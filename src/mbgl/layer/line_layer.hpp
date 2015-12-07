@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class LineLayoutProperties {
+class LineLayoutProperties final {
 public:
     LayoutProperty<CapType> cap { CapType::Butt };
     LayoutProperty<JoinType> join { JoinType::Miter };
@@ -15,7 +15,7 @@ public:
     LayoutProperty<float> roundLimit { 1.0f };
 };
 
-class LinePaintProperties {
+class LinePaintProperties final {
 public:
     PaintProperty<float> opacity { 1.0f };
     PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
@@ -36,7 +36,7 @@ public:
     }
 };
 
-class LineLayer : public StyleLayer {
+class LineLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

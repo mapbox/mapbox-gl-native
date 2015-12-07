@@ -30,14 +30,14 @@ protected:
     GLint a_data2 = -1;
 };
 
-class SDFGlyphShader : public SDFShader {
+class SDFGlyphShader final : public SDFShader {
 public:
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 };
 
-class SDFIconShader : public SDFShader {
+class SDFIconShader final : public SDFShader {
 public:
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 };
 
 } // namespace mbgl

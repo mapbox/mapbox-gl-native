@@ -36,7 +36,7 @@ namespace mbgl {
 
 class AnnotationTileLayer;
 
-class PointAnnotationImpl {
+class PointAnnotationImpl final {
 public:
     using Map = std::map<AnnotationID, std::shared_ptr<PointAnnotationImpl>>;
     using Tree = boost::geometry::index::rtree<std::shared_ptr<const PointAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;

@@ -19,7 +19,7 @@ class OutlineShader;
 class PlainShader;
 class PatternShader;
 
-class FillBucket : public Bucket {
+class FillBucket final : public Bucket {
 
     static void *alloc(void *data, unsigned int size);
     static void *realloc(void *data, void *ptr, unsigned int size);

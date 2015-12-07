@@ -10,7 +10,7 @@ namespace mbgl {
 
 class VectorTileLayer;
 
-class VectorTileFeature : public GeometryTileFeature {
+class VectorTileFeature final : public GeometryTileFeature {
 public:
     VectorTileFeature(pbf, const VectorTileLayer&);
 
@@ -26,7 +26,7 @@ private:
     pbf geometry_pbf;
 };
 
-class VectorTileLayer : public GeometryTileLayer {
+class VectorTileLayer final : public GeometryTileLayer {
 public:
     VectorTileLayer(pbf);
 
@@ -44,7 +44,7 @@ private:
     std::vector<pbf> features;
 };
 
-class VectorTile : public GeometryTile {
+class VectorTile final : public GeometryTile {
 public:
     VectorTile(std::shared_ptr<const std::string> data);
 
@@ -59,7 +59,7 @@ private:
 class SourceInfo;
 class TileID;
 
-class VectorTileMonitor : public GeometryTileMonitor {
+class VectorTileMonitor final : public GeometryTileMonitor {
 public:
     VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
 

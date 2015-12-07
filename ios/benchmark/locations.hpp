@@ -7,7 +7,7 @@
 namespace mbgl {
 namespace bench {
 
-struct Location {
+struct Location final {
     const std::string name;
     const double longitude;
     const double latitude;

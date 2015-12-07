@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-class OutlineShader : public Shader {
+class OutlineShader final : public Shader {
 public:
     OutlineShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>                u_matrix = {"u_matrix", *this};
     Uniform<std::array<GLfloat, 4>> u_color  = {"u_color",  *this};

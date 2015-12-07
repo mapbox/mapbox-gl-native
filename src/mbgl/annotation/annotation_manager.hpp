@@ -21,7 +21,7 @@ class AnnotationTile;
 class AnnotationTileMonitor;
 class Style;
 
-class AnnotationManager : private util::noncopyable {
+class AnnotationManager final : private util::noncopyable {
 public:
     AnnotationManager(float pixelRatio);
     ~AnnotationManager();

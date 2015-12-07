@@ -25,7 +25,7 @@ enum class ThreadType : uint8_t {
     Unknown,
 };
 
-struct ThreadContext {
+struct ThreadContext final {
 public:
     ThreadContext(const std::string& name, ThreadType type, ThreadPriority priority);
 

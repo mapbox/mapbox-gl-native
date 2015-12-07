@@ -10,10 +10,10 @@
 
 #include <atomic>
 
-class GLFWView : public mbgl::View {
+class GLFWView final : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
-    ~GLFWView();
+    ~GLFWView() override;
 
     float getPixelRatio() const override;
     std::array<uint16_t, 2> getSize() const override;

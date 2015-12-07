@@ -32,14 +32,14 @@ namespace util {
 template <class T> class Thread;
 } // namespace util
 
-struct EdgeInsets {
+struct EdgeInsets final {
     double top = 0;
     double left = 0;
     double bottom = 0;
     double right = 0;
 };
 
-class Map : private util::noncopyable {
+class Map final : private util::noncopyable {
     friend class View;
 
 public:

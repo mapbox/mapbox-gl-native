@@ -16,7 +16,7 @@ namespace mbgl {
 
 class RequestBase;
 
-class DefaultFileRequest : public FileRequest {
+class DefaultFileRequest final : public FileRequest {
 public:
     DefaultFileRequest(const Resource& resource_,
                        DefaultFileSource& fileSource_)
@@ -24,7 +24,7 @@ public:
           fileSource(fileSource_) {
     }
 
-    ~DefaultFileRequest() {
+    ~DefaultFileRequest() override {
         fileSource.cancel(resource, this);
     }
 
@@ -34,7 +34,7 @@ public:
     std::unique_ptr<WorkRequest> workRequest;
 };
 
-class DefaultFileRequestImpl : public util::noncopyable {
+class DefaultFileRequestImpl final : public util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
 
@@ -84,7 +84,7 @@ private:
     int failedRequests = 0;
 };
 
-class DefaultFileSource::Impl {
+class DefaultFileSource::Impl final {
 public:
     using Callback = std::function<void (Response)>;
 

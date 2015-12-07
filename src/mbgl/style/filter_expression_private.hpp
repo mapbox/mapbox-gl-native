@@ -5,7 +5,7 @@
 namespace mbgl {
 
 template <class Extractor>
-struct Evaluator : public mapbox::util::static_visitor<bool>
+struct Evaluator final : public mapbox::util::static_visitor<bool>
 {
     const Extractor& extractor;
 

@@ -9,7 +9,7 @@ namespace mbgl {
 namespace util {
 
 template <class T>
-class exclusive {
+class exclusive final {
 public:
     inline exclusive(T* val, std::unique_ptr<std::lock_guard<std::mutex>> mtx) : ptr(val), lock(std::move(mtx)) {}
 

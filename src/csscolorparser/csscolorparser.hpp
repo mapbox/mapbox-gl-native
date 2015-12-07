@@ -29,7 +29,7 @@
 
 namespace CSSColorParser {
 
-struct Color {
+struct Color final {
     inline Color() {}
     inline Color(unsigned char r_, unsigned char g_, unsigned char b_, float a_)
         : r(r_), g(g_), b(b_), a(a_) {}

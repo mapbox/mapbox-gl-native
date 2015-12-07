@@ -17,7 +17,7 @@ namespace util {
 
 typedef void * LOOP_HANDLE;
 
-class RunLoop : private util::noncopyable {
+class RunLoop final : private util::noncopyable {
 public:
     enum class Type : uint8_t {
         Default,
@@ -111,7 +111,7 @@ private:
     MBGL_STORE_THREAD(tid)
 
     template <class F, class P>
-    class Invoker : public WorkTask {
+    class Invoker final : public WorkTask {
     public:
         Invoker(F&& f, P&& p, std::shared_ptr<std::atomic<bool>> canceled_ = nullptr)
           : canceled(std::move(canceled_)),

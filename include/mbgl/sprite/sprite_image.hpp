@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class SpriteImage : private util::noncopyable {
+class SpriteImage final : private util::noncopyable {
 public:
     SpriteImage(
         uint16_t width, uint16_t height, float pixelRatio, std::string&& data, bool sdf = false);

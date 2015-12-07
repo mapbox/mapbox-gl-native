@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class CircleVertexBuffer : public Buffer<
+class CircleVertexBuffer final : public Buffer<
     4 // 2 bytes per short * 4 of them.
 > {
 public:

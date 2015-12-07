@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class Response {
+class Response final {
 public:
     Response() = default;
     Response(const Response&);
@@ -32,7 +32,7 @@ public:
     std::string etag;
 };
 
-class Response::Error {
+class Response::Error final {
 public:
     enum class Reason : uint8_t {
         // Success = 1, // Reserve 1 for Success.

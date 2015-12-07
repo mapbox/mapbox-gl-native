@@ -11,7 +11,7 @@ namespace mbgl {
 
 // The MockFileSource is a FileSource that can simulate different
 // types of failures and it will work completely offline.
-class MockFileSource : public FileSource {
+class MockFileSource final : public FileSource {
 public:
     // Success:
     //     Will reply to every request correctly with valid data.

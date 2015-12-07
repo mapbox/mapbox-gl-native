@@ -65,7 +65,7 @@ class CollisionBoxShader;
 
 struct ClipID;
 
-class Painter : private util::noncopyable {
+class Painter final : private util::noncopyable {
 public:
     Painter(MapData&, TransformState&);
     ~Painter();

@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class PropertyTransition {
+class PropertyTransition final {
 public:
     mapbox::util::optional<Duration> duration;
     mapbox::util::optional<Duration> delay;

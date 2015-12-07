@@ -12,10 +12,10 @@ class StyleLayer;
 class TexturePool;
 class WorkRequest;
 
-class RasterTileData : public TileData {
+class RasterTileData final : public TileData {
 public:
     RasterTileData(const TileID&, TexturePool&, const SourceInfo&, Worker&);
-    ~RasterTileData();
+    ~RasterTileData() override;
 
     using Callback = std::function<void()>;
 

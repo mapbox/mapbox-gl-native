@@ -14,8 +14,7 @@
 
 namespace node_mbgl {
 
-class NodeMap : public Nan::ObjectWrap,
-                public mbgl::FileSource {
+class NodeMap final : public Nan::ObjectWrap, public mbgl::FileSource {
 public:
     struct RenderOptions;
     class RenderWorker;

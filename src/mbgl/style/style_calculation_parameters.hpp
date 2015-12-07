@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class StyleCalculationParameters {
+class StyleCalculationParameters final {
 public:
     explicit StyleCalculationParameters(float z_)
         : z(z_) {}

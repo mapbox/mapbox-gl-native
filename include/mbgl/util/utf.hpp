@@ -9,7 +9,7 @@ namespace mbgl {
 
 namespace util {
 
-class utf8_to_utf32 {
+class utf8_to_utf32 final {
  public:
     static std::u32string convert(std::string const& utf8)
     {

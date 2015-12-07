@@ -10,7 +10,7 @@
 namespace mbgl {
 namespace util {
 
-class GLObjectStore : private util::noncopyable {
+class GLObjectStore final : private util::noncopyable {
 public:
     GLObjectStore() = default;
 

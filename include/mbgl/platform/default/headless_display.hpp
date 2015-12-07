@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class HeadlessDisplay {
+class HeadlessDisplay final {
 public:
     HeadlessDisplay();
     ~HeadlessDisplay();

@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-class TexturePool : private util::noncopyable {
+class TexturePool final : private util::noncopyable {
 
 public:
     GLuint getTextureID();

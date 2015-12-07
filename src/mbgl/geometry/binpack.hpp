@@ -9,7 +9,7 @@
 namespace mbgl {
 
 template <typename T>
-class BinPack : private util::noncopyable {
+class BinPack final : private util::noncopyable {
 public:
     BinPack(T width, T height)
         : free(1, Rect<uint16_t>{ 0, 0, width, height }) {}

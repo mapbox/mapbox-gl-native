@@ -32,7 +32,7 @@ class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 
-class SymbolFeature {
+class SymbolFeature final {
 public:
     std::vector<std::vector<Coordinate>> geometry;
     std::u32string label;
@@ -41,7 +41,7 @@ public:
 
 struct Anchor;
 
-class SymbolInstance {
+class SymbolInstance final {
     public:
         explicit SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
                 const Shaping& shapedText, const PositionedIcon& shapedIcon,
@@ -59,7 +59,7 @@ class SymbolInstance {
         CollisionFeature iconCollisionFeature;
 };
 
-class SymbolBucket : public Bucket {
+class SymbolBucket final : public Bucket {
     typedef ElementGroup<1> TextElementGroup;
     typedef ElementGroup<2> IconElementGroup;
     typedef ElementGroup<1> CollisionBoxElementGroup;
@@ -124,20 +124,20 @@ private:
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 
-    struct SymbolRenderData {
-        struct TextBuffer {
+    struct SymbolRenderData final {
+        struct TextBuffer final {
             TextVertexBuffer vertices;
             TriangleElementsBuffer triangles;
             std::vector<std::unique_ptr<TextElementGroup>> groups;
         } text;
 
-        struct IconBuffer {
+        struct IconBuffer final {
             IconVertexBuffer vertices;
             TriangleElementsBuffer triangles;
             std::vector<std::unique_ptr<IconElementGroup>> groups;
         } icon;
 
-        struct CollisionBoxBuffer {
+        struct CollisionBoxBuffer final {
             CollisionBoxVertexBuffer vertices;
             std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
         } collisionBox;

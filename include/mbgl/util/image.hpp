@@ -12,7 +12,7 @@ enum ImageAlphaMode {
 };
 
 template <ImageAlphaMode Mode>
-class Image {
+class Image final {
 public:
     Image() = default;
 

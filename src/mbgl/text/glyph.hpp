@@ -16,7 +16,7 @@ typedef std::pair<uint16_t, uint16_t> GlyphRange;
 // Note: this only works for the BMP
 GlyphRange getGlyphRange(char32_t glyph);
 
-struct GlyphMetrics {
+struct GlyphMetrics final  {
     operator bool() const {
         return !(width == 0 && height == 0 && advance == 0);
     }
@@ -30,7 +30,7 @@ struct GlyphMetrics {
 
 };
 
-struct Glyph {
+struct Glyph final {
     inline explicit Glyph() : rect(0, 0, 0, 0), metrics() {}
     inline explicit Glyph(const Rect<uint16_t> &rect_,
                           const GlyphMetrics &metrics_)
@@ -46,7 +46,7 @@ struct Glyph {
 
 typedef std::map<uint32_t, Glyph> GlyphPositions;
 
-class PositionedGlyph {
+class PositionedGlyph final {
 public:
     inline explicit PositionedGlyph(uint32_t glyph_, float x_, float y_)
         : glyph(glyph_), x(x_), y(y_) {}
@@ -56,7 +56,7 @@ public:
     float y = 0;
 };
 
-class Shaping {
+class Shaping final {
     public:
     inline explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
     inline explicit Shaping(float x, float y, std::u32string text_)
@@ -71,7 +71,7 @@ class Shaping {
     operator bool() const { return !positionedGlyphs.empty(); }
 };
 
-class SDFGlyph {
+class SDFGlyph final {
 public:
     uint32_t id = 0;
 

@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-struct Resource {
+struct Resource final {
     enum Kind : uint8_t {
         Unknown = 0,
         Style,
@@ -24,7 +24,7 @@ struct Resource {
         return kind == res.kind && url == res.url;
     }
 
-    struct Hash {
+    struct Hash final {
         std::size_t operator()(Resource const& r) const {
             return std::hash<std::string>()(r.url) ^ (std::hash<uint8_t>()(r.kind) << 1);
         }

@@ -14,7 +14,7 @@ namespace mbgl {
 class StyleCalculationParameters;
 
 template <typename T>
-class Function {
+class Function final {
 public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
@@ -35,7 +35,7 @@ private:
 
 // Partial specialization for cross-faded properties (*-pattern, line-dasharray).
 template <typename T>
-class Function<Faded<T>> {
+class Function<Faded<T>> final {
 public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;

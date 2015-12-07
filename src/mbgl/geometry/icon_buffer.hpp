@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-    class IconVertexBuffer : public Buffer<
+    class IconVertexBuffer final : public Buffer<
     16
     > {
     public:

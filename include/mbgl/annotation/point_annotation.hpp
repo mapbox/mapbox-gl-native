@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class PointAnnotation {
+class PointAnnotation final {
 public:
     inline PointAnnotation(const LatLng& position_, const std::string& icon_ = "")
         : position(position_), icon(icon_) {

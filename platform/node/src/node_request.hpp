@@ -13,7 +13,7 @@ namespace node_mbgl {
 
 class NodeFileSource;
 
-class NodeRequest : public Nan::ObjectWrap {
+class NodeRequest final : public Nan::ObjectWrap {
 public:
     static NAN_MODULE_INIT(Init);
 

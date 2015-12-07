@@ -60,7 +60,7 @@ namespace gl {
     void mbx_trapExtension(const char *name, GLuint array);
 #endif
     
-struct Error : ::std::runtime_error {
+struct Error final : ::std::runtime_error {
     inline Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
     const GLenum code;
 };
@@ -68,7 +68,7 @@ struct Error : ::std::runtime_error {
 void checkError(const char *cmd, const char *file, int line);
 
 #if defined(DEBUG)
-#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { inline ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
+#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E final { inline ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
 #else
 #define MBGL_CHECK_ERROR(cmd) (cmd)
 #endif
@@ -88,7 +88,7 @@ template <class>
 class ExtensionFunction;
 
 template <class R, class... Args>
-class ExtensionFunction<R (Args...)> : protected ExtensionFunctionBase {
+class ExtensionFunction<R (Args...)> final : protected ExtensionFunctionBase {
 public:
     ExtensionFunction(std::initializer_list<Probe> probes_) {
         probes = probes_;

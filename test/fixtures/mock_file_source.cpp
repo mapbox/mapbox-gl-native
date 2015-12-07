@@ -18,7 +18,7 @@ public:
           fileSource(fileSource_) {
     }
 
-    ~MockFileRequest() {
+    ~MockFileRequest() override {
         fileSource.cancel(this);
     }
 

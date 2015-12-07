@@ -10,7 +10,7 @@ namespace mbgl {
 
 class PropertyTransition;
 
-class StyleCascadeParameters {
+class StyleCascadeParameters final {
 public:
     StyleCascadeParameters(const std::vector<ClassID>& classes_,
                            const TimePoint& now_,

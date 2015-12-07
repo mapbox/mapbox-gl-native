@@ -11,7 +11,7 @@
 namespace mbgl {
 
 template <GLsizei count>
-struct ElementGroup : public util::noncopyable {
+struct ElementGroup final : public util::noncopyable {
     std::array<VertexArrayObject, count> array;
     GLsizei vertex_length;
     GLsizei elements_length;
@@ -23,7 +23,7 @@ struct ElementGroup : public util::noncopyable {
     }
 };
 
-class TriangleElementsBuffer : public Buffer<
+class TriangleElementsBuffer final : public Buffer<
     6, // bytes per triangle (3 * unsigned short == 6 bytes)
     GL_ELEMENT_ARRAY_BUFFER
 > {
@@ -34,7 +34,7 @@ public:
 };
 
 
-class LineElementsBuffer : public Buffer<
+class LineElementsBuffer final : public Buffer<
     4, // bytes per triangle (2 * unsigned short == 6 bytes)
     GL_ELEMENT_ARRAY_BUFFER
 > {

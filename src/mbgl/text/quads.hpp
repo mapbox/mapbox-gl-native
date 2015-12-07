@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-    struct SymbolQuad {
+    struct SymbolQuad final {
         explicit SymbolQuad(const vec2<float> &tl_, const vec2<float> &tr_,
                 const vec2<float> &bl_, const vec2<float> &br_,
                 const Rect<uint16_t> &tex_, float angle_, const vec2<float> &anchorPoint_,

@@ -11,7 +11,7 @@ class TileID;
 
 using PrecisionPoint = vec2<double>;
 
-struct LatLng {
+struct LatLng final {
     double latitude = 0;
     double longitude = 0;
 
@@ -28,7 +28,7 @@ struct LatLng {
     PrecisionPoint project() const;
 };
 
-struct ProjectedMeters {
+struct ProjectedMeters final {
     double northing = 0;
     double easting = 0;
 
@@ -40,7 +40,7 @@ struct ProjectedMeters {
     }
 };
 
-struct LatLngBounds {
+struct LatLngBounds final {
     LatLng sw = {-90, -180};
     LatLng ne = {90, 180};
 
@@ -88,7 +88,7 @@ struct LatLngBounds {
     }
 };
 
-struct MetersBounds {
+struct MetersBounds final {
     ProjectedMeters sw;
     ProjectedMeters ne;
 

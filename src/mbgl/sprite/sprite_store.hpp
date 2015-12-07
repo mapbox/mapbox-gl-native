@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class SpriteStore : private util::noncopyable {
+class SpriteStore final : private util::noncopyable {
 public:
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
 

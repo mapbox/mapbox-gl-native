@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-class LinepatternShader : public Shader {
+class LinepatternShader final : public Shader {
 public:
     LinepatternShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>                u_matrix         = {"u_matrix",         *this};
     UniformMatrix<4>                u_exmatrix       = {"u_exmatrix",       *this};

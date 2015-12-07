@@ -14,7 +14,7 @@
 
 namespace {
 
-struct FDHolder {
+struct FDHolder final {
     FDHolder(int fd_) : fd(fd_) {}
 
     ~FDHolder() {
@@ -24,7 +24,7 @@ struct FDHolder {
     int fd;
 };
 
-class FileIOWorker {
+class FileIOWorker final {
 public:
     FileIOWorker() = default;
 
@@ -63,13 +63,13 @@ namespace mbgl {
 
 using namespace std::placeholders;
 
-class AssetRequest : public RequestBase {
+class AssetRequest final : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
     AssetRequest(const Resource&, Callback, const std::string& assetRoot,
                  util::Thread<FileIOWorker> *worker);
-    ~AssetRequest();
+    ~AssetRequest() override;
 
     // RequestBase implementation.
     void cancel() final;
@@ -94,7 +94,7 @@ private:
     std::unique_ptr<WorkRequest> request;
 };
 
-class AssetFSContext : public AssetContextBase {
+class AssetFSContext final : public AssetContextBase {
 public:
     AssetFSContext()
         : worker({"FileIOWorker", util::ThreadType::Worker, util::ThreadPriority::Regular}) {}

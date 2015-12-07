@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class FontStack {
+class FontStack final {
 public:
     void insert(uint32_t id, const SDFGlyph &glyph);
     const std::map<uint32_t, GlyphMetrics> &getMetrics() const;

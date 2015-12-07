@@ -9,13 +9,13 @@
 
 namespace mbgl {
 
-typedef struct {
+struct LinePatternPos final {
     float width;
     float height;
     float y;
-} LinePatternPos;
+};
 
-class LineAtlas {
+class LineAtlas final {
 public:
     LineAtlas(GLsizei width, GLsizei height);
     ~LineAtlas();

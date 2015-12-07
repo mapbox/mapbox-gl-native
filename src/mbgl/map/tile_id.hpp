@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-class TileID {
+class TileID final {
 public:
     const int16_t w = 0;
     const int8_t z = 0;
@@ -25,7 +25,7 @@ public:
         return ((std::pow(2, z) * y + x) * 32) + z;
     }
 
-    struct Hash {
+    struct Hash final {
         std::size_t operator()(const TileID& id) const {
             return std::hash<uint64_t>()(id.to_uint64());
         }

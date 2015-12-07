@@ -1,1 +1,1 @@
-Checks: 'misc-throw-by-value-catch-by-reference,llvm-namespace-comment,llvm-header-guard,-clang-analyzer-security.insecureAPI.rand'
+Checks: 'misc-throw-by-value-catch-by-reference,llvm-namespace-comment,llvm-header-guard,modernize-use-override,modernize-use-default,-clang-analyzer-security.insecureAPI.rand'

@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class Projection {
+class Projection final {
 
 public:
     static inline MetersBounds getWorldBoundsMeters() {

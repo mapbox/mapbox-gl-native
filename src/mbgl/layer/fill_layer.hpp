@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class FillPaintProperties {
+class FillPaintProperties final {
 public:
     PaintProperty<bool> antialias { true };
     PaintProperty<float> opacity { 1.0f };
@@ -17,7 +17,7 @@ public:
     PaintProperty<std::string, Faded<std::string>> pattern { "" };
 };
 
-class FillLayer : public StyleLayer {
+class FillLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

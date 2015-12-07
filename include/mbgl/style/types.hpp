@@ -13,7 +13,7 @@ typedef std::array<float, 4> Color;
 
 
 template <typename T>
-struct Faded {
+struct Faded final {
     Faded() = default;
     Faded(const T& v) : to(v) {}
 

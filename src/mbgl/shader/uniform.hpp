@@ -7,7 +7,7 @@
 namespace mbgl {
 
 template <typename T>
-class Uniform {
+class Uniform final {
 public:
     Uniform(const GLchar* name, const Shader& shader) : current() {
          location = MBGL_CHECK_ERROR(glGetUniformLocation(shader.program, name));
@@ -28,7 +28,7 @@ private:
 };
 
 template <size_t C, size_t R = C>
-class UniformMatrix {
+class UniformMatrix final {
 public:
     typedef std::array<float, C*R> T;
 

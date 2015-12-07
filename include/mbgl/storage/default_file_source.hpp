@@ -10,7 +10,7 @@ namespace util {
 template <typename T> class Thread;
 } // namespace util
 
-class DefaultFileSource : public FileSource {
+class DefaultFileSource final : public FileSource {
 public:
     DefaultFileSource(FileCache *cache, const std::string &root = "");
     ~DefaultFileSource() override;

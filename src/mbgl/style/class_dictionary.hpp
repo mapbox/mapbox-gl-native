@@ -13,7 +13,7 @@ enum class ClassID : uint32_t {
     Named = 2 // These values (and all subsequent IDs) are from a named style from the layer
 };
 
-class ClassDictionary {
+class ClassDictionary final {
 private:
     ClassDictionary();
 

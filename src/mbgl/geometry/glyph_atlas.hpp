@@ -14,7 +14,7 @@
 
 namespace mbgl {
 
-class GlyphAtlas : public util::noncopyable {
+class GlyphAtlas final : public util::noncopyable {
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
     ~GlyphAtlas();
@@ -37,7 +37,7 @@ public:
     const GLsizei height;
 
 private:
-    struct GlyphValue {
+    struct GlyphValue final {
         GlyphValue(const Rect<uint16_t>& rect_, uintptr_t id)
             : rect(rect_), ids({ id }) {}
         Rect<uint16_t> rect;

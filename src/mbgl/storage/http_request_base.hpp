@@ -13,8 +13,8 @@ public:
         , cancelled(false) {
     }
 
-    virtual ~HTTPRequestBase() = default;
-    virtual void cancel() override { cancelled = true; };
+    ~HTTPRequestBase() override = default;
+    void cancel() override { cancelled = true; };
 
 protected:
     static Seconds parseCacheControl(const char *value);

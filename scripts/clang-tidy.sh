@@ -16,4 +16,6 @@ command -v ${CLANG_TIDY:-clang-tidy} >/dev/null 2>&1 || {
 cd build/${HOST}-${HOST_VERSION}/${BUILDTYPE}
 
 git ls-files '../../../src/mbgl/*.cpp' '../../../platform/*.cpp' '../../../test/*.cpp' | \
-    xargs -I{} -P ${JOBS} ${CLANG_TIDY:-clang-tidy} -header-filter='\/mbgl\/' {}
+    xargs -I{} -P ${JOBS} ${CLANG_TIDY:-clang-tidy} \
+    -header-filter='\/mbgl\/' \
+    -line-filter='[{"name":"gtest.h"}]' {}

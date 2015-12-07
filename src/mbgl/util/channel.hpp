@@ -10,7 +10,7 @@
 namespace mbgl {
 
 template <class T>
-class Channel : public mbgl::util::noncopyable {
+class Channel final : public mbgl::util::noncopyable {
 public:
     void send(const T& t) {
         std::unique_lock<std::mutex> lock(mutex);

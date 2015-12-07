@@ -11,7 +11,7 @@ namespace mbgl {
 namespace gl {
 
 template <typename T>
-class Value {
+class Value final {
 public:
     inline void operator=(const typename T::Type& value) {
         if (dirty || current != value) {
@@ -36,7 +36,7 @@ private:
     bool dirty = false;
 };
 
-struct ClearDepth {
+struct ClearDepth final {
     using Type = GLfloat;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -49,8 +49,8 @@ struct ClearDepth {
     }
 };
 
-struct ClearColor {
-    struct Type { GLfloat r, g, b, a; };
+struct ClearColor final {
+    struct Type final { GLfloat r, g, b, a; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glClearColor(value.r, value.g, value.b, value.a));
@@ -66,7 +66,7 @@ inline bool operator!=(const ClearColor::Type& a, const ClearColor::Type& b) {
     return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
 }
 
-struct ClearStencil {
+struct ClearStencil final {
     using Type = GLint;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -79,7 +79,7 @@ struct ClearStencil {
     }
 };
 
-struct StencilMask {
+struct StencilMask final {
     using Type = GLuint;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -92,7 +92,7 @@ struct StencilMask {
     }
 };
 
-struct DepthMask {
+struct DepthMask final {
     using Type = GLboolean;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -105,8 +105,8 @@ struct DepthMask {
     }
 };
 
-struct ColorMask {
-    struct Type { bool r, g, b, a; };
+struct ColorMask final {
+    struct Type final { bool r, g, b, a; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glColorMask(value.r, value.g, value.b, value.a));
@@ -123,8 +123,8 @@ inline bool operator!=(const ColorMask::Type& a, const ColorMask::Type& b) {
     return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
 }
 
-struct StencilFunc {
-    struct Type { GLenum func; GLint ref; GLuint mask; };
+struct StencilFunc final {
+    struct Type final { GLenum func; GLint ref; GLuint mask; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilFunc(value.func, value.ref, value.mask));
@@ -142,7 +142,7 @@ inline bool operator!=(const StencilFunc::Type& a, const StencilFunc::Type& b) {
     return a.func != b.func || a.ref != b.ref || a.mask != b.mask;
 }
 
-struct StencilTest {
+struct StencilTest final {
     using Type = bool;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -155,8 +155,8 @@ struct StencilTest {
     }
 };
 
-struct StencilOp {
-    struct Type { GLenum sfail, dpfail, dppass; };
+struct StencilOp final {
+    struct Type final { GLenum sfail, dpfail, dppass; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilOp(value.sfail, value.dpfail, value.dppass));
@@ -170,8 +170,8 @@ struct StencilOp {
     }
 };
 
-struct DepthRange {
-    struct Type { GLfloat near, far; };
+struct DepthRange final {
+    struct Type final { GLfloat near, far; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glDepthRange(value.near, value.far));
@@ -187,7 +187,7 @@ inline bool operator!=(const DepthRange::Type& a, const DepthRange::Type& b) {
     return a.near != b.near || a.far != b.far;
 }
 
-struct DepthTest {
+struct DepthTest final {
     using Type = bool;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -200,7 +200,7 @@ struct DepthTest {
     }
 };
 
-struct DepthFunc {
+struct DepthFunc final {
     using Type = GLenum;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -213,7 +213,7 @@ struct DepthFunc {
     }
 };
 
-struct Blend {
+struct Blend final {
     using Type = bool;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -226,8 +226,8 @@ struct Blend {
     }
 };
 
-struct BlendFunc {
-    struct Type { GLenum sfactor, dfactor; };
+struct BlendFunc final {
+    struct Type final { GLenum sfactor, dfactor; };
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBlendFunc(value.sfactor, value.dfactor));
@@ -240,7 +240,7 @@ struct BlendFunc {
     }
 };
 
-struct Program {
+struct Program final {
     using Type = GLuint;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -253,7 +253,7 @@ struct Program {
     }
 };
 
-struct LineWidth {
+struct LineWidth final {
     using Type = GLfloat;
     static const Type Default;
     inline static void Set(const Type& value) {
@@ -266,7 +266,7 @@ struct LineWidth {
     }
 };
 
-class Config {
+class Config final {
 public:
     void reset() {
         stencilFunc.reset();

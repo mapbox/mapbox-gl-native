@@ -16,7 +16,7 @@ class WorkRequest;
 class FileRequest;
 class GeometryTileMonitor;
 
-class VectorTileData : public TileData {
+class VectorTileData final : public TileData {
 public:
     VectorTileData(const TileID&,
                    std::unique_ptr<GeometryTileMonitor> monitor,
@@ -24,7 +24,7 @@ public:
                    Style&,
                    const std::function<void()>& callback);
 
-    ~VectorTileData();
+    ~VectorTileData() override;
 
     Bucket* getBucket(const StyleLayer&) override;
 

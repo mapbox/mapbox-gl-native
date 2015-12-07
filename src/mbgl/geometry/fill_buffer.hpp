@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class FillVertexBuffer : public Buffer<
+class FillVertexBuffer final : public Buffer<
     4 // bytes per coordinates (2 * unsigned short == 4 bytes)
 > {
 public:

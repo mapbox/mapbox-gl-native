@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace mbgl {
-    class CollisionBox {
+    class CollisionBox final {
         public:
             explicit CollisionBox(const vec2<float> &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
                 anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
@@ -29,7 +29,7 @@ namespace mbgl {
             float placementScale = 0.0f;
     };
 
-    class CollisionFeature {
+    class CollisionFeature final {
         public:
             // for text
             inline explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,

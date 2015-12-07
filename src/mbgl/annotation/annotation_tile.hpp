@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-class AnnotationTileFeature : public GeometryTileFeature {
+class AnnotationTileFeature final : public GeometryTileFeature {
 public:
     AnnotationTileFeature(FeatureType, GeometryCollection,
                           std::unordered_map<std::string, std::string> properties = {{}});
@@ -23,7 +23,7 @@ public:
     const GeometryCollection geometries;
 };
 
-class AnnotationTileLayer : public GeometryTileLayer {
+class AnnotationTileLayer final : public GeometryTileLayer {
 public:
     std::size_t featureCount() const override { return features.size(); }
     util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override { return features[i]; }
@@ -31,7 +31,7 @@ public:
     std::vector<util::ptr<const AnnotationTileFeature>> features;
 };
 
-class AnnotationTile : public GeometryTile {
+class AnnotationTile final : public GeometryTile {
 public:
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 
@@ -40,11 +40,11 @@ public:
 
 class MapData;
 
-class AnnotationTileMonitor : public GeometryTileMonitor {
+class AnnotationTileMonitor final : public GeometryTileMonitor {
 public:
     // TODO: should just take AnnotationManager&, but we need to eliminate util::exclusive<AnnotationManager> from MapData first.
     AnnotationTileMonitor(const TileID&, MapData&);
-    ~AnnotationTileMonitor();
+    ~AnnotationTileMonitor() override;
 
     void update(std::unique_ptr<GeometryTile>);
     std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;

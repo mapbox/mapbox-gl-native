@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-struct CameraOptions {
+struct CameraOptions final {
     mapbox::util::optional<LatLng> center;
     mapbox::util::optional<double> zoom;
     mapbox::util::optional<double> angle;

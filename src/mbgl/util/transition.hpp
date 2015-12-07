@@ -34,7 +34,7 @@ protected:
 };
 
 template <typename T>
-class ease_transition : public transition {
+class ease_transition final : public transition {
 public:
     ease_transition(T from_, T to_, T& value_, const TimePoint& start_, const Duration& duration_)
         : transition(start_, duration_),
@@ -42,7 +42,7 @@ public:
           to(to_),
           value(value_) {}
 
-    state update(const TimePoint& now) const;
+    state update(const TimePoint& now) const override;
 
 private:
     const T from, to;
@@ -51,14 +51,14 @@ private:
 };
 
 template <typename T>
-class timeout : public transition {
+class timeout final : public transition {
 public:
     timeout(T final_value_, T& value_, const TimePoint& start_, const Duration& duration_)
         : transition(start_, duration_),
           final_value(final_value_),
           value(value_) {}
 
-    state update(const TimePoint& now) const {
+    state update(const TimePoint& now) const override {
         if (progress(now) >= 1) {
             value = final_value;
             return complete;

@@ -27,7 +27,7 @@ class SymbolLayer;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
-class TileParseResultBuckets {
+class TileParseResultBuckets final {
 public:
     TileData::State state = TileData::State::invalid;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
@@ -36,7 +36,7 @@ public:
 using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
                                               std::string>;           // error
 
-class TileWorker : public util::noncopyable {
+class TileWorker final : public util::noncopyable {
 public:
     TileWorker(TileID,
                std::string sourceID,

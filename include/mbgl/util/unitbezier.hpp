@@ -31,7 +31,7 @@
 namespace mbgl {
 namespace util {
 
-struct UnitBezier {
+struct UnitBezier final {
     UnitBezier(double p1x, double p1y, double p2x, double p2y) {
         // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and (1,1).
         cx = 3.0 * p1x;

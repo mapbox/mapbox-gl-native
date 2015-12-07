@@ -20,7 +20,7 @@ class LineShader;
 class LineSDFShader;
 class LinepatternShader;
 
-class LineBucket : public Bucket {
+class LineBucket final : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
@@ -39,7 +39,7 @@ public:
     void drawLinePatterns(LinepatternShader& shader);
 
 private:
-    struct TriangleElement {
+    struct TriangleElement final {
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
         uint16_t a, b, c;
     };

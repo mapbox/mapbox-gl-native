@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #define SCOPED_TEST(name) \
-    static class name { \
+    static class name final { \
         bool completed = false; \
     public: \
         void finish() { EXPECT_FALSE(completed) << #name " was already completed."; completed = true; } \

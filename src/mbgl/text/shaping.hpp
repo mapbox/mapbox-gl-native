@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-    class PositionedIcon {
+    class PositionedIcon final {
         public:
             inline explicit PositionedIcon() {}
             inline explicit PositionedIcon(Rect<uint16_t> _image,

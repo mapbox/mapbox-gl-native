@@ -11,7 +11,7 @@ namespace util {
 template <typename T> class Thread;
 } // namespace util
 
-class SQLiteCache : public FileCache {
+class SQLiteCache final : public FileCache {
 public:
     SQLiteCache(const std::string &path = ":memory:");
     ~SQLiteCache() override;
@@ -26,7 +26,7 @@ private:
     const std::unique_ptr<util::Thread<Impl>> thread;
 };
 
-class SharedSQLiteCache : util::noncopyable {
+class SharedSQLiteCache final : util::noncopyable {
 public:
     static std::shared_ptr<SQLiteCache> get(const std::string &path = ":memory:");
 

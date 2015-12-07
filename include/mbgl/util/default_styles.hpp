@@ -8,7 +8,7 @@ namespace mbgl {
 namespace util {
 namespace default_styles {
 
-struct DefaultStyle {
+struct DefaultStyle final {
     const char* url;
     const char* name;
 };

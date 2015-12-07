@@ -10,7 +10,7 @@ class RasterShader;
 class StaticVertexBuffer;
 class VertexArrayObject;
 
-class RasterBucket : public Bucket {
+class RasterBucket final : public Bucket {
 public:
     RasterBucket(TexturePool&);
 

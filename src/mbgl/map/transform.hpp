@@ -17,7 +17,7 @@ namespace mbgl {
 
 class View;
 
-class Transform : private util::noncopyable {
+class Transform final : private util::noncopyable {
 public:
     Transform(View&, ConstrainMode);
 
