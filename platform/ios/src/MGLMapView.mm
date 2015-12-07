@@ -2508,8 +2508,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // add sprite
     auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-        std::move(cPremultipliedImage), 
-        float(annotationImage.image.scale));
+        std::move(cPremultipliedImage),
+        float(annotationImage.image.scale),
+        Boolean(false),
+        mbgl::vec2<float>{static_cast<float>(annotationImage.centerOffset.x), static_cast<float>(annotationImage.centerOffset.y)});
 
     // sprite upload
     NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
