@@ -62,8 +62,8 @@ extern const char *revision;
 extern const char *string;
 extern const unsigned int number;
 
-}}
-}}
+}} // namespace version
+}} // namespace mbgl
 
 #endif
 """.format(

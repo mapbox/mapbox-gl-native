@@ -45,6 +45,6 @@ public:
     Style& style;
 };
 
-}
+} // namespace mbgl
 
 #endif
