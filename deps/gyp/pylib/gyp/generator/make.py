@@ -1480,7 +1480,8 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
       libraries = spec.get('libraries')
       if libraries:
         # Remove duplicate entries
-        libraries = gyp.common.uniquer(libraries)
+        # Commented out due to https://code.google.com/p/gyp/issues/detail?id=419
+        # libraries = gyp.common.uniquer(libraries)
         if self.flavor == 'mac':
           libraries = self.xcode_settings.AdjustLibraries(libraries)
       self.WriteList(libraries, 'LIBS')
