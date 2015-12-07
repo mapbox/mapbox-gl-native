@@ -196,6 +196,9 @@ public:
     BOOL _isTargetingInterfaceBuilder;
     CLLocationDegrees _pendingLatitude;
     CLLocationDegrees _pendingLongitude;
+    
+    /// True if the view is currently printing itself.
+    BOOL _isPrinting;
 }
 
 #pragma mark Lifecycle
@@ -793,6 +796,21 @@ public:
             break;
         }
     }
+}
+
+#pragma mark Printing
+
+- (void)print:(__unused id)sender {
+    _isPrinting = YES;
+    [self invalidate];
+}
+
+- (void)printWithImage:(NSImage *)image {
+    NSImageView *imageView = [[NSImageView alloc] initWithFrame:self.bounds];
+    imageView.image = image;
+    
+    NSPrintOperation *op = [NSPrintOperation printOperationWithView:imageView];
+    [op runOperation];
 }
 
 #pragma mark Viewport
@@ -2213,7 +2231,37 @@ public:
         activate();
     }
     
-    void afterRender() override {}
+    void afterRender() override {
+        if (nativeView->_isPrinting) {
+            nativeView->_isPrinting = NO;
+            std::string png = encodePNG(readStillImage());
+            NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
+            NSImage *image = [[NSImage alloc] initWithData:data];
+            [nativeView performSelectorOnMainThread:@selector(printWithImage:)
+                                         withObject:image
+                                      waitUntilDone:NO];
+        }
+    }
+    
+    mbgl::PremultipliedImage readStillImage() override {
+        auto size = getFramebufferSize();
+        const unsigned int w = size[0];
+        const unsigned int h = size[1];
+        
+        mbgl::PremultipliedImage image { w, h };
+        MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+        
+        const int stride = image.stride();
+        auto tmp = std::make_unique<uint8_t[]>(stride);
+        uint8_t *rgba = image.data.get();
+        for (int i = 0, j = h - 1; i < j; i++, j--) {
+            std::memcpy(tmp.get(), rgba + i * stride, stride);
+            std::memcpy(rgba + i * stride, rgba + j * stride, stride);
+            std::memcpy(rgba + j * stride, tmp.get(), stride);
+        }
+        
+        return image;
+    }
     
 private:
     /// Cocoa map view that this adapter bridges to.
