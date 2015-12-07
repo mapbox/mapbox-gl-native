@@ -1,96 +1,100 @@
-language: android
+language: cpp
 
 sudo: false
+
+# Save common build configurations as shortcuts, so we can reference them later.
+addons_shortcuts:
+  addons_clang35: &clang35
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
+      packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev',
+                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  addons_gcc49: &gcc49
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev',
+                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+  addons_clang38-tidy: &clang38-tidy
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise' ]
+      packages: [ 'clang-tidy-3.8', 'clang-3.8', 'libgcc-4.9-dev', 'libstdc++-4.9-dev', 'libstdc++6',
+                  'libllvm3.4', 'libclang-common-3.8-dev', 'libclang1-3.8', 'liblldb-3.8',
+                  'libllvm3.8', 'lldb-3.8', 'llvm-3.8', 'llvm-3.8-dev', 'llvm-3.8-runtime', 'xutils-dev',
+                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
 
 matrix:
   exclude:
     - os: linux
   include:
+
+    # OS X - Xcode 7 - Debug
     - os: osx
       osx_image: xcode7
+      compiler: ": xcode-debug"
       env: FLAVOR=osx BUILDTYPE=Debug
+
+
+    # OS X/Node.js 5 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: clang
+      compiler: ": node5-xcode"
       env: FLAVOR=node NODE_VERSION=5
+
+    # OS X/Node.js 4 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: clang
+      compiler: ": node4-xcode"
       env: FLAVOR=node NODE_VERSION=4
+
+    # OS X/Node.js 0.10 - Xcode 7
     - os: osx
       osx_image: xcode7
-      compiler: clang
+      compiler: ": node0.10-xcode"
       env: FLAVOR=node NODE_VERSION=0.10
+
+
+    # Linux/Node.js 5 - Clang 3.5 - Release
     - os: linux
-      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=5
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": node5-clang35-release"
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=5 _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+
+    # Linux/Node.js 4 - Clang 3.5 - Release
     - os: linux
-      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=4
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": node4-clang35-release"
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=4 _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+
+    # Linux/Node.js 0.10 - Clang 3.5 - Release
     - os: linux
-      env: FLAVOR=node CXX=clang++-3.5 BUILDTYPE=Release NODE_VERSION=0.10
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": node0.10-clang35-release"
+      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=0.10 _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+
+
+    # Linux - GCC 4.9 - Release
     - os: linux
-      env: FLAVOR=linux CXX=g++-4.9 BUILDTYPE=Release
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test' ]
-          packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": linux-gcc49-release"
+      env: FLAVOR=linux BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
+      addons: *gcc49
+
+    # Linux - Clang 3.5 - Debug
     - os: linux
-      env: FLAVOR=linux CXX=clang++-3.5 BUILDTYPE=Debug
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": linux-clang35-debug"
+      env: FLAVOR=linux BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+
+    # Linux - Clang 3.5 - Release
     - os: linux
-      env: FLAVOR=linux CXX=clang++-3.5 BUILDTYPE=Release
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-          packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": linux-clang35-release"
+      env: FLAVOR=linux BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+
+    # clang-tidy - Clang 3.8 - Release
     - os: linux
-      env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Release
-      android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
-      addons:
-        apt:
-          packages: [ 'lib32stdc++6' ]
-    - os: linux
-      env: FLAVOR=android ANDROID_ABI=arm-v7 BUILDTYPE=Debug
-      android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
-      addons:
-        apt:
-          packages: [ 'lib32stdc++6' ]
-    - os: linux
-      env: FLAVOR=android ANDROID_ABI=arm-v8 BUILDTYPE=Release
-      android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
-      addons:
-        apt:
-          packages: [ 'lib32stdc++6' ]
-    - os: linux
-      env: FLAVOR=android ANDROID_ABI=x86 BUILDTYPE=Release
-      android:
-        components: [ 'tools', 'platform-tools', 'build-tools-23.0.2', 'android-23', 'extra-android-m2repository', 'extra-android-support', 'extra-google-m2repository' ]
-      addons:
-        apt:
-          packages: [ 'lib32stdc++6' ]
-    - os: linux
-      env: FLAVOR=linux CXX=clang++-3.8 BUILDTYPE=Release ACTION=tidy AWS_ACCESS_KEY_ID=
-      addons:
-        apt:
-          sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise' ]
-          packages: [ 'clang-tidy-3.8', 'libgcc-4.9-dev', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'libclang-common-3.8-dev', 'libclang1-3.8', 'liblldb-3.8', 'libllvm3.8', 'lldb-3.8', 'llvm-3.8', 'llvm-3.8-dev', 'llvm-3.8-runtime', 'xutils-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      compiler: ": tidy-clang38-release"
+      env: FLAVOR=linux ACTION=tidy BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 AWS_ACCESS_KEY_ID=
+      addons: *clang38-tidy
 
 env:
   global:
@@ -100,8 +104,6 @@ env:
     - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
     # Access Token
     - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
-    # Testmunk
-    - secure: "CHBiUM60TolDbQnn+4IRA/tvOKwKs3g9EDvv8YHSJMg3FuHmjKQkprBasvxf3hnTXg4WLZEubmeDcyJ6RRzPP5mMSr/hksYl0pSjj/6TUecE5fHPVVeN7txVqkpOBf9i45Y+iBUQMjBb1NnDK3pHXxpnAs1Q/pe7vReErj4GF1U="
     # iOS code signing
     - secure: "I6Iu75X1E+js5tzijtKi1EGtIuBcA4/25nDYe0svV4HAtujY71ZJZ4eB6355CKhFXpLXrF3i7eKVX3v+zWS0QROPEWacgsqsvNg+Ba9cnznW/faUSOYekCfhzWd/6reYDM7KzKAQwSUHLk9JIWK/kkmi4r+vVJK7h+tjPllK5YA="
     - IOS_APP_NAME="Mapbox GL"
@@ -111,6 +113,9 @@ env:
     - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
 
 before_install:
+- if [ ! -z "${_CXX}" ]; then export CXX="${_CXX}" ; fi
+- if [ ! -z "${_CC}" ]; then export CC="${_CC}" ; fi
+- ${CXX} --version
 - source ./scripts/travis_helper.sh
 
 install:
