@@ -3,11 +3,12 @@ package com.mapbox.mapboxsdk.location;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
-import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LostApiClient;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LocationServices implements LocationListener {
+public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
 
     private static LocationServices instance = null;
 
@@ -16,6 +17,8 @@ public class LocationServices implements LocationListener {
 
     private Location lastLocation = null;
 
+    private List<LocationListener> locationListeners = null;
+
     /**
      * Private constructor for singleton LocationServices
      */
@@ -23,6 +26,7 @@ public class LocationServices implements LocationListener {
         super();
         // Setup location services
         mLocationClient = new LostApiClient.Builder(context).build();
+        locationListeners = new ArrayList<>();
     }
 
     /**
@@ -88,9 +92,35 @@ public class LocationServices implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         this.lastLocation = location;
+
+        // Update Listeners
+        for (LocationListener listener : this.locationListeners) {
+            listener.onLocationChanged(location);
+        }
     }
 
+    /**
+     * Last known location
+     * @return Last known location data
+     */
     public Location getLastLocation() {
         return lastLocation;
+    }
+
+    /**
+     * Registers a LocationListener to receive location updates
+     * @param locationListener LocationListener
+     */
+    public void addLocationListener(@NonNull LocationListener locationListener) {
+        this.locationListeners.add(locationListener);
+    }
+
+    /**
+     * Unregister a LocationListener to stop receiving location updates
+     * @param locationListener LocationListener to remove
+     * @return True if LocationListener was found and removed, False if it was not
+     */
+    public boolean removeLocationListener(@NonNull LocationListener locationListener) {
+        return this.locationListeners.remove(locationListener);
     }
 }
