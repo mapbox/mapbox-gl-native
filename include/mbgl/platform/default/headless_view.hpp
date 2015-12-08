@@ -48,7 +48,7 @@ private:
     void createContext();
     void loadExtensions();
     void clearBuffers();
-    bool isActive();
+    bool isActive() const;
 
 private:
     std::shared_ptr<HeadlessDisplay> display;

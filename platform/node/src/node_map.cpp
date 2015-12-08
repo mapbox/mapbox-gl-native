@@ -37,7 +37,7 @@ static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
     return display;
 }
 
-const static char* releasedMessage() {
+static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
@@ -138,7 +138,7 @@ NAN_METHOD(NodeMap::New) {
     info.GetReturnValue().Set(info.This());
 }
 
-const std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
+std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
     Nan::HandleScope scope;
 
     v8::Local<v8::Object> JSON = Nan::Get(
@@ -197,46 +197,46 @@ NAN_METHOD(NodeMap::Load) {
     info.GetReturnValue().SetUndefined();
 }
 
-std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
+NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     Nan::HandleScope scope;
 
-    auto options = std::make_unique<RenderOptions>();
+    NodeMap::RenderOptions options;
 
     if (Nan::Has(obj, Nan::New("zoom").ToLocalChecked()).FromJust()) {
-        options->zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.zoom = Nan::Get(obj, Nan::New("zoom").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("bearing").ToLocalChecked()).FromJust()) {
-        options->bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.bearing = Nan::Get(obj, Nan::New("bearing").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("pitch").ToLocalChecked()).FromJust()) {
-        options->pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
+        options.pitch = Nan::Get(obj, Nan::New("pitch").ToLocalChecked()).ToLocalChecked()->NumberValue();
     }
 
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
         auto centerObj = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked();
         if (centerObj->IsArray()) {
             auto center = centerObj.As<v8::Array>();
-            if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-            if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+            if (center->Length() > 0) { options.longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+            if (center->Length() > 1) { options.latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
         }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {
-        options->width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.width = Nan::Get(obj, Nan::New("width").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("height").ToLocalChecked()).FromJust()) {
-        options->height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
+        options.height = Nan::Get(obj, Nan::New("height").ToLocalChecked()).ToLocalChecked()->IntegerValue();
     }
 
     if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
         auto classes = Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Array>();
         const int length = classes->Length();
-        options->classes.reserve(length);
+        options.classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options->classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
+            options.classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
         }
     }
 
@@ -295,13 +295,13 @@ NAN_METHOD(NodeMap::Render) {
     info.GetReturnValue().SetUndefined();
 }
 
-void NodeMap::startRender(std::unique_ptr<NodeMap::RenderOptions> options) {
-    view.resize(options->width, options->height);
+void NodeMap::startRender(NodeMap::RenderOptions options) {
+    view.resize(options.width, options.height);
     map->update(mbgl::Update::Dimensions);
-    map->setClasses(options->classes);
-    map->setLatLngZoom(mbgl::LatLng(options->latitude, options->longitude), options->zoom);
-    map->setBearing(options->bearing);
-    map->setPitch(options->pitch);
+    map->setClasses(options.classes);
+    map->setLatLngZoom(mbgl::LatLng(options.latitude, options.longitude), options.zoom);
+    map->setBearing(options.bearing);
+    map->setPitch(options.pitch);
 
     map->renderStill([this](const std::exception_ptr eptr, mbgl::PremultipliedImage&& result) {
         if (eptr) {
