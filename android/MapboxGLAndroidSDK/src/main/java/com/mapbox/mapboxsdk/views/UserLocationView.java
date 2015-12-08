@@ -574,7 +574,7 @@ final class UserLocationView extends View {
             mShowDirection = true;
             mGpsMarkerDirection = 0;
             if (location.hasBearing()) {
-                mMapView.setBearing(mUserLocation.getBearing());
+                mMapView.setBearing(location.getBearing());
             }
         }
 
