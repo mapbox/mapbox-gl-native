@@ -9,7 +9,7 @@
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 static NSString * const kCustomCalloutTitle = @"Custom Callout";
-static NSString * const kOffsetMarkerTitle = @"Offset Marker";
+static NSString * const kOffsetMarkerTitle = @"Offset Marker and Callout";
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { 38.9131982, -77.0325453144239 },
@@ -576,6 +576,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         UIImage *imagePng = [UIImage imageNamed:@"default_marker"];
         MGLAnnotationImage *image = [MGLAnnotationImage annotationImageWithImage:imagePng reuseIdentifier:kOffsetMarkerTitle];
         image.centerOffset = CGPointMake(0.0, -12.0);
+        image.calloutOffset = CGPointMake(-8.0, 3.0);
         return image;
     }
 
