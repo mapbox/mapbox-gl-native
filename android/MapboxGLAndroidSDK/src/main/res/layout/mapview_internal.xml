@@ -6,11 +6,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.mapbox.mapboxsdk.views.CompassView
-        android:id="@+id/compassView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <ImageView
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
@@ -29,9 +24,10 @@
         android:src="@drawable/ic_info_outline_24dp_selector"
         android:background="@drawable/bg_default_selector"/>
 
-    <com.mapbox.mapboxsdk.views.UserLocationView
-        android:id="@+id/userLocationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <com.mapbox.mapboxsdk.views.MapOverlayDispatch
+        android:id="@+id/overlayDispatch"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </merge>

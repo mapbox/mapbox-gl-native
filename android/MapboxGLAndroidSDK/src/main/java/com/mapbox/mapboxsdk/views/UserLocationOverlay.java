@@ -22,31 +22,36 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
-final class UserLocationView extends View {
+final class UserLocationOverlay implements Overlay {
 
+    //region CLASS VARIABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
+
+    //region CLASS METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
+
+    //region FIELDS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private final Context mContext;
     private MapView mMapView;
-
-    private float mDensity;
 
     private boolean mShowMarker;
     private boolean mShowDirection;
     private boolean mShowAccuracy;
-    private boolean mStaleMarker;
 
     private PointF mMarkerScreenPoint;
     private Matrix mMarkerScreenMatrix;
@@ -58,18 +63,12 @@ final class UserLocationView extends View {
 
     private Drawable mUserLocationDrawable;
     private RectF mUserLocationDrawableBoundsF;
-    private Rect mUserLocationDrawableBounds;
 
     private Drawable mUserLocationBearingDrawable;
     private RectF mUserLocationBearingDrawableBoundsF;
-    private Rect mUserLocationBearingDrawableBounds;
 
     private Drawable mUserLocationStaleDrawable;
     private RectF mUserLocationStaleDrawableBoundsF;
-    private Rect mUserLocationStaleDrawableBounds;
-
-    private Rect mDirtyRect;
-    private RectF mDirtyRectF;
 
     private LatLng mMarkerCoordinate;
     private ValueAnimator mMarkerCoordinateAnimator;
@@ -95,35 +94,26 @@ final class UserLocationView extends View {
 
     // Compass data
     private MyBearingListener mBearingChangeListener;
+    private boolean mEnabled;
 
-    public UserLocationView(Context context) {
-        super(context);
-        initialize(context);
-    }
+    //endregion
 
-    public UserLocationView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initialize(context);
-    }
+    //region INJECTED DEPENDENCIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
 
-    public UserLocationView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        initialize(context);
-    }
+    //region INJECTED VIEWS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
 
-    private void initialize(Context context) {
+    //region CONSTRUCTOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public UserLocationOverlay(Context context) {
+        mContext = context;
+
         // View configuration
         setEnabled(false);
-        setWillNotDraw(false);
-
-        // Layout params
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        setLayoutParams(lp);
 
         // Setup location services
-        mLocationClient = new LostApiClient.Builder(getContext()).build();
+        mLocationClient = new LostApiClient.Builder(context).build();
         mLocationRequest = LocationRequest.create()
                 .setFastestInterval(1000)
                 .setSmallestDisplacement(3.0f)
@@ -136,7 +126,7 @@ final class UserLocationView extends View {
         Resources resources = context.getResources();
         int accuracyColor = resources.getColor(R.color.my_location_ring);
 
-        mDensity = resources.getDisplayMetrics().density;
+        float density = resources.getDisplayMetrics().density;
         mMarkerCoordinate = new LatLng(0.0, 0.0);
         mMarkerScreenPoint = new PointF();
         mMarkerScreenMatrix = new Matrix();
@@ -150,15 +140,15 @@ final class UserLocationView extends View {
         mAccuracyPaintStroke = new Paint();
         mAccuracyPaintStroke.setAntiAlias(true);
         mAccuracyPaintStroke.setStyle(Paint.Style.STROKE);
-        mAccuracyPaintStroke.setStrokeWidth(0.5f * mDensity);
+        mAccuracyPaintStroke.setStrokeWidth(0.5f * density);
         mAccuracyPaintStroke.setColor(accuracyColor);
         mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
 
         mAccuracyPath = new Path();
         mAccuracyBounds = new RectF();
 
-        mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location);
-        mUserLocationDrawableBounds = new Rect(
+        mUserLocationDrawable = ContextCompat.getDrawable(context, R.drawable.my_location);
+        Rect userLocationDrawableBounds = new Rect(
                 -mUserLocationDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
                 mUserLocationDrawable.getIntrinsicWidth() / 2,
@@ -168,10 +158,10 @@ final class UserLocationView extends View {
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
                 mUserLocationDrawable.getIntrinsicWidth() / 2,
                 mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
+        mUserLocationDrawable.setBounds(userLocationDrawableBounds);
 
-        mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_bearing);
-        mUserLocationBearingDrawableBounds = new Rect(
+        mUserLocationBearingDrawable = ContextCompat.getDrawable(context, R.drawable.my_location_bearing);
+        Rect userLocationBearingDrawableBounds = new Rect(
                 -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
                 mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
@@ -181,10 +171,10 @@ final class UserLocationView extends View {
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
                 mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
+        mUserLocationBearingDrawable.setBounds(userLocationBearingDrawableBounds);
 
-        mUserLocationStaleDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_stale);
-        mUserLocationStaleDrawableBounds = new Rect(
+        mUserLocationStaleDrawable = ContextCompat.getDrawable(context, R.drawable.my_location_stale);
+        Rect userLocationStaleDrawableBounds = new Rect(
                 -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
                 mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
@@ -194,143 +184,19 @@ final class UserLocationView extends View {
                 -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
                 mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
                 mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+        mUserLocationStaleDrawable.setBounds(userLocationStaleDrawableBounds);
     }
 
-    public void setMapView(MapView mapView) {
-        mMapView = mapView;
-    }
 
-    public void onStart() {
-        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
-            mBearingChangeListener.onStart(getContext());
-        }
-    }
+    //endregion
 
-    public void onStop() {
-        mBearingChangeListener.onStop();
-        cancelAnimations();
-    }
+    //region LIFE CYCLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    //region ACCESSORS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
 
-        if (!mShowMarker) {
-            return;
-        }
-
-        canvas.concat(mMarkerScreenMatrix);
-
-        Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
-        dotDrawable = mStaleMarker ? mUserLocationStaleDrawable : dotDrawable;
-        // IMPORTANT also update in update()
-        RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-        dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
-
-        boolean willDraw = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
-            willDraw = mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
-        }
-        willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
-
-        if (willDraw) {
-            if (mShowAccuracy && !mStaleMarker) {
-                canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
-                canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
-            }
-            dotDrawable.draw(canvas);
-        }
-    }
-
-    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        mMyLocationTrackingMode = myLocationTrackingMode;
-
-        if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
-            // center map directly if we have a location fix
-            mMapView.setCenterCoordinate(new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude()));
-        }
-    }
-
-    @MyLocationTracking.Mode
-    public int getMyLocationTrackingMode() {
-        return mMyLocationTrackingMode;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-        setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
-        toggleGps(enabled);
-    }
-
-    public void update() {
-        if (isEnabled() && mShowMarker) {
-            setVisibility(View.VISIBLE);
-
-            mStaleMarker = isStale(mUserLocation);
-
-            // compute new marker position
-            // TODO add JNI method that takes existing pointf
-            if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
-                mMarkerScreenMatrix.reset();
-                mMarkerScreenMatrix.setTranslate(
-                        mMarkerScreenPoint.x,
-                        mMarkerScreenPoint.y);
-            } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                mMapView.setCenterCoordinate(mMarkerCoordinate, true);
-            }
-
-            // rotate so arrow in points to bearing
-            if (mShowDirection) {
-                if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
-                    mMarkerScreenMatrix.preRotate(mCompassMarkerDirection + (float) mMapView.getDirection());
-                } else if (mMyBearingTrackingMode == MyBearingTracking.GPS) {
-                    if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                        mMarkerScreenMatrix.preRotate(mGpsMarkerDirection + (float) mMapView.getDirection());
-                    } else {
-                        mMarkerScreenMatrix.preRotate(mGpsMarkerDirection);
-                    }
-                }
-            }
-
-            // adjust accuracy circle
-            if (mShowAccuracy && !mStaleMarker) {
-                mAccuracyPath.reset();
-                mAccuracyPath.addCircle(0.0f, 0.0f,
-                        (float) (mMarkerAccuracy / mMapView.getMetersPerPixelAtLatitude(
-                                mMarkerCoordinate.getLatitude())),
-                        Path.Direction.CW);
-
-                mAccuracyPath.computeBounds(mAccuracyBounds, false);
-                mAccuracyBounds.inset(-1.0f, -1.0f);
-            }
-
-            // invalidate changed pixels
-            if (mDirtyRect == null) {
-                mDirtyRect = new Rect();
-                mDirtyRectF = new RectF();
-            } else {
-                // the old marker location
-                invalidate(mDirtyRect);
-            }
-
-            RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-            dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
-            RectF largerBounds = mShowAccuracy && !mStaleMarker && mAccuracyBounds.contains(dotBounds)
-                    ? mAccuracyBounds : dotBounds;
-            mMarkerScreenMatrix.mapRect(mDirtyRectF, largerBounds);
-            mDirtyRectF.roundOut(mDirtyRect);
-            invalidate(mDirtyRect); // the new marker location
-        } else {
-            setVisibility(View.INVISIBLE);
-        }
-    }
-
-    public Location getLocation() {
-        return mUserLocation;
-    }
+    //region PRIVATE METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     /**
      * Enabled / Disable GPS location updates along with updating the UI
@@ -360,125 +226,6 @@ final class UserLocationView extends View {
                 mLocationClient.disconnect();
                 mUserLocation = null;
             }
-        }
-    }
-
-    public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        mMyBearingTrackingMode = myBearingTrackingMode;
-
-        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-            mShowDirection = false;
-            mBearingChangeListener.onStart(getContext());
-        } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
-            mBearingChangeListener.onStop();
-            if (mUserLocation != null && mUserLocation.hasBearing()) {
-                mShowDirection = true;
-            } else {
-                mShowDirection = false;
-            }
-        } else {
-            mShowDirection = false;
-        }
-    }
-
-    @MyBearingTracking.Mode
-    public int getMyBearingTrackingMode() {
-        return mMyBearingTrackingMode;
-    }
-
-    private class MyBearingListener implements SensorEventListener {
-
-        // Sensor model
-        private SensorManager mSensorManager;
-        private Sensor mSensorRotationVector;
-        private int mRotationDevice;
-
-        // Sensor data sensor rotation vector
-        private float[] mRotationMatrix = new float[16];
-        private float[] mRemappedMatrix = new float[16];
-        private float[] mOrientation = new float[3];
-
-        // Location data
-        private GeomagneticField mGeomagneticField;
-
-        // Controls the sensor update rate in milliseconds
-        private static final int UPDATE_RATE_MS = 300;
-
-        // Compass data
-        private float mCompassBearing;
-        private long mCompassUpdateNextTimestamp = 0;
-
-        public MyBearingListener(Context context) {
-            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        }
-
-        public void onStart(Context context) {
-            mRotationDevice = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
-            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 2500);
-        }
-
-        public void onStop() {
-            mSensorManager.unregisterListener(this, mSensorRotationVector);
-        }
-
-        public float getCompassBearing() {
-            return mCompassBearing;
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            if (mPaused) {
-                return;
-            }
-
-            long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime < mCompassUpdateNextTimestamp) {
-                return;
-            }
-
-            switch (event.sensor.getType()) {
-                case Sensor.TYPE_ROTATION_VECTOR:
-                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
-                    break;
-            }
-
-            switch (mRotationDevice) {
-                case Surface.ROTATION_0:
-                    // Portrait
-                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
-                    break;
-                default:
-                    // Landscape
-                    SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, mRemappedMatrix);
-                    SensorManager.getOrientation(mRemappedMatrix, mOrientation);
-                    break;
-            }
-
-            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
-            mGeomagneticField = new GeomagneticField(
-                    (float) mUserLocation.getLatitude(),
-                    (float) mUserLocation.getLongitude(),
-                    (float) mUserLocation.getAltitude(),
-                    currentTime);
-            mCompassBearing = (float) Math.toDegrees(mOrientation[0] + mGeomagneticField.getDeclination());
-            setCompass(mCompassBearing);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // TODO add accuracy to the equiation
-        }
-    }
-
-
-    private class MyLocationListener implements LocationListener {
-        @Override
-        public void onLocationChanged(Location location) {
-            if (mPaused) {
-                return;
-            }
-            setLocation(location);
         }
     }
 
@@ -624,8 +371,14 @@ final class UserLocationView extends View {
     }
 
     void updateOnNextFrame() {
-        mMapView.update();
+        if (mMapView != null) {
+            mMapView.update();
+        }
     }
+
+    //endregion
+
+    //region PUBLIC METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void pause() {
         mPaused = true;
@@ -634,13 +387,70 @@ final class UserLocationView extends View {
 
     public void resume() {
         mPaused = false;
-        if (isEnabled()) {
+        if (mEnabled) {
             toggleGps(true);
         }
     }
 
     public void setOnMyLocationChangeListener(@Nullable MapView.OnMyLocationChangeListener listener) {
         mOnMyLocationChangeListener = listener;
+    }
+
+    public void onStart() {
+        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+            mBearingChangeListener.onStart(mContext);
+        }
+    }
+
+    public void onStop() {
+        mBearingChangeListener.onStop();
+        cancelAnimations();
+    }
+
+    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+        mMyLocationTrackingMode = myLocationTrackingMode;
+
+        if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
+            // center map directly if we have a location fix
+            mMapView.setCenterCoordinate(new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude()));
+        }
+    }
+
+    @MyLocationTracking.Mode
+    public int getMyLocationTrackingMode() {
+        return mMyLocationTrackingMode;
+    }
+
+    public void setEnabled(boolean enabled) {
+        mEnabled = enabled;
+        toggleGps(enabled);
+    }
+
+    public Location getLocation() {
+        return mUserLocation;
+    }
+
+    public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
+        mMyBearingTrackingMode = myBearingTrackingMode;
+
+        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+            mShowDirection = false;
+            mBearingChangeListener.onStart(mContext);
+        } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
+            mBearingChangeListener.onStop();
+            if (mUserLocation != null && mUserLocation.hasBearing()) {
+                mShowDirection = true;
+            } else {
+                mShowDirection = false;
+            }
+        } else {
+            mShowDirection = false;
+        }
+    }
+
+    @MyBearingTracking.Mode
+    public int getMyBearingTrackingMode() {
+        return mMyBearingTrackingMode;
     }
 
     // public for animator only
@@ -672,6 +482,241 @@ final class UserLocationView extends View {
         updateOnNextFrame();
     }
 
+    public void cancelAnimations() {
+        if (mMarkerCoordinateAnimator != null) {
+            mMarkerCoordinateAnimator.cancel();
+            mMarkerCoordinateAnimator = null;
+        }
+
+        if (mMarkerDirectionAnimator != null) {
+            mMarkerDirectionAnimator.cancel();
+            mMarkerDirectionAnimator = null;
+        }
+
+        if (mMarkerAccuracyAnimator != null) {
+            mMarkerAccuracyAnimator.cancel();
+            mMarkerAccuracyAnimator = null;
+        }
+    }
+
+    //endregion
+
+    //region Overlay ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    @Override
+    public void onOverlayDraw(MapView mapView, Canvas canvas, BoundingBox wgsBounds, LatLng wgsCenter, float bearing, float zoom) {
+
+        if (!mShowMarker) {
+            return;
+        }
+
+        boolean staleMarker = isStale(mUserLocation);
+
+        // compute new marker position
+        if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            mMapView.toScreenLocation(mMarkerCoordinate, mMarkerScreenPoint);
+            mMarkerScreenMatrix.reset();
+            mMarkerScreenMatrix.setTranslate(
+                    mMarkerScreenPoint.x,
+                    mMarkerScreenPoint.y);
+        } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+            mMapView.setCenterCoordinate(mMarkerCoordinate, true);
+        }
+
+        // rotate so arrow in points to bearing
+        if (mShowDirection) {
+            if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+                mMarkerScreenMatrix.preRotate(mCompassMarkerDirection + (float) mMapView.getDirection());
+            } else if (mMyBearingTrackingMode == MyBearingTracking.GPS) {
+                if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+                    mMarkerScreenMatrix.preRotate(mGpsMarkerDirection + (float) mMapView.getDirection());
+                } else {
+                    mMarkerScreenMatrix.preRotate(mGpsMarkerDirection);
+                }
+            }
+        }
+
+        // adjust accuracy circle
+        if (mShowAccuracy && !staleMarker) {
+            mAccuracyPath.reset();
+            mAccuracyPath.addCircle(0.0f, 0.0f,
+                    (float) (mMarkerAccuracy / mMapView.getMetersPerPixelAtLatitude(
+                            mMarkerCoordinate.getLatitude())),
+                    Path.Direction.CW);
+
+            mAccuracyPath.computeBounds(mAccuracyBounds, false);
+            mAccuracyBounds.inset(-1.0f, -1.0f);
+        }
+
+        canvas.save();
+
+        canvas.concat(mMarkerScreenMatrix);
+
+        Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
+        dotDrawable = staleMarker ? mUserLocationStaleDrawable : dotDrawable;
+        RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
+        dotBounds = staleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
+
+        boolean willDraw = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
+            willDraw = mShowAccuracy && !staleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
+        }
+        willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
+
+        if (willDraw) {
+            if (mShowAccuracy && !staleMarker) {
+                canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
+                canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
+            }
+            dotDrawable.draw(canvas);
+        }
+
+        canvas.restore();
+    }
+
+    @Override
+    public void onOverlayTouchEvent(MotionEvent event) {
+
+    }
+
+    @Override
+    public void onOverlayAttached(MapView mapView) {
+        mMapView = mapView;
+    }
+
+    @Override
+    public void onOverlayDetached() {
+
+    }
+
+    @Override
+    public void onOverlaySingleTapConfirmed(LatLng pressPosition) {
+
+    }
+
+    @Override
+    public void onOverlayLongPress(LatLng pressPosition) {
+
+    }
+
+    @Override
+    public boolean isOverlayDrawEnabled() {
+        return mEnabled;
+    }
+
+    @Override
+    public void onMapViewPixelBoundsChanged(Rect mapPixelBounds) {
+
+    }
+
+
+    //endregion
+
+    //region LISTENERS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    private class MyBearingListener implements SensorEventListener {
+
+        // Sensor model
+        private SensorManager mSensorManager;
+        private Sensor mSensorRotationVector;
+        private int mRotationDevice;
+
+        // Sensor data sensor rotation vector
+        private float[] mRotationMatrix = new float[16];
+        private float[] mRemappedMatrix = new float[16];
+        private float[] mOrientation = new float[3];
+
+        // Location data
+        private GeomagneticField mGeomagneticField;
+
+        // Controls the sensor update rate in milliseconds
+        private static final int UPDATE_RATE_MS = 300;
+
+        // Compass data
+        private float mCompassBearing;
+        private long mCompassUpdateNextTimestamp = 0;
+
+        public MyBearingListener(Context context) {
+            mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            mSensorRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        }
+
+        public void onStart(Context context) {
+            mRotationDevice = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+            mSensorManager.registerListener(this, mSensorRotationVector, UPDATE_RATE_MS * 2500);
+        }
+
+        public void onStop() {
+            mSensorManager.unregisterListener(this, mSensorRotationVector);
+        }
+
+        public float getCompassBearing() {
+            return mCompassBearing;
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (mPaused) {
+                return;
+            }
+
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime < mCompassUpdateNextTimestamp) {
+                return;
+            }
+
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
+                    break;
+            }
+
+            switch (mRotationDevice) {
+                case Surface.ROTATION_0:
+                    // Portrait
+                    SensorManager.getOrientation(mRotationMatrix, mOrientation);
+                    break;
+                default:
+                    // Landscape
+                    SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, mRemappedMatrix);
+                    SensorManager.getOrientation(mRemappedMatrix, mOrientation);
+                    break;
+            }
+
+            mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
+            mGeomagneticField = new GeomagneticField(
+                    (float) mUserLocation.getLatitude(),
+                    (float) mUserLocation.getLongitude(),
+                    (float) mUserLocation.getAltitude(),
+                    currentTime);
+            mCompassBearing = (float) Math.toDegrees(mOrientation[0] + mGeomagneticField.getDeclination());
+            setCompass(mCompassBearing);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            // TODO add accuracy to the equiation
+        }
+    }
+
+
+    private class MyLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (mPaused) {
+                return;
+            }
+            setLocation(location);
+        }
+    }
+
+    //endregion
+
+    //region EVENTS  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //endregion
+
+    //region INNER CLASSES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
 
         private double mFromLat;
@@ -697,21 +742,6 @@ final class UserLocationView extends View {
         }
     }
 
-    public void cancelAnimations() {
-        if (mMarkerCoordinateAnimator != null) {
-            mMarkerCoordinateAnimator.cancel();
-            mMarkerCoordinateAnimator = null;
-        }
-
-        if (mMarkerDirectionAnimator != null) {
-            mMarkerDirectionAnimator.cancel();
-            mMarkerDirectionAnimator = null;
-        }
-
-        if (mMarkerAccuracyAnimator != null) {
-            mMarkerAccuracyAnimator.cancel();
-            mMarkerAccuracyAnimator = null;
-        }
-    }
+    //endregion
 
 }
