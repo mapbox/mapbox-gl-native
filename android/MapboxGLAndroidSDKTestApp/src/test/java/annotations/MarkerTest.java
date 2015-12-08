@@ -13,8 +13,14 @@ public class MarkerTest {
 
     @Test
     public void testSanity() {
-        Marker marker = new MarkerOptions().getMarker();
-        assertNotNull("marker should not be null", marker);
+        MarkerOptions markerOptions = new MarkerOptions();
+        assertNotNull("markerOptions should not be null", markerOptions);
+    }
+
+    @Test
+    public void testMarker() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        assertNotNull("marker should not be null", markerOptions.getMarker());
     }
 
     @Test
