@@ -17,7 +17,13 @@ Just run:
 npm install mapbox-gl-native
 ```
 
-Other platforms will fall back to a source compile with `make node`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native/blob/master/INSTALL.md#depends).
+Other platforms will fall back to a source compile with `make node`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native/blob/node-v2.1.0/INSTALL.md#2-installing-dependencies).
+
+## Testing
+
+```
+npm test
+```
 
 ## Rendering a map tile
 
@@ -44,12 +50,6 @@ The first argument passed to `map.render` is an options object, all keys are opt
 ```
 
 When you are finished using a map object, you can call `map.release()` to dispose the internal map resources manually. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than v8's garbage collector.
-
-## Testing
-
-```
-npm test
-```
 
 ## Implementing a file source
 
@@ -149,6 +149,51 @@ var map = new mbgl.Map({
 
 Mapbox GL uses two types of protocols: `asset://` for files that should be loaded from some local static system, and `http://` (and `https://`), which should be loaded from the internet. However, stylesheets are free to use other protocols too, if your implementation of `request` supports these; e.g. you could use `s3://` to indicate that files are supposed to be loaded from S3.
 
+## Listening for log events
+
+The module imported with `require('mapbox-gl-native')` inherits from [`EventEmitter`](https://nodejs.org/api/events.html), and the `NodeLogObserver` will push log events to this. Log messages can have [`class`](https://github.com/mapbox/mapbox-gl-native/blob/node-v2.1.0/include/mbgl/platform/event.hpp#L43-L60), [`severity`](https://github.com/mapbox/mapbox-gl-native/blob/node-v2.1.0/include/mbgl/platform/event.hpp#L17-L23), `code` ([HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html)), and `text` parameters.
+
+```
+MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
+    { Event::General, "General" },
+    { Event::Setup, "Setup" },
+    { Event::Shader, "Shader" },
+    { Event::ParseStyle, "ParseStyle" },
+    { Event::ParseTile, "ParseTile" },
+    { Event::Render, "Render" },
+    { Event::Style, "Style" },
+    { Event::Database, "Database" },
+    { Event::HttpRequest, "HttpRequest" },
+    { Event::Sprite, "Sprite" },
+    { Event::Image, "Image" },
+    { Event::OpenGL, "OpenGL" },
+    { Event::JNI, "JNI" },
+    { Event::Android, "Android" },
+    { Event::Crash, "Crash" },
+    { Event(-1), "Unknown" },
+});
+```
+
+```
+MBGL_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
+    { EventSeverity::Debug, "DEBUG" },
+    { EventSeverity::Info, "INFO" },
+    { EventSeverity::Warning, "WARNING" },
+    { EventSeverity::Error, "ERROR" },
+    { EventSeverity(-1), "UNKNOWN" },
+});
+```
+
+```js
+var mbgl = require('mapbox-gl-native');
+mbgl.on('message', function(msg) {
+    t.ok(msg, 'emits error');
+    t.equal(msg.class, 'Style');
+    t.equal(msg.severity, 'ERROR');
+    t.ok(msg.text.match(/Failed to load/), 'error text matches');
+});
+```
+
 ## Mapbox API Access tokens
 
 To use styles that rely on Mapbox vector tiles, you must pass an [API access token](https://www.mapbox.com/developers/api/#access-tokens) in your `request` implementation with requests to `mapbox://` protocols.
@@ -200,4 +245,3 @@ map.render({}, function(err, image) {
 });
 
 ```
-
