@@ -1,3 +1,5 @@
+package geometry;
+
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 
 import org.junit.Test;
