@@ -39,6 +39,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     config.stencilTest = GL_TRUE;
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
+    config.depthMask = GL_TRUE;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
@@ -93,7 +94,6 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             spriteAtlas->bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
-            config.depthMask = GL_TRUE;
             setDepthSublayer(0);
             bucket.drawElements(*patternShader);
         }
@@ -110,7 +110,6 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             plainShader->u_color = fill_color;
 
             // Draw the actual triangles into the color & stencil buffer.
-            config.depthMask = GL_TRUE;
             setDepthSublayer(1);
             bucket.drawElements(*plainShader);
         }
