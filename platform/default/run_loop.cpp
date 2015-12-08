@@ -56,9 +56,7 @@ RunLoop* RunLoop::Get() {
 
 class RunLoop::Impl {
 public:
-    Impl() = default;
-
-    uv_loop_t *loop;
+    uv_loop_t *loop = nullptr;
     RunLoop::Type type;
     std::unique_ptr<AsyncTask> async;
 
@@ -118,7 +116,7 @@ LOOP_HANDLE RunLoop::getLoopHandle() {
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(task); });
+    withMutex([&] { queue.push(std::move(task)); });
     impl->async->send();
 }
 
