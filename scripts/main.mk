@@ -144,11 +144,16 @@ Xcode/%: Xcode/__project__
 		-jobs $(JOBS) \
 		$(XCPRETTY)
 
+.PHONY: Ninja
+Ninja: Ninja/__project__
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
+	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE)
+
 Ninja/%: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) $*
 
-
+.PHONY: Ninja/compdb
 Ninja/compdb: OUTPUT=build/$(HOST_SLUG)/$(BUILDTYPE)/compile_commands.json
 Ninja/compdb: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Writing to $(OUTPUT)$(FORMAT_END)\n"
@@ -157,6 +162,7 @@ Ninja/compdb: Ninja/__project__
 
 #### Tidy ######################################################################
 
+.PHONY: tidy
 tidy: Ninja/compdb
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Generating header files...$(FORMAT_END)\n"
 	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) version shaders
