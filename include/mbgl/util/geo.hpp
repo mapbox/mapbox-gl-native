@@ -18,7 +18,7 @@ struct LatLng final {
     inline LatLng(double lat = 0, double lon = 0)
         : latitude(lat), longitude(lon) {}
 
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return !(std::isnan(latitude) || std::isnan(longitude));
     }
 
@@ -35,7 +35,7 @@ struct ProjectedMeters final {
     inline ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
 
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
@@ -54,7 +54,7 @@ struct LatLngBounds final {
         return { bounds.ne, bounds.sw };
     }
 
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return sw && ne;
     }
 
@@ -95,7 +95,7 @@ struct MetersBounds final {
     inline MetersBounds(const ProjectedMeters& sw_, const ProjectedMeters& ne_)
         : sw(sw_), ne(ne_) {}
 
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return sw && ne;
     }
 };

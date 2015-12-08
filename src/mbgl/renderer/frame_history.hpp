@@ -11,7 +11,7 @@
 namespace mbgl {
 
 struct FrameSnapshot final {
-    explicit inline FrameSnapshot(TimePoint now_, float z_) : now(now_), z(z_) {}
+    inline explicit FrameSnapshot(TimePoint now_, float z_) : now(now_), z(z_) {}
     const TimePoint now;
     float z;
 };

@@ -23,7 +23,7 @@ struct pbf {
     inline pbf(const unsigned char *data, size_t length);
     inline pbf();
 
-    inline operator bool() const;
+    inline explicit operator bool() const;
 
     inline bool next();
     inline bool next(uint32_t tag);

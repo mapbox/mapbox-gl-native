@@ -17,7 +17,7 @@ typedef std::pair<uint16_t, uint16_t> GlyphRange;
 GlyphRange getGlyphRange(char32_t glyph);
 
 struct GlyphMetrics final  {
-    operator bool() const {
+    explicit operator bool() const {
         return !(width == 0 && height == 0 && advance == 0);
     }
 
@@ -36,7 +36,7 @@ struct Glyph final {
                           const GlyphMetrics &metrics_)
         : rect(rect_), metrics(metrics_) {}
 
-    operator bool() const {
+    explicit operator bool() const {
         return metrics || rect.hasArea();
     }
 
@@ -68,7 +68,7 @@ class Shaping final {
     int32_t left;
     int32_t right;
 
-    operator bool() const { return !positionedGlyphs.empty(); }
+    explicit operator bool() const { return !positionedGlyphs.empty(); }
 };
 
 class SDFGlyph final {
