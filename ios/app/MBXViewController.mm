@@ -9,6 +9,7 @@
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 static NSString * const kCustomCalloutTitle = @"Custom Callout";
+static NSString * const kOffsetMarkerTitle = @"Offset Marker";
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { 38.9131982, -77.0325453144239 },
@@ -21,6 +22,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) NSUInteger styleIndex;
+@property (nonatomic, strong) NSDictionary *settingsDictionary;
 
 @end
 
@@ -175,12 +177,13 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                  : @"Show Custom Style Layer"),
                                                                 @"Print Telemetry Logfile",
                                                                 @"Delete Telemetry Logfile",
+                                                                @"Add offset annotation",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(__unused UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == actionSheet.firstOtherButtonIndex)
     {
@@ -326,12 +329,16 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             }
         }
     }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
+    {
+        [self addOffsetAnnotations];
+    }
 }
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
-
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
         NSData *featuresData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"points" ofType:@"geojson"]];
@@ -536,6 +543,17 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return filePath;
 }
 
+- (void)addOffsetAnnotations
+{
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    
+    MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+    annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
+    annotation.title = kOffsetMarkerTitle;
+    [self.mapView addAnnotation:annotation];
+    [self.mapView showAnnotations:@[annotation] animated:YES];
+}
+
 #pragma mark - Destruction
 
 - (void)dealloc
@@ -553,6 +571,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         || [annotation.title isEqualToString:kCustomCalloutTitle])
     {
         return nil; // use default marker
+    }
+    if ([annotation.title isEqualToString:kOffsetMarkerTitle]) {
+        UIImage *imagePng = [UIImage imageNamed:@"default_marker"];
+        MGLAnnotationImage *image = [MGLAnnotationImage annotationImageWithImage:imagePng reuseIdentifier:kOffsetMarkerTitle];
+        image.centerOffset = CGPointMake(0.0, -12.0);
+        return image;
     }
 
     NSString *title = [(MGLPointAnnotation *)annotation title];
