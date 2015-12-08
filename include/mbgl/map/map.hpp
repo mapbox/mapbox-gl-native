@@ -27,6 +27,7 @@ class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
 struct CameraOptions;
+class StyleLayer;
 
 namespace util {
 template <class T> class Thread;
@@ -161,6 +162,10 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
+
+    // Style API
+    void addLayer(std::unique_ptr<StyleLayer>);
+    void addLayer(std::unique_ptr<StyleLayer>, const std::string& before);
 
     // Memory
     void setSourceTileCacheSize(size_t);

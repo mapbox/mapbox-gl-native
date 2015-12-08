@@ -11,6 +11,7 @@
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
@@ -275,6 +276,10 @@ void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<cons
 double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
+}
+
+void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> after) {
+    style->addLayer(std::move(layer), after);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {

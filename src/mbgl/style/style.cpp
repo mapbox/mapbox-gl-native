@@ -4,6 +4,7 @@
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -100,18 +101,18 @@ StyleLayer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(std::unique_ptr<StyleLayer> layer) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> before) {
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();
         }
     }
 
-    layers.emplace_back(std::move(layer));
-}
+    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        customLayer->initialize();
+    }
 
-void Style::addLayer(std::unique_ptr<StyleLayer> layer, const std::string& before) {
-    layers.emplace(findLayer(before), std::move(layer));
+    layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer));
 }
 
 void Style::removeLayer(const std::string& id) {
@@ -246,6 +247,11 @@ RenderData Style::getRenderData() const {
                 // This is a textured background. We need to render it with a quad.
                 result.order.emplace_back(*layer);
             }
+            continue;
+        }
+
+        if (layer->is<CustomLayer>()) {
+            result.order.emplace_back(*layer);
             continue;
         }
 

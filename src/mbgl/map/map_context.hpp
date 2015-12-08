@@ -11,6 +11,8 @@
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 
+#include <mapbox/optional.hpp>
+
 #include <vector>
 
 namespace mbgl {
@@ -48,9 +50,14 @@ public:
 
     bool isLoaded() const;
 
+    // Annotations
     void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
     double getTopOffsetPixelsForAnnotationIcon(const std::string&);
     void updateAnnotations();
+    
+    // Style API
+    void addLayer(std::unique_ptr<StyleLayer>,
+                  const mapbox::util::optional<std::string> before);
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();

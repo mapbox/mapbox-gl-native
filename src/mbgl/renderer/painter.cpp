@@ -10,8 +10,10 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/style_render_parameters.hpp>
 
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -217,9 +219,11 @@ void Painter::renderPass(RenderPass pass_,
 
     for (; it != end; ++it, i += increment) {
         currentLayer = i;
-        const auto& item = *it;
 
-        if (!item.layer.hasRenderPass(pass))
+        const auto& item = *it;
+        const StyleLayer& layer = item.layer;
+
+        if (!layer.hasRenderPass(pass))
             continue;
 
         if (pass == RenderPass::Translucent) {
@@ -233,13 +237,17 @@ void Painter::renderPass(RenderPass pass_,
         config.stencilMask = 0x0;
         config.viewport = { 0, 0, frame.framebufferSize[0], frame.framebufferSize[1] };
 
-        if (item.bucket && item.tile) {
-            MBGL_DEBUG_GROUP(item.layer.id + " - " + std::string(item.tile->id));
-            prepareTile(*item.tile);
-            item.bucket->render(*this, item.layer, item.tile->id, item.tile->matrix);
-        } else {
+        if (layer.is<BackgroundLayer>()) {
             MBGL_DEBUG_GROUP("background");
-            renderBackground(*item.layer.template as<BackgroundLayer>());
+            renderBackground(*layer.as<BackgroundLayer>());
+        } else if (layer.is<CustomLayer>()) {
+            MBGL_DEBUG_GROUP(layer.id + " - custom");
+            layer.as<CustomLayer>()->render(StyleRenderParameters(state));
+            config.setDirty();
+        } else {
+            MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->id));
+            prepareTile(*item.tile);
+            item.bucket->render(*this, layer, item.tile->id, item.tile->matrix);
         }
     }
 

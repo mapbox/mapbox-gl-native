@@ -43,7 +43,7 @@
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
         'api/set_style.cpp',
-
+        'api/custom_layer.cpp',
 
         'miscellaneous/async_task.cpp',
         'miscellaneous/clip_ids.cpp',

@@ -11,6 +11,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
 
+#include <mapbox/optional.hpp>
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -88,8 +90,8 @@ public:
 
     std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
     StyleLayer* getLayer(const std::string& id) const;
-    void addLayer(std::unique_ptr<StyleLayer>);
-    void addLayer(std::unique_ptr<StyleLayer>, const std::string& beforeLayerID);
+    void addLayer(std::unique_ptr<StyleLayer>,
+                  mapbox::util::optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
     RenderData getRenderData() const;

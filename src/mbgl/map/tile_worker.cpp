@@ -4,6 +4,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -109,8 +110,8 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
     if (state == TileData::State::obsolete)
         return;
 
-    // Background is a special case.
-    if (layer->is<BackgroundLayer>())
+    // Background and custom layers are special cases.
+    if (layer->is<BackgroundLayer>() || layer->is<CustomLayer>())
         return;
 
     // Skip this bucket if we are to not render this
