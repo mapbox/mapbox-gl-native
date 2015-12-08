@@ -13,7 +13,9 @@ import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
@@ -234,6 +236,10 @@ final class NativeMapView {
 
     public void moveBy(double dx, double dy) {
         moveBy(dx, dy, 0);
+    }
+
+    public List<List<Object>> getFeatures(PointF pointF, long raduis) {
+        return nativeGetFeatures(mNativeMapViewPtr, pointF.x, pointF.y, raduis);
     }
 
     public void moveBy(double dx, double dy, long duration) {
@@ -514,6 +520,8 @@ final class NativeMapView {
                                          List<String> classes);
 
     private native List<String> nativeGetClasses(long nativeMapViewPtr);
+
+    private native List<List<Object>> nativeGetFeatures(long nativeMapViewPtr, double dx, double dy, long radius);
 
     private native void nativeSetDefaultTransitionDuration(
             long nativeMapViewPtr, long duration);

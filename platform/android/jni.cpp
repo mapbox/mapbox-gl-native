@@ -23,6 +23,7 @@
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/interactive_features.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -86,6 +87,12 @@ jclass arrayListClass = nullptr;
 jmethodID arrayListConstructorId = nullptr;
 jmethodID arrayListAddId = nullptr;
 
+jclass hashMapClass = nullptr;
+jmethodID hashMapConstructorId = nullptr;
+jmethodID hashMapPutId = nullptr;
+  
+
+           
 jclass projectedMetersClass = nullptr;
 jmethodID projectedMetersConstructorId = nullptr;
 jfieldID projectedMetersNorthingId = nullptr;
@@ -246,6 +253,8 @@ std::vector<std::string> std_vector_string_from_jobject(JNIEnv *env, jobject jli
     return vector;
 }
 
+
+
 jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vector) {
     jobject jlist = env->NewObject(arrayListClass, arrayListConstructorId);
     if (jlist == nullptr) {
@@ -260,9 +269,54 @@ jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vecto
             return nullptr;
         }
     }
-
     return jlist;
 }
+
+
+jobject std_features_result_to_jobject(JNIEnv *env, FeatureResults feature_result ){
+    jobject jlist = env->NewObject(arrayListClass, arrayListConstructorId);
+    if (jlist == nullptr) {
+        env->ExceptionDescribe();
+        return nullptr;
+    }
+
+    for (const auto& feature : feature_result) {
+        jobject tuple = env->NewObject(arrayListClass, arrayListConstructorId);
+        jstring string_0 = std_string_to_jstring(env, std::get<0>(feature));
+        env->CallBooleanMethod(tuple, arrayListAddId, string_0);
+        env->DeleteLocalRef(string_0);
+        jstring string_1 = std_string_to_jstring(env, std::get<1>(feature));     
+        env->CallBooleanMethod(tuple, arrayListAddId, string_1);
+        env->DeleteLocalRef(string_1);
+        jobject hashmap = env->NewObject(hashMapClass, hashMapConstructorId); 
+        
+         if (hashmap == nullptr) {
+            env->ExceptionDescribe();
+            return nullptr;
+           }
+        
+        std::map<std::string, std::string> m =  std::get<2>(feature);
+        for( std::map<std::string, std::string>::iterator iterator = m.begin(); iterator != m.end(); iterator++) {
+            jstring key = std_string_to_jstring(env, iterator->first.c_str());
+            jstring value = std_string_to_jstring(env, iterator->second.c_str());
+            env->CallObjectMethod(hashmap, hashMapPutId, key, value);
+            env->DeleteLocalRef(key);
+            env->DeleteLocalRef(value);
+        }
+        
+        env->CallBooleanMethod(tuple, arrayListAddId, hashmap);
+        env->DeleteLocalRef(hashmap);
+        env->CallBooleanMethod(jlist, arrayListAddId, tuple);
+        env->DeleteLocalRef(tuple);
+        
+        if (env->ExceptionCheck()) {
+            env->ExceptionDescribe();
+            return nullptr;
+        }
+    } 
+     return jlist;
+}
+
 
 jlongArray std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector) {
     jlongArray jarray = env->NewLongArray(vector.size());
@@ -1411,6 +1465,14 @@ jobject JNICALL nativeLatLngForProjectedMeters(JNIEnv *env, jobject obj, jlong n
     return ret;
 }
 
+jobject JNICALL nativeGetFeatures(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble dx, jdouble dy, jint radius){
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetFeatures");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::PrecisionPoint point(dx, dy);
+    return std_features_result_to_jobject(env, nativeMapView->getMap().featuresAt(point,radius));  
+}
+
 jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLng) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativePixelForLatLng");
     assert(nativeMapViewPtr != 0);
@@ -1730,13 +1792,32 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
-
-    arrayListAddId = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+   arrayListAddId = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
     if (arrayListAddId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
+   
 
+   
+    hashMapClass = env->FindClass("java/util/HashMap");
+    if (hashMapClass == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+
+    hashMapConstructorId = env->GetMethodID(hashMapClass, "<init>", "()V");
+    if (hashMapConstructorId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+    
+    hashMapPutId = env->GetMethodID(hashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    if (hashMapPutId == nullptr) {
+        env->ExceptionDescribe();
+        return JNI_ERR;
+    }
+    
     projectedMetersClass = env->FindClass("com/mapbox/mapboxsdk/geometry/ProjectedMeters");
     if (projectedMetersClass == nullptr) {
         env->ExceptionDescribe();
@@ -1956,6 +2037,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetCollisionDebug", "(J)Z", reinterpret_cast<void *>(&nativeGetCollisionDebug)},
         {"nativeIsFullyLoaded", "(J)Z", reinterpret_cast<void *>(&nativeIsFullyLoaded)},
         {"nativeSetReachability", "(JZ)V", reinterpret_cast<void *>(&nativeSetReachability)},
+        {"nativeGetFeatures",  "(JDDJ)Ljava/util/List;",reinterpret_cast<void *>(&nativeGetFeatures)}, 
         {"nativeGetMetersPerPixelAtLatitude", "(JDD)D", reinterpret_cast<void *>(&nativeGetMetersPerPixelAtLatitude)},
         {"nativeProjectedMetersForLatLng",
          "(JLcom/mapbox/mapboxsdk/geometry/LatLng;)Lcom/mapbox/mapboxsdk/geometry/ProjectedMeters;",
@@ -2068,6 +2150,20 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    hashMapClass =  reinterpret_cast<jclass>(env->NewGlobalRef(hashMapClass));
+     if (hashMapClass == nullptr) {
+        env->ExceptionDescribe();
+        env->DeleteGlobalRef(latLngClass);
+        env->DeleteGlobalRef(latLngZoomClass);
+        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(spriteClass);
+        env->DeleteGlobalRef(markerClass);
+        env->DeleteGlobalRef(polylineClass);
+        env->DeleteGlobalRef(polygonClass);
+        env->DeleteGlobalRef(runtimeExceptionClass);
+        env->DeleteGlobalRef(nullPointerExceptionClass);
+     }
+    
     arrayListClass = reinterpret_cast<jclass>(env->NewGlobalRef(arrayListClass));
     if (arrayListClass == nullptr) {
         env->ExceptionDescribe();
@@ -2080,6 +2176,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(polygonClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
         env->DeleteGlobalRef(nullPointerExceptionClass);
+        env->DeleteGlobalRef(hashMapClass);
         return JNI_ERR;
     }
 
@@ -2249,6 +2346,11 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     arrayListClass = nullptr;
     arrayListConstructorId = nullptr;
     arrayListAddId = nullptr;
+    
+    env->DeleteGlobalRef(hashMapClass);
+    hashMapClass = nullptr;
+    hashMapConstructorId = nullptr;
+    hashMapPutId = nullptr;
 
     env->DeleteGlobalRef(projectedMetersClass);
     projectedMetersClass = nullptr;

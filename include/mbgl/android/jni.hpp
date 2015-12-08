@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <mbgl/util/interactive_features.hpp>
 
 // Forward definition of JNI types
 typedef class _jclass* jclass;
@@ -111,7 +112,7 @@ extern jstring std_string_to_jstring(JNIEnv *env, std::string str);
 extern std::vector<std::string> std_vector_string_from_jobject(JNIEnv *env, jobject jlist);
 extern jobject std_vector_string_to_jobject(JNIEnv *env, std::vector<std::string> vector);
 extern jlongArray std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t> vector);
-
+extern jobject std_features_result_to_jobject(JNIEnv *env, FeatureResults feature_result );
 }
 }
 

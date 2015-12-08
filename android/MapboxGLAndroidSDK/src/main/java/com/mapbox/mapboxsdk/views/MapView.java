@@ -410,7 +410,7 @@ public final class MapView extends FrameLayout {
          *
          * @param point The projected map coordinate the user clicked on.
          */
-        void onMapClick(@NonNull LatLng point);
+        void onMapClick(@ NonNull LatLng point, PointF pointF);
     }
 
     /**
@@ -1634,6 +1634,17 @@ public final class MapView extends FrameLayout {
     }
 
     //
+    // Features
+    //
+
+    @UiThread
+    @NonNull
+    public List<List<Object>> getFeatures(PointF pointF, long raduis) {
+        return mNativeMapView.getFeatures(pointF,raduis);
+    }
+
+
+    //
     // Annotations
     //
 
@@ -2474,7 +2485,7 @@ public final class MapView extends FrameLayout {
                 // notify app of map click
                 if (mOnMapClickListener != null) {
                     LatLng point = fromScreenLocation(tapPoint);
-                    mOnMapClickListener.onMapClick(point);
+                    mOnMapClickListener.onMapClick(point, tapPoint);
                 }
             }
 
