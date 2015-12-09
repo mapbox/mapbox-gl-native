@@ -1,6 +1,7 @@
 #include <mbgl/util/async_task.hpp>
 
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <atomic>
 #include <functional>
@@ -38,15 +39,33 @@ public:
     }
 
     void maySend() {
-        // uv_async_send will do the call coalescing for us.
-        if (uv_async_send(async) != 0) {
-            throw std::runtime_error("Failed to async send.");
+        if (!queued.test_and_set()) {
+            if (uv_async_send(async) != 0) {
+                throw std::runtime_error("Failed to async send.");
+            }
         }
+    }
+
+    void runTask() {
+        queued.clear();
+        task();
+    }
+
+    void received() {
+        if (throttle == Duration::zero()) {
+            runTask();
+        } else {
+            timer.start(throttle, Duration::zero(), [this] { runTask(); });
+        }
+    }
+
+    void setThrottle(Duration timeout) {
+        throttle = timeout;
     }
 
 private:
     static void asyncCallback(UV_ASYNC_PARAMS(handle)) {
-        reinterpret_cast<Impl*>(handle->data)->task();
+        reinterpret_cast<Impl*>(handle->data)->received();
     }
 
     uv_handle_t* handle() {
@@ -55,7 +74,12 @@ private:
 
     uv_async_t* async;
 
+    util::Timer timer;
+
     std::function<void()> task;
+    std::atomic_flag queued = ATOMIC_FLAG_INIT;
+
+    Duration throttle = Duration::zero();
 };
 
 AsyncTask::AsyncTask(std::function<void()>&& fn)
@@ -66,6 +90,10 @@ AsyncTask::~AsyncTask() = default;
 
 void AsyncTask::send() {
     impl->maySend();
+}
+
+void AsyncTask::setThrottle(Duration timeout) {
+    impl->setThrottle(timeout);
 }
 
 } // namespace util

@@ -1,6 +1,7 @@
 #ifndef MBGL_UTIL_ASYNC_TASK
 #define MBGL_UTIL_ASYNC_TASK
 
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
@@ -15,6 +16,8 @@ public:
     ~AsyncTask();
 
     void send();
+
+    void setThrottle(Duration timeout);
 
 private:
     class Impl;
