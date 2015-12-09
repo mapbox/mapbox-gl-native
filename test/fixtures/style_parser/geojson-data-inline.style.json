@@ -1,0 +1,9 @@
+{
+  "version": 8,
+  "sources": {
+    "mapbox": {
+      "type": "geojson",
+      "data": { "type": "Feature", "geometry": { "type": "Point", "coordinates": [100.0, 0.0] } }
+    }
+  }
+}
