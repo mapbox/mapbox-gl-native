@@ -101,6 +101,9 @@ Xcode/node: ; $(RUN) HTTP=none ASSET=none CACHE=none Xcode/node
 
 .PHONY: xnode
 xnode: Xcode/node ; @open ./build/binding.xcodeproj
+nproj:
+	$(RUN) HTTP=none ASSET=none CACHE=none node/xproj
+	@open ./build/binding.xcodeproj
 
 .PHONY: test
 test: ; $(RUN) Makefile/test

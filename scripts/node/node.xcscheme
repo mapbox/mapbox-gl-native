@@ -58,11 +58,7 @@
       </MacroExpansion>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "{{NODE_PATH}}/npm"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "{{NPM_COMMAND}}"
+            argument = "{{NODE_ARGUMENT}}"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
