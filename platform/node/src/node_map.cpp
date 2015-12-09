@@ -215,9 +215,12 @@ std::unique_ptr<NodeMap::RenderOptions> NodeMap::ParseOptions(v8::Local<v8::Obje
     }
 
     if (Nan::Has(obj, Nan::New("center").ToLocalChecked()).FromJust()) {
-        auto center = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked().As<v8::Array>();
-        if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
-        if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+        auto centerObj = Nan::Get(obj, Nan::New("center").ToLocalChecked()).ToLocalChecked();
+        if (centerObj->IsArray()) {
+            auto center = centerObj.As<v8::Array>();
+            if (center->Length() > 0) { options->longitude = Nan::Get(center, 0).ToLocalChecked()->NumberValue(); }
+            if (center->Length() > 1) { options->latitude = Nan::Get(center, 1).ToLocalChecked()->NumberValue(); }
+        }
     }
 
     if (Nan::Has(obj, Nan::New("width").ToLocalChecked()).FromJust()) {

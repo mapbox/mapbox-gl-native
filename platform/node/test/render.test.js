@@ -31,6 +31,11 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
         callback(new Error('timed out after 20 seconds'));
     }, 20000);
 
+    options.center = style.center;
+    options.zoom = style.zoom;
+    options.bearing = style.bearing;
+    options.pitch = style.pitch;
+
     map.load(style);
     map.render(options, function (err, pixels) {
         map.release();
