@@ -73,39 +73,81 @@ void StyleParser::parseSources(const JSVal& value) {
 
         source->info.type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
 
-        if (sourceVal.HasMember("url")) {
-            const JSVal& urlVal = sourceVal["url"];
-
-            if (!urlVal.IsString()) {
-                Log::Warning(Event::ParseStyle, "source url must be a string");
+        switch (source->info.type) {
+        case SourceType::Vector:
+            if (!parseVectorSource(*source, sourceVal)) {
                 continue;
             }
-
-            source->info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+            break;
+        case SourceType::Raster:
+            if (!parseRasterSource(*source, sourceVal)) {
+                continue;
+            }
+            break;
+        default:
+            Log::Warning(Event::ParseStyle, "source type %s is not supported", SourceTypeClass(source->info.type).c_str());
         }
-
-        if (sourceVal.HasMember("tileSize")) {
-            const JSVal& tileSizeVal = sourceVal["tileSize"];
-
-            if (!tileSizeVal.IsUint()) {
-                Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
-                continue;
-            }
-
-            unsigned int intValue = tileSizeVal.GetUint();
-            if (intValue > std::numeric_limits<uint16_t>::max()) {
-                Log::Warning(Event::ParseStyle, "values for tileSize that are larger than %d are not supported", std::numeric_limits<uint16_t>::max());
-                continue;
-            }
-
-            source->info.tile_size = intValue;
-        }
-
-        source->info.parseTileJSONProperties(sourceVal);
 
         sourcesMap.emplace(source->info.source_id, source.get());
         sources.emplace_back(std::move(source));
     }
+}
+
+bool StyleParser::parseVectorSource(Source& source, const JSVal& sourceVal) {
+    // A vector tile source either specifies the URL of a TileJSON file...
+    if (sourceVal.HasMember("url")) {
+        const JSVal& urlVal = sourceVal["url"];
+
+        if (!urlVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "source url must be a string");
+            return false;
+        }
+
+        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+
+    } else {
+        // ...or the TileJSON directly.
+        source.info.parseTileJSONProperties(sourceVal);
+    }
+
+    return true;
+}
+
+bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
+    if (sourceVal.HasMember("tileSize")) {
+        const JSVal& tileSizeVal = sourceVal["tileSize"];
+
+        if (!tileSizeVal.IsUint()) {
+            Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
+            return false;
+        }
+
+        unsigned int intValue = tileSizeVal.GetUint();
+        if (intValue > std::numeric_limits<uint16_t>::max()) {
+            Log::Warning(Event::ParseStyle, "values for tileSize that are larger than %d are not supported", std::numeric_limits<uint16_t>::max());
+            return false;
+        }
+
+        source.info.tile_size = intValue;
+    }
+
+    // A raster tile source either specifies the URL of a TileJSON file...
+    if (sourceVal.HasMember("url")) {
+        const JSVal& urlVal = sourceVal["url"];
+
+        if (!urlVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "source url must be a string");
+            return false;
+        }
+
+        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+
+    } else {
+        // ...or the TileJSON directly.
+        source.info.parseTileJSONProperties(sourceVal);
+    }
+
+    return true;
 }
 
 void StyleParser::parseLayers(const JSVal& value) {

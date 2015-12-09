@@ -33,6 +33,8 @@ public:
 
 private:
     void parseSources(const JSVal&);
+    bool parseVectorSource(Source&, const JSVal&);
+    bool parseRasterSource(Source&, const JSVal&);
     void parseLayers(const JSVal&);
     void parseLayer(const std::string& id, const JSVal&, std::unique_ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSVal& value);
