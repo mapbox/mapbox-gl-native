@@ -27,17 +27,14 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapzen.android.lost.api.LocationListener;
-import com.mapzen.android.lost.api.LocationRequest;
-import com.mapzen.android.lost.api.LocationServices;
-import com.mapzen.android.lost.api.LostApiClient;
+import com.mapbox.mapboxsdk.location.LocationListener;
+import com.mapbox.mapboxsdk.location.LocationServices;
 
-final class UserLocationView extends View {
+final class UserLocationView extends View implements LocationListener {
 
     private MapView mMapView;
 
@@ -80,10 +77,7 @@ final class UserLocationView extends View {
     private ObjectAnimator mMarkerAccuracyAnimator;
 
     private boolean mPaused = false;
-    private LostApiClient mLocationClient;
-    private LocationRequest mLocationRequest;
     private Location mUserLocation;
-    private MyLocationListener mLocationListener;
 
     MapView.OnMyLocationChangeListener mOnMyLocationChangeListener;
 
@@ -121,13 +115,6 @@ final class UserLocationView extends View {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         setLayoutParams(lp);
-
-        // Setup location services
-        mLocationClient = new LostApiClient.Builder(getContext()).build();
-        mLocationRequest = LocationRequest.create()
-                .setFastestInterval(1000)
-                .setSmallestDisplacement(3.0f)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Setup sensors
         mBearingChangeListener = new MyBearingListener(context);
@@ -338,29 +325,27 @@ final class UserLocationView extends View {
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
-        if (mLocationClient == null) {
-            return;
-        }
+
+        LocationServices locationServices = LocationServices.getLocationServices(getContext());
 
         if (enableGps) {
-            if (!mLocationClient.isConnected()) {
-                mUserLocation = null;
-                mLocationClient.connect();
-                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation();
-                if (lastLocation != null) {
-                    setLocation(lastLocation);
-                }
-                mLocationListener = new MyLocationListener();
-                LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, mLocationListener);
+            // Set an initial location if one available
+            Location lastLocation = locationServices.getLastLocation();
+            if (lastLocation != null) {
+                setLocation(lastLocation);
             }
+
+            // Register for Location Updates
+            locationServices.addLocationListener(this);
         } else {
-            if (mLocationClient.isConnected()) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(mLocationListener);
-                mLocationListener = null;
-                mLocationClient.disconnect();
-                mUserLocation = null;
-            }
+            // Disable location and user dot
+            setLocation(null);
+
+            // Deregister for Location Updates
+            locationServices.removeLocationListener(this);
         }
+
+        locationServices.toggleGPS(enableGps);
     }
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
@@ -471,15 +456,17 @@ final class UserLocationView extends View {
         }
     }
 
-
-    private class MyLocationListener implements LocationListener {
-        @Override
-        public void onLocationChanged(Location location) {
-            if (mPaused) {
-                return;
-            }
-            setLocation(location);
+    /**
+     * Callback method for receiving location updates from LocationServices.
+     *
+     * @param location The new Location data
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+        if (mPaused) {
+            return;
         }
+        setLocation(location);
     }
 
     private boolean isStale(Location location) {
@@ -627,11 +614,17 @@ final class UserLocationView extends View {
         mMapView.update();
     }
 
+    /**
+     * Called from MapView.onPause()
+     */
     public void pause() {
         mPaused = true;
         toggleGps(false);
     }
 
+    /**
+     * Called from MapView.onResume()
+     */
     public void resume() {
         mPaused = false;
         if (isEnabled()) {
