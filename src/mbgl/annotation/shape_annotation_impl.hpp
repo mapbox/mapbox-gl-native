@@ -1,7 +1,7 @@
 #ifndef MBGL_SHAPE_ANNOTATION_IMPL
 #define MBGL_SHAPE_ANNOTATION_IMPL
 
-#include <mapbox/geojsonvt/geojsonvt.hpp>
+#include <mapbox/geojsonvt.hpp>
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
@@ -32,8 +32,8 @@ public:
 
 private:
     const uint8_t maxZoom;
-    mapbox::util::geojsonvt::ProjectedFeatureType type;
-    std::unique_ptr<mapbox::util::geojsonvt::GeoJSONVT> shapeTiler;
+    mapbox::geojsonvt::ProjectedFeatureType type;
+    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> shapeTiler;
 };
 
 } // namespace mbgl
