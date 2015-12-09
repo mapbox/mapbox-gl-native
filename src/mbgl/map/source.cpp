@@ -167,9 +167,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
         return state;
     }
 
-    auto pos = tiles.emplace(id, std::make_unique<Tile>(id));
-
-    Tile& new_tile = *pos.first->second;
+    auto newTile = std::make_unique<Tile>(id);
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
@@ -178,19 +176,19 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
     auto it = tileDataMap.find(normalized_id);
     if (it != tileDataMap.end()) {
         // Create a shared_ptr handle. Note that this might be empty!
-        new_tile.data = it->second.lock();
+        newTile->data = it->second.lock();
     }
 
-    if (new_tile.data && new_tile.data->getState() == TileData::State::obsolete) {
+    if (newTile->data && newTile->data->getState() == TileData::State::obsolete) {
         // Do not consider the tile if it's already obsolete.
-        new_tile.data.reset();
+        newTile->data.reset();
     }
 
-    if (!new_tile.data) {
-        new_tile.data = cache.get(normalized_id.to_uint64());
+    if (!newTile->data) {
+        newTile->data = cache.get(normalized_id.to_uint64());
     }
 
-    if (!new_tile.data) {
+    if (!newTile->data) {
         auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
@@ -201,7 +199,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
                                                              parameters.worker);
 
             tileData->request(parameters.pixelRatio, callback);
-            new_tile.data = tileData;
+            newTile->data = tileData;
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
@@ -210,20 +208,23 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
             } else if (info.type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
             } else {
-                throw std::runtime_error("source type not implemented");
+                Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(info.type).c_str());
+                return TileData::State::invalid;
             }
 
-            new_tile.data = std::make_shared<VectorTileData>(normalized_id,
+            newTile->data = std::make_shared<VectorTileData>(normalized_id,
                                                              std::move(monitor),
                                                              info.source_id,
                                                              parameters.style,
                                                              callback);
         }
 
-        tileDataMap.emplace(new_tile.data->id, new_tile.data);
+        tileDataMap.emplace(newTile->data->id, newTile->data);
     }
 
-    return new_tile.data->getState();
+    const auto newState = newTile->data->getState();
+    tiles.emplace(id, std::move(newTile));
+    return newState;
 }
 
 double Source::getZoom(const TransformState& state) const {

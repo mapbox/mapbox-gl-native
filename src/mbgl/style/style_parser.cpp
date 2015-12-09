@@ -8,6 +8,9 @@
 
 #include <mbgl/platform/log.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+#include <mapbox/geojsonvt/convert.hpp>
+
 #include <algorithm>
 
 namespace mbgl {
@@ -84,6 +87,11 @@ void StyleParser::parseSources(const JSVal& value) {
                 continue;
             }
             break;
+        case SourceType::GeoJSON:
+            if (!parseGeoJSONSource(*source, sourceVal)) {
+                continue;
+            }
+            break;
         default:
             Log::Warning(Event::ParseStyle, "source type %s is not supported", SourceTypeClass(source->info.type).c_str());
         }
@@ -145,6 +153,29 @@ bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
     } else {
         // ...or the TileJSON directly.
         source.info.parseTileJSONProperties(sourceVal);
+    }
+
+    return true;
+}
+
+bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
+    if (!sourceVal.HasMember("data")) {
+        Log::Warning(Event::ParseStyle, "GeoJSON source must have a data value");
+        return false;
+    }
+
+    const JSVal& dataVal = sourceVal["data"];
+    if (dataVal.IsString()) {
+        // We need to load an external GeoJSON file
+        source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
+
+    } else if (dataVal.IsObject()) {
+        // We need to parse dataVal as a GeoJSON object
+        auto geojsonvt = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(mapbox::geojsonvt::Convert::convert(dataVal, 0));
+        // TODO
+    } else {
+        Log::Warning(Event::ParseStyle, "GeoJSON data must be a URL or an object");
+        return false;
     }
 
     return true;
