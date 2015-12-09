@@ -15,6 +15,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'checkstyle'
 
+final Properties LOCAL_PROPS = loadProps(project.rootProject.file('local.properties'));
+
 task accessToken {
     def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml")
     if (!tokenFile.exists()) {
@@ -67,10 +69,24 @@ android {
         disable 'InvalidPackage'
     }
 
+    signingConfigs {
+        release {
+            if (LOCAL_PROPS.storeFile) {
+                storeFile new File((String) LOCAL_PROPS.storeFile)
+                storePassword LOCAL_PROPS.storePassword
+                keyAlias LOCAL_PROPS.keyAlias
+                keyPassword LOCAL_PROPS.keyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (LOCAL_PROPS.storeFile) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
@@ -110,4 +126,16 @@ android.applicationVariants.all { variant ->
     checkstyle.exclude('**/BuildConfig.java')
     checkstyle.exclude('**/R.java')
     project.tasks.getByName("check").dependsOn checkstyle
+}
+
+@Nullable
+private Properties loadProps(File file) {
+    Properties props = null
+    if (file.canRead()) {
+        props = new Properties()
+        props.load(new FileInputStream(file))
+    } else {
+        System.err.println '"${file}" not found'
+    }
+    return props
 }
