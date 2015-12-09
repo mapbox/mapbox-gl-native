@@ -19,6 +19,8 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     private List<LocationListener> locationListeners = null;
 
+    private boolean isGPSEnabled = false;
+
     /**
      * Private constructor for singleton LocationServices
      */
@@ -74,7 +76,6 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
             com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
 
-
         } else {
 
             // Disconnect
@@ -86,7 +87,11 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
         }
 
+        isGPSEnabled = enableGPS;
+    }
 
+    public boolean isGPSEnabled() {
+        return isGPSEnabled;
     }
 
     @Override
