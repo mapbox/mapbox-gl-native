@@ -168,11 +168,10 @@ bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
     if (dataVal.IsString()) {
         // We need to load an external GeoJSON file
         source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
-
     } else if (dataVal.IsObject()) {
         // We need to parse dataVal as a GeoJSON object
-        auto geojsonvt = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(mapbox::geojsonvt::Convert::convert(dataVal, 0));
-        // TODO
+        using namespace mapbox::geojsonvt;
+        source.info.geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(dataVal, 0));
     } else {
         Log::Warning(Event::ParseStyle, "GeoJSON data must be a URL or an object");
         return false;
