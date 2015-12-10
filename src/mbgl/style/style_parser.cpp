@@ -171,9 +171,16 @@ bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
     } else if (dataVal.IsObject()) {
         // We need to parse dataVal as a GeoJSON object
         using namespace mapbox::geojsonvt;
-        source.info.geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(dataVal, 0));
+        try {
+            source.info.geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(dataVal, 0));
+        } catch (const std::exception& ex) {
+            Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
+            // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
+            // tiles to load.
+            source.info.geojsonvt = std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
+        }
     } else {
-        Log::Warning(Event::ParseStyle, "GeoJSON data must be a URL or an object");
+        Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
         return false;
     }
 
