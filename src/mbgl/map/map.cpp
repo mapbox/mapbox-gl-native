@@ -8,6 +8,7 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/thread.hpp>
@@ -425,12 +426,15 @@ LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
     
 #pragma mark - Style API
 
-void Map::addLayer(std::unique_ptr<StyleLayer> layer) {
-    context->invoke(&MapContext::addLayer, std::move(layer), mapbox::util::optional<std::string>());
-}
-
-void Map::addLayer(std::unique_ptr<StyleLayer> layer, const std::string& before) {
-    context->invoke(&MapContext::addLayer, std::move(layer), before);
+void Map::addCustomLayer(const std::string& id,
+                         CustomLayerInitializeFunction initialize,
+                         CustomLayerRenderFunction render,
+                         CustomLayerDeinitializeFunction deinitialize,
+                         void* context_,
+                         const char* before) {
+    context->invoke(&MapContext::addLayer,
+        std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
+        before ? std::string(before) : mapbox::util::optional<std::string>());
 }
 
 #pragma mark - Toggles

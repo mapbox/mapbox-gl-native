@@ -13,11 +13,8 @@ using namespace mbgl;
 static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
 static const GLchar * fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
 
-class TestLayer : public CustomLayer {
+class TestLayer {
 public:
-    TestLayer() : CustomLayer("custom") {}
-    TestLayer(const TestLayer& copy) : CustomLayer(copy) {} // Don't copy GL resources
-
     ~TestLayer() {
         if (program) {
             MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
@@ -29,7 +26,7 @@ public:
         }
     }
 
-    void initialize() override {
+    void initialize() {
         program = MBGL_CHECK_ERROR(glCreateProgram());
         vertexShader = MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
         fragmentShader = MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER));
@@ -49,7 +46,7 @@ public:
         MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW));
     }
 
-    void render(const StyleRenderParameters&) const override {
+    void render() {
         MBGL_CHECK_ERROR(glUseProgram(program));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
@@ -57,10 +54,6 @@ public:
         MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
         MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-    }
-
-    std::unique_ptr<StyleLayer> clone() const override {
-        return std::make_unique<TestLayer>(*this);
     }
 
     GLuint program = 0;
@@ -77,7 +70,17 @@ TEST(CustomLayer, Basic) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addLayer(std::make_unique<TestLayer>());
+    map.addCustomLayer(
+        "custom",
+        [] (void* context) {
+            reinterpret_cast<TestLayer*>(context)->initialize();
+        },
+        [] (void* context, const CustomLayerRenderParameters&) {
+            reinterpret_cast<TestLayer*>(context)->render();
+        },
+        [] (void* context) {
+            delete reinterpret_cast<TestLayer*>(context);
+        }, new TestLayer());
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
 }

@@ -239,7 +239,7 @@ void Painter::renderPass(RenderPass pass_,
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.id + " - custom");
-            layer.as<CustomLayer>()->render(StyleRenderParameters(state));
+            layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
             MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->id));

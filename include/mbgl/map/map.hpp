@@ -9,6 +9,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <cstdint>
 #include <string>
@@ -27,7 +28,6 @@ class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
 struct CameraOptions;
-class StyleLayer;
 
 namespace util {
 template <class T> class Thread;
@@ -164,9 +164,12 @@ public:
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
-    // Style API
-    void addLayer(std::unique_ptr<StyleLayer>);
-    void addLayer(std::unique_ptr<StyleLayer>, const std::string& before);
+    void addCustomLayer(const std::string& id,
+                        CustomLayerInitializeFunction,
+                        CustomLayerRenderFunction,
+                        CustomLayerDeinitializeFunction,
+                        void* context,
+                        const char* before = nullptr);
 
     // Memory
     void setSourceTileCacheSize(size_t);
