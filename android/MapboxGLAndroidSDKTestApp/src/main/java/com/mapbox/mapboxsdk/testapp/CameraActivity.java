@@ -26,7 +26,7 @@ public class CameraActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView = (MapView) findViewById(R.id.cameraMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.setStyle(Style.MAPBOX_STREETS);
         mMapView.onCreate(savedInstanceState);
