@@ -80,7 +80,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {
-    static const double baseTolerance = 10;
+    static const double baseTolerance = 4;
     static const uint16_t extent = 4096;
 
     if (!shapeTiler) {
