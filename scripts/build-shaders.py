@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, re, os, errno
+import sys, re, os, errno, hashlib
 
 
 output_dir = sys.argv[1]
@@ -26,6 +26,19 @@ for file_name in file_names:
             shaders[shader_name] = {}
         with open(file_name, "r") as f:
             shaders[shader_name][shader_type] = f.read()
+
+def sha256(str):
+    return hashlib.sha256(str).hexdigest()
+
+def write_if_changed(path, content):
+    mkdir_p(os.path.dirname(path))
+    try:
+        with open(path, 'r') as f: write = sha256(content) != sha256(f.read())
+    except IOError as e:
+        write = True
+
+    if write:
+        with open(path, 'w') as f: f.write(content)
 
 
 def write_header():
@@ -55,8 +68,7 @@ extern const shader_source shaders[SHADER_COUNT];
 #endif
 """ % '\n'.join(['    %s_SHADER,' % name.upper() for name in shaders.keys()])
     header_path = os.path.join(output_dir, 'include/mbgl/shader/shaders.hpp')
-    mkdir_p(os.path.dirname(header_path))
-    with open(header_path, 'w') as f: f.write(header)
+    write_if_changed(header_path, header)
 
 
 def write_source(shader_platform, prefix, suffix):
@@ -98,8 +110,7 @@ const shader_source shaders[SHADER_COUNT] = {{
 )
 
     source_path = os.path.join(output_dir, 'src/shader/shaders_' + shader_platform + '.cpp')
-    mkdir_p(os.path.dirname(source_path))
-    with open(source_path, 'w') as f: f.write(source)
+    write_if_changed(source_path, source)
 
 write_header()
 write_source('gl', '#ifndef GL_ES_VERSION_2_0', '#endif')
