@@ -80,7 +80,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {
-    static const double baseTolerance = 3;
+    static const double baseTolerance = 10;
     static const uint16_t extent = 4096;
 
     if (!shapeTiler) {
@@ -108,9 +108,8 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
 
         mapbox::geojsonvt::Options options;
         options.maxZoom = maxZoom;
-        options.indexMaxZoom = 4;
-        options.indexMaxPoints = 100;
-        options.tolerance = 10;
+        options.buffer = 128u;
+        options.tolerance = baseTolerance;
         shapeTiler = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(features, options);
     }
 
