@@ -1,5 +1,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
+#include <mbgl/gl/types.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -49,16 +50,33 @@ PremultipliedImage HeadlessView::readStillImage(std::array<uint16_t, 2> size) {
     }
 
     PremultipliedImage image { size[0], size[1] };
-    MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
+    GLuint bufferId;
 
-    const auto stride = image.stride();
-    auto tmp = std::make_unique<uint8_t[]>(stride);
-    uint8_t* rgba = image.data.get();
-    for (int i = 0, j = size[1] - 1; i < j; i++, j--) {
-        std::memcpy(tmp.get(), rgba + i * stride, stride);
-        std::memcpy(rgba + i * stride, rgba + j * stride, stride);
-        std::memcpy(rgba + j * stride, tmp.get(), stride);
+    MBGL_CHECK_ERROR(glGenBuffers(1, &bufferId));
+    MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, bufferId));
+    MBGL_CHECK_ERROR(glBufferData(GL_PIXEL_PACK_BUFFER, size[1] * image.stride(), 0, GL_STREAM_READ));
+    MBGL_CHECK_ERROR(glReadPixels(0, 0, size[0], size[1], GL_RGBA, GL_UNSIGNED_BYTE, 0));
+
+    // Map the PBO to process its data by CPU
+    GLubyte* ptr = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+
+    if (ptr) {
+        const int stride = image.stride();
+        uint8_t* rgba = image.data.get();
+
+        for (unsigned int i = 0, j = size[1] - 1; i < j; i++, j--) {
+            std::memcpy(rgba + i * stride, ptr + j * stride, stride);
+        }
+
+        MBGL_CHECK_ERROR(glUnmapBuffer(GL_PIXEL_PACK_BUFFER));
+    } else {
+        throw std::runtime_error(std::string("Could not map buffer on return from read pixels."));
     }
+
+    MBGL_CHECK_ERROR(glDeleteBuffers(1, &bufferId));
+
+    // back to conventional pixel operation
+    MBGL_CHECK_ERROR(glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
 
     return image;
 }
