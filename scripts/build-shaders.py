@@ -6,6 +6,20 @@ import sys, re, os, errno
 output_dir = sys.argv[1]
 file_names = sys.argv[2:]
 
+header_path = os.path.join(output_dir, 'include/mbgl/shader/shaders.hpp')
+
+def needs_update():
+    header_mtime = os.path.getmtime(header_path)
+
+    if os.path.getmtime(os.path.realpath(__file__)) > header_mtime:
+        return True
+
+    for file_name in file_names:
+        if os.path.getmtime(file_name) > header_mtime:
+            return True
+
+    return False
+
 
 def mkdir_p(path):
     try:
@@ -54,7 +68,6 @@ extern const shader_source shaders[SHADER_COUNT];
 
 #endif
 """ % '\n'.join(['    %s_SHADER,' % name.upper() for name in shaders.keys()])
-    header_path = os.path.join(output_dir, 'include/mbgl/shader/shaders.hpp')
     mkdir_p(os.path.dirname(header_path))
     with open(header_path, 'w') as f: f.write(header)
 
@@ -100,6 +113,9 @@ const shader_source shaders[SHADER_COUNT] = {{
     source_path = os.path.join(output_dir, 'src/shader/shaders_' + shader_platform + '.cpp')
     mkdir_p(os.path.dirname(source_path))
     with open(source_path, 'w') as f: f.write(source)
+
+if not needs_update():
+    sys.exit(0)
 
 write_header()
 write_source('gl', '#ifndef GL_ES_VERSION_2_0', '#endif')
