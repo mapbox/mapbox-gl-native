@@ -16,7 +16,7 @@ class GlyphAtlas;
 class GlyphStore;
 class CollisionTile;
 
-class StyleBucketParameters {
+class StyleBucketParameters final {
 public:
     StyleBucketParameters(const TileID& tileID_,
                           const GeometryTileLayer& layer_,

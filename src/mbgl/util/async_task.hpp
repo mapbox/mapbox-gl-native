@@ -9,7 +9,7 @@
 namespace mbgl {
 namespace util {
 
-class AsyncTask : private util::noncopyable {
+class AsyncTask final : private util::noncopyable {
 public:
     AsyncTask(std::function<void()>&&);
     ~AsyncTask();

@@ -33,7 +33,7 @@ typedef bgm::box<CollisionPoint> Box;
 typedef std::pair<Box, CollisionBox> CollisionTreeBox;
 typedef bgi::rtree<CollisionTreeBox, bgi::linear<16, 4>> Tree;
 
-class CollisionTile {
+class CollisionTile final {
 public:
     explicit CollisionTile(PlacementConfig);
 

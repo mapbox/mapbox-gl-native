@@ -18,7 +18,7 @@ namespace node_mbgl {
 namespace util {
 
 template <typename T>
-class AsyncQueue {
+class AsyncQueue final {
 public:
     AsyncQueue(uv_loop_t *loop, std::function<void(T &)> fn) :
           callback(fn) {

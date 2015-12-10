@@ -10,9 +10,9 @@
 
 namespace mbgl {
 
-class FixtureLog {
+class FixtureLog final {
 public:
-    struct Message {
+    struct Message final {
         Message(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
         Message();
 
@@ -26,7 +26,7 @@ public:
         mutable bool checked = false;
     };
 
-    class Observer : public Log::Observer {
+    class Observer final : public Log::Observer {
     public:
         using LogMessage = Message;
 
@@ -34,10 +34,10 @@ public:
         ~Observer();
 
         // Log::Observer implementation
-        virtual bool onRecord(EventSeverity severity,
-                              Event event,
-                              int64_t code,
-                              const std::string& msg) override;
+        bool onRecord(EventSeverity severity,
+                      Event event,
+                      int64_t code,
+                      const std::string& msg) override;
 
         bool empty() const;
         size_t count(const Message& message) const;

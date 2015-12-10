@@ -19,7 +19,7 @@ enum OpenFlag : int {
     PrivateCache = 0x00040000,
 };
 
-struct Exception : std::runtime_error {
+struct Exception final : std::runtime_error {
     inline Exception(int err, const char *msg) : std::runtime_error(msg), code(err) {}
     inline Exception(int err, const std::string& msg) : std::runtime_error(msg), code(err) {}
     const int code = 0;
@@ -27,7 +27,7 @@ struct Exception : std::runtime_error {
 
 class Statement;
 
-class Database {
+class Database final {
 private:
     Database(const Database &) = delete;
     Database &operator=(const Database &) = delete;
@@ -38,7 +38,7 @@ public:
     ~Database();
     Database &operator=(Database &&);
 
-    operator bool() const;
+    explicit operator bool() const;
 
     void exec(const std::string &sql);
     Statement prepare(const char *query);
@@ -47,7 +47,7 @@ private:
     sqlite3 *db = nullptr;
 };
 
-class Statement {
+class Statement final {
 private:
     Statement(const Statement &) = delete;
     Statement &operator=(const Statement &) = delete;
@@ -58,7 +58,7 @@ public:
     ~Statement();
     Statement &operator=(Statement &&);
 
-    operator bool() const;
+    explicit operator bool() const;
 
     template <typename T> void bind(int offset, T value);
     void bind(int offset, const std::string &value, bool retain = true);

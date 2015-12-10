@@ -10,20 +10,20 @@
 
 namespace mbgl {
 
-struct FrameSnapshot {
-    explicit inline FrameSnapshot(TimePoint now_, float z_) : now(now_), z(z_) {}
+struct FrameSnapshot final {
+    inline explicit FrameSnapshot(TimePoint now_, float z_) : now(now_), z(z_) {}
     const TimePoint now;
     float z;
 };
 
-struct FadeProperties {
+struct FadeProperties final {
     float fadedist;
     float minfadezoom;
     float maxfadezoom;
     float bump;
 };
 
-class FrameHistory {
+class FrameHistory final {
 public:
     // Record frame history that will be used to calculate fading params
     void record(TimePoint now, float zoom);

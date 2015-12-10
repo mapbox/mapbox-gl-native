@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-class PlainShader : public Shader {
+class PlainShader final : public Shader {
 public:
     PlainShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>                u_matrix   = {"u_matrix", *this};
     Uniform<std::array<GLfloat, 4>> u_color    = {"u_color",  *this};

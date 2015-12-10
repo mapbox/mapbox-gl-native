@@ -7,11 +7,11 @@
 
 namespace mbgl {
 
-class CollisionBoxShader : public Shader {
+class CollisionBoxShader final : public Shader {
 public:
     CollisionBoxShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>              u_matrix      = {"u_matrix",      *this};
     Uniform<GLfloat>              u_scale       = {"u_scale",       *this};

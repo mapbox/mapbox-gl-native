@@ -6,14 +6,14 @@
 
 namespace mbgl {
 
-class BackgroundPaintProperties {
+class BackgroundPaintProperties final {
 public:
     PaintProperty<float> opacity { 1.0f };
     PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
     PaintProperty<std::string, Faded<std::string>> pattern { "" };
 };
 
-class BackgroundLayer : public StyleLayer {
+class BackgroundLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

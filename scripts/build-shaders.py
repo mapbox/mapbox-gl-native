@@ -50,7 +50,7 @@ enum {
 
 extern const shader_source shaders[SHADER_COUNT];
 
-}
+} // namespace mbgl
 
 #endif
 """ % '\n'.join(['    %s_SHADER,' % name.upper() for name in shaders.keys()])
@@ -89,7 +89,7 @@ const shader_source shaders[SHADER_COUNT] = {{
 {shaders}
 }};
 
-}}
+}} // namespace mbgl
 {suffix}
 """.format(
     prefix = prefix,

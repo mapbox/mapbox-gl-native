@@ -18,7 +18,7 @@ class TileID;
 struct box;
 struct TileCoordinate;
 
-class TransformState {
+class TransformState final {
     friend class Transform;
 
 public:

@@ -403,7 +403,7 @@ void JNICALL nativeInitializeDisplay(JNIEnv *env, jobject obj, jlong nativeMapVi
     try
     {
         nativeMapView->initializeDisplay();
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw_jni_error(env, "Unable to initialize GL display.");
     }
 }
@@ -422,7 +422,7 @@ void JNICALL nativeInitializeContext(JNIEnv *env, jobject obj, jlong nativeMapVi
 
     try {
         nativeMapView->initializeContext();
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw_jni_error(env, "Unable to initialize GL context.");
     }
 }
@@ -441,7 +441,7 @@ void JNICALL nativeCreateSurface(JNIEnv *env, jobject obj, jlong nativeMapViewPt
 
     try {
         nativeMapView->createSurface(ANativeWindow_fromSurface(env, surface));
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         throw_jni_error(env, "Unable to create GL surface.");
     }
 }

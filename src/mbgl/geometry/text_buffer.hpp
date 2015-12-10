@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class TextVertexBuffer : public Buffer <
+class TextVertexBuffer final : public Buffer <
     16,
     GL_ARRAY_BUFFER,
     32768

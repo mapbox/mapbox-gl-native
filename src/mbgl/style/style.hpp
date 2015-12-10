@@ -32,7 +32,7 @@ class TexturePool;
 class Tile;
 class Bucket;
 
-struct RenderItem {
+struct RenderItem final {
     inline RenderItem(const StyleLayer& layer_,
                       const Tile* tile_ = nullptr,
                       Bucket* bucket_ = nullptr)
@@ -44,19 +44,19 @@ struct RenderItem {
     const StyleLayer& layer;
 };
 
-struct RenderData {
+struct RenderData final {
     Color backgroundColor = {{ 0, 0, 0, 0 }};
     std::set<Source*> sources;
     std::vector<RenderItem> order;
 };
 
-class Style : public GlyphStore::Observer,
-              public SpriteStore::Observer,
-              public Source::Observer,
-              public util::noncopyable {
+class Style final : public GlyphStore::Observer,
+                    public SpriteStore::Observer,
+                    public Source::Observer,
+                    public util::noncopyable {
 public:
     Style(MapData&);
-    ~Style();
+    ~Style() override;
 
     class Observer {
     public:

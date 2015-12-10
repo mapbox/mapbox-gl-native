@@ -23,7 +23,7 @@ namespace util {
 // object creation, it's safe to obtain the Object stored in this thread.
 
 template <class Object>
-class Thread {
+class Thread final {
 public:
     template <class... Args>
     Thread(const ThreadContext&, Args&&... args);

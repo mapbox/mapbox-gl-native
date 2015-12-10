@@ -17,7 +17,7 @@ namespace debugging {
 
 void enable();
 
-struct group {
+struct group final {
     group(const std::string&);
     ~group();
 };

@@ -10,7 +10,7 @@ namespace mbgl {
 namespace util {
 
 #ifndef DISABLE_STOPWATCH
-class stopwatch {
+class stopwatch final {
 public:
     stopwatch(Event event = Event::General);
     stopwatch(EventSeverity severity, Event event = Event::General);
@@ -26,7 +26,7 @@ private:
     TimePoint start;
 };
 #else
-class stopwatch {
+class stopwatch final {
     inline stopwatch(Event event = Event::General);
     inline stopwatch(EventSeverity severity, Event event = Event::General);
     inline stopwatch(const std::string &name, Event event = Event::General);

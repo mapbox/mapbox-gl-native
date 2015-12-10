@@ -10,8 +10,8 @@
 namespace mbgl {
 
 template <typename T = double>
-struct vec2 {
-    struct null {};
+struct vec2 final {
+    struct null final {};
     typedef T Type;
 
     T x, y;
@@ -85,18 +85,18 @@ struct vec2 {
     }
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return !std::isnan(x) && !std::isnan(y);
     }
 
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    inline explicit operator bool() const {
         return x != std::numeric_limits<T>::min() && y != std::numeric_limits<T>::min();
     }
 };
 
 template <typename T = double>
-struct vec3 {
+struct vec3 final {
     T x, y, z;
 
     inline vec3() = default;
@@ -108,7 +108,7 @@ struct vec3 {
 };
 
 template <typename T = double>
-struct vec4 {
+struct vec4 final {
     T x, y, z, w;
 
     inline vec4() = default;

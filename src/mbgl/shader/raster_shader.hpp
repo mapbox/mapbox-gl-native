@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-class RasterShader : public Shader {
+class RasterShader final : public Shader {
 public:
     RasterShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>                u_matrix            = {"u_matrix",            *this};
     Uniform<GLint>                  u_image             = {"u_image",             *this};

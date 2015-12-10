@@ -7,13 +7,13 @@
 namespace mbgl {
 
 template <typename Type>
-struct EnumValue {
+struct EnumValue final {
     const Type value;
     const char *name;
 };
 
 template <typename EnumName, const EnumValue<EnumName> *names, const size_t length>
-struct Enum {
+struct Enum final {
     using Type = EnumName;
     Type value;
     static const constexpr size_t l = length;

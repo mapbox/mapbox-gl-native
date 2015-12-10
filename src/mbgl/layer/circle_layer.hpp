@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class CirclePaintProperties {
+class CirclePaintProperties final {
 public:
     PaintProperty<float> radius { 5.0f };
     PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
@@ -20,7 +20,7 @@ public:
     }
 };
 
-class CircleLayer : public StyleLayer {
+class CircleLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

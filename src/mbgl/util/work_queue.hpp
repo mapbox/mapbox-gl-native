@@ -18,7 +18,7 @@ class RunLoop;
 // and it will make sure they get executed on the
 // thread that created the WorkQueue. All pending
 // works are canceled when the queue gets destructed.
-class WorkQueue : private util::noncopyable {
+class WorkQueue final : private util::noncopyable {
 public:
     WorkQueue();
     ~WorkQueue();

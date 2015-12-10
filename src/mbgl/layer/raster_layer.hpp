@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-class RasterPaintProperties {
+class RasterPaintProperties final {
 public:
     PaintProperty<float> opacity { 1.0f };
     PaintProperty<float> hueRotate { 0.0f };
@@ -17,7 +17,7 @@ public:
     PaintProperty<float> fadeDuration { 0.0f };
 };
 
-class RasterLayer : public StyleLayer {
+class RasterLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

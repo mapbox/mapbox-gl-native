@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-class Raster : public std::enable_shared_from_this<Raster> {
+class Raster final : public std::enable_shared_from_this<Raster> {
 
 public:
     Raster(TexturePool&);

@@ -6,11 +6,11 @@
 
 namespace mbgl {
 
-class PatternShader : public Shader {
+class PatternShader final : public Shader {
 public:
     PatternShader();
 
-    void bind(GLbyte *offset) final;
+    void bind(GLbyte *offset) override;
 
     UniformMatrix<4>                u_matrix          = {"u_matrix",          *this};
     Uniform<std::array<GLfloat, 2>> u_pattern_tl_a    = {"u_pattern_tl_a",    *this};

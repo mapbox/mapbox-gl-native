@@ -20,7 +20,7 @@ namespace mbgl {
 using JSVal = rapidjson::Value;
 
 template <typename T, typename Result = T>
-class PaintProperty {
+class PaintProperty final {
 public:
     using Fn = Function<Result>;
 
@@ -104,7 +104,7 @@ public:
     std::map<ClassID, Fn> values;
     std::map<ClassID, PropertyTransition> transitions;
 
-    struct CascadedValue {
+    struct CascadedValue final {
         CascadedValue(std::unique_ptr<CascadedValue> prior_,
                       TimePoint begin_,
                       TimePoint end_,

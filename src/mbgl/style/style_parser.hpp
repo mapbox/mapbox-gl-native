@@ -19,7 +19,7 @@ class Source;
 
 using JSVal = rapidjson::Value;
 
-class StyleParser {
+class StyleParser final {
 public:
     ~StyleParser();
 

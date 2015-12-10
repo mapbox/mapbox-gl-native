@@ -11,7 +11,7 @@ class TexturePool;
 class MapData;
 class Style;
 
-class StyleUpdateParameters {
+class StyleUpdateParameters final {
 public:
     StyleUpdateParameters(float pixelRatio_,
                           MapDebugOptions debugOptions_,
@@ -45,6 +45,6 @@ public:
     Style& style;
 };
 
-}
+} // namespace mbgl
 
 #endif

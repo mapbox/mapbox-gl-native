@@ -30,6 +30,8 @@ enum MapChange : uint8_t {
 
 class View {
 public:
+    virtual ~View() = default;
+
     // Called from the main thread directly after initialization. Must always return the same value,
     // i.e. it may not change over time.
     virtual float getPixelRatio() const = 0;

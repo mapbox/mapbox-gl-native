@@ -60,7 +60,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
 });
 
 
-struct EventPermutation {
+struct EventPermutation final {
     const EventSeverity severity;
     const Event event;
 

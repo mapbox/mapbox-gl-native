@@ -3,7 +3,7 @@
 
 namespace mbgl {
 
-class PlacementConfig {
+class PlacementConfig final {
 public:
     inline PlacementConfig(float angle_ = 0, float pitch_ = 0, bool debug_ = false)
         : angle(angle_), pitch(pitch_), debug(debug_) {

@@ -16,7 +16,7 @@ namespace mbgl {
 class Style;
 class AnnotationTile;
 
-class ShapeAnnotationImpl {
+class ShapeAnnotationImpl final {
 public:
     using Map = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
 

@@ -30,12 +30,12 @@ FilterExpression parseFilterExpression(const rapidjson::Value&);
 template <class Extractor>
 bool evaluate(const FilterExpression&, const Extractor&);
 
-struct NullExpression {
+struct NullExpression final {
     template <class Extractor>
     bool evaluate(const Extractor&) const { return true; }
 };
 
-struct EqualsExpression {
+struct EqualsExpression final {
     std::string key;
     Value value;
 
@@ -43,7 +43,7 @@ struct EqualsExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct NotEqualsExpression {
+struct NotEqualsExpression final {
     std::string key;
     Value value;
 
@@ -51,7 +51,7 @@ struct NotEqualsExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct LessThanExpression {
+struct LessThanExpression final {
     std::string key;
     Value value;
 
@@ -59,7 +59,7 @@ struct LessThanExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct LessThanEqualsExpression {
+struct LessThanEqualsExpression final {
     std::string key;
     Value value;
 
@@ -67,7 +67,7 @@ struct LessThanEqualsExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct GreaterThanExpression {
+struct GreaterThanExpression final {
     std::string key;
     Value value;
 
@@ -75,7 +75,7 @@ struct GreaterThanExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct GreaterThanEqualsExpression {
+struct GreaterThanEqualsExpression final {
     std::string key;
     Value value;
 
@@ -83,7 +83,7 @@ struct GreaterThanEqualsExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct InExpression {
+struct InExpression final {
     std::string key;
     std::vector<Value> values;
 
@@ -91,7 +91,7 @@ struct InExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct NotInExpression {
+struct NotInExpression final {
     std::string key;
     std::vector<Value> values;
 
@@ -99,21 +99,21 @@ struct NotInExpression {
     bool evaluate(const Extractor&) const;
 };
 
-struct AnyExpression {
+struct AnyExpression final {
     std::vector<FilterExpression> expressions;
 
     template <class Extractor>
     bool evaluate(const Extractor&) const;
 };
 
-struct AllExpression {
+struct AllExpression final {
     std::vector<FilterExpression> expressions;
 
     template <class Extractor>
     bool evaluate(const Extractor&) const;
 };
 
-struct NoneExpression {
+struct NoneExpression final {
     std::vector<FilterExpression> expressions;
 
     template <class Extractor>

@@ -8,7 +8,7 @@
 namespace mbgl {
 namespace http {
 
-class CacheControl {
+class CacheControl final {
 public:
     static CacheControl parse(const std::string&);
 

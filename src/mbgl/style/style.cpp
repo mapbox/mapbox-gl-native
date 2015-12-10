@@ -368,7 +368,7 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
             lastError = error;
             std::rethrow_exception(error);
         }
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         Log::Error(Event::Style, "%s", e.what());
     }
 

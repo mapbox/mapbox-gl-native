@@ -15,7 +15,7 @@ class GlyphStore;
 class FontStack;
 class FileRequest;
 
-class GlyphPBF : private util::noncopyable {
+class GlyphPBF final : private util::noncopyable {
 public:
     class Observer {
     public:
@@ -28,7 +28,7 @@ public:
     GlyphPBF(GlyphStore* store,
              const std::string& fontStack,
              const GlyphRange& glyphRange);
-    virtual ~GlyphPBF();
+    ~GlyphPBF();
 
     bool isParsed() const {
         return parsed;

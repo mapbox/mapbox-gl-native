@@ -11,7 +11,7 @@ namespace mbgl {
 
 class PlainShader;
 
-class DebugBucket : private util::noncopyable {
+class DebugBucket final : private util::noncopyable {
 public:
     DebugBucket(TileID id, TileData::State, Seconds modified, Seconds expires, MapDebugOptions);
 

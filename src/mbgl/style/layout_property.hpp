@@ -12,7 +12,7 @@ namespace mbgl {
 using JSVal = rapidjson::Value;
 
 template <typename T>
-class LayoutProperty {
+class LayoutProperty final {
 public:
     explicit LayoutProperty(T v) : value(std::move(v)) {}
 

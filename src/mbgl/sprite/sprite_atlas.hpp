@@ -21,7 +21,7 @@ class SpriteStore;
 class SpriteImage;
 class SpritePosition;
 
-struct SpriteAtlasPosition {
+struct SpriteAtlasPosition final {
     inline SpriteAtlasPosition(const std::array<float, 2> size_ = {{0, 0}},
                                const std::array<float, 2> tl_ = {{0, 0}},
                                const std::array<float, 2> br_ = {{0, 0}})
@@ -31,12 +31,12 @@ struct SpriteAtlasPosition {
     std::array<float, 2> br;
 };
 
-struct SpriteAtlasElement {
+struct SpriteAtlasElement final {
     const Rect<uint16_t> pos;
     const std::shared_ptr<const SpriteImage> texture;
 };
 
-class SpriteAtlas : public util::noncopyable {
+class SpriteAtlas final : public util::noncopyable {
 public:
     typedef uint16_t dimension;
 
@@ -74,7 +74,7 @@ private:
     const dimension pixelWidth, pixelHeight;
     const float pixelRatio;
 
-    struct Holder : private util::noncopyable {
+    struct Holder final : private util::noncopyable {
         inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
         inline Holder(Holder&&);
         std::shared_ptr<const SpriteImage> texture;

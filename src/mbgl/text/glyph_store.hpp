@@ -18,7 +18,7 @@ namespace mbgl {
 // The GlyphStore manages the loading and storage of Glyphs
 // and creation of FontStack objects. The GlyphStore lives
 // on the MapThread but can be queried from any thread.
-class GlyphStore : public GlyphPBF::Observer, private util::noncopyable {
+class GlyphStore final : public GlyphPBF::Observer, private util::noncopyable {
 public:
     class Observer {
     public:
@@ -27,9 +27,6 @@ public:
         virtual void onGlyphRangeLoaded() = 0;
         virtual void onGlyphRangeLoadingFailed(std::exception_ptr error) = 0;
     };
-
-    GlyphStore() = default;
-    virtual ~GlyphStore() = default;
 
     util::exclusive<FontStack> getFontStack(const std::string& fontStack);
 

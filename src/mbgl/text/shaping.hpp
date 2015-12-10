@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-    class PositionedIcon {
+    class PositionedIcon final {
         public:
             inline explicit PositionedIcon() {}
             inline explicit PositionedIcon(Rect<uint16_t> _image,
@@ -19,7 +19,7 @@ namespace mbgl {
             float left = 0;
             float right = 0;
 
-            operator bool() const { return image.hasArea(); }
+            explicit operator bool() const { return image.hasArea(); }
     };
 
     class SymbolLayoutProperties;

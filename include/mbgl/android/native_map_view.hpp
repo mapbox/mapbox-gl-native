@@ -15,7 +15,7 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView : public mbgl::View, private mbgl::util::noncopyable {
+class NativeMapView final : public mbgl::View, private mbgl::util::noncopyable {
 public:
     NativeMapView(JNIEnv *env, jobject obj, float pixelRatio, int availableProcessors, size_t totalMemory);
     virtual ~NativeMapView();

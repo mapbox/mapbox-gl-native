@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-struct ZoomHistory {
+struct ZoomHistory final {
     float lastZoom;
     float lastIntegerZoom;
     TimePoint lastIntegerZoomTime;

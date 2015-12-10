@@ -30,7 +30,7 @@ class Tile;
 struct ClipID;
 struct box;
 
-class SourceInfo : private util::noncopyable {
+class SourceInfo final : private util::noncopyable {
 public:
     SourceType type = SourceType::Vector;
     std::string url;
@@ -47,7 +47,7 @@ public:
     std::string tileURL(const TileID& id, float pixelRatio) const;
 };
 
-class Source : private util::noncopyable {
+class Source final : private util::noncopyable {
 public:
     class Observer {
     public:

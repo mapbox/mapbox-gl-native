@@ -73,6 +73,7 @@ config: ; $(RUN) config
 # Generates a compilation database with ninja for use in clang tooling
 compdb: ; $(RUN) Ninja/compdb
 tidy: ; $(RUN) tidy
+ninja: ; $(RUN) Ninja
 
 .PHONY: android android-lib
 # Builds a particular android architecture.

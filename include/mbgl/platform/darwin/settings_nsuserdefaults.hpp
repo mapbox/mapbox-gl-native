@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class Settings_NSUserDefaults {
+class Settings_NSUserDefaults final {
 public:
     Settings_NSUserDefaults();
     void load();

@@ -13,7 +13,7 @@ class Statement;
 
 namespace mbgl {
 
-class SQLiteCache::Impl {
+class SQLiteCache::Impl final {
 public:
     explicit Impl(const std::string &path = ":memory:");
     ~Impl();

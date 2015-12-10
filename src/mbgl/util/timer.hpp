@@ -10,7 +10,7 @@
 namespace mbgl {
 namespace util {
 
-class Timer : private util::noncopyable {
+class Timer final : private util::noncopyable {
 public:
     Timer();
     ~Timer();

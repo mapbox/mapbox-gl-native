@@ -12,13 +12,13 @@ namespace node_mbgl {
 
 namespace util { template <typename T> class AsyncQueue; }
 
-class NodeLogObserver : public mbgl::Log::Observer {
+class NodeLogObserver final : public mbgl::Log::Observer {
 public:
     NodeLogObserver(v8::Local<v8::Object> target);
     ~NodeLogObserver();
 
     // Log::Observer implementation
-    virtual bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
+    bool onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &msg) override;
 
 private:
     Nan::Persistent<v8::Object> module;

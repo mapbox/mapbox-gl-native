@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-struct box {
+struct box final {
     box(TileCoordinate tl_, TileCoordinate tr_, TileCoordinate br_, TileCoordinate bl_) :
         tl(tl_), tr(tr_), br(br_), bl(bl_) {}
     TileCoordinate tl, tr, br, bl;

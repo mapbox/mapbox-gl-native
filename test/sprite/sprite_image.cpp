@@ -9,7 +9,7 @@ TEST(Sprite, SpriteImageZeroWidth) {
     try {
         SpriteImage(0, 16, 2, "");
         FAIL() << "Expected exception";
-    } catch (util::SpriteImageException& ex) {
+    } catch (const util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
     }
 }
@@ -18,7 +18,7 @@ TEST(Sprite, SpriteImageZeroHeight) {
     try {
         SpriteImage(16, 0, 2, "");
         FAIL() << "Expected exception";
-    } catch (util::SpriteImageException& ex) {
+    } catch (const util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
     }
 }
@@ -27,7 +27,7 @@ TEST(Sprite, SpriteImageZeroRatio) {
     try {
         SpriteImage(16, 16, 0, "");
         FAIL() << "Expected exception";
-    } catch (util::SpriteImageException& ex) {
+    } catch (const util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
     }
 }
@@ -36,7 +36,7 @@ TEST(Sprite, SpriteImageMismatchedData) {
     try {
         SpriteImage(16, 16, 2, "");
         FAIL() << "Expected exception";
-    } catch (util::SpriteImageException& ex) {
+    } catch (const util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image pixel count mismatch", ex.what());
     }
 }

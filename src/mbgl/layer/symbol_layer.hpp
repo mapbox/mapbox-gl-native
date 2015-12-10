@@ -9,13 +9,13 @@ namespace mbgl {
 
 class SpriteAtlas;
 
-class SymbolLayoutProperties {
+class SymbolLayoutProperties final {
 public:
     LayoutProperty<PlacementType> placement { PlacementType::Point };
     LayoutProperty<float> spacing { 250.0f };
     LayoutProperty<bool> avoidEdges { false };
 
-    class IconProperties {
+    class IconProperties final {
     public:
         LayoutProperty<bool> allowOverlap { false };
         LayoutProperty<bool> ignorePlacement { false };
@@ -29,7 +29,7 @@ public:
         LayoutProperty<std::array<float, 2>> offset { {{ 0, 0 }} };
     } icon;
 
-    class TextProperties {
+    class TextProperties final {
     public:
         LayoutProperty<RotationAlignmentType> rotationAlignment { RotationAlignmentType::Viewport };
         LayoutProperty<std::string> field { "" };
@@ -56,9 +56,9 @@ public:
     float textMaxSize = 16.0f;
 };
 
-class SymbolPaintProperties {
+class SymbolPaintProperties final {
 public:
-    class PaintProperties {
+    class PaintProperties final {
     public:
         PaintProperties(float size_) : size(size_) {}
 
@@ -82,7 +82,7 @@ public:
     PaintProperties text { 16.0f };
 };
 
-class SymbolLayer : public StyleLayer {
+class SymbolLayer final : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 

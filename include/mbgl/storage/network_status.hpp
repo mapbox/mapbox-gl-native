@@ -10,7 +10,7 @@ namespace util {
 class AsyncTask;
 } // namespace util
 
-class NetworkStatus {
+class NetworkStatus final {
 public:
     static void Reachable();
 

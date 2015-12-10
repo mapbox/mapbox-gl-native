@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class LineVertexBuffer : public Buffer<
+class LineVertexBuffer final : public Buffer<
     8 // 2 coordinates per vertex + 1 linesofar + 1 extrude coord pair == 4 (== 8 bytes)
 > {
 public:

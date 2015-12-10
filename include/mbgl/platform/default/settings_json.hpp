@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class Settings_JSON {
+class Settings_JSON final {
 public:
     Settings_JSON();
     void load();

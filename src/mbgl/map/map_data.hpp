@@ -16,7 +16,7 @@
 
 namespace mbgl {
 
-class MapData {
+class MapData final {
     using Lock = std::lock_guard<std::mutex>;
 
 public:

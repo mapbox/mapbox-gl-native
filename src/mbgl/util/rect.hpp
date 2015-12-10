@@ -4,7 +4,7 @@
 namespace mbgl {
 
 template <typename T>
-struct Rect {
+struct Rect final {
     inline Rect() = default;
     inline Rect(T x_, T y_, T w_, T h_) : x(x_), y(y_), w(w_), h(h_) {}
     T x = 0, y = 0;

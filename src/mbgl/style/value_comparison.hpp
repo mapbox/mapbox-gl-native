@@ -12,7 +12,7 @@ namespace util {
 namespace detail {
 
 template <typename Operator>
-struct relaxed_operator_visitor {
+struct relaxed_operator_visitor final {
     typedef bool result_type;
 
     template <typename T0, typename T1>
@@ -46,32 +46,32 @@ struct relaxed_operator_visitor {
     }
 };
 
-struct relaxed_equal_operator {
+struct relaxed_equal_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs == rhs; }
 };
 
-struct relaxed_not_equal_operator {
+struct relaxed_not_equal_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs != rhs; }
 };
 
-struct relaxed_greater_operator {
+struct relaxed_greater_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs > rhs; }
 };
 
-struct relaxed_greater_equal_operator {
+struct relaxed_greater_equal_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs >= rhs; }
 };
 
-struct relaxed_less_operator {
+struct relaxed_less_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs < rhs; }
 };
 
-struct relaxed_less_equal_operator {
+struct relaxed_less_equal_operator final {
     template <typename T0, typename T1>
     inline bool operator()(T0 lhs, T1 rhs) const { return lhs <= rhs; }
 };

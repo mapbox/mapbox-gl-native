@@ -24,14 +24,14 @@ class Painter;
 class SpriteImage;
 class FileRequest;
 
-struct FrameData {
+struct FrameData final {
     std::array<uint16_t, 2> framebufferSize;
 };
 
-class MapContext : public Style::Observer {
+class MapContext final : public Style::Observer {
 public:
     MapContext(View&, FileSource&, MapMode, GLContextMode, const float pixelRatio);
-    ~MapContext();
+    ~MapContext() override;
 
     MapData& getData() { return data; }
 

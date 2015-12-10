@@ -8,7 +8,7 @@
 namespace {
 
 template <typename T, T (*Create)(), void (*Destroy)(const T&)>
-class Preserve {
+class Preserve final {
 public:
     Preserve() : data(Create()) {}
     ~Preserve() { Destroy(data); }

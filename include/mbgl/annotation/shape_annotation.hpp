@@ -13,19 +13,19 @@ namespace mbgl {
 using AnnotationSegment = std::vector<LatLng>;
 using AnnotationSegments = std::vector<AnnotationSegment>;
 
-struct FillAnnotationProperties {
+struct FillAnnotationProperties final {
     float opacity = 1;
     Color color = {{ 0, 0, 0, 1 }};
     Color outlineColor = {{ 0, 0, 0, -1 }};
 };
 
-struct LineAnnotationProperties {
+struct LineAnnotationProperties final {
     float opacity = 1;
     float width = 1;
     Color color = {{ 0, 0, 0, 1 }};
 };
 
-class ShapeAnnotation {
+class ShapeAnnotation final {
 public:
     using Properties = mapbox::util::variant<
         FillAnnotationProperties, // creates a fill annotation

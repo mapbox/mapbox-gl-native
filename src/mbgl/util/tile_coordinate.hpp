@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-struct TileCoordinate {
+struct TileCoordinate final {
     double column;
     double row;
     double zoom;

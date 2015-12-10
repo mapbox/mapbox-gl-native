@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class Log {
+class Log final {
 public:
     class Observer : private util::noncopyable {
     public:

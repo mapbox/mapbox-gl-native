@@ -16,7 +16,7 @@ namespace mbgl {
 class Tile;
 class TileID;
 
-struct ClipID {
+struct ClipID final {
     inline ClipID() {}
     inline ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}
 
@@ -28,9 +28,9 @@ struct ClipID {
     }
 };
 
-class ClipIDGenerator {
+class ClipIDGenerator final {
 private:
-    struct Leaf {
+    struct Leaf final {
         Leaf(Tile &tile);
         void add(const TileID &p);
         bool operator==(const Leaf &other) const;

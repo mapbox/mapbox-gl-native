@@ -14,7 +14,7 @@ class Shader : private util::noncopyable {
 public:
     Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment);
 
-    ~Shader();
+    virtual ~Shader();
     const GLchar *name;
     GLuint program;
 

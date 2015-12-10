@@ -68,7 +68,7 @@ public:
     virtual std::unique_ptr<FileRequest> monitorTile(const Callback&) = 0;
 };
 
-class GeometryTileFeatureExtractor {
+class GeometryTileFeatureExtractor final {
 public:
     GeometryTileFeatureExtractor(const GeometryTileFeature& feature_)
         : feature(feature_) {}

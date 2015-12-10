@@ -13,7 +13,7 @@ namespace mbgl {
 class CircleVertexBuffer;
 class CircleShader;
 
-class CircleBucket : public Bucket {
+class CircleBucket final : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:

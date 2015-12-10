@@ -37,7 +37,7 @@ public:
         style_->setObserver(this);
     }
 
-    ~MockMapContext() {
+    ~MockMapContext() override {
         cleanup();
     }
 

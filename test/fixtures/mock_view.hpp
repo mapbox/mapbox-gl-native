@@ -7,7 +7,7 @@
 
 namespace mbgl {
 
-class MockView : public View {
+class MockView final : public View {
 public:
     MockView() = default;
 

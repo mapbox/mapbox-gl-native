@@ -8,7 +8,7 @@
 
 namespace mbgl {
 
-class TileCache {
+class TileCache final {
 public:
     TileCache(size_t size_ = 0) : size(size_) {}
 

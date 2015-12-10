@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class DebugFontBuffer : public Buffer<
+class DebugFontBuffer final : public Buffer<
     4 // 2 bytes per coordinate, 2 coordinates
 > {
 public:
