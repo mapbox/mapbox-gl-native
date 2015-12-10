@@ -109,7 +109,7 @@ node/configure:
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 
-node/xproj:
+node/xproj: Xcode/__project__ node/configure
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -f xcode -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 	$(QUIET)$(ENV) ./scripts/node/create_node_scheme.sh "node test" "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
