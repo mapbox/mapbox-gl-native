@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../gyp/common.gypi',
+    '../../gyp/common.gypi',
   ],
   'targets': [
     { 'target_name': 'osxapp',
@@ -22,11 +22,11 @@
 
       'sources': [
         './main.mm',
-        '../platform/darwin/settings_nsuserdefaults.hpp',
-        '../platform/darwin/settings_nsuserdefaults.mm',
-        '../platform/darwin/reachability.m',
-        '../platform/default/glfw_view.hpp',
-        '../platform/default/glfw_view.cpp',
+        '../darwin/settings_nsuserdefaults.hpp',
+        '../darwin/settings_nsuserdefaults.mm',
+        '../darwin/reachability.m',
+        '../default/glfw_view.hpp',
+        '../default/glfw_view.cpp',
       ],
 
       'variables' : {
@@ -55,7 +55,7 @@
         'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
         'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         'SDKROOT': 'macosx',
-        'INFOPLIST_FILE': '../macosx/Info.plist',
+        'INFOPLIST_FILE': '../platform/osx/Info.plist',
         'CLANG_ENABLE_OBJC_ARC': 'YES'
       },
     }

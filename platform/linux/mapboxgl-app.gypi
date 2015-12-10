@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../gyp/common.gypi',
+    '../../gyp/common.gypi',
   ],
   'targets': [
     { 'target_name': 'linuxapp',
@@ -18,10 +18,10 @@
 
       'sources': [
         'main.cpp',
-        '../platform/default/settings_json.cpp',
-        '../platform/default/glfw_view.hpp',
-        '../platform/default/glfw_view.cpp',
-        '../platform/default/log_stderr.cpp',
+        '../default/settings_json.cpp',
+        '../default/glfw_view.hpp',
+        '../default/glfw_view.cpp',
+        '../default/log_stderr.cpp',
       ],
 
       'variables' : {

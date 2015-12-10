@@ -13,8 +13,6 @@
 /config/*.gypi
 /build
 /lib
-/macosx/build
-/linux/build
 /ios/build
 /ios/app/build
 /test/build
