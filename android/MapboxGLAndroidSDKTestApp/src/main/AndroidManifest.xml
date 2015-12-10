@@ -37,7 +37,9 @@
         <activity
             android:name=".BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/action_add_bulk_markers" />
+            android:label="@string/activity_add_bulk_markers" />
+        <activity android:name=".CameraActivity"
+                  android:label="@string/activity_camera"/>
         <activity
             android:name=".TiltActivity"
             android:label="@string/activity_tilt" />
