@@ -12,11 +12,11 @@
 namespace mbgl {
 
 struct CameraOptions {
-    mapbox::util::optional<LatLng> center;
-    mapbox::util::optional<double> zoom;
-    mapbox::util::optional<double> angle;
-    mapbox::util::optional<double> pitch;
-    mapbox::util::optional<Duration> duration;
+    mapbox::util::optional<LatLng> center;      // Map center (Degrees)
+    mapbox::util::optional<double> zoom;        // Map zoom level Positive Numbers > 0 and < 18
+    mapbox::util::optional<double> angle;       // Map rotation bearing in Radians counter-clockwise from north. The value is wrapped to [−π rad, π rad]
+    mapbox::util::optional<double> pitch;       // Map angle in degrees at which the camera is looking to ground (Radians)
+    mapbox::util::optional<Duration> duration;  // Animation time length (Nanoseconds)
     mapbox::util::optional<double> speed;
     mapbox::util::optional<double> curve;
     mapbox::util::optional<mbgl::util::UnitBezier> easing;

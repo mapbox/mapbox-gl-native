@@ -1479,6 +1479,104 @@ jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject
     return nativeMapView->getMap().getTopOffsetPixelsForAnnotationIcon(std_string_from_jstring(env, symbolName));
 }
 
+void JNICALL nativeJumpTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jdouble pitch, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeJumpTo");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    if (angle != -1) {
+        options.angle = angle;
+    }
+    options.center = mbgl::LatLng(latitude, longitude);
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
+
+    nativeMapView->getMap().jumpTo(options);
+}
+
+void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeEaseTo");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    if (angle != -1) {
+        options.angle = angle;
+    }
+    options.center = mbgl::LatLng(latitude, longitude);
+    options.duration = mbgl::Duration(duration);
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
+
+    nativeMapView->getMap().easeTo(options);
+}
+
+void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeFlyTo");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    if (angle != -1) {
+        options.angle = angle;
+    }
+    options.center = mbgl::LatLng(latitude, longitude);
+    options.duration = mbgl::Duration(duration);
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
+
+    nativeMapView->getMap().flyTo(options);
+}
+
 void JNICALL nativeAddCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject customLayer, jstring before) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddCustomLayer");
     assert(nativeMapViewPtr != 0);
@@ -2022,6 +2120,12 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
+        {"nativeJumpTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;DD)V",
+         reinterpret_cast<void *>(&nativeJumpTo)},
+        {"nativeEaseTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;JDD)V",
+         reinterpret_cast<void *>(&nativeEaseTo)},
+        {"nativeFlyTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;JDD)V",
+         reinterpret_cast<void *>(&nativeFlyTo)},
         {"nativeAddCustomLayer", "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V",
          reinterpret_cast<void *>(&nativeAddCustomLayer)},
         {"nativeRemoveCustomLayer", "(JLjava/lang/String;)V",

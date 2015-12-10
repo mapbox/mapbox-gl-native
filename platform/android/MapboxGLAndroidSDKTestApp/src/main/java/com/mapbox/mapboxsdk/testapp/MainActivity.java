@@ -342,6 +342,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), InfoWindowAdapterActivity.class));
                                 return true;
 
+                            case R.id.action_camera:
+                                startActivity(new Intent(getApplicationContext(), CameraActivity.class));
+                                return true;
+
                             case R.id.action_tilt:
                                 startActivity(new Intent(getApplicationContext(), TiltActivity.class));
                                 return true;

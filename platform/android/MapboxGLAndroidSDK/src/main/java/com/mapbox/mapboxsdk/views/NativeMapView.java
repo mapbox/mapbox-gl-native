@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.views;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.Surface;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -12,7 +11,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -450,6 +448,18 @@ final class NativeMapView {
         return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
     }
 
+    public void jumpTo(double angle, LatLng center,  double pitch, double zoom) {
+        nativeJumpTo(mNativeMapViewPtr, angle, center, pitch, zoom);
+    }
+
+    public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom) {
+        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+    }
+
+    public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
+        nativeFlyTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+    }
+
     public void addCustomLayer(CustomLayer customLayer, String before) {
         nativeAddCustomLayer(mNativeMapViewPtr, customLayer, before);
     }
@@ -638,6 +648,12 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
+
+    private native void nativeJumpTo(long nativeMapViewPtr, double angle, LatLng center, double pitch, double zoom);
+
+    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
+
+    private native void nativeFlyTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
 
     private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
 

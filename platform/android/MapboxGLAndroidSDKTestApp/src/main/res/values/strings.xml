@@ -14,6 +14,8 @@
     <string name="activity_info_window_concurrent">InfoWindow Activity (Concurrent)</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
+    <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
+    <string name="activity_camera">Camera</string>
     <string name="activity_polyline">Polyline Activity</string>
     <string name="activity_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="activity_custom_layer">Custom Layer</string>
@@ -35,9 +37,14 @@
     <string name="action_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="action_info_window_concurrent">InfoWindow (Concurrent)</string>
     <string name="action_add_bulk_markers">Add Markers in bulk</string>
+    <string name="action_camera">Camera</string>
     <string name="action_visible_bounds">Set Visible Bounds</string>
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>
+
+    <string name="button_camera_animate">Animate</string>
+    <string name="button_camera_animate_callback">Callback</string>
+    <string name="button_camera_animate_duration">Duration</string>
 
     <string name="label_fps">FPS:</string>
 

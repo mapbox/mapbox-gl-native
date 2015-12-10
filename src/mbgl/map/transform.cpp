@@ -7,6 +7,7 @@
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>
@@ -61,12 +62,22 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Position
 
+/*
+ * Change any combination of center, zoom, bearing, and pitch, without
+ * a transition. The map will retain the current values for any options
+ * not included in `options`.
+ */
 void Transform::jumpTo(const CameraOptions& options) {
     CameraOptions jumpOptions(options);
     jumpOptions.duration.reset();
     easeTo(jumpOptions);
 }
 
+/*
+ * Change any combination of center, zoom, bearing, and pitch, with a smooth animation
+ * between old and new values. The map will retain the current values for any options
+ * not included in `options`.
+ */
 void Transform::easeTo(const CameraOptions& options) {
     CameraOptions easeOptions(options);
     LatLng latLng = easeOptions.center ? *easeOptions.center : getLatLng();
@@ -313,18 +324,24 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
     }
 }
 
+/**
+* Flying animation to a specified location/zoom/bearing with automatic curve.
+*/
 void Transform::flyTo(const CameraOptions &options) {
+
     CameraOptions flyOptions(options);
     LatLng latLng = options.center ? *options.center : getLatLng();
     LatLng startLatLng = getLatLng();
     double zoom = flyOptions.zoom ? *flyOptions.zoom : getZoom();
     double angle = flyOptions.angle ? *flyOptions.angle : getAngle();
     double pitch = flyOptions.pitch ? *flyOptions.pitch : getPitch();
+
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
     }
     
     double new_scale = std::pow(2.0, zoom);
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - new_scale: %f", new_scale);
     
     const double scaled_tile_size = new_scale * util::tileSize;
     state.Bc = scaled_tile_size / 360;
@@ -344,6 +361,8 @@ void Transform::flyTo(const CameraOptions &options) {
     state.panning = true;
     state.scaling = true;
     state.rotating = true;
+
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - startZ: %f", startZ);
     
     double rho = flyOptions.curve ? *flyOptions.curve : 1.42;
     double w0 = std::max(state.width, state.height);

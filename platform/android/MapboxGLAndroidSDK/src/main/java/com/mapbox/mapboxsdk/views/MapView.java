@@ -65,6 +65,9 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -76,7 +79,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-
+import com.mapbox.mapboxsdk.utils.MathUtils;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -84,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -579,6 +583,21 @@ public final class MapView extends FrameLayout {
          * @param location The current location of the My Location dot The type of map change event.
          */
         void onMyLocationChange(@Nullable Location location);
+    }
+
+    /**
+     * A callback interface for reporting when a task is complete or cancelled.
+     */
+    public static interface CancelableCallback {
+        /**
+         * Invoked when a task is cancelled.
+         */
+        public abstract void onCancel();
+
+        /**
+         * Invoked when a task is complete.
+         */
+        public abstract void onFinish();
     }
 
     //
@@ -1452,6 +1471,109 @@ public final class MapView extends FrameLayout {
         this.mTiltEnabled = tiltEnabled;
     }
 
+
+    //
+    // Camera API
+    //
+
+    /**
+     * Gets the current position of the camera.
+     * The CameraPosition returned is a snapshot of the current position, and will not automatically update when the camera moves.
+     * @return The current position of the Camera.
+     */
+    public final CameraPosition getCameraPosition () {
+        return new CameraPosition(getCenterCoordinate(), (float)getZoomLevel(), (float)getTilt(), (float)getBearing());
+    }
+
+    /**
+     * Animates the movement of the camera from the current position to the position defined in the update.
+     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
+
+     * See CameraUpdateFactory for a set of updates.
+     * @param update The change that should be applied to the camera.
+     */
+    @UiThread
+    public final void animateCamera (CameraUpdate update) {
+        animateCamera(update, 0, null);
+    }
+
+
+    /**
+     * Animates the movement of the camera from the current position to the position defined in the update and calls an optional callback on completion.
+     * See CameraUpdateFactory for a set of updates.
+     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
+     * @param update The change that should be applied to the camera.
+     * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
+     */
+    @UiThread
+    public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
+        animateCamera(update, 0, callback);
+    }
+
+    /**
+     * Moves the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
+     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * @param update The change that should be applied to the camera.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
+     * @param callback An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
+     */
+    @UiThread
+    public final void animateCamera (CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
+
+        if (update.getTarget() == null) {
+            Log.w(TAG, "animateCamera with null target coordinate passed in.  Will immediatele return without animating camera.");
+            return;
+        }
+
+        mNativeMapView.cancelTransitions();
+
+        // Register callbacks early enough
+        if (callback != null) {
+            final MapView view = this;
+            addOnMapChangedListener(new OnMapChangedListener() {
+                @Override
+                public void onMapChanged(@MapChange int change) {
+                    if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
+                        callback.onFinish();
+
+                        // Clean up after self
+                        removeOnMapChangedListener(this);
+                    }
+                }
+            });
+        }
+
+        // Convert Degrees To Radians
+        double angle = -1;
+        if (update.getBearing() >= 0) {
+            angle = (-update.getBearing()) * MathConstants.DEG2RAD;
+        }
+        double pitch = -1;
+        if (update.getTilt() >= 0) {
+            double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
+            pitch = dp * MathConstants.DEG2RAD;
+        }
+        double zoom = -1;
+        if (update.getZoom() >= 0) {
+            zoom = update.getZoom();
+        }
+
+        long durationNano = 0;
+        if (durationMs > 0) {
+            durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
+        }
+
+        if (durationMs == 0) {
+            // Route To `jumpTo`
+            Log.i(TAG, "jumpTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
+            jumpTo(angle, update.getTarget(), pitch, zoom);
+        } else {
+            // Use `flyTo`
+            Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
+            flyTo(angle, update.getTarget(), durationNano, pitch, zoom);
+        }
+    }
+
     //
     // InfoWindows
     //
@@ -2276,8 +2398,50 @@ public final class MapView extends FrameLayout {
     }
 
     //
-    // Camera
+    // Mapbox Core GL Camera
     //
+
+    /**
+     * Change any combination of center, zoom, bearing, and pitch, without
+     * a transition. The map will retain the current values for any options
+     * not included in `options`.
+     * @param bearing Bearing in Radians
+     * @param center Center Coordinate
+     * @param pitch Pitch in Radians
+     * @param zoom Zoom Level
+     */
+    @UiThread
+    public void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
+        mNativeMapView.jumpTo(bearing, center, pitch, zoom);
+    }
+
+    /**
+     * Change any combination of center, zoom, bearing, and pitch, with a smooth animation
+     * between old and new values. The map will retain the current values for any options
+     * not included in `options`.
+     * @param bearing Bearing in Radians
+     * @param center Center Coordinate
+     * @param duration Animation time in Nanoseconds
+     * @param pitch Pitch in Radians
+     * @param zoom Zoom Level
+     */
+    @UiThread
+    public void easeTo(double bearing, LatLng center, long duration,  double pitch, double zoom) {
+        mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
+    }
+
+    /**
+     * Flying animation to a specified location/zoom/bearing with automatic curve.
+     * @param bearing Bearing in Radians
+     * @param center Center Coordinate
+     * @param duration Animation time in Nanoseconds
+     * @param pitch Pitch in Radians
+     * @param zoom Zoom Level
+     */
+    @UiThread
+    public void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom) {
+        mNativeMapView.flyTo(bearing, center, duration, pitch, zoom);
+    }
 
     /**
      * Changes the map's viewport to fit the given coordinate bounds.
@@ -2464,9 +2628,32 @@ public final class MapView extends FrameLayout {
         }
     }
 
-    // Used by UserLocationView
-    void setBearing(float bearing) {
-        mNativeMapView.setBearing(bearing, 100);
+    /**
+     * Get Bearing in degrees
+     * @return Bearing in degrees
+     */
+    public double getBearing() {
+        return mNativeMapView.getBearing();
+    }
+
+    /**
+     * Set Bearing in degrees
+     * @param bearing Bearing in degrees
+     */
+    public void setBearing(float bearing) {
+        mNativeMapView.setBearing(bearing);
+    }
+
+    /**
+     * Sets Bearing in degrees
+     *
+     * NOTE: Used by UserLocationView
+     *
+     * @param bearing Bearing in degrees
+     * @param duration Length of time to rotate
+     */
+    public void setBearing(float bearing, long duration) {
+        mNativeMapView.setBearing(bearing, duration);
     }
 
     //
