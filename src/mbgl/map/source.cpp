@@ -4,6 +4,7 @@
 #include <mbgl/map/tile.hpp>
 #include <mbgl/map/vector_tile.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -207,6 +208,8 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
                 monitor = std::make_unique<VectorTileMonitor>(info, normalized_id, parameters.pixelRatio);
             } else if (info.type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
+            } else if (info.type == SourceType::GeoJSON) {
+                monitor = std::make_unique<GeoJSONTileMonitor>(info.geojsonvt.get(), normalized_id);
             } else {
                 Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(info.type).c_str());
                 return TileData::State::invalid;

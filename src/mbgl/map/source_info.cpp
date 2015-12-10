@@ -3,6 +3,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/token.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+
 namespace mbgl {
 
 namespace {
@@ -82,6 +84,9 @@ void parse(const rapidjson::Value& value, std::array<float, N>& target, const ch
 }
 
 } // end namespace
+
+// Destructor in implementation file because header only contains forward declarations.
+SourceInfo::~SourceInfo() = default;
 
 void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
     parse(value, tiles, "tiles");
