@@ -65,6 +65,7 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -579,6 +580,21 @@ public final class MapView extends FrameLayout {
          * @param location The current location of the My Location dot The type of map change event.
          */
         void onMyLocationChange(@Nullable Location location);
+    }
+
+    /**
+     * A callback interface for reporting when a task is complete or cancelled.
+     */
+    public static interface CancelableCallback {
+        /**
+         * Invoked when a task is cancelled.
+         */
+        public abstract void onCancel();
+
+        /**
+         * Invoked when a task is complete.
+         */
+        public abstract void onFinish();
     }
 
     //
@@ -1450,6 +1466,45 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setTiltEnabled(boolean tiltEnabled) {
         this.mTiltEnabled = tiltEnabled;
+    }
+
+
+    //
+    // Camera API
+    //
+
+    /**
+     * Animates the movement of the camera from the current position to the position defined in the update.
+     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
+
+     * See CameraUpdateFactory for a set of updates.
+     * @param update The change that should be applied to the camera.
+     */
+    public final void animateCamera (CameraUpdate update) {
+
+    }
+
+
+    /**
+     * Animates the movement of the camera from the current position to the position defined in the update and calls an optional callback on completion.
+     * See CameraUpdateFactory for a set of updates.
+     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
+     * @param update The change that should be applied to the camera.
+     * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
+     */
+    public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
+
+    }
+
+    /**
+     * Moves the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
+     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * @param update The change that should be applied to the camera.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
+     * @param callback An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
+     */
+    public final void animateCamera (CameraUpdate update, int durationMs, MapView.CancelableCallback callback) {
+
     }
 
     //
