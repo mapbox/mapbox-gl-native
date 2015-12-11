@@ -152,6 +152,8 @@ void MapWindow::resizeGL(int w, int h)
 
 void MapWindow::paintGL()
 {
+    glViewport(0, 0, width(), height());
+
     m_frameDraws++;
     m_map.render();
 }
