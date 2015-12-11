@@ -229,11 +229,12 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onStart();
     }
 
+    // Called when our app comes into the foreground
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onResume() {
+        super.onResume();
 
-        mMapView.onStop();
+        mMapView.onResume();
     }
 
     // Called when our app goes into the background
@@ -244,12 +245,11 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onPause();
     }
 
-    // Called when our app comes into the foreground
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void onStop() {
+        super.onStop();
 
-        mMapView.onResume();
+        mMapView.onStop();
     }
 
     @Override
