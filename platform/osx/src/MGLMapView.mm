@@ -1587,14 +1587,6 @@ public:
     [self updateAnnotationTrackingAreas];
 }
 
-- (id <MGLAnnotation>)selectedAnnotation {
-    if (!_annotationContextsByAnnotationTag.count(_selectedAnnotationTag)) {
-        return nil;
-    }
-    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
-    return annotationContext.annotation;
-}
-
 - (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier {
     // This prefix is used to avoid collisions with style-defined sprites in
     // mbgl, but reusable identifiers are never prefixed.
@@ -1639,7 +1631,7 @@ public:
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationTag annotationTag) {
+        std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
             NSAssert(_annotationContextsByAnnotationTag.count(annotationTag) != 0, @"Unknown annotation found nearby click");
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             if (!annotation) {
@@ -1667,6 +1659,17 @@ public:
         std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
         
         if (nearbyAnnotations == _annotationsNearbyLastClick) {
+            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+                double distanceA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                         coordinateA.longitude - currentCoordinate.longitude);
+                double distanceB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                         coordinateB.longitude - currentCoordinate.longitude);
+                return distanceA < distanceB;
+            });
+            
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
             if (_lastSelectedAnnotationTag == MGLAnnotationTagNotFound
@@ -1706,13 +1709,26 @@ public:
     return _mbglMap->getPointAnnotationsInBounds(queryBounds);
 }
 
+- (id <MGLAnnotation>)selectedAnnotation {
+    if (!_annotationContextsByAnnotationTag.count(_selectedAnnotationTag)) {
+        return nil;
+    }
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(_selectedAnnotationTag);
+    return annotationContext.annotation;
+}
+
+- (void)setSelectedAnnotation:(id <MGLAnnotation>)annotation {
+    [self willChangeValueForKey:@"selectedAnnotations"];
+    _selectedAnnotationTag = [self annotationTagForAnnotation:annotation];
+    if (_selectedAnnotationTag != MGLAnnotationTagNotFound) {
+        _lastSelectedAnnotationTag = _selectedAnnotationTag;
+    }
+    [self didChangeValueForKey:@"selectedAnnotations"];
+}
+
 - (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     return selectedAnnotation ? @[selectedAnnotation] : @[];
-}
-
-- (void)setSelectedAnnotation:(id <MGLAnnotation>)selectedAnnotation {
-    _selectedAnnotationTag = [self annotationTagForAnnotation:selectedAnnotation];
 }
 
 - (void)setSelectedAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
@@ -1759,10 +1775,7 @@ public:
         return;
     }
     
-    [self willChangeValueForKey:@"selectedAnnotation"];
-    _selectedAnnotationTag = annotationTag;
-    _lastSelectedAnnotationTag = _selectedAnnotationTag;
-    [self didChangeValueForKey:@"selectedAnnotation"];
+    self.selectedAnnotation = annotation;
     
     // For the callout to be shown, the annotation must have a title, its
     // callout must not already be shown, and the annotation must be able to
