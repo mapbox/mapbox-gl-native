@@ -65,6 +65,7 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
@@ -1474,6 +1475,15 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * Gets the current position of the camera.
+     * The CameraPosition returned is a snapshot of the current position, and will not automatically update when the camera moves.
+     * @return The current position of the Camera.
+     */
+    public final CameraPosition getCameraPosition () {
+        return new CameraPosition(getCenterCoordinate(), (float)getZoomLevel(), (float)getTilt(), (float)getBearing());
+    }
+
+    /**
      * Animates the movement of the camera from the current position to the position defined in the update.
      * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
 
@@ -1481,6 +1491,11 @@ public final class MapView extends FrameLayout {
      * @param update The change that should be applied to the camera.
      */
     public final void animateCamera (CameraUpdate update) {
+
+        setBearing(update.getBearing());
+        setTilt(new Double(update.getTilt()), 0L);
+        setCenterCoordinate(update.getTarget());
+        setZoomLevel(update.getZoom());
 
     }
 
@@ -2520,6 +2535,10 @@ public final class MapView extends FrameLayout {
         if (mNativeMapView != null) {
             mNativeMapView.update();
         }
+    }
+
+    double getBearing() {
+        return mNativeMapView.getBearing();
     }
 
     // Used by UserLocationView
