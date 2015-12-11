@@ -2924,7 +2924,7 @@ public final class MapView extends FrameLayout {
 
             // Get tilt value (scale and clamp)
             double pitch = getTilt();
-            pitch += 0.1 * detector.getShovePixelsDelta();
+            pitch -= 0.1 * detector.getShovePixelsDelta();
             pitch = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, pitch));
 
             // Tilt the map
