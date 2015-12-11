@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mainMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setZoomControlsEnabled(true);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
