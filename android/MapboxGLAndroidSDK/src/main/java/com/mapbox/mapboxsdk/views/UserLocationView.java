@@ -354,15 +354,13 @@ final class UserLocationView extends View implements LocationListener {
             mShowAccuracy = false;
             mShowDirection = false;
             mBearingChangeListener.onStart(getContext());
-        } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
+        } else {
             mBearingChangeListener.onStop();
-            if (mUserLocation != null && mUserLocation.hasBearing()) {
-                mShowDirection = true;
+            if (myBearingTrackingMode == MyBearingTracking.GPS) {
+                mShowDirection = (mUserLocation != null) && mUserLocation.hasBearing();
             } else {
                 mShowDirection = false;
             }
-        } else {
-            mShowDirection = false;
         }
     }
 
