@@ -64,10 +64,10 @@ static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
 
 /// Slop area around the hit testing point, allowing for imprecise annotation selection.
-const CGFloat MGLAnnotationImagePaddingForHitTest = 10;
+const CGFloat MGLAnnotationImagePaddingForHitTest = 5;
 
 /// Distance from the callout’s anchor point to the annotation it points to.
-const CGFloat MGLAnnotationImagePaddingForCallout = 0;
+const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
@@ -1115,16 +1115,19 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
-    if (self.userLocationVisible && ! _userLocationAnnotationIsSelected)
+    if (self.userLocationVisible)
     {
-        NSAssert(_selectedAnnotationTag == MGLAnnotationTagNotFound,
-                 @"Both the user location annotation and an mbgl-backed annotation are selected.");
-        
-        CGRect userLocationRect = CGRectInset({ tapPoint, CGSizeZero }, 15, 15);
+        // Assume that the user is fat-fingering an annotation.
+        CGRect hitRect = CGRectInset({ tapPoint, CGSizeZero },
+                                     -MGLAnnotationImagePaddingForHitTest,
+                                     -MGLAnnotationImagePaddingForHitTest);
 
-        if (CGRectContainsPoint(userLocationRect, [self convertCoordinate:self.userLocation.coordinate toPointToView:self]))
+        if (CGRectIntersectsRect(hitRect, self.userLocationAnnotationView.frame))
         {
-            [self selectAnnotation:self.userLocation animated:YES];
+            if ( ! _userLocationAnnotationIsSelected)
+            {
+                [self selectAnnotation:self.userLocation animated:YES];
+            }
             return;
         }
     }
@@ -2074,7 +2077,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 /// Returns the annotation tag assigned to the given annotation. Relatively expensive.
 - (MGLAnnotationTag)annotationTagForAnnotation:(id <MGLAnnotation>)annotation
 {
-    if ( ! annotation || _userLocationAnnotationIsSelected)
+    if ( ! annotation || annotation == self.userLocation)
     {
         return MGLAnnotationTagNotFound;
     }
@@ -2367,6 +2370,10 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     return self.annotationImagesByIdentifier[identifier];
 }
 
+CLLocationDistance MGLDistanceBetweenCoordinate2Ds(CLLocationCoordinate2D a, CLLocationCoordinate2D b) {
+    return hypot(b.latitude - a.latitude, b.longitude - a.longitude);
+}
+
 /**
     Returns the tag of the annotation at the given point in the view.
 
@@ -2400,14 +2407,10 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        mbgl::util::erase_if(nearbyAnnotations, [&](const MGLAnnotationTag annotationTag)
+        std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag)
         {
-            NSAssert(_annotationContextsByAnnotationTag.count(annotationTag) != 0, @"Unknown annotation found nearby tap");
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
-            if ( ! annotation)
-            {
-                return true;
-            }
+            NSAssert(annotation, @"Unknown annotation found nearby tap");
             
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             if ( ! annotationImage.enabled)
@@ -2561,8 +2564,9 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
         if (_userLocationAnnotationIsSelected)
         {
-            CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
-            positioningRect = CGRectMake(calloutAnchorPoint.x - 1, calloutAnchorPoint.y - 13, 0, 0);
+            positioningRect = CGRectInset(self.userLocationAnnotationView.frame,
+                                          -MGLAnnotationImagePaddingForCallout,
+                                          -MGLAnnotationImagePaddingForCallout);
         }
 
         // consult delegate for left and/or right accessory views
