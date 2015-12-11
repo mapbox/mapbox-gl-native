@@ -43,6 +43,7 @@
         '../default/string_stdlib.cpp',
         '../default/thread.cpp',
         'include/qmapboxgl.hpp',
+        'qmapbox.qrc',
         'src/async_task.cpp',
         'src/async_task_impl.hpp',
         'src/http_file_source.cpp',

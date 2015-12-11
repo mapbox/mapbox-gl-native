@@ -31,7 +31,9 @@ function print_qt_flags {
     QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
     if [ ${QT_VERSION_MAJOR} -gt 4 ] ; then
         CONFIG+="    'qt_moc%': '$(pkg-config Qt${QT_VERSION_MAJOR}Core --variable=host_bins)/moc',"$LN
+        CONFIG+="    'qt_rcc%': '$(pkg-config Qt${QT_VERSION_MAJOR}Core --variable=host_bins)/rcc',"$LN
     else
         CONFIG+="    'qt_moc%': '$(pkg-config QtCore --variable=moc_location)',"$LN
+        CONFIG+="    'qt_rcc%': '$(pkg-config QtCore --variable=rcc_location)',"$LN
     fi
 }

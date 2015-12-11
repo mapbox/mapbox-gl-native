@@ -9,10 +9,18 @@
 #include <QNetworkReply>
 #include <QSslConfiguration>
 
+// Needs to be on the global namespace
+// for linking purposes.
+void initResources() {
+    Q_INIT_RESOURCE(qmapbox);
+}
+
 namespace mbgl {
 
 HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
 {
+    initResources();
+
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
 #if QT_VERSION >= 0x050000
@@ -22,7 +30,7 @@ HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
     m_ssl.setProtocol(QSsl::TlsV1);
 #endif
 
-    m_ssl.setCaCertificates(QSslCertificate::fromPath("ca-bundle.crt"));
+    m_ssl.setCaCertificates(QSslCertificate::fromPath(":ca-bundle.crt"));
     if (m_ssl.caCertificates().isEmpty()) {
         mbgl::Log::Warning(mbgl::Event::HttpRequest, "Could not load list of certificate authorities");
     }
