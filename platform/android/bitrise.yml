@@ -44,7 +44,7 @@ workflows:
         - content: |-
             #!/bin/bash
 
-            cd android
+            cd platform/android
             ./gradlew testReleaseUnitTest --continue
         - is_debug: 'yes'
     - slack:
@@ -78,7 +78,7 @@ workflows:
         - content: |-
             #!/bin/bash
 
-            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg android/MapboxGLAndroidSDK/secring.gpg
+            aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
           opts:
             is_expand: true
     - script:
@@ -91,7 +91,7 @@ workflows:
             NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
             signing.keyId=$SIGNING_KEYID
             signing.password=$SIGNING_PASSWORD
-            signing.secretKeyRingFile=secring.gpg" >> android/MapboxGLAndroidSDK/gradle.properties
+            signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
           opts:
             is_expand: true
     - script:
@@ -107,5 +107,5 @@ workflows:
         - content: |-
             #!/bin/bash
 
-            cd android
+            cd platform/android
             ./gradlew uploadArchives
