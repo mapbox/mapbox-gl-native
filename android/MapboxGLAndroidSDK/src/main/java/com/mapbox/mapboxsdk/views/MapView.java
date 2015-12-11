@@ -77,7 +77,6 @@ import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -1448,6 +1447,7 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update) {
 
+        // Order Matters!  Otherwise Core GL will stomp on things
         setCenterCoordinate(update.getTarget());
         setZoomLevel(update.getZoom());
         setTilt(new Double(update.getTilt()), 0L);
@@ -2474,20 +2474,33 @@ public final class MapView extends FrameLayout {
         }
     }
 
-    double getBearing() {
+    /**
+     * Get Bearing in degrees
+     * @return Bearing in degrees
+     */
+    public double getBearing() {
         return mNativeMapView.getBearing();
     }
 
-    // Used by UserLocationView
-    void setBearing(float bearing) {
-        mNativeMapView.setBearing(bearing, 100);
-    }
-
-/*
+    /**
+     * Set Bearing in degrees
+     * @param bearing Bearing in degrees
+     */
     public void setBearing(float bearing) {
         mNativeMapView.setBearing(bearing);
     }
-*/
+
+    /**
+     * Sets Bearing in degrees
+     *
+     * NOTE: Used by UserLocationView
+     *
+     * @param bearing Bearing in degrees
+     * @param duration Length of time to rotate
+     */
+    public void setBearing(float bearing, long duration) {
+        mNativeMapView.setBearing(bearing, duration);
+    }
 
     //
     // View events

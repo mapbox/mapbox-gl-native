@@ -87,6 +87,7 @@ final class UserLocationView extends View implements LocationListener {
 
     // Compass data
     private MyBearingListener mBearingChangeListener;
+    private static final long BEARING_DURATION = 100;
 
     public UserLocationView(Context context) {
         super(context);
@@ -553,7 +554,7 @@ final class UserLocationView extends View implements LocationListener {
             mShowDirection = true;
             mGpsMarkerDirection = 0;
             if (location.hasBearing()) {
-                mMapView.setBearing(location.getBearing());
+                mMapView.setBearing(location.getBearing(), BEARING_DURATION);
             }
         }
 
@@ -600,7 +601,7 @@ final class UserLocationView extends View implements LocationListener {
                 mShowDirection = true;
                 mGpsMarkerDirection = 0;
                 mCompassMarkerDirection = 0;
-                mMapView.setBearing(bearing);
+                mMapView.setBearing(bearing, BEARING_DURATION);
             }
         }
     }
