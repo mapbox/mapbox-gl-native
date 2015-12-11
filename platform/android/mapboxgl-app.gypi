@@ -16,6 +16,10 @@
         'mbgl.gyp:cache-<(cache_lib)',
       ],
 
+      'include_dirs': [
+        './include',
+      ],
+
       'sources': [
         './native_map_view.cpp',
         './jni.cpp',
