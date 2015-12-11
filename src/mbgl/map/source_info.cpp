@@ -1,9 +1,11 @@
+#include <mbgl/platform/log.hpp>
 #include <mbgl/map/source_info.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/token.hpp>
 
 #include <mapbox/geojsonvt.hpp>
+#include <mapbox/geojsonvt/convert.hpp>
 
 namespace mbgl {
 
@@ -95,6 +97,19 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
     parse(value, attribution, "attribution");
     parse(value, center, "center");
     parse(value, bounds, "bounds");
+}
+
+void SourceInfo::parseGeoJSON(const rapidjson::Value& value) {
+    using namespace mapbox::geojsonvt;
+
+    try {
+        geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(value, 0));
+    } catch (const std::exception& ex) {
+        Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
+        // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
+        // tiles to load.
+        geojsonvt = std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
+    }
 }
 
 std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {

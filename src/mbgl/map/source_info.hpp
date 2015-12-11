@@ -39,6 +39,7 @@ public:
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
     void parseTileJSONProperties(const rapidjson::Value&);
+    void parseGeoJSON(const rapidjson::Value&);
     std::string tileURL(const TileID& id, float pixelRatio) const;
 };
 

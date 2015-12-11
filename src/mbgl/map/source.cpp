@@ -61,6 +61,7 @@ void Source::load() {
         return;
     }
 
+    // URL may either be a TileJSON file, or a GeoJSON file.
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Source, info.url }, [this](Response res) {
         if (res.stale) {
@@ -86,7 +87,12 @@ void Source::load() {
             return;
         }
 
-        info.parseTileJSONProperties(d);
+        if (info.type == SourceType::Vector || info.type == SourceType::Raster) {
+            info.parseTileJSONProperties(d);
+        } else if (info.type == SourceType::GeoJSON) {
+            info.parseGeoJSON(d);
+        }
+
         loaded = true;
 
         emitSourceLoaded();
