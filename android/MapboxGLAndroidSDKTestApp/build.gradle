@@ -39,7 +39,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.mapbox.mapboxgl.testapp"
+        applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 6
