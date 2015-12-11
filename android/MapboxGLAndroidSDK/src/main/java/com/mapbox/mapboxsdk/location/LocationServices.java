@@ -41,7 +41,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
             if (context == null) {
                 throw new NullPointerException("Context required for accessing LocationServices");
             }
-            instance = new LocationServices(context);
+            instance = new LocationServices(context.getApplicationContext());
         }
         return instance;
     }
