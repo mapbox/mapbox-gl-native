@@ -18,6 +18,7 @@
 
       'include_dirs': [
         './include',
+        '../src',
       ],
 
       'sources': [
@@ -112,13 +113,13 @@
           'files': [
             '../../common/ca-bundle.crt',
           ],
-          'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main/assets'
+          'destination': '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main/assets'
         },
         {
         'files': [
           '<(PRODUCT_DIR)/obj.target'
         ],
-        'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main'
+        'destination': '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main'
         },
       ],
 
@@ -126,13 +127,13 @@
         {
           'action_name': 'Strip mapbox library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
         {
           'action_name': 'Strip example custom layer library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libexample-custom-layer.so' ],
-          'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/$(JNIDIR)/libexample-custom-layer.so' ],
+          'outputs': [ '<(pwd)/../platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/$(JNIDIR)/libexample-custom-layer.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         }
       ],
