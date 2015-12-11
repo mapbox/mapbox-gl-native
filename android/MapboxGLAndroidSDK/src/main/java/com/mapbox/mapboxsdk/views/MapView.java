@@ -1492,10 +1492,10 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update) {
 
-        setBearing(update.getBearing());
-        setTilt(new Double(update.getTilt()), 0L);
         setCenterCoordinate(update.getTarget());
         setZoomLevel(update.getZoom());
+        setTilt(new Double(update.getTilt()), 0L);
+        setBearing(update.getBearing());
 
     }
 
@@ -2545,6 +2545,12 @@ public final class MapView extends FrameLayout {
     void setBearing(float bearing) {
         mNativeMapView.setBearing(bearing, 100);
     }
+
+/*
+    public void setBearing(float bearing) {
+        mNativeMapView.setBearing(bearing);
+    }
+*/
 
     //
     // View events
