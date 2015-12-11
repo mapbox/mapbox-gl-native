@@ -2370,10 +2370,6 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     return self.annotationImagesByIdentifier[identifier];
 }
 
-CLLocationDistance MGLDistanceBetweenCoordinate2Ds(CLLocationCoordinate2D a, CLLocationCoordinate2D b) {
-    return hypot(b.latitude - a.latitude, b.longitude - a.longitude);
-}
-
 /**
     Returns the tag of the annotation at the given point in the view.
 
@@ -2435,6 +2431,19 @@ CLLocationDistance MGLDistanceBetweenCoordinate2Ds(CLLocationCoordinate2D a, CLL
         
         if (nearbyAnnotations == _annotationsNearbyLastTap)
         {
+            // The first selection in the cycle should be the one nearest to the
+            // tap.
+            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+                CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                                 coordinateA.longitude - currentCoordinate.longitude);
+                CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                                 coordinateB.longitude - currentCoordinate.longitude);
+                return deltaA < deltaB;
+            });
+            
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
             if (_selectedAnnotationTag == MGLAnnotationTagNotFound
