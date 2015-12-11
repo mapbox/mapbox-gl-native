@@ -23,10 +23,10 @@ gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and sav
 
 ## Developing In Android Studio
 
-To work with the Mapbox Android SDK, you'll first need to get it setup as a Project in Android Studio.  To do so Open Android Studio and select "Import project (Eclipse ADT, Gradle, etc.)" from the Welcome to Android Studio dialog.  From there select the `android` directory from the local file system where `mapbox-gl-native` was cloned.  For example:
+To work with the Mapbox Android SDK, you'll first need to get it setup as a Project in Android Studio.  To do so Open Android Studio and select "Import project (Eclipse ADT, Gradle, etc.)" from the Welcome to Android Studio dialog.  From there select the `platform/android` directory from the local file system where `mapbox-gl-native` was cloned.  For example:
 
 ```sh
-/Users/<user>/development/mapbox-gl-native/android
+/Users/<user>/development/mapbox-gl-native/platform/android
 ```
 
 The Mapbox Android SDK is a multi-module Gradle based project.  Specifically, the SDK itself is an [Android Library](http://developer.android.com/tools/projects/index.html#LibraryModules) module and it utilizes a companion [test module](http://developer.android.com/tools/projects/index.html#testing) (aka "the TestApp") for daily development.  When Android Studio finishes importing the project both `MapboxGLAndroidSDK` and `MapboxGLAndroidSDKTestApp` modules should be visible.

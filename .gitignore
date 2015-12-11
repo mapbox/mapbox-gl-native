@@ -4,11 +4,11 @@
 *.actual.png
 *.diff.png
 *.pyc
-/android/debug
-/android/sdk
-/android/**/.classpath
-/android/**/.project
-/android/**/.settings/
+/platform/android/debug
+/platform/android/sdk
+/platform/android/**/.classpath
+/platform/android/**/.project
+/platform/android/**/.settings/
 /mason_packages
 /config/*.gypi
 /build

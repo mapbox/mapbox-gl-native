@@ -47,6 +47,7 @@
 
       'include_dirs': [
         '../include',
+        '../platform/android/include',
         '../src',
       ],
 
