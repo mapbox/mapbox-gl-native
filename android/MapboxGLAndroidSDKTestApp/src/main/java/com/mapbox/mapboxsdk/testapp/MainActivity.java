@@ -34,6 +34,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -395,6 +396,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), PolylineActivity.class));
                                 return true;
 
+                            case R.id.action_custom_layer:
+                                addCustomLayer();
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
@@ -568,6 +573,16 @@ public class MainActivity extends AppCompatActivity {
     private void removeAnnotations() {
         mMarkerList.clear();
         mMapView.removeAllAnnotations();
+    }
+
+    private void addCustomLayer() {
+        mMapView.addCustomLayer(
+            new CustomLayer("custom",
+                ExampleCustomLayer.createContext(),
+                ExampleCustomLayer.InitializeFunction,
+                ExampleCustomLayer.RenderFunction,
+                ExampleCustomLayer.DeinitializeFunction),
+            null);
     }
 
     // Called when FPS changes

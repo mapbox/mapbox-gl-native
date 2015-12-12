@@ -59,10 +59,45 @@
       ],
     },
 
+    { 'target_name': 'example-custom-layer-lib',
+      'product_name': 'example-custom-layer',
+      'type': 'shared_library',
+      'hard_dependency': 1,
+
+      'sources': [
+        './example_custom_layer.cpp',
+      ],
+
+      'variables': {
+        'ldflags': [
+          '-llog',
+          '-landroid',
+          '-lEGL',
+          '-lGLESv2',
+          '-lstdc++',
+          '-latomic',
+        ],
+      },
+
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'libraries': [ '<@(ldflags)' ],
+        }]
+      ],
+    },
 
     { 'target_name': 'androidapp',
       'type': 'none',
       'hard_dependency': 1,
+
+      'dependencies': [
+        'android-lib',
+        'example-custom-layer-lib',
+      ],
 
       'variables': {
         'pwd': '<!(pwd)',
@@ -85,11 +120,17 @@
 
       'actions': [
         {
-          'action_name': 'Strip dynamic library',
+          'action_name': 'Strip mapbox library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
           'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
+        {
+          'action_name': 'Strip example custom layer library',
+          'inputs': [ '<(PRODUCT_DIR)/lib.target/libexample-custom-layer.so' ],
+          'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/$(JNIDIR)/libexample-custom-layer.so' ],
+          'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
+        }
       ],
     },
   ],

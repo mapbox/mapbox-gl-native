@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
+import com.mapbox.mapboxsdk.layers.CustomLayer;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -449,6 +450,10 @@ final class NativeMapView {
         return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
     }
 
+    public void addCustomLayer(CustomLayer customLayer, String before) {
+        nativeAddCustomLayer(mNativeMapViewPtr, customLayer, before);
+    }
+
     //
     // Callbacks
     //
@@ -629,4 +634,6 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
+
+    private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
 }

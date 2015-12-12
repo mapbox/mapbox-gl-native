@@ -111,6 +111,13 @@ jclass httpRequestClass = nullptr;
 jmethodID httpRequestStartId = nullptr;
 jmethodID httpRequestCancelId = nullptr;
 
+jclass customLayerClass = nullptr;
+jfieldID customLayerIdId = nullptr;
+jfieldID customLayerContextId = nullptr;
+jfieldID customLayerInitializeFunctionId = nullptr;
+jfieldID customLayerRenderFunctionId = nullptr;
+jfieldID customLayerDeinitializeFunctionId = nullptr;
+
 bool throw_jni_error(JNIEnv *env, const char *msg) {
     if (env->ThrowNew(runtimeExceptionClass, msg) < 0) {
         env->ExceptionDescribe();
@@ -1471,6 +1478,19 @@ jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject
     return nativeMapView->getMap().getTopOffsetPixelsForAnnotationIcon(std_string_from_jstring(env, symbolName));
 }
 
+void JNICALL nativeAddCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject customLayer, jstring before) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddCustomLayer");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().addCustomLayer(
+        std_string_from_jstring(env, reinterpret_cast<jstring>(env->GetObjectField(customLayer, customLayerIdId))),
+        reinterpret_cast<mbgl::CustomLayerInitializeFunction>(env->GetLongField(customLayer, customLayerInitializeFunctionId)),
+        reinterpret_cast<mbgl::CustomLayerRenderFunction>(env->GetLongField(customLayer, customLayerRenderFunctionId)),
+        reinterpret_cast<mbgl::CustomLayerDeinitializeFunction>(env->GetLongField(customLayer, customLayerDeinitializeFunctionId)),
+        reinterpret_cast<void*>(env->GetLongField(customLayer, customLayerContextId)),
+        before ? std_string_from_jstring(env, before).c_str() : nullptr);
+}
+
 
 }
 
@@ -1848,6 +1868,36 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->ExceptionDescribe();
     }
 
+    customLayerClass = env->FindClass("com/mapbox/mapboxsdk/layers/CustomLayer");
+    if (customLayerClass == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    customLayerIdId = env->GetFieldID(customLayerClass, "mID", "Ljava/lang/String;");
+    if (customLayerIdId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    customLayerContextId = env->GetFieldID(customLayerClass, "mContext", "J");
+    if (customLayerContextId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    customLayerInitializeFunctionId = env->GetFieldID(customLayerClass, "mInitializeFunction", "J");
+    if (customLayerInitializeFunctionId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    customLayerRenderFunctionId = env->GetFieldID(customLayerClass, "mRenderFunction", "J");
+    if (customLayerRenderFunctionId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
+    customLayerDeinitializeFunctionId = env->GetFieldID(customLayerClass, "mDeinitializeFunction", "J");
+    if (customLayerDeinitializeFunctionId == nullptr) {
+        env->ExceptionDescribe();
+    }
+
     const std::vector<JNINativeMethod> methods = {
         {"nativeCreate", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;FIJ)J",
          reinterpret_cast<void *>(&nativeCreate)},
@@ -1965,6 +2015,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
+        {"nativeAddCustomLayer", "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V",
+         reinterpret_cast<void *>(&nativeAddCustomLayer)},
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {

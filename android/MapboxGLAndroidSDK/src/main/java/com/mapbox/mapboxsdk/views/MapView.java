@@ -74,6 +74,7 @@ import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
+import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.lang.annotation.Retention;
@@ -3780,6 +3781,11 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setAttributionVisibility(int visibility) {
         mAttributionsView.setVisibility(visibility);
+    }
+
+    @UiThread
+    public void addCustomLayer(CustomLayer customLayer, String before) {
+        mNativeMapView.addCustomLayer(customLayer, before);
     }
 
     private void setWidgetGravity(@NonNull final View view, int gravity) {

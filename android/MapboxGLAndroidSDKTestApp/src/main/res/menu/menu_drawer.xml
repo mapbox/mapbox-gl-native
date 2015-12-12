@@ -138,6 +138,12 @@
                 android:icon="@drawable/ic_trending_up_24dp"
                 android:title="@string/activity_polyline" />
 
+            <item
+                android:id="@+id/action_custom_layer"
+                android:checkable="false"
+                android:icon="@drawable/ic_trending_up_24dp"
+                android:title="@string/activity_custom_layer" />
+
         </menu>
     </item>
 
