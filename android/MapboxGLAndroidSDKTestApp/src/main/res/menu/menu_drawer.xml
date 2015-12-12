@@ -69,7 +69,7 @@
             <item
                 android:id="@+id/action_tilt"
                 android:checkable="false"
-                android:icon="@drawable/ic_flip_to_back_24dp"
+                android:icon="@drawable/ic_tilt"
                 android:title="@string/action_tilt" />
 
             <item
@@ -87,13 +87,13 @@
             <item
                 android:id="@+id/action_info_window_concurrent"
                 android:checkable="false"
-                android:icon="@drawable/ic_flip_to_front_24dp"
+                android:icon="@drawable/ic_flip_to_back_24dp"
                 android:title="@string/action_info_window_concurrent" />
 
             <item
                 android:id="@+id/action_info_window_adapter"
                 android:checkable="false"
-                android:icon="@drawable/ic_flip_to_back_24dp"
+                android:icon="@drawable/ic_infowindow_adapter"
                 android:title="@string/action_info_window_adapter" />
 
             <item
@@ -107,6 +107,12 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_filter_center_focus_24dp"
                 android:title="@string/action_manual_zoom" />
+
+            <item
+                android:id="@+id/action_coordinate_change"
+                android:checkable="false"
+                android:icon="@drawable/ic_animate_coordinates"
+                android:title="@string/action_animate_coordinate_change" />
 
             <item
                 android:id="@+id/action_visible_bounds"

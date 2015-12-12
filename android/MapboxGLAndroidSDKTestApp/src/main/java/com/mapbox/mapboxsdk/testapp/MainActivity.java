@@ -356,6 +356,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), ManualZoomActivity.class));
                                 return true;
 
+                            case R.id.action_coordinate_change:
+                                startActivity(new Intent(getApplicationContext(), CoordinateChangeActivity.class));
+                                return true;
+
                             case R.id.action_bulk_markers:
                                 startActivity(new Intent(getApplicationContext(), BulkMarkerActivity.class));
                                 return true;

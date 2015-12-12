@@ -56,6 +56,9 @@
         <activity
             android:name=".PolylineActivity"
             android:label="@string/activity_polyline" />
+        <activity
+            android:name=".CoordinateChangeActivity"
+            android:label="@string/activity_animate_coordinate_change" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
