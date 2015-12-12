@@ -56,6 +56,11 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
                 .setAction(android.R.string.ok, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        // Disable UserInput
+                        mMapView.setScrollEnabled(false);
+                        mMapView.setZoomEnabled(false);
+
+                        // Reposition coordinate bounds
                         float margin = getResources().getDimension(R.dimen.coordinatebounds_margin);
                         mMapView.setVisibleCoordinateBounds(new CoordinateBounds(losAngeles, newYork), new RectF(margin, 0, margin, 0), true);
                     }
