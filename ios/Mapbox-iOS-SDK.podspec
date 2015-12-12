@@ -4,7 +4,7 @@ Pod::Spec.new do |m|
   m.version = '3.0.1-symbols'
 
   m.summary           = 'Open source vector map solution for iOS with full styling capabilities.'
-  m.description       = 'Open source OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa bindings.'
+  m.description       = 'Open source, OpenGL-based vector map solution for iOS with full styling capabilities and Cocoa Touch APIs.'
   m.homepage          = 'https://www.mapbox.com/ios-sdk/'
   m.license           = { :type => 'BSD', :file => 'Mapbox.framework/LICENSE.md' }
   m.author            = { 'Mapbox' => 'mobile@mapbox.com' }
