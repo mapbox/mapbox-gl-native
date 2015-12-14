@@ -409,8 +409,8 @@ LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
 
 #pragma mark - Features
 
-FeatureResults Map::featuresAt(const PrecisionPoint point, const uint8_t radius) const {
-    return context->invokeSync<FeatureResults>(&MapContext::featuresAt, point, radius);
+std::vector<FeatureDescription> Map::featureDescriptionsAt(const PrecisionPoint point, const uint8_t radius) const {
+    return context->invokeSync<std::vector<FeatureDescription>>(&MapContext::featureDescriptionsAt, point, radius);
 }
 
 

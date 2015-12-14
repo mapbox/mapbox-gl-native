@@ -3,16 +3,17 @@
 
 #include <map>
 #include <string>
-#include <vector>
-#include <tuple>
 
 namespace mbgl {
 
-// key, value
-typedef std::map<std::string, std::string> FeatureProperties;
+struct FeatureDescription {
+    inline explicit FeatureDescription(std::string layer_, std::string source_, std::map<std::string, std::string>properties_)
+    : layer(layer_), source(source_), properties(properties_) {}
 
-// layer name, source name, feature properties
-typedef std::vector<std::tuple<std::string, std::string, FeatureProperties>> FeatureResults;
+    std::string layer;
+    std::string source;
+    std::map<std::string, std::string> properties;
+};
 
 }
 

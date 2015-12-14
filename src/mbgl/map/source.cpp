@@ -606,7 +606,7 @@ void Source::dumpDebugLogs() const {
     }
 }
 
-FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radius, const TransformState& transform) const {
+std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoint point, const uint8_t radius, const TransformState& transform) const {
     // figure out tile (bounded by source max zoom)
     LatLng p = transform.pointToLatLng(point);
 
@@ -640,7 +640,7 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
 
     FeatureBox queryBox = {{ left, bottom }, { right, top }};
 
-    FeatureResults results;
+    std::vector<FeatureDescription> results;
 
     // find the right tile
     for (const auto& tile : getLoadedTiles()) {
@@ -650,10 +650,7 @@ FeatureResults Source::featuresAt(const PrecisionPoint point, const uint8_t radi
         const auto& data = tile->data;
         data->featureTree.query(boost::geometry::index::intersects(queryBox),
                                 boost::make_function_output_iterator([&](const auto& val) {
-            const std::string layer_id = std::get<1>(val);
-            const FeatureProperties feature_properties = std::get<2>(val);
-            const auto result = std::make_tuple(layer_id, info.source_id, feature_properties);
-            results.push_back(result);
+            results.push_back(val.second);
         }));
     }
 

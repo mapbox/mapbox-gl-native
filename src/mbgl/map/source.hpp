@@ -93,7 +93,7 @@ public:
     void setObserver(Observer* observer);
     void dumpDebugLogs() const;
 
-    FeatureResults featuresAt(const PrecisionPoint, const uint8_t radius, const TransformState&) const;
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint8_t radius, const TransformState&) const;
 
     SourceInfo info;
     bool enabled;

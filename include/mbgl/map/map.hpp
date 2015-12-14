@@ -161,7 +161,7 @@ public:
     double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
 
     // Features
-    FeatureResults featuresAt(const PrecisionPoint, const uint8_t radius = 5) const;
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint8_t radius = 5) const;
 
     // Sprites
     void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);

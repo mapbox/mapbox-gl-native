@@ -3,9 +3,6 @@
 
 #include <mbgl/util/interactive_features.hpp>
 
-#include <tuple>
-#include <string>
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -33,7 +30,7 @@ namespace FeatureBGI = FeatureBG::index;
 
 typedef FeatureBGM::point<int16_t, 2, FeatureBG::cs::cartesian> FeaturePoint;
 typedef FeatureBGM::box<FeaturePoint> FeatureBox;
-typedef std::tuple<FeatureBox, std::string, FeatureProperties> Feature;
+typedef std::pair<FeatureBox, FeatureDescription> Feature;
 typedef FeatureBGI::rtree<Feature, FeatureBGI::linear<16, 4>> FeatureTree;
 
 }

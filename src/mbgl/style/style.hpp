@@ -69,7 +69,7 @@ public:
     void addLayer(util::ptr<StyleLayer>, const std::string& beforeLayerID);
     void removeLayer(const std::string& layerID);
 
-    FeatureResults featuresAt(const PrecisionPoint, const uint8_t radius, const TransformState& transform) const;
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint8_t radius, const TransformState& transform) const;
 
     void dumpDebugLogs() const;
 

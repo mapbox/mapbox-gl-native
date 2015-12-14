@@ -388,20 +388,18 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     // flip y for core
     point.y = self.bounds.size.height - point.y;
 
-    mbgl::FeatureResults results = _mbglMap->featuresAt(mbgl::PrecisionPoint(point.x, point.y), 50);
+    std::vector<mbgl::FeatureDescription> results = _mbglMap->featureDescriptionsAt(mbgl::PrecisionPoint(point.x, point.y), 50);
 
     NSMutableArray *features = [NSMutableArray arrayWithCapacity:results.size()];
 
     for (const auto& result : results)
     {
-        NSString *layerName  = @(std::get<0>(result).c_str());
-        NSString *sourceName = @(std::get<1>(result).c_str());
+        NSString *layerName  = @(result.layer.c_str());
+        NSString *sourceName = @(result.source.c_str());
 
-        const auto& properties = std::get<2>(result);
+        NSMutableDictionary *featureProperties = [NSMutableDictionary dictionaryWithCapacity:result.properties.size()];
 
-        NSMutableDictionary *featureProperties = [NSMutableDictionary dictionaryWithCapacity:properties.size()];
-
-        for (const auto& property : properties)
+        for (const auto& property : result.properties)
         {
             NSString *key = @(property.first.c_str());
             NSString *val = @(property.second.c_str());

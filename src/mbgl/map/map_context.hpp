@@ -52,7 +52,7 @@ public:
     double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
     void updateAnnotations();
 
-    FeatureResults featuresAt(const PrecisionPoint, const uint8_t radius) const;
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint8_t radius) const;
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
