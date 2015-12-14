@@ -607,7 +607,11 @@ void Source::dumpDebugLogs() const {
 }
 
 std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius, const TransformState& transform) const {
-    // figure out tile (bounded by source max zoom)
+    // First, we figure out the tile being queried, bounded by
+    // the source's max zoom.
+    //
+    // We project the point into Spherical Mercator unit space
+    // in order to simplify tile math.
     LatLng p = transform.pointToLatLng(point);
 
     const double sine = std::sin(p.latitude * M_PI / 180);
@@ -616,22 +620,29 @@ std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoi
 
     y = y < -1 ? -1 : y > 1 ? 1 : y;
 
+    // Then we determine the tile in the source's max zoom
+    // in which the query point resides.
     const uint8_t z = ::floor(transform.getZoom());
     const uint8_t sourceMaxZ = ::fmin(z, info.max_zoom);
     const uint32_t z2 = ::powf(2, sourceMaxZ);
 
     TileID id(z, ::floor(x * z2), ::floor(y * z2), sourceMaxZ);
 
-    // figure out query bounds
+    // Second, we determine the query point (zero radius) or
+    // box (non-zero radius) in terms of tile extent space. To
+    // do this, we factor in the current incremental transform
+    // scale.
+    const uint16_t extent = 4096;
+
     TileCoordinate coordinate = transform.pointToCoordinate(point);
     coordinate = coordinate.zoomTo(::fmin(id.z, info.max_zoom));
 
-    vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
+    vec2<uint16_t> position((coordinate.column - id.x) * extent, (coordinate.row - id.y) * extent);
 
     const uint32_t tileScale = ::pow(2, id.z);
     const double scale = util::tileSize * transform.getScale() / (tileScale / id.overscaling);
 
-    const int16_t r = radius * 4096 / scale;
+    const int16_t r = radius * extent / scale;
 
     const int16_t left   = position.x - r;
     const int16_t right  = position.x + r;
@@ -640,18 +651,19 @@ std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoi
 
     FeatureBox queryBox = {{ left, bottom }, { right, top }};
 
+    // Third, we query the appropriate tile data object's
+    // feature tree for matching features.
     std::vector<FeatureDescription> results;
 
-    // find the right tile
-    for (const auto& tile : getLoadedTiles()) {
-        if (tile->id != id) continue;
-
-        // query the tile
-        const auto& data = tile->data;
-        data->featureTree.query(boost::geometry::index::intersects(queryBox),
-                                boost::make_function_output_iterator([&](const auto& val) {
-            results.push_back(val.second);
-        }));
+    const auto tileIter = tiles.find(id);
+    if (tileIter != tiles.end()) {
+        const auto& queryTile = tileIter->second;
+        if (queryTile->data->getState() == TileData::State::parsed) {
+            queryTile->data->featureTree.query(boost::geometry::index::intersects(queryBox),
+                                               boost::make_function_output_iterator([&](const auto& val) {
+                results.push_back(val.second);
+            }));
+        }
     }
 
     return results;
