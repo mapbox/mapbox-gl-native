@@ -266,7 +266,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
         if (value.HasMember("interactive")) {
             const JSVal& interactive = value["interactive"];
             if (interactive.IsBool()) {
-                layer->interactive = interactive.GetBool();
+                layer->isInteractive = interactive.GetBool();
             } else {
                 Log::Warning(Event::ParseStyle, "interactive of layer %s must be a boolean", layer->id.c_str());
             }

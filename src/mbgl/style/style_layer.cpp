@@ -43,7 +43,7 @@ void StyleLayer::copy(const StyleLayer& src) {
     minZoom = src.minZoom;
     maxZoom = src.maxZoom;
     visibility = src.visibility;
-    interactive = src.interactive;
+    isInteractive = src.isInteractive;
 }
 
 }

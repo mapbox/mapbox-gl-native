@@ -56,7 +56,7 @@ public:
     float minZoom = -std::numeric_limits<float>::infinity();
     float maxZoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
-    bool interactive;
+    bool isInteractive;
 
 protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
