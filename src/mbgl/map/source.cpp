@@ -606,7 +606,7 @@ void Source::dumpDebugLogs() const {
     }
 }
 
-std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoint point, const uint8_t radius, const TransformState& transform) const {
+std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius, const TransformState& transform) const {
     // figure out tile (bounded by source max zoom)
     LatLng p = transform.pointToLatLng(point);
 

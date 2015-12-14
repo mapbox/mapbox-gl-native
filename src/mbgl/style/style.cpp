@@ -265,7 +265,7 @@ void Style::emitResourceLoadingFailed(std::exception_ptr error) {
     }
 }
 
-std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoint point, const uint8_t radius, const TransformState& transform) const {
+std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius, const TransformState& transform) const {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     std::vector<FeatureDescription> results;

@@ -277,7 +277,7 @@ double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symb
     }
 }
 
-std::vector<FeatureDescription> MapContext::featureDescriptionsAt(const PrecisionPoint point, const uint8_t radius) const {
+std::vector<FeatureDescription> MapContext::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return std::vector<FeatureDescription>();
     return style->featureDescriptionsAt(point, radius, transformState);
