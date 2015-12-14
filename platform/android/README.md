@@ -2,7 +2,7 @@
 
 [![Bitrise](https://www.bitrise.io/app/79cdcbdc42de4303.svg?token=_InPF8bII6W7J6kFr-L8QQ&branch=master)](https://www.bitrise.io/app/79cdcbdc42de4303)
 
-A library based on [Mapbox GL Native](../../README.md) for embedding interactive vector maps into Java applications on Android devices.
+A library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps into Java applications on Android devices.
 
 This repository is for day-to-day development of the SDK. Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications. For production applications, please consider installing an official, prebuilt release instead; see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/) for installation instructions.
 

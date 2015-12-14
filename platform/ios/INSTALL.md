@@ -20,7 +20,11 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
    [sudo] gem install jazzy
    ```
 
-1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
+1. Run `make ipackage`. The packaging script will produce a `build/ios/pkg/` folder containing:
+  - a `dynamic` folder containing a dynamically-linked fat framework
+  - a `static` folder containing a statically-linked framework
+  - a `documentation` folder with HTML API documentation
+  - an example `Settings.bundle` for providing the required Mapbox Metrics opt-out setting
 
 ### Install
 
@@ -33,13 +37,13 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
 1. Zip up the build product.
 
     ```
-    cd build/ios/pkg/static
+    cd build/ios/pkg/
     ZIP=mapbox-ios-sdk.zip
     rm -f ../${ZIP}
     zip -r ../${ZIP} *
     ```
 
-1. Modify a custom `Mapbox-iOS-SDK.podspec` to download this zip file.
+1. Customize [`Mapbox-iOS-SDK.podspec`](../ios/Mapbox-iOS-SDK.podspec) to download this zip file.
 
     ```rb
     {...}
@@ -60,17 +64,31 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
 
 1. Run `pod update` to grab the newly-built library.
 
-#### Binary
+#### Dynamic framework
 
-1. Built from source manually per above.
+This is the recommended workflow for manually integrating the SDK into an application targeting iOS 8 and above:
 
-1. Copy the contents of `build/ios/pkg/static` into your project. It should happen automatically, but ensure that:
+1. Build from source manually per above.
 
-   - `Headers` is in your *Header Search Paths* (`HEADER_SEARCH_PATHS`) build setting.
-   - `Mapbox.bundle` is in your target's *Copy Bundle Resources* build phase.
-   - `libMapbox.a` is in your target's *Link Binary With Libraries* build phase.
+1. Open the project editor and select your application target. Drag `build/ios/pkg/dynamic/Mapbox.framework` into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
-1. Add the following Cocoa framework dependencies to your target's *Link Binary With Libraries* build phase:
+1. In the Build Phases tab, click the + button at the top and select “New Run Script Phase”. Enter the following code into the script text field:
+
+```bash
+bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-frameworks.sh"
+```
+
+(The last step, courtesy of [Realm](https://github.com/realm/realm-cocoa/), is required for working around an [iOS App Store bug](http://www.openradar.me/radar?id=6409498411401216) when archiving universal binaries.)
+
+#### Static framework
+
+If your application targets iOS 7.x, you’ll need to install the static framework instead:
+
+1. Build from source manually per above.
+
+1. Open the project editor and select your application target. Drag `build/ios/pkg/static/Mapbox.framework` into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+
+1. Add the following Cocoa Touch frameworks and libraries to the “Linked Frameworks and Libraries” section:
 
    - `GLKit.framework`
    - `ImageIO.framework`
@@ -81,7 +99,13 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
    - `libsqlite3.dylib`
    - `libz.dylib`
 
-1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
+1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
+
+### Use
+
+1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
+
+1. In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
 
 ## Use
 
