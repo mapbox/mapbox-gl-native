@@ -20,7 +20,7 @@ mapbox::util::optional<Value> AnnotationTileFeature::getValue(const std::string&
     return mapbox::util::optional<Value>();
 }
 
-std::unordered_map<std::string, std::string> AnnotationTileFeature::getAllValues() const {
+std::unordered_map<std::string, std::string> AnnotationTileFeature::getValues() const {
     return properties;
 }
 

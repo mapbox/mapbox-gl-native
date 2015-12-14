@@ -85,7 +85,7 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
     return mapbox::util::optional<Value>();
 }
 
-std::unordered_map<std::string, std::string> VectorTileFeature::getAllValues() const {
+std::unordered_map<std::string, std::string> VectorTileFeature::getValues() const {
     std::unordered_map<std::string, std::string> values;
 
     for (const auto keyIter : layer.keys) {

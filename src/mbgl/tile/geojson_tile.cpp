@@ -22,7 +22,7 @@ mapbox::util::optional<Value> GeoJSONTileFeature::getValue(const std::string& ke
     return mapbox::util::optional<Value>();
 }
 
-std::unordered_map<std::string, std::string> GeoJSONTileFeature::getAllValues() const {
+std::unordered_map<std::string, std::string> GeoJSONTileFeature::getValues() const {
     return tags;
 }
 

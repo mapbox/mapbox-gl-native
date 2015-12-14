@@ -176,7 +176,7 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
             if (featureBox.min_corner().get<0>() < extent && featureBox.min_corner().get<1>() < extent &&
                 featureBox.max_corner().get<0>() > -1 && featureBox.max_corner().get<1>() > -1) {
                 // sort properties on keys
-                const auto values = feature->getAllValues();
+                const auto values = feature->getValues();
                 std::map<std::string, std::string> properties;
                 properties.insert(values.begin(), values.end());
                 result.featureTree.insert(std::make_pair(featureBox, FeatureDescription(layer->id, layer->source, properties)));

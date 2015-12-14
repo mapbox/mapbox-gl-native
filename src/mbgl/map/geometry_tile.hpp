@@ -32,7 +32,7 @@ public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
-    virtual std::unordered_map<std::string, std::string> getAllValues() const = 0;
+    virtual std::unordered_map<std::string, std::string> getValues() const = 0;
     virtual GeometryCollection getGeometries() const = 0;
 };
 
