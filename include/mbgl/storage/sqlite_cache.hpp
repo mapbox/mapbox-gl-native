@@ -16,6 +16,9 @@ public:
     SQLiteCache(const std::string &path = ":memory:");
     ~SQLiteCache() override;
 
+    void setMaximumCacheSize(uint64_t size);
+    void setMaximumCacheEntrySize(uint64_t size);
+
     // FileCache API
     std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) override;
     void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
