@@ -7,6 +7,23 @@ import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+
+/**
+ * <p>
+ * A builder object for the options configuration {@link com.mapbox.mapboxsdk.annotations.Marker} and
+ * {@link com.mapbox.mapboxsdk.annotations.InfoWindow}
+ * instances on maps.
+ * </p>
+ *
+ * <h3>Example</h3>
+ *
+ * <pre>
+ * mMapView.addMarker(new MarkerOptions()
+ *   .title("Intersection")
+ *   .snippet("H St NW with 15th St NW")
+ *   .position(new LatLng(38.9002073, -77.03364419)));
+ * </pre>
+ */
 public final class MarkerOptions implements Parcelable {
 
     public static final Parcelable.Creator<MarkerOptions> CREATOR

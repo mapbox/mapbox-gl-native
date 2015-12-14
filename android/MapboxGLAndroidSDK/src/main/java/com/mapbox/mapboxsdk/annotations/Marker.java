@@ -7,6 +7,11 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
 
+/**
+ * A marker is a map overlay that shows an icon image at a specific
+ * geographical location and can be associated with a {@link InfoWindow}
+ * that is shown when the marker is tapped.
+ */
 public final class Marker extends Annotation {
 
     private LatLng position;
