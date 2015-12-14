@@ -165,6 +165,7 @@ cp -pv ios/framework/Info.plist "${OUTPUT}/static/${NAME}.framework/Info.plist"
 perl -pi -e "s/(?<=<string>)0(?=<\/string>)/${PROJ_VERSION}/g" "${OUTPUT}/static/${NAME}.framework/Info.plist"
 mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
 cp -pv ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
+cp -pv ios/framework/strip-frameworks.sh "${OUTPUT}/dynamic/${NAME}.framework/strip-frameworks.sh"
 
 step "Generating API documentation…"
 if [ -z `which jazzy` ]; then
