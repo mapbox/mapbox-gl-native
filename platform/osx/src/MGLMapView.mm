@@ -1659,14 +1659,16 @@ public:
         std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
         
         if (nearbyAnnotations == _annotationsNearbyLastClick) {
+            // The first selection in the cycle should be the one nearest to the
+            // click.
             CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
             std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
                 CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
                 CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
-                double distanceA = hypot(coordinateA.latitude - currentCoordinate.latitude,
-                                         coordinateA.longitude - currentCoordinate.longitude);
-                double distanceB = hypot(coordinateB.latitude - currentCoordinate.latitude,
-                                         coordinateB.longitude - currentCoordinate.longitude);
+                CLLocationDegrees distanceA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                                    coordinateA.longitude - currentCoordinate.longitude);
+                CLLocationDegrees distanceB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                                    coordinateB.longitude - currentCoordinate.longitude);
                 return distanceA < distanceB;
             });
             

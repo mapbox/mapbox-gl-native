@@ -4,7 +4,7 @@ This project provides an OS X SDK analogous to the Mapbox iOS SDK. Mapbox does n
 
 ### Build
 
-1. Run `make xpackage`, which produces a `Mapbox.framework` in the `gyp/build/Release/` folder.
+1. Run `make xpackage`, which produces a `Mapbox.framework` in the `build/osx/pkg/` folder.
 
 ### Install
 
