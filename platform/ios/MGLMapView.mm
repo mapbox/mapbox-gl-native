@@ -383,7 +383,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     }];
 }
 
-- (NS_ARRAY_OF(NSDictionary *) *)featuresAt:(CGPoint)point
+- (NS_ARRAY_OF(NSDictionary *) *)featureDescriptionsAtPoint:(CGPoint)point
 {
     // flip y for core
     point.y = self.bounds.size.height - point.y;
@@ -409,9 +409,9 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
             featureProperties[key] = val;
         }
 
-        [features addObject:@{ @"layer":      layerName,
-                               @"source":     sourceName,
-                               @"properties": featureProperties }];
+        [features addObject:@{ MGLFeatureLayerNameKey:  layerName,
+                               MGLFeatureSourceNameKey: sourceName,
+                               MGLFeaturePropertiesKey: featureProperties }];
     }
 
     return [NSArray arrayWithArray:features];

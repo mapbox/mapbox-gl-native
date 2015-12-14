@@ -346,7 +346,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
         CGPoint point = [pan locationInView:pan.view];
 
-        NSArray *features = [self.mapView featuresAt:point];
+        NSArray *features = [self.mapView featureDescriptionsAtPoint:point];
 
         if ([features count])
         {
@@ -355,14 +355,14 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             for (NSDictionary *feature in features)
             {
                 [output appendString:@"Layer: "];
-                [output appendString:[feature objectForKey:@"layer"]];
+                [output appendString:[feature objectForKey:MGLFeatureLayerNameKey]];
                 [output appendString:@"\n"];
 
                 [output appendString:@"Source: "];
-                [output appendString:[feature objectForKey:@"source"]];
+                [output appendString:[feature objectForKey:MGLFeatureSourceNameKey]];
                 [output appendString:@"\n"];
 
-                NSDictionary *properties = [feature objectForKey:@"properties"];
+                NSDictionary *properties = [feature objectForKey:MGLFeaturePropertiesKey];
 
                 for (NSString *key in [properties allKeys])
                 {
