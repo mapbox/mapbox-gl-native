@@ -383,12 +383,12 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     }];
 }
 
-- (NS_ARRAY_OF(NSDictionary *) *)featureDescriptionsAtPoint:(CGPoint)point
+- (NS_ARRAY_OF(NSDictionary *) *)featureDescriptionsAtPoint:(CGPoint)point radius:(CGFloat)radius
 {
     // flip y for core
     point.y = self.bounds.size.height - point.y;
 
-    std::vector<mbgl::FeatureDescription> results = _mbglMap->featureDescriptionsAt(mbgl::PrecisionPoint(point.x, point.y), 50);
+    std::vector<mbgl::FeatureDescription> results = _mbglMap->featureDescriptionsAt(mbgl::PrecisionPoint(point.x, point.y), radius);
 
     NSMutableArray *features = [NSMutableArray arrayWithCapacity:results.size()];
 

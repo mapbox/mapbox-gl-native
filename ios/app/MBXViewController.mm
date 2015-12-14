@@ -346,7 +346,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
         CGPoint point = [pan locationInView:pan.view];
 
-        NSArray *features = [self.mapView featureDescriptionsAtPoint:point];
+        NSArray *features = [self.mapView featureDescriptionsAtPoint:point radius:50];
 
         if ([features count])
         {
