@@ -394,8 +394,8 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
     for (const auto& result : results)
     {
-        NSString *layerName  = [NSString stringWithUTF8String:std::get<0>(result).c_str()];
-        NSString *sourceName = [NSString stringWithUTF8String:std::get<1>(result).c_str()];
+        NSString *layerName  = @(std::get<0>(result).c_str());
+        NSString *sourceName = @(std::get<1>(result).c_str());
 
         const auto& properties = std::get<2>(result);
 
@@ -403,8 +403,8 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
 
         for (const auto& property : properties)
         {
-            NSString *key = [NSString stringWithUTF8String:property.first.c_str()];
-            NSString *val = [NSString stringWithUTF8String:property.second.c_str()];
+            NSString *key = @(property.first.c_str());
+            NSString *val = @(property.second.c_str());
 
             featureProperties[key] = val;
         }
@@ -1157,7 +1157,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
         {
             // pare down nearby annotations to only enabled ones
             NSEnumerator *metadataEnumerator = [self.annotationMetadataByAnnotation objectEnumerator];
-            NSString *prefix = [NSString stringWithUTF8String:spritePrefix.c_str()];
+            NSString *prefix = @(spritePrefix.c_str());
             std::unordered_set<uint32_t> disabledAnnotationIDs;
 
             while (NSDictionary *metadata = [metadataEnumerator nextObject])
@@ -2296,7 +2296,7 @@ CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng latLng)
         {
             [self.annotationMetadataByAnnotation setObject:@{
                 MGLAnnotationIDKey     : @(pointAnnotationIDs[i]),
-                MGLAnnotationSymbolKey : [NSString stringWithUTF8String:points[i].icon.c_str()]
+                MGLAnnotationSymbolKey : @(points[i].icon.c_str())
             } forKey:annotations[i]];
         }
     }
