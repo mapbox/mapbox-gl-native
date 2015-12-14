@@ -131,6 +131,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.stencilMask = 0xFF;
         config.depthTest = GL_FALSE;
         config.depthMask = GL_TRUE;
+        config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
         config.clearColor = { background[0], background[1], background[2], background[3] };
         config.clearStencil = 0;
         config.clearDepth = 1;
