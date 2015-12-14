@@ -140,13 +140,13 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
     if (layer.interactive) {
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
-            FeatureBox featureBox = {{ 4096, 4096 }, { -1, -1 }};
+            FeatureBox featureBox = {{ extent, extent }, { -1, -1 }};
             const auto geometries = feature->getGeometries();
             for (std::size_t j = 0; j < geometries.size(); j++) {
                 const auto geometry = geometries.at(j);
                 for (std::size_t k = 0; k < geometry.size(); k++) {
                     auto point = geometry.at(k);
-                    if (point.x < 0 || point.x > 4095 || point.y < 0 || point.y > 4095) continue;
+                    if (point.x < 0 || point.x > extent - 1 || point.y < 0 || point.y > extent - 1) continue;
                     const auto min = featureBox.min_corner();
                     const auto max = featureBox.max_corner();
                     if (point.x < min.get<0>()) {
@@ -156,16 +156,16 @@ void TileWorker::parseLayer(const StyleLayer& layer, const GeometryTile& geometr
                         featureBox.min_corner().set<1>(::fmax(point.y, 0));
                     }
                     if (point.x > max.get<0>()) {
-                        featureBox.max_corner().set<0>(::fmin(point.x, 4095));
+                        featureBox.max_corner().set<0>(::fmin(point.x, extent - 1));
                     }
                     if (point.y > max.get<1>()) {
-                        featureBox.max_corner().set<1>(::fmin(point.y, 4095));
+                        featureBox.max_corner().set<1>(::fmin(point.y, extent - 1));
                     }
                 }
             }
 
-            if (featureBox.min_corner().get<0>() < 4096 && featureBox.min_corner().get<1>() < 4096 &&
-                featureBox.max_corner().get<0>() > -1   && featureBox.max_corner().get<1>() > -1) {
+            if (featureBox.min_corner().get<0>() < extent && featureBox.min_corner().get<1>() < extent &&
+                featureBox.max_corner().get<0>() > -1 && featureBox.max_corner().get<1>() > -1) {
                 const auto& values = feature->getAllValues();
                 FeatureProperties properties;
                 properties.insert(values.begin(), values.end());

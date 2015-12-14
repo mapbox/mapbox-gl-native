@@ -72,6 +72,8 @@ private:
 
     // Temporary holder
     TileParseResultBuckets result;
+
+    const uint16_t extent = 4096;
 };
 
 } // namespace mbgl
