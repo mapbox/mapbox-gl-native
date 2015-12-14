@@ -18,6 +18,10 @@ void Painter::renderCircle(CircleBucket& bucket,
     if (pass == RenderPass::Opaque) return;
 
     config.stencilTest = GL_FALSE;
+    config.depthFunc.reset();
+    config.depthTest = GL_TRUE;
+    config.depthMask = GL_FALSE;
+    setDepthSublayer(0);
 
     const CirclePaintProperties& properties = layer.paint;
     mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);

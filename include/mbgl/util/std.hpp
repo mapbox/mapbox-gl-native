@@ -24,7 +24,7 @@ void erase_if(Container &container, Predicate pred) {
     erase_if(container, container.begin(), container.end(), pred);
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

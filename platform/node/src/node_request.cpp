@@ -1,5 +1,6 @@
 #include "node_request.hpp"
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <cmath>
 #include <iostream>
@@ -43,6 +44,8 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
+    using Milliseconds = mbgl::Milliseconds;
+
     mbgl::Response response;
 
     if (info.Length() < 1) {
@@ -63,14 +66,14 @@ NAN_METHOD(NodeRequest::Respond) {
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(modified)) {
-                response.modified = modified / 1000; // JS timestamps are milliseconds
+                response.modified = mbgl::asSeconds(Milliseconds(Milliseconds::rep(modified)));
             }
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
             const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(expires)) {
-                response.expires = expires / 1000; // JS timestamps are milliseconds
+                response.expires = mbgl::asSeconds(Milliseconds(Milliseconds::rep(expires)));
             }
         }
 

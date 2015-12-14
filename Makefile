@@ -22,9 +22,10 @@ default: ; @printf "You must specify a valid target\n"
 #### OS X targets ##############################################################
 
 ifeq ($(BUILD),osx)
-.PHONY: osx xosx run-osx run-xosx
+.PHONY: osx xosx nosx run-osx run-xosx
 osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Makefile/osxapp
 xosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
+nosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Ninja/osxapp
 run-osx: osx ; @"build/osx-x86_64/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 run-xosx: xosx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
@@ -55,15 +56,27 @@ ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
 ipackage-no-bitcode: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh no-bitcode
 iframework: ipackage-strip ; ./scripts/ios/framework.sh
 itest: ipackage-sim ; ./scripts/ios/test.sh
+
+.PHONY: xpackage xpackage-strip
+xpackage: Xcode/osx ; @JOBS=$(JOBS) ./scripts/osx/package.sh
+xpackage-strip: Xcode/osx ; @JOBS=$(JOBS) ./scripts/osx/package.sh strip
 endif
 
 #### All platforms targets #####################################################
 
 .PHONY: linux run-linux run-valgrind-linux
 linux: ; $(RUN) Makefile/linuxapp
+nlinux: ; $(RUN) Ninja/linuxapp
 run-linux: linux ; (cd build/linux-x86_64/$(BUILDTYPE) && ./mapbox-gl)
 run-valgrind-linux: linux
 	(cd build/linux-x86_64/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
+
+
+.PHONY: config compdb tidy
+config: ; $(RUN) config
+# Generates a compilation database with ninja for use in clang tooling
+compdb: ; $(RUN) Ninja/compdb
+tidy: ; $(RUN) tidy
 
 .PHONY: android android-lib
 # Builds a particular android architecture.
@@ -92,6 +105,9 @@ Xcode/node: ; $(RUN) HTTP=none ASSET=none CACHE=none Xcode/node
 
 .PHONY: xnode
 xnode: Xcode/node ; @open ./build/binding.xcodeproj
+nproj:
+	$(RUN) HTTP=none ASSET=none CACHE=none node/xproj
+	@open ./build/binding.xcodeproj
 
 .PHONY: test
 test: ; $(RUN) Makefile/test
@@ -116,10 +132,12 @@ ifeq ($(BUILD), osx)
 	if [ $$CUSTOM_DD ]; then \
 		echo clearing files in $$CUSTOM_DD older than one day; \
 		find $$CUSTOM_DD/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
+		find $$CUSTOM_DD/osxapp-* -mtime +1 | xargs rm -rf; \
 	fi; \
 	if [ -d ~/Library/Developer/Xcode/DerivedData/ ] && [ ! $$CUSTOM_DD ]; then \
-		echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* older than one day'; \
+		echo 'clearing files in ~/Library/Developer/Xcode/DerivedData/{mapboxgl-app,osxapp}-* older than one day'; \
 		find ~/Library/Developer/Xcode/DerivedData/mapboxgl-app-* -mtime +1 | xargs rm -rf; \
+		find ~/Library/Developer/Xcode/DerivedData/osxapp-* -mtime +1 | xargs rm -rf; \
 	fi
 endif
 
@@ -134,6 +152,7 @@ endif
 clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
+	-rm -rf ./gyp/build/
 	-rm -rf ./macosx/build
 	-rm -rf ./linux/build
 	-rm -rf ./ios/build

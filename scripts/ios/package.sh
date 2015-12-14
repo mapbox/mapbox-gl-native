@@ -99,12 +99,12 @@ echo "Created ${OUTPUT}/static/lib${NAME}.a"
 
 step "Copying Headers..."
 mkdir -p "${OUTPUT}/static/Headers"
+for i in `ls -R include/mbgl/darwin | grep -vi private`; do
+    cp -pv include/mbgl/darwin/$i "${OUTPUT}/static/Headers"
+done
 for i in `ls -R include/mbgl/ios | grep -vi private`; do
     cp -pv include/mbgl/ios/$i "${OUTPUT}/static/Headers"
 done
-
-step "Setting up dummy source file for CocoaPods 0.37.0..."
-echo "// https://github.com/mapbox/mapbox-gl-native/issues/1426" > "${OUTPUT}/static/MGLDummy.m"
 
 
 # Manually create resource bundle. We don't use a GYP target here because of
@@ -128,12 +128,16 @@ README=/tmp/mbgl/README.md
 cat ios/docs/pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
-cat CHANGELOG.md >> ${README}
+cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' >> ${README}
 # Copy headers to a temporary location where we can substitute macros that appledoc doesn't understand.
 cp -r "${OUTPUT}/static/Headers" /tmp/mbgl
 perl \
     -pi \
     -e 's/NS_(?:(MUTABLE)_)?(ARRAY|SET|DICTIONARY)_OF\(\s*(.+?)\s*\)/NS\L\u$1\u$2\E <$3>/g' \
+    /tmp/mbgl/Headers/*.h
+perl \
+    -i -p0 \
+    -e 's/^#if\s+!\s*TARGET_OS_IPHONE\s*(?:&&[^\n]+)?\n.+?\n#endif//gms' \
     /tmp/mbgl/Headers/*.h
 appledoc \
     --output ${DOCS_OUTPUT} \

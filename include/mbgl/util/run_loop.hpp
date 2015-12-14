@@ -2,9 +2,9 @@
 #define MBGL_UTIL_RUN_LOOP
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/util.hpp>
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
-#include <mbgl/util/uv_detail.hpp>
 
 #include <functional>
 #include <utility>
@@ -15,20 +15,35 @@
 namespace mbgl {
 namespace util {
 
+typedef void * LOOP_HANDLE;
+
 class RunLoop : private util::noncopyable {
 public:
-    RunLoop(uv_loop_t*);
+    enum class Type : uint8_t {
+        Default,
+        New,
+    };
+
+    enum class Event : uint8_t {
+        None      = 0,
+        Read      = 1,
+        Write     = 2,
+        ReadWrite = Read | Write,
+    };
+
+    RunLoop(Type type = Type::Default);
     ~RunLoop();
 
-    static RunLoop* Get() {
-        return current.get();
-    }
+    static RunLoop* Get();
+    static LOOP_HANDLE getLoopHandle();
 
-    static uv_loop_t* getLoop() {
-        return current.get()->get();
-    }
-
+    void run();
+    void runOnce();
     void stop();
+
+    // So far only needed by the libcurl backend.
+    void addWatch(int fd, Event, std::function<void(int, Event)>&& callback);
+    void removeWatch(int fd);
 
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
@@ -38,8 +53,7 @@ public:
             std::move(fn),
             std::move(tuple));
 
-        withMutex([&] { queue.push(task); });
-        async.send();
+        push(task);
     }
 
     // Post the cancellable work fn(args...) to this RunLoop.
@@ -55,8 +69,7 @@ public:
             std::move(tuple),
             flag);
 
-        withMutex([&] { queue.push(task); });
-        async.send();
+        push(task);
 
         return std::make_unique<WorkRequest>(task);
     }
@@ -73,7 +86,7 @@ public:
         // because if the request was cancelled, then R might have been destroyed. L2 needs to check
         // the flag because the request may have been cancelled after L2 was invoked but before it
         // began executing.
-        auto after = [flag, current = RunLoop::current.get(), callback1 = std::move(callback)] (auto&&... results1) {
+        auto after = [flag, current = RunLoop::Get(), callback1 = std::move(callback)] (auto&&... results1) {
             if (!*flag) {
                 current->invoke([flag, callback2 = std::move(callback1)] (auto&&... results2) {
                     if (!*flag) {
@@ -89,20 +102,19 @@ public:
             std::move(tuple),
             flag);
 
-        withMutex([&] { queue.push(task); });
-        async.send();
+        push(task);
 
         return std::make_unique<WorkRequest>(task);
     }
 
-    uv_loop_t* get() { return async.get()->loop; }
-
 private:
+    MBGL_STORE_THREAD(tid)
+
     template <class F, class P>
     class Invoker : public WorkTask {
     public:
         Invoker(F&& f, P&& p, std::shared_ptr<std::atomic<bool>> canceled_ = nullptr)
-          : canceled(canceled_),
+          : canceled(std::move(canceled_)),
             func(std::move(f)),
             params(std::move(p)) {
         }
@@ -143,17 +155,31 @@ private:
 
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
-    void withMutex(std::function<void()>&&);
-    void process();
+    void push(std::shared_ptr<WorkTask>);
+
+    void withMutex(std::function<void()>&& fn) {
+        std::lock_guard<std::mutex> lock(mutex);
+        fn();
+    }
+
+    void process() {
+        Queue queue_;
+        withMutex([&] { queue_.swap(queue); });
+
+        while (!queue_.empty()) {
+            (*(queue_.front()))();
+            queue_.pop();
+        }
+    }
 
     Queue queue;
     std::mutex mutex;
-    uv::async async;
 
-    static uv::tls<RunLoop> current;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

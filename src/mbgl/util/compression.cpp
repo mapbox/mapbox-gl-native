@@ -6,6 +6,8 @@
 #include <cstring>
 #include <stdexcept>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 
 // Check zlib library version.
 const static bool zlibVersionCheck = []() {
@@ -20,6 +22,7 @@ const static bool zlibVersionCheck = []() {
     return true;
 }();
 
+#pragma GCC diagnostic pop
 
 namespace mbgl {
 namespace util {
@@ -93,5 +96,5 @@ std::string decompress(const std::string &raw) {
 
     return result;
 }
-}
-}
+} // namespace util
+} // namespace mbgl

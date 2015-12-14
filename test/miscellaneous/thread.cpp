@@ -66,7 +66,7 @@ public:
 TEST(Thread, invoke) {
     const std::thread::id tid = std::this_thread::get_id();
 
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
     std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
 
     loop.invoke([&] {
@@ -110,7 +110,7 @@ TEST(Thread, invoke) {
         test.clear();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST(Thread, context) {
@@ -122,7 +122,7 @@ TEST(Thread, context) {
 
     const std::thread::id tid = std::this_thread::get_id();
 
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
     std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
 
     loop.invoke([&] {
@@ -134,7 +134,7 @@ TEST(Thread, context) {
         }));
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 class TestWorker {
@@ -148,7 +148,7 @@ public:
 };
 
 TEST(Thread, ExecutesAfter) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
     Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
 
     bool didWork = false;
@@ -161,14 +161,15 @@ TEST(Thread, ExecutesAfter) {
         didWork = true;
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 
     EXPECT_TRUE(didWork);
     EXPECT_TRUE(didAfter);
 }
 
 TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
+
     Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
 
     std::promise<void> started;
@@ -186,7 +187,7 @@ TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
 }
 
 TEST(Thread, WorkRequestDeletionCancelsAfter) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
     Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
 
     std::promise<void> started;
@@ -200,12 +201,12 @@ TEST(Thread, WorkRequestDeletionCancelsAfter) {
 
     started.get_future().get();
     request.reset();
-    uv_run(uv_default_loop(), UV_RUN_ONCE);
+    loop.runOnce();
     EXPECT_FALSE(didAfter);
 }
 
 TEST(Thread, WorkRequestDeletionCancelsImmediately) {
-    RunLoop loop(uv_default_loop());
+    RunLoop loop;
     Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
 
     std::promise<void> started;

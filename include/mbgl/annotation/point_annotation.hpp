@@ -17,6 +17,6 @@ public:
     const std::string icon;
 };
 
-}
+} // namespace mbgl
 
 #endif

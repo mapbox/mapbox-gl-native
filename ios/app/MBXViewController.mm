@@ -134,7 +134,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
                                          destructiveButtonTitle:nil
                                               otherButtonTitles:@"Reset North",
                                                                 @"Reset Position",
-                                                                @"Toggle Debug",
+                                                                @"Cycle debug options",
                                                                 @"Empty Memory",
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
@@ -159,7 +159,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
-        [self.mapView toggleDebug];
+        [self.mapView cycleDebugOptions];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
     {
@@ -313,12 +313,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             dispatch_async(dispatch_get_main_queue(), ^
             {
                 [self.mapView addAnnotations:annotations];
-
-                [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(38.904722, -77.016389)
-                                        zoomLevel:10
-                                         animated:NO];
-
-                [self.mapView setDirection:0];
+                [self.mapView showAnnotations:annotations animated:YES];
             });
         }
     });

@@ -102,8 +102,8 @@ inline bool relaxed_less_equal(Value const &lhs, Value const &rhs) {
     return apply_visitor(detail::relaxed_operator_visitor<detail::relaxed_less_equal_operator>(), lhs, rhs);
 }
 
-}
+} // namespace util
 
-}
+} // namespace mbgl
 
 #endif

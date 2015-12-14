@@ -17,7 +17,7 @@ This section is for people contributing to Mapbox GL directly in the context of 
 
 ### Access Tokens
 
-_The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/account/apps/)._
+_The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
 
 Set up the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`.
 
@@ -83,7 +83,6 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
    - `libc++.dylib`
    - `libsqlite3.dylib`
    - `libz.dylib`
-   - `CoreTelephony.framework` (optional, telemetry-only)
 
 1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
 

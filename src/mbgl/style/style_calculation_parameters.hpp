@@ -26,6 +26,6 @@ public:
     Duration defaultFadeDuration;
 };
 
-}
+} // namespace mbgl
 
 #endif

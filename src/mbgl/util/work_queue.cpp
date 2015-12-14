@@ -1,6 +1,7 @@
 #include <mbgl/util/work_queue.hpp>
-
 #include <mbgl/util/run_loop.hpp>
+
+#include <cassert>
 
 namespace mbgl {
 namespace util {
@@ -33,5 +34,5 @@ void WorkQueue::pop(const std::function<void()>& fn) {
     queue.pop();
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

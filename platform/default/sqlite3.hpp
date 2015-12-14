@@ -21,6 +21,7 @@ enum OpenFlag : int {
 
 struct Exception : std::runtime_error {
     inline Exception(int err, const char *msg) : std::runtime_error(msg), code(err) {}
+    inline Exception(int err, const std::string& msg) : std::runtime_error(msg), code(err) {}
     const int code = 0;
 };
 

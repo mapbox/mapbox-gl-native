@@ -4,8 +4,10 @@
 
 #include <mbgl/sprite/sprite_store.hpp>
 
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
+#include <utility>
 
 using namespace mbgl;
 
@@ -155,7 +157,7 @@ struct SpriteParams {
 
 class SpriteThread : public SpriteStore::Observer {
 public:
-    SpriteThread(FileSource* fileSource, SpriteTestCallback callback) : callback_(callback) {
+    SpriteThread(FileSource* fileSource, SpriteTestCallback callback) : callback_(std::move(callback)) {
         util::ThreadContext::setFileSource(fileSource);
     }
 
@@ -186,9 +188,9 @@ private:
 class SpriteTest : public testing::Test {
 protected:
     void runTest(const SpriteParams& params, FileSource* fileSource, SpriteTestCallback callback) {
-        util::RunLoop loop(uv_default_loop());
+        util::RunLoop loop;
 
-        async_ = std::make_unique<uv::async>(loop.get(), [&] { loop.stop(); });
+        async_ = std::make_unique<util::AsyncTask>([&] { loop.stop(); });
         async_->unref();
 
         const util::ThreadContext context = {"Map", util::ThreadType::Map, util::ThreadPriority::Regular};
@@ -196,7 +198,7 @@ protected:
         util::Thread<SpriteThread> tester(context, fileSource, callback);
         tester.invoke(&SpriteThread::loadSprite, params);
 
-        uv_run(loop.get(), UV_RUN_DEFAULT);
+        loop.run();
 
         tester.invoke(&SpriteThread::unloadSprite);
     }
@@ -206,7 +208,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<uv::async> async_;
+    std::unique_ptr<util::AsyncTask> async_;
 };
 
 TEST_F(SpriteTest, LoadingSuccess) {

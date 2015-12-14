@@ -1,6 +1,10 @@
 #ifndef MBGL_TEST_UTIL
 #define MBGL_TEST_UTIL
 
+#include <mbgl/util/image.hpp>
+
+#include <cstdint>
+
 #include <gtest/gtest.h>
 
 #define SCOPED_TEST(name) \
@@ -12,13 +16,25 @@
     } name;
 
 namespace mbgl {
+    
+class Map;
+    
 namespace test {
+    
+std::string getFileSourceRoot();
 
 pid_t startServer(const char *executable);
 void stopServer(pid_t pid);
 
 uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
+    
+PremultipliedImage render(Map&);
+
+void checkImage(const std::string& base,
+                const PremultipliedImage& actual,
+                double imageThreshold = 0,
+                double pixelThreshold = 0);
 
 }
 }

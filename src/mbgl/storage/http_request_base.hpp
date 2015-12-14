@@ -2,6 +2,7 @@
 #define MBGL_STORAGE_HTTP_REQUEST_BASE
 
 #include <mbgl/storage/request_base.hpp>
+#include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
 
@@ -16,7 +17,7 @@ public:
     virtual void cancel() override { cancelled = true; };
 
 protected:
-    static int64_t parseCacheControl(const char *value);
+    static Seconds parseCacheControl(const char *value);
 
     bool cancelled;
 };

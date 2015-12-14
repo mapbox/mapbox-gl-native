@@ -1,7 +1,6 @@
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/still_image.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -12,12 +11,12 @@
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_layer.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 
 #include <mbgl/util/gl_object_store.hpp>
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
@@ -27,19 +26,20 @@
 
 namespace mbgl {
 
-MapContext::MapContext(View& view_, FileSource& fileSource, MapData& data_)
+MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
     : view(view_),
-      data(data_),
-      asyncUpdate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [this] { update(); })),
-      asyncInvalidate(std::make_unique<uv::async>(util::RunLoop::getLoop(), [&view_] { view_.invalidate(); })),
+      dataPtr(std::make_unique<MapData>(mode_, contextMode_, pixelRatio_)),
+      data(*dataPtr),
+      asyncUpdate([this] { update(); }),
+      asyncInvalidate([&view_] { view_.invalidate(); }),
       texturePool(std::make_unique<TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
-    asyncUpdate->unref();
-    asyncInvalidate->unref();
+    asyncUpdate.unref();
+    asyncInvalidate.unref();
 
     view.activate();
 }
@@ -59,6 +59,7 @@ void MapContext::cleanup() {
     style.reset();
     painter.reset();
     texturePool.reset();
+    dataPtr.reset();
 
     glObjectStore.performCleanup();
 
@@ -77,14 +78,14 @@ void MapContext::pause() {
 
     view.activate();
 
-    asyncInvalidate->send();
+    asyncInvalidate.send();
 }
 
 void MapContext::triggerUpdate(const TransformState& state, const Update flags) {
     transformState = state;
     updateFlags |= flags;
 
-    asyncUpdate->send();
+    asyncUpdate.send();
 }
 
 void MapContext::setStyleURL(const std::string& url) {
@@ -153,7 +154,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     data.loading = true;
 
     updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
-    asyncUpdate->send();
+    asyncUpdate.send();
 }
 
 void MapContext::update() {
@@ -185,7 +186,7 @@ void MapContext::update() {
     style->update(transformState, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
-        asyncInvalidate->send();
+        asyncInvalidate.send();
     } else if (callback && style->isLoaded()) {
         renderSync(transformState, frameData);
     }
@@ -200,22 +201,22 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
     }
 
     if (data.mode != MapMode::Still) {
-        fn(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), {});
         return;
     }
 
     if (callback) {
-        fn(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map is currently rendering an image")), {});
         return;
     }
 
     if (!style) {
-        fn(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")), nullptr);
+        fn(std::make_exception_ptr(util::MisuseException("Map doesn't have a style")), {});
         return;
     }
 
     if (style->getLastError()) {
-        fn(style->getLastError(), nullptr);
+        fn(style->getLastError(), {});
         return;
     }
 
@@ -224,7 +225,7 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
     frameData = frame;
 
     updateFlags |= Update::RenderStill;
-    asyncUpdate->send();
+    asyncUpdate.send();
 }
 
 bool MapContext::renderSync(const TransformState& state, const FrameData& frame) {
@@ -243,7 +244,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     glObjectStore.performCleanup();
 
     if (!painter) painter = std::make_unique<Painter>(data, transformState);
-    painter->render(*style, frame);
+    painter->render(*style, frame, data.getAnnotationManager()->getSpriteAtlas());
 
     if (data.mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());
@@ -254,10 +255,10 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
 
     if (style->hasTransitions()) {
         updateFlags |= Update::Classes;
-        asyncUpdate->send();
+        asyncUpdate.send();
     } else if (painter->needsAnimation()) {
         updateFlags |= Update::Repaint;
-        asyncUpdate->send();
+        asyncUpdate.send();
     }
 
     return isLoaded();
@@ -267,14 +268,18 @@ bool MapContext::isLoaded() const {
     return style->isLoaded();
 }
 
-double MapContext::getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol) {
+void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    auto sprite = style->spriteStore->getSprite(symbol);
-    if (sprite) {
-        return -sprite->height / 2;
-    } else {
-        return 0;
-    }
+    data.getAnnotationManager()->addIcon(name, sprite);
+}
+
+double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
+}
+
+void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> after) {
+    style->addLayer(std::move(layer), after);
 }
 
 std::vector<FeatureDescription> MapContext::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
@@ -288,45 +293,29 @@ void MapContext::setSourceTileCacheSize(size_t size) {
     if (size != sourceCacheSize) {
         sourceCacheSize = size;
         if (!style) return;
-        for (const auto &source : style->sources) {
-            source->setCacheSize(sourceCacheSize);
-        }
-        asyncInvalidate->send();
+        style->setSourceTileCacheSize(size);
+        asyncInvalidate.send();
     }
 }
 
 void MapContext::onLowMemory() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return;
-    for (const auto &source : style->sources) {
-        source->onLowMemory();
-    }
-    asyncInvalidate->send();
-}
-
-void MapContext::setSprite(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    if (!style) {
-        Log::Info(Event::Sprite, "Ignoring sprite without stylesheet");
-        return;
-    }
-
-    style->spriteStore->setSprite(name, sprite);
-
-    style->spriteAtlas->updateDirty();
+    style->onLowMemory();
+    asyncInvalidate.send();
 }
 
 void MapContext::onTileDataChanged() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     updateFlags |= Update::Repaint;
-    asyncUpdate->send();
+    asyncUpdate.send();
 }
 
 void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (data.mode == MapMode::Still && callback) {
-        callback(error, nullptr);
+        callback(error, {});
         callback = nullptr;
     }
 }
@@ -342,4 +331,4 @@ void MapContext::dumpDebugLogs() const {
     Log::Info(Event::General, "--------------------------------------------------------------------------------");
 }
 
-}
+} // namespace mbgl

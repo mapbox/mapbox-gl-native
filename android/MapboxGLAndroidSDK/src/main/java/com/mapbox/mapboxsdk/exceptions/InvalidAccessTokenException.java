@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.views.MapView;
 public class InvalidAccessTokenException extends RuntimeException {
 
     public InvalidAccessTokenException() {
-        super("Using MapView requires setting a valid access token. See the README.md");
+        super("Using MapView requires setting a valid access token. See the INSTALL.md");
     }
 
 }

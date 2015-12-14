@@ -1,7 +1,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/android/jni.hpp>
 
-#include <uv.h>
 #include <libgen.h>
 
 namespace mbgl {

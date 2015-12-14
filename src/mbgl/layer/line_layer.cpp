@@ -6,11 +6,7 @@
 namespace mbgl {
 
 std::unique_ptr<StyleLayer> LineLayer::clone() const {
-    std::unique_ptr<LineLayer> result = std::make_unique<LineLayer>();
-    result->copy(*this);
-    result->layout = layout;
-    result->paint = paint;
-    return std::move(result);
+    return std::make_unique<LineLayer>(*this);
 }
 
 void LineLayer::parseLayout(const JSVal& value) {
@@ -27,6 +23,7 @@ void LineLayer::parsePaints(const JSVal& layer) {
     paint.translateAnchor.parse("line-translate-anchor", layer);
     paint.width.parse("line-width", layer);
     paint.gapWidth.parse("line-gap-width", layer);
+    paint.offset.parse("line-offset", layer);
     paint.blur.parse("line-blur", layer);
     paint.dasharray.parse("line-dasharray", layer);
     paint.pattern.parse("line-pattern", layer);
@@ -39,6 +36,7 @@ void LineLayer::cascade(const StyleCascadeParameters& parameters) {
     paint.translateAnchor.cascade(parameters);
     paint.width.cascade(parameters);
     paint.gapWidth.cascade(parameters);
+    paint.offset.cascade(parameters);
     paint.blur.cascade(parameters);
     paint.dasharray.cascade(parameters);
     paint.pattern.cascade(parameters);
@@ -59,6 +57,7 @@ bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
     hasTransitions |= paint.translateAnchor.calculate(parameters);
     hasTransitions |= paint.width.calculate(parameters);
     hasTransitions |= paint.gapWidth.calculate(parameters);
+    hasTransitions |= paint.offset.calculate(parameters);
     hasTransitions |= paint.blur.calculate(parameters);
     hasTransitions |= paint.dasharray.calculate(parameters);
     hasTransitions |= paint.pattern.calculate(parameters);
@@ -86,4 +85,4 @@ std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameter
     return std::move(bucket);
 }
 
-}
+} // namespace mbgl

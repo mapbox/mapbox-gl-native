@@ -6,6 +6,8 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 
+#include <mapbox/optional.hpp>
+
 #include <string>
 #include <map>
 #include <mutex>
@@ -41,15 +43,12 @@ public:
     SpriteAtlas(dimension width, dimension height, float pixelRatio, SpriteStore& store);
     ~SpriteAtlas();
 
-    // Returns the coordinates of an image that is sourced from the sprite image.
-    // This getter attempts to read the image from the sprite if it is already loaded.
-    // In that case, it copies it into the sprite atlas and returns the dimensions.
-    // Otherwise, it returns a 0/0/0/0 rect.
-    // This function is used during bucket creation.
-    SpriteAtlasElement getImage(const std::string& name, const bool wrap);
+    // If the sprite is loaded, copies the requsted image from it into the atlas and returns
+    // the resulting icon measurements. If not, returns an empty optional.
+    mapbox::util::optional<SpriteAtlasElement> getImage(const std::string& name, const bool wrap);
 
     // This function is used for getting the position during render time.
-    SpriteAtlasPosition getPosition(const std::string& name, bool repeating = false);
+    mapbox::util::optional<SpriteAtlasPosition> getPosition(const std::string& name, bool repeating = false);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear = false);
@@ -66,6 +65,8 @@ public:
     inline dimension getTextureWidth() const { return pixelWidth; }
     inline dimension getTextureHeight() const { return pixelHeight; }
     inline float getPixelRatio() const { return pixelRatio; }
+
+    // Only for use in tests.
     inline const uint32_t* getData() const { return data.get(); }
 
 private:
@@ -90,7 +91,7 @@ private:
     BinPack<dimension> bin;
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
-    const std::unique_ptr<uint32_t[]> data;
+    std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     GLuint texture = 0;
@@ -98,6 +99,6 @@ private:
     static const int buffer = 1;
 };
 
-};
+} // namespace mbgl
 
 #endif

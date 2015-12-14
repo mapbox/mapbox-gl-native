@@ -4,7 +4,10 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <set>
 #include <unordered_map>
@@ -38,7 +41,7 @@ public:
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
-    std::unique_ptr<uv::timer> timerRequest;
+    std::unique_ptr<util::Timer> timerRequest;
 
     inline DefaultFileRequestImpl(const Resource& resource_)
         : resource(resource_) {}
@@ -57,7 +60,7 @@ public:
     // Returns the seconds we have to wait until we need to redo this request. A value of 0
     // means that we need to redo it immediately, and a negative value means that we're not setting
     // a timeout at all.
-    int64_t getRetryTimeout() const;
+    Seconds getRetryTimeout() const;
 
     // Checks the currently stored response and replaces it with an idential one, except with the
     // stale flag set, if the response is expired.
@@ -100,14 +103,13 @@ private:
     void reschedule(DefaultFileRequestImpl&);
 
     std::unordered_map<Resource, std::unique_ptr<DefaultFileRequestImpl>, Resource::Hash> pending;
-    uv_loop_t* const loop;
     FileCache* const cache;
     const std::string assetRoot;
     const std::unique_ptr<AssetContextBase> assetContext;
     const std::unique_ptr<HTTPContextBase> httpContext;
-    const std::unique_ptr<uv::async> reachability;
+    util::AsyncTask reachability;
 };
 
-}
+} // namespace mbgl
 
 #endif

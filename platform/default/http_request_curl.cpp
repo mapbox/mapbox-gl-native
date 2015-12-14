@@ -6,7 +6,9 @@
 
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <curl/curl.h>
 
@@ -21,12 +23,6 @@
 #include <cassert>
 #include <cstring>
 #include <cstdio>
-
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
-#else
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
-#endif
 
 void handleError(CURLMcode code) {
     if (code != CURLM_OK) {
@@ -48,27 +44,24 @@ class HTTPCURLContext : public HTTPContextBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    explicit HTTPCURLContext(uv_loop_t *loop);
+    HTTPCURLContext();
     ~HTTPCURLContext();
 
     HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
-                               uv_loop_t*,
                                std::shared_ptr<const Response>) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
-    static void perform(uv_poll_t *req, int status, int events);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
-    static void onTimeout(UV_TIMER_PARAMS(req));
+    static void onTimeout(HTTPCURLContext *context);
 
+    void perform(curl_socket_t s, util::RunLoop::Event event);
     CURL *getHandle();
     void returnHandle(CURL *handle);
     void checkMultiInfo();
 
-    uv_loop_t *loop = nullptr;
-
     // Used as the CURL timer function to periodically check for socket updates.
-    uv_timer_t *timeout = nullptr;
+    util::Timer timeout;
 
     // CURL multi handle that we use to request multiple URLs at the same time, without having to
     // block and spawn threads.
@@ -89,7 +82,6 @@ public:
     HTTPCURLRequest(HTTPCURLContext*,
                 const Resource&,
                 Callback,
-                uv_loop_t*,
                 std::shared_ptr<const Response>);
     ~HTTPCURLRequest();
 
@@ -116,54 +108,12 @@ private:
     char error[CURL_ERROR_SIZE];
 };
 
-
-
-struct Socket {
-private:
-    uv_poll_t poll;
-
-public:
-    HTTPCURLContext *context = nullptr;
-    const curl_socket_t sockfd = 0;
-
-public:
-    Socket(HTTPCURLContext *context_, curl_socket_t sockfd_) : context(context_), sockfd(sockfd_) {
-        assert(context);
-        uv_poll_init_socket(context->loop, &poll, sockfd);
-        poll.data = this;
-    }
-
-    void start(int events, uv_poll_cb cb) {
-        uv_poll_start(&poll, events, cb);
-    }
-
-    void stop() {
-        assert(poll.data);
-        uv_poll_stop(&poll);
-        uv_close((uv_handle_t *)&poll, [](uv_handle_t *handle) {
-            assert(handle->data);
-            delete reinterpret_cast<Socket *>(handle->data);
-        });
-    }
-
-private:
-    // Make the destructor private to ensure that we can only close the Socket
-    // with stop(), and disallow manual deletion.
-    ~Socket() = default;
-};
-
 // -------------------------------------------------------------------------------------------------
 
-HTTPCURLContext::HTTPCURLContext(uv_loop_t *loop_)
-    : HTTPContextBase(),
-      loop(loop_) {
+HTTPCURLContext::HTTPCURLContext() {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
     }
-
-    timeout = new uv_timer_t;
-    timeout->data = this;
-    uv_timer_init(loop, timeout);
 
     share = curl_share_init();
 
@@ -186,15 +136,13 @@ HTTPCURLContext::~HTTPCURLContext() {
     curl_share_cleanup(share);
     share = nullptr;
 
-    uv_timer_stop(timeout);
-    uv::close(timeout);
+    timeout.stop();
 }
 
 HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
                                             RequestBase::Callback callback,
-                                            uv_loop_t* loop_,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPCURLRequest(this, resource, callback, loop_, response);
+    return new HTTPCURLRequest(this, resource, callback, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -233,51 +181,45 @@ void HTTPCURLContext::checkMultiInfo() {
     }
 }
 
-void HTTPCURLContext::perform(uv_poll_t *req, int /* status */, int events) {
-    assert(req->data);
-    auto socket = reinterpret_cast<Socket *>(req->data);
-    auto context = socket->context;
-    MBGL_VERIFY_THREAD(context->tid);
+void HTTPCURLContext::perform(curl_socket_t s, util::RunLoop::Event events) {
+    MBGL_VERIFY_THREAD(tid);
 
     int flags = 0;
 
-    if (events & UV_READABLE) {
+    if (events == util::RunLoop::Event::Read) {
         flags |= CURL_CSELECT_IN;
     }
-    if (events & UV_WRITABLE) {
+    if (events == util::RunLoop::Event::Write) {
         flags |= CURL_CSELECT_OUT;
     }
 
 
     int running_handles = 0;
-    curl_multi_socket_action(context->multi, socket->sockfd, flags, &running_handles);
-    context->checkMultiInfo();
+    curl_multi_socket_action(multi, s, flags, &running_handles);
+    checkMultiInfo();
 }
 
 int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int action, void *userp,
-                              void *socketp) {
-    auto socket = reinterpret_cast<Socket *>(socketp);
+                              void * /* socketp */) {
     assert(userp);
     auto context = reinterpret_cast<HTTPCURLContext *>(userp);
     MBGL_VERIFY_THREAD(context->tid);
 
-    if (!socket && action != CURL_POLL_REMOVE) {
-        socket = new Socket(context, s);
-        curl_multi_assign(context->multi, s, (void *)socket);
-    }
-
     switch (action) {
-    case CURL_POLL_IN:
-        socket->start(UV_READABLE, perform);
+    case CURL_POLL_IN: {
+        using namespace std::placeholders;
+        util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Read,
+                std::bind(&HTTPCURLContext::perform, context, _1, _2));
         break;
-    case CURL_POLL_OUT:
-        socket->start(UV_WRITABLE, perform);
+    }
+    case CURL_POLL_OUT: {
+        using namespace std::placeholders;
+        util::RunLoop::Get()->addWatch(s, util::RunLoop::Event::Write,
+                std::bind(&HTTPCURLContext::perform, context, _1, _2));
         break;
+    }
     case CURL_POLL_REMOVE:
-        if (socket) {
-            socket->stop();
-            curl_multi_assign(context->multi, s, nullptr);
-        }
+        util::RunLoop::Get()->removeWatch(s);
         break;
     default:
         throw std::runtime_error("Unhandled CURL socket action");
@@ -286,9 +228,7 @@ int HTTPCURLContext::handleSocket(CURL * /* handle */, curl_socket_t s, int acti
     return 0;
 }
 
-void HTTPCURLContext::onTimeout(UV_TIMER_PARAMS(req)) {
-    assert(req->data);
-    auto context = reinterpret_cast<HTTPCURLContext *>(req->data);
+void HTTPCURLContext::onTimeout(HTTPCURLContext *context) {
     MBGL_VERIFY_THREAD(context->tid);
     int running_handles;
     CURLMcode error = curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
@@ -306,8 +246,10 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
         // A timeout of 0 ms means that the timer will invoked in the next loop iteration.
         timeout_ms = 0;
     }
-    uv_timer_stop(context->timeout);
-    uv_timer_start(context->timeout, onTimeout, timeout_ms, 0);
+    context->timeout.stop();
+    context->timeout.start(std::chrono::milliseconds(timeout_ms), Duration::zero(),
+        std::bind(&HTTPCURLContext::onTimeout, context));
+
     return 0;
 }
 
@@ -411,7 +353,7 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, uv_loop_t*, std::shared_ptr<const Response> response_)
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(response_),
@@ -425,9 +367,9 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
         if (!existingResponse->etag.empty()) {
             const std::string header = std::string("If-None-Match: ") + existingResponse->etag;
             headers = curl_slist_append(headers, header.c_str());
-        } else if (existingResponse->modified) {
+        } else if (existingResponse->modified != Seconds::zero()) {
             const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified);
+                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified.count());
             headers = curl_slist_append(headers, time.c_str());
         }
     }
@@ -525,7 +467,7 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = curl_getdate(value.c_str(), nullptr);
+        baton->response->modified = Seconds(curl_getdate(value.c_str(), nullptr));
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
@@ -533,7 +475,7 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         baton->response->expires = parseCacheControl(value.c_str());
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = curl_getdate(value.c_str(), nullptr);
+        baton->response->expires = Seconds(curl_getdate(value.c_str(), nullptr));
     }
 
     return length;
@@ -620,8 +562,8 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
     delete this;
 }
 
-std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
-    return std::make_unique<HTTPCURLContext>(loop);
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
+    return std::make_unique<HTTPCURLContext>();
 }
 
 } // namespace mbgl

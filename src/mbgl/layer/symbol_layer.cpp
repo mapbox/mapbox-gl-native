@@ -6,11 +6,7 @@
 namespace mbgl {
 
 std::unique_ptr<StyleLayer> SymbolLayer::clone() const {
-    std::unique_ptr<SymbolLayer> result = std::make_unique<SymbolLayer>();
-    result->copy(*this);
-    result->layout = layout;
-    result->paint = paint;
-    return std::move(result);
+    return std::make_unique<SymbolLayer>(*this);
 }
 
 void SymbolLayer::parseLayout(const JSVal& value) {
@@ -178,7 +174,7 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     // needed by this tile.
     if (!parameters.partialParse) {
         bucket->addFeatures(parameters.tileUID,
-                            parameters.spriteAtlas,
+                            *spriteAtlas,
                             parameters.glyphAtlas,
                             parameters.glyphStore,
                             parameters.collisionTile);
@@ -187,4 +183,4 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     return std::move(bucket);
 }
 
-}
+} // namespace mbgl

@@ -53,6 +53,6 @@ private:
     std::vector<std::pair<float, T>> stops;
 };
 
-}
+} // namespace mbgl
 
 #endif

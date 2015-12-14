@@ -1,4 +1,4 @@
-#include <mapbox/geojsonvt/geojsonvt_convert.hpp>
+#include <mapbox/geojsonvt/convert.hpp>
 
 #include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-using namespace mapbox::util::geojsonvt;
+namespace geojsonvt = mapbox::geojsonvt;
 
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_,
                                          const ShapeAnnotation& shape_,
@@ -27,10 +27,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         return;
 
     if (shape.properties.is<LineAnnotationProperties>()) {
-        type = ProjectedFeatureType::LineString;
+        type = geojsonvt::ProjectedFeatureType::LineString;
 
         std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-        layer->type = StyleLayerType::Line;
         layer->layout.join = JoinType::Round;
 
         const LineAnnotationProperties& properties = shape.properties.get<LineAnnotationProperties>();
@@ -45,10 +44,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 
     } else if (shape.properties.is<FillAnnotationProperties>()) {
-        type = ProjectedFeatureType::Polygon;
+        type = geojsonvt::ProjectedFeatureType::Polygon;
 
         std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
-        layer->type = StyleLayerType::Fill;
 
         const FillAnnotationProperties& properties = shape.properties.get<FillAnnotationProperties>();
         layer->paint.opacity = properties.opacity;
@@ -67,11 +65,12 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         std::unique_ptr<StyleLayer> layer = sourceLayer->clone();
 
-        type = layer->type == StyleLayerType::Line
-            ? ProjectedFeatureType::LineString
-            : ProjectedFeatureType::Polygon;
+        type = layer->is<LineLayer>()
+            ? geojsonvt::ProjectedFeatureType::LineString
+            : geojsonvt::ProjectedFeatureType::Polygon;
 
         layer->id = layerID;
+        layer->ref = "";
         layer->source = AnnotationManager::SourceID;
         layer->sourceLayer = layer->id;
         layer->visibility = VisibilityType::Visible;
@@ -81,33 +80,37 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 }
 
 void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile) {
-    static const double baseTolerance = 3;
+    static const double baseTolerance = 4;
     static const uint16_t extent = 4096;
 
     if (!shapeTiler) {
         const uint64_t maxAmountOfTiles = 1 << maxZoom;
         const double tolerance = baseTolerance / (maxAmountOfTiles * extent);
 
-        ProjectedGeometryContainer rings;
-        std::vector<LonLat> points;
+        geojsonvt::ProjectedRings rings;
+        std::vector<geojsonvt::LonLat> points;
 
         for (size_t i = 0; i < shape.segments[0].size(); ++i) { // first segment for now (no holes)
             const double constraintedLatitude = ::fmin(::fmax(shape.segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-            points.push_back(LonLat(shape.segments[0][i].longitude, constraintedLatitude));
+            points.push_back(geojsonvt::LonLat(shape.segments[0][i].longitude, constraintedLatitude));
         }
 
-        if (type == ProjectedFeatureType::Polygon &&
+        if (type == geojsonvt::ProjectedFeatureType::Polygon &&
                 (points.front().lon != points.back().lon || points.front().lat != points.back().lat)) {
-            points.push_back(LonLat(points.front().lon, points.front().lat));
+            points.push_back(geojsonvt::LonLat(points.front().lon, points.front().lat));
         }
 
-        ProjectedGeometryContainer ring = Convert::project(points, tolerance);
-        rings.members.push_back(ring);
+        auto ring = geojsonvt::Convert::projectRing(points, tolerance);
+        rings.push_back(ring);
 
-        std::vector<ProjectedFeature> features;
-        features.push_back(Convert::create(Tags(), type, rings));
+        std::vector<geojsonvt::ProjectedFeature> features;
+        features.push_back(geojsonvt::Convert::create(geojsonvt::Tags(), type, rings));
 
-        shapeTiler = std::make_unique<mapbox::util::geojsonvt::GeoJSONVT>(features, maxZoom, 4, 100, 10);
+        mapbox::geojsonvt::Options options;
+        options.maxZoom = maxZoom;
+        options.buffer = 128u;
+        options.tolerance = baseTolerance;
+        shapeTiler = std::make_unique<mapbox::geojsonvt::GeoJSONVT>(features, options);
     }
 
     const auto& shapeTile = shapeTiler->getTile(tileID.z, tileID.x, tileID.y);
@@ -120,20 +123,19 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
     for (auto& shapeFeature : shapeTile.features) {
         FeatureType featureType = FeatureType::Unknown;
 
-        if (shapeFeature.type == TileFeatureType::LineString) {
+        if (shapeFeature.type == geojsonvt::TileFeatureType::LineString) {
             featureType = FeatureType::LineString;
-        } else if (shapeFeature.type == TileFeatureType::Polygon) {
+        } else if (shapeFeature.type == geojsonvt::TileFeatureType::Polygon) {
             featureType = FeatureType::Polygon;
         }
 
         assert(featureType != FeatureType::Unknown);
 
         GeometryCollection renderGeometry;
-        for (auto& shapeGeometry : shapeFeature.tileGeometry) {
+        for (auto& shapeRing : shapeFeature.tileGeometry.get<geojsonvt::TileRings>()) {
             std::vector<Coordinate> renderLine;
-            auto& shapeRing = shapeGeometry.get<TileRing>();
 
-            for (auto& shapePoint : shapeRing.points) {
+            for (auto& shapePoint : shapeRing) {
                 renderLine.emplace_back(shapePoint.x, shapePoint.y);
             }
 
@@ -157,4 +159,4 @@ LatLngBounds ShapeAnnotationImpl::bounds() const {
     return result;
 }
 
-}
+} // namespace mbgl

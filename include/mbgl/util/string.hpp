@@ -35,7 +35,7 @@ inline std::string sprintf(const std::string &msg, Args... args) {
     return sprintf<max>(msg.c_str(), args...);
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

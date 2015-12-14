@@ -35,7 +35,7 @@ void identity(mat2& out);
 void rotate(mat2& out, const mat2& a, double rad);
 void scale(mat2& out, const mat2& a, double v0, double v1);
 
-}
-}
+} // namespace matrix
+} // namespace mbgl
 
 #endif

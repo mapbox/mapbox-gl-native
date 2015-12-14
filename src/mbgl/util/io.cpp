@@ -39,5 +39,5 @@ void deleteFile(const std::string& filename) {
     }
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

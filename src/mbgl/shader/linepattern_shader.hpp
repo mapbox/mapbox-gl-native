@@ -27,11 +27,12 @@ public:
     Uniform<GLfloat>                u_fade           = {"u_fade",           *this};
     Uniform<GLfloat>                u_opacity        = {"u_opacity",        *this};
     Uniform<GLfloat>                u_extra          = {"u_extra",          *this};
+    Uniform<GLfloat>                u_offset         = {"u_offset",         *this};
     UniformMatrix<2>                u_antialiasingmatrix  = {"u_antialiasingmatrix",  *this};
 
 private:
     GLint a_data = -1;
 };
-}
+} // namespace mbgl
 
 #endif

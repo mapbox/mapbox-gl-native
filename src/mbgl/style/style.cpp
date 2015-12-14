@@ -1,19 +1,25 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/source.hpp>
+#include <mbgl/map/tile.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/class_dictionary.hpp>
+#include <mbgl/style/style_update_parameters.hpp>
 #include <mbgl/style/style_cascade_parameters.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/layer/background_layer.hpp>
+
 #include <csscolorparser/csscolorparser.hpp>
 
 #include <rapidjson/document.h>
@@ -30,7 +36,6 @@ Style::Style(MapData& data_)
       spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
-      mtx(std::make_unique<uv::rwlock>()),
       workers(4) {
     glyphStore->setObserver(this);
     spriteStore->setObserver(this);
@@ -47,16 +52,16 @@ void Style::setJSON(const std::string& json, const std::string&) {
     StyleParser parser;
     parser.parse(doc);
 
-    for (auto& source : parser.getSources()) {
+    for (auto& source : parser.sources) {
         addSource(std::move(source));
     }
 
-    for (auto& layer : parser.getLayers()) {
+    for (auto& layer : parser.layers) {
         addLayer(std::move(layer));
     }
 
-    glyphStore->setURL(parser.getGlyphURL());
-    spriteStore->setURL(parser.getSpriteURL());
+    glyphStore->setURL(parser.glyphURL);
+    spriteStore->setURL(parser.spriteURL);
 
     loaded = true;
 }
@@ -76,7 +81,16 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
-std::vector<util::ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
+std::vector<std::unique_ptr<StyleLayer>> Style::getLayers() const {
+    std::vector<std::unique_ptr<StyleLayer>> result;
+    result.reserve(layers.size());
+    for (const auto& layer : layers) {
+        result.push_back(layer->clone());
+    }
+    return result;
+}
+
+std::vector<std::unique_ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
     return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
         return layer->id == id;
     });
@@ -87,12 +101,18 @@ StyleLayer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(util::ptr<StyleLayer> layer) {
-    layers.emplace_back(std::move(layer));
-}
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> before) {
+    if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
+        if (!symbolLayer->spriteAtlas) {
+            symbolLayer->spriteAtlas = spriteAtlas.get();
+        }
+    }
 
-void Style::addLayer(util::ptr<StyleLayer> layer, const std::string& before) {
-    layers.emplace(findLayer(before), std::move(layer));
+    if (CustomLayer* customLayer = layer->as<CustomLayer>()) {
+        customLayer->initialize();
+    }
+
+    layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer));
 }
 
 void Style::removeLayer(const std::string& id) {
@@ -105,8 +125,18 @@ void Style::removeLayer(const std::string& id) {
 void Style::update(const TransformState& transform,
                    TexturePool& texturePool) {
     bool allTilesUpdated = true;
+    StyleUpdateParameters parameters(data.pixelRatio,
+                                     data.getDebug(),
+                                     data.getAnimationTime(),
+                                     transform,
+                                     workers,
+                                     texturePool,
+                                     shouldReparsePartialTiles,
+                                     data,
+                                     *this);
+
     for (const auto& source : sources) {
-        if (!source->update(data, transform, *this, texturePool, shouldReparsePartialTiles)) {
+        if (!source->update(parameters)) {
             allTilesUpdated = false;
         }
     }
@@ -139,8 +169,6 @@ void Style::cascade() {
 }
 
 void Style::recalculate(float z) {
-    uv::writelock lock(mtx);
-
     for (const auto& source : sources) {
         source->enabled = false;
     }
@@ -192,6 +220,90 @@ bool Style::isLoaded() const {
     }
 
     return true;
+}
+
+RenderData Style::getRenderData() const {
+    RenderData result;
+
+    for (const auto& source : sources) {
+        if (source->enabled) {
+            result.sources.insert(source.get());
+        }
+    }
+
+    for (const auto& layer : layers) {
+        if (layer->visibility == VisibilityType::None)
+            continue;
+
+        if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
+            if (background->paint.pattern.value.from.empty()) {
+                // This is a solid background. We can use glClear().
+                result.backgroundColor = background->paint.color;
+                result.backgroundColor[0] *= background->paint.opacity;
+                result.backgroundColor[1] *= background->paint.opacity;
+                result.backgroundColor[2] *= background->paint.opacity;
+                result.backgroundColor[3] *= background->paint.opacity;
+            } else {
+                // This is a textured background. We need to render it with a quad.
+                result.order.emplace_back(*layer);
+            }
+            continue;
+        }
+
+        if (layer->is<CustomLayer>()) {
+            result.order.emplace_back(*layer);
+            continue;
+        }
+
+        Source* source = getSource(layer->source);
+        if (!source) {
+            Log::Warning(Event::Render, "can't find source for layer '%s'", layer->id.c_str());
+            continue;
+        }
+
+        for (auto tile : source->getTiles()) {
+            if (!tile->data || !tile->data->isReady())
+                continue;
+
+            // We're not clipping symbol layers, so when we have both parents and children of symbol
+            // layers, we drop all children in favor of their parent to avoid duplicate labels.
+            // See https://github.com/mapbox/mapbox-gl-native/issues/2482
+            if (layer->is<SymbolLayer>()) {
+                bool skip = false;
+                // Look back through the buckets we decided to render to find out whether there is
+                // already a bucket from this layer that is a parent of this tile. Tiles are ordered
+                // by zoom level when we obtain them from getTiles().
+                for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
+                    if (tile->id.isChildOf(it->tile->id)) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) {
+                    continue;
+                }
+            }
+
+            auto bucket = tile->data->getBucket(*layer);
+            if (bucket) {
+                result.order.emplace_back(*layer, tile, bucket);
+            }
+        }
+    }
+
+    return result;
+}
+
+void Style::setSourceTileCacheSize(size_t size) {
+    for (const auto& source : sources) {
+        source->setCacheSize(size);
+    }
+}
+
+void Style::onLowMemory() {
+    for (const auto& source : sources) {
+        source->onLowMemory();
+    }
 }
 
 void Style::setObserver(Observer* observer_) {
@@ -288,4 +400,4 @@ void Style::dumpDebugLogs() const {
     spriteStore->dumpDebugLogs();
 }
 
-}
+} // namespace mbgl

@@ -20,8 +20,8 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
 // sometimes have multiple valid URLs.
 std::string canonicalURL(const std::string &url);
 
-}
-}
-}
+} // namespace mapbox
+} // namespace util
+} // namespace mbgl
 
 #endif

@@ -1,9 +1,8 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issue/1369
@@ -22,9 +21,9 @@ TEST_F(Storage, HTTPIssue1369) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     SQLiteCache cache;
     DefaultFileSource fs(&cache);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 
@@ -38,12 +37,12 @@ TEST_F(Storage, HTTPIssue1369) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
         loop.stop();
         HTTPIssue1369.finish();
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

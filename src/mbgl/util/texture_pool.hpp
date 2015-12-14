@@ -20,6 +20,6 @@ private:
     std::set<GLuint> texture_ids;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -65,13 +65,13 @@ class VectorTileMonitor : public GeometryTileMonitor {
 public:
     VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
 
-    std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
 private:
     std::string url;
     std::shared_ptr<const std::string> data;
 };
 
-}
+} // namespace mbgl
 
 #endif

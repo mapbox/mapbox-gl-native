@@ -8,7 +8,7 @@ namespace mbgl {
 
 namespace util {
 template <typename T> class Thread;
-}
+} // namespace util
 
 class DefaultFileSource : public FileSource {
 public:
@@ -29,6 +29,6 @@ private:
     std::string accessToken;
 };
 
-}
+} // namespace mbgl
 
 #endif

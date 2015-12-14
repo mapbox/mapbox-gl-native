@@ -29,4 +29,4 @@ size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t 
     return idx;
 }
 
-}
+} // namespace mbgl

@@ -24,6 +24,6 @@ public:
     PropertyTransition defaultTransition;
 };
 
-}
+} // namespace mbgl
 
 #endif

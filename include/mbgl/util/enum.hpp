@@ -49,7 +49,7 @@ public:
     using name = ::mbgl::Enum<type, type##_names, sizeof(type##_names) / sizeof(::mbgl::EnumValue<type>)>; \
     inline std::ostream& operator<<(std::ostream& os, type t) { return os << name(t).str(); }
 
-}
+} // namespace mbgl
 
 #endif
 

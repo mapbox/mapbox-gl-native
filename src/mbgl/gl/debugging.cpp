@@ -185,6 +185,6 @@ group::~group() {
     }
 }
 
-}
-}
-}
+} // namespace debugging
+} // namespace gl
+} // namespace mbgl

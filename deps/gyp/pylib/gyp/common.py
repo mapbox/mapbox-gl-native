@@ -131,13 +131,20 @@ def QualifiedTarget(build_file, target, toolset):
 
 
 @memoize
-def RelativePath(path, relative_to):
+def RelativePath(path, relative_to, follow_path_symlink=True):
   # Assuming both |path| and |relative_to| are relative to the current
   # directory, returns a relative path that identifies path relative to
   # relative_to.
+  # If |follow_symlink_path| is true (default) and |path| is a symlink, then
+  # this method returns a path to the real file represented by |path|. If it is
+  # false, this method returns a path to the symlink. If |path| is not a
+  # symlink, this option has no effect.
 
   # Convert to normalized (and therefore absolute paths).
-  path = os.path.realpath(path)
+  if follow_path_symlink:
+    path = os.path.realpath(path)
+  else:
+    path = os.path.abspath(path)
   relative_to = os.path.realpath(relative_to)
 
   # On Windows, we can't create a relative path to a different drive, so just
@@ -329,7 +336,7 @@ def WriteOnDiff(filename):
     the target if it differs (on close).
   """
 
-  class Writer:
+  class Writer(object):
     """Wrapper around file which only covers the target if it differs."""
     def __init__(self):
       # Pick temporary file.
@@ -418,6 +425,8 @@ def GetFlavor(params):
     return 'freebsd'
   if sys.platform.startswith('openbsd'):
     return 'openbsd'
+  if sys.platform.startswith('netbsd'):
+    return 'netbsd'
   if sys.platform.startswith('aix'):
     return 'aix'
 
@@ -548,7 +557,7 @@ class CycleError(Exception):
 
 
 def TopologicallySorted(graph, get_edges):
-  """Topologically sort based on a user provided edge definition.
+  r"""Topologically sort based on a user provided edge definition.
 
   Args:
     graph: A list of node names.
@@ -586,3 +595,14 @@ def TopologicallySorted(graph, get_edges):
   for node in sorted(graph):
     Visit(node)
   return ordered_nodes
+
+def CrossCompileRequested():
+  # TODO: figure out how to not build extra host objects in the
+  # non-cross-compile case when this is enabled, and enable unconditionally.
+  return (os.environ.get('GYP_CROSSCOMPILE') or
+          os.environ.get('AR_host') or
+          os.environ.get('CC_host') or
+          os.environ.get('CXX_host') or
+          os.environ.get('AR_target') or
+          os.environ.get('CC_target') or
+          os.environ.get('CXX_target'))

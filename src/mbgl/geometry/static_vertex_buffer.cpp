@@ -11,4 +11,4 @@ StaticVertexBuffer::StaticVertexBuffer(std::initializer_list<std::pair<int16_t, 
     }
 }
 
-}
+} // namespace mbgl

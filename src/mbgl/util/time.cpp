@@ -1,5 +1,4 @@
 #include <mbgl/util/time.hpp>
-#include <mbgl/util/uv_detail.hpp>
 
 #include <cstdio>
 
@@ -19,5 +18,13 @@ std::string rfc1123(std::time_t time) {
     return buffer;
 }
 
+std::string iso8601(std::time_t time) {
+    std::tm info;
+    gmtime_r(&time, &info);
+    char buffer[30];
+    std::strftime(buffer, sizeof(buffer), "%F %T", &info);
+    return buffer;
 }
-}
+
+} // namespace util
+} // namespace mbgl

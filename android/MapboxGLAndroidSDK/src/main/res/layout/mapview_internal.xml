@@ -26,7 +26,8 @@
         android:clickable="true"
         android:contentDescription="@string/attributionsIconContentDescription"
         android:padding="7dp"
-        android:src="@drawable/attribution_button_selector" />
+        android:src="@drawable/ic_info_outline_24dp_selector"
+        android:background="@drawable/bg_default_selector"/>
 
     <com.mapbox.mapboxsdk.views.UserLocationView
         android:id="@+id/userLocationView"

@@ -23,10 +23,6 @@ void Painter::drawClippingMasks(const std::set<Source*>& sources) {
     for (const auto& source : sources) {
         source->drawClippingMasks(*this);
     }
-
-    config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
-    config.depthMask = GL_TRUE;
-    config.stencilMask = 0x0;
 }
 
 void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {

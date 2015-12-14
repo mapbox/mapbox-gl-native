@@ -35,7 +35,7 @@ class stopwatch {
     inline ~stopwatch() {}
 };
 #endif
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

@@ -1,8 +1,7 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, HTTPLoad) {
@@ -10,8 +9,8 @@ TEST_F(Storage, HTTPLoad) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     const int concurrency = 50;
     const int max = 10000;
@@ -29,8 +28,8 @@ TEST_F(Storage, HTTPLoad) {
             EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
-            EXPECT_EQ(0, res.expires);
-            EXPECT_EQ(0, res.modified);
+            EXPECT_EQ(Seconds::zero(), res.expires);
+            EXPECT_EQ(Seconds::zero(), res.modified);
             EXPECT_EQ("", res.etag);
 
             if (number <= max) {
@@ -47,5 +46,5 @@ TEST_F(Storage, HTTPLoad) {
         req(i);
     }
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }

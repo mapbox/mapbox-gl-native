@@ -116,4 +116,4 @@ bool NoneExpression::evaluate(const Extractor& extractor) const {
     return true;
 }
 
-}
+} // namespace mbgl

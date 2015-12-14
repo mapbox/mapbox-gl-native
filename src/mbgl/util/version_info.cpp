@@ -10,5 +10,5 @@ const char *revision = MBGL_VERSION_REV;
 const char *string = MBGL_VERSION_STRING;
 const unsigned int number = MBGL_VERSION;
 
-}
-}
+} // namespace version
+} // namespace mbgl

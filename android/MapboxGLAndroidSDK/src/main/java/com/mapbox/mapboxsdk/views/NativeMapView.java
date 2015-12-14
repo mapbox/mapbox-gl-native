@@ -256,6 +256,14 @@ final class NativeMapView {
         nativeResetPosition(mNativeMapViewPtr);
     }
 
+    public double getPitch() {
+        return nativeGetPitch(mNativeMapViewPtr);
+    }
+
+    public void setPitch(double pitch, long duration) {
+        nativeSetPitch(mNativeMapViewPtr, pitch, duration);
+    }
+
     public void scaleBy(double ds) {
         scaleBy(ds, -1.0, -1.0);
     }
@@ -385,8 +393,8 @@ final class NativeMapView {
         return nativeGetAnnotationsInBounds(mNativeMapViewPtr, bbox);
     }
 
-    public void setSprite(String symbol, int width, int height, float scale, byte[] pixels) {
-        nativeSetSprite(mNativeMapViewPtr, symbol, width, height, scale, pixels);
+    public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
+        nativeAddAnnotationIcon(mNativeMapViewPtr, symbol, width, height, scale, pixels);
     }
 
     public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
@@ -401,24 +409,12 @@ final class NativeMapView {
         nativeSetDebug(mNativeMapViewPtr, debug);
     }
 
-    public void toggleDebug() {
+    public void cycleDebugOptions() {
         nativeToggleDebug(mNativeMapViewPtr);
     }
 
     public boolean getDebug() {
         return nativeGetDebug(mNativeMapViewPtr);
-    }
-
-    public void setCollisionDebug(boolean debug) {
-        nativeSetCollisionDebug(mNativeMapViewPtr, debug);
-    }
-
-    public void toggleCollisionDebug() {
-        nativeToggleCollisionDebug(mNativeMapViewPtr);
-    }
-
-    public boolean getCollisionDebug() {
-        return nativeGetCollisionDebug(mNativeMapViewPtr);
     }
 
     public boolean isFullyLoaded() {
@@ -545,6 +541,10 @@ final class NativeMapView {
 
     private native void nativeResetPosition(long nativeMapViewPtr);
 
+    private native double nativeGetPitch(long nativeMapViewPtr);
+
+    private native void nativeSetPitch(long nativeMapViewPtr, double pitch, long duration);
+
     private native void nativeScaleBy(long nativeMapViewPtr, double ds,
                                       double cx, double cy, long duration);
 
@@ -600,7 +600,7 @@ final class NativeMapView {
 
     private native long[] nativeGetAnnotationsInBounds(long mNativeMapViewPtr, BoundingBox bbox);
 
-    private native void nativeSetSprite(long nativeMapViewPtr, String symbol,
+    private native void nativeAddAnnotationIcon(long nativeMapViewPtr, String symbol,
                                         int width, int height, float scale, byte[] pixels);
 
     private native void nativeSetVisibleCoordinateBounds(long mNativeMapViewPtr, LatLng[] coordinates,
@@ -613,12 +613,6 @@ final class NativeMapView {
     private native void nativeToggleDebug(long nativeMapViewPtr);
 
     private native boolean nativeGetDebug(long nativeMapViewPtr);
-
-    private native void nativeSetCollisionDebug(long nativeMapViewPtr, boolean debug);
-
-    private native void nativeToggleCollisionDebug(long nativeMapViewPtr);
-
-    private native boolean nativeGetCollisionDebug(long nativeMapViewPtr);
 
     private native boolean nativeIsFullyLoaded(long nativeMapViewPtr);
 

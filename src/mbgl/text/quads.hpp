@@ -43,6 +43,6 @@ namespace mbgl {
     SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
             const bool alongLine, const GlyphPositions& face);
-}
+} // namespace mbgl
 
 #endif

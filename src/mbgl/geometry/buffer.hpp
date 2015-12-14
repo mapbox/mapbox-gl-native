@@ -99,7 +99,7 @@ protected:
         }
 
         if (i * itemSize >= pos) {
-            throw new std::runtime_error("Can't get element after array bounds");
+            throw std::runtime_error("Can't get element after array bounds");
         } else {
             return reinterpret_cast<char *>(array) + (i * itemSize);
         }
@@ -122,6 +122,6 @@ private:
     GLuint buffer = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -208,4 +208,4 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
 
     return quads;
 }
-}
+} // namespace mbgl

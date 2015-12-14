@@ -75,4 +75,4 @@ bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const fl
 
 }
 
-}
+} // namespace mbgl

@@ -16,4 +16,4 @@ void StyleBucketParameters::eachFilteredFeature(const FilterExpression& filter,
     }
 }
 
-}
+} // namespace mbgl

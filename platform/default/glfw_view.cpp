@@ -81,6 +81,8 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     pixelRatio = static_cast<float>(fbWidth) / width;
 
+    glViewport(0, 0, fbWidth, fbHeight);
+
     glfwMakeContextCurrent(nullptr);
 
     printf("\n");
@@ -89,7 +91,6 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `S` to cycle through bundled styles\n");
     printf("- Press `X` to reset the transform\n");
     printf("- Press `N` to reset north\n");
-    printf("- Press `C` to toggle symbol collision debug boxes\n");
     printf("- Press `R` to toggle any available `night` style class\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
@@ -102,7 +103,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- `Control` + mouse drag to rotate\n");
     printf("- `Shift` + mouse drag to tilt\n");
     printf("\n");
-    printf("- Press `Tab` to toggle debug information\n");
+    printf("- Press `Tab` to cycle through the map debug options\n");
     printf("- Press `Esc` to quit\n");
     printf("\n");
     printf("================================================================================\n");
@@ -116,6 +117,7 @@ GLFWView::~GLFWView() {
 
 void GLFWView::initialize(mbgl::Map *map_) {
     View::initialize(map_);
+    map->addAnnotationIcon("default_marker", makeSpriteImage(22, 22, 1));
 }
 
 void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, int mods) {
@@ -127,10 +129,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_TAB:
-            view->map->toggleDebug();
-            break;
-        case GLFW_KEY_C:
-            view->map->toggleCollisionDebug();
+            view->map->cycleDebugOptions();
             break;
         case GLFW_KEY_X:
             if (!mods)
@@ -225,7 +224,7 @@ void GLFWView::addRandomCustomPointAnnotations(int count) {
     for (int i = 0; i < count; i++) {
         static int spriteID = 1;
         const auto name = std::string{ "marker-" } + mbgl::util::toString(spriteID++);
-        map->setSprite(name, makeSpriteImage(22, 22, 1));
+        map->addAnnotationIcon(name, makeSpriteImage(22, 22, 1));
         spriteIDs.push_back(name);
         points.emplace_back(makeRandomPoint(), name);
     }
@@ -238,7 +237,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
 
     for (int i = 0; i < count; i++) {
-        points.emplace_back(makeRandomPoint(), "marker-15");
+        points.emplace_back(makeRandomPoint(), "default_marker");
     }
 
     auto newIDs = map->addPointAnnotations(points);
@@ -319,6 +318,8 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     GLFWView *view = reinterpret_cast<GLFWView *>(glfwGetWindowUserPointer(window));
     view->fbWidth = width;
     view->fbHeight = height;
+
+    glViewport(0, 0, width, height);
 
     view->map->update(mbgl::Update::Repaint);
 }
@@ -539,5 +540,5 @@ void showColorDebugImage(std::string name, const char *data, size_t logicalWidth
 }
 #endif
 
-}
-}
+} // namespace platform
+} // namespace mbgl

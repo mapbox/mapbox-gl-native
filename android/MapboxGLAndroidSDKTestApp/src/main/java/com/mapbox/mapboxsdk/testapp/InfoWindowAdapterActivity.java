@@ -17,7 +17,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -47,7 +46,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.onCreate(savedInstanceState);
 
         mSpriteFactory = new SpriteFactory(mMapView);
-        mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_black_48dp);
+        mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_24dp);
 
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
 
@@ -63,6 +62,9 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
                 return textView;
             }
         });
+
+        // Enable to let concurrent multiple infowindows to be shown.
+        //mMapView.setAllowConcurrentMultipleOpenInfoWindows(true);
 
         mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
         mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));

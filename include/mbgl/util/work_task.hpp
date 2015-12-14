@@ -16,6 +16,6 @@ public:
     virtual void cancel() = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

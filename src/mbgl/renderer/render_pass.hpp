@@ -26,6 +26,6 @@ constexpr inline RenderPass operator&(RenderPass a, RenderPass b) {
                                    static_cast<std::underlying_type<RenderPass>::type>(b));
 }
 
-}
+} // namespace mbgl
 
 #endif

@@ -404,4 +404,4 @@ optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSV
     return Function<Faded<std::string>>(*constant);
 }
 
-}
+} // namespace mbgl

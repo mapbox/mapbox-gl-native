@@ -25,7 +25,7 @@ RasterTileData::~RasterTileData() {
 }
 
 void RasterTileData::request(float pixelRatio,
-                             const std::function<void()>& callback) {
+                             const RasterTileData::Callback& callback) {
     std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
@@ -54,6 +54,9 @@ void RasterTileData::request(float pixelRatio,
             // Only overwrite the state when we didn't have a previous tile.
             state = State::loaded;
         }
+
+        modified = res.modified;
+        expires = res.expires;
 
         workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
             workRequest.reset();

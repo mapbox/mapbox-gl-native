@@ -19,6 +19,6 @@ private:
     std::shared_ptr<WorkTask> task;
 };
 
-}
+} // namespace mbgl
 
 #endif

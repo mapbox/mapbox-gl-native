@@ -2,6 +2,7 @@
 #define MBGL_MAP_MAP
 
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/image.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -9,6 +10,7 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/interactive_features.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <cstdint>
 #include <string>
@@ -22,7 +24,6 @@ class FileSource;
 class View;
 class MapData;
 class MapContext;
-class StillImage;
 class SpriteImage;
 class Transform;
 class PointAnnotation;
@@ -31,7 +32,7 @@ struct CameraOptions;
 
 namespace util {
 template <class T> class Thread;
-}
+} // namespace util
 
 struct EdgeInsets {
     double top = 0;
@@ -59,7 +60,7 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void(std::exception_ptr, std::unique_ptr<const StillImage>)>;
+    using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
     void renderStill(StillImageCallback callback);
 
     // Triggers a synchronous render.
@@ -100,6 +101,7 @@ public:
     // Camera
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&);
+    void flyTo(const CameraOptions&);
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
@@ -147,6 +149,10 @@ public:
     LatLng latLngForPixel(const PrecisionPoint&) const;
 
     // Annotations
+    void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
+    void removeAnnotationIcon(const std::string&);
+    double getTopOffsetPixelsForAnnotationIcon(const std::string&);
+
     AnnotationID addPointAnnotation(const PointAnnotation&);
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
 
@@ -158,34 +164,35 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
     LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string&);
+
+    // Style API
+    void addCustomLayer(const std::string& id,
+                        CustomLayerInitializeFunction,
+                        CustomLayerRenderFunction,
+                        CustomLayerDeinitializeFunction,
+                        void* context,
+                        const char* before = nullptr);
 
     // Features
     std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius = 0) const;
-
-    // Sprites
-    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
-    void removeSprite(const std::string&);
 
     // Memory
     void setSourceTileCacheSize(size_t);
     void onLowMemory();
 
     // Debug
-    void setDebug(bool value);
-    void toggleDebug();
-    bool getDebug() const;
-    void setCollisionDebug(bool value);
-    void toggleCollisionDebug();
-    bool getCollisionDebug() const;
+    void setDebug(MapDebugOptions);
+    void cycleDebugOptions();
+    MapDebugOptions getDebug() const;
+
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
 
 private:
     View& view;
     const std::unique_ptr<Transform> transform;
-    const std::unique_ptr<MapData> data;
     const std::unique_ptr<util::Thread<MapContext>> context;
+    MapData* data;
 
     enum class RenderState {
         never,
@@ -196,6 +203,6 @@ private:
     RenderState renderState = RenderState::never;
 };
 
-}
+} // namespace mbgl
 
 #endif

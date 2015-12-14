@@ -1,6 +1,11 @@
 #include "util.hpp"
 
+#include <mbgl/map/map.hpp>
 #include <mbgl/platform/log.hpp>
+#include <mbgl/util/image.hpp>
+#include <mbgl/util/io.hpp>
+
+#include <mapbox/pixelmatch.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -8,11 +13,20 @@
 #pragma GCC diagnostic pop
 
 #include <csignal>
+#include <future>
 
 #include <unistd.h>
 
 namespace mbgl {
 namespace test {
+
+std::string getFileSourceRoot() {
+#ifdef MBGL_ASSET_ZIP
+    return "test/fixtures/annotations/assets.zip";
+#else
+    return "";
+#endif
+}
 
 pid_t startServer(const char *executable) {
     int pipefd[2];
@@ -81,5 +95,41 @@ uint64_t crc64(const std::string& str) {
     return crc64(str.data(), str.size());
 }
 
+PremultipliedImage render(Map& map) {
+    std::promise<PremultipliedImage> promise;
+    map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
+        promise.set_value(std::move(image));
+    });
+    return promise.get_future().get();
 }
+
+void checkImage(const std::string& base,
+                const PremultipliedImage& actual,
+                double imageThreshold,
+                double pixelThreshold) {
+    if (getenv("UPDATE")) {
+        util::write_file(base + "/expected.png", encodePNG(actual));
+        return;
+    }
+
+    PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
+    PremultipliedImage diff { expected.width, expected.height };
+
+    ASSERT_EQ(expected.width, actual.width);
+    ASSERT_EQ(expected.height, actual.height);
+
+    double pixels = mapbox::pixelmatch(actual.data.get(),
+                                       expected.data.get(),
+                                       expected.width,
+                                       expected.height,
+                                       diff.data.get(),
+                                       pixelThreshold);
+
+    EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
+
+    util::write_file(base + "/actual.png", encodePNG(actual));
+    util::write_file(base + "/diff.png", encodePNG(diff));
 }
+
+} // namespace test
+} // namespace mbgl

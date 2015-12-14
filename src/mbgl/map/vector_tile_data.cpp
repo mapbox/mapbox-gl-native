@@ -20,12 +20,17 @@ VectorTileData::VectorTileData(const TileID& id_,
       worker(style_.workers),
       tileWorker(id_,
                  sourceID,
-                 style_,
+                 *style_.spriteStore,
+                 *style_.glyphAtlas,
+                 *style_.glyphStore,
                  state),
       monitor(std::move(monitor_))
 {
     state = State::loading;
-    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err, std::unique_ptr<GeometryTile> tile) {
+    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
+                                                        std::unique_ptr<GeometryTile> tile,
+                                                        Seconds modified_,
+                                                        Seconds expires_) {
         if (err) {
             try {
                 std::rethrow_exception(err);
@@ -50,11 +55,14 @@ VectorTileData::VectorTileData(const TileID& id_,
             state = State::partial;
         }
 
+        modified = modified_;
+        expires = expires_;
+
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
         // when tile data changed. Replacing the workRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
-        workRequest = worker.parseGeometryTile(tileWorker, style.layers, std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+        workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -161,7 +169,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
 
 void VectorTileData::redoPlacement() {
     workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, style.layers, buckets, targetConfig, [this, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -186,4 +194,4 @@ void VectorTileData::cancel() {
     workRequest.reset();
 }
 
-}
+} // namespace mbgl

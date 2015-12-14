@@ -75,22 +75,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else {
             _scale = [UIScreen mainScreen].scale;
         }
-
-        // Collect cellular carrier data if CoreTelephony is linked
-        Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
-        if (CTTelephonyNetworkInfo != NULL) {
-            id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
-
-            SEL subscriberCellularProviderSelector = NSSelectorFromString(@"subscriberCellularProvider");
-            id carrierVendor = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:subscriberCellularProviderSelector])(telephonyNetworkInfo, subscriberCellularProviderSelector);
-
-            // Guard against simulator, iPod Touch, etc.
-            if (carrierVendor) {
-                SEL carrierNameSelector = NSSelectorFromString(@"carrierName");
-                NSString *carrierName = ((id (*)(id, SEL))[carrierVendor methodForSelector:carrierNameSelector])(carrierVendor, carrierNameSelector);
-                _carrier = carrierName;
-            }
-        }
     }
     return self;
 }
@@ -509,16 +493,11 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
         [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
 
-        if (strongSelf.data.carrier) {
-            [evt setValue:strongSelf.data.carrier forKey:@"carrier"];
-
-            NSString *cell = [strongSelf currentCellularNetworkConnectionType];
-            [evt setObject:(cell ? cell : [NSNull null]) forKey:@"cellularNetworkType"];
-        }
-
         MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
         [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
-        
+
+        [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
+
         [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
 
         // Make Immutable Version
@@ -678,6 +657,41 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 // Can be called from any thread.
 //
+- (NSString *) applicationState {
+    __block NSString *result;
+
+    NSString *(^applicationStateBlock)(void) = ^{
+        switch ([UIApplication sharedApplication].applicationState) {
+            case UIApplicationStateActive:
+                result = @"Active";
+                break;
+            case UIApplicationStateInactive:
+                result = @"Inactive";
+                break;
+            case UIApplicationStateBackground:
+                result = @"Background";
+                break;
+            default:
+                result = @"Default - Unknown";
+                break;
+        }
+
+        return result;
+    };
+
+    if ( ! [[NSThread currentThread] isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = applicationStateBlock();
+        });
+    } else {
+        result = applicationStateBlock();
+    }
+
+    return result;
+}
+
+// Can be called from any thread.
+//
 - (NSInteger) contentSizeScale {
     __block NSInteger result = -9999;
 
@@ -722,27 +736,6 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 
     return result;
-}
-
-// Can be called from any thread.
-//
-- (NSString *) currentCellularNetworkConnectionType {
-    NSString *radioTech;
-
-    Class CTTelephonyNetworkInfo = NSClassFromString(@"CTTelephonyNetworkInfo");
-    if (CTTelephonyNetworkInfo) {
-        id telephonyNetworkInfo = [[CTTelephonyNetworkInfo alloc] init];
-        SEL currentRadioAccessTechnologySelector = NSSelectorFromString(@"currentRadioAccessTechnology");
-        radioTech = ((id (*)(id, SEL))[telephonyNetworkInfo methodForSelector:currentRadioAccessTechnologySelector])(telephonyNetworkInfo, currentRadioAccessTechnologySelector);
-    }
-
-    if (radioTech == nil) {
-        return nil;
-    } else if ([radioTech hasPrefix:@"CTRadioAccessTechnology"]) {
-        return [radioTech substringFromIndex:23];
-    } else {
-        return @"Unknown";
-    }
 }
 
 // Can be called from any thread.

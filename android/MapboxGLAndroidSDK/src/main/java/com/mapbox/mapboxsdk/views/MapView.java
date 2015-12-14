@@ -51,11 +51,12 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
+import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -84,13 +85,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A {@code MapView} provides an embeddable map interface, similar to the one provided by the Google Maps API.
+ * A {@code MapView} provides an embeddable map interface.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
  * <p/>
  * Use of {@code MapView} requires a Mapbox API access token.
- * Obtain an access token on the <a href="https://www.mapbox.com/account/apps/">Mapbox account page</a>.
+ * Obtain an access token on the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
  * <p/>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
@@ -113,10 +114,11 @@ public final class MapView extends FrameLayout {
     private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
     private static final String STATE_ZOOM_LEVEL = "zoomLevel";
-    private static final String STATE_DIRECTION = "direction";
+    private static final String STATE_TILT = "tilt";
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
     private static final String STATE_ROTATE_ENABLED = "rotateEnabled";
+    private static final String STATE_TILT_ENABLED = "tiltEnabled";
     private static final String STATE_ZOOM_CONTROLS_ENABLED = "zoomControlsEnabled";
     private static final String STATE_DEBUG_ACTIVE = "debugActive";
     private static final String STATE_STYLE_URL = "styleUrl";
@@ -161,6 +163,14 @@ public final class MapView extends FrameLayout {
      */
     public static final double MAXIMUM_ZOOM_LEVEL = 18.0;
 
+    /**
+     * The currently supported maximum and minimum tilt values.
+     *
+     * @see MapView#setTilt(double)
+     */
+    private static final double MINIMUM_TILT = 0;
+    private static final double MAXIMUM_TILT = 60;
+
     //
     // Instance members
     //
@@ -178,8 +188,10 @@ public final class MapView extends FrameLayout {
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
+    private ShoveGestureDetector mShoveGestureDetector;
     private boolean mTwoTap = false;
     private boolean mZoomStarted = false;
+    private boolean mQuickZoom = false;
 
     // Shows zoom buttons
     private ZoomButtonsController mZoomButtonsController;
@@ -201,7 +213,8 @@ public final class MapView extends FrameLayout {
     // Every annotation that has been added to the map
     private final List<Annotation> mAnnotations = new ArrayList<>();
     private List<Marker> mMarkersNearLastTap = new ArrayList<>();
-    private Marker mSelectedMarker;
+    private List<Marker> mSelectedMarkers = new ArrayList<>();
+    private List<InfoWindow> mInfoWindows = new ArrayList<>();
     private InfoWindowAdapter mInfoWindowAdapter;
     private SpriteFactory mSpriteFactory;
     private ArrayList<Sprite> mSprites = new ArrayList<>();
@@ -238,6 +251,8 @@ public final class MapView extends FrameLayout {
     private boolean mZoomEnabled = true;
     private boolean mScrollEnabled = true;
     private boolean mRotateEnabled = true;
+    private boolean mTiltEnabled = true;
+    private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
 
     //
@@ -273,87 +288,115 @@ public final class MapView extends FrameLayout {
     }
 
     /**
-     * This event is triggered whenever the currently displayed map region is about to changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * without an animation.
      * <p/>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_WILL_CHANGE = 0;
 
     /**
-     * This event is triggered whenever the currently displayed map region is about to changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * with an animation.
      * <p/>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_WILL_CHANGE_ANIMATED = 1;
 
     /**
-     * This event is triggered whenever the currently displayed map region is changing.
+     * This {@link MapChange} is triggered whenever the currently displayed map region is changing.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_IS_CHANGING = 2;
 
     /**
-     * This event is triggered whenever the currently displayed map region finished changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * without an animation.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_DID_CHANGE = 3;
 
     /**
-     * This event is triggered whenever the currently displayed map region finished changing
+     * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * with an animation.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
-     * This event is triggered when the map is about to start loading a new map style.
+     * This {@link MapChange} is triggered when the map is about to start loading a new map style.
      * <p/>
      * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
      * {@link MapView#DID_FAIL_LOADING_MAP}.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
-     * This event is triggered when the map has successfully loaded a new map style.
+     * This {@link MapChange} is triggered when the map has successfully loaded a new map style.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
      * <p/>
      * This event is triggered when the map has failed to load a new map style.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_RENDERING_FRAME = 8;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_FRAME = 9;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int WILL_START_RENDERING_MAP = 11;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_MAP = 12;
 
     /**
-     * Currently not implemented.
+     * This {@link MapChange} is currently not implemented.
+     * <p/>
+     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
@@ -467,7 +510,20 @@ public final class MapView extends FrameLayout {
         /**
          * Called when the displayed map view changes.
          *
-         * @param change The type of map change event.
+         * @param change Type of map change event, one of {@link #REGION_WILL_CHANGE},
+         *               {@link #REGION_WILL_CHANGE_ANIMATED},
+         *               {@link #REGION_IS_CHANGING},
+         *               {@link #REGION_DID_CHANGE},
+         *               {@link #REGION_DID_CHANGE_ANIMATED},
+         *               {@link #WILL_START_LOADING_MAP},
+         *               {@link #DID_FAIL_LOADING_MAP},
+         *               {@link #DID_FINISH_LOADING_MAP},
+         *               {@link #WILL_START_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME},
+         *               {@link #DID_FINISH_RENDERING_FRAME_FULLY_RENDERED},
+         *               {@link #WILL_START_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP},
+         *               {@link #DID_FINISH_RENDERING_MAP_FULLY_RENDERED}.
          */
         void onMapChanged(@MapChange int change);
     }
@@ -636,6 +692,7 @@ public final class MapView extends FrameLayout {
         mScaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
         ScaleGestureDetectorCompat.setQuickScaleEnabled(mScaleGestureDetector, true);
         mRotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
+        mShoveGestureDetector = new ShoveGestureDetector(context, new ShoveGestureListener());
 
         // Shows the zoom controls
         if (!context.getPackageManager()
@@ -681,6 +738,7 @@ public final class MapView extends FrameLayout {
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
             setRotateEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+            setTiltEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
             setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, isZoomControlsEnabled()));
             setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
             if (typedArray.getString(R.styleable.MapView_style_url) != null) {
@@ -752,10 +810,11 @@ public final class MapView extends FrameLayout {
             // need to set zoom level first because of limitation on rotating when zoomed out
             setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
-            setDirection(savedInstanceState.getDouble(STATE_DIRECTION));
+            setTilt(savedInstanceState.getDouble(STATE_TILT), null);
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
             setScrollEnabled(savedInstanceState.getBoolean(STATE_SCROLL_ENABLED));
             setRotateEnabled(savedInstanceState.getBoolean(STATE_ROTATE_ENABLED));
+            setTiltEnabled(savedInstanceState.getBoolean(STATE_TILT_ENABLED));
             setZoomControlsEnabled(savedInstanceState.getBoolean(STATE_ZOOM_CONTROLS_ENABLED));
             setDebugActive(savedInstanceState.getBoolean(STATE_DEBUG_ACTIVE));
             setStyleUrl(savedInstanceState.getString(STATE_STYLE_URL));
@@ -807,10 +866,6 @@ public final class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if ((change == REGION_WILL_CHANGE) || (change == REGION_WILL_CHANGE_ANIMATED)) {
-                    deselectMarker();
-                }
-
                 if (change == DID_FINISH_LOADING_MAP) {
                     reloadSprites();
                     reloadMarkers();
@@ -837,9 +892,11 @@ public final class MapView extends FrameLayout {
         // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
+        outState.putDouble(STATE_TILT, getTilt());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
         outState.putBoolean(STATE_SCROLL_ENABLED, isScrollEnabled());
         outState.putBoolean(STATE_ROTATE_ENABLED, isRotateEnabled());
+        outState.putBoolean(STATE_TILT_ENABLED, isTiltEnabled());
         outState.putBoolean(STATE_ZOOM_CONTROLS_ENABLED, isZoomControlsEnabled());
         outState.putBoolean(STATE_DEBUG_ACTIVE, isDebugActive());
         outState.putString(STATE_STYLE_URL, getStyleUrl());
@@ -1058,6 +1115,32 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setScrollEnabled(boolean scrollEnabled) {
         this.mScrollEnabled = scrollEnabled;
+    }
+
+    //
+    // Pitch / Tilt
+    //
+
+    /**
+     * Gets the current Tilt in degrees of the MapView
+     * @return tilt in degrees
+     */
+    public double getTilt() {
+        return mNativeMapView.getPitch();
+    }
+
+    /**
+     * Sets the Tilt in degrees of the MapView.
+     * @param pitch New tilt in degrees
+     * @param duration Animation time in milliseconds.  If null then 0 is used, making the animation immediate.
+     */
+    @FloatRange(from = MINIMUM_TILT, to = MAXIMUM_TILT)
+    public void setTilt(Double pitch, @Nullable Long duration) {
+        long actualDuration = 0;
+        if (duration != null) {
+            actualDuration = duration;
+        }
+        mNativeMapView.setPitch(pitch, actualDuration);
     }
 
     //
@@ -1295,6 +1378,59 @@ public final class MapView extends FrameLayout {
     }
 
     //
+    // Tilt
+    //
+
+    /**
+     * Returns whether the user may tilt the map.
+     *
+     * @return If true, tilting is enabled.
+     */
+    @UiThread
+    public boolean isTiltEnabled() {
+        return mTiltEnabled;
+    }
+
+    /**
+     * Changes whether the user may tilt the map.
+     * <p/>
+     * This setting controls only user interactions with the map. If you set the value to false,
+     * you may still change the map location programmatically.
+     * <p/>
+     * The default value is true.
+     *
+     * @param tiltEnabled If true, tilting is enabled.
+     */
+    @UiThread
+    public void setTiltEnabled(boolean tiltEnabled) {
+        this.mTiltEnabled = tiltEnabled;
+    }
+
+    //
+    // InfoWindows
+    //
+
+    /**
+     * Changes whether the map allows concurrent multiple infowindows to be shown.
+     *
+     * @param allow If true, map allows concurrent multiple infowindows to be shown.
+     */
+    @UiThread
+    public void setAllowConcurrentMultipleOpenInfoWindows(boolean allow) {
+        this.mAllowConcurrentMultipleOpenInfoWindows = allow;
+    }
+
+    /**
+     * Returns whether the map allows concurrent multiple infowindows to be shown.
+     *
+     * @return If true, map allows concurrent multiple infowindows to be shown.
+     */
+    @UiThread
+    public boolean isAllowConcurrentMultipleOpenInfoWindows() {
+        return this.mAllowConcurrentMultipleOpenInfoWindows;
+    }
+
+    //
     // Debug
     //
 
@@ -1305,7 +1441,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public boolean isDebugActive() {
-        return mNativeMapView.getDebug() || mNativeMapView.getCollisionDebug();
+        return mNativeMapView.getDebug();
     }
 
     /**
@@ -1318,20 +1454,19 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setDebugActive(boolean debugActive) {
         mNativeMapView.setDebug(debugActive);
-        mNativeMapView.setCollisionDebug(debugActive);
     }
 
     /**
-     * Toggles whether the map debug information is shown.
+     * Cycles through the map debug options.
      * <p/>
-     * The value of {@link MapView#isDebugActive()} is toggled.
+     * The value of {@link MapView#isDebugActive()} reflects whether there are
+     * any map debug options enabled or disabled.
      *
      * @see MapView#isDebugActive()
      */
     @UiThread
-    public void toggleDebug() {
-        mNativeMapView.toggleDebug();
-        mNativeMapView.toggleCollisionDebug();
+    public void cycleDebugOptions() {
+        mNativeMapView.cycleDebugOptions();
     }
 
     // True if map has finished loading the view
@@ -1356,7 +1491,7 @@ public final class MapView extends FrameLayout {
      * <li>{@code http://...} or {@code https://...}:
      * retrieves the style over the Internet from any web server.</li>
      * <li>{@code asset://...}:
-     * reads the style from the APK {@code asset/} directory.
+     * reads the style from the APK {@code assets/} directory.
      * This is used to load a style bundled with your app.</li>
      * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
@@ -1659,7 +1794,7 @@ public final class MapView extends FrameLayout {
         }
         float scale = density / DisplayMetrics.DENSITY_DEFAULT;
 
-        mNativeMapView.setSprite(
+        mNativeMapView.addAnnotationIcon(
                 id,
                 (int) (bitmap.getWidth() / scale),
                 (int) (bitmap.getHeight() / scale),
@@ -1871,8 +2006,9 @@ public final class MapView extends FrameLayout {
 
     /**
      * Convenience method for removing a Marker from the map.
-     *
+     * <p/>
      * Calls removeAnnotation() internally
+     *
      * @param marker Marker to remove
      */
     @UiThread
@@ -2005,7 +2141,8 @@ public final class MapView extends FrameLayout {
 
     /**
      * Selects a marker. The selected marker will have it's info window opened.
-     * Any other open info windows will be closed.
+     * Any other open info windows will be closed unless isAllowConcurrentMultipleOpenInfoWindows()
+     * is true.
      * <p/>
      * Selecting an already selected marker will have no effect.
      *
@@ -2018,12 +2155,14 @@ public final class MapView extends FrameLayout {
             return;
         }
 
-        if (marker == mSelectedMarker) {
+        if (mSelectedMarkers.contains(marker)) {
             return;
         }
 
         // Need to deselect any currently selected annotation first
-        deselectMarker();
+        if (!isAllowConcurrentMultipleOpenInfoWindows()) {
+            deselectMarkers();
+        }
 
         boolean handledDefaultClick = false;
         if (mOnMarkerClickListener != null) {
@@ -2032,26 +2171,46 @@ public final class MapView extends FrameLayout {
         }
 
         if (!handledDefaultClick) {
-            // default behaviour
-            // Can't do this as InfoWindow will get hidden
-            //setCenterCoordinate(marker.getPosition(), true);
-            marker.showInfoWindow();
+            // default behaviour show InfoWindow
+            mInfoWindows.add(marker.showInfoWindow());
         }
 
-        mSelectedMarker = marker;
+        mSelectedMarkers.add(marker);
     }
 
     /**
-     * Deselects any currently selected marker. The selected marker will have it's info window closed.
+     * Deselects any currently selected marker. All markers will have it's info window closed.
      */
     @UiThread
-    public void deselectMarker() {
-        if (mSelectedMarker != null) {
-            if (mSelectedMarker.isInfoWindowShown()) {
-                mSelectedMarker.hideInfoWindow();
-                mSelectedMarker = null;
+    public void deselectMarkers() {
+        if (mSelectedMarkers.isEmpty()) {
+            return;
+        }
+
+        for (Marker marker : mSelectedMarkers) {
+            if (marker.isInfoWindowShown()) {
+                marker.hideInfoWindow();
             }
         }
+
+        // Removes all selected markers from the list
+        mSelectedMarkers.clear();
+    }
+
+    /**
+     * Deselects a currently selected marker. The selected marker will have it's info window closed.
+     */
+    @UiThread
+    public void deselectMarker(@NonNull Marker marker) {
+        if (!mSelectedMarkers.contains(marker)) {
+            return;
+        }
+
+        if (marker.isInfoWindowShown()) {
+            marker.hideInfoWindow();
+        }
+
+        mSelectedMarkers.remove(marker);
     }
 
     //
@@ -2129,8 +2288,8 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     @Nullable
-    public Marker getSelectedMarker() {
-        return mSelectedMarker;
+    public List<Marker> getSelectedMarkers() {
+        return mSelectedMarkers;
     }
 
     private void adjustTopOffsetPixels() {
@@ -2144,12 +2303,12 @@ public final class MapView extends FrameLayout {
             }
         }
 
-        if (mSelectedMarker != null) {
-            if (mSelectedMarker.isInfoWindowShown()) {
-                Marker temp = mSelectedMarker;
+        for (Marker marker : mSelectedMarkers) {
+            if (marker.isInfoWindowShown()) {
+                Marker temp = marker;
                 temp.hideInfoWindow();
                 temp.showInfoWindow();
-                mSelectedMarker = temp;
+                marker = temp;
             }
         }
     }
@@ -2230,6 +2389,9 @@ public final class MapView extends FrameLayout {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             mCompassView.update(getDirection());
             mUserLocationView.update();
+            for (InfoWindow infoWindow : mInfoWindows) {
+                infoWindow.update();
+            }
         }
     }
 
@@ -2289,11 +2451,13 @@ public final class MapView extends FrameLayout {
      * @see MapView#setZoomEnabled(boolean)
      * @see MapView#setScrollEnabled(boolean)
      * @see MapView#setRotateEnabled(boolean)
+     * @see MapView#setTiltEnabled(boolean)
      */
     public void setAllGesturesEnabled(boolean enabled) {
         setZoomEnabled(enabled);
         setScrollEnabled(enabled);
         setRotateEnabled(enabled);
+        setTiltEnabled(enabled);
     }
 
     // Called when user touches the screen, all positions are absolute
@@ -2308,6 +2472,7 @@ public final class MapView extends FrameLayout {
         // Check two finger gestures first
         mRotateGestureDetector.onTouchEvent(event);
         mScaleGestureDetector.onTouchEvent(event);
+        mShoveGestureDetector.onTouchEvent(event);
 
         // Handle two finger tap
         switch (event.getActionMasked()) {
@@ -2329,7 +2494,9 @@ public final class MapView extends FrameLayout {
                 // First pointer up
                 long tapInterval = event.getEventTime() - event.getDownTime();
                 boolean isTap = tapInterval <= ViewConfiguration.getTapTimeout();
-                boolean inProgress = mRotateGestureDetector.isInProgress() || mScaleGestureDetector.isInProgress();
+                boolean inProgress = mRotateGestureDetector.isInProgress()
+                        || mScaleGestureDetector.isInProgress()
+                        || mShoveGestureDetector.isInProgress();
 
                 if (mTwoTap && isTap && !inProgress) {
                     PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
@@ -2369,20 +2536,33 @@ public final class MapView extends FrameLayout {
 
         // Called for double taps
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onDoubleTapEvent(MotionEvent e) {
             if (!mZoomEnabled) {
                 return false;
             }
 
-            // Single finger double tap
-            // Zoom in
-            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
-                // Zoom in on gesture
-                zoom(true, e.getX(), e.getY());
-            } else {
-                // Zoom in on center map
-                zoom(true, getWidth() / 2, getHeight() / 2);
+            switch (e.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (mQuickZoom) {
+                        mQuickZoom = false;
+                        break;
+                    }
+
+                    // Single finger double tap
+                    if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                        // Zoom in on gesture
+                        zoom(true, e.getX(), e.getY());
+                    } else {
+                        // Zoom in on center map
+                        zoom(true, getWidth() / 2, getHeight() / 2);
+                    }
+                    break;
             }
+
             return true;
         }
 
@@ -2426,19 +2606,24 @@ public final class MapView extends FrameLayout {
                 Collections.sort(nearbyMarkers);
 
                 if (nearbyMarkers == mMarkersNearLastTap) {
+
+                    // TODO: We still need to adapt this logic to the new mSelectedMarkers list,
+                    // though the basic functionality is there.
+
                     // the selection candidates haven't changed; cycle through them
-                    if (mSelectedMarker != null && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
-                        // the selected marker is the last in the set; cycle back to the first
-                        // note: this could be the selected marker if only one in set
-                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-                    } else if (mSelectedMarker != null) {
-                        // otherwise increment the selection through the candidates
-                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
-                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
-                    } else {
+//                    if (mSelectedMarker != null
+//                            && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
+//                        // the selected marker is the last in the set; cycle back to the first
+//                        // note: this could be the selected marker if only one in set
+//                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
+//                    } else if (mSelectedMarker != null) {
+//                        // otherwise increment the selection through the candidates
+//                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
+//                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
+//                    } else {
                         // no current selection; select the first one
                         newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-                    }
+//                    }
                 } else {
                     // start tracking a new set of nearby markers
                     mMarkersNearLastTap = nearbyMarkers;
@@ -2459,7 +2644,7 @@ public final class MapView extends FrameLayout {
                     Annotation annotation = mAnnotations.get(i);
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
-                            if (mSelectedMarker == null || annotation.getId() != mSelectedMarker.getId()) {
+                            if (mSelectedMarkers.isEmpty() || !mSelectedMarkers.contains(annotation)) {
                                 selectMarker((Marker) annotation);
                             }
                             break;
@@ -2469,7 +2654,7 @@ public final class MapView extends FrameLayout {
 
             } else {
                 // deselect any selected marker
-                deselectMarker();
+                deselectMarkers();
 
                 // notify app of map click
                 if (mOnMapClickListener != null) {
@@ -2484,7 +2669,7 @@ public final class MapView extends FrameLayout {
         // Called for a long press
         @Override
         public void onLongPress(MotionEvent e) {
-            if (mOnMapLongClickListener != null) {
+            if (mOnMapLongClickListener != null && !mQuickZoom) {
                 LatLng point = fromScreenLocation(new PointF(e.getX(), e.getY()));
                 mOnMapLongClickListener.onMapLongClick(point);
             }
@@ -2541,7 +2726,7 @@ public final class MapView extends FrameLayout {
         }
     }
 
-    // This class handles two finger gestures
+    // This class handles two finger gestures and double-tap drag gestures
     private class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
         long mBeginTime = 0;
@@ -2566,8 +2751,8 @@ public final class MapView extends FrameLayout {
             mZoomStarted = false;
         }
 
-        // Called each time one of the two fingers moves
-        // Called for pinch zooms
+        // Called each time a finger moves
+        // Called for pinch zooms and quickzooms/quickscales
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             if (!mZoomEnabled) {
@@ -2595,8 +2780,11 @@ public final class MapView extends FrameLayout {
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
+            // Gesture is a quickzoom if there aren't two fingers
+            mQuickZoom = !mTwoTap;
+
             // Scale the map
-            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+            if (!mQuickZoom && mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
@@ -2675,6 +2863,71 @@ public final class MapView extends FrameLayout {
                 // around center map
                 mNativeMapView.setBearing(bearing, (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
             }
+            return true;
+        }
+    }
+
+    // This class handles a vertical two-finger shove. (If you place two fingers on screen with
+    // less than a 20 degree angle between them, this will detect movement on the Y-axis.)
+    private class ShoveGestureListener implements ShoveGestureDetector.OnShoveGestureListener {
+
+        long mBeginTime = 0;
+        float mTotalDelta = 0.0f;
+        boolean mStarted = false;
+
+        @Override
+        public boolean onShoveBegin(ShoveGestureDetector detector) {
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            mBeginTime = detector.getEventTime();
+            return true;
+        }
+
+        @Override
+        public void onShoveEnd(ShoveGestureDetector detector) {
+            mBeginTime = 0;
+            mTotalDelta = 0.0f;
+            mStarted = false;
+        }
+
+        @Override
+        public boolean onShove(ShoveGestureDetector detector) {
+            if (!mTiltEnabled) {
+                return false;
+            }
+
+            // If tilt is large enough ignore a tap
+            // Also if zoom already started, don't tilt
+            mTotalDelta += detector.getShovePixelsDelta();
+            if (!mZoomStarted && ((mTotalDelta > 10.0f) || (mTotalDelta < -10.0f))) {
+                mStarted = true;
+            }
+
+            // Ignore short touches in case it is a tap
+            // Also ignore small tilt
+            long time = detector.getEventTime();
+            long interval = time - mBeginTime;
+            if (!mStarted && (interval <= ViewConfiguration.getTapTimeout())) {
+                return false;
+            }
+
+            if (!mStarted) {
+                return false;
+            }
+
+            // Cancel any animation
+            mNativeMapView.cancelTransitions();
+
+            // Get tilt value (scale and clamp)
+            double pitch = getTilt();
+            pitch -= 0.1 * detector.getShovePixelsDelta();
+            pitch = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, pitch));
+
+            // Tilt the map
+            setTilt(pitch, null);
+
             return true;
         }
     }
@@ -3238,6 +3491,12 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+        validateGesturesForTrackingModes();
+    }
+
+    private void validateGesturesForTrackingModes() {
+        int myLocationTrackingMode = mUserLocationView.getMyLocationTrackingMode();
+        int myBearingTrackingMode = mUserLocationView.getMyBearingTrackingMode();
 
         // Enable/disable gestures based on tracking mode
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -3245,9 +3504,10 @@ public final class MapView extends FrameLayout {
             mRotateEnabled = true;
         } else {
             mScrollEnabled = false;
-            mRotateEnabled = (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW);
+            mRotateEnabled = (myBearingTrackingMode == MyBearingTracking.NONE);
         }
     }
+
 
     /**
      * Returns the current user location tracking mode.
@@ -3264,7 +3524,12 @@ public final class MapView extends FrameLayout {
 
     /**
      * Set the current my bearing tracking mode.
-     * Tracking my bearing disables gestures and shows the direction the user is heading.
+     * <p/>
+     * Tracking the users bearing will disable gestures and shows the direction the user is heading.
+     * <p/>
+     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
+     * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
+     * <p/>
      * See {@link MyBearingTracking} for different values.
      *
      * @param myBearingTrackingMode The bearing tracking mode to be used.
@@ -3273,6 +3538,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+        validateGesturesForTrackingModes();
     }
 
     /**

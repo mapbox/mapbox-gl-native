@@ -11,6 +11,6 @@ struct box {
     TileCoordinate tl, tr, br, bl;
 };
 
-}
+} // namespace mbgl
 
 #endif

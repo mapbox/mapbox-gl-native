@@ -34,7 +34,6 @@ class LineAtlas;
 class Source;
 struct FrameData;
 
-
 class DebugBucket;
 class FillBucket;
 class FillLayer;
@@ -47,8 +46,6 @@ class SymbolLayer;
 class RasterBucket;
 class RasterLayer;
 class BackgroundLayer;
-
-struct RasterProperties;
 
 class SDFShader;
 class PlainShader;
@@ -68,32 +65,14 @@ class CollisionBoxShader;
 
 struct ClipID;
 
-struct RenderItem {
-    inline RenderItem(const StyleLayer& layer_,
-                      const Tile* tile_ = nullptr,
-                      Bucket* bucket_ = nullptr)
-        : tile(tile_), bucket(bucket_), layer(layer_) {
-    }
-
-    const Tile* const tile;
-    Bucket* const bucket;
-    const StyleLayer& layer;
-};
-
 class Painter : private util::noncopyable {
 public:
     Painter(MapData&, TransformState&);
     ~Painter();
 
-    // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
-    // tiles whatsoever.
-    void clear();
-
-    // Updates the default matrices to the current viewport dimensions.
-    void changeMatrix();
-
     void render(const Style& style,
-                const FrameData& frame);
+                const FrameData& frame,
+                SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
     void renderTileDebug(const Tile& tile);
@@ -113,29 +92,12 @@ public:
     float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
-    void preparePrerender(RasterBucket &bucket);
-
-    void renderPrerenderedTexture(RasterBucket &bucket, const mat4 &matrix, const RasterProperties& properties);
-
-    void createPrerendered(RasterBucket& bucket, const StyleLayer &layer_desc, const TileID& id);
-
-    // Adjusts the dimensions of the OpenGL viewport
-    void resize();
-
     void drawClippingMasks(const std::set<Source*>&);
     void drawClippingMask(const mat4& matrix, const ClipID& clip);
-
-    void resetFramebuffer();
-    void bindFramebuffer();
-    void pushFramebuffer();
-    GLuint popFramebuffer();
-    void discardFramebuffers();
 
     bool needsAnimation() const;
 
 private:
-    void setup();
-    void setupShaders();
     mat4 translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor);
 
     std::vector<RenderItem> determineRenderOrder(const Style& style);
@@ -160,7 +122,6 @@ private:
 
     void setDepthSublayer(int n);
 
-public:
     mat4 projMatrix;
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
@@ -179,7 +140,6 @@ public:
         return identity;
     }();
 
-private:
     MapData& data;
     TransformState& state;
     FrameData frame;
@@ -189,19 +149,17 @@ private:
     gl::Config config;
 
     RenderPass pass = RenderPass::Opaque;
-    Color background = {{ 0, 0, 0, 0 }};
 
     int numSublayers = 3;
     GLsizei currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
-public:
-    FrameHistory frameHistory;
-
     SpriteAtlas* spriteAtlas;
     GlyphAtlas* glyphAtlas;
     LineAtlas* lineAtlas;
+
+    FrameHistory frameHistory;
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
@@ -252,6 +210,6 @@ public:
     VertexArrayObject tileBorderArray;
 };
 
-}
+} // namespace mbgl
 
 #endif

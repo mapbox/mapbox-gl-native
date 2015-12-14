@@ -1,5 +1,10 @@
 #include <mbgl/style/style_parser.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/raster_layer.hpp>
+#include <mbgl/layer/background_layer.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -7,9 +12,11 @@
 
 namespace mbgl {
 
+StyleParser::~StyleParser() = default;
+
 void StyleParser::parse(const JSVal& document) {
     if (document.HasMember("version")) {
-        version = document["version"].GetInt();
+        int version = document["version"].GetInt();
         if (version != 8) {
             Log::Warning(Event::ParseStyle, "current renderer implementation only supports style spec version 8; using an outdated style will cause rendering errors");
         }
@@ -66,39 +73,107 @@ void StyleParser::parseSources(const JSVal& value) {
 
         source->info.type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
 
-        if (sourceVal.HasMember("url")) {
-            const JSVal& urlVal = sourceVal["url"];
-
-            if (!urlVal.IsString()) {
-                Log::Warning(Event::ParseStyle, "source url must be a string");
+        switch (source->info.type) {
+        case SourceType::Vector:
+            if (!parseVectorSource(*source, sourceVal)) {
                 continue;
             }
-
-            source->info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+            break;
+        case SourceType::Raster:
+            if (!parseRasterSource(*source, sourceVal)) {
+                continue;
+            }
+            break;
+        case SourceType::GeoJSON:
+            if (!parseGeoJSONSource(*source, sourceVal)) {
+                continue;
+            }
+            break;
+        default:
+            Log::Warning(Event::ParseStyle, "source type %s is not supported", SourceTypeClass(source->info.type).c_str());
         }
-
-        if (sourceVal.HasMember("tileSize")) {
-            const JSVal& tileSizeVal = sourceVal["tileSize"];
-
-            if (!tileSizeVal.IsUint()) {
-                Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
-                continue;
-            }
-
-            unsigned int intValue = tileSizeVal.GetUint();
-            if (intValue > std::numeric_limits<uint16_t>::max()) {
-                Log::Warning(Event::ParseStyle, "values for tileSize that are larger than %d are not supported", std::numeric_limits<uint16_t>::max());
-                continue;
-            }
-
-            source->info.tile_size = intValue;
-        }
-
-        source->info.parseTileJSONProperties(sourceVal);
 
         sourcesMap.emplace(source->info.source_id, source.get());
         sources.emplace_back(std::move(source));
     }
+}
+
+bool StyleParser::parseVectorSource(Source& source, const JSVal& sourceVal) {
+    // A vector tile source either specifies the URL of a TileJSON file...
+    if (sourceVal.HasMember("url")) {
+        const JSVal& urlVal = sourceVal["url"];
+
+        if (!urlVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "source url must be a string");
+            return false;
+        }
+
+        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+
+    } else {
+        // ...or the TileJSON directly.
+        source.info.parseTileJSONProperties(sourceVal);
+    }
+
+    return true;
+}
+
+bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
+    if (sourceVal.HasMember("tileSize")) {
+        const JSVal& tileSizeVal = sourceVal["tileSize"];
+
+        if (!tileSizeVal.IsUint()) {
+            Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
+            return false;
+        }
+
+        unsigned int intValue = tileSizeVal.GetUint();
+        if (intValue > std::numeric_limits<uint16_t>::max()) {
+            Log::Warning(Event::ParseStyle, "values for tileSize that are larger than %d are not supported", std::numeric_limits<uint16_t>::max());
+            return false;
+        }
+
+        source.info.tile_size = intValue;
+    }
+
+    // A raster tile source either specifies the URL of a TileJSON file...
+    if (sourceVal.HasMember("url")) {
+        const JSVal& urlVal = sourceVal["url"];
+
+        if (!urlVal.IsString()) {
+            Log::Warning(Event::ParseStyle, "source url must be a string");
+            return false;
+        }
+
+        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
+
+    } else {
+        // ...or the TileJSON directly.
+        source.info.parseTileJSONProperties(sourceVal);
+    }
+
+    return true;
+}
+
+bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
+    if (!sourceVal.HasMember("data")) {
+        Log::Warning(Event::ParseStyle, "GeoJSON source must have a data value");
+        return false;
+    }
+
+    const JSVal& dataVal = sourceVal["data"];
+    if (dataVal.IsString()) {
+        // We need to load an external GeoJSON file
+        source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
+    } else if (dataVal.IsObject()) {
+        // We need to parse dataVal as a GeoJSON object
+        source.info.parseGeoJSON(dataVal);
+    } else {
+        Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
+        return false;
+    }
+
+    return true;
 }
 
 void StyleParser::parseLayers(const JSVal& value) {
@@ -134,7 +209,7 @@ void StyleParser::parseLayers(const JSVal& value) {
             continue;
         }
 
-        layersMap.emplace(layerID, std::pair<const JSVal&, util::ptr<StyleLayer>> { layerValue, nullptr });
+        layersMap.emplace(layerID, std::pair<const JSVal&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
         ids.push_back(layerID);
     }
 
@@ -144,14 +219,18 @@ void StyleParser::parseLayers(const JSVal& value) {
         parseLayer(it->first,
                    it->second.first,
                    it->second.second);
+    }
+
+    for (const auto& id : ids) {
+        auto it = layersMap.find(id);
 
         if (it->second.second) {
-            layers.emplace_back(it->second.second);
+            layers.emplace_back(std::move(it->second.second));
         }
     }
 }
 
-void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::ptr<StyleLayer>& layer) {
+void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::unique_ptr<StyleLayer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
@@ -185,7 +264,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
                    it->second.second);
         stack.pop_front();
 
-        util::ptr<StyleLayer> reference = it->second.second;
+        StyleLayer* reference = it->second.second.get();
         if (!reference) {
             return;
         }
@@ -208,16 +287,25 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, util::pt
         }
 
         std::string type { typeVal.GetString(), typeVal.GetStringLength() };
-        StyleLayerType typeClass = StyleLayerTypeClass(type);
-        layer = StyleLayer::create(typeClass);
 
-        if (!layer) {
+        if (type == "fill") {
+            layer = std::make_unique<FillLayer>();
+        } else if (type == "line") {
+            layer = std::make_unique<LineLayer>();
+        } else if (type == "circle") {
+            layer = std::make_unique<CircleLayer>();
+        } else if (type == "symbol") {
+            layer = std::make_unique<SymbolLayer>();
+        } else if (type == "raster") {
+            layer = std::make_unique<RasterLayer>();
+        } else if (type == "background") {
+            layer = std::make_unique<BackgroundLayer>();
+        } else {
             Log::Warning(Event::ParseStyle, "unknown type '%s' for layer '%s'", type.c_str(), id.c_str());
             return;
         }
 
         layer->id = id;
-        layer->type = typeClass;
 
         if (value.HasMember("source")) {
             const JSVal& value_source = value["source"];
@@ -292,4 +380,4 @@ void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {
     layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
 }
 
-}
+} // namespace mbgl

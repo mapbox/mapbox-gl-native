@@ -50,6 +50,6 @@ private:
     Observer* observer = nullptr;
 };
 
-}
+} // namespace mbgl
 
 #endif

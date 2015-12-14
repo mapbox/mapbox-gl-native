@@ -17,8 +17,10 @@ public:
     RasterTileData(const TileID&, TexturePool&, const SourceInfo&, Worker&);
     ~RasterTileData();
 
+    using Callback = std::function<void()>;
+
     void request(float pixelRatio,
-                 const std::function<void()>& callback);
+                 const Callback& callback);
 
     void cancel() override;
 
@@ -35,6 +37,6 @@ private:
     std::unique_ptr<WorkRequest> workRequest;
 };
 
-}
+} // namespace mbgl
 
 #endif

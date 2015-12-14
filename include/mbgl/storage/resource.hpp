@@ -32,6 +32,6 @@ struct Resource {
 
 };
 
-}
+} // namespace mbgl
 
 #endif

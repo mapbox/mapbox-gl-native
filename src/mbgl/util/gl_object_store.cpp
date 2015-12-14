@@ -4,6 +4,8 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/gl.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 namespace util {
 
@@ -44,5 +46,5 @@ void GLObjectStore::performCleanup() {
     }
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

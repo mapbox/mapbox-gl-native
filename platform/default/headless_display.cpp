@@ -81,4 +81,4 @@ HeadlessDisplay::~HeadlessDisplay() {
 #endif
 }
 
-}
+} // namespace mbgl

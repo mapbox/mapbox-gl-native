@@ -7,7 +7,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/util/uv_detail.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
@@ -78,21 +77,20 @@ void DefaultFileSource::cancel(const Resource& res, FileRequest* req) {
 // ----- Impl -----
 
 DefaultFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
-    : loop(util::RunLoop::getLoop()),
-      cache(cache_),
+    : cache(cache_),
       assetRoot(root.empty() ? platform::assetRoot() : root),
-      assetContext(AssetContextBase::createContext(loop)),
-      httpContext(HTTPContextBase::createContext(loop)),
-      reachability(std::make_unique<uv::async>(loop, std::bind(&Impl::networkIsReachableAgain, this))) {
+      assetContext(AssetContextBase::createContext()),
+      httpContext(HTTPContextBase::createContext()),
+      reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
     // Subscribe to network status changes, but make sure that this async handle doesn't keep the
     // loop alive; otherwise our app wouldn't terminate. After all, we only need status change
     // notifications when our app is still running.
-    NetworkStatus::Subscribe(reachability->get());
-    reachability->unref();
+    NetworkStatus::Subscribe(&reachability);
+    reachability.unref();
 }
 
 DefaultFileSource::Impl::~Impl() {
-    NetworkStatus::Unsubscribe(reachability->get());
+    NetworkStatus::Unsubscribe(&reachability);
 }
 
 void DefaultFileSource::Impl::networkIsReachableAgain() {
@@ -202,10 +200,10 @@ void DefaultFileSource::Impl::startRealRequest(DefaultFileRequestImpl& request) 
 
     if (algo::starts_with(request.resource.url, "asset://")) {
         request.realRequest =
-            assetContext->createRequest(request.resource, callback, loop, assetRoot);
+            assetContext->createRequest(request.resource, callback, assetRoot);
     } else {
         request.realRequest =
-            httpContext->createRequest(request.resource, callback, loop, request.getResponse());
+            httpContext->createRequest(request.resource, callback, request.getResponse());
     }
 }
 
@@ -231,17 +229,16 @@ void DefaultFileSource::Impl::reschedule(DefaultFileRequestImpl& request) {
         return;
     }
 
-    const auto timeout = request.getRetryTimeout();
+    const Seconds timeout = request.getRetryTimeout();
 
-    if (timeout == 0) {
+    if (timeout == Seconds::zero()) {
         update(request);
-    } else if (timeout > 0) {
+    } else if (timeout > Seconds::zero()) {
         if (!request.timerRequest) {
-            request.timerRequest = std::make_unique<uv::timer>(util::RunLoop::getLoop());
+            request.timerRequest = std::make_unique<util::Timer>();
         }
 
-        // timeout is in seconds, but the timer takes milliseconds.
-        request.timerRequest->start(1000 * timeout, 0, [this, &request] {
+        request.timerRequest->start(timeout, Duration::zero(), [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
         });
@@ -298,14 +295,16 @@ const std::shared_ptr<const Response>& DefaultFileRequestImpl::getResponse() con
     return response;
 }
 
-int64_t DefaultFileRequestImpl::getRetryTimeout() const {
+Seconds DefaultFileRequestImpl::getRetryTimeout() const {
+    Seconds timeout = Seconds::zero();
+
     if (!response) {
         // If we don't have a response, we should retry immediately.
-        return 0;
+        return timeout;
     }
 
     // A value < 0 means that we should not retry.
-    int64_t timeout = -1;
+    timeout = Seconds(-1);
 
     if (response->error) {
         assert(failedRequests > 0);
@@ -314,14 +313,14 @@ int64_t DefaultFileRequestImpl::getRetryTimeout() const {
             // Retry immediately, unless we have a certain number of attempts already
             const int graceRetries = 3;
             if (failedRequests <= graceRetries) {
-                timeout = 1;
+                timeout = Seconds(1);
             } else {
-                timeout = 1 << std::min(failedRequests - graceRetries, 31);
+                timeout = Seconds(1 << std::min(failedRequests - graceRetries, 31));
             }
         } break;
         case Response::Error::Reason::Connection: {
             // Exponential backoff
-            timeout = 1 << std::min(failedRequests - 1, 31);
+            timeout = Seconds(1 << std::min(failedRequests - 1, 31));
         } break;
         default:
             // Do not retry due to error.
@@ -330,14 +329,11 @@ int64_t DefaultFileRequestImpl::getRetryTimeout() const {
     }
 
     // Check to see if this response expires earlier than a potential error retry.
-    if (response->expires > 0) {
-        const int64_t expires =
-            response->expires -
-            std::chrono::duration_cast<std::chrono::seconds>(SystemClock::now().time_since_epoch())
-                .count();
+    if (response->expires > Seconds::zero()) {
+        const Seconds secsToExpire = response->expires - toSeconds(SystemClock::now());
         // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
         // than the previous one.
-        timeout = timeout < 0 ? expires : std::min(timeout, std::max<int64_t>(0, expires));
+        timeout = timeout < Seconds::zero() ? secsToExpire: std::min(timeout, std::max(Seconds::zero(), secsToExpire));
     }
 
     return timeout;

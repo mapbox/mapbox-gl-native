@@ -16,9 +16,4 @@
 -keep class com.mapbox.mapboxsdk.http.** { *; }
 
 # Package views
--keep class com.mapbox.mapboxsdk.views.MapView**
--keep class com.mapbox.mapboxsdk.views.NativeMapView**
--keepclassmembers class com.mapbox.mapboxsdk.views.NativeMapView** {
-    *;
-}
-
+-keep class com.mapbox.mapboxsdk.views.** { *; }

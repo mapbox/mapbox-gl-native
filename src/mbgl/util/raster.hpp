@@ -9,8 +9,6 @@
 
 #include <mutex>
 
-typedef struct uv_loop_s uv_loop_t;
-
 namespace mbgl {
 
 class Raster : public std::enable_shared_from_this<Raster> {
@@ -20,7 +18,7 @@ public:
     ~Raster();
 
     // load image data
-    bool load(std::unique_ptr<util::Image> image);
+    bool load(PremultipliedImage);
 
     // bind current texture
     void bind(bool linear = false);
@@ -58,9 +56,9 @@ private:
     GLint filter = 0;
 
     // the raw pixels
-    std::unique_ptr<util::Image> img;
+    PremultipliedImage img;
 };
 
-}
+} // namespace mbgl
 
 #endif

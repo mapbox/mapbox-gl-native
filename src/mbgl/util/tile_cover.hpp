@@ -10,6 +10,6 @@ namespace mbgl {
 
 std::forward_list<TileID> tileCover(int8_t z, const box& bounds, int8_t actualZ);
 
-}
+} // namespace mbgl
 
 #endif

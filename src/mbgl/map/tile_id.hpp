@@ -54,6 +54,6 @@ public:
 
 };
 
-}
+} // namespace mbgl
 
 #endif

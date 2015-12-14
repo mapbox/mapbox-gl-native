@@ -1,6 +1,8 @@
 #ifndef MBGL_STORAGE_RESPONSE
 #define MBGL_STORAGE_RESPONSE
 
+#include <mbgl/util/chrono.hpp>
+
 #include <string>
 #include <memory>
 
@@ -25,8 +27,8 @@ public:
     // The actual data of the response. This is guaranteed to never be empty.
     std::shared_ptr<const std::string> data;
 
-    int64_t modified = 0;
-    int64_t expires = 0;
+    Seconds modified = Seconds::zero();
+    Seconds expires = Seconds::zero();
     std::string etag;
 };
 

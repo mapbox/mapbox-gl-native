@@ -21,5 +21,5 @@ uint32_t ceil_log2(uint64_t x) {
     return y;
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

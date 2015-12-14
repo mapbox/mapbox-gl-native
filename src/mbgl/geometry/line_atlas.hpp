@@ -41,6 +41,6 @@ private:
     std::map<size_t, LinePatternPos> positions;
 };
 
-};
+} // namespace mbgl
 
 #endif

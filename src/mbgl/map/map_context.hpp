@@ -5,16 +5,16 @@
 #include <mbgl/map/update.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/map_data.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/geo.hpp>
 
-#include <vector>
+#include <mapbox/optional.hpp>
 
-namespace uv {
-class async;
-}
+#include <vector>
 
 namespace mbgl {
 
@@ -31,8 +31,10 @@ struct FrameData {
 
 class MapContext : public Style::Observer {
 public:
-    MapContext(View&, FileSource&, MapData&);
+    MapContext(View&, FileSource&, MapMode, GLContextMode, const float pixelRatio);
     ~MapContext();
+
+    MapData& getData() { return data; }
 
     void pause();
 
@@ -49,8 +51,14 @@ public:
 
     bool isLoaded() const;
 
-    double getTopOffsetPixelsForAnnotationSymbol(const std::string& symbol);
+    // Annotations
+    void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
+    double getTopOffsetPixelsForAnnotationIcon(const std::string&);
     void updateAnnotations();
+    
+    // Style API
+    void addLayer(std::unique_ptr<StyleLayer>,
+                  const mapbox::util::optional<std::string> before);
 
     std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius) const;
 
@@ -58,8 +66,6 @@ public:
     void onLowMemory();
 
     void cleanup();
-
-    void setSprite(const std::string&, std::shared_ptr<const SpriteImage>);
 
     // Style::Observer implementation.
     void onTileDataChanged() override;
@@ -75,13 +81,14 @@ private:
     void loadStyleJSON(const std::string& json, const std::string& base);
 
     View& view;
+    std::unique_ptr<MapData> dataPtr;
     MapData& data;
 
     util::GLObjectStore glObjectStore;
 
     Update updateFlags = Update::Nothing;
-    std::unique_ptr<uv::async> asyncUpdate;
-    std::unique_ptr<uv::async> asyncInvalidate;
+    util::AsyncTask asyncUpdate;
+    util::AsyncTask asyncInvalidate;
 
     std::unique_ptr<TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
@@ -98,6 +105,6 @@ private:
     FrameData frameData;
 };
 
-}
+} // namespace mbgl
 
 #endif

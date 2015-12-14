@@ -1,6 +1,7 @@
 #include "../fixtures/util.hpp"
 #include <mbgl/util/compression.hpp>
 #include <mbgl/util/scaling.hpp>
+#include <mbgl/util/premultiply.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -23,8 +24,9 @@ TEST(Bilinear, Scaling) {
     const uint32_t *srcData = reinterpret_cast<const uint32_t *>(src + 8);
     const vec2<uint32_t> srcSize { width, height };
     const vec2<uint32_t> dstSize { 128, 128 };
-    auto dst = std::make_unique<uint32_t[]>(dstSize.x * dstSize.y);
-    uint32_t *dstData = dst.get();
+
+    UnassociatedImage dst { dstSize.x, dstSize.y };
+    uint32_t *dstData = reinterpret_cast<uint32_t*>(dst.data.get());
     std::fill(dstData, dstData + dstSize.x * dstSize.y, 0xFFFF00FF);
 
     util::bilinearScale(srcData, srcSize, { 0, 0, 24, 24 }, dstData, dstSize, { 8, 8, 24, 24 }, false);
@@ -42,7 +44,7 @@ TEST(Bilinear, Scaling) {
     util::bilinearScale(srcData, srcSize, { 252, 380, 12, 12 }, dstData, dstSize, { 18, 90, 24, 24 }, false);
 
     const std::string data { reinterpret_cast<char *>(dstData), dstSize.x * dstSize.y * sizeof(uint32_t) };
-    util::write_file("test/fixtures/sprites/atlas_actual.png", util::compress_png(dstSize.x, dstSize.y, reinterpret_cast<uint8_t *>(dstData)));
+    util::write_file("test/fixtures/sprites/atlas_actual.png", encodePNG(util::premultiply(std::move(dst))));
     util::write_file("test/fixtures/sprites/atlas_actual.bin", util::compress(data));
 
     const std::string reference = util::decompress(util::read_file("test/fixtures/sprites/atlas_reference.bin"));

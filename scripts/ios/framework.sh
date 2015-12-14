@@ -18,6 +18,9 @@ cat ../../../../ios/framework/umbrella >> Mapbox.framework/Headers/Mapbox.h
 # resources
 cp -rv ../static/Mapbox.bundle Mapbox.framework/Mapbox.bundle
 
+# license
+cp -v ../../../../LICENSE.md Mapbox.framework
+
 # settings bundle
 cp -rv ../../../../ios/framework/Settings.bundle Mapbox.framework/Settings.bundle
 
@@ -31,6 +34,7 @@ cp -v ../../../../ios/framework/modulemap Mapbox.framework/Modules/module.module
 
 # Info.plist
 VERSION=$( git tag | grep ^ios | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
+echo "Using $VERSION for Info.plist. Note that you will need to manually update the product for pre-releases or release candidates."
 cp -v ../../../../ios/framework/Info.plist Mapbox.framework
 perl -pi -e "s/#####/$VERSION/" Mapbox.framework/Info.plist
 perl -pi -e "s/%%%%%/$VERSION/" Mapbox.framework/Info.plist

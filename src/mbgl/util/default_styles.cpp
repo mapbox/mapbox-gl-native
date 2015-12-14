@@ -11,6 +11,6 @@ const DefaultStyle dark      = { "mapbox://styles/mapbox/dark-v8",             "
 const DefaultStyle satellite = { "mapbox://styles/mapbox/satellite-v8",        "Satellite" };
 const DefaultStyle hybrid    = { "mapbox://styles/mapbox/satellite-hybrid-v8", "Hybrid" };
 
-}
+} // namespace default_styles
 } // end namespace util
 } // end namespace mbgl

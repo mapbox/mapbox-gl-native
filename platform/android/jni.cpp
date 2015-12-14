@@ -375,6 +375,7 @@ std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation
 namespace {
 
 using namespace mbgl::android;
+using DebugOptions = mbgl::MapDebugOptions;
 
 jlong JNICALL nativeCreate(JNIEnv *env, jobject obj, jstring cachePath_, jstring dataPath_, jstring apkPath_, jfloat pixelRatio, jint availableProcessors, jlong totalMemory) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeCreate");
@@ -661,6 +662,20 @@ void JNICALL nativeResetPosition(JNIEnv *env, jobject obj, jlong nativeMapViewPt
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     nativeMapView->getMap().resetPosition();
+}
+
+jdouble JNICALL nativeGetPitch(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetPitch");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    return nativeMapView->getMap().getPitch();
+}
+
+void JNICALL nativeSetPitch(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble pitch, jlong duration) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetPitch");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setPitch(pitch, std::chrono::milliseconds(duration));    
 }
 
 void JNICALL nativeScaleBy(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble ds, jdouble cx,
@@ -1194,9 +1209,9 @@ jlongArray JNICALL nativeGetAnnotationsInBounds(JNIEnv *env, jobject obj, jlong 
     return std_vector_uint_to_jobject(env, annotations);
 }
 
-void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
+void JNICALL nativeAddAnnotationIcon(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
         jstring symbol, jint width, jint height, jfloat scale, jbyteArray jpixels) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetSprite");
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddAnnotationIcon");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
@@ -1213,7 +1228,7 @@ void JNICALL nativeSetSprite(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
         float(scale),
         std::move(pixels));
 
-    nativeMapView->getMap().setSprite(symbolName, spriteImage);
+    nativeMapView->getMap().addAnnotationIcon(symbolName, spriteImage);
 }
 
 void JNICALL nativeSetVisibleCoordinateBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
@@ -1293,7 +1308,10 @@ void JNICALL nativeSetDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jb
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setDebug(debug);
+
+    DebugOptions debugOptions = debug ? DebugOptions::TileBorders | DebugOptions::ParseStatus | DebugOptions::Collision
+                                      : DebugOptions::NoDebug;
+    nativeMapView->getMap().setDebug(debugOptions);
     nativeMapView->enableFps(debug);
 }
 
@@ -1301,36 +1319,15 @@ void JNICALL nativeToggleDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr)
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeToggleDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().toggleDebug();
-    nativeMapView->enableFps(nativeMapView->getMap().getDebug());
+    nativeMapView->getMap().cycleDebugOptions();
+    nativeMapView->enableFps(nativeMapView->getMap().getDebug() != DebugOptions::NoDebug);
 }
 
 jboolean JNICALL nativeGetDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetDebug");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().getDebug();
-}
-
-void JNICALL nativeSetCollisionDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean debug) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetCollisionDebug");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setCollisionDebug(debug);
-}
-
-void JNICALL nativeToggleCollisionDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeToggleCollisionDebug");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().toggleCollisionDebug();
-}
-
-jboolean JNICALL nativeGetCollisionDebug(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetCollisionDebug");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().getCollisionDebug();
+    return nativeMapView->getMap().getDebug() != DebugOptions::NoDebug;
 }
 
 jboolean JNICALL nativeIsFullyLoaded(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1471,7 +1468,7 @@ jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetTopOffsetPixelsForAnnotationSymbol");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().getTopOffsetPixelsForAnnotationSymbol(std_string_from_jstring(env, symbolName));
+    return nativeMapView->getMap().getTopOffsetPixelsForAnnotationIcon(std_string_from_jstring(env, symbolName));
 }
 
 
@@ -1905,6 +1902,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
+        {"nativeGetPitch", "(J)D", reinterpret_cast<void *>(&nativeGetPitch)},
+        {"nativeSetPitch", "(JDJ)V", reinterpret_cast<void *>(&nativeSetPitch)},
         {"nativeScaleBy", "(JDDDJ)V", reinterpret_cast<void *>(&nativeScaleBy)},
         {"nativeSetScale", "(JDDDJ)V", reinterpret_cast<void *>(&nativeSetScale)},
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
@@ -1944,16 +1943,13 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeRemoveAnnotations", "(J[J)V", reinterpret_cast<void *>(&nativeRemoveAnnotations)},
         {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;)[J",
          reinterpret_cast<void *>(&nativeGetAnnotationsInBounds)},
-        {"nativeSetSprite", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeSetSprite)},
+        {"nativeAddAnnotationIcon", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeAddAnnotationIcon)},
         {"nativeSetVisibleCoordinateBounds", "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V",
                 reinterpret_cast<void *>(&nativeSetVisibleCoordinateBounds)},
         {"nativeOnLowMemory", "(J)V", reinterpret_cast<void *>(&nativeOnLowMemory)},
         {"nativeSetDebug", "(JZ)V", reinterpret_cast<void *>(&nativeSetDebug)},
         {"nativeToggleDebug", "(J)V", reinterpret_cast<void *>(&nativeToggleDebug)},
         {"nativeGetDebug", "(J)Z", reinterpret_cast<void *>(&nativeGetDebug)},
-        {"nativeSetCollisionDebug", "(JZ)V", reinterpret_cast<void *>(&nativeSetCollisionDebug)},
-        {"nativeToggleCollisionDebug", "(J)V", reinterpret_cast<void *>(&nativeToggleCollisionDebug)},
-        {"nativeGetCollisionDebug", "(J)Z", reinterpret_cast<void *>(&nativeGetCollisionDebug)},
         {"nativeIsFullyLoaded", "(J)Z", reinterpret_cast<void *>(&nativeIsFullyLoaded)},
         {"nativeSetReachability", "(JZ)V", reinterpret_cast<void *>(&nativeSetReachability)},
         {"nativeGetMetersPerPixelAtLatitude", "(JDD)D", reinterpret_cast<void *>(&nativeGetMetersPerPixelAtLatitude)},

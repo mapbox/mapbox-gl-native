@@ -3,7 +3,6 @@
 
 #include "../fixtures/util.hpp"
 #include <mbgl/storage/response.hpp>
-#include <uv.h>
 #include <iostream>
 
 class Storage : public testing::Test {

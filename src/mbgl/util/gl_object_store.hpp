@@ -29,7 +29,7 @@ private:
     std::vector<GLuint> abandonedTextures;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

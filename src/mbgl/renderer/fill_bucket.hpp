@@ -63,6 +63,6 @@ private:
     static const int vertices_per_group = 3;
 };
 
-}
+} // namespace mbgl
 
 #endif

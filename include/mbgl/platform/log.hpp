@@ -72,6 +72,6 @@ private:
     static void platformRecord(EventSeverity severity, const std::string &msg);
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -92,4 +92,4 @@ void VertexArrayObject::storeBinding(Shader &shader, GLuint vertexBuffer, GLuint
     bound_elements_buffer = elementsBuffer;
 }
 
-}
+} // namespace mbgl

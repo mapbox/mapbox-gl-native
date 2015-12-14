@@ -6,6 +6,7 @@
 #include <mbgl/util/thread_context.hpp>
 
 #include <sstream>
+#include <utility>
 
 namespace mbgl {
 
@@ -145,7 +146,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
 }
 
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
-    : data(data_) {
+    : data(std::move(data_)) {
 }
 
 util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
@@ -179,7 +180,7 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
         } else if (layer_pbf.tag == 3) { // keys
             keys.emplace(layer_pbf.string(), keys.size());
         } else if (layer_pbf.tag == 4) { // values
-            values.emplace_back(std::move(parseValue(layer_pbf.message())));
+            values.emplace_back(parseValue(layer_pbf.message()));
         } else if (layer_pbf.tag == 5) { // extent
             extent = layer_pbf.varint();
         } else {
@@ -196,7 +197,7 @@ VectorTileMonitor::VectorTileMonitor(const SourceInfo& source, const TileID& id,
     : url(source.tileURL(id, pixelRatio)) {
 }
 
-std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback) {
+std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
     return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](Response res) {
         if (res.data && data == res.data) {
             // We got the same data again. Abort early.
@@ -205,19 +206,19 @@ std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(std::function<void (
 
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound) {
-                callback(nullptr, nullptr);
+                callback(nullptr, nullptr, res.modified, res.expires);
                 return;
             } else {
                 std::stringstream message;
                 message << "Failed to load [" << url << "]: " << res.error->message;
-                callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr);
+                callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr, res.modified, res.expires);
                 return;
             }
         }
 
         data = res.data;
-        callback(nullptr, std::make_unique<VectorTile>(data));
+        callback(nullptr, std::make_unique<VectorTile>(data), res.modified, res.expires);
     });
 }
 
-}
+} // namespace mbgl

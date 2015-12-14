@@ -43,19 +43,20 @@ class MapData;
 
 class AnnotationTileMonitor : public GeometryTileMonitor {
 public:
+    // TODO: should just take AnnotationManager&, but we need to eliminate util::exclusive<AnnotationManager> from MapData first.
     AnnotationTileMonitor(const TileID&, MapData&);
     ~AnnotationTileMonitor();
 
     void update(std::unique_ptr<GeometryTile>);
-    std::unique_ptr<FileRequest> monitorTile(std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)>) override;
+    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
     TileID tileID;
 
 private:
     MapData& data;
-    std::function<void (std::exception_ptr, std::unique_ptr<GeometryTile>)> callback;
+    GeometryTileMonitor::Callback callback;
 };
 
-}
+} // namespace mbgl
 
 #endif

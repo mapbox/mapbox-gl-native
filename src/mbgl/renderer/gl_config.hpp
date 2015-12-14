@@ -112,9 +112,10 @@ struct ColorMask {
         MBGL_CHECK_ERROR(glColorMask(value.r, value.g, value.b, value.a));
     }
     inline static Type Get() {
-        GLfloat floats[4];
-        MBGL_CHECK_ERROR(glGetFloatv(GL_COLOR_WRITEMASK, floats));
-        return { floats[0], floats[1], floats[2], floats[3] };
+        GLboolean bools[4];
+        MBGL_CHECK_ERROR(glGetBooleanv(GL_COLOR_WRITEMASK, bools));
+        return { static_cast<bool>(bools[0]), static_cast<bool>(bools[1]),
+                 static_cast<bool>(bools[2]), static_cast<bool>(bools[3]) };
     }
 };
 
@@ -265,23 +266,6 @@ struct LineWidth {
     }
 };
 
-struct Viewport {
-    struct Type { GLint x, y; GLsizei width, height; };
-    static const Type Default;
-    inline static void Set(const Type& value) {
-        MBGL_CHECK_ERROR(glViewport(value.x, value.y, value.width, value.height));
-    }
-    inline static Type Get() {
-        GLint viewport[4];
-        MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-        return { viewport[0], viewport[1], viewport[2], viewport[3] };
-    }
-};
-
-inline bool operator!=(const Viewport::Type& a, const Viewport::Type& b) {
-    return a.x != b.x || a.y != b.y || a.width != b.width || a.height != b.height;
-}
-
 class Config {
 public:
     void reset() {
@@ -301,7 +285,6 @@ public:
         clearStencil.reset();
         program.reset();
         lineWidth.reset();
-        viewport.reset();
     }
 
     void setDirty() {
@@ -321,7 +304,6 @@ public:
         clearStencil.setDirty();
         program.setDirty();
         lineWidth.setDirty();
-        viewport.setDirty();
     }
 
     Value<StencilFunc> stencilFunc;
@@ -340,7 +322,6 @@ public:
     Value<ClearStencil> clearStencil;
     Value<Program> program;
     Value<LineWidth> lineWidth;
-    Value<Viewport> viewport;
 };
 
 } // namespace gl

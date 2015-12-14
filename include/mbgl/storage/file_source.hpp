@@ -30,6 +30,6 @@ public:
     virtual std::unique_ptr<FileRequest> request(const Resource&, Callback) = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -14,6 +14,6 @@ public:
     mapbox::util::optional<Duration> delay;
 };
 
-}
+} // namespace mbgl
 
 #endif

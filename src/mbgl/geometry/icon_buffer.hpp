@@ -15,6 +15,6 @@ namespace mbgl {
 
     };
 
-}
+} // namespace mbgl
 
 #endif

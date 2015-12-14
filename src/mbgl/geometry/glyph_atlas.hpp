@@ -56,6 +56,6 @@ private:
     GLuint texture = 0;
 };
 
-};
+} // namespace mbgl
 
 #endif

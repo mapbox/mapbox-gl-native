@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, int8_t tx, int8_t ty, int32_t linesofar) {
+GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
     GLsizei idx = index();
     void *data = addElement();
 
@@ -16,8 +16,13 @@ GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, 
     int8_t *extrude = static_cast<int8_t *>(data);
     extrude[4] = ::round(extrudeScale * ex);
     extrude[5] = ::round(extrudeScale * ey);
-    extrude[6] = static_cast<int8_t>(linesofar / 128);
-    extrude[7] = static_cast<int8_t>(linesofar % 128);
+
+    // Encode the -1/0/1 direction value into .zw coordinates of a_data, which is normally covered
+    // by linesofar, so we need to merge them.
+    // The z component's first bit, as well as the sign bit is reserved for the direction,
+    // so we need to shift the linesofar.
+    extrude[6] = ((dir < 0) ? -1 : 1) * ((dir ? 1 : 0) | static_cast<int8_t>((linesofar << 1) & 0x7F));
+    extrude[7] = (linesofar >> 6) & 0x7F;
 
     return idx;
 }

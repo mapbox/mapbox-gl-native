@@ -37,7 +37,7 @@ private:
     RunLoop* runLoop;
 };
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

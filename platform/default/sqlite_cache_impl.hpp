@@ -2,6 +2,7 @@
 #define MBGL_STORAGE_DEFAULT_SQLITE_CACHE_IMPL
 
 #include <mbgl/storage/sqlite_cache.hpp>
+#include <mbgl/util/chrono.hpp>
 
 namespace mapbox {
 namespace sqlite {
@@ -19,7 +20,7 @@ public:
 
     void get(const Resource&, Callback);
     void put(const Resource& resource, std::shared_ptr<const Response> response);
-    void refresh(const Resource& resource, int64_t expires);
+    void refresh(const Resource& resource, Seconds expires);
 
 private:
     void createDatabase();

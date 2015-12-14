@@ -40,7 +40,7 @@ public:
                             std::function<void(RasterTileParseResult)> callback);
 
     Request parseGeometryTile(TileWorker&,
-                              std::vector<util::ptr<StyleLayer>>,
+                              std::vector<std::unique_ptr<StyleLayer>>,
                               std::unique_ptr<GeometryTile>,
                               PlacementConfig,
                               std::function<void(TileParseResult)> callback);
@@ -49,7 +49,6 @@ public:
                                            std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,
-                          std::vector<util::ptr<StyleLayer>>,
                           const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
                           PlacementConfig config,
                           std::function<void()> callback);
@@ -59,6 +58,6 @@ private:
     std::vector<std::unique_ptr<util::Thread<Impl>>> threads;
     std::size_t current = 0;
 };
-}
+} // namespace mbgl
 
 #endif

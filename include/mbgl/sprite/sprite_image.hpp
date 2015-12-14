@@ -35,6 +35,6 @@ public:
     const bool sdf;
 };
 
-}
+} // namespace mbgl
 
 #endif

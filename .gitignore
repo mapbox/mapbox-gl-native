@@ -13,8 +13,6 @@
 /config/*.gypi
 /build
 /lib
-/macosx/build
-/linux/build
 /ios/build
 /ios/app/build
 /test/build
@@ -25,6 +23,8 @@
 /test/fixtures/api/1.png
 /test/fixtures/api/2.png
 /test/fixtures/database/*.db
+/test/fixtures/*/*/actual.png
+/test/fixtures/*/*/diff.png
 /test/output
 /include/mbgl/shader/shaders.hpp
 /src/shader/shaders_gl.cpp

@@ -8,10 +8,12 @@
 #include <mbgl/style/style_cascade_parameters.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/std.hpp>
 
 #include <rapidjson/document.h>
 
 #include <map>
+#include <utility>
 
 namespace mbgl {
 
@@ -22,9 +24,8 @@ class PaintProperty {
 public:
     using Fn = Function<Result>;
 
-    PaintProperty(T fallbackValue_)
-        : fallbackValue(fallbackValue_),
-          value(fallbackValue_) {
+    explicit PaintProperty(T fallbackValue)
+        : value(fallbackValue) {
         values.emplace(ClassID::Fallback, Fn(fallbackValue));
     }
 
@@ -33,14 +34,8 @@ public:
           transitions(other.transitions) {
     }
 
-    void operator=(const PaintProperty& other) {
-        values = other.values;
-        transitions = other.transitions;
-    }
-
     void parse(const char* name, const JSVal& layer) {
-        values.clear();
-        values.emplace(ClassID::Fallback, Fn(fallbackValue));
+        mbgl::util::erase_if(values, [] (const auto& p) { return p.first != ClassID::Fallback; });
 
         std::string transitionName = { name };
         transitionName += "-transition";
@@ -103,9 +98,9 @@ public:
         return cascaded->prior.operator bool();
     }
 
+    void operator=(const T& v) { values.emplace(ClassID::Default, Fn(v)); }
     operator T() const { return value; }
 
-    T fallbackValue;
     std::map<ClassID, Fn> values;
     std::map<ClassID, PropertyTransition> transitions;
 
@@ -117,7 +112,7 @@ public:
             : prior(std::move(prior_)),
               begin(begin_),
               end(end_),
-              value(value_) {
+              value(std::move(value_)) {
         }
 
         Result calculate(const StyleCalculationParameters& parameters) {
@@ -147,6 +142,6 @@ public:
     Result value;
 };
 
-}
+} // namespace mbgl
 
 #endif

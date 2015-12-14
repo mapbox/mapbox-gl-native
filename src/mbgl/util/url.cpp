@@ -47,5 +47,5 @@ std::string percentDecode(const std::string& input) {
     return decoded;
 }
 
-}
-}
+} // namespace util
+} // namespace mbgl

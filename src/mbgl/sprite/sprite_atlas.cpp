@@ -24,9 +24,7 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_,
       pixelRatio(pixelRatio_),
       store(store_),
       bin(width_, height_),
-      data(std::make_unique<uint32_t[]>(pixelWidth * pixelHeight)),
       dirty(true) {
-    std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
 }
 
 Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
@@ -49,17 +47,17 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
     return rect;
 }
 
-SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
-        return { rect_it->second.pos, rect_it->second.texture };
+        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.texture };
     }
 
     auto sprite = store.getSprite(name);
     if (!sprite) {
-        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
+        return {};
     }
 
     Rect<dimension> rect = allocateImage(sprite->width, sprite->height);
@@ -67,19 +65,24 @@ SpriteAtlasElement SpriteAtlas::getImage(const std::string& name, const bool wra
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
         }
-        return { Rect<dimension> { 0, 0, 0, 0 }, nullptr };
+        return {};
     }
 
     const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
     copy(holder, wrap);
 
-    return { rect, sprite };
+    return SpriteAtlasElement { rect, sprite };
 }
 
-SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repeating) {
+mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    auto rect = getImage(name, repeating).pos;
+    auto img = getImage(name, repeating);
+    if (!img) {
+        return {};
+    }
+
+    auto rect = (*img).pos;
     if (repeating) {
         // When the image is repeating, get the correct position of the image, rather than the
         // one rounded up to 4 pixels.
@@ -103,6 +106,11 @@ SpriteAtlasPosition SpriteAtlas::getPosition(const std::string& name, bool repea
 }
 
 void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
+    if (!data) {
+        data = std::make_unique<uint32_t[]>(pixelWidth * pixelHeight);
+        std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
+    }
+
     const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
     if (!srcData) return;
     const vec2<uint32_t> srcSize { holder.texture->pixelWidth, holder.texture->pixelHeight };
@@ -189,6 +197,10 @@ void SpriteAtlas::updateDirty() {
 }
 
 void SpriteAtlas::bind(bool linear) {
+    if (!data) {
+        return; // Empty atlas
+    }
+
     if (!texture) {
         MBGL_CHECK_ERROR(glGenTextures(1, &texture));
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));

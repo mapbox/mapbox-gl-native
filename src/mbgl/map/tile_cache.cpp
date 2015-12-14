@@ -61,4 +61,4 @@ void TileCache::clear() {
     tiles.clear();
 }
 
-};
+} // namespace mbgl

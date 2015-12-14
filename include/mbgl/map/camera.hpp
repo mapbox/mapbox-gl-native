@@ -7,6 +7,8 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/unitbezier.hpp>
 
+#include <functional>
+
 namespace mbgl {
 
 struct CameraOptions {
@@ -16,8 +18,10 @@ struct CameraOptions {
     mapbox::util::optional<double> pitch;
     mapbox::util::optional<Duration> duration;
     mapbox::util::optional<mbgl::util::UnitBezier> easing;
+    std::function<void(double)> transitionFrameFn;
+    std::function<void()> transitionFinishFn;
 };
 
-}
+} // namespace mbgl
 
 #endif /* MBGL_MAP_CAMERA */

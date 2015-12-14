@@ -24,4 +24,4 @@ size_t CollisionBoxVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, f
     return idx;
 }
 
-}
+} // namespace mbgl

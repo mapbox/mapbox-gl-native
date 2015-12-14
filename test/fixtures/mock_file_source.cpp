@@ -3,15 +3,10 @@
 
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <algorithm>
 #include <unordered_map>
-
-namespace {
-
-const uint64_t timeout = 1000000;
-
-}
 
 namespace mbgl {
 
@@ -36,8 +31,8 @@ public:
 class MockFileSource::Impl {
 public:
     Impl(Type type, const std::string& match)
-        : type_(type), match_(match), timer_(util::RunLoop::getLoop()) {
-        timer_.start(timeout, timeout, [this] { dispatchPendingRequests(); });
+        : type_(type), match_(match) {
+        timer_.start(std::chrono::milliseconds(1000), std::chrono::milliseconds(1000), [this] { dispatchPendingRequests(); });
         timer_.unref();
     }
 
@@ -63,7 +58,7 @@ private:
     Type type_;
     std::string match_;
     std::unordered_map<FileRequest*, std::pair<Resource, Callback>> pendingRequests_;
-    uv::timer timer_;
+    util::Timer timer_;
 
     std::function<void(void)> requestEnqueuedCallback_;
 };
@@ -72,7 +67,7 @@ void MockFileSource::Impl::replyWithSuccess(Resource resource, Callback callback
     Response res;
 
     try {
-        res.data = std::make_shared<const std::string>(std::move(util::read_file(resource.url)));
+        res.data = std::make_shared<const std::string>(util::read_file(resource.url));
     } catch (const std::exception& err) {
         res.error = std::make_unique<Response::Error>(Response::Error::Reason::Other, err.what());
     }
@@ -108,7 +103,7 @@ void MockFileSource::Impl::replyWithCorruptedData(Resource resource, Callback ca
     }
 
     Response res;
-    auto data = std::make_shared<std::string>(std::move(util::read_file(resource.url)));
+    auto data = std::make_shared<std::string>(util::read_file(resource.url));
     data->insert(0, "CORRUPTED");
     res.data = std::move(data);
     callback(res);
@@ -163,4 +158,4 @@ void MockFileSource::cancel(FileRequest* req) {
     thread_->invoke(&Impl::cancelRequest, req);
 }
 
-}
+} // namespace mbgl

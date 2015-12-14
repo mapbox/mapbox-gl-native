@@ -11,4 +11,4 @@ GlyphRange getGlyphRange(char32_t glyph) {
     return { start, end };
 }
 
-}
+} // namespace mbgl

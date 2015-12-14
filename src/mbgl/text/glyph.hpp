@@ -4,6 +4,7 @@
 #include <mbgl/util/rect.hpp>
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 #include <string>
 #include <map>
@@ -59,7 +60,7 @@ class Shaping {
     public:
     inline explicit Shaping() : top(0), bottom(0), left(0), right(0) {}
     inline explicit Shaping(float x, float y, std::u32string text_)
-        : text(text_), top(y), bottom(y), left(x), right(x) {}
+        : text(std::move(text_)), top(y), bottom(y), left(x), right(x) {}
     std::vector<PositionedGlyph> positionedGlyphs;
     std::u32string text;
     int32_t top;

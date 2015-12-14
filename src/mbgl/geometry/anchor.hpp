@@ -21,6 +21,6 @@ struct Anchor {
 
 typedef std::vector<Anchor> Anchors;
 
-}
+} // namespace mbgl
 
 #endif

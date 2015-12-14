@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         final ActionBar ab = getSupportActionBar();
         if (ab != null) {
-            ab.setHomeAsUpIndicator(R.drawable.ic_menu);
+            ab.setHomeAsUpIndicator(R.drawable.ic_menu_24dp);
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mainMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setZoomControlsEnabled(true);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
@@ -229,11 +228,12 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onStart();
     }
 
+    // Called when our app comes into the foreground
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onResume() {
+        super.onResume();
 
-        mMapView.onStop();
+        mMapView.onResume();
     }
 
     // Called when our app goes into the background
@@ -244,12 +244,11 @@ public class MainActivity extends AppCompatActivity {
         mMapView.onPause();
     }
 
-    // Called when our app comes into the foreground
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void onStop() {
+        super.onStop();
 
-        mMapView.onResume();
+        mMapView.onStop();
     }
 
     @Override
@@ -322,8 +321,8 @@ public class MainActivity extends AppCompatActivity {
                         switch (menuItem.getItemId()) {
 
                             case R.id.action_debug:
-                                // Toggle debug mode
-                                mMapView.toggleDebug();
+                                // Cycle map debug options
+                                mMapView.cycleDebugOptions();
                                 toggleFpsCounter(mMapView.isDebugActive());
                                 return true;
 
@@ -341,6 +340,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), InfoWindowAdapterActivity.class));
                                 return true;
 
+                            case R.id.action_tilt:
+                                startActivity(new Intent(getApplicationContext(), TiltActivity.class));
+                                return true;
+
                             case R.id.action_map_fragment:
                                 startActivity(new Intent(getApplicationContext(), MapFragmentActivity.class));
                                 return true;
@@ -353,12 +356,20 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), ManualZoomActivity.class));
                                 return true;
 
+                            case R.id.action_coordinate_change:
+                                startActivity(new Intent(getApplicationContext(), CoordinateChangeActivity.class));
+                                return true;
+
                             case R.id.action_bulk_markers:
                                 startActivity(new Intent(getApplicationContext(), BulkMarkerActivity.class));
                                 return true;
 
                             case R.id.action_info_window:
                                 startActivity(new Intent(getApplicationContext(), InfoWindowActivity.class));
+                                return true;
+
+                            case R.id.action_info_window_concurrent:
+                                startActivity(new Intent(getApplicationContext(), InfoWindowConcurrentActivity.class));
                                 return true;
 
                             case R.id.action_visible_bounds:

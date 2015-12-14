@@ -1,8 +1,7 @@
 #include "storage.hpp"
 
-#include <uv.h>
-
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 TEST_F(Storage, HTTPCoalescing) {
@@ -13,8 +12,8 @@ TEST_F(Storage, HTTPCoalescing) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     static const Response *reference = nullptr;
 
@@ -31,8 +30,8 @@ TEST_F(Storage, HTTPCoalescing) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 
         if (counter >= total) {
@@ -51,7 +50,7 @@ TEST_F(Storage, HTTPCoalescing) {
         });
     }
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 TEST_F(Storage, HTTPMultiple) {
@@ -59,8 +58,8 @@ TEST_F(Storage, HTTPMultiple) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=2147483647" };
     std::unique_ptr<FileRequest> req1;
@@ -70,8 +69,8 @@ TEST_F(Storage, HTTPMultiple) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(2147483647, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(2147483647, res.expires.count());
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 
         // Start a second request for the same resource after the first one has been completed.
@@ -86,8 +85,8 @@ TEST_F(Storage, HTTPMultiple) {
             EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
-            EXPECT_EQ(2147483647, res2.expires);
-            EXPECT_EQ(0, res2.modified);
+            EXPECT_EQ(2147483647, res2.expires.count());
+            EXPECT_EQ(Seconds::zero(), res2.modified);
             EXPECT_EQ("", res2.etag);
 
             loop.stop();
@@ -95,7 +94,7 @@ TEST_F(Storage, HTTPMultiple) {
         });
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 }
 
 // Tests that we get stale responses from previous requests when requesting the same thing again.
@@ -104,8 +103,8 @@ TEST_F(Storage, HTTPStale) {
 
     using namespace mbgl;
 
+    util::RunLoop loop;
     DefaultFileSource fs(nullptr);
-    util::RunLoop loop(uv_default_loop());
 
     int updates = 0;
     int stale = 0;
@@ -119,8 +118,8 @@ TEST_F(Storage, HTTPStale) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(false, res.stale);
-        EXPECT_EQ(0, res.expires);
-        EXPECT_EQ(0, res.modified);
+        EXPECT_EQ(Seconds::zero(), res.expires);
+        EXPECT_EQ(Seconds::zero(), res.modified);
         EXPECT_EQ("", res.etag);
 
         // Don't start the request twice in case this callback gets fired multiple times.
@@ -135,8 +134,8 @@ TEST_F(Storage, HTTPStale) {
             EXPECT_EQ(nullptr, res2.error);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Hello World!", *res2.data);
-            EXPECT_EQ(0, res2.expires);
-            EXPECT_EQ(0, res2.modified);
+            EXPECT_EQ(Seconds::zero(), res2.expires);
+            EXPECT_EQ(Seconds::zero(), res2.modified);
             EXPECT_EQ("", res2.etag);
 
             if (res2.stale) {
@@ -152,7 +151,7 @@ TEST_F(Storage, HTTPStale) {
         });
     });
 
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    loop.run();
 
     EXPECT_EQ(1, stale);
     EXPECT_EQ(1, updates);

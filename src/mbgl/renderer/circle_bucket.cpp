@@ -23,7 +23,7 @@ void CircleBucket::render(Painter& painter,
                         const StyleLayer& layer,
                         const TileID& id,
                         const mat4& matrix) {
-    painter.renderCircle(*this, dynamic_cast<const CircleLayer&>(layer), id, matrix);
+    painter.renderCircle(*this, *layer.as<CircleLayer>(), id, matrix);
 }
 
 bool CircleBucket::hasData() const {

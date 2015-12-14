@@ -50,7 +50,7 @@ public:
     const PointAnnotation point;
 };
 
-}
+} // namespace mbgl
 
 // Tell Boost Geometry how to access a std::shared_ptr<mbgl::PointAnnotation> object.
 namespace boost {

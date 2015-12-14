@@ -32,6 +32,6 @@ private:
     uint32_t offset = 0;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -59,7 +59,7 @@ void parseGlyphPBF(mbgl::FontStack& stack, const std::string& data) {
     }
 }
 
-}
+} // namespace
 
 namespace mbgl {
 
@@ -138,4 +138,4 @@ void GlyphPBF::emitGlyphPBFLoadingFailed(const std::string& message) {
     observer->onGlyphPBFLoadingFailed(error);
 }
 
-}
+} // namespace mbgl

@@ -3,6 +3,7 @@
 
 #include <mapbox/variant.hpp>
 
+#include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>
 
@@ -12,18 +13,12 @@
 
 namespace mbgl {
 
-namespace util {
-
-class Image;
-
-} // namespace util
-
 class SpriteImage;
 
 using SpriteImagePtr = std::shared_ptr<const SpriteImage>;
 
 // Extracts an individual image from a spritesheet from the given location.
-SpriteImagePtr createSpriteImage(const util::Image& image,
+SpriteImagePtr createSpriteImage(const PremultipliedImage&,
                                  uint16_t srcX,
                                  uint16_t srcY,
                                  uint16_t srcWidth,

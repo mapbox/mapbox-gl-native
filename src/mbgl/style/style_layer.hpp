@@ -21,12 +21,19 @@ class Bucket;
 
 using JSVal = rapidjson::Value;
 
-class StyleLayer : public util::noncopyable {
+class StyleLayer {
 public:
-    static std::unique_ptr<StyleLayer> create(StyleLayerType);
-    virtual std::unique_ptr<StyleLayer> clone() const = 0;
-
     virtual ~StyleLayer() = default;
+
+    // Check whether this layer is of the given subtype.
+    template <class T> bool is() const { return dynamic_cast<const T*>(this); }
+
+    // Dynamically cast this layer to the given subtype.
+    template <class T>       T* as()       { return dynamic_cast<      T*>(this); }
+    template <class T> const T* as() const { return dynamic_cast<const T*>(this); }
+
+    // Create a copy of this layer.
+    virtual std::unique_ptr<StyleLayer> clone() const = 0;
 
     virtual void parseLayout(const JSVal& value) = 0;
     virtual void parsePaints(const JSVal& value) = 0;
@@ -47,7 +54,6 @@ public:
     bool hasRenderPass(RenderPass) const;
 
 public:
-    StyleLayerType type;
     std::string id;
     std::string ref;
     std::string source;
@@ -59,13 +65,15 @@ public:
     bool isInteractive;
 
 protected:
+    StyleLayer() = default;
+    StyleLayer(const StyleLayer&) = default;
+    StyleLayer& operator=(const StyleLayer&) = delete;
+
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
-
-    void copy(const StyleLayer& source);
 };
 
-}
+} // namespace mbgl
 
 #endif

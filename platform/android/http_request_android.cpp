@@ -5,6 +5,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/android/jni.hpp>
 
+#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/string.hpp>
@@ -26,7 +27,6 @@ public:
 
     HTTPRequestBase* createRequest(const Resource&,
                                RequestBase::Callback,
-                               uv_loop_t*,
                                std::shared_ptr<const Response>) final;
 
     JavaVM *vm = nullptr;
@@ -38,7 +38,6 @@ public:
     HTTPAndroidRequest(HTTPAndroidContext*,
                 const Resource&,
                 Callback,
-                uv_loop_t*,
                 std::shared_ptr<const Response>);
     ~HTTPAndroidRequest();
 
@@ -59,7 +58,7 @@ private:
 
     jobject obj = nullptr;
 
-    uv::async async;
+    util::AsyncTask async;
 
     static const int connectionError = 0;
     static const int temporaryError = 1;
@@ -113,24 +112,23 @@ HTTPAndroidContext::~HTTPAndroidContext() {
 
 HTTPRequestBase* HTTPAndroidContext::createRequest(const Resource& resource,
                                             RequestBase::Callback callback,
-                                            uv_loop_t* loop_,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPAndroidRequest(this, resource, callback, loop_, response);
+    return new HTTPAndroidRequest(this, resource, callback, response);
 }
 
-HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_, uv_loop_t* loop, std::shared_ptr<const Response> response_)
+HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
       existingResponse(response_),
-      async(loop, [this] { finish(); }) {
+      async([this] { finish(); }) {
 
     std::string etagStr;
     std::string modifiedStr;
     if (existingResponse) {
         if (!existingResponse->etag.empty()) {
             etagStr = existingResponse->etag;
-        } else if (existingResponse->modified) {
-            modifiedStr = util::rfc1123(existingResponse->modified);
+        } else if (existingResponse->modified != Seconds::zero()) {
+            modifiedStr = util::rfc1123(existingResponse->modified.count());
         }
     }
 
@@ -195,11 +193,11 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     response = std::make_unique<Response>();
     using Error = Response::Error;
 
-    response->modified = parse_date(modified.c_str());
+    response->modified = Seconds(parse_date(modified.c_str()));
     response->etag = etag;
     response->expires = parseCacheControl(cacheControl.c_str());
     if (!expires.empty()) {
-        response->expires = parse_date(expires.c_str());
+        response->expires = Seconds(parse_date(expires.c_str()));
     }
     response->data = std::make_shared<std::string>(body);
 
@@ -250,7 +248,7 @@ void HTTPAndroidRequest::onFailure(int type, std::string message) {
     async.send();
 }
 
-std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext(uv_loop_t* loop) {
+std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
     return std::make_unique<HTTPAndroidContext>();
 }
 

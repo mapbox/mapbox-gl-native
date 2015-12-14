@@ -24,6 +24,7 @@ public:
         : mode(mode_)
         , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
+        , annotationManager(pixelRatio)
         , animationTime(Duration::zero())
         , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
         , defaultTransitionDuration(Duration::zero())
@@ -49,24 +50,25 @@ public:
     std::vector<std::string> getClasses() const;
 
 
-    inline bool getDebug() const {
-        return debug;
-    }
-    inline bool toggleDebug() {
-        return debug ^= 1u;
-    }
-    inline void setDebug(bool value) {
-        debug = value;
+    inline MapDebugOptions getDebug() const {
+        return debugOptions;
     }
 
-    inline bool getCollisionDebug() const {
-        return collisionDebug;
+    inline void cycleDebugOptions() {
+        if (debugOptions & MapDebugOptions::Collision)
+            debugOptions = MapDebugOptions::NoDebug;
+        else if (debugOptions & MapDebugOptions::Timestamps)
+            debugOptions = debugOptions | MapDebugOptions::Collision;
+        else if (debugOptions & MapDebugOptions::ParseStatus)
+            debugOptions = debugOptions | MapDebugOptions::Timestamps;
+        else if (debugOptions & MapDebugOptions::TileBorders)
+            debugOptions = debugOptions | MapDebugOptions::ParseStatus;
+        else
+            debugOptions = MapDebugOptions::TileBorders;
     }
-    inline bool toggleCollisionDebug() {
-        return collisionDebug ^= 1u;
-    }
-    inline void setCollisionDebug(bool value) {
-        collisionDebug = value;
+
+    inline void setDebug(MapDebugOptions debugOptions_) {
+        debugOptions = debugOptions_;
     }
 
     inline TimePoint getAnimationTime() const {
@@ -136,8 +138,7 @@ private:
     mutable std::mutex mtx;
 
     std::vector<std::string> classes;
-    std::atomic<uint8_t> debug { false };
-    std::atomic<uint8_t> collisionDebug { false };
+    std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;
@@ -151,6 +152,6 @@ public:
     bool loading = false;
 };
 
-}
+} // namespace mbgl
 
 #endif

@@ -18,7 +18,7 @@ std::string read_file(const std::string &filename);
 
 void deleteFile(const std::string& filename);
 
-}
-}
+} // namespace util
+} // namespace mbgl
 
 #endif

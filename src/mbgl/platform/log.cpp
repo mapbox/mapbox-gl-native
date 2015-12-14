@@ -12,7 +12,7 @@ namespace {
 
 static std::unique_ptr<Log::Observer> currentObserver;
 
-}
+} // namespace
 
 void Log::setObserver(std::unique_ptr<Observer> observer) {
     currentObserver = std::move(observer);
@@ -63,4 +63,4 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
     platformRecord(severity, logStream.str());
 }
 
-}
+} // namespace mbgl

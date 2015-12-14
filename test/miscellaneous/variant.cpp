@@ -7,6 +7,10 @@
 using namespace mbgl;
 
 TEST(Variant, toString) {
+    // Force the default locale so we don't
+    // get results like "3,14" instead of "3.14".
+    std::locale::global(std::locale::classic());
+
     EXPECT_EQ("lord", toString( (std::string)"lord" ));
     EXPECT_EQ("36", toString( (uint64_t)36 ));
     EXPECT_EQ("-239", toString( (int64_t)-239 ));

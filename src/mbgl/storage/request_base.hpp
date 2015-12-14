@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <functional>
+#include <utility>
 
 namespace mbgl {
 
@@ -18,7 +19,7 @@ public:
 
     RequestBase(const Resource& resource_, Callback notify_)
         : resource(resource_)
-        , notify(notify_) {
+        , notify(std::move(notify_)) {
     }
 
     virtual ~RequestBase() = default;
