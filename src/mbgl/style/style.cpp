@@ -272,8 +272,8 @@ std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoin
 
     for (const auto& source : sources) {
         if (source->info.type == SourceType::Vector && source->isLoaded()) {
-            const auto source_results = source->featureDescriptionsAt(point, radius, transform);
-            results.insert(results.end(), source_results.begin(), source_results.end());
+            const auto sourceResults = source->featureDescriptionsAt(point, radius, transform);
+            results.insert(results.end(), sourceResults.begin(), sourceResults.end());
         }
     }
 

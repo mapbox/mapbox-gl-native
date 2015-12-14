@@ -617,10 +617,10 @@ std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoi
     y = y < -1 ? -1 : y > 1 ? 1 : y;
 
     const uint8_t z = ::floor(transform.getZoom());
-    const uint8_t source_max_z = ::fmin(z, info.max_zoom);
-    const uint32_t z2 = ::powf(2, source_max_z);
+    const uint8_t sourceMaxZ = ::fmin(z, info.max_zoom);
+    const uint32_t z2 = ::powf(2, sourceMaxZ);
 
-    TileID id(z, ::floor(x * z2), ::floor(y * z2), source_max_z);
+    TileID id(z, ::floor(x * z2), ::floor(y * z2), sourceMaxZ);
 
     // figure out query bounds
     TileCoordinate coordinate = transform.pointToCoordinate(point);
@@ -628,8 +628,8 @@ std::vector<FeatureDescription> Source::featureDescriptionsAt(const PrecisionPoi
 
     vec2<uint16_t> position((coordinate.column - id.x) * 4096, (coordinate.row - id.y) * 4096);
 
-    const uint32_t tile_scale = ::pow(2, id.z);
-    const double scale = util::tileSize * transform.getScale() / (tile_scale / id.overscaling);
+    const uint32_t tileScale = ::pow(2, id.z);
+    const double scale = util::tileSize * transform.getScale() / (tileScale / id.overscaling);
 
     const int16_t r = radius * 4096 / scale;
 

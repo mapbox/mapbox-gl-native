@@ -87,11 +87,11 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
 std::unordered_map<std::string, std::string> VectorTileFeature::getAllValues() const {
     std::unordered_map<std::string, std::string> values;
 
-    for (const auto key_it : layer.keys) {
-        const auto& key = key_it.first;
-        const auto maybe_val = getValue(key);
-        if (maybe_val) {
-            const auto& val = mbgl::toString(maybe_val.get());
+    for (const auto keyIter : layer.keys) {
+        const auto& key = keyIter.first;
+        const auto maybeVal = getValue(key);
+        if (maybeVal) {
+            const auto& val = mbgl::toString(maybeVal.get());
             values.emplace(key, val);
         }
     }
