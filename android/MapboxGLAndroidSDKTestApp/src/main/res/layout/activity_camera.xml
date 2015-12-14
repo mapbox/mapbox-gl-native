@@ -18,16 +18,34 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="end|bottom"
+        android:text="@string/button_camera_animate"
+        android:id="@+id/cameraAnimateButton"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_24dp"
-        app:backgroundTint="@android:color/white" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_camera_animate_callback"
+        android:id="@+id/cameraAnimateCallbackButton"
+        android:layout_alignTop="@+id/cameraAnimateButton"
+        android:layout_centerHorizontal="true"
+        android:background="@color/white"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_camera_animate_duration"
+        android:id="@+id/cameraAnimateDurationButton"
+        android:layout_alignBottom="@+id/cameraAnimateCallbackButton"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:background="@color/white"/>
 
 </RelativeLayout>
