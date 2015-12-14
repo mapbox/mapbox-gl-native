@@ -146,7 +146,7 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
 
     std::unique_ptr<Bucket> bucket = layer->createBucket(parameters);
 
-    if (layer.isInteractive) {
+    if (layer->isInteractive) {
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
             FeatureBox featureBox = {{ extent, extent }, { -1, -1 }};
@@ -179,7 +179,7 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
                 const auto values = feature->getAllValues();
                 std::map<std::string, std::string> properties;
                 properties.insert(values.begin(), values.end());
-                result.featureTree.insert(std::make_pair(featureBox, FeatureDescription(layer.id, layer.source, properties)));
+                result.featureTree.insert(std::make_pair(featureBox, FeatureDescription(layer->id, layer->source, properties)));
             }
         }
     }
