@@ -1508,7 +1508,10 @@ public final class MapView extends FrameLayout {
      * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
      */
     public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
-
+        animateCamera(update);
+        if (callback != null) {
+            callback.onFinish();
+        }
     }
 
     /**
