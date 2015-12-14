@@ -70,12 +70,12 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onCancel() {
                         // NOTE: This shouldn't appear
-                        Toast.makeText(getApplicationContext(), "animateCamera() onCancel Callback called.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "onCancel Callback called.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onFinish() {
-                        Toast.makeText(getApplicationContext(), "animateCamera() onFinish Callback called.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "onFinish Callback called.", Toast.LENGTH_SHORT).show();
                     }
                 };
 
@@ -84,6 +84,33 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
+        Button cameraDurationButton = (Button) findViewById(R.id.cameraAnimateDurationButton);
+        cameraDurationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(-22.91214, -43.23012))     // Sets the center of the map to Maracanã
+                        .zoom(16)                                   // Sets the zoom
+                        .bearing(270)                               // Sets the orientation of the camera to east
+                        .tilt(20)                                   // Sets the tilt of the camera to 30 degrees
+                        .build();                                   // Creates a CameraPosition from the builder
+
+
+                MapView.CancelableCallback callback = new MapView.CancelableCallback() {
+                    @Override
+                    public void onCancel() {
+                        Toast.makeText(getApplicationContext(), "Duration onCancel Callback called.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        Toast.makeText(getApplicationContext(), "Duration onFinish Callback called.", Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, callback);
+            }
+        });
 
     }
 
