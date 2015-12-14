@@ -149,7 +149,7 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
     if (layer->isInteractive) {
         for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
             const auto feature = geometryLayer->getFeature(i);
-            FeatureBox featureBox = {{ extent, extent }, { -1, -1 }};
+            FeatureBox featureBox = {{ int16_t(extent), int16_t(extent) }, { -1, -1 }};
             const auto geometries = feature->getGeometries();
             for (std::size_t j = 0; j < geometries.size(); j++) {
                 const auto geometry = geometries.at(j);
