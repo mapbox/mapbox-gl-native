@@ -7,6 +7,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Polygon is a geometry annotation that's a closed loop of coordinates.
+ */
 public final class Polygon extends MultiPoint {
 
     private int fillColor = Color.BLACK; // default fillColor is black

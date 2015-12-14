@@ -7,9 +7,10 @@ import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.views.MapView;
 
 /**
+ * <p>
  * A {@code SpriteBitmapChangedException} is thrown by {@link MapView} when a {@link Marker} is added
  * that has a {@link Sprite} with a {@link Bitmap} that has been modified.
- * <p/>
+ * </p>
  * You cannot modify a {@code Sprite} after it has been added to the map in a {@code Marker}
  *
  * @see MapView

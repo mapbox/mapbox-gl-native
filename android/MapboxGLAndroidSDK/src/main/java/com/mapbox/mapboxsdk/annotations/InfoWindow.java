@@ -16,7 +16,10 @@ import com.mapbox.mapboxsdk.views.MapView;
 import java.lang.ref.WeakReference;
 
 /**
- * A tooltip view
+ * <p>
+ * A tooltip view. This is a UI element placed over a map at a specific geographic
+ * location.
+ * </p>
  */
 public class InfoWindow {
 

@@ -4,9 +4,10 @@ import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
 
 /**
+ * <p>
  * A {@code TooManySpritesException} is thrown by {@link SpriteFactory} when it
  * cannot create a {@link Sprite} because there are already too many.
- * <p/>
+ * </p>
  * You should try to reuse Sprite objects whenever possible.
  *
  * @see SpriteFactory

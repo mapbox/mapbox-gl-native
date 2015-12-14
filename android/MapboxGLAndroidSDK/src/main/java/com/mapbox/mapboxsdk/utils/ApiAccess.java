@@ -14,8 +14,9 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 public final class ApiAccess {
 
     /**
+     * <p>
      * Returns the Mapbox access token set in the app resources.
-     * <p/>
+     * </p>
      * It will first search the application manifest for a {@link MapboxConstants#KEY_META_DATA_MANIFEST}
      * meta-data value. If not found it will then attempt to load the access token from the
      * {@code res/raw/token.txt} development file.

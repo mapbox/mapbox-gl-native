@@ -85,14 +85,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>
  * A {@code MapView} provides an embeddable map interface.
  * You use this class to display map information and to manipulate the map contents from your application.
  * You can center the map on a given coordinate, specify the size of the area you want to display,
  * and style the features of the map to fit your application's use case.
- * <p/>
+ * </p>
+ * <p>
  * Use of {@code MapView} requires a Mapbox API access token.
  * Obtain an access token on the <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
- * <p/>
+ * </p>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  *
@@ -288,115 +290,133 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * without an animation.
-     * <p/>
+     * </p>
+     * <p>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE}.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE = 0;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered whenever the currently displayed map region is about to changing
      * with an animation.
-     * <p/>
+     * </p>
+     * <p>
      * This event is followed by a series of {@link MapView#REGION_IS_CHANGING} and ends
      * with {@link MapView#REGION_DID_CHANGE_ANIMATED}.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int REGION_WILL_CHANGE_ANIMATED = 1;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered whenever the currently displayed map region is changing.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int REGION_IS_CHANGING = 2;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * without an animation.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE = 3;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered whenever the currently displayed map region finished changing
      * with an animation.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int REGION_DID_CHANGE_ANIMATED = 4;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered when the map is about to start loading a new map style.
-     * <p/>
+     * </p>
+     * <p>
      * This event is followed by {@link MapView#DID_FINISH_LOADING_MAP} or
      * {@link MapView#DID_FAIL_LOADING_MAP}.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int WILL_START_LOADING_MAP = 5;
 
     /**
+     * <p>
      * This {@link MapChange} is triggered when the map has successfully loaded a new map style.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_LOADING_MAP = 6;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
+     * </p>
+     * <p>
      * This event is triggered when the map has failed to load a new map style.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FAIL_LOADING_MAP = 7;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_FRAME = 8;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME = 9;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_FRAME_FULLY_RENDERED = 10;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int WILL_START_RENDERING_MAP = 11;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP = 12;
 
     /**
+     * <p>
      * This {@link MapChange} is currently not implemented.
-     * <p/>
-     * More information in {@see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener}
+     * </p>
+     * @see com.mapbox.mapboxsdk.views.MapView.OnMapChangedListener
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
@@ -794,6 +814,7 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * You must call this method from the parent's {@link android.app.Activity#onCreate(Bundle)} or
      * {@link android.app.Fragment#onCreate(Bundle)}.
      * </p>
@@ -1013,10 +1034,12 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Centers the map on a new coordinate immediately without changing the zoom level.
-     * <p/>
+     * </p>
+     * <p>
      * The initial coordinate is (0, 0).
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLng, boolean)}.
      *
      * @param centerCoordinate The new coordinate.
@@ -1028,8 +1051,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Centers the map on a new coordinate without changing the zoom level and optionally animates the change.
-     * <p/>
+     * </p>
      * The initial coordinate is (0, 0).
      *
      * @param centerCoordinate The new coordinate.
@@ -1048,10 +1072,12 @@ public final class MapView extends FrameLayout {
 
 
     /**
+     * <p>
      * Centers the map on a new coordinate immediately while changing the current zoom level.
-     * <p/>
+     * </p>
+     * <p>
      * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setCenterCoordinate(LatLngZoom, boolean)}.
      *
      * @param centerCoordinate The new coordinate and zoom level.
@@ -1073,8 +1099,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Centers the map on a new coordinate while changing the zoom level and optionally animates the change.
-     * <p/>
+     * </p>
      * The initial value is a center coordinate of (0, 0) and a zoom level of 0.
      *
      * @param centerCoordinate The new coordinate and zoom level.
@@ -1103,11 +1130,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes whether the user may scroll around the map.
-     * <p/>
+     * </p>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * </p>
      * The default value is true.
      *
      * @param scrollEnabled If true, scrolling is enabled.
@@ -1168,15 +1197,18 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Rotates the map to a new heading relative to true north immediately.
-     * <p/>
-     * The value 0 means that the top edge of the map view will correspond to true north.<br>
-     * The value 90 means the top of the map will point due east.<br>
-     * The value 180 means the top of the map will point due south.<br>
-     * The value 270 means the top of the map will point due west.
-     * <p/>
+     * </p>
+     * <ul>
+     * <li>The value 0 means that the top edge of the map view will correspond to true north.</li>
+     * <li>The value 90 means the top of the map will point due east.</li>
+     * <li>The value 180 means the top of the map will point due south.</li>
+     * <li>The value 270 means the top of the map will point due west.</li>
+     * </ul>
+     * <p>
      * The initial heading is 0.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setDirection(double, boolean)}.
      *
      * @param direction The new heading measured in degrees.
@@ -1188,13 +1220,15 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Rotates the map to a new heading relative to true north and optionally animates the change.
-     * <p/>
-     * The value 0 means that the top edge of the map view will correspond to true north.<br/>
-     * The value 90 means the top of the map will point due east.<br/>
-     * The value 180 means the top of the map will point due south.<br/>
-     * The value 270 means the top of the map will point due west
-     * <p/>
+     * </p>
+     * <ul>
+     * <li>The value 0 means that the top edge of the map view will correspond to true north.</li>
+     * <li>The value 90 means the top of the map will point due east.</li>
+     * <li>The value 180 means the top of the map will point due south.</li>
+     * <li>The value 270 means the top of the map will point due west.</li>
+     * </ul>
      * The initial heading is 0.
      *
      * @param direction The new heading measured in degrees from true north.
@@ -1228,11 +1262,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes whether the user may rotate the map.
-     * <p/>
+     * </p>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * </p>
      * The default value is true.
      *
      * @param rotateEnabled If true, rotating is enabled.
@@ -1258,14 +1294,17 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Zooms the map to a new zoom level immediately without changing the center coordinate.
-     * <p/>
+     * </p>
+     * <p>
      * At zoom level 0, tiles cover the entire world map;
-     * at zoom level 1, tiles cover &frac14 of the world;
+     * at zoom level 1, tiles cover 1/14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * <p/>
+     * </p>
+     * <p>
      * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setZoomLevel(double, boolean)}.
      *
      * @param zoomLevel The new coordinate.
@@ -1278,12 +1317,14 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
-     * <p/>
+     * </p>
+     * <p>
      * At zoom level 0, tiles cover the entire world map;
-     * at zoom level 1, tiles cover &frac14 of the world;
+     * at zoom level 1, tiles cover 1/14 of the world;
      * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * <p/>
+     * </p>
      * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM_LEVEL}.
      *
      * @param zoomLevel The new coordinate.
@@ -1311,11 +1352,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes whether the user may zoom the map.
-     * <p/>
+     * </p>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * </p>
      * The default value is true.
      *
      * @param zoomEnabled If true, zooming is enabled.
@@ -1341,12 +1384,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Sets whether the zoom controls are enabled.
      * If enabled, the zoom controls are a pair of buttons
      * (one for zooming in, one for zooming out) that appear on the screen.
      * When pressed, they cause the camera to zoom in (or out) by one zoom level.
      * If disabled, the zoom controls are not shown.
-     * <p/>
+     * </p>
      * By default the zoom controls are enabled if the device is only single touch capable;
      *
      * @param enabled If true, the zoom controls are enabled.
@@ -1392,11 +1436,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes whether the user may tilt the map.
-     * <p/>
+     * </p>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * </p>
      * The default value is true.
      *
      * @param tiltEnabled If true, tilting is enabled.
@@ -1445,8 +1491,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes whether the map debug information is shown.
-     * <p/>
+     * </p>
      * The default value is false.
      *
      * @param debugActive If true, map debug information is shown.
@@ -1457,8 +1504,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Cycles through the map debug options.
-     * <p/>
+     * </p>
      * The value of {@link MapView#isDebugActive()} reflects whether there are
      * any map debug options enabled or disabled.
      *
@@ -1479,8 +1527,9 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * Loads a new map style from the specified URL.
-     * <p/>
+     * </p>
      * {@code url} can take the following forms:
      * <ul>
      * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
@@ -1495,10 +1544,10 @@ public final class MapView extends FrameLayout {
      * This is used to load a style bundled with your app.</li>
      * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
-     * <p/>
+     * <p>
      * This method is asynchronous and will return immediately before the style finishes loading.
      * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
-     * <p/>
+     * </p>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
      *
@@ -1515,11 +1564,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Loads a new map style from the specified bundled style.
-     * <p/>
+     * </p>
+     * <p>
      * This method is asynchronous and will return immediately before the style finishes loading.
      * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
-     * <p/>
+     * </p>
      * If the style fails to load or an invalid style URL is set, the map view will become blank.
      * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
      *
@@ -1532,8 +1583,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Returns the map style currently displayed in the map view.
-     * <p/>
+     * </p>
      * If the default style is currently displayed, a URL will be returned instead of null.
      *
      * @return The URL of the map style.
@@ -1556,10 +1608,12 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes the set of currently active map style classes immediately.
-     * <p/>
+     * </p>
+     * <p>
      * The list of valid class identifiers is defined by the currently loaded map style.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClasses A list of class identifiers.
@@ -1572,8 +1626,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Changes the set of currently active map style classes with an animated transition.
-     * <p/>
+     * </p>
      * The list of valid class identifiers is defined by the currently loaded map style.
      *
      * @param styleClasses       A list of class identifiers.
@@ -1596,8 +1651,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Activates the specified map style class.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClass The class identifier.
@@ -1613,8 +1669,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Deactivates the specified map style class.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#setStyleClasses(List, long)}.
      *
      * @param styleClass The class identifier.
@@ -1645,8 +1702,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Deactivates all the currently active map style classes immediately.
-     * <p/>
+     * </p>
      * If you want to animate the change, use {@link MapView#removeAllStyleClasses(long)}.
      *
      * @see MapView#removeAllStyleClasses(long)
@@ -1683,11 +1741,13 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
-     * <p/>
+     * </p>
+     * <p>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
      * or an exception will be thrown.
-     * <p/>
+     * </p>
      * You can use {@link ApiAccess#getToken(Context)} to load an access token from your
      * application's manifest.
      *
@@ -1830,8 +1890,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Adds a marker to this map.
-     * <p/>
+     * </p>
      * The marker's icon is rendered on the map at the location {@code Marker.position}.
      * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
      *
@@ -1855,8 +1916,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Adds multiple markers to this map.
-     * <p/>
+     * </p>
      * The marker's icon is rendered on the map at the location {@code Marker.position}.
      * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
      *
@@ -2005,8 +2067,9 @@ public final class MapView extends FrameLayout {
 
 
     /**
+     * <p>
      * Convenience method for removing a Marker from the map.
-     * <p/>
+     * </p>
      * Calls removeAnnotation() internally
      *
      * @param marker Marker to remove
@@ -2126,8 +2189,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
-     * <p/>
+     * </p>
      * The distance between pixels decreases as the latitude approaches the poles.
      * This relationship parallels the relationship between longitudinal coordinates at different latitudes.
      *
@@ -2140,10 +2204,11 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Selects a marker. The selected marker will have it's info window opened.
      * Any other open info windows will be closed unless isAllowConcurrentMultipleOpenInfoWindows()
      * is true.
-     * <p/>
+     * </p>
      * Selecting an already selected marker will have no effect.
      *
      * @param marker The marker to select.
@@ -2440,11 +2505,13 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * Sets the preference for whether all gestures should be enabled or disabled.
-     * <p/>
+     * </p>
+     * <p>
      * This setting controls only user interactions with the map. If you set the value to false,
      * you may still change the map location programmatically.
-     * <p/>
+     * </p>
      * The default value is true.
      *
      * @param enabled If true, all gestures are available; otherwise, all gestures are disabled.
@@ -3259,8 +3326,9 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * Add a callback that's invoked when the displayed map view changes.
-     * <p/>
+     * </p>
      * To remove the callback, use {@link MapView#removeOnMapChangedListener(OnMapChangedListener)}.
      *
      * @param listener The callback that's invoked on every frame rendered to the map view.
@@ -3299,8 +3367,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Sets a custom renderer for the contents of info window.
-     * <p/>
+     * </p>
      * When set your callback is invoked when an info window is about to be shown. By returning
      * a custom {@link View}, the default info window will be replaced.
      *
@@ -3441,10 +3510,11 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Enables or disables the my-location layer.
      * While enabled, the my-location layer continuously draws an indication of a user's current
      * location and bearing.
-     * <p/>
+     * </p>
      * In order to use the my-location layer feature you need to request permission for either
      * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}
      * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
@@ -3480,9 +3550,10 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Set the current my location tracking mode.
      * Tracking my location disables gestures and pans the viewport
-     * <p/>
+     * </p>
      * See {@link MyLocationTracking} for different values.
      *
      * @param myLocationTrackingMode The location tracking mode to be used.
@@ -3523,13 +3594,16 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Set the current my bearing tracking mode.
-     * <p/>
+     * </p>
+     * <p>
      * Tracking the users bearing will disable gestures and shows the direction the user is heading.
-     * <p/>
+     * </p>
+     * <p>
      * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
      * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
-     * <p/>
+     * </p>
      * See {@link MyBearingTracking} for different values.
      *
      * @param myBearingTrackingMode The bearing tracking mode to be used.
@@ -3570,11 +3644,12 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Enables or disables the compass. The compass is an icon on the map that indicates the
      * direction of north on the map. When a user clicks
      * the compass, the camera orients itself to its default orientation and fades away shortly
      * after. If disabled, the compass will never be displayed.
-     * <p/>
+     * </p>
      * By default, the compass is enabled.
      *
      * @param compassEnabled True to enable the compass; false to disable the compass.
@@ -3585,9 +3660,10 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Sets the gravity of the compass view. Use this to change the corner of the map view that the
      * compass is displayed in.
-     * <p/>
+     * </p>
      * By default, the compass is in the top right corner.
      *
      * @param gravity One of the values from {@link Gravity}.
@@ -3617,9 +3693,10 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * Sets the gravity of the logo view. Use this to change the corner of the map view that the
      * Mapbox logo is displayed in.
-     * <p/>
+     * </p>
      * By default, the logo is in the bottom left corner.
      *
      * @param gravity One of the values from {@link Gravity}.
@@ -3645,8 +3722,9 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Enables or disables the Mapbox logo.
-     * <p/>
+     * </p>
      * By default, the compass is enabled.
      *
      * @param visibility True to enable the logo; false to disable the logo.
@@ -3661,9 +3739,10 @@ public final class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
      * Sets the gravity of the attribution button view. Use this to change the corner of the map
      * view that the attribution button is displayed in.
-     * <p/>
+     * </p>
      * By default, the attribution button is in the bottom left corner.
      *
      * @param gravity One of the values from {@link Gravity}.
@@ -3689,10 +3768,11 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
      * Enables or disables the attribution button. The attribution is a button with an "i" than when
      * clicked shows a menu with copyright and legal notices. The menu also inlcudes the "Improve
      * this map" link which user can report map errors with.
-     * <p/>
+     * </p>
      * By default, the attribution button is enabled.
      *
      * @param visibility True to enable the attribution button; false to disable the attribution button.

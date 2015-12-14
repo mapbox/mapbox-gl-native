@@ -4,11 +4,18 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.views.MapView;
 
+/**
+ * Annotation is the most general kind of overlay on top of a map,
+ * from which {@link InfoWindow} and {@link Marker} are derived: it manages
+ * attachment to a map and identification, but does not require
+ * content to be placed at a geographical point.
+ */
 public abstract class Annotation implements Comparable<Annotation> {
 
     /**
+     * <p>
      * The annotation id
-     * <p/>
+     * </p>
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
@@ -18,8 +25,9 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     /**
+     * <p>
      * Gets the annotation's unique ID.
-     * <p/>
+     * </p>
      * This ID is unique for a MapView instance and is suitable for associating your own extra
      * data with.
      */
