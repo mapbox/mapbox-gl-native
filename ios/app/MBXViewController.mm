@@ -7,6 +7,13 @@
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
+static const CLLocationCoordinate2D WorldTourDestinations[] = {
+    { 38.9131982, -77.0325453144239 },
+    { 37.7757368, -122.4135302 },
+    { 12.9810816, 77.6368034 },
+    { -13.15589555, -74.2178961777998 },
+};
+
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
@@ -15,6 +22,9 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 @end
 
 @implementation MBXViewController
+{
+    BOOL _isTouringWorld;
+}
 
 #pragma mark - Setup
 
@@ -138,6 +148,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
                                                                 @"Add Test Shapes",
+                                                                @"Start World Tour",
                                                                 @"Remove Annotations",
                                                                 nil];
 
@@ -243,6 +254,10 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
     {
+        [self startWorldTour:actionSheet];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
 }
@@ -332,6 +347,46 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     self.mapView.userTrackingMode = nextMode;
 }
 
+- (IBAction)startWorldTour:(__unused id)sender
+{
+    _isTouringWorld = YES;
+    
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
+    for (NSUInteger i = 0; i < numberOfAnnotations; i++)
+    {
+        MGLPointAnnotation *annotation = [[MGLPointAnnotation alloc] init];
+        annotation.coordinate = WorldTourDestinations[i];
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+    [self continueWorldTourWithRemainingAnnotations:annotations];
+}
+
+- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+{
+    MGLPointAnnotation *nextAnnotation = annotations.firstObject;
+    if (!nextAnnotation || !_isTouringWorld)
+    {
+        _isTouringWorld = NO;
+        return;
+    }
+    
+    [annotations removeObjectAtIndex:0];
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
+                                                            fromDistance:10
+                                                                   pitch:arc4random_uniform(60)
+                                                                 heading:arc4random_uniform(360)];
+    __weak MBXViewController *weakSelf = self;
+    [self.mapView flyToCamera:camera withDuration:0 completionHandler:^{
+        MBXViewController *strongSelf = weakSelf;
+        [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
+                         withObject:annotations
+                         afterDelay:2];
+    }];
+}
+
 #pragma mark - Destruction
 
 - (void)dealloc
@@ -348,6 +403,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     if ([annotation.title isEqualToString:@"Dropped Marker"]) return nil; // use default marker
 
     NSString *title = [(MGLPointAnnotation *)annotation title];
+    if (!title.length) return nil;
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
     UIColor *color;
