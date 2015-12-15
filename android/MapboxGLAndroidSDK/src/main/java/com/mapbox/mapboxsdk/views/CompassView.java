@@ -16,6 +16,11 @@ import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * CompassView is a UI element overlaid on a map that shows the map's bearing
+ * when it isn't true north (0.0). Tapping the compass resets the bearing to true
+ * north and hides the compass.
+ */
 final class CompassView extends ImageView {
 
     private Timer mNorthTimer;

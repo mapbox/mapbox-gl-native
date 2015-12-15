@@ -32,6 +32,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 
+/**
+ * This view shows the user's location, as determined from GPS, on the map
+ * as a dot annotation.
+ */
 final class UserLocationView extends View implements LocationListener {
 
     private MapView mMapView;
