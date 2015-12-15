@@ -255,8 +255,8 @@ void Painter::renderPass(RenderPass pass_,
 }
 
 void Painter::renderBackground(const BackgroundLayer& layer) {
-    // Note: This function is only called for textured background. Otherwise, the background color
-    // is created with glClear.
+    // Note that for bottommost layers without a pattern, the background color is drawn with
+    // glClear rather than this method.
     const BackgroundPaintProperties& properties = layer.paint;
 
     if (!properties.pattern.value.to.empty()) {
@@ -316,13 +316,24 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         backgroundBuffer.bind();
         patternShader->bind(0);
         spriteAtlas->bind(true);
+    } else {
+        Color color = properties.color;
+        color[0] *= properties.opacity;
+        color[1] *= properties.opacity;
+        color[2] *= properties.opacity;
+        color[3] *= properties.opacity;
+
+        config.program = plainShader->program;
+        plainShader->u_matrix = identityMatrix;
+        plainShader->u_color = color;
+        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
     config.stencilTest = GL_FALSE;
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
-    config.depthRange = { 1.0f, 1.0f };
+    setDepthSublayer(0);
 
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 }
