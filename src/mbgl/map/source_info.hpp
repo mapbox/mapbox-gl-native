@@ -6,9 +6,9 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <mapbox/variant.hpp>
-#include <rapidjson/document.h>
 
 #include <array>
 #include <vector>
@@ -38,8 +38,8 @@ public:
     std::string source_id = "";
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
-    void parseTileJSONProperties(const rapidjson::Value&);
-    void parseGeoJSON(const rapidjson::Value&);
+    void parseTileJSONProperties(const JSValue&);
+    void parseGeoJSON(const JSValue&);
     std::string tileURL(const TileID& id, float pixelRatio) const;
 };
 

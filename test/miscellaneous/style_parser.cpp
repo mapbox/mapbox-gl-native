@@ -22,12 +22,12 @@ class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 TEST_P(StyleParserTest, ParseStyle) {
     const std::string base = std::string("test/fixtures/style_parser/") + GetParam();
 
-    rapidjson::Document infoDoc;
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> infoDoc;
     infoDoc.Parse<0>(util::read_file(base + ".info.json").c_str());
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    rapidjson::Document styleDoc;
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> styleDoc;
     styleDoc.Parse<0>(util::read_file(base + ".style.json").c_str());
     ASSERT_FALSE(styleDoc.HasParseError());
     ASSERT_TRUE(styleDoc.IsObject());
@@ -40,14 +40,14 @@ TEST_P(StyleParserTest, ParseStyle) {
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
-        const rapidjson::Value &value = it->value;
+        const JSValue &value = it->value;
         ASSERT_EQ(true, value.IsObject());
 
         if (value.HasMember("log")) {
-            const rapidjson::Value &js_log = value["log"];
+            const JSValue &js_log = value["log"];
             ASSERT_EQ(true, js_log.IsArray());
             for (rapidjson::SizeType i = 0; i < js_log.Size(); i++) {
-                const rapidjson::Value &js_entry = js_log[i];
+                const JSValue &js_entry = js_log[i];
                 ASSERT_EQ(true, js_entry.IsArray());
 
                 const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();

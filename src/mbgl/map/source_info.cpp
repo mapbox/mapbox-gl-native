@@ -11,12 +11,12 @@ namespace mbgl {
 
 namespace {
 
-void parse(const rapidjson::Value& value, std::vector<std::string>& target, const char* name) {
+void parse(const JSValue& value, std::vector<std::string>& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
 
-    const rapidjson::Value& property = value[name];
+    const JSValue& property = value[name];
     if (!property.IsArray()) {
         return;
     }
@@ -32,12 +32,12 @@ void parse(const rapidjson::Value& value, std::vector<std::string>& target, cons
     }
 }
 
-void parse(const rapidjson::Value& value, std::string& target, const char* name) {
+void parse(const JSValue& value, std::string& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
 
-    const rapidjson::Value& property = value[name];
+    const JSValue& property = value[name];
     if (!property.IsString()) {
         return;
     }
@@ -45,12 +45,12 @@ void parse(const rapidjson::Value& value, std::string& target, const char* name)
     target = { property.GetString(), property.GetStringLength() };
 }
 
-void parse(const rapidjson::Value& value, uint16_t& target, const char* name) {
+void parse(const JSValue& value, uint16_t& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
 
-    const rapidjson::Value& property = value[name];
+    const JSValue& property = value[name];
     if (!property.IsUint()) {
         return;
     }
@@ -64,12 +64,12 @@ void parse(const rapidjson::Value& value, uint16_t& target, const char* name) {
 }
 
 template <size_t N>
-void parse(const rapidjson::Value& value, std::array<float, N>& target, const char* name) {
+void parse(const JSValue& value, std::array<float, N>& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
 
-    const rapidjson::Value& property = value[name];
+    const JSValue& property = value[name];
     if (!property.IsArray() || property.Size() != N) {
         return;
     }
@@ -90,7 +90,7 @@ void parse(const rapidjson::Value& value, std::array<float, N>& target, const ch
 // Destructor in implementation file because header only contains forward declarations.
 SourceInfo::~SourceInfo() = default;
 
-void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
+void SourceInfo::parseTileJSONProperties(const JSValue& value) {
     parse(value, tiles, "tiles");
     parse(value, min_zoom, "minzoom");
     parse(value, max_zoom, "maxzoom");
@@ -99,7 +99,7 @@ void SourceInfo::parseTileJSONProperties(const rapidjson::Value& value) {
     parse(value, bounds, "bounds");
 }
 
-void SourceInfo::parseGeoJSON(const rapidjson::Value& value) {
+void SourceInfo::parseGeoJSON(const JSValue& value) {
     using namespace mapbox::geojsonvt;
 
     try {

@@ -24,8 +24,8 @@ public:
 private:
     std::unique_ptr<StyleLayer> clone() const final;
 
-    void parseLayout(const JSVal&) final {}
-    void parsePaints(const JSVal&) final {}
+    void parseLayout(const JSValue&) final {}
+    void parsePaints(const JSValue&) final {}
 
     void cascade(const StyleCascadeParameters&) final {}
     bool recalculate(const StyleCalculationParameters&) final;

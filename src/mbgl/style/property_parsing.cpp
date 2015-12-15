@@ -11,7 +11,7 @@
 namespace mbgl {
 
 template <>
-optional<bool> parseProperty(const char* name, const JSVal& value) {
+optional<bool> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsBool()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a boolean", name);
         return {};
@@ -21,7 +21,7 @@ optional<bool> parseProperty(const char* name, const JSVal& value) {
 }
 
 template <>
-optional<float> parseProperty(const char* name, const JSVal& value) {
+optional<float> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsNumber()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a number, or a number function", name);
         return {};
@@ -31,7 +31,7 @@ optional<float> parseProperty(const char* name, const JSVal& value) {
 }
 
 template <>
-optional<std::string> parseProperty(const char* name, const JSVal& value) {
+optional<std::string> parseProperty(const char* name, const JSValue& value) {
     if (std::string { "text-font" } == name) {
         if (!value.IsArray()) {
             Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", name);
@@ -40,7 +40,7 @@ optional<std::string> parseProperty(const char* name, const JSVal& value) {
 
         std::string result = "";
         for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            const JSVal& stop = value[i];
+            const JSValue& stop = value[i];
             if (stop.IsString()) {
                 result += stop.GetString();
                 if (i < value.Size()-1) {
@@ -63,7 +63,7 @@ optional<std::string> parseProperty(const char* name, const JSVal& value) {
 }
 
 template <>
-optional<Color> parseProperty(const char* name, const JSVal& value) {
+optional<Color> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -81,7 +81,7 @@ optional<Color> parseProperty(const char* name, const JSVal& value) {
 }
 
 template <>
-optional<TranslateAnchorType> parseProperty(const char* name, const JSVal& value) {
+optional<TranslateAnchorType> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -91,7 +91,7 @@ optional<TranslateAnchorType> parseProperty(const char* name, const JSVal& value
 }
 
 template <>
-optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, const JSVal& value) {
+optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -101,7 +101,7 @@ optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, con
 }
 
 template <>
-optional<CapType> parseProperty<CapType>(const char* name, const JSVal& value) {
+optional<CapType> parseProperty<CapType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -111,7 +111,7 @@ optional<CapType> parseProperty<CapType>(const char* name, const JSVal& value) {
 }
 
 template <>
-optional<JoinType> parseProperty<JoinType>(const char* name, const JSVal& value) {
+optional<JoinType> parseProperty<JoinType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -121,7 +121,7 @@ optional<JoinType> parseProperty<JoinType>(const char* name, const JSVal& value)
 }
 
 template <>
-optional<PlacementType> parseProperty<PlacementType>(const char* name, const JSVal& value) {
+optional<PlacementType> parseProperty<PlacementType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -131,7 +131,7 @@ optional<PlacementType> parseProperty<PlacementType>(const char* name, const JSV
 }
 
 template <>
-optional<TextAnchorType> parseProperty<TextAnchorType>(const char* name, const JSVal& value) {
+optional<TextAnchorType> parseProperty<TextAnchorType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -141,7 +141,7 @@ optional<TextAnchorType> parseProperty<TextAnchorType>(const char* name, const J
 }
 
 template <>
-optional<TextJustifyType> parseProperty<TextJustifyType>(const char* name, const JSVal& value) {
+optional<TextJustifyType> parseProperty<TextJustifyType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -151,7 +151,7 @@ optional<TextJustifyType> parseProperty<TextJustifyType>(const char* name, const
 }
 
 template <>
-optional<TextTransformType> parseProperty<TextTransformType>(const char* name, const JSVal& value) {
+optional<TextTransformType> parseProperty<TextTransformType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -161,7 +161,7 @@ optional<TextTransformType> parseProperty<TextTransformType>(const char* name, c
 }
 
 template <>
-optional<RotationAlignmentType> parseProperty<RotationAlignmentType>(const char* name, const JSVal& value) {
+optional<RotationAlignmentType> parseProperty<RotationAlignmentType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -171,7 +171,7 @@ optional<RotationAlignmentType> parseProperty<RotationAlignmentType>(const char*
 }
 
 template <>
-optional<std::array<float, 2>> parseProperty(const char* name, const JSVal& value) {
+optional<std::array<float, 2>> parseProperty(const char* name, const JSValue& value) {
     if (value.IsArray() && value.Size() == 2 &&
             value[rapidjson::SizeType(0)].IsNumber() &&
             value[rapidjson::SizeType(1)].IsNumber()) {
@@ -186,7 +186,7 @@ optional<std::array<float, 2>> parseProperty(const char* name, const JSVal& valu
 }
 
 template <>
-optional<std::vector<float>> parseProperty(const char* name, const JSVal& value) {
+optional<std::vector<float>> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers", name);
         return {};
@@ -195,7 +195,7 @@ optional<std::vector<float>> parseProperty(const char* name, const JSVal& value)
     std::vector<float> result;
 
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        const JSVal& part = value[i];
+        const JSValue& part = value[i];
 
         if (!part.IsNumber()) {
             Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers", name);
@@ -209,7 +209,7 @@ optional<std::vector<float>> parseProperty(const char* name, const JSVal& value)
 }
 
 template <>
-optional<PropertyTransition> parseProperty(const char *, const JSVal& value) {
+optional<PropertyTransition> parseProperty(const char *, const JSValue& value) {
     PropertyTransition transition;
     if (value.IsObject()) {
         bool parsed = false;
@@ -231,7 +231,7 @@ optional<PropertyTransition> parseProperty(const char *, const JSVal& value) {
 // --- Function ---
 
 template <typename T>
-optional<std::vector<std::pair<float, T>>> parseStops(const char* name, const JSVal& value) {
+optional<std::vector<std::pair<float, T>>> parseStops(const char* name, const JSValue& value) {
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "stops function must specify a stops array");
         return {};
@@ -240,7 +240,7 @@ optional<std::vector<std::pair<float, T>>> parseStops(const char* name, const JS
     std::vector<std::pair<float, T>> stops;
 
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        const JSVal& stop = value[i];
+        const JSValue& stop = value[i];
 
         if (!stop.IsArray()) {
             Log::Warning(Event::ParseStyle, "function argument must be a numeric value");
@@ -252,7 +252,7 @@ optional<std::vector<std::pair<float, T>>> parseStops(const char* name, const JS
             return {};
         }
 
-        const JSVal& z = stop[rapidjson::SizeType(0)];
+        const JSValue& z = stop[rapidjson::SizeType(0)];
         if (!z.IsNumber()) {
             Log::Warning(Event::ParseStyle, "zoom level in stop must be a number");
             return {};
@@ -270,7 +270,7 @@ optional<std::vector<std::pair<float, T>>> parseStops(const char* name, const JS
 }
 
 template <typename T>
-optional<Function<T>> parseFunction(const char* name, const JSVal& value) {
+optional<Function<T>> parseFunction(const char* name, const JSValue& value) {
     if (!value.IsObject()) {
         auto constant = parseProperty<T>(name, value);
         if (!constant) {
@@ -287,7 +287,7 @@ optional<Function<T>> parseFunction(const char* name, const JSVal& value) {
     float base = 1.0f;
 
     if (value.HasMember("base")) {
-        const JSVal& value_base = value["base"];
+        const JSValue& value_base = value["base"];
 
         if (!value_base.IsNumber()) {
             Log::Warning(Event::ParseStyle, "base must be numeric");
@@ -306,64 +306,64 @@ optional<Function<T>> parseFunction(const char* name, const JSVal& value) {
     return { Function<T>(*stops, base) };
 }
 
-template <> optional<Function<std::array<float, 2>>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<std::array<float, 2>>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<std::array<float, 2>>(name, value);
 }
 
-template <> optional<Function<std::string>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<std::string>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<std::string>(name, value);
 }
 
-template <> optional<Function<TranslateAnchorType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<TranslateAnchorType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<TranslateAnchorType>(name, value);
 }
 
-template <> optional<Function<RotateAnchorType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<RotateAnchorType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<RotateAnchorType>(name, value);
 }
 
-template <> optional<Function<CapType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<CapType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<CapType>(name, value);
 }
 
-template <> optional<Function<JoinType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<JoinType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<JoinType>(name, value);
 }
 
-template <> optional<Function<PlacementType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<PlacementType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<PlacementType>(name, value);
 }
 
-template <> optional<Function<TextAnchorType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<TextAnchorType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<TextAnchorType>(name, value);
 }
 
-template <> optional<Function<TextJustifyType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<TextJustifyType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<TextJustifyType>(name, value);
 }
 
-template <> optional<Function<TextTransformType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<TextTransformType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<TextTransformType>(name, value);
 }
 
-template <> optional<Function<RotationAlignmentType>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<RotationAlignmentType>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<RotationAlignmentType>(name, value);
 }
 
-template <> optional<Function<bool>> parseProperty(const char* name, const JSVal& value) {
+template <> optional<Function<bool>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<bool>(name, value);
 }
 
-template<> optional<Function<float>> parseProperty(const char* name, const JSVal& value) {
+template<> optional<Function<float>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<float>(name, value);
 }
 
-template<> optional<Function<Color>> parseProperty(const char* name, const JSVal& value) {
+template<> optional<Function<Color>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<Color>(name, value);
 }
 
 template <typename T>
-optional<Function<Faded<T>>> parseFadedFunction(const JSVal& value) {
+optional<Function<Faded<T>>> parseFadedFunction(const JSValue& value) {
     if (!value.HasMember("stops")) {
         Log::Warning(Event::ParseStyle, "function must specify a function type");
         return {};
@@ -379,7 +379,7 @@ optional<Function<Faded<T>>> parseFadedFunction(const JSVal& value) {
 }
 
 template <>
-optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, const JSVal& value) {
+optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, const JSValue& value) {
     if (value.IsObject()) {
         return parseFadedFunction<std::vector<float>>(value);
     }
@@ -392,7 +392,7 @@ optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, co
 }
 
 template <>
-optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSVal& value) {
+optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSValue& value) {
     if (value.IsObject()) {
         return parseFadedFunction<std::string>(value);
     }

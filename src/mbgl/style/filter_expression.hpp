@@ -2,8 +2,7 @@
 #define MBGL_STYLE_FILTER_EXPRESSION
 
 #include <mbgl/style/value.hpp>
-
-#include <rapidjson/document.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <string>
 #include <vector>
@@ -25,7 +24,7 @@ typedef mapbox::util::variant<
     struct NoneExpression
     > FilterExpression;
 
-FilterExpression parseFilterExpression(const rapidjson::Value&);
+FilterExpression parseFilterExpression(const JSValue&);
 
 template <class Extractor>
 bool evaluate(const FilterExpression&, const Extractor&);

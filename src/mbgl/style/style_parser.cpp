@@ -14,7 +14,7 @@ namespace mbgl {
 
 StyleParser::~StyleParser() = default;
 
-void StyleParser::parse(const JSVal& document) {
+void StyleParser::parse(const JSValue& document) {
     if (document.HasMember("version")) {
         int version = document["version"].GetInt();
         if (version != 8) {
@@ -31,30 +31,30 @@ void StyleParser::parse(const JSVal& document) {
     }
 
     if (document.HasMember("sprite")) {
-        const JSVal& sprite = document["sprite"];
+        const JSValue& sprite = document["sprite"];
         if (sprite.IsString()) {
             spriteURL = { sprite.GetString(), sprite.GetStringLength() };
         }
     }
 
     if (document.HasMember("glyphs")) {
-        const JSVal& glyphs = document["glyphs"];
+        const JSValue& glyphs = document["glyphs"];
         if (glyphs.IsString()) {
             glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
         }
     }
 }
 
-void StyleParser::parseSources(const JSVal& value) {
+void StyleParser::parseSources(const JSValue& value) {
     if (!value.IsObject()) {
         Log::Warning(Event::ParseStyle, "sources must be an object");
         return;
     }
 
-    rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+    JSValue::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
-        const JSVal& nameVal = itr->name;
-        const JSVal& sourceVal = itr->value;
+        const JSValue& nameVal = itr->name;
+        const JSValue& sourceVal = itr->value;
 
         std::unique_ptr<Source> source = std::make_unique<Source>();
 
@@ -65,7 +65,7 @@ void StyleParser::parseSources(const JSVal& value) {
             continue;
         }
 
-        const JSVal& typeVal = sourceVal["type"];
+        const JSValue& typeVal = sourceVal["type"];
         if (!typeVal.IsString()) {
             Log::Warning(Event::ParseStyle, "source type must have one of the enum values");
             continue;
@@ -98,10 +98,10 @@ void StyleParser::parseSources(const JSVal& value) {
     }
 }
 
-bool StyleParser::parseVectorSource(Source& source, const JSVal& sourceVal) {
+bool StyleParser::parseVectorSource(Source& source, const JSValue& sourceVal) {
     // A vector tile source either specifies the URL of a TileJSON file...
     if (sourceVal.HasMember("url")) {
-        const JSVal& urlVal = sourceVal["url"];
+        const JSValue& urlVal = sourceVal["url"];
 
         if (!urlVal.IsString()) {
             Log::Warning(Event::ParseStyle, "source url must be a string");
@@ -118,9 +118,9 @@ bool StyleParser::parseVectorSource(Source& source, const JSVal& sourceVal) {
     return true;
 }
 
-bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
+bool StyleParser::parseRasterSource(Source& source, const JSValue& sourceVal) {
     if (sourceVal.HasMember("tileSize")) {
-        const JSVal& tileSizeVal = sourceVal["tileSize"];
+        const JSValue& tileSizeVal = sourceVal["tileSize"];
 
         if (!tileSizeVal.IsUint()) {
             Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
@@ -138,7 +138,7 @@ bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
 
     // A raster tile source either specifies the URL of a TileJSON file...
     if (sourceVal.HasMember("url")) {
-        const JSVal& urlVal = sourceVal["url"];
+        const JSValue& urlVal = sourceVal["url"];
 
         if (!urlVal.IsString()) {
             Log::Warning(Event::ParseStyle, "source url must be a string");
@@ -155,13 +155,13 @@ bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
     return true;
 }
 
-bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
+bool StyleParser::parseGeoJSONSource(Source& source, const JSValue& sourceVal) {
     if (!sourceVal.HasMember("data")) {
         Log::Warning(Event::ParseStyle, "GeoJSON source must have a data value");
         return false;
     }
 
-    const JSVal& dataVal = sourceVal["data"];
+    const JSValue& dataVal = sourceVal["data"];
     if (dataVal.IsString()) {
         // We need to load an external GeoJSON file
         source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
@@ -176,7 +176,7 @@ bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
     return true;
 }
 
-void StyleParser::parseLayers(const JSVal& value) {
+void StyleParser::parseLayers(const JSValue& value) {
     std::vector<std::string> ids;
 
     if (!value.IsArray()) {
@@ -185,7 +185,7 @@ void StyleParser::parseLayers(const JSVal& value) {
     }
 
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        const JSVal& layerValue = value[i];
+        const JSValue& layerValue = value[i];
 
         if (!layerValue.IsObject()) {
             Log::Warning(Event::ParseStyle, "layer must be an object");
@@ -197,7 +197,7 @@ void StyleParser::parseLayers(const JSVal& value) {
             continue;
         }
 
-        const JSVal& id = layerValue["id"];
+        const JSValue& id = layerValue["id"];
         if (!id.IsString()) {
             Log::Warning(Event::ParseStyle, "layer id must be a string");
             continue;
@@ -209,7 +209,7 @@ void StyleParser::parseLayers(const JSVal& value) {
             continue;
         }
 
-        layersMap.emplace(layerID, std::pair<const JSVal&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
+        layersMap.emplace(layerID, std::pair<const JSValue&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
         ids.push_back(layerID);
     }
 
@@ -230,7 +230,7 @@ void StyleParser::parseLayers(const JSVal& value) {
     }
 }
 
-void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::unique_ptr<StyleLayer>& layer) {
+void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<StyleLayer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
@@ -244,7 +244,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
 
     if (value.HasMember("ref")) {
         // This layer is referencing another layer. Recursively parse that layer.
-        const JSVal& refVal = value["ref"];
+        const JSValue& refVal = value["ref"];
         if (!refVal.IsString()) {
             Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", id.c_str());
             return;
@@ -280,7 +280,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
             return;
         }
 
-        const JSVal& typeVal = value["type"];
+        const JSValue& typeVal = value["type"];
         if (!typeVal.IsString()) {
             Log::Warning(Event::ParseStyle, "layer '%s' has an invalid type", id.c_str());
             return;
@@ -308,7 +308,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         layer->id = id;
 
         if (value.HasMember("source")) {
-            const JSVal& value_source = value["source"];
+            const JSValue& value_source = value["source"];
             if (value_source.IsString()) {
                 layer->source = { value_source.GetString(), value_source.GetStringLength() };
                 auto source_it = sourcesMap.find(layer->source);
@@ -321,7 +321,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("source-layer")) {
-            const JSVal& value_source_layer = value["source-layer"];
+            const JSValue& value_source_layer = value["source-layer"];
             if (value_source_layer.IsString()) {
                 layer->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
             } else {
@@ -334,7 +334,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("minzoom")) {
-            const JSVal& min_zoom = value["minzoom"];
+            const JSValue& min_zoom = value["minzoom"];
             if (min_zoom.IsNumber()) {
                 layer->minZoom = min_zoom.GetDouble();
             } else {
@@ -343,7 +343,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("maxzoom")) {
-            const JSVal& max_zoom = value["maxzoom"];
+            const JSValue& max_zoom = value["maxzoom"];
             if (max_zoom.IsNumber()) {
                 layer->maxZoom = max_zoom.GetDouble();
             } else {
@@ -360,7 +360,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
     layer->parsePaints(value);
 }
 
-void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {
+void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
     if (!value.HasMember("visibility")) {
         return;
     } else if (!value["visibility"].IsString()) {

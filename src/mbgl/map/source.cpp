@@ -77,7 +77,7 @@ void Source::load() {
             return;
         }
 
-        rapidjson::Document d;
+        rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
         d.Parse<0>(res.data->c_str());
 
         if (d.HasParseError()) {

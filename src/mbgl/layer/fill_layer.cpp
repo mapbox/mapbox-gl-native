@@ -8,7 +8,7 @@ std::unique_ptr<StyleLayer> FillLayer::clone() const {
     return std::make_unique<FillLayer>(*this);
 }
 
-void FillLayer::parsePaints(const JSVal& layer) {
+void FillLayer::parsePaints(const JSValue& layer) {
     paint.antialias.parse("fill-antialias", layer);
     paint.opacity.parse("fill-opacity", layer);
     paint.color.parse("fill-color", layer);

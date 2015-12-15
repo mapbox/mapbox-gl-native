@@ -4,9 +4,7 @@
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/image.hpp>
-
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <cmath>
 #include <limits>
@@ -59,7 +57,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
 
 namespace {
 
-inline uint16_t getUInt16(const rapidjson::Value& value, const char* name, const uint16_t def = 0) {
+inline uint16_t getUInt16(const JSValue& value, const char* name, const uint16_t def = 0) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsUint() && v.GetUint() <= std::numeric_limits<uint16_t>::max()) {
@@ -73,7 +71,7 @@ inline uint16_t getUInt16(const rapidjson::Value& value, const char* name, const
     return def;
 }
 
-inline double getDouble(const rapidjson::Value& value, const char* name, const double def = 0) {
+inline double getDouble(const JSValue& value, const char* name, const double def = 0) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsNumber()) {
@@ -86,7 +84,7 @@ inline double getDouble(const rapidjson::Value& value, const char* name, const d
     return def;
 }
 
-inline bool getBoolean(const rapidjson::Value& value, const char* name, const bool def = false) {
+inline bool getBoolean(const JSValue& value, const char* name, const bool def = false) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsBool()) {
@@ -102,8 +100,6 @@ inline bool getBoolean(const rapidjson::Value& value, const char* name, const bo
 } // namespace
 
 SpriteParseResult parseSprite(const std::string& image, const std::string& json) {
-    using namespace rapidjson;
-
     Sprites sprites;
     PremultipliedImage raster;
 
@@ -113,7 +109,7 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
         return std::string("Could not parse sprite image");
     }
 
-    Document doc;
+    JSDocument doc;
     doc.Parse<0>(json.c_str());
 
     if (doc.HasParseError()) {
@@ -123,9 +119,9 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
     } else if (!doc.IsObject()) {
         return std::string("Sprite JSON root must be an object");
     } else {
-        for (Value::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
+        for (JSValue::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
             const std::string name = { itr->name.GetString(), itr->name.GetStringLength() };
-            const Value& value = itr->value;
+            const JSValue& value = itr->value;
 
             if (value.IsObject()) {
                 const uint16_t x = getUInt16(value, "x", 0);

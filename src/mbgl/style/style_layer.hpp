@@ -5,8 +5,7 @@
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
-
-#include <rapidjson/document.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <memory>
 #include <string>
@@ -18,8 +17,6 @@ class StyleCascadeParameters;
 class StyleCalculationParameters;
 class StyleBucketParameters;
 class Bucket;
-
-using JSVal = rapidjson::Value;
 
 class StyleLayer {
 public:
@@ -35,8 +32,8 @@ public:
     // Create a copy of this layer.
     virtual std::unique_ptr<StyleLayer> clone() const = 0;
 
-    virtual void parseLayout(const JSVal& value) = 0;
-    virtual void parsePaints(const JSVal& value) = 0;
+    virtual void parseLayout(const JSValue& value) = 0;
+    virtual void parsePaints(const JSValue& value) = 0;
 
     // If the layer has a ref, the ref. Otherwise, the id.
     const std::string& bucketName() const;

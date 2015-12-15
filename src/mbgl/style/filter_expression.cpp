@@ -18,7 +18,7 @@ Value parseFeatureType(const Value& value) {
 }
 
 template <class Expression>
-FilterExpression parseBinaryFilter(const rapidjson::Value& value) {
+FilterExpression parseBinaryFilter(const JSValue& value) {
     FilterExpression empty;
 
     if (value.Size() < 3) {
@@ -43,7 +43,7 @@ FilterExpression parseBinaryFilter(const rapidjson::Value& value) {
 }
 
 template <class Expression>
-FilterExpression parseSetFilter(const rapidjson::Value& value) {
+FilterExpression parseSetFilter(const JSValue& value) {
     FilterExpression empty;
 
     if (value.Size() < 2) {
@@ -69,7 +69,7 @@ FilterExpression parseSetFilter(const rapidjson::Value& value) {
 }
 
 template <class Expression>
-FilterExpression parseCompoundFilter(const rapidjson::Value& value) {
+FilterExpression parseCompoundFilter(const JSValue& value) {
     Expression expression;
     for (rapidjson::SizeType i = 1; i < value.Size(); ++i) {
         expression.expressions.push_back(parseFilterExpression(value[i]));
@@ -77,7 +77,7 @@ FilterExpression parseCompoundFilter(const rapidjson::Value& value) {
     return expression;
 }
 
-FilterExpression parseFilterExpression(const rapidjson::Value& value) {
+FilterExpression parseFilterExpression(const JSValue& value) {
     FilterExpression empty;
 
     if (!value.IsArray()) {

@@ -8,7 +8,7 @@ std::unique_ptr<StyleLayer> CircleLayer::clone() const {
     return std::make_unique<CircleLayer>(*this);
 }
 
-void CircleLayer::parsePaints(const JSVal& layer) {
+void CircleLayer::parsePaints(const JSValue& layer) {
     paint.radius.parse("circle-radius", layer);
     paint.color.parse("circle-color", layer);
     paint.opacity.parse("circle-opacity", layer);

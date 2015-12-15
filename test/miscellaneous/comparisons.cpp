@@ -37,7 +37,7 @@ private:
 };
 
 FilterExpression parse(const char * expression) {
-    rapidjson::Document doc;
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
     doc.Parse<0>(expression);
     return parseFilterExpression(doc);
 }
