@@ -67,6 +67,9 @@ public:
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }
 
+    // User constraints
+    void setUserConstraints(LatLngBounds userConstraints) { state.userConstraints = userConstraints; }
+    
 private:
     void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void _setScale(double scale, const PrecisionPoint& center, const Duration& = Duration::zero());

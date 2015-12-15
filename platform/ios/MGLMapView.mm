@@ -1875,6 +1875,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 }
 
+- (void)setUserConstraintsSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast
+{
+    _mbglMap->setUserConstraints(mbgl::LatLngBounds(mbgl::LatLng(southWest.latitude, southWest.longitude), mbgl::LatLng(northEast.latitude, northEast.longitude)));
+}
+
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view
 {
     return MGLLocationCoordinate2DFromLatLng([self convertPoint:point toLatLngFromView:view]);

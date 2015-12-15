@@ -136,6 +136,9 @@ public:
     // Size
     uint16_t getWidth() const;
     uint16_t getHeight() const;
+    
+    // User constraints
+    void setUserConstraints(LatLngBounds userConstraints);
 
     // Projection
     MetersBounds getWorldBoundsMeters() const;

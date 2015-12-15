@@ -211,6 +211,14 @@ IB_DESIGNABLE
 *   @param function A timing function used for the animation. Set this parameter to `nil` for a transition that matches most system animations. If the duration is `0`, this parameter is ignored. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function;
 
+/**
+ *  Constrains map movement within the given coordinates.
+ *
+ *  @param southWest The south west coordinate to constrain the map to.
+ *  @param northEast The north east coordinate to constrain the map to.
+ */
+- (void)setUserConstraintsSouthWest:(CLLocationCoordinate2D)southWest andNorthEast:(CLLocationCoordinate2D)northEast;
+
 /** Moves the viewpoint to a different location with respect to the map with an optional transition duration and timing function.
 *   @param camera The new viewpoint.
 *   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously.

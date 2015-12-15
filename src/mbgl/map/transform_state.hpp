@@ -58,6 +58,10 @@ public:
 
     // State
     bool isChanging() const;
+    
+    // User constraints
+    LatLngBounds userConstraints = LatLngBounds(LatLng(-90, -180), LatLng(90, 180));
+
     bool isRotating() const;
     bool isScaling() const;
     bool isPanning() const;
@@ -71,10 +75,12 @@ public:
     LatLng coordinateToLatLng(const TileCoordinate&) const;
 
     PrecisionPoint coordinateToPoint(const TileCoordinate&) const;
+    PrecisionPoint latLngToXY(LatLng latlng) const;
     TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
 
 private:
     void constrain(double& scale, double& x, double& y) const;
+    void userConstrain(double& scale_, double& x_, double& y_) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);

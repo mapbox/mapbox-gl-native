@@ -303,7 +303,12 @@ uint16_t Map::getHeight() const {
     return transform->getState().getHeight();
 }
 
+#pragma mark - User constrains
 
+void Map::setUserConstraints(LatLngBounds userConstraints) {
+    transform->setUserConstraints(userConstraints);
+}
+    
 #pragma mark - Rotation
 
 void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& duration) {
