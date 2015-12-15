@@ -5821,6 +5821,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -5990,6 +5991,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -6060,6 +6062,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -6139,6 +6142,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -6579,6 +6583,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -6669,6 +6674,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -6918,6 +6924,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -7001,6 +7008,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "all",
                 [
@@ -7195,6 +7203,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "==",
                 "type",
@@ -7515,6 +7524,7 @@
             "type": "symbol",
             "source": "composite",
             "source-layer": "poi_label",
+            "interactive": true,
             "filter": [
                 "==",
                 "type",

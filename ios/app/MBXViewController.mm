@@ -263,8 +263,9 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             [self.interactiveShield addGestureRecognizer:pan];
 
             self.featuresView = [[UITextView alloc] initWithFrame:CGRectMake(20, self.topLayoutGuide.length + 20,
-                self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height * 2 / 3)];
-            self.featuresView.font = [UIFont systemFontOfSize:10];
+                self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height / 4)];
+            self.featuresView.selectable = NO;
+            self.featuresView.font = [UIFont systemFontOfSize:16];
             self.featuresView.backgroundColor = [UIColor whiteColor];
             self.featuresView.alpha = 0.75;
             self.featuresView.text = @"Moving the map is now disabled until you change the style. Pan with your finger to query for features.";
@@ -345,29 +346,42 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
         if ([features count])
         {
-            NSMutableString *output = [NSMutableString string];
+            NSMutableArray *outputNames = [NSMutableArray array];
+            NSMutableArray *seenIDs = [NSMutableArray array];
 
             for (NSDictionary *feature in features)
             {
-                [output appendString:@"Layer: "];
-                [output appendString:[feature objectForKey:MGLFeatureLayerNameKey]];
-                [output appendString:@"\n"];
+                NSDictionary *properties = feature[MGLFeaturePropertiesKey];
 
-                [output appendString:@"Source: "];
-                [output appendString:[feature objectForKey:MGLFeatureSourceNameKey]];
-                [output appendString:@"\n"];
+                NSString *featureID = properties[@"osm_id"];
 
-                NSDictionary *properties = [feature objectForKey:MGLFeaturePropertiesKey];
-
-                for (NSString *key in [properties allKeys])
+                if ( ! [seenIDs containsObject:featureID])
                 {
-                    [output appendString:@"{"];
-                    [output appendString:key];
-                    [output appendString:@"}: "];
-                    [output appendString:properties[key]];
-                    [output appendString:@"\n"];
-                }
+                    [seenIDs addObject:featureID];
 
+                    NSString *featureName = properties[@"name_en"];
+
+                    // Mapbox-returned OSM IDs have 1 + zero padding in front of
+                    // the actual OSM ID, so let's remove that.
+                    //
+                    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^10+(.*)"
+                                                                                           options:0
+                                                                                             error:nil];
+
+                    featureID = [regex stringByReplacingMatchesInString:featureID
+                                                                options:0
+                                                                  range:NSMakeRange(0, featureID.length)
+                                                           withTemplate:@"$1"];
+
+                    [outputNames addObject:[NSString stringWithFormat:@"- %@ (OSM #%@)", featureName, featureID]];
+                }
+            }
+
+            NSMutableString *output = [NSMutableString stringWithString:@"Features:\n\n"];
+
+            for (NSString *outputName in outputNames)
+            {
+                [output appendString:outputName];
                 [output appendString:@"\n"];
             }
 
