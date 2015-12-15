@@ -9,12 +9,12 @@
 
 @implementation MGLAnnotationImage
 
-+ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(nullable NSString *)reuseIdentifier
++ (instancetype)annotationImageWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier
 {
     return [[self alloc] initWithImage:image reuseIdentifier:reuseIdentifier];
 }
 
-- (instancetype)initWithImage:(UIImage *)image reuseIdentifier:(nullable NSString *)reuseIdentifier
+- (instancetype)initWithImage:(UIImage *)image reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super init];
 

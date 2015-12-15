@@ -187,12 +187,9 @@ void SpriteAtlas::updateDirty() {
             // The two names match;
             Holder& holder = imageIterator->second;
             holder.texture = spriteIterator->second;
-            if (holder.texture != nullptr)
-            {
+            if (holder.texture != nullptr) {
                 copy(holder, imageIterator->first.second);
-            }
-            else
-            {
+            } else {
                 images.erase(imageIterator);
             }
             
