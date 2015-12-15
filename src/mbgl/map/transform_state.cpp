@@ -243,6 +243,10 @@ double TransformState::zoomScale(double zoom) const {
     return std::pow(2.0f, zoom);
 }
 
+double TransformState::scaleZoom(double s) const {
+    return std::log2(s);
+}
+
 float TransformState::worldSize() const {
     return util::tileSize * scale;
 }

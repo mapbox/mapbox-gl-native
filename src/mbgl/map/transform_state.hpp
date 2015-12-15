@@ -95,6 +95,7 @@ private:
     double lngX(double lon) const;
     double latY(double lat) const;
     double zoomScale(double zoom) const;
+    double scaleZoom(double scale) const;
     float worldSize() const;
 
     mat4 coordinatePointMatrix(double z) const;

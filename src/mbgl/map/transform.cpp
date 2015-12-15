@@ -319,6 +319,7 @@ void Transform::flyTo(const CameraOptions &options) {
     LatLng startLatLng = getLatLng();
     double zoom = flyOptions.zoom ? *flyOptions.zoom : getZoom();
     double angle = flyOptions.angle ? *flyOptions.angle : getAngle();
+    double pitch = flyOptions.pitch ? *flyOptions.pitch : getPitch();
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
     }
@@ -337,13 +338,14 @@ void Transform::flyTo(const CameraOptions &options) {
     
     view.notifyMapChange(MapChangeRegionWillChangeAnimated);
     
-    const double startS = state.scale;
+    const double startZ = state.scaleZoom(state.scale);
     const double startA = state.angle;
+    const double startP = state.pitch;
     state.panning = true;
     state.scaling = true;
     state.rotating = true;
     
-    const double rho = 1.42;
+    double rho = flyOptions.curve ? *flyOptions.curve : 1.42;
     double w0 = std::max(state.width, state.height);
     double w1 = w0 / new_scale;
     double u1 = ::hypot(xn, yn);
@@ -371,47 +373,65 @@ void Transform::flyTo(const CameraOptions &options) {
     double S = (is_close ? (std::abs(std::log(w1 / w0)) / rho)
                 : ((r(1) - r0) / rho));
     
-    if (!flyOptions.duration) {
-        flyOptions.duration = Duration::zero();
+    Duration duration = flyOptions.duration ? *flyOptions.duration : Duration::zero();
+    if (flyOptions.duration) {
+        duration = *flyOptions.duration;
+    } else {
+        double speed = flyOptions.speed ? *flyOptions.speed : 1.2;
+        duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+            std::chrono::duration<double, std::chrono::seconds::period>(S / speed));
     }
     startTransition(
-                    [=](double t) {
-                        util::UnitBezier ease = flyOptions.easing ? *flyOptions.easing : util::UnitBezier(0, 0, 0.25, 1);
-                        return ease.solve(t, 0.001);
-                    },
-                    [=](double k) {
-                        double s = k * S;
-                        double us = u(s);
-                        
-                        //First calculate the desired latlng
-                        double desiredLat = startLatLng.latitude + (latLng.latitude - startLatLng.latitude) * us;
-                        double desiredLng = startLatLng.longitude + (latLng.longitude - startLatLng.longitude) * us;
-                        
-                        //Now calculate desired zoom
-                        state.scale = startS - w(s);
-                        
-                        //Now set values
-                        const double new_scaled_tile_size = state.scale * util::tileSize;
-                        state.Bc = new_scaled_tile_size / 360;
-                        state.Cc = new_scaled_tile_size / util::M2PI;
-                        
-                        const double f2 = ::fmin(::fmax(std::sin(util::DEG2RAD * desiredLat), -m), m);
-                        state.x = -desiredLng * state.Bc;
-                        state.y = 0.5 * state.Cc * std::log((1 + f2) / (1 - f2));
-                        
-                        if (angle != startA) {
-                            state.angle = util::wrap(util::interpolate(startA, angle, k), -M_PI, M_PI);
-                        }
-                        
-                        view.notifyMapChange(MapChangeRegionIsChanging);
-                        return Update::Zoom;
-                    },
-                    [=] {
-                        state.panning = false;
-                        state.scaling = false;
-                        state.rotating = false;
-                        view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-                    }, *flyOptions.duration);
+        [=](double t) {
+            util::UnitBezier ease = flyOptions.easing ? *flyOptions.easing : util::UnitBezier(0, 0, 0.25, 1);
+            return ease.solve(t, 0.001);
+        },
+        [=](double k) {
+            double s = k * S;
+            double us = u(s);
+            
+            //First calculate the desired latlng
+            double desiredLat = startLatLng.latitude + (latLng.latitude - startLatLng.latitude) * us;
+            double desiredLng = startLatLng.longitude + (latLng.longitude - startLatLng.longitude) * us;
+            
+            //Now calculate desired zoom
+            double desiredZoom = startZ + state.scaleZoom(1 / w(s));
+            double desiredScale = state.zoomScale(desiredZoom);
+            state.scale = ::fmax(::fmin(desiredScale, state.max_scale), state.min_scale);
+            
+            //Now set values
+            const double new_scaled_tile_size = state.scale * util::tileSize;
+            state.Bc = new_scaled_tile_size / 360;
+            state.Cc = new_scaled_tile_size / util::M2PI;
+            
+            const double f2 = ::fmin(::fmax(std::sin(util::DEG2RAD * desiredLat), -m), m);
+            state.x = -desiredLng * state.Bc;
+            state.y = 0.5 * state.Cc * std::log((1 + f2) / (1 - f2));
+            
+            if (angle != startA) {
+                state.angle = util::wrap(util::interpolate(startA, angle, k), -M_PI, M_PI);
+            }
+            if (pitch != startP) {
+                state.pitch = util::clamp(util::interpolate(startP, pitch, k), 0., 60.);
+            }
+            // At k = 1.0, a DidChangeAnimated notification should be sent from finish().
+            if (k < 1.0) {
+                if (options.transitionFrameFn) {
+                    options.transitionFrameFn(k);
+                }
+                view.notifyMapChange(MapChangeRegionIsChanging);
+            }
+            return Update::Zoom;
+        },
+        [=] {
+            state.panning = false;
+            state.scaling = false;
+            state.rotating = false;
+            if (options.transitionFinishFn) {
+                options.transitionFinishFn();
+            }
+            view.notifyMapChange(MapChangeRegionDidChangeAnimated);
+        }, duration);
 };
 
 #pragma mark - Angle

@@ -17,6 +17,8 @@ struct CameraOptions {
     mapbox::util::optional<double> angle;
     mapbox::util::optional<double> pitch;
     mapbox::util::optional<Duration> duration;
+    mapbox::util::optional<double> speed;
+    mapbox::util::optional<double> curve;
     mapbox::util::optional<mbgl::util::UnitBezier> easing;
     std::function<void(double)> transitionFrameFn;
     std::function<void()> transitionFinishFn;
