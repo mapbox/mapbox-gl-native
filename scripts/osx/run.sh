@@ -11,12 +11,6 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-mapbox_time "package_osx_symbols" \
-make xpackage
-
-mapbox_time "package_osx_stripped" \
-make xpackage-strip
-
 mapbox_time "compile_program" \
 make xosx -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
