@@ -1139,7 +1139,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         if (hitAnnotationTag != _selectedAnnotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
-            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %i", hitAnnotationTag);
+            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
             [self selectAnnotation:annotation animated:YES];
         }
     }

@@ -1205,7 +1205,7 @@ public:
     if (hitAnnotationTag != MGLAnnotationTagNotFound) {
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
-            NSAssert(annotation, @"Cannot select nonexistent annotation with ID %i", hitAnnotationTag);
+            NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
             [self selectAnnotation:annotation];
         }
     } else {
