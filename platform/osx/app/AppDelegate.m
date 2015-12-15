@@ -9,6 +9,13 @@
 static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken";
 static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
 
+static const CLLocationCoordinate2D WorldTourDestinations[] = {
+    { .latitude = 38.9131982, .longitude = -77.0325453144239 },
+    { .latitude = 37.7757368, .longitude = -122.4135302 },
+    { .latitude = 12.9810816, .longitude = 77.6368034 },
+    { .latitude = -13.15589555, .longitude = -74.2178961777998 },
+};
+
 @interface AppDelegate () <NSApplicationDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
 
 @property (weak) IBOutlet NSWindow *window;
@@ -26,6 +33,7 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
+    BOOL _isTouringWorld;
 }
 
 #pragma mark Lifecycle
@@ -283,6 +291,48 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     [self.mapView removeAnnotations:self.mapView.annotations];
 }
 
+- (IBAction)startWorldTour:(id)sender {
+    _isTouringWorld = YES;
+    
+    [self removeAllPins:sender];
+    NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
+    for (NSUInteger i = 0; i < numberOfAnnotations; i++) {
+        MGLPointAnnotation *annotation = [[MGLPointAnnotation alloc] init];
+        annotation.coordinate = WorldTourDestinations[i];
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+    [self continueWorldTourWithRemainingAnnotations:annotations];
+}
+
+- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations {
+    MGLPointAnnotation *nextAnnotation = annotations.firstObject;
+    if (!nextAnnotation || !_isTouringWorld) {
+        _isTouringWorld = NO;
+        return;
+    }
+    
+    [annotations removeObjectAtIndex:0];
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
+                                                            fromDistance:0
+                                                                   pitch:arc4random_uniform(60)
+                                                                 heading:arc4random_uniform(360)];
+    __weak AppDelegate *weakSelf = self;
+    [self.mapView flyToCamera:camera withDuration:0 completionHandler:^{
+        AppDelegate *strongSelf = weakSelf;
+        [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
+                         withObject:annotations
+                         afterDelay:2];
+    }];
+}
+
+- (IBAction)stopWorldTour:(id)sender {
+    _isTouringWorld = NO;
+    // Any programmatic viewpoint change cancels outstanding animations.
+    self.mapView.camera = self.mapView.camera;
+}
+
 #pragma mark Help methods
 
 - (IBAction)showShortcuts:(id)sender {
@@ -445,6 +495,12 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     if (menuItem.action == @selector(removeAllPins:)) {
         return self.mapView.annotations.count;
     }
+    if (menuItem.action == @selector(startWorldTour:)) {
+        return !_isTouringWorld;
+    }
+    if (menuItem.action == @selector(stopWorldTour:)) {
+        return _isTouringWorld;
+    }
     if (menuItem.action == @selector(showShortcuts:)) {
         return YES;
     }
@@ -480,9 +536,12 @@ static NSString * const MGLDroppedPinAnnotationImageIdentifier = @"dropped";
     
     if (toolbarItem.action == @selector(showShareMenu:)) {
         [(NSButton *)toolbarItem.view sendActionOn:NSLeftMouseDownMask];
-        return ([MGLAccountManager accessToken]
-                && [self.mapView.styleURL.scheme isEqualToString:@"mapbox"]
-                && [self.mapView.styleURL.pathComponents.firstObject isEqualToString:@"styles"]);
+        if (![MGLAccountManager accessToken]) {
+            return NO;
+        }
+        NSURL *styleURL = self.mapView.styleURL;
+        return ([styleURL.scheme isEqualToString:@"mapbox"]
+                && [styleURL.pathComponents.firstObject isEqualToString:@"styles"]);
     }
     if (toolbarItem.action == @selector(setStyle:)) {
         NSPopUpButton *popUpButton = (NSPopUpButton *)toolbarItem.view;

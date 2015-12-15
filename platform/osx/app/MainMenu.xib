@@ -469,7 +469,7 @@
                                     <action selector="toggleRandomizesCursorsOnDroppedPins:" target="-1" id="Mpw-b8-oub"/>
                                 </connections>
                             </menuItem>
-                            <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
+                            <menuItem isSeparatorItem="YES" id="Sl5-nE-kHd"/>
                             <menuItem title="Blanket Map With Pins" id="LMZ-oe-Ngh">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -480,6 +480,19 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="removeAllPins:" target="-1" id="NRM-y5-Wul"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
+                            <menuItem title="Start World Tour" id="VFo-Jh-2sw">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="startWorldTour:" target="-1" id="66Y-Gm-Yn1"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Stop World Tour" id="Pa8-qU-xfr">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="stopWorldTour:" target="-1" id="aq0-7t-AGi"/>
                                 </connections>
                             </menuItem>
                         </items>
