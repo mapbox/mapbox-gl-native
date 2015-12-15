@@ -1,14 +1,6 @@
 ---
 format_version: 1.0.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
-app:
-  envs:
-  - BITRISE_PROJECT_PATH: "./scripts/ios_bitrise/ios_bitrise.xcodeproj"
-    opts:
-      is_expand: false
-  - BITRISE_SCHEME: ios_bitrise
-    opts:
-      is_expand: false
 trigger_map:
 - pattern: "*"
   is_pull_request_allowed: true
