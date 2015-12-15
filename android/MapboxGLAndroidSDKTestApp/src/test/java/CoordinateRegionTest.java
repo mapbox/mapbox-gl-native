@@ -1,5 +1,3 @@
-package geometry;
-
 import com.mapbox.mapboxsdk.geometry.CoordinateRegion;
 import com.mapbox.mapboxsdk.geometry.CoordinateSpan;
 import com.mapbox.mapboxsdk.geometry.LatLng;

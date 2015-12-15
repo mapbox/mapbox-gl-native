@@ -1,5 +1,3 @@
-package geometry;
-
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 
 import org.junit.Test;

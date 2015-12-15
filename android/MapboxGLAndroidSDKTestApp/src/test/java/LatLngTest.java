@@ -1,5 +1,3 @@
-package geometry;
-
 import android.location.Location;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
