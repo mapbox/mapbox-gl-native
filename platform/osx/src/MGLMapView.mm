@@ -987,6 +987,53 @@ public:
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
     
+    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    if (duration > 0) {
+        options.duration = MGLDurationInSeconds(duration);
+        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+    }
+    if (completion) {
+        options.transitionFinishFn = [completion]() {
+            // Must run asynchronously after the transition is completely over.
+            // Otherwise, a call to -setCamera: within the completion handler
+            // would reenter the completion handler’s caller.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        };
+    }
+    
+    [self willChangeValueForKey:@"camera"];
+    _mbglMap->easeTo(options);
+    [self didChangeValueForKey:@"camera"];
+}
+
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion {
+    _mbglMap->cancelTransitions();
+    
+    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    if (duration > 0) {
+        options.duration = MGLDurationInSeconds(duration);
+    }
+    if (completion) {
+        options.transitionFinishFn = [completion]() {
+            // Must run asynchronously after the transition is completely over.
+            // Otherwise, a call to -setCamera: within the completion handler
+            // would reenter the completion handler’s caller.
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        };
+    }
+    
+    [self willChangeValueForKey:@"camera"];
+    _mbglMap->flyTo(options);
+    [self didChangeValueForKey:@"camera"];
+}
+
+/// Returns a CameraOptions object that specifies parameters for animating to
+/// the given camera.
+- (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera {
     // The opposite side is the distance between the center and one edge.
     mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
     mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(centerLatLng);
@@ -1037,24 +1084,7 @@ public:
     if (pitch >= 0) {
         options.pitch = pitch;
     }
-    if (duration > 0) {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(function);
-    }
-    if (completion) {
-        options.transitionFinishFn = [completion]() {
-            // Must run asynchronously after the transition is completely over.
-            // Otherwise, a call to -setCamera: within the completion handler
-            // would reenter the completion handler’s caller.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                completion();
-            });
-        };
-    }
-    
-    [self willChangeValueForKey:@"camera"];
-    _mbglMap->easeTo(options);
-    [self didChangeValueForKey:@"camera"];
+    return options;
 }
 
 + (NSSet *)keyPathsForValuesAffectingVisibleCoordinateBounds {
@@ -1215,7 +1245,7 @@ public:
 
 /// Tap with two fingers (“right-click”) to zoom out.
 - (void)handleSecondaryClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
-    if (!self.zoomEnabled) {
+    if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded) {
         return;
     }
     
@@ -1227,7 +1257,7 @@ public:
 
 /// Double-click or double-tap to zoom in.
 - (void)handleDoubleClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
-    if (!self.zoomEnabled) {
+    if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded) {
         return;
     }
     
@@ -2244,6 +2274,9 @@ public:
         // main thread. OpenGL contexts and extensions are thread-local, so this
         // has to happen on the Map thread too.
         activate();
+        
+//        auto size = getFramebufferSize();
+//        MBGL_CHECK_ERROR(glViewport(0, 0, size[0], size[1]));
     }
     
     void afterRender() override {

@@ -1787,18 +1787,52 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
-    [self _setCamera:camera withDuration:duration animationTimingFunction:function completionHandler:completion useFly:NO];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    if (duration > 0)
+    {
+        options.duration = MGLDurationInSeconds(duration);
+        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+    }
+    if (completion)
+    {
+        options.transitionFinishFn = [completion]() {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        };
+    }
+    
+    [self willChangeValueForKey:@"camera"];
+    _mbglMap->easeTo(options);
+    [self didChangeValueForKey:@"camera"];
 }
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
 {
-    [self _setCamera:camera withDuration:duration animationTimingFunction:nil completionHandler:completion useFly:YES];
+    _mbglMap->cancelTransitions();
+    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    if (duration > 0)
+    {
+        options.duration = MGLDurationInSeconds(duration);
+    }
+    if (completion)
+    {
+        options.transitionFinishFn = [completion]() {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                completion();
+            });
+        };
+    }
+    
+    [self willChangeValueForKey:@"camera"];
+    _mbglMap->flyTo(options);
+    [self didChangeValueForKey:@"camera"];
 }
 
-- (void)_setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion useFly:(BOOL)fly
-{
-    _mbglMap->cancelTransitions();
-    
+/// Returns a CameraOptions object that specifies parameters for animating to
+/// the given camera.
+- (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera {
     // The opposite side is the distance between the center and one edge.
     mbgl::LatLng centerLatLng = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
     mbgl::ProjectedMeters centerMeters = _mbglMap->projectedMetersForLatLng(centerLatLng);
@@ -1855,24 +1889,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         options.pitch = pitch;
     }
-    if (duration > 0)
-    {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(function);
-    }
-    if (completion)
-    {
-        options.transitionFinishFn = [completion]() {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                completion();
-            });
-        };
-    }
-    if (fly) {
-        _mbglMap->flyTo(options);
-    } else {
-        _mbglMap->easeTo(options);
-    }
+    return options;
 }
 
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view

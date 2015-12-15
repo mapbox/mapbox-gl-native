@@ -249,6 +249,16 @@ IB_DESIGNABLE
     @param completion The block to execute after the animation finishes. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
+/** Uses a ballistic parabolic motion to “fly” the viewpoint to a different
+    location with respect to the map with an optional transition duration.
+    
+    @param camera The new viewpoint.
+    @param duration The amount of time, measured in seconds, that the transition
+        animation should take. Specify `0` to jump to the new viewpoint
+        instantaneously.
+    @param completion The block to execute after the animation finishes. */
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion;
+
 /** The geographic coordinate bounds visible in the receiver’s viewport.
     
     Changing the value of this property updates the receiver immediately. If you
