@@ -5,6 +5,12 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 
+/**
+ * ProjectedMeters is an internal representation of longitude, latitude points that
+ * have been projected into Mapbox GL's Mercator projection. Instead of decimal
+ * degrees, it uses Mercator meters (which are notably not equivalent to SI meters)
+ * except at the equator.
+ */
 public class ProjectedMeters implements IProjectedMeters, Parcelable, Serializable {
 
     public static final Creator<ProjectedMeters> CREATOR = new Creator<ProjectedMeters>() {

@@ -9,6 +9,17 @@ import com.mapbox.mapboxsdk.constants.MathConstants;
 
 import java.io.Serializable;
 
+/**
+ * <p>
+ * This class is container for a single latitude, longitude pair, with
+ * optional altitude. Latitude and longitude are expressed as decimal degrees
+ * in the WGS84 datum. By default, altitude is 0.0, or sea level.
+ * </p>
+ * <p>
+ * Mapbox GL displays maps in the Mercator Projection and projects geographical
+ * data automatically, so all data enters in the WGS84 datum.
+ * </p>
+ */
 public class LatLng implements ILatLng, Parcelable, Serializable {
 
     public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
