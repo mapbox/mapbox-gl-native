@@ -1008,6 +1008,10 @@ public:
     [self didChangeValueForKey:@"camera"];
 }
 
+- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion {
+    [self flyToCamera:camera withDuration:0 completionHandler:completion];
+}
+
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
     

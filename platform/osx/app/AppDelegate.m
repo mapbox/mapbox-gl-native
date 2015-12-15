@@ -319,7 +319,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                    pitch:arc4random_uniform(60)
                                                                  heading:arc4random_uniform(360)];
     __weak AppDelegate *weakSelf = self;
-    [self.mapView flyToCamera:camera withDuration:0 completionHandler:^{
+    [self.mapView flyToCamera:camera completionHandler:^{
         AppDelegate *strongSelf = weakSelf;
         [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
                          withObject:annotations
