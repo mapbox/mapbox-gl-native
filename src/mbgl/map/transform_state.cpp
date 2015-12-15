@@ -244,7 +244,7 @@ double TransformState::zoomScale(double zoom) const {
 }
 
 double TransformState::scaleZoom(double s) const {
-    return std::log2(s);
+    return ::log2(s);
 }
 
 float TransformState::worldSize() const {
