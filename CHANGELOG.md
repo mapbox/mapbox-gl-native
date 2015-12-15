@@ -2,9 +2,17 @@
 
 ## Android master
 
+## 2.3.0
+
+* Added Tilt / Pitch Support ([#2805](https://github.com/mapbox/mapbox-gl-native/issues/2805))
+* Keep InfoWindow Open When Panning ([#3121](https://github.com/mapbox/mapbox-gl-native/issues/3121))
+* Concurrent Multiple Open InfoWindows ([#3115](https://github.com/mapbox/mapbox-gl-native/issues/3115))
+* OkHttp Replace curl ([#2856](https://github.com/mapbox/mapbox-gl-native/issues/2856))
+* GPS and Compass Customization Support ([#2858](https://github.com/mapbox/mapbox-gl-native/issues/2858))
+
 ## 2.2.0
 
-- New User Dot location graphics ([#2732](https://github.com/mapbox/mapbox-gl-native/issues/2732)
+- New User Dot location graphics ([#2732](https://github.com/mapbox/mapbox-gl-native/issues/2732))
 - Custom Drawable Markers ([#2744](https://github.com/mapbox/mapbox-gl-native/issues/2744))
 - `MapView.setOnInfoWindowClickListener()` support ([#2448](https://github.com/mapbox/mapbox-gl-native/issues/2448))
 - Completed Annotations API ([#1716](https://github.com/mapbox/mapbox-gl-native/issues/1716))
