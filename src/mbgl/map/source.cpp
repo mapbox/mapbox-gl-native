@@ -61,6 +61,8 @@ void Source::load() {
         return;
     }
 
+    if (req) return;
+
     // URL may either be a TileJSON file, or a GeoJSON file.
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Source, info.url }, [this](Response res) {
