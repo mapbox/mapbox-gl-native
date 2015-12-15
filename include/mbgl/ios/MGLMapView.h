@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 @protocol MGLOverlay;
+@protocol MGLCalloutViewProtocol;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -962,7 +963,18 @@ IB_DESIGNABLE
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
 /**
- Return the view to display on the left side of the standard callout bubble.
+ Returns a custom callout view to display for the specified annotation.
+ 
+ If the method is present in the delegate, it must return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view.
+ 
+ @param mapView The map view that requested the callout view.
+ @param annotation The object representing the annotation.
+ @return A view following the MGLCalloutView protocol.
+ */
+- (nullable UIView <MGLCalloutViewProtocol> *)mapView:(MGLMapView *)mapView customCalloutViewForAnnotation:(id <MGLAnnotation>)annotation;
+
+/**
+ Returns the view to display on the left side of the standard callout bubble.
  
  The default value is treated as if `nil`. The left callout view is typically used to display information about the annotation or to link to custom information provided by your application.
  
@@ -975,7 +987,7 @@ IB_DESIGNABLE
 - (nullable UIView *)mapView:(MGLMapView *)mapView leftCalloutAccessoryViewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
- Return the view to display on the right side of the standard callout bubble.
+ Returns the view to display on the right side of the standard callout bubble.
  
  The default value is treated is if `nil`. The right callout view is typically used to link to more detailed information about the annotation. A common view to specify for this property is `UIButton` object whose type is set to `UIButtonTypeDetailDisclosure`.
  

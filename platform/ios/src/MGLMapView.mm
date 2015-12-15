@@ -39,8 +39,7 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLMapboxEvents.h"
-
-#import "SMCalloutView.h"
+#import "MGLCalloutView.h"
 
 #import <algorithm>
 #import <cstdlib>
@@ -118,7 +117,7 @@ public:
                           GLKViewDelegate,
                           CLLocationManagerDelegate,
                           UIActionSheetDelegate,
-                          SMCalloutViewDelegate,
+                          MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
                           MGLAnnotationImageDelegate>
 
@@ -139,7 +138,7 @@ public:
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
 /// Currently shown popover representing the selected annotation.
-@property (nonatomic) SMCalloutView *calloutViewForSelectedAnnotation;
+@property (nonatomic) UIView<MGLCalloutViewProtocol> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGPoint centerPoint;
@@ -1342,12 +1341,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 }
 
-- (BOOL)calloutViewShouldHighlight:(__unused SMCalloutView *)calloutView
+- (BOOL)calloutViewShouldHighlight:(__unused MGLCalloutView *)calloutView
 {
     return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
 }
 
-- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
+- (void)calloutViewClicked:(__unused MGLCalloutView *)calloutView
 {
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
@@ -2515,7 +2514,14 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
         // build the callout
-        self.calloutViewForSelectedAnnotation = [self calloutViewForAnnotation:annotation];
+        if ([self.delegate respondsToSelector:@selector(mapView:customCalloutViewForAnnotation:)])
+        {
+            self.calloutViewForSelectedAnnotation = [self.delegate mapView:self customCalloutViewForAnnotation:annotation];
+        }
+        if (!self.calloutViewForSelectedAnnotation)
+        {
+            self.calloutViewForSelectedAnnotation = [self calloutViewForAnnotation:annotation];
+        }
 
         if (_userLocationAnnotationIsSelected)
         {
@@ -2570,9 +2576,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 }
 
-- (SMCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
+- (MGLCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
 {
-    SMCalloutView *calloutView = [SMCalloutView platformCalloutView];
+    MGLCalloutView *calloutView = (MGLCalloutView *)[MGLCalloutView platformCalloutView];
 
     if ([annotation respondsToSelector:@selector(title)]) calloutView.title = annotation.title;
     if ([annotation respondsToSelector:@selector(subtitle)]) calloutView.subtitle = annotation.subtitle;
