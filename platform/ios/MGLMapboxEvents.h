@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CoreLocation.h>
 
 #import "MGLTypes.h"
 
@@ -24,6 +25,9 @@ extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
 extern NSString *const MGLEventKeyArrivalDate;
 extern NSString *const MGLEventKeyDepartureDate;
+
+extern NSString *const MGLEventKeyDebugDistanceFilter;
+extern NSString *const MGLEventKeyDebugDesiredAccuracy;
 
 extern NSString *const MGLEventGestureSingleTap;
 extern NSString *const MGLEventGestureDoubleTap;
@@ -66,7 +70,10 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 + (void) flush;
 
 // Main thread only
-+ (void)validate;
++ (void) validate;
+
+// Main thread only, moved here for debug porpoises 🐬
+@property (nonatomic) CLLocationManager *locationManager;
 
 @end
 

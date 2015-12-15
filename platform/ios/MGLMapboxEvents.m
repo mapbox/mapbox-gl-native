@@ -37,6 +37,9 @@ NSString *const MGLEventKeyGestureID = @"gesture";
 NSString *const MGLEventKeyArrivalDate = @"arrivalDate";
 NSString *const MGLEventKeyDepartureDate = @"departureDate";
 
+NSString *const MGLEventKeyDebugDistanceFilter = @"debug.distanceFilter";
+NSString *const MGLEventKeyDebugDesiredAccuracy = @"debug.desiredAccuracy";
+
 NSString *const MGLEventGestureSingleTap = @"SingleTap";
 NSString *const MGLEventGestureDoubleTap = @"DoubleTap";
 NSString *const MGLEventGestureTwoFingerSingleTap = @"TwoFingerTap";
@@ -130,9 +133,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSData *geoTrustCert;
 @property (atomic) NSData *testServerCert;
 @property (atomic) BOOL usesTestServer;
+@property (atomic) BOOL debugEnabled;
 
 // Main thread only
-@property (nonatomic) CLLocationManager *locationManager;
+//@property (nonatomic) CLLocationManager *locationManager;
 
 // The paused state tracker is only ever accessed from the main thread.
 //
@@ -251,6 +255,12 @@ const NSTimeInterval MGLFlushInterval = 60;
         if (cerPath != nil) {
             _testServerCert = [NSData dataWithContentsOfFile:cerPath];
         }
+        
+        NSNumber *debugEnabledNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsDebug"];
+        _debugEnabled = (debugEnabledNumber) ? [debugEnabledNumber boolValue] : NO;
+        if (_debugEnabled) {
+           NSLog(@"Telemetry debugging is enabled. Please only use this in private builds.");
+        }
 
         // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
@@ -313,6 +323,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:_userDefaultsObserver];
+    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy))];
+    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter))];
     [self pauseMetricsCollection];
 }
 
@@ -410,6 +422,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
+    _locationManager.allowsBackgroundLocationUpdates = true;
     _locationManager.delegate = self;
     
     [_locationManager startUpdatingLocation];
@@ -417,6 +430,19 @@ const NSTimeInterval MGLFlushInterval = 60;
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
         [_locationManager startMonitoringVisits];
+    }
+    
+    [_locationManager addObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy)) options:NSKeyValueObservingOptionInitial context:NULL];
+    [_locationManager addObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter)) options:NSKeyValueObservingOptionInitial context:NULL];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:NSStringFromSelector(@selector(desiredAccuracy))]) {
+        NSLog(@"KVO'd: %@ = %0.f", keyPath, _locationManager.desiredAccuracy);
+    } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(distanceFilter))]) {
+        NSLog(@"KVO'd: %@ = %0.f", keyPath, _locationManager.distanceFilter);
+    } else {
+        NSLog(@"KVO'd something else?: %@ = %@", keyPath, object);
     }
 }
 
@@ -478,8 +504,15 @@ const NSTimeInterval MGLFlushInterval = 60;
         if (!event) return;
 
         MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
+        
+        // prune debug events, now that we have a mutable dictionary
+        if (!_debugEnabled) {
+            [evt removeObjectsForKeys:@[MGLEventKeyDebugDistanceFilter, MGLEventKeyDebugDesiredAccuracy]];
+        }
+        
         // mapbox-events stock attributes
         [evt setObject:event forKey:@"event"];
+        
         [evt setObject:@(version) forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
         [evt setObject:strongSelf.instanceID forKey:@"instance"];
@@ -502,6 +535,8 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         // Make Immutable Version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+
+        //NSLog(@"%@", finalEvent);
         
         // Put On The Queue
         [_eventQueue addObject:finalEvent];
@@ -781,7 +816,9 @@ const NSTimeInterval MGLFlushInterval = 60;
             MGLEventKeyCourse: @(loc.course),
             MGLEventKeyAltitude: @(round(loc.altitude)),
             MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
-            MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))
+            MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy)),
+            MGLEventKeyDebugDesiredAccuracy: @(manager.desiredAccuracy),
+            MGLEventKeyDebugDistanceFilter: @(manager.distanceFilter)
         }];
     }
 }
@@ -792,7 +829,9 @@ const NSTimeInterval MGLFlushInterval = 60;
         MGLEventKeyLongitude: @(visit.coordinate.longitude),
         MGLEventKeyHorizontalAccuracy: @(round(visit.horizontalAccuracy)),
         MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
-        MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
+        MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate],
+        MGLEventKeyDebugDesiredAccuracy: @(manager.desiredAccuracy),
+        MGLEventKeyDebugDistanceFilter: @(manager.distanceFilter)
     }];
 }
 
