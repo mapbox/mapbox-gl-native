@@ -233,7 +233,7 @@ public:
 }
 
 + (NSArray *)restorableStateKeyPaths {
-    return @[@"camera"];
+    return @[@"camera", @"debugMask"];
 }
 
 - (void)commonInit {
