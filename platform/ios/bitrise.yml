@@ -16,7 +16,7 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - script@1.1.0:
+    - script:
         title: Check for skipping CI
         inputs:
         - content: |-
@@ -30,10 +30,10 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
-    - select-xcode-version@2.2.0:
+    - select-xcode-version:
         title: Select Xcode version
         run_if: '{{enveq "SKIPCI" "false"}}'
-    - script@1.1.0:
+    - script:
         title: Install Homebrew dependencies
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -44,7 +44,7 @@ workflows:
             brew install automake
             brew install homebrew/versions/appledoc22
             brew link --force appledoc22
-    - script@1.1.0:
+    - script:
         title: Run make ipackage-sim
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -53,7 +53,7 @@ workflows:
 
             make ipackage-sim
         - is_debug: 'yes'
-    - xcode-test@1.6.0:
+    - xcode-test:
         title: Run Xcode Tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
@@ -62,7 +62,7 @@ workflows:
         - simulator_device: iPhone 6
           opts:
             is_expand: false
-    - slack@2.1.0:
+    - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:

@@ -16,7 +16,7 @@ trigger_map:
 workflows:
   primary:
     steps:
-    - script@1.1.0:
+    - script:
         title: Check for skipping CI
         inputs:
         - content: |-
@@ -30,14 +30,14 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
-    - script@1.1.0:
+    - script:
         title: Install Linux Dependencies
         inputs:
         - content: |-
             #!/bin/bash
 
             apt-get install pkg-config
-    - script@1.1.0:
+    - script:
         title: Build Android SDK For arm
         inputs:
         - content: |-
@@ -45,7 +45,7 @@ workflows:
 
             make android -j4
         - is_debug: 'yes'
-    - script@1.1.0:
+    - script:
         title: Run Unit Tests
         inputs:
         - content: |-
@@ -54,7 +54,7 @@ workflows:
             cd android
             ./gradlew testReleaseUnitTest --continue
         - is_debug: 'yes'
-    - slack@2.1.0:
+    - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
