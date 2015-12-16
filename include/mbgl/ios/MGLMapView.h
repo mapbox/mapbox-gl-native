@@ -82,6 +82,13 @@ IB_DESIGNABLE
 /** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
+/** Query the visible map for features at a given point. 
+*
+*   @param point A point on screen, for example at a user gesture.
+*   @param radius A distance in screen points around which to query features.
+*   @return An array of `NSDictionary` objects representing features near the point. Keys and values provided include `MGLFeatureLayerNameKey` for the feature layer name in the active style, `MGLFeatureSourceNameKey` for the feature source name in the active style, and `MGLFeaturePropertiesKey` containing a dictionary of properties of the feature from the source data as `NSString` keys and values. */
+- (NS_ARRAY_OF(NSDictionary *) *)featureDescriptionsAtPoint:(CGPoint)point radius:(CGFloat)radius;
+
 #pragma mark - Accessing the Delegate
 
 /** @name Accessing the Delegate */

@@ -435,7 +435,8 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
 LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
     return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
 }
-    
+
+
 #pragma mark - Style API
 
 void Map::addCustomLayer(const std::string& id,
@@ -448,6 +449,14 @@ void Map::addCustomLayer(const std::string& id,
         std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
         before ? std::string(before) : mapbox::util::optional<std::string>());
 }
+
+
+#pragma mark - Features
+
+std::vector<FeatureDescription> Map::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
+    return context->invokeSync<std::vector<FeatureDescription>>(&MapContext::featureDescriptionsAt, point, radius);
+}
+
 
 #pragma mark - Toggles
 

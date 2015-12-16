@@ -4,6 +4,8 @@
 #include <mapbox/variant.hpp>
 
 #include <mbgl/map/tile_data.hpp>
+#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>
@@ -31,6 +33,7 @@ class TileParseResultBuckets {
 public:
     TileData::State state = TileData::State::invalid;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    FeatureTree featureTree;
 };
 
 using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
@@ -78,6 +81,8 @@ private:
 
     // Temporary holder
     TileParseResultBuckets result;
+
+    const uint16_t extent = 4096;
 };
 
 } // namespace mbgl

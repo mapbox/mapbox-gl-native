@@ -12,6 +12,8 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
+
 #include <utility>
 
 using namespace mbgl;
@@ -143,6 +145,44 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
                                      *collisionTile);
 
     std::unique_ptr<Bucket> bucket = layer->createBucket(parameters);
+
+    if (layer->isInteractive) {
+        for (std::size_t i = 0; i < geometryLayer->featureCount(); i++) {
+            const auto feature = geometryLayer->getFeature(i);
+            FeatureBox featureBox = {{ int16_t(extent), int16_t(extent) }, { -1, -1 }};
+            const auto geometries = feature->getGeometries();
+            for (std::size_t j = 0; j < geometries.size(); j++) {
+                const auto geometry = geometries.at(j);
+                for (std::size_t k = 0; k < geometry.size(); k++) {
+                    auto point = geometry.at(k);
+                    if (point.x < 0 || point.x > extent - 1 || point.y < 0 || point.y > extent - 1) continue;
+                    const auto min = featureBox.min_corner();
+                    const auto max = featureBox.max_corner();
+                    if (point.x < min.get<0>()) {
+                        featureBox.min_corner().set<0>(::fmax(point.x, 0));
+                    }
+                    if (point.y < min.get<1>()) {
+                        featureBox.min_corner().set<1>(::fmax(point.y, 0));
+                    }
+                    if (point.x > max.get<0>()) {
+                        featureBox.max_corner().set<0>(::fmin(point.x, extent - 1));
+                    }
+                    if (point.y > max.get<1>()) {
+                        featureBox.max_corner().set<1>(::fmin(point.y, extent - 1));
+                    }
+                }
+            }
+
+            if (featureBox.min_corner().get<0>() < extent && featureBox.min_corner().get<1>() < extent &&
+                featureBox.max_corner().get<0>() > -1 && featureBox.max_corner().get<1>() > -1) {
+                // sort properties on keys
+                const auto values = feature->getValues();
+                std::map<std::string, std::string> properties;
+                properties.insert(values.begin(), values.end());
+                result.featureTree.insert(std::make_pair(featureBox, FeatureDescription(layer->id, layer->source, properties)));
+            }
+        }
+    }
 
     if (layer->is<SymbolLayer>() && partialParse) {
         // We cannot parse this bucket yet. Instead, we're saving it for later.

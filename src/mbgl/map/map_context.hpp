@@ -10,6 +10,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <mapbox/optional.hpp>
 
@@ -59,6 +60,8 @@ public:
     // Style API
     void addLayer(std::unique_ptr<StyleLayer>,
                   const mapbox::util::optional<std::string> before);
+
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius) const;
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();

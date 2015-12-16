@@ -25,13 +25,13 @@
 
 namespace mbgl {
 
-namespace bg = boost::geometry;
-namespace bgm = bg::model;
-namespace bgi = bg::index;
-typedef bgm::point<float, 2, bg::cs::cartesian> CollisionPoint;
-typedef bgm::box<CollisionPoint> Box;
+namespace CollisionBG = boost::geometry;
+namespace CollisionBGM = CollisionBG::model;
+namespace CollisionBGI = CollisionBG::index;
+typedef CollisionBGM::point<float, 2, CollisionBG::cs::cartesian> CollisionPoint;
+typedef CollisionBGM::box<CollisionPoint> Box;
 typedef std::pair<Box, CollisionBox> CollisionTreeBox;
-typedef bgi::rtree<CollisionTreeBox, bgi::linear<16, 4>> Tree;
+typedef CollisionBGI::rtree<CollisionTreeBox, CollisionBGI::linear<16, 4>> CollisionTree;
 
 class CollisionTile {
 public:
@@ -49,7 +49,7 @@ public:
 private:
     Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box);
 
-    Tree tree;
+    CollisionTree tree;
     std::array<float, 4> rotationMatrix;
 };
 

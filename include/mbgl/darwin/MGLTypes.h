@@ -26,6 +26,15 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     MGLUserTrackingModeFollowWithCourse,
 };
 
+/** The style layer name for a queried map feature. */
+extern NSString * const MGLFeatureLayerNameKey;
+
+/** The style source name for a queried map feature. */
+extern NSString * const MGLFeatureSourceNameKey;
+
+/** The properties from the source data for a queried map feature. */
+extern NSString * const MGLFeaturePropertiesKey;
+
 NS_ASSUME_NONNULL_END
 
 #pragma clang diagnostic push

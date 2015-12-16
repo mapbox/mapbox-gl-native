@@ -6,6 +6,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 
 #include <atomic>
 #include <string>
@@ -14,7 +15,6 @@
 
 namespace mbgl {
 
-class StyleLayer;
 class Worker;
 class DebugBucket;
 
@@ -100,6 +100,8 @@ public:
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
+
+    FeatureTree featureTree;
 
 protected:
     std::atomic<State> state;

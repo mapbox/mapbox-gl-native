@@ -5,6 +5,8 @@
 #include <mbgl/map/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <forward_list>
 #include <map>
@@ -56,6 +58,8 @@ public:
 
     void setObserver(Observer* observer);
     void dumpDebugLogs() const;
+
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius, const TransformState&) const;
 
     SourceInfo info;
     bool enabled;
