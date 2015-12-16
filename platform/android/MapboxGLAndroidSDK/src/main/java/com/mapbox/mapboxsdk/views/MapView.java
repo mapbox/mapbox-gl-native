@@ -3792,6 +3792,11 @@ public final class MapView extends FrameLayout {
         mNativeMapView.addCustomLayer(customLayer, before);
     }
 
+    @UiThread
+    public void invalidateCustomLayers() {
+        mNativeMapView.update();
+    }
+
     private void setWidgetGravity(@NonNull final View view, int gravity) {
         LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
         layoutParams.gravity = gravity;
