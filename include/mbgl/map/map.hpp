@@ -184,7 +184,7 @@ public:
     void cycleDebugOptions();
     MapDebugOptions getDebug() const;
 
-    bool isFullyLoaded() const;
+    bool isLoaded() const;
     void dumpDebugLogs() const;
 
 private:

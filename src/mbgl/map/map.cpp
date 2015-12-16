@@ -465,7 +465,7 @@ MapDebugOptions Map::getDebug() const {
     return data->getDebug();
 }
 
-bool Map::isFullyLoaded() const {
+bool Map::isLoaded() const {
     return context->invokeSync<bool>(&MapContext::isLoaded);
 }
 

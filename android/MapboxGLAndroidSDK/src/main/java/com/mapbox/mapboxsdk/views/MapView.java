@@ -1519,8 +1519,8 @@ public final class MapView extends FrameLayout {
     }
 
     // True if map has finished loading the view
-    private boolean isFullyLoaded() {
-        return mNativeMapView.isFullyLoaded();
+    private boolean isLoaded() {
+        return mNativeMapView.isLoaded();
     }
 
     //

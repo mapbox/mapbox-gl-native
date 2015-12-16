@@ -14,7 +14,7 @@
 - (void)invalidate;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
-- (BOOL)isFullyLoaded;
+- (BOOL)isLoaded;
 
 @end
 
@@ -140,7 +140,7 @@ static const int benchmarkDuration = 200; // frames
 
     else if (state == State::WaitingForAssets)
     {
-        if ([mapView isFullyLoaded])
+        if ([mapView isLoaded])
         {
             // Start the benchmarking timer.
             state = State::WarmingUp;

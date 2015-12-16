@@ -3294,9 +3294,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return path;
 }
 
-- (BOOL)isFullyLoaded
+- (BOOL)isLoaded
 {
-    return _mbglMap->isFullyLoaded();
+    return _mbglMap->isLoaded();
 }
 
 - (void)prepareForInterfaceBuilder
