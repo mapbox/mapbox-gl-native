@@ -189,11 +189,10 @@ void SpriteAtlas::updateDirty() {
             holder.texture = spriteIterator->second;
             if (holder.texture != nullptr) {
                 copy(holder, imageIterator->first.second);
+                ++imageIterator;
             } else {
-                images.erase(imageIterator);
+                images.erase(imageIterator++);
             }
-            
-            ++imageIterator;
             // Don't advance the spriteIterator because there might be another sprite with the same
             // name, but a different wrap value.
         }
