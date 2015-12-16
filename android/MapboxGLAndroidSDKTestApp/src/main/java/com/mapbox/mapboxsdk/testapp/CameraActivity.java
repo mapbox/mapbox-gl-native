@@ -90,7 +90,7 @@ public class CameraActivity extends AppCompatActivity {
             public void onClick(View view) {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(-22.91214, -43.23012))     // Sets the center of the map to Maracanã
-                        .zoom(16)                                   // Sets the zoom
+                        .zoom(13)                                   // Sets the zoom
                         .bearing(270)                               // Sets the orientation of the camera to east
                         .tilt(20)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder

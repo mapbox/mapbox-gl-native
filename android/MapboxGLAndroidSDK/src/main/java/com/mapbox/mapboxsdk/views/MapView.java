@@ -1514,7 +1514,14 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update, int durationMs, MapView.CancelableCallback callback) {
 
-        flyTo(update.getBearing(), update.getTarget(), durationMs, update.getTilt(), update.getZoom());
+//        mNativeMapView.cancelTransitions();
+        // Convert Degrees To Radians
+        double angle = -1;
+        if (update.getBearing() >= 0) {
+            angle = ((-update.getBearing()) * Math.PI) / 180;
+        }
+
+        flyTo(angle, update.getTarget(), durationMs, update.getTilt(), update.getZoom());
 
         if (callback != null) {
             callback.onFinish();
@@ -2353,11 +2360,11 @@ public final class MapView extends FrameLayout {
 
     /**
      *
-     * @param angle
-     * @param center
-     * @param duration
-     * @param pitch
-     * @param zoom
+     * @param angle Angle in Radians
+     * @param center Center Coordinate
+     * @param duration Animation time in Milliseconds
+     * @param pitch Pitch in Degrees
+     * @param zoom Zoom Level
      */
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
         mNativeMapView.flyTo(angle, center, duration, pitch, zoom);
