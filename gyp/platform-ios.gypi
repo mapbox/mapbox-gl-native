@@ -50,6 +50,7 @@
         '../platform/ios/MGLMapboxEvents.m',
         '../include/mbgl/ios/MGLMapView.h',
         '../include/mbgl/ios/MGLMapView+IBAdditions.h',
+        '../include/mbgl/ios/MGLMapView+MGLCustomStyleLayerAdditions.h',
         '../platform/ios/MGLMapView.mm',
         '../include/mbgl/ios/MGLAccountManager.h',
         '../platform/ios/MGLAccountManager_Private.h',
