@@ -67,6 +67,7 @@ import com.mapbox.mapboxsdk.annotations.Sprite;
 import com.mapbox.mapboxsdk.annotations.SpriteFactory;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -77,6 +78,8 @@ import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.utils.MathUtils;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -1514,16 +1517,16 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update, int durationMs, MapView.CancelableCallback callback) {
 
-//        mNativeMapView.cancelTransitions();
+        mNativeMapView.cancelTransitions();
         // Convert Degrees To Radians
         double angle = -1;
         if (update.getBearing() >= 0) {
-            angle = ((-update.getBearing()) * Math.PI) / 180;
+            angle = (-update.getBearing()) * MathConstants.DEG2RAD;
         }
         double pitch = -1;
         if (update.getTilt() >= 0) {
-            double dp = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, update.getTilt()));
-            pitch = (dp * Math.PI) / 180;
+            double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
+            pitch = dp * MathConstants.DEG2RAD;
         }
 
         flyTo(angle, update.getTarget(), durationMs, pitch, update.getZoom());
