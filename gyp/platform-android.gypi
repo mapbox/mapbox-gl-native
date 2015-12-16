@@ -10,8 +10,8 @@
       ],
 
       'sources': [
-        '../platform/android/log_android.cpp',
-        '../platform/android/asset_root.cpp',
+        '../platform/android/src/log_android.cpp',
+        '../platform/android/src/asset_root.cpp',
         '../platform/default/async_task.cpp',
         '../platform/default/run_loop.cpp',
         '../platform/default/thread.cpp',
@@ -47,7 +47,6 @@
 
       'include_dirs': [
         '../include',
-        '../platform/android/include',
         '../src',
       ],
 

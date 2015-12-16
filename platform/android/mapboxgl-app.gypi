@@ -17,13 +17,12 @@
       ],
 
       'include_dirs': [
-        './include',
         '../src',
       ],
 
       'sources': [
-        './native_map_view.cpp',
-        './jni.cpp',
+        './src/native_map_view.cpp',
+        './src/jni.cpp',
       ],
 
       'cflags_cc': [
@@ -70,7 +69,7 @@
       'hard_dependency': 1,
 
       'sources': [
-        './example_custom_layer.cpp',
+        './src/example_custom_layer.cpp',
       ],
 
       'variables': {

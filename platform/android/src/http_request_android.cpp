@@ -3,7 +3,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/android/jni.hpp>
+#include "jni.hpp"
 
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/time.hpp>

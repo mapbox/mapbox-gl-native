@@ -1,5 +1,5 @@
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/android/jni.hpp>
+#include "jni.hpp"
 
 #include <libgen.h>
 

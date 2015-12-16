@@ -1,3 +1,6 @@
+#include "native_map_view.hpp"
+#include "jni.hpp"
+
 #include <cstdlib>
 #include <ctime>
 #include <cassert>
@@ -9,8 +12,6 @@
 
 #include <GLES2/gl2.h>
 
-#include <mbgl/android/native_map_view.hpp>
-#include <mbgl/android/jni.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>

@@ -13,8 +13,9 @@
 #include <android/native_window_jni.h>
 #include <sys/system_properties.h>
 
-#include <mbgl/android/jni.hpp>
-#include <mbgl/android/native_map_view.hpp>
+#include "jni.hpp"
+#include "native_map_view.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
