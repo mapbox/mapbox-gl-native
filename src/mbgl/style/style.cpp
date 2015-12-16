@@ -77,7 +77,6 @@ Style::~Style() {
 
 void Style::addSource(std::unique_ptr<Source> source) {
     source->setObserver(this);
-    source->load();
     sources.emplace_back(std::move(source));
 }
 
@@ -184,11 +183,10 @@ void Style::recalculate(float z) {
         hasPendingTransitions |= layer->recalculate(parameters);
 
         Source* source = getSource(layer->source);
-        if (!source) {
-            continue;
+        if (source && layer->needsRendering()) {
+            source->enabled = true;
+            if (!source->loaded && !source->isLoading()) source->load();
         }
-
-        source->enabled = true;
     }
 }
 
@@ -209,10 +207,8 @@ bool Style::isLoaded() const {
         return false;
     }
 
-    for (const auto& source : sources) {
-        if (!source->isLoaded()) {
-            return false;
-        }
+    for (const auto& source: sources) {
+        if (source->enabled && !source->isLoaded()) return false;
     }
 
     if (!spriteStore->isLoaded()) {

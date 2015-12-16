@@ -50,6 +50,9 @@ public:
     // Checks whether this layer needs to be rendered in the given render pass.
     bool hasRenderPass(RenderPass) const;
 
+    // Checks whether this layer can be rendered.
+    bool needsRendering() const;
+
 public:
     std::string id;
     std::string ref;

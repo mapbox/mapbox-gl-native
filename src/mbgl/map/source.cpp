@@ -39,9 +39,7 @@ Source::Source() {}
 Source::~Source() = default;
 
 bool Source::isLoaded() const {
-    if (!loaded) {
-        return false;
-    }
+    if (!loaded) return false;
 
     for (const auto& tile : tiles) {
         if (tile.second->data->getState() != TileData::State::parsed) {
@@ -50,6 +48,10 @@ bool Source::isLoaded() const {
     }
 
     return true;
+}
+
+bool Source::isLoading() const {
+    return !loaded && req.operator bool();
 }
 
 // Note: This is a separate function that must be called exactly once after creation

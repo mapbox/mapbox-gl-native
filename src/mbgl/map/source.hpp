@@ -35,7 +35,9 @@ public:
     Source();
     ~Source();
 
+    bool loaded = false;
     void load();
+    bool isLoading() const;
     bool isLoaded() const;
 
     // Request or parse all the tiles relevant for the "TransformState". This method
@@ -58,7 +60,7 @@ public:
     void dumpDebugLogs() const;
 
     SourceInfo info;
-    bool enabled;
+    bool enabled = false;
 
 private:
     void tileLoadingCompleteCallback(const TileID&, const TransformState&, bool collisionDebug);
@@ -80,7 +82,6 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-    bool loaded = false;
 
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();

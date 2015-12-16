@@ -32,5 +32,9 @@
       "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
       "icon-image": "{maki}_icon"
     }
+  }, {
+    "id":  "rasterlayer",
+    "type": "fill",
+    "source": "rastersource"
   }]
 }

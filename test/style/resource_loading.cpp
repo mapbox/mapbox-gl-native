@@ -51,6 +51,8 @@ public:
         data_.setAnimationTime(now);
         transform_.updateTransitions(now);
 
+        style_->cascade();
+        style_->recalculate(16);
         style_->update(transform_.getState(), texturePool_);
     }
 
