@@ -262,7 +262,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
         [self insertCustomStyleLayer];
     }
