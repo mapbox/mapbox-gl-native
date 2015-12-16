@@ -2926,10 +2926,14 @@ public final class MapView extends FrameLayout {
             // Rotate the map
             if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
                 // around gesture
-                mNativeMapView.setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
+                mNativeMapView.setBearing(bearing,
+                        detector.getFocusX() / mScreenDensity,
+                        (getHeight() - detector.getFocusY()) / mScreenDensity);
             } else {
                 // around center map
-                mNativeMapView.setBearing(bearing, (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
+                mNativeMapView.setBearing(bearing,
+                        (getWidth() / 2) / mScreenDensity,
+                        (getHeight() / 2) / mScreenDensity);
             }
             return true;
         }
