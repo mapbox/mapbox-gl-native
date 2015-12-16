@@ -1334,7 +1334,7 @@ jboolean JNICALL nativeIsFullyLoaded(JNIEnv *env, jobject obj, jlong nativeMapVi
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeIsFullyLoaded");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return nativeMapView->getMap().isFullyLoaded();
+    return nativeMapView->getMap().isLoaded();
 }
 
 void JNICALL nativeSetReachability(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jboolean status) {

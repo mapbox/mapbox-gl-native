@@ -417,8 +417,8 @@ final class NativeMapView {
         return nativeGetDebug(mNativeMapViewPtr);
     }
 
-    public boolean isFullyLoaded() {
-        return nativeIsFullyLoaded(mNativeMapViewPtr);
+    public boolean isLoaded() {
+        return nativeIsLoaded(mNativeMapViewPtr);
     }
 
     public void setReachability(boolean status) {
@@ -614,7 +614,7 @@ final class NativeMapView {
 
     private native boolean nativeGetDebug(long nativeMapViewPtr);
 
-    private native boolean nativeIsFullyLoaded(long nativeMapViewPtr);
+    private native boolean nativeIsLoaded(long nativeMapViewPtr);
 
     private native void nativeSetReachability(long nativeMapViewPtr, boolean status);
 
