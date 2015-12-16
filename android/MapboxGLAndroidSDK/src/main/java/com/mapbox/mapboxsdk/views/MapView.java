@@ -87,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -1529,7 +1530,12 @@ public final class MapView extends FrameLayout {
             pitch = dp * MathConstants.DEG2RAD;
         }
 
-        flyTo(angle, update.getTarget(), durationMs, pitch, update.getZoom());
+        long durationNano = 0;
+        if (durationMs > 0) {
+            durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
+        }
+
+        flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
 
         if (callback != null) {
             callback.onFinish();
@@ -2370,7 +2376,7 @@ public final class MapView extends FrameLayout {
      *
      * @param angle Angle in Radians
      * @param center Center Coordinate
-     * @param duration Animation time in Milliseconds
+     * @param duration Animation time in Nanoseconds
      * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */

@@ -108,7 +108,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 };
 
-                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, callback);
+                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 50000, callback);
             }
         });
 
