@@ -111,13 +111,6 @@ env:
     - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
     # Access Token
     - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
-    # iOS code signing
-    - secure: "I6Iu75X1E+js5tzijtKi1EGtIuBcA4/25nDYe0svV4HAtujY71ZJZ4eB6355CKhFXpLXrF3i7eKVX3v+zWS0QROPEWacgsqsvNg+Ba9cnznW/faUSOYekCfhzWd/6reYDM7KzKAQwSUHLk9JIWK/kkmi4r+vVJK7h+tjPllK5YA="
-    - IOS_APP_NAME="Mapbox GL"
-    - 'IOS_DEVELOPER_NAME="iPhone Distribution: Mapbox, Inc."'
-    - IOS_PROFILE_NAME="ios-in-house"
-    - secure: "nQqSM8rd7OHtV4MqmNqVnkrVHqxKqQsaWRYk4/nPdhbeVWtTtkk0df711LrF1TUtbEPEewHxYUvTZ/UXmwJNeoKdzTHavI8hnatRkgjyxGERPn1il1Otelht9I+LQQHf+plrpRjVWBrNIW0Zox1B3cqn6d3NglpbXrEQ2EjYGNA="
-    - KIF_SCREENSHOTS="${TRAVIS_BUILD_DIR}/screenshots"
 
 before_install:
 - source ./scripts/set_compiler.sh
