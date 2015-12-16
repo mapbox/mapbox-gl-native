@@ -4,6 +4,7 @@
 #import <mbgl/util/default_styles.hpp>
 
 #import <CoreLocation/CoreLocation.h>
+#import <OpenGLES/ES2/gl.h>
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
@@ -150,6 +151,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                 @"Add Test Shapes",
                                                                 @"Start World Tour",
                                                                 @"Remove Annotations",
+                                                                @"Insert Custom Style Layer",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -260,6 +262,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    {
+        [self insertCustomStyleLayer];
+    }
 }
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
@@ -300,6 +306,59 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             });
         }
     });
+}
+
+- (void)insertCustomStyleLayer
+{
+    static const GLchar *vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
+    static const GLchar *fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
+    
+    __block GLuint program = 0;
+    __block GLuint vertexShader = 0;
+    __block GLuint fragmentShader = 0;
+    __block GLuint buffer = 0;
+    __block GLuint a_pos = 0;
+    [self.mapView insertCustomStyleLayerWithIdentifier:@"mbx-custom" preparationHandler:^{
+        program = glCreateProgram();
+        vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        
+        glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+        glCompileShader(vertexShader);
+        glAttachShader(program, vertexShader);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+        glCompileShader(fragmentShader);
+        glAttachShader(program, fragmentShader);
+        glLinkProgram(program);
+        a_pos = glGetAttribLocation(program, "a_pos");
+        
+        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
+        glGenBuffers(1, &buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW);
+    } drawingHandler:^(__unused CGSize size,
+                       __unused CLLocationCoordinate2D centerCoordinate,
+                       __unused double zoomLevel,
+                       __unused CLLocationDirection direction,
+                       __unused CGFloat pitch,
+                       __unused CGFloat perspectiveSkew) {
+        glUseProgram(program);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glEnableVertexAttribArray(a_pos);
+        glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    } completionHandler:^{
+        if (program) {
+            glDeleteBuffers(1, &buffer);
+            glDetachShader(program, vertexShader);
+            glDetachShader(program, fragmentShader);
+            glDeleteShader(vertexShader);
+            glDeleteShader(fragmentShader);
+            glDeleteProgram(program);
+        }
+    } belowStyleLayerWithIdentifier:@"housenum-label"];
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longPress
