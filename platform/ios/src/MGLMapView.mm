@@ -2504,7 +2504,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         {
             self.calloutViewForSelectedAnnotation = [self.delegate mapView:self customCalloutViewForAnnotation:annotation];
         }
-        else {
+        if (!self.calloutViewForSelectedAnnotation)
+        {
             self.calloutViewForSelectedAnnotation = [self calloutViewForAnnotation:annotation];
         }
 

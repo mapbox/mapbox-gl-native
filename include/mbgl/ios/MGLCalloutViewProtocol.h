@@ -9,13 +9,8 @@
 @property (nonatomic, weak) id<MGLCalloutViewDelegate> delegate;
 
 // Presents a callout view by adding it to "inView" and pointing at the given rect of inView's bounds.
-// Constrains the callout to the bounds of the given view. Optionally scrolls the given rect into view (plus margins)
-// if -delegate is set and responds to -delayForRepositionWithSize.
+// Constrains the callout to the bounds of the given view.
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated;
-
-// Same as the view-based presentation, but inserts the callout into a CALayer hierarchy instead. Be aware that you'll have to direct
-// your own touches to any accessory views, since CALayer doesn't relay touch events.
-- (void)presentCalloutFromRect:(CGRect)rect inLayer:(CALayer *)layer constrainedToLayer:(CALayer *)constrainedLayer animated:(BOOL)animated;
 
 - (void)dismissCalloutAnimated:(BOOL)animated;
 
@@ -26,10 +21,9 @@
 
 @optional
 // Controls whether the callout "highlights" when pressed. default YES. You must also respond to `-calloutViewClicked` below.
-// Not honored by SMClassicCalloutView.
 - (BOOL)calloutViewShouldHighlight:(UIView<MGLCalloutViewProtocol> *)calloutView;
 
-// Called when the callout view is clicked. Not honored by SMClassicCalloutView.
+// Called when the callout view is clicked.
 - (void)calloutViewClicked:(UIView<MGLCalloutViewProtocol> *)calloutView;
 
 @end

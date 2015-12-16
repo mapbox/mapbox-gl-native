@@ -596,12 +596,13 @@ IB_DESIGNABLE
 
 /** Returns a custom callout view to display for the specified annotation.
  *
- *   If the method is present in the delegate, it must return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view.
+ *   If the method is present in the delegate, it can return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view.
+ *   If the method returns nil, the map will use the default callout view.
  *
  *   @param mapView The map view that requested the callout view.
  *   @param annotation The object representing the annotation.
  *   @return A view following the MGLCalloutView protocol. */
-- (UIView<MGLCalloutViewProtocol> *)mapView:(MGLMapView *)mapView customCalloutViewForAnnotation:(id <MGLAnnotation>)annotation;
+- (nullable UIView<MGLCalloutViewProtocol> *)mapView:(MGLMapView *)mapView customCalloutViewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /** Return the view to display on the left side of the standard callout bubble.
 *
