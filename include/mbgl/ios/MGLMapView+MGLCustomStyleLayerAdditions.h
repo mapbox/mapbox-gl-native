@@ -20,7 +20,7 @@ typedef void (^MGLCustomStyleLayerCompletionHandler)(void);
 
 - (void)insertCustomStyleLayerWithIdentifier:(NSString *)identifier preparationHandler:(MGLCustomStyleLayerPreparationHandler)preparation drawingHandler:(MGLCustomStyleLayerDrawingHandler)drawing completionHandler:(MGLCustomStyleLayerCompletionHandler)completion belowStyleLayerWithIdentifier:(nullable NSString *)otherIdentifier;
 
-- (void)invalidateCustomStyleLayers;
+- (void)setCustomStyleLayersNeedDisplay;
 
 @end
 

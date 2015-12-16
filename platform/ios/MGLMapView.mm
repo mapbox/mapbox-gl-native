@@ -3675,7 +3675,7 @@ void MGLFinishCustomStyleLayer(void *context)
                              context, otherIdentifier.UTF8String);
 }
 
-- (void)invalidateCustomStyleLayers
+- (void)setCustomStyleLayersNeedDisplay
 {
     _mbglMap->update(mbgl::Update::Repaint);
 }
