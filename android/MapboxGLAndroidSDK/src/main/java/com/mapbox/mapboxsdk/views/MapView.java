@@ -1520,8 +1520,13 @@ public final class MapView extends FrameLayout {
         if (update.getBearing() >= 0) {
             angle = ((-update.getBearing()) * Math.PI) / 180;
         }
+        double pitch = -1;
+        if (update.getTilt() >= 0) {
+            double dp = Math.max(MINIMUM_TILT, Math.min(MAXIMUM_TILT, update.getTilt()));
+            pitch = (dp * Math.PI) / 180;
+        }
 
-        flyTo(angle, update.getTarget(), durationMs, update.getTilt(), update.getZoom());
+        flyTo(angle, update.getTarget(), durationMs, pitch, update.getZoom());
 
         if (callback != null) {
             callback.onFinish();
@@ -2363,7 +2368,7 @@ public final class MapView extends FrameLayout {
      * @param angle Angle in Radians
      * @param center Center Coordinate
      * @param duration Animation time in Milliseconds
-     * @param pitch Pitch in Degrees
+     * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
