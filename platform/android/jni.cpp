@@ -1475,15 +1475,28 @@ jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject
 void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeFlyTo");
     assert(nativeMapViewPtr != 0);
-//    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    // TODO - Create CameraOptions in C++
-    // Based on:
-    // https://github.com/mapbox/mapbox-gl-native/blob/4e0e8166539a03fb5180b813b27d8fff87850a37/platform/osx/src/MGLMapView.mm#L1018-L1021 
-    // https://github.com/mapbox/mapbox-gl-native/blob/4e0e8166539a03fb5180b813b27d8fff87850a37/platform/osx/src/MGLMapView.mm#L1040-L1092
-//    mbgl::CameraOptions options;
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
 
-//    nativeMapView->getMap().flyTo(options);
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    options.angle = angle;
+    options.center = mbgl::LatLng(latitude, longitude);
+    options.duration = mbgl::Duration(duration);
+    options.pitch = pitch;
+    options.zoom = zoom;
+
+    nativeMapView->getMap().flyTo(options);
 }
 
 }
