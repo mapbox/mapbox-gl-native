@@ -117,20 +117,20 @@ before_install:
 - source ./scripts/travis_helper.sh
 
 install:
-- ./scripts/${FLAVOR}/install.sh
+- ./platform/${FLAVOR}/scripts/install.sh
 
 before_script:
 - if command -v ccache >/dev/null 2>&1; then ccache --zero-stats ; fi
 
 script:
-- ./scripts/${FLAVOR}/${ACTION:-run}.sh
+- ./platform/${FLAVOR}/scripts/${ACTION:-run}.sh
 
 after_failure:
-- "[ -f ./scripts/${FLAVOR}/after_failure.sh ] && ./scripts/${FLAVOR}/after_failure.sh"
+- "[ -f ./platform/${FLAVOR}/scripts/after_failure.sh ] && ./platform/${FLAVOR}/scripts/after_failure.sh"
 
 after_script:
 - if command -v ccache >/dev/null 2>&1; then ccache --show-stats ; fi
-- "[ -f ./scripts/${FLAVOR}/after_script.sh ] && ./scripts/${FLAVOR}/after_script.sh"
+- "[ -f ./platform/${FLAVOR}/scripts/after_script.sh ] && ./platform/${FLAVOR}/scripts/after_script.sh"
 
 notifications:
   slack:

@@ -10,4 +10,4 @@ export MASON_PLATFORM=android
 export MASON_ANDROID_ABI=${ANDROID_ABI}
 
 mapbox_time "android_toolchain" \
-./scripts/android/toolchain.sh
+./platform/android/scripts/toolchain.sh

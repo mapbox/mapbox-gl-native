@@ -54,9 +54,9 @@ function print_opengl_flags {
 }
 
 # Load dependencies
-source scripts/${MASON_PLATFORM}/configure.sh
-if [ -e scripts/${MASON_PLATFORM}/${MASON_PLATFORM_VERSION}/configure.sh ]; then
-    source scripts/${MASON_PLATFORM}/${MASON_PLATFORM_VERSION}/configure.sh
+source platform/${MASON_PLATFORM}/scripts/configure.sh
+if [ -e platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh ]; then
+    source platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh
 fi
 
 PYTHON=`which python || abort 'Cannot find python'`

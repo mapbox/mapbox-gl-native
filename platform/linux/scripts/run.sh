@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-source ./scripts/${TRAVIS_OS_NAME}/setup.sh
+source ./platform/linux/scripts/setup.sh
 
 BUILDTYPE=${BUILDTYPE:-Release}
 
@@ -11,21 +11,18 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-source ~/.nvm/nvm.sh
-nvm use $NODE_VERSION
-
 mapbox_time "compile_program" \
-npm install --build-from-source
+make linux -j${JOBS} BUILDTYPE=${BUILDTYPE}
+
+mapbox_time "compile_render_binary" \
+make render -j${JOBS} BUILDTYPE=${BUILDTYPE}
+
+mapbox_time "compile_tests" \
+make test -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 ################################################################################
 # Test
 ################################################################################
 
-# Travis OS X has no GPU
-if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-    mapbox_time "run_tests" \
-    npm test
-
-    mapbox_time "run_render_tests" \
-    npm run test-suite
-fi
+mapbox_time "run_tests" \
+make test-* BUILDTYPE=${BUILDTYPE}

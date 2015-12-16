@@ -28,7 +28,7 @@ if [[ ${TRAVIS_TAG} == node-v${PACKAGE_JSON_VERSION} ]] || test "${COMMIT_MESSAG
     ./node_modules/.bin/node-pre-gyp publish info
 
     if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-        source ./scripts/${TRAVIS_OS_NAME}/setup.sh
+        source ./platform/linux/scripts/setup.sh
 
         rm -rf build
         rm -rf lib

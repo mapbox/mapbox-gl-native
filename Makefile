@@ -50,16 +50,16 @@ ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
 ibench: ; $(RUN) HOST=ios Xcode/ios-bench
 
 .PHONY: ipackage ipackage-strip ipackage-sim ipackage-no-bitcode itest
-ipackage: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh
-ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh strip
-ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh sim
-ipackage-no-bitcode: Xcode/ios ; @JOBS=$(JOBS) ./scripts/ios/package.sh no-bitcode
-iframework: ipackage-strip ; ./scripts/ios/framework.sh
-itest: ipackage-sim ; ./scripts/ios/test.sh
+ipackage: Xcode/ios ; @JOBS=$(JOBS) ./platform/ios/scripts/package.sh
+ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) ./platform/ios/scripts/package.sh strip
+ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) ./platform/ios/scripts/package.sh sim
+ipackage-no-bitcode: Xcode/ios ; @JOBS=$(JOBS) ./platform/ios/scripts/package.sh no-bitcode
+iframework: ipackage-strip ; ./platform/ios/scripts/framework.sh
+itest: ipackage-sim ; ./platform/ios/scripts/test.sh
 
 .PHONY: xpackage xpackage-strip
-xpackage: Xcode/osx ; @JOBS=$(JOBS) ./scripts/osx/package.sh
-xpackage-strip: Xcode/osx ; @JOBS=$(JOBS) ./scripts/osx/package.sh strip
+xpackage: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh
+xpackage-strip: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh strip
 endif
 
 #### All platforms targets #####################################################

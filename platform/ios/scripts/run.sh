@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 set -u
 
-source ./scripts/ios/setup.sh
+source ./platform/ios/scripts/setup.sh
 
 BUILDTYPE=${BUILDTYPE:-Release}
 
@@ -23,21 +23,21 @@ if [[ ${PUBLISH_PLATFORM} = 'ios' ]]; then
     make ipackage
 
     mapbox_time "deploy_ios_symbols"
-    ./scripts/ios/publish.sh "${PUBLISH_VERSION}" symbols
+    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" symbols
 
     # no debug symbols, for smaller distribution
     mapbox_time "package_ios_stripped" \
     make ipackage-strip
 
     mapbox_time "deploy_ios_stripped"
-    ./scripts/ios/publish.sh "${PUBLISH_VERSION}"
+    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}"
 
     # debug symbols but no Bitcode
     mapbox_time "package_ios_no_bitcode" \
     make ipackage-no-bitcode
 
     mapbox_time "deploy_ios_no_bitcode"
-    ./scripts/ios/publish.sh "${PUBLISH_VERSION}" no-bitcode
+    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" no-bitcode
 else
     # build & test iOS
     mapbox_time "run_ios_tests" \
