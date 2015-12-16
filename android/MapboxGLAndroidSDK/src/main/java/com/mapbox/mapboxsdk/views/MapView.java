@@ -1490,13 +1490,7 @@ public final class MapView extends FrameLayout {
      * @param update The change that should be applied to the camera.
      */
     public final void animateCamera (CameraUpdate update) {
-
-        // Order Matters!  Otherwise Core GL will stomp on things
-        setCenterCoordinate(update.getTarget());
-        setZoomLevel(update.getZoom());
-        setTilt(new Double(update.getTilt()), 0L);
-        setBearing(update.getBearing());
-
+        animateCamera(update, 0, null);
     }
 
 
@@ -1508,10 +1502,7 @@ public final class MapView extends FrameLayout {
      * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
      */
     public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
-        animateCamera(update);
-        if (callback != null) {
-            callback.onFinish();
-        }
+        animateCamera(update, 0, callback);
     }
 
     /**
@@ -1523,6 +1514,11 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update, int durationMs, MapView.CancelableCallback callback) {
 
+        flyTo(update.getBearing(), update.getTarget(), durationMs, update.getTilt(), update.getZoom());
+
+        if (callback != null) {
+            callback.onFinish();
+        }
     }
 
     //
@@ -2352,8 +2348,20 @@ public final class MapView extends FrameLayout {
     }
 
     //
-    // Camera
+    // Mapbox Core GL Camera
     //
+
+    /**
+     *
+     * @param angle
+     * @param center
+     * @param duration
+     * @param pitch
+     * @param zoom
+     */
+    public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
+        mNativeMapView.flyTo(angle, center, duration, pitch, zoom);
+    }
 
     /**
      * Changes the map's viewport to fit the given coordinate bounds.
