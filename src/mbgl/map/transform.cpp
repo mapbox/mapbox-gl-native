@@ -414,7 +414,12 @@ void Transform::flyTo(const CameraOptions &options) {
             double desiredLng = startLatLng.longitude + (latLng.longitude - startLatLng.longitude) * us;
             
             //Now calculate desired zoom
-            double desiredZoom = startZ + state.scaleZoom(1 / w(s));
+            double desiredZoomStart = 0;
+            if (duration != Duration::zero()) {
+                desiredZoomStart = startZ;
+            }
+
+            double desiredZoom = desiredZoomStart + state.scaleZoom(1 / w(s));
             double desiredScale = state.zoomScale(desiredZoom);
             state.scale = ::fmax(::fmin(desiredScale, state.max_scale), state.min_scale);
 
