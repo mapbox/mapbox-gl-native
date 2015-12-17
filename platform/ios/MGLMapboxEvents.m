@@ -389,9 +389,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         [_locationManager stopMonitoringVisits];
     }
     
-    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy))];
-    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter))];
-    
     _locationManager = nil;
 }
 
@@ -431,19 +428,6 @@ const NSTimeInterval MGLFlushInterval = 60;
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
         [_locationManager startMonitoringVisits];
-    }
-    
-    [_locationManager addObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy)) options:NSKeyValueObservingOptionInitial context:NULL];
-    [_locationManager addObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter)) options:NSKeyValueObservingOptionInitial context:NULL];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:NSStringFromSelector(@selector(desiredAccuracy))]) {
-        NSLog(@"KVO'd: %@ = %0.f", keyPath, _locationManager.desiredAccuracy);
-    } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(distanceFilter))]) {
-        NSLog(@"KVO'd: %@ = %0.f", keyPath, _locationManager.distanceFilter);
-    } else {
-        NSLog(@"KVO'd something else?: %@ = %@", keyPath, object);
     }
 }
 
