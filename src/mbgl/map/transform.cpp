@@ -7,6 +7,7 @@
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
 #include <cstdio>
@@ -314,12 +315,23 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
 }
 
 void Transform::flyTo(const CameraOptions &options) {
+
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getZoom(): %f", getZoom());
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getAngle(): %f", getAngle());
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getPitch(): %f", getPitch());
+
     CameraOptions flyOptions(options);
     LatLng latLng = options.center ? *options.center : getLatLng();
     LatLng startLatLng = getLatLng();
     double zoom = flyOptions.zoom ? *flyOptions.zoom : getZoom();
     double angle = flyOptions.angle ? *flyOptions.angle : getAngle();
     double pitch = flyOptions.pitch ? *flyOptions.pitch : getPitch();
+
+
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - zoom: %f", zoom);
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - angle: %f", angle);
+    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - pitch: %f", pitch);
+
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
     }
