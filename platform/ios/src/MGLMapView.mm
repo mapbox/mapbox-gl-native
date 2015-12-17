@@ -27,8 +27,8 @@
 #include <mbgl/util/default_styles.hpp>
 
 #import "Mapbox.h"
-#import "../darwin/MGLGeometry_Private.h"
-#import "../darwin/MGLMultiPoint_Private.h"
+#import "../../darwin/MGLGeometry_Private.h"
+#import "../../darwin/MGLMultiPoint_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
