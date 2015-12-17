@@ -417,6 +417,10 @@ void Transform::flyTo(const CameraOptions &options) {
             double desiredZoom = startZ + state.scaleZoom(1 / w(s));
             double desiredScale = state.zoomScale(desiredZoom);
             state.scale = ::fmax(::fmin(desiredScale, state.max_scale), state.min_scale);
+
+            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - desiredZoom: %f", desiredZoom);
+            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - desiredScale: %f", desiredScale);
+            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - state.scale: %f", state.scale);
             
             //Now set values
             const double new_scaled_tile_size = state.scale * util::tileSize;
