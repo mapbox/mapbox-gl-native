@@ -1205,6 +1205,7 @@ public final class MapView extends FrameLayout {
     @FloatRange(from = 0, to = 360)
     public double getDirection() {
         double direction = -mNativeMapView.getBearing();
+        Log.i(TAG, "direction = " + direction);
 
         while (direction > 360) {
             direction -= 360;
@@ -1212,6 +1213,8 @@ public final class MapView extends FrameLayout {
         while (direction < 0) {
             direction += 360;
         }
+
+        Log.i(TAG, "final direction = " + direction);
 
         return direction;
     }
@@ -1524,6 +1527,7 @@ public final class MapView extends FrameLayout {
         if (update.getBearing() >= 0) {
             angle = (-update.getBearing()) * MathConstants.DEG2RAD;
         }
+        Log.i(TAG, "CameraOptions.getBearing() == " + update.getBearing() + "; angle = " + angle);
         double pitch = -1;
         if (update.getTilt() >= 0) {
             double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
