@@ -314,6 +314,9 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
     }
 }
 
+/**
+* Animates from the current geographic location to a requested one in CameraOptions over time.
+*/
 void Transform::flyTo(const CameraOptions &options) {
 
     mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getZoom(): %f", getZoom());
@@ -414,12 +417,7 @@ void Transform::flyTo(const CameraOptions &options) {
             double desiredLng = startLatLng.longitude + (latLng.longitude - startLatLng.longitude) * us;
             
             //Now calculate desired zoom
-            double desiredZoomStart = 0;
-            if (duration != Duration::zero()) {
-                desiredZoomStart = startZ;
-            }
-
-            double desiredZoom = desiredZoomStart + state.scaleZoom(1 / w(s));
+            double desiredZoom = startZ + state.scaleZoom(1 / w(s));
             double desiredScale = state.zoomScale(desiredZoom);
             state.scale = ::fmax(::fmin(desiredScale, state.max_scale), state.min_scale);
 
