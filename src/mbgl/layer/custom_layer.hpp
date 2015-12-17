@@ -32,10 +32,10 @@ private:
 
     std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const final;
 
-    CustomLayerInitializeFunction initializeFn;
-    CustomLayerRenderFunction renderFn;
-    CustomLayerDeinitializeFunction deinitializeFn;
-    void* context;
+    CustomLayerInitializeFunction initializeFn = nullptr;
+    CustomLayerRenderFunction renderFn = nullptr;
+    CustomLayerDeinitializeFunction deinitializeFn = nullptr;
+    void* context = nullptr;
 };
 
 } // namespace mbgl
