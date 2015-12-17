@@ -62,7 +62,7 @@ public class CameraActivity extends AppCompatActivity {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(48.21874, 11.62465))     // Sets the center of the map to Allianz Arena
                         .zoom(16)                                   // Sets the zoom
-                        .bearing(180)                               // Sets the orientation of the camera to east
+                        .bearing(180)                               // Sets the orientation of the camera to south
                         .tilt(40)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder
 
@@ -91,7 +91,7 @@ public class CameraActivity extends AppCompatActivity {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(-22.91214, -43.23012))     // Sets the center of the map to Maracanã
                         .zoom(13)                                   // Sets the zoom
-                        .bearing(270)                               // Sets the orientation of the camera to east
+                        .bearing(270)                               // Sets the orientation of the camera to west
                         .tilt(20)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder
 
