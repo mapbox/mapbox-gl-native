@@ -1541,11 +1541,6 @@ void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdoub
         return;
     }
 
-    mbgl::Log::Info(mbgl::Event::JNI, "nativeFlyTo - Angle: %f", angle);
-    mbgl::Log::Info(mbgl::Event::JNI, "nativeFlyTo - Duration: %lld", duration);
-    mbgl::Log::Info(mbgl::Event::JNI, "nativeFlyTo - Pitch: %f", pitch);
-    mbgl::Log::Info(mbgl::Event::JNI, "nativeFlyTo - Zoom: %f", zoom);
-
     mbgl::CameraOptions options;
     options.angle = angle;
     options.center = mbgl::LatLng(latitude, longitude);

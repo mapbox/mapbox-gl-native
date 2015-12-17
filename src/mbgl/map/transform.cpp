@@ -62,12 +62,22 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Position
 
+/*
+ * Change any combination of center, zoom, bearing, and pitch, without
+ * a transition. The map will retain the current values for any options
+ * not included in `options`.
+ */
 void Transform::jumpTo(const CameraOptions& options) {
     CameraOptions jumpOptions(options);
     jumpOptions.duration.reset();
     easeTo(jumpOptions);
 }
 
+/*
+ * Change any combination of center, zoom, bearing, and pitch, with a smooth animation
+ * between old and new values. The map will retain the current values for any options
+ * not included in `options`.
+ */
 void Transform::easeTo(const CameraOptions& options) {
     CameraOptions easeOptions(options);
     LatLng latLng = easeOptions.center ? *easeOptions.center : getLatLng();
@@ -315,13 +325,9 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
 }
 
 /**
-* Animates from the current geographic location to a requested one in CameraOptions over time.
+* Flying animation to a specified location/zoom/bearing with automatic curve.
 */
 void Transform::flyTo(const CameraOptions &options) {
-
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getZoom(): %f", getZoom());
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getAngle(): %f", getAngle());
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - getPitch(): %f", getPitch());
 
     CameraOptions flyOptions(options);
     LatLng latLng = options.center ? *options.center : getLatLng();
@@ -329,11 +335,6 @@ void Transform::flyTo(const CameraOptions &options) {
     double zoom = flyOptions.zoom ? *flyOptions.zoom : getZoom();
     double angle = flyOptions.angle ? *flyOptions.angle : getAngle();
     double pitch = flyOptions.pitch ? *flyOptions.pitch : getPitch();
-
-
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - zoom: %f", zoom);
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - angle: %f", angle);
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - pitch: %f", pitch);
 
     if (std::isnan(latLng.latitude) || std::isnan(latLng.longitude) || std::isnan(zoom)) {
         return;
@@ -345,10 +346,6 @@ void Transform::flyTo(const CameraOptions &options) {
     const double scaled_tile_size = new_scale * util::tileSize;
     state.Bc = scaled_tile_size / 360;
     state.Cc = scaled_tile_size / util::M2PI;
-
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - scaled_tile_size: %f", scaled_tile_size);
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - state.Bc: %f", state.Bc);
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - state.Cc: %f", state.Cc);
     
     const double m = 1 - 1e-15;
     const double f = ::fmin(::fmax(std::sin(util::DEG2RAD * latLng.latitude), -m), m);
@@ -420,10 +417,6 @@ void Transform::flyTo(const CameraOptions &options) {
             double desiredZoom = startZ + state.scaleZoom(1 / w(s));
             double desiredScale = state.zoomScale(desiredZoom);
             state.scale = ::fmax(::fmin(desiredScale, state.max_scale), state.min_scale);
-
-            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - desiredZoom: %f", desiredZoom);
-            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - desiredScale: %f", desiredScale);
-            mbgl::Log::Info(mbgl::Event::JNI, "flyTo - state.scale: %f", state.scale);
             
             //Now set values
             const double new_scaled_tile_size = state.scale * util::tileSize;
