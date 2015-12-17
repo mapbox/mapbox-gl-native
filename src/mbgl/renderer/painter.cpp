@@ -240,6 +240,7 @@ void Painter::renderPass(RenderPass pass_,
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.id + " - custom");
+            VertexArrayObject::Unbind();
             layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
