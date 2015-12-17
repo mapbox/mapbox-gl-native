@@ -323,8 +323,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:_userDefaultsObserver];
-    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy))];
-    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter))];
     [self pauseMetricsCollection];
 }
 
@@ -390,6 +388,9 @@ const NSTimeInterval MGLFlushInterval = 60;
     if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
         [_locationManager stopMonitoringVisits];
     }
+    
+    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(desiredAccuracy))];
+    [_locationManager removeObserver:self forKeyPath:NSStringFromSelector(@selector(distanceFilter))];
     
     _locationManager = nil;
 }
