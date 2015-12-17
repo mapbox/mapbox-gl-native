@@ -60,7 +60,7 @@
       
       'copies': [
         {
-          'destination': '<(PRODUCT_DIR)/\${FRAMEWORKS_FOLDER_PATH}',
+          'destination': '<(PRODUCT_DIR)/${FRAMEWORKS_FOLDER_PATH}',
           'files': [
             '<(PRODUCT_DIR)/Mapbox.framework',
           ],
