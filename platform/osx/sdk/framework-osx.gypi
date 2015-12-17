@@ -24,7 +24,7 @@
         'DYLIB_INSTALL_NAME_BASE': '@rpath',
         'INFOPLIST_FILE': '../platform/osx/sdk/Info.plist',
         'LD_RUNPATH_SEARCH_PATHS': [
-          '$(inherited)',
+          '${inherited}',
           '@executable_path/../Frameworks',
           '@loader_path/Frameworks',
         ],
