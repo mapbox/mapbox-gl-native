@@ -1489,10 +1489,16 @@ void JNICALL nativeJumpTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
     }
 
     mbgl::CameraOptions options;
-    options.angle = angle;
+    if (angle != -1) {
+        options.angle = angle;
+    }
     options.center = mbgl::LatLng(latitude, longitude);
-    options.pitch = pitch;
-    options.zoom = zoom;
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
 
     nativeMapView->getMap().jumpTo(options);
 }
@@ -1515,11 +1521,17 @@ void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
     }
 
     mbgl::CameraOptions options;
-    options.angle = angle;
+    if (angle != -1) {
+        options.angle = angle;
+    }
     options.center = mbgl::LatLng(latitude, longitude);
     options.duration = mbgl::Duration(duration);
-    options.pitch = pitch;
-    options.zoom = zoom;
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
 
     nativeMapView->getMap().easeTo(options);
 }
@@ -1542,11 +1554,17 @@ void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdoub
     }
 
     mbgl::CameraOptions options;
-    options.angle = angle;
+    if (angle != -1) {
+        options.angle = angle;
+    }
     options.center = mbgl::LatLng(latitude, longitude);
     options.duration = mbgl::Duration(duration);
-    options.pitch = pitch;
-    options.zoom = zoom;
+    if (pitch != -1) {
+        options.pitch = pitch;
+    }
+    if (zoom != -1) {
+        options.zoom = zoom;
+    }
 
     nativeMapView->getMap().flyTo(options);
 }

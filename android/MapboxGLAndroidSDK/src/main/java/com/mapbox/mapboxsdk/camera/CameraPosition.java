@@ -60,8 +60,11 @@ public final class CameraPosition implements Parcelable {
         }
         this.target = target;
 
-        if (tilt < 0.0f || tilt > 90.0f) {
-            throw new IllegalArgumentException("tilt is outside of 0 to 90 degrees range");
+        // Allow for default value of -1
+        if (tilt != -1) {
+            if (tilt < 0.0f || tilt > 90.0f) {
+                throw new IllegalArgumentException("tilt is outside of 0 to 90 degrees range");
+            }
         }
         this.tilt = tilt;
 
@@ -88,10 +91,10 @@ public final class CameraPosition implements Parcelable {
      */
     public static final class Builder {
 
-        private float bearing;
-        private LatLng target;
-        private float tilt;
-        private float zoom;
+        private float bearing = -1;
+        private LatLng target = null;
+        private float tilt = -1;
+        private float zoom = -1;
 
         /**
          * Creates an empty builder.

@@ -1517,6 +1517,11 @@ public final class MapView extends FrameLayout {
      */
     public final void animateCamera (CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
 
+        if (update.getTarget() == null) {
+            Log.w(TAG, "animateCamera with null target coordinate passed in.  Will immediatele return without animating camera.");
+            return;
+        }
+
         mNativeMapView.cancelTransitions();
 
         // Register callbacks early enough
@@ -1551,6 +1556,10 @@ public final class MapView extends FrameLayout {
             double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
             pitch = dp * MathConstants.DEG2RAD;
         }
+        double zoom = -1;
+        if (update.getZoom() >= 0) {
+            zoom = update.getZoom();
+        }
 
         long durationNano = 0;
         if (durationMs > 0) {
@@ -1560,11 +1569,11 @@ public final class MapView extends FrameLayout {
         if (durationMs == 0) {
             // Route To `jumpTo`
             Log.i(TAG, "jumpTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-            jumpTo(angle, update.getTarget(), pitch, update.getZoom());
+            jumpTo(angle, update.getTarget(), pitch, zoom);
         } else {
             // Use `flyTo`
             Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-            flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
+            flyTo(angle, update.getTarget(), durationNano, pitch, zoom);
         }
     }
 

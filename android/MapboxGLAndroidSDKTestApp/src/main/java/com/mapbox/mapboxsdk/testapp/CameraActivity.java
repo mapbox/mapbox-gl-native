@@ -50,7 +50,6 @@ public class CameraActivity extends AppCompatActivity {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(44.50128, -88.06216))    // Sets the center of the map to Lambeau Field
                         .zoom(14)                                   // Sets the zoom
-                        .bearing(90)                                // Sets the orientation of the camera to east
                         .tilt(30)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder
                 mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -66,7 +65,6 @@ public class CameraActivity extends AppCompatActivity {
                         .target(new LatLng(48.21874, 11.62465))     // Sets the center of the map to Allianz Arena
                         .zoom(16)                                   // Sets the zoom
                         .bearing(180)                               // Sets the orientation of the camera to south
-                        .tilt(40)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder
 
                 MapView.CancelableCallback callback = new MapView.CancelableCallback() {
@@ -93,11 +91,9 @@ public class CameraActivity extends AppCompatActivity {
             public void onClick(View view) {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(-22.91214, -43.23012))     // Sets the center of the map to Maracanã
-                        .zoom(13)                                   // Sets the zoom
                         .bearing(270)                               // Sets the orientation of the camera to west
                         .tilt(20)                                   // Sets the tilt of the camera to 30 degrees
                         .build();                                   // Creates a CameraPosition from the builder
-
 
                 MapView.CancelableCallback callback = new MapView.CancelableCallback() {
                     @Override
@@ -111,7 +107,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 };
 
-                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 50000, callback);
+                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 25000, callback);
             }
         });
 
