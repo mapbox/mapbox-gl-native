@@ -373,13 +373,18 @@ void Transform::flyTo(const CameraOptions &options) {
     double S = (is_close ? (std::abs(std::log(w1 / w0)) / rho)
                 : ((r(1) - r0) / rho));
     
-    Duration duration = flyOptions.duration ? *flyOptions.duration : Duration::zero();
+    Duration duration;
     if (flyOptions.duration) {
         duration = *flyOptions.duration;
     } else {
         double speed = flyOptions.speed ? *flyOptions.speed : 1.2;
         duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
             std::chrono::duration<double, std::chrono::seconds::period>(S / speed));
+    }
+    if (duration == Duration::zero()) {
+        // Atomic transition.
+        jumpTo(options);
+        return;
     }
     startTransition(
         [=](double t) {
