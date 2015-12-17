@@ -72,6 +72,10 @@
         './src/example_custom_layer.cpp',
       ],
 
+      'include_dirs': [
+        '../../include',
+      ],
+
       'variables': {
         'ldflags': [
           '-llog',
