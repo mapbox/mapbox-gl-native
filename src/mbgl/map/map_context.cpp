@@ -289,6 +289,12 @@ void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optio
     asyncUpdate.send();
 }
 
+void MapContext::removeLayer(const std::string& id) {
+    style->removeLayer(id);
+    updateFlags |= Update::Classes;
+    asyncUpdate.send();
+}
+
 void MapContext::setSourceTileCacheSize(size_t size) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (size != sourceCacheSize) {

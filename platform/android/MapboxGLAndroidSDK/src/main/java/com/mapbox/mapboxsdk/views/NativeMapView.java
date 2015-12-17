@@ -454,6 +454,10 @@ final class NativeMapView {
         nativeAddCustomLayer(mNativeMapViewPtr, customLayer, before);
     }
 
+    public void removeCustomLayer(String id) {
+        nativeRemoveCustomLayer(mNativeMapViewPtr, id);
+    }
+
     //
     // Callbacks
     //
@@ -636,4 +640,6 @@ final class NativeMapView {
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
 
     private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
+
+    private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 }

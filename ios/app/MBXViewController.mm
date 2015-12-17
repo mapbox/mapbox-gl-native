@@ -25,6 +25,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 @implementation MBXViewController
 {
     BOOL _isTouringWorld;
+    BOOL _isShowingCustomStyleLayer;
 }
 
 #pragma mark - Setup
@@ -151,7 +152,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                 @"Add Test Shapes",
                                                                 @"Start World Tour",
                                                                 @"Remove Annotations",
-                                                                @"Insert Custom Style Layer",
+                                                                @"Toggle Custom Style Layer",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -264,7 +265,14 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
-        [self insertCustomStyleLayer];
+        if (_isShowingCustomStyleLayer)
+        {
+            [self removeCustomStyleLayer];
+        }
+        else
+        {
+            [self insertCustomStyleLayer];
+        }
     }
 }
 
@@ -310,6 +318,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (void)insertCustomStyleLayer
 {
+    _isShowingCustomStyleLayer = YES;
+
     static const GLchar *vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
     static const GLchar *fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
     
@@ -359,6 +369,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             glDeleteProgram(program);
         }
     } belowStyleLayerWithIdentifier:@"housenum-label"];
+}
+
+- (void)removeCustomStyleLayer
+{
+    _isShowingCustomStyleLayer = NO;
+    [self.mapView removeCustomStyleLayerWithIdentifier:@"mbx-custom"];
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longPress

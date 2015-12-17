@@ -174,6 +174,7 @@ public:
                         CustomLayerDeinitializeFunction,
                         void* context,
                         const char* before = nullptr);
+    void removeCustomLayer(const std::string& id);
 
     // Memory
     void setSourceTileCacheSize(size_t);

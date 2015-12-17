@@ -449,6 +449,10 @@ void Map::addCustomLayer(const std::string& id,
         before ? std::string(before) : mapbox::util::optional<std::string>());
 }
 
+void Map::removeCustomLayer(const std::string& id) {
+    context->invoke(&MapContext::removeLayer, id);
+}
+
 #pragma mark - Toggles
 
 void Map::setDebug(MapDebugOptions mode) {

@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private int mSelectedStyle = R.id.actionStyleMapboxStreets;
     private NavigationView mNavigationView;
     private CoordinatorLayout mCoordinatorLayout;
+    private boolean mIsShowingCustomLayer;
 
     // Used for GPS
     private FloatingActionButton mLocationFAB;
@@ -397,7 +398,11 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case R.id.action_custom_layer:
-                                addCustomLayer();
+                                if (mIsShowingCustomLayer) {
+                                    removeCustomLayer();
+                                } else {
+                                    addCustomLayer();
+                                }
                                 return true;
 
                             default:
@@ -576,6 +581,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addCustomLayer() {
+        mIsShowingCustomLayer = true;
         mMapView.addCustomLayer(
             new CustomLayer("custom",
                 ExampleCustomLayer.createContext(),
@@ -583,6 +589,11 @@ public class MainActivity extends AppCompatActivity {
                 ExampleCustomLayer.RenderFunction,
                 ExampleCustomLayer.DeinitializeFunction),
             null);
+    }
+
+    private void removeCustomLayer() {
+        mIsShowingCustomLayer = false;
+        mMapView.removeCustomLayer("custom");
     }
 
     // Called when FPS changes

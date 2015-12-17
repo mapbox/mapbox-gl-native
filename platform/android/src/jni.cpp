@@ -1492,6 +1492,12 @@ void JNICALL nativeAddCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapViewP
         before ? std_string_from_jstring(env, before).c_str() : nullptr);
 }
 
+void JNICALL nativeRemoveCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jstring id) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveCustomLayer");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().removeCustomLayer(std_string_from_jstring(env, id));
+}
 
 }
 
@@ -2018,6 +2024,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
         {"nativeAddCustomLayer", "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V",
          reinterpret_cast<void *>(&nativeAddCustomLayer)},
+        {"nativeRemoveCustomLayer", "(JLjava/lang/String;)V",
+         reinterpret_cast<void *>(&nativeRemoveCustomLayer)},
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {

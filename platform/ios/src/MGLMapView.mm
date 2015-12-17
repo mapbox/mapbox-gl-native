@@ -3675,6 +3675,11 @@ void MGLFinishCustomStyleLayer(void *context)
                              context, otherIdentifier.UTF8String);
 }
 
+- (void)removeCustomStyleLayerWithIdentifier:(NSString *)identifier
+{
+    _mbglMap->removeCustomLayer(identifier.UTF8String);
+}
+
 - (void)setCustomStyleLayersNeedDisplay
 {
     _mbglMap->update(mbgl::Update::Repaint);

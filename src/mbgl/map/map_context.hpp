@@ -59,6 +59,7 @@ public:
     // Style API
     void addLayer(std::unique_ptr<StyleLayer>,
                   const mapbox::util::optional<std::string> before);
+    void removeLayer(const std::string& id);
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
