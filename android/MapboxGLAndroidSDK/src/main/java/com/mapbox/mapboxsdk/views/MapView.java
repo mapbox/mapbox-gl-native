@@ -1515,9 +1515,32 @@ public final class MapView extends FrameLayout {
      * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
      * @param callback An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
      */
-    public final void animateCamera (CameraUpdate update, int durationMs, MapView.CancelableCallback callback) {
+    public final void animateCamera (CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
 
         mNativeMapView.cancelTransitions();
+
+        // Register callbacks early enough
+        if (callback != null) {
+            final MapView view = this;
+            addOnMapChangedListener(new OnMapChangedListener() {
+                @Override
+                public void onMapChanged(@MapChange int change) {
+                    if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
+                        // Invoke callback on UI Thread
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                callback.onFinish();
+                            }
+                        });
+
+                        // Clean up after self
+                        removeOnMapChangedListener(this);
+                    }
+                }
+            });
+        }
+
         // Convert Degrees To Radians
         double angle = -1;
         if (update.getBearing() >= 0) {
@@ -1543,13 +1566,6 @@ public final class MapView extends FrameLayout {
             Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
             flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
         }
-
-/*
-        // Not implemented yet
-        if (callback != null) {
-            callback.onFinish();
-        }
-*/
     }
 
     //

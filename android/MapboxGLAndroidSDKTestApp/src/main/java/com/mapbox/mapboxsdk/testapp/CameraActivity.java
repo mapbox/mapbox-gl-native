@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,8 @@ import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
 public class CameraActivity extends AppCompatActivity {
+
+    private static final String TAG = "CameraActivity";
 
     private MapView mMapView;
 
@@ -70,12 +73,12 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onCancel() {
                         // NOTE: This shouldn't appear
-                        Toast.makeText(getApplicationContext(), "onCancel Callback called.", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "onCancel Callback called.");
                     }
 
                     @Override
                     public void onFinish() {
-                        Toast.makeText(getApplicationContext(), "onFinish Callback called.", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "onFinish Callback called.");
                     }
                 };
 
@@ -99,12 +102,12 @@ public class CameraActivity extends AppCompatActivity {
                 MapView.CancelableCallback callback = new MapView.CancelableCallback() {
                     @Override
                     public void onCancel() {
-                        Toast.makeText(getApplicationContext(), "Duration onCancel Callback called.", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "Duration onCancel Callback called.");
                     }
 
                     @Override
                     public void onFinish() {
-                        Toast.makeText(getApplicationContext(), "Duration onFinish Callback called.", Toast.LENGTH_SHORT).show();
+                        Log.i(TAG, "Duration onFinish Callback called.");
                     }
                 };
 
