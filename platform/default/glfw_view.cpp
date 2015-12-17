@@ -81,8 +81,6 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     pixelRatio = static_cast<float>(fbWidth) / width;
 
-    glViewport(0, 0, fbWidth, fbHeight);
-
     glfwMakeContextCurrent(nullptr);
 
     printf("\n");
@@ -333,8 +331,6 @@ void GLFWView::onFramebufferResize(GLFWwindow *window, int width, int height) {
     view->fbWidth = width;
     view->fbHeight = height;
 
-    glViewport(0, 0, width, height);
-
     view->map->update(mbgl::Update::Repaint);
 }
 
@@ -434,7 +430,11 @@ void GLFWView::invalidate() {
 }
 
 void GLFWView::beforeRender() {
-    // no-op
+    // This is called from the map thread but `width` and `height`
+    // can be accessed with no race because the main thread is blocked
+    // when we render. This will be more straightforward when we move
+    // rendering to the main thread.
+    glViewport(0, 0, width, height);
 }
 
 void GLFWView::afterRender() {
