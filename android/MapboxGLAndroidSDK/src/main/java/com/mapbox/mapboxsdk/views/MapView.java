@@ -1535,8 +1535,15 @@ public final class MapView extends FrameLayout {
             durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
         }
 
-        Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-        flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
+        if (durationMs == 0) {
+            // Route To `jumpTo`
+            Log.i(TAG, "jumpTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
+            jumpTo(angle, update.getTarget(), pitch, update.getZoom());
+        } else {
+            // Use `flyTo`
+            Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
+            flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
+        }
 
 /*
         // Not implemented yet
@@ -2377,15 +2384,42 @@ public final class MapView extends FrameLayout {
     //
 
     /**
-     *
-     * @param angle Angle in Radians
+     * Change any combination of center, zoom, bearing, and pitch, without
+     * a transition. The map will retain the current values for any options
+     * not included in `options`.
+     * @param bearing Bearing in Radians
+     * @param center Center Coordinate
+     * @param pitch Pitch in Radians
+     * @param zoom Zoom Level
+     */
+    public void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
+        mNativeMapView.jumpTo(bearing, center, pitch, zoom);
+    }
+
+    /**
+     * Change any combination of center, zoom, bearing, and pitch, with a smooth animation
+     * between old and new values. The map will retain the current values for any options
+     * not included in `options`.
+     * @param bearing Bearing in Radians
      * @param center Center Coordinate
      * @param duration Animation time in Nanoseconds
      * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */
-    public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
-        mNativeMapView.flyTo(angle, center, duration, pitch, zoom);
+    public void easeTo(double bearing, LatLng center, long duration,  double pitch, double zoom) {
+        mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
+    }
+
+    /**
+     * Flying animation to a specified location/zoom/bearing with automatic curve.
+     * @param bearing Bearing in Radians
+     * @param center Center Coordinate
+     * @param duration Animation time in Nanoseconds
+     * @param pitch Pitch in Radians
+     * @param zoom Zoom Level
+     */
+    public void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom) {
+        mNativeMapView.flyTo(bearing, center, duration, pitch, zoom);
     }
 
     /**

@@ -1471,6 +1471,58 @@ jdouble JNICALL nativeGetTopOffsetPixelsForAnnotationSymbol(JNIEnv *env, jobject
     return nativeMapView->getMap().getTopOffsetPixelsForAnnotationIcon(std_string_from_jstring(env, symbolName));
 }
 
+void JNICALL nativeJumpTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jdouble pitch, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeJumpTo");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    options.angle = angle;
+    options.center = mbgl::LatLng(latitude, longitude);
+    options.pitch = pitch;
+    options.zoom = zoom;
+
+    nativeMapView->getMap().jumpTo(options);
+}
+
+void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeEaseTo");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    jdouble latitude = env->GetDoubleField(centerLatLng, latLngLatitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    jdouble longitude = env->GetDoubleField(centerLatLng, latLngLongitudeId);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        return;
+    }
+
+    mbgl::CameraOptions options;
+    options.angle = angle;
+    options.center = mbgl::LatLng(latitude, longitude);
+    options.duration = mbgl::Duration(duration);
+    options.pitch = pitch;
+    options.zoom = zoom;
+
+    nativeMapView->getMap().easeTo(options);
+}
 
 void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeFlyTo");
@@ -1997,6 +2049,10 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeLatLngForPixel)},
         {"nativeGetTopOffsetPixelsForAnnotationSymbol", "(JLjava/lang/String;)D",
          reinterpret_cast<void *>(&nativeGetTopOffsetPixelsForAnnotationSymbol)},
+        {"nativeJumpTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;DD)V",
+         reinterpret_cast<void *>(&nativeJumpTo)},
+        {"nativeEaseTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;JDD)V",
+         reinterpret_cast<void *>(&nativeEaseTo)},
         {"nativeFlyTo", "(JDLcom/mapbox/mapboxsdk/geometry/LatLng;JDD)V",
          reinterpret_cast<void *>(&nativeFlyTo)},
     };

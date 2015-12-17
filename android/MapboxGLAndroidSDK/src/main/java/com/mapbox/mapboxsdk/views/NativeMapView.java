@@ -447,6 +447,14 @@ final class NativeMapView {
         return nativeGetTopOffsetPixelsForAnnotationSymbol(mNativeMapViewPtr, symbolName);
     }
 
+    public void jumpTo(double angle, LatLng center,  double pitch, double zoom) {
+        nativeJumpTo(mNativeMapViewPtr, angle, center, pitch, zoom);
+    }
+
+    public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom) {
+        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+    }
+
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
         nativeFlyTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
     }
@@ -631,6 +639,10 @@ final class NativeMapView {
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
+
+    private native void nativeJumpTo(long nativeMapViewPtr, double angle, LatLng center, double pitch, double zoom);
+
+    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
 
     private native void nativeFlyTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
 }
