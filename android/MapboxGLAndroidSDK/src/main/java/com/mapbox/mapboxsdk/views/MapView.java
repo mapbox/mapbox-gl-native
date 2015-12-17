@@ -1535,11 +1535,15 @@ public final class MapView extends FrameLayout {
             durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
         }
 
+        Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
         flyTo(angle, update.getTarget(), durationNano, pitch, update.getZoom());
 
+/*
+        // Not implemented yet
         if (callback != null) {
             callback.onFinish();
         }
+*/
     }
 
     //
