@@ -54,10 +54,10 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 }
 
 box TransformState::cornersToBox(uint32_t z) const {
-    double w = width;
-    double h = height;
+    double w = width + util::tileSize * 2;
+    double h = height + util::tileSize * 2;
     box b(
-    pointToCoordinate({ 0, 0 }).zoomTo(z),
+    pointToCoordinate({ -util::tileSize, -util::tileSize }).zoomTo(z),
     pointToCoordinate({ w, 0 }).zoomTo(z),
     pointToCoordinate({ w, h }).zoomTo(z),
     pointToCoordinate({ 0, h }).zoomTo(z));
