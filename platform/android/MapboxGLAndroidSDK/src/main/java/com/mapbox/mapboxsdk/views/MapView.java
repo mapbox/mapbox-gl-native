@@ -219,8 +219,7 @@ public final class MapView extends FrameLayout {
     private List<Marker> mSelectedMarkers = new ArrayList<>();
     private List<InfoWindow> mInfoWindows = new ArrayList<>();
     private InfoWindowAdapter mInfoWindowAdapter;
-    private SpriteFactory mSpriteFactory;
-    private ArrayList<Sprite> mSprites = new ArrayList<>();
+    private List<Sprite> mSprites = new ArrayList<>();
 
     // Used for the Mapbox Logo
     private ImageView mLogoView;
@@ -229,7 +228,7 @@ public final class MapView extends FrameLayout {
     private ImageView mAttributionsView;
 
     // Used to manage MapChange event listeners
-    private ArrayList<OnMapChangedListener> mOnMapChangedListener = new ArrayList<>();
+    private List<OnMapChangedListener> mOnMapChangedListener = new ArrayList<>();
 
     // Used to manage map click event listeners
     private OnMapClickListener mOnMapClickListener;
@@ -1834,10 +1833,7 @@ public final class MapView extends FrameLayout {
     //
 
     public SpriteFactory getSpriteFactory() {
-        if (mSpriteFactory == null) {
-            mSpriteFactory = new SpriteFactory(this);
-        }
-        return mSpriteFactory;
+        return SpriteFactory.getInstance(getContext());
     }
 
     private void loadSprite(Sprite sprite) {

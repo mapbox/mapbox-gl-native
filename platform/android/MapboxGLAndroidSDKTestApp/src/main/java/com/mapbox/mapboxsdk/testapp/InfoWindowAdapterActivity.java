@@ -45,7 +45,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
 
-        mSpriteFactory = new SpriteFactory(mMapView);
+        mSpriteFactory = SpriteFactory.getInstance(this);
         mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_24dp);
 
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {

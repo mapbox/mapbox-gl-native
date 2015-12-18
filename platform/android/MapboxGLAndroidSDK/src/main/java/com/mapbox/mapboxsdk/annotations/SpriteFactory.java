@@ -7,12 +7,13 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.TooManySpritesException;
-import com.mapbox.mapboxsdk.views.MapView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,17 +24,25 @@ public final class SpriteFactory {
 
     private static final String SPRITE_ID_PREFIX = "com.mapbox.sprites.sprite_";
 
-    private MapView mMapView;
+    private Context mContext;
+    private static SpriteFactory sInstance;
     private Sprite mDefaultMarker;
     private BitmapFactory.Options mOptions;
 
     private int mNextId = 0;
 
-    public SpriteFactory(MapView mapView) {
-        mMapView = mapView;
+    public static synchronized SpriteFactory getInstance(@NonNull Context context) {
+        if (sInstance == null) {
+            sInstance = new SpriteFactory(context.getApplicationContext());
+        }
+        return sInstance;
+    }
+
+    private SpriteFactory(@NonNull Context context) {
+        mContext = context;
         DisplayMetrics realMetrics = null;
         DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager) mMapView.getContext().getSystemService(Context.WINDOW_SERVICE);
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             realMetrics = new DisplayMetrics();
@@ -48,31 +57,23 @@ public final class SpriteFactory {
         if (realMetrics != null) {
             mOptions.inScreenDensity = realMetrics.densityDpi;
         }
-
     }
 
-    public Sprite fromBitmap(Bitmap bitmap) {
-        if (bitmap == null) {
-            return null;
-        }
-
+    public Sprite fromBitmap(@NonNull Bitmap bitmap) {
         if (mNextId < 0) {
             throw new TooManySpritesException();
         }
         String id = SPRITE_ID_PREFIX + ++mNextId;
-
         return new Sprite(id, bitmap);
     }
 
-    public Sprite fromDrawable(Drawable drawable) {
+    public Sprite fromDrawable(@NonNull Drawable drawable) {
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
-
         return fromDrawable(drawable, width, height);
     }
 
-
-    public Sprite fromDrawable(Drawable drawable, int width, int height) {
+    public Sprite fromDrawable(@NonNull Drawable drawable, int width, int height) {
         if ((width < 0) || (height < 0)) {
             return null;
         }
@@ -84,12 +85,11 @@ public final class SpriteFactory {
         drawable.setBounds(bounds);
         drawable.draw(canvas);
         drawable.setBounds(temp);
-
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromResource(int resourceId) {
-        Bitmap bitmap = BitmapFactory.decodeResource(mMapView.getResources(), resourceId);
+    public Sprite fromResource(@DrawableRes int resourceId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
         return fromBitmap(bitmap);
     }
 
@@ -100,30 +100,30 @@ public final class SpriteFactory {
         return mDefaultMarker;
     }
 
-    private Sprite fromInputStream(InputStream is) {
+    private Sprite fromInputStream(@NonNull InputStream is) {
         Bitmap bitmap = BitmapFactory.decodeStream(is, null, mOptions);
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromAsset(String assetName) {
+    public Sprite fromAsset(@NonNull String assetName) {
         InputStream is;
         try {
-            is = mMapView.getContext().getAssets().open(assetName);
+            is = mContext.getAssets().open(assetName);
         } catch (IOException e) {
             return null;
         }
         return fromInputStream(is);
     }
 
-    public Sprite fromPath(String absolutePath) {
+    public Sprite fromPath(@NonNull String absolutePath) {
         Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, mOptions);
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromFile(String fileName) {
+    public Sprite fromFile(@NonNull String fileName) {
         FileInputStream is;
         try {
-            is = mMapView.getContext().openFileInput(fileName);
+            is = mContext.openFileInput(fileName);
         } catch (FileNotFoundException e) {
             return null;
         }
