@@ -5,9 +5,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -24,12 +24,6 @@ public class BoundingBoxTest {
     public void testSanity() {
         BoundingBox boundingBox = new BoundingBox(0.0, 0.0, 0.0, 0.0);
         assertNotNull("boundingBox should not be null", boundingBox);
-    }
-
-    @Test
-    public void testDefaultConstructor() {
-        mBoundingBox = new BoundingBox(0, 0, 0, 0);
-        assertEquals(mBoundingBox, new BoundingBox());
     }
 
     @Test
@@ -155,14 +149,8 @@ public class BoundingBoxTest {
     }
 
     @Test
-    public void testEmptySpanEmptyNotEmptyBox(){
+    public void testEmptySpanEmptyNotEmptyBox() {
         assertFalse(mBoundingBox.isEmpty());
-    }
-
-    @Test
-    public void testEmptySpanEmptyBox() {
-        mBoundingBox = new BoundingBox();
-        assertTrue(mBoundingBox.isEmpty());
     }
 
     @Test
@@ -172,7 +160,7 @@ public class BoundingBoxTest {
     }
 
     @Test
-    public void testEmptySpanEmptyLongitude(){
+    public void testEmptySpanEmptyLongitude() {
         mBoundingBox = new BoundingBox(0.0, 3.0, 0.0, 1.0);
         assertTrue(mBoundingBox.isEmpty());
     }

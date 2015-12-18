@@ -57,14 +57,7 @@ public final class BoundingBox implements Parcelable, Serializable {
         this.mLonWest = other.getLonWest();
         this.mIsValid = other.isValid();
     }
-
-    /**
-     * Create a new BoundingBox with no size centered at 0, 0, also known as null island
-     */
-    public BoundingBox() {
-        this(0, 0, 0, 0);
-    }
-
+    
     /**
      * Calculates the centerpoint of this bounding box by simple interpolation and returns
      * it as a point. This is a non-geodesic calculation which is not the geographic center.
