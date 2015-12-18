@@ -1,0 +1,36 @@
+{
+  "version": 8,
+  "name": "Test",
+  "sources": {
+    "usedsource": {
+      "url": "test/fixtures/resources/source_vector.json",
+      "type": "vector"
+    },
+    "unusedsource": {
+      "url": "test/fixtures/resources/source_vector.json",
+      "type": "vector"
+    }
+  },
+  "sprite": "test/fixtures/resources/sprite",
+  "glyphs": "test/fixtures/resources/glyphs.pbf",
+  "layers": [{
+    "id": "usedlayer",
+    "type": "symbol",
+    "source": "usedsource"
+  }, {
+    "id":  "unusedlayeropacity",
+    "type": "symbol",
+    "source": "unusedsource",
+    "paint" : {
+        "icon-opacity" : 0,
+        "text-opacity" : 0
+    }
+  }, {
+    "id":  "unusedlayervisibility",
+    "type": "symbol",
+    "source": "unusedsource",
+    "layout" : {
+        "visibility" : "none"
+    }
+  }]
+}
