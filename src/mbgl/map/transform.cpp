@@ -341,8 +341,7 @@ void Transform::flyTo(const CameraOptions &options) {
     }
     
     double new_scale = std::pow(2.0, zoom);
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - new_scale: %f", new_scale);
-    
+
     const double scaled_tile_size = new_scale * util::tileSize;
     state.Bc = scaled_tile_size / 360;
     state.Cc = scaled_tile_size / util::M2PI;
@@ -362,8 +361,6 @@ void Transform::flyTo(const CameraOptions &options) {
     state.scaling = true;
     state.rotating = true;
 
-    mbgl::Log::Info(mbgl::Event::JNI, "flyTo - startZ: %f", startZ);
-    
     double rho = flyOptions.curve ? *flyOptions.curve : 1.42;
     double w0 = std::max(state.width, state.height);
     double w1 = w0 / new_scale;
