@@ -100,6 +100,9 @@ private:
 
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
+    
+    void setLatLngZoom(const LatLng &latLng, double zoom);
+    void setScalePoint(const double scale, const PrecisionPoint &point);
 
 private:
     ConstrainMode constrainMode;
