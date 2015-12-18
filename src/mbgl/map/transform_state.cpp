@@ -4,6 +4,7 @@
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/math.hpp>
 
 using namespace mbgl;
 
@@ -368,6 +369,34 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 
     double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
     y_ = std::max(-max_y, std::min(y_, max_y));
+}
+
+void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
+    double newScale = zoomScale(zoom);
+    const double newWorldSize = newScale * util::tileSize;
+    Bc = newWorldSize / 360;
+    Cc = newWorldSize / util::M2PI;
+    
+    const double m = 1 - 1e-15;
+    const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude), -m, m);
+    
+    PrecisionPoint point = {
+        -latLng.longitude * Bc,
+        0.5 * Cc * std::log((1 + f) / (1 - f)),
+    };
+    setScalePoint(newScale, point);
+}
+
+void TransformState::setScalePoint(const double newScale, const PrecisionPoint &point) {
+    double constrainedScale = newScale;
+    PrecisionPoint constrainedPoint = point;
+    constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
+    
+    scale = constrainedScale;
+    x = constrainedPoint.x;
+    y = constrainedPoint.y;
+    Bc = worldSize() / 360;
+    Cc = worldSize() / util::M2PI;
 }
 
 

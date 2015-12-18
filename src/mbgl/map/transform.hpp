@@ -26,6 +26,8 @@ public:
 
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&);
+    /** Smoothly zoom out, pan, and zoom back into the given camera along a
+        great circle, as though the viewer is aboard a supersonic jetcopter. */
     void flyTo(const CameraOptions&);
 
     // Position

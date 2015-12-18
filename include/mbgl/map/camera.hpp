@@ -11,16 +11,53 @@
 
 namespace mbgl {
 
+/** Various options for describing the viewpoint of a map, along with parameters
+    for transitioning to the viewpoint with animation. All fields are optional;
+    the default values of transition options depend on how this struct is used.
+ */
 struct CameraOptions {
-    mapbox::util::optional<LatLng> center;      // Map center (Degrees)
-    mapbox::util::optional<double> zoom;        // Map zoom level Positive Numbers > 0 and < 18
-    mapbox::util::optional<double> angle;       // Map rotation bearing in Radians counter-clockwise from north. The value is wrapped to [−π rad, π rad]
-    mapbox::util::optional<double> pitch;       // Map angle in degrees at which the camera is looking to ground (Radians)
-    mapbox::util::optional<Duration> duration;  // Animation time length (Nanoseconds)
+    // Viewpoint options
+    
+    /** Coordinate at the center of the map. */
+    mapbox::util::optional<LatLng> center;
+    
+    /** Zero-based zoom level. Constrained to the minimum and maximum zoom
+        levels. */
+    mapbox::util::optional<double> zoom;
+    
+    /** Bearing, measured in radians counterclockwise from true north. Wrapped
+        to [−π rad, π rad). */
+    mapbox::util::optional<double> angle;
+    
+    /** Pitch toward the horizon measured in radians, with 0 rad resulting in a
+        two-dimensional map. */
+    mapbox::util::optional<double> pitch;
+    
+    // Transition options
+    
+    /** Time to animate to the viewpoint defined herein. */
+    mapbox::util::optional<Duration> duration;
+    
+    /** Average velocity of a flyTo() transition, measured in distance units per
+        second. */
     mapbox::util::optional<double> speed;
+    
+    /** The relative amount of zooming that takes place along the flight path of
+        a flyTo() transition. A high value maximizes zooming for an exaggerated
+        animation, while a low value minimizes zooming for something closer to
+        easeTo(). */
     mapbox::util::optional<double> curve;
+    
+    /** The easing timing curve of the transition. */
     mapbox::util::optional<mbgl::util::UnitBezier> easing;
+    
+    /** A function that is called on each frame of the transition, just before a
+        screen update, except on the last frame. The first parameter indicates
+        the elapsed time as a percentage of the duration. */
     std::function<void(double)> transitionFrameFn;
+    
+    /** A function that is called once on the last frame of the transition, just
+        before the corresponding screen update. */
     std::function<void()> transitionFinishFn;
 };
 
