@@ -101,11 +101,13 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onCancel() {
                         Log.i(TAG, "Duration onCancel Callback called.");
+                        Toast.makeText(CameraActivity.this, "Duration onCancel Callback called.", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFinish() {
                         Log.i(TAG, "Duration onFinish Callback called.");
+                        Toast.makeText(CameraActivity.this, "Duration onFinish Callback called.", Toast.LENGTH_LONG).show();
                     }
                 };
 

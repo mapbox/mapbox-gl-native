@@ -1492,6 +1492,7 @@ public final class MapView extends FrameLayout {
      * See CameraUpdateFactory for a set of updates.
      * @param update The change that should be applied to the camera.
      */
+    @UiThread
     public final void animateCamera (CameraUpdate update) {
         animateCamera(update, 0, null);
     }
@@ -1504,6 +1505,7 @@ public final class MapView extends FrameLayout {
      * @param update The change that should be applied to the camera.
      * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
      */
+    @UiThread
     public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
         animateCamera(update, 0, callback);
     }
@@ -1515,6 +1517,7 @@ public final class MapView extends FrameLayout {
      * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
      * @param callback An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
      */
+    @UiThread
     public final void animateCamera (CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
 
         if (update.getTarget() == null) {
@@ -1531,13 +1534,7 @@ public final class MapView extends FrameLayout {
                 @Override
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
-                        // Invoke callback on UI Thread
-                        view.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onFinish();
-                            }
-                        });
+                        callback.onFinish();
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -2416,6 +2413,7 @@ public final class MapView extends FrameLayout {
      * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */
+    @UiThread
     public void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
     }
@@ -2430,6 +2428,7 @@ public final class MapView extends FrameLayout {
      * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */
+    @UiThread
     public void easeTo(double bearing, LatLng center, long duration,  double pitch, double zoom) {
         mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
     }
@@ -2442,6 +2441,7 @@ public final class MapView extends FrameLayout {
      * @param pitch Pitch in Radians
      * @param zoom Zoom Level
      */
+    @UiThread
     public void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom) {
         mNativeMapView.flyTo(bearing, center, duration, pitch, zoom);
     }
