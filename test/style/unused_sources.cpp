@@ -68,6 +68,10 @@ public:
         callback(error, style.get());
     }
 
+    void addClass(const std::string& class_) {
+        data.addClass(class_);
+    }
+
 private:
     MapData data;
     std::unique_ptr<Style> style;
@@ -77,7 +81,7 @@ private:
     MockStyleObserverCallback callback;
 };
 
-TEST(Style, UnusedSources) {
+TEST(Style, UnusedSource) {
     util::RunLoop loop;
 
     MockView view;
@@ -99,6 +103,37 @@ TEST(Style, UnusedSources) {
     std::unique_ptr<util::Thread<MockStyleObserver>> observer(
         std::make_unique<util::Thread<MockStyleObserver>>(
             util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, callback));
+
+    loop.run();
+
+    // Needed because it will make the Map thread
+    // join and cease logging after this point.
+    observer->invoke(&MockStyleObserver::cleanup);
+    observer.reset();
+}
+
+TEST(Style, UnusedSourceActiveViaClassUpdate) {
+    util::RunLoop loop;
+
+    MockView view;
+    MockFileSource fileSource(MockFileSource::Success, "");
+
+    auto callback = [&loop](std::exception_ptr error, Style* style) {
+        loop.stop();
+
+        EXPECT_TRUE(error == nullptr);
+
+        Source *unusedSource = style->getSource("unusedsource");
+        EXPECT_TRUE(unusedSource);
+        EXPECT_TRUE(unusedSource->isLoaded());
+    };
+
+    std::unique_ptr<util::Thread<MockStyleObserver>> observer(
+        std::make_unique<util::Thread<MockStyleObserver>>(
+            util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, callback));
+
+    observer->invoke(&MockStyleObserver::addClass, "visible");
+    observer->invoke(&MockStyleObserver::update);
 
     loop.run();
 
