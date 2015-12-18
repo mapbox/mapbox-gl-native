@@ -18,10 +18,43 @@
 #include <memory>
 
 QMapboxGLSettings::QMapboxGLSettings()
-    : m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
+    : m_mapMode(QMapboxGLSettings::ContinuousMap)
+    , m_contextMode(QMapboxGLSettings::UniqueGLContext)
+    , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
+    , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
     , m_cacheDatabasePath(":memory:")
     , m_assetPath(QCoreApplication::applicationDirPath())
 {
+}
+
+QMapboxGLSettings::MapMode QMapboxGLSettings::mapMode() const
+{
+    return m_mapMode;
+}
+
+void QMapboxGLSettings::setMapMode(MapMode mode)
+{
+    m_mapMode = mode;
+}
+
+QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
+{
+    return m_contextMode;
+}
+
+void QMapboxGLSettings::setContextMode(GLContextMode mode)
+{
+    m_contextMode = mode;
+}
+
+QMapboxGLSettings::ConstrainMode QMapboxGLSettings::constrainMode() const
+{
+    return m_constrainMode;
+}
+
+void QMapboxGLSettings::setConstrainMode(ConstrainMode mode)
+{
+    m_constrainMode = mode;
 }
 
 unsigned QMapboxGLSettings::cacheDatabaseMaximumSize() const
@@ -67,10 +100,12 @@ QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
     : QObject(parent_)
     , d_ptr(new QMapboxGLPrivate(this, settings))
 {
-    d_ptr->fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    mbgl::MapMode mapMode = static_cast<mbgl::MapMode>(settings.mapMode());
+    mbgl::GLContextMode contextMode = static_cast<mbgl::GLContextMode>(settings.contextMode());
+    mbgl::ConstrainMode constrainMode = static_cast<mbgl::ConstrainMode>(settings.constrainMode());
 
-    d_ptr->mapObj = std::make_unique<mbgl::Map>(*d_ptr, *d_ptr->fileSourceObj,
-            mbgl::MapMode::Continuous, mbgl::GLContextMode::Shared);
+    d_ptr->fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    d_ptr->mapObj = std::make_unique<mbgl::Map>(*d_ptr, *d_ptr->fileSourceObj, mapMode, contextMode, constrainMode);
 }
 
 QMapboxGL::~QMapboxGL()
