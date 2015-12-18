@@ -72,11 +72,13 @@ public class CameraActivity extends AppCompatActivity {
                     public void onCancel() {
                         // NOTE: This shouldn't appear
                         Log.i(TAG, "onCancel Callback called.");
+                        Toast.makeText(CameraActivity.this, "onCancel Callback called.", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onFinish() {
                         Log.i(TAG, "onFinish Callback called.");
+                        Toast.makeText(CameraActivity.this, "onFinish Callback called.", Toast.LENGTH_LONG).show();
                     }
                 };
 
