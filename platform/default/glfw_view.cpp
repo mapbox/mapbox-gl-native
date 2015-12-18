@@ -434,7 +434,7 @@ void GLFWView::beforeRender() {
     // can be accessed with no race because the main thread is blocked
     // when we render. This will be more straightforward when we move
     // rendering to the main thread.
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, fbWidth, fbHeight);
 }
 
 void GLFWView::afterRender() {
