@@ -344,6 +344,16 @@ void Transform::flyTo(const CameraOptions &options) {
         return;
     }
     
+    // If a path crossing the antemeridian would be shorter, extend the final
+    // coordinate so that interpolating between the two endpoints will cross it.
+    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > 180) {
+        if (startLatLng.longitude > 0 && latLng.longitude < 0) {
+            latLng.longitude += 360;
+        } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {
+            latLng.longitude -= 360;
+        }
+    }
+    
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
