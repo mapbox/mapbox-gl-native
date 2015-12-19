@@ -38,15 +38,16 @@ struct CameraOptions {
     /** Time to animate to the viewpoint defined herein. */
     mapbox::util::optional<Duration> duration;
     
-    /** Average velocity of a flyTo() transition, measured in distance units per
-        second. */
-    mapbox::util::optional<double> speed;
+    /** Average velocity of a flyTo() transition, measured in screenfuls per
+        second, assuming a linear timing curve.
+        
+        A <i>screenful</i> is the visible span in pixels. It does not correspond
+        to a fixed physical distance but rather varies by zoom level. */
+    mapbox::util::optional<double> velocity;
     
-    /** The relative amount of zooming that takes place along the flight path of
-        a flyTo() transition. A high value maximizes zooming for an exaggerated
-        animation, while a low value minimizes zooming for something closer to
-        easeTo(). */
-    mapbox::util::optional<double> curve;
+    /** Zero-based zoom level at the peak of the flyTo() transition’s flight
+        path. */
+    mapbox::util::optional<double> minZoom;
     
     /** The easing timing curve of the transition. */
     mapbox::util::optional<mbgl::util::UnitBezier> easing;
