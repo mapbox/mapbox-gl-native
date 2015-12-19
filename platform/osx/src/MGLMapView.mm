@@ -1009,14 +1009,14 @@ public:
 }
 
 - (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion {
-    [self flyToCamera:camera withDuration:0 completionHandler:completion];
+    [self flyToCamera:camera withDuration:-1 completionHandler:completion];
 }
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
     
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
-    if (duration > 0) {
+    if (duration >= 0) {
         options.duration = MGLDurationInSeconds(duration);
     }
     if (completion) {
