@@ -371,24 +371,38 @@ void Transform::flyTo(const CameraOptions &options) {
     const double startAngle = state.angle;
     const double startPitch = state.pitch;
     
+    /// w₀: Initial visible span, measured in pixels at the initial scale.
+    /// Known henceforth as a <i>screenful</i>.
+    double w0 = std::max(state.width, state.height);
+    /// w₁: Final visible span, measured in pixels with respect to the initial
+    /// scale.
+    double w1 = w0 / state.zoomScale(zoom - startZoom);
+    /// Length of the flight path as projected onto the ground plane, measured
+    /// in pixels from the world image origin at the initial scale.
+    double u1 = ::hypot((endPoint - startPoint).x, (endPoint - startPoint).y);
+    
     /** ρ: The relative amount of zooming that takes place along the flight
         path. A high value maximizes zooming for an exaggerated animation, while
         a low value minimizes zooming for something closer to easeTo().
         
         1.42 is the average value selected by participants in the user study in
         van Wijk (2003). A value of 6<sup>¼</sup> would be equivalent to the
-        root mean squared average velocity, V<sub>RMS</sub>. */
-    double rho = flyOptions.curve ? *flyOptions.curve : 1.42;
-    /// w₀: Initial visible range.
-    double w0 = std::max(state.width, state.height);
-    /// w₁: Target visible range.
-    double w1 = w0 / state.zoomScale(zoom - startZoom);
-    /// Length of the flight path as projected onto the ground plane.
-    double u1 = ::hypot((endPoint - startPoint).x, (endPoint - startPoint).y);
+        root mean squared average velocity, V<sub>RMS</sub>. A value of 1 would
+        produce a circular motion. */
+    double rho = 1.42;
+    if (flyOptions.minZoom) {
+        double minZoom = util::min(*flyOptions.minZoom, startZoom, zoom);
+        /// w<sub>m</sub>: Maximum visible span, measured in pixels with respect
+        /// to the initial scale.
+        double wMax = w0 / state.zoomScale(minZoom - startZoom);
+        rho = std::sqrt(wMax / u1 * 2);
+    }
     /// ρ²
     double rho2 = rho * rho;
     
-    /// rᵢ
+    /** rᵢ: Returns the zoom-out factor at one end of the animation.
+        
+        @param i 0 for the ascent or 1 for the descent. */
     auto r = [=](double i) {
         /// bᵢ
         double b = (w1 * w1 - w0 * w0 + (i ? -1 : 1) * rho2 * rho2 * u1 * u1) / (2 * (i ? w1 : w0) * rho2 * u1);
@@ -397,27 +411,30 @@ void Transform::flyTo(const CameraOptions &options) {
     
     // When u₀ = u₁, the optimal path doesn’t require both ascent and descent.
     bool isClose = std::abs(u1) < 0.000001;
-    // Bail if the path is too short.
+    // Perform a more or less instantaneous transition if the path is too short.
     if (isClose && std::abs(w0 - w1) < 0.000001) {
+        easeTo(options);
         return;
     }
     
-    /// r₀: rᵢ where i = 0.
+    /// r₀: Zoom-out factor during ascent.
     double r0 = r(0);
-    /** w(s): Visible range on the ground, proportional to the scale, measured
-        in world coordinates.
+    /** w(s): Returns the visible span on the ground, measured in pixels with
+        respect to the initial scale.
         
         Assumes an angular field of view of 2 arctan ½ ≈ 53°. */
     auto w = [=](double s) {
         return (isClose ? std::exp((w1 < w0 ? -1 : 1) * rho * s)
                 : (std::cosh(r0) / std::cosh(r0 + rho * s)));
     };
-    /// u(s): Distance along the flight path as projected onto the ground plane.
+    /// u(s): Returns the distance along the flight path as projected onto the
+    /// ground plane, measured in pixels from the world image origin at the
+    /// initial scale.
     auto u = [=](double s) {
         return (isClose ? 0.
                 : (w0 * (std::cosh(r0) * std::tanh(r0 + rho * s) - std::sinh(r0)) / rho2 / u1));
     };
-    /// S: Total length of the flight path.
+    /// S: Total length of the flight path, measured in ρ-screenfuls.
     double S = (isClose ? (std::abs(std::log(w1 / w0)) / rho)
                 : ((r(1) - r0) / rho));
     
@@ -425,13 +442,16 @@ void Transform::flyTo(const CameraOptions &options) {
     if (flyOptions.duration) {
         duration = *flyOptions.duration;
     } else {
-        /// V: Average velocity.
-        double velocity = flyOptions.speed ? *flyOptions.speed : 1.2;
+        /// V: Average velocity, measured in ρ-screenfuls per second.
+        double velocity = 1.2;
+        if (flyOptions.velocity) {
+            velocity = *flyOptions.velocity / rho;
+        }
         duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
             std::chrono::duration<double, std::chrono::seconds::period>(S / velocity));
     }
     if (duration == Duration::zero()) {
-        // Atomic transition.
+        // Perform an instantaneous transition.
         jumpTo(options);
         return;
     }
@@ -452,7 +472,8 @@ void Transform::flyTo(const CameraOptions &options) {
             return ease.solve(t, 0.001);
         },
         [=](double k) {
-            /// s: The distance traveled along the flight path.
+            /// s: The distance traveled along the flight path, measured in
+            /// ρ-screenfuls.
             double s = k * S;
             double us = u(s);
             
