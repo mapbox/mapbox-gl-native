@@ -218,14 +218,20 @@ IB_DESIGNABLE
 *   @param completion The block to execute after the animation finishes. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
-/** Uses a ballistic parabolic motion to "fly" the viewpoint to a different location with respect to the map with a default duration based on the length of the flight path.
+/** Moves the viewpoint to a different location using a transition animation that evokes powered flight and a default duration based on the length of the flight path.
+*
+*   The transition animation seamlessly incorporates zooming and panning to help the user find his or her bearings even after traversing a great distance.
+*
 *   @param camera The new viewpoint.
 *   @param completion The block to execute after the animation finishes. */
 - (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion;
 
-/** Uses a ballistic parabolic motion to "fly" the viewpoint to a different location with respect to the map with an optional transition duration.
+/** Moves the viewpoint to a different location using a transition animation that evokes powered flight and an optional transition duration.
+*
+*   The transition animation seamlessly incorporates zooming and panning to help the user find his or her bearings even after traversing a great distance.
+*
 *   @param camera The new viewpoint.
-*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to use the default duration, which is based on the length of the flight path.
+*   @param duration The amount of time, measured in seconds, that the transition animation should take. Specify `0` to jump to the new viewpoint instantaneously. Specify a negative value to use the default duration, which is based on the length of the flight path.
 *   @param completion The block to execute after the animation finishes. */
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion;
 
