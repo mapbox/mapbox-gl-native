@@ -1618,7 +1618,7 @@ public final class MapView extends FrameLayout {
             durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
         }
 
-        easeTo(angle, update.getTarget(), durationMs, pitch, zoom);
+        easeTo(angle, update.getTarget(), durationNano, pitch, zoom);
     }
 
     /**
