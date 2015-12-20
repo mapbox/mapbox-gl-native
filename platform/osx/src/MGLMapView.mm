@@ -946,6 +946,9 @@ public:
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
+    if ([self.camera isEqual:camera]) {
+        return;
+    }
     
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration > 0) {
@@ -974,6 +977,9 @@ public:
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion {
     _mbglMap->cancelTransitions();
+    if ([self.camera isEqual:camera]) {
+        return;
+    }
     
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration >= 0) {

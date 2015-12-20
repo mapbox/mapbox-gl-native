@@ -1750,6 +1750,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    if ([self.camera isEqual:camera])
+    {
+        return;
+    }
+
     _mbglMap->cancelTransitions();
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration > 0)
@@ -1778,6 +1783,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
 {
+    if ([self.camera isEqual:camera])
+    {
+        return;
+    }
+
     _mbglMap->cancelTransitions();
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration >= 0)
