@@ -42,9 +42,9 @@
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>
 
+    <string name="button_camera_move">Move</string>
+    <string name="button_camera_ease">Ease</string>
     <string name="button_camera_animate">Animate</string>
-    <string name="button_camera_animate_callback">Callback</string>
-    <string name="button_camera_animate_duration">Duration</string>
 
     <string name="label_fps">FPS:</string>
 

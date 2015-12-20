@@ -1521,7 +1521,7 @@ public final class MapView extends FrameLayout {
     public final void animateCamera (CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
 
         if (update.getTarget() == null) {
-            Log.w(TAG, "animateCamera with null target coordinate passed in.  Will immediatele return without animating camera.");
+            Log.w(TAG, "animateCamera with null target coordinate passed in.  Will immediately return without animating camera.");
             return;
         }
 
@@ -1565,13 +1565,45 @@ public final class MapView extends FrameLayout {
 
         if (durationMs == 0) {
             // Route To `jumpTo`
-            Log.i(TAG, "jumpTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-            jumpTo(angle, update.getTarget(), pitch, zoom);
+            Log.i(TAG, "easeTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
+            easeTo(angle, update.getTarget(), 0, pitch, zoom);
         } else {
             // Use `flyTo`
             Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
             flyTo(angle, update.getTarget(), durationNano, pitch, zoom);
         }
+    }
+
+    /**
+     * Repositions the camera according to the instructions defined in the update.
+     * The move is instantaneous, and a subsequent getCameraPosition() will reflect the new position.
+     * See CameraUpdateFactory for a set of updates.
+     * @param update The change that should be applied to the camera.
+     */
+    public final void moveCamera (CameraUpdate update) {
+        if (update.getTarget() == null) {
+            Log.w(TAG, "moveCamera with null target coordinate passed in.  Will immediately return without moving camera.");
+            return;
+        }
+
+        mNativeMapView.cancelTransitions();
+
+        // Convert Degrees To Radians
+        double angle = -1;
+        if (update.getBearing() >= 0) {
+            angle = (-update.getBearing()) * MathConstants.DEG2RAD;
+        }
+        double pitch = -1;
+        if (update.getTilt() >= 0) {
+            double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
+            pitch = dp * MathConstants.DEG2RAD;
+        }
+        double zoom = -1;
+        if (update.getZoom() >= 0) {
+            zoom = update.getZoom();
+        }
+
+        jumpTo(angle, update.getTarget(), pitch, zoom);
     }
 
     //
@@ -2411,7 +2443,7 @@ public final class MapView extends FrameLayout {
      * @param zoom Zoom Level
      */
     @UiThread
-    public void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
+    private void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
     }
 
@@ -2426,7 +2458,7 @@ public final class MapView extends FrameLayout {
      * @param zoom Zoom Level
      */
     @UiThread
-    public void easeTo(double bearing, LatLng center, long duration,  double pitch, double zoom) {
+    private void easeTo(double bearing, LatLng center, long duration,  double pitch, double zoom) {
         mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
     }
 
@@ -2439,7 +2471,7 @@ public final class MapView extends FrameLayout {
      * @param zoom Zoom Level
      */
     @UiThread
-    public void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom) {
+    private void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom) {
         mNativeMapView.flyTo(bearing, center, duration, pitch, zoom);
     }
 

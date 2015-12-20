@@ -21,8 +21,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_animate"
-        android:id="@+id/cameraAnimateButton"
+        android:text="@string/button_camera_move"
+        android:id="@+id/cameraMoveButton"
         android:layout_margin="@dimen/fab_margin"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -32,18 +32,18 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_animate_callback"
-        android:id="@+id/cameraAnimateCallbackButton"
-        android:layout_alignTop="@+id/cameraAnimateButton"
+        android:text="@string/button_camera_ease"
+        android:id="@+id/cameraEaseButton"
+        android:layout_alignTop="@+id/cameraMoveButton"
         android:layout_centerHorizontal="true"
         android:background="@color/white"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_animate_duration"
-        android:id="@+id/cameraAnimateDurationButton"
-        android:layout_alignBottom="@+id/cameraAnimateCallbackButton"
+        android:text="@string/button_camera_animate"
+        android:id="@+id/cameraAnimateButton"
+        android:layout_alignBottom="@+id/cameraEaseButton"
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/fab_margin"
         android:background="@color/white"/>
