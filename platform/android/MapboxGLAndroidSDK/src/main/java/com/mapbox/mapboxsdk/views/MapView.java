@@ -1563,15 +1563,62 @@ public final class MapView extends FrameLayout {
             durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
         }
 
-        if (durationMs == 0) {
-            // Route To `jumpTo`
-            Log.i(TAG, "easeTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-            easeTo(angle, update.getTarget(), 0, pitch, zoom);
-        } else {
-            // Use `flyTo`
-            Log.i(TAG, "flyTo() called with angle = " + angle + "; target = " + update.getTarget() + "; durationNano = " + durationNano + "; Pitch = " + pitch + "; Zoom = " + update.getZoom());
-            flyTo(angle, update.getTarget(), durationNano, pitch, zoom);
+        flyTo(angle, update.getTarget(), durationNano, pitch, zoom);
+    }
+
+    /**
+     * Ease the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
+     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * @param update The change that should be applied to the camera.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
+     * @param callback An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
+     */
+    @UiThread
+    public final void easeCamera(CameraUpdate update, int durationMs, final MapView.CancelableCallback callback) {
+        if (update.getTarget() == null) {
+            Log.w(TAG, "easeCamera with null target coordinate passed in.  Will immediately return without easing camera.");
+            return;
         }
+
+        mNativeMapView.cancelTransitions();
+
+        // Register callbacks early enough
+        if (callback != null) {
+            final MapView view = this;
+            addOnMapChangedListener(new OnMapChangedListener() {
+                @Override
+                public void onMapChanged(@MapChange int change) {
+                    if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
+                        callback.onFinish();
+
+                        // Clean up after self
+                        removeOnMapChangedListener(this);
+                    }
+                }
+            });
+        }
+
+        // Convert Degrees To Radians
+        double angle = -1;
+        if (update.getBearing() >= 0) {
+            angle = (-update.getBearing()) * MathConstants.DEG2RAD;
+        }
+        double pitch = -1;
+        if (update.getTilt() >= 0) {
+            double dp = MathUtils.clamp(update.getTilt(), MINIMUM_TILT, MAXIMUM_TILT);
+            pitch = dp * MathConstants.DEG2RAD;
+        }
+        double zoom = -1;
+        if (update.getZoom() >= 0) {
+            zoom = update.getZoom();
+        }
+
+        long durationNano = 0;
+        if (durationMs > 0) {
+            durationNano = TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS);
+        }
+
+        easeTo(angle, update.getTarget(), durationMs, pitch, zoom);
     }
 
     /**
@@ -1580,6 +1627,7 @@ public final class MapView extends FrameLayout {
      * See CameraUpdateFactory for a set of updates.
      * @param update The change that should be applied to the camera.
      */
+    @UiThread
     public final void moveCamera (CameraUpdate update) {
         if (update.getTarget() == null) {
             Log.w(TAG, "moveCamera with null target coordinate passed in.  Will immediately return without moving camera.");

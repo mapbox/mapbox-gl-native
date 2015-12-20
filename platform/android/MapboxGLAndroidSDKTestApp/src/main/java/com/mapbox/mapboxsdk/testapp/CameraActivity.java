@@ -67,7 +67,21 @@ public class CameraActivity extends AppCompatActivity {
                         .bearing(180)                               // Sets the orientation of the camera to south
                         .build();                                   // Creates a CameraPosition from the builder
 
-                mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                MapView.CancelableCallback callback = new MapView.CancelableCallback() {
+                    @Override
+                    public void onCancel() {
+                        Log.i(TAG, "Duration onCancel Callback called.");
+                        Toast.makeText(CameraActivity.this, "Ease onCancel Callback called.", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        Log.i(TAG, "Duration onFinish Callback called.");
+                        Toast.makeText(CameraActivity.this, "Ease onFinish Callback called.", Toast.LENGTH_LONG).show();
+                    }
+                };
+
+                mMapView.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 25000, callback);
             }
         });
 
