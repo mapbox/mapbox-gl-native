@@ -1168,7 +1168,7 @@ public:
             _directionAtBeginningOfGesture = self.direction;
             _pitchAtBeginningOfGesture = _mbglMap->getPitch();
         } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
-            mbgl::PrecisionPoint center(startPoint.x, startPoint.y);
+            mbgl::PrecisionPoint center(startPoint.x, self.bounds.size.height - startPoint.y);
             if (self.rotateEnabled) {
                 CLLocationDirection newDirection = _directionAtBeginningOfGesture - delta.x / 10;
                 [self willChangeValueForKey:@"direction"];
