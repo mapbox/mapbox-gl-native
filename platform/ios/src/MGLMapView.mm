@@ -1750,12 +1750,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
         return;
     }
 
-    _mbglMap->cancelTransitions();
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration > 0)
     {
@@ -1783,16 +1783,28 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion
 {
+    [self flyToCamera:camera withDuration:duration peakAltitude:-1 completionHandler:completion];
+}
+
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+{
+    _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
         return;
     }
 
-    _mbglMap->cancelTransitions();
     mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
     if (duration >= 0)
     {
         options.duration = MGLDurationInSeconds(duration);
+    }
+    if (peakAltitude >= 0)
+    {
+        CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
+        CLLocationDegrees peakPitch = (self.camera.pitch + camera.pitch) / 2;
+        options.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
+                                                  peakLatitude, self.frame.size);
     }
     if (completion)
     {
