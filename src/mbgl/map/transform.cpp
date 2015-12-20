@@ -364,6 +364,8 @@ void Transform::flyTo(const CameraOptions &options) {
         state.latY(latLng.latitude),
     };
     
+    zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
+    
     // Minimize rotation by taking the shorter path around the circle.
     double normalizedAngle = _normalizeAngle(angle, state.angle);
     state.angle = _normalizeAngle(state.angle, normalizedAngle);
@@ -395,6 +397,7 @@ void Transform::flyTo(const CameraOptions &options) {
     double rho = 1.42;
     if (flyOptions.minZoom) {
         double minZoom = util::min(*flyOptions.minZoom, startZoom, zoom);
+        minZoom = util::clamp(minZoom, state.getMinZoom(), state.getMaxZoom());
         /// w<sub>m</sub>: Maximum visible span, measured in pixels with respect
         /// to the initial scale.
         double wMax = w0 / state.zoomScale(minZoom - startZoom);
