@@ -61,6 +61,9 @@
         <activity
             android:name=".CoordinateChangeActivity"
             android:label="@string/activity_animate_coordinate_change" />
+        <activity
+            android:name=".DirectionsActivity"
+            android:label="@string/activity_directions" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
