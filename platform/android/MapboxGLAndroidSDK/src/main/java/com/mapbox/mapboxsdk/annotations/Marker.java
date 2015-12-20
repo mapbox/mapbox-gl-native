@@ -16,7 +16,7 @@ public final class Marker extends Annotation {
 
     private LatLng position;
     private String snippet;
-    private Sprite icon;
+    private Icon icon;
     private String title;
     private InfoWindow infoWindow = null;
     private boolean infoWindowShown = false;
@@ -69,11 +69,11 @@ public final class Marker extends Annotation {
     /**
      * Do not use this method. Used internally by the SDK.
      */
-    public void setIcon(@Nullable Sprite icon) {
+    public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
     }
 
-    public Sprite getIcon() {
+    public Icon getIcon() {
         return icon;
     }
 

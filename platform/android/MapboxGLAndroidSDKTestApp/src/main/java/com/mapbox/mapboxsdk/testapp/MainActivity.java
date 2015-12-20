@@ -29,7 +29,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.annotations.Sprite;
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -532,14 +532,14 @@ public class MainActivity extends AppCompatActivity {
         final MarkerOptions backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
         markerOptionsList.add(backLot);
 
-        final Sprite dogIcon = mMapView.getSpriteFactory().fromAsset("dog-park-24.png");
+        final Icon dogIcon = mMapView.getIconFactory().fromAsset("dog-park-24.png");
         final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", dogIcon, 38.531577, -122.010646);
         markerOptionsList.add(cheeseRoom);
 
         List<Marker> markers = mMapView.addMarkers(markerOptionsList);
     }
 
-    private MarkerOptions generateMarker(String title, String snippet, Sprite icon, double lat, double lng) {
+    private MarkerOptions generateMarker(String title, String snippet, Icon icon, double lat, double lng) {
         return new MarkerOptions()
                 .position(new LatLng(lat, lng))
                 .title(title)

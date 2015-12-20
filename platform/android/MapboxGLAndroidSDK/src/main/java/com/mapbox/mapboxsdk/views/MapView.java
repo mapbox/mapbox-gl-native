@@ -56,6 +56,7 @@ import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -63,16 +64,15 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.annotations.Sprite;
-import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
-import com.mapbox.mapboxsdk.exceptions.SpriteBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -223,7 +223,7 @@ public final class MapView extends FrameLayout {
     private List<Marker> mSelectedMarkers = new ArrayList<>();
     private List<InfoWindow> mInfoWindows = new ArrayList<>();
     private InfoWindowAdapter mInfoWindowAdapter;
-    private List<Sprite> mSprites = new ArrayList<>();
+    private List<Icon> mIcons = new ArrayList<>();
 
     // Used for the Mapbox Logo
     private ImageView mLogoView;
@@ -907,7 +907,7 @@ public final class MapView extends FrameLayout {
             @Override
             public void onMapChanged(@MapChange int change) {
                 if (change == DID_FINISH_LOADING_MAP) {
-                    reloadSprites();
+                    reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
                 }
@@ -1954,13 +1954,13 @@ public final class MapView extends FrameLayout {
     // Annotations
     //
 
-    public SpriteFactory getSpriteFactory() {
-        return SpriteFactory.getInstance(getContext());
+    public IconFactory getIconFactory() {
+        return IconFactory.getInstance(getContext());
     }
 
-    private void loadSprite(Sprite sprite) {
-        Bitmap bitmap = sprite.getBitmap();
-        String id = sprite.getId();
+    private void loadIcon(Icon icon) {
+        Bitmap bitmap = icon.getBitmap();
+        String id = icon.getId();
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
             bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
         }
@@ -1980,31 +1980,31 @@ public final class MapView extends FrameLayout {
                 scale, buffer.array());
     }
 
-    private void reloadSprites() {
-        int count = mSprites.size();
+    private void reloadIcons() {
+        int count = mIcons.size();
         for (int i = 0; i < count; i++) {
-            Sprite sprite = mSprites.get(i);
-            loadSprite(sprite);
+            Icon icon = mIcons.get(i);
+            loadIcon(icon);
         }
     }
 
     private Marker prepareMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        Sprite icon = marker.getIcon();
+        Icon icon = marker.getIcon();
         if (icon == null) {
-            icon = getSpriteFactory().defaultMarker();
+            icon = getIconFactory().defaultMarker();
             marker.setIcon(icon);
         }
-        if (!mSprites.contains(icon)) {
-            mSprites.add(icon);
-            loadSprite(icon);
+        if (!mIcons.contains(icon)) {
+            mIcons.add(icon);
+            loadIcon(icon);
         } else {
-            Sprite oldSprite = mSprites.get(mSprites.indexOf(icon));
-            if (!oldSprite.getBitmap().sameAs(icon.getBitmap())) {
-                throw new SpriteBitmapChangedException();
+            Icon oldIcon = mIcons.get(mIcons.indexOf(icon));
+            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+                throw new IconBitmapChangedException();
             }
         }
-        marker.setTopOffsetPixels(getTopOffsetPixelsForSprite(icon));
+        marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
         return marker;
     }
 
@@ -2296,14 +2296,14 @@ public final class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    private int getTopOffsetPixelsForSprite(Sprite sprite) {
+    private int getTopOffsetPixelsForIcon(Icon icon) {
         // This method will dead lock if map paused. Causes a freeze if you add a marker in an
         // activity's onCreate()
         if (mNativeMapView.isPaused()) {
             return 0;
         }
 
-        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(sprite.getId())
+        return (int) (mNativeMapView.getTopOffsetPixelsForAnnotationSymbol(icon.getId())
                 * mScreenDensity);
     }
 
@@ -2525,7 +2525,7 @@ public final class MapView extends FrameLayout {
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 marker.setTopOffsetPixels(
-                        getTopOffsetPixelsForSprite(marker.getIcon()));
+                        getTopOffsetPixelsForIcon(marker.getIcon()));
             }
         }
 

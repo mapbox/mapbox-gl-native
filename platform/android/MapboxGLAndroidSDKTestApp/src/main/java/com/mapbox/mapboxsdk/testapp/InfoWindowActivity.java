@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -45,18 +45,18 @@ public class InfoWindowActivity extends AppCompatActivity {
         mMapView.addMarker(new MarkerOptions()
                 .title("Intersection")
                 .snippet("H St NW with 15th St NW")
-                .icon(SpriteFactory.getInstance(this).fromAsset("london-underground-24.png"))
+                .icon(IconFactory.getInstance(this).fromAsset("london-underground-24.png"))
                 .position(new LatLng(38.9002073, -77.03364419)));
 
         mMapView.addMarker(new MarkerOptions()
                 .title("White House")
                 .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
-                .icon(mMapView.getSpriteFactory().fromAsset("town-hall-24.png"))
+                .icon(mMapView.getIconFactory().fromAsset("town-hall-24.png"))
                 .position(new LatLng(38.897705003219784, -77.03655168667463)));
 
         mMapView.addMarker(new MarkerOptions().title("Intersection")
                 .snippet("E St NW with 17th St NW")
-                .icon(mMapView.getSpriteFactory().fromAsset("commercial-24.png"))
+                .icon(mMapView.getIconFactory().fromAsset("commercial-24.png"))
                 .position(new LatLng(38.8954236, -77.0394623)));
 
         final DecimalFormat formatter = new DecimalFormat("#.#####");

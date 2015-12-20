@@ -13,10 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.Sprite;
-import com.mapbox.mapboxsdk.annotations.SpriteFactory;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
@@ -24,7 +24,7 @@ import com.mapbox.mapboxsdk.views.MapView;
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
     private MapView mMapView;
-    private SpriteFactory mSpriteFactory;
+    private IconFactory mIconFactory;
     private Drawable mIconDrawable;
 
     @Override
@@ -45,7 +45,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
 
-        mSpriteFactory = SpriteFactory.getInstance(this);
+        mIconFactory = IconFactory.getInstance(this);
         mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_24dp);
 
         mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
@@ -81,7 +81,7 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         marker.position(new LatLng(lat, lng));
 
         mIconDrawable.setColorFilter(Color.parseColor(marker.getSnippet()), PorterDuff.Mode.SRC_IN);
-        Sprite icon = mSpriteFactory.fromDrawable(mIconDrawable);
+        Icon icon = mIconFactory.fromDrawable(mIconDrawable);
         marker.icon(icon);
         return marker;
     }

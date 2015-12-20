@@ -15,32 +15,32 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.exceptions.TooManySpritesException;
+import com.mapbox.mapboxsdk.exceptions.TooManyIconsException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public final class SpriteFactory {
+public final class IconFactory {
 
-    private static final String SPRITE_ID_PREFIX = "com.mapbox.sprites.sprite_";
+    private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";
 
     private Context mContext;
-    private static SpriteFactory sInstance;
-    private Sprite mDefaultMarker;
+    private static IconFactory sInstance;
+    private Icon mDefaultMarker;
     private BitmapFactory.Options mOptions;
 
     private int mNextId = 0;
 
-    public static synchronized SpriteFactory getInstance(@NonNull Context context) {
+    public static synchronized IconFactory getInstance(@NonNull Context context) {
         if (sInstance == null) {
-            sInstance = new SpriteFactory(context.getApplicationContext());
+            sInstance = new IconFactory(context.getApplicationContext());
         }
         return sInstance;
     }
 
-    private SpriteFactory(@NonNull Context context) {
+    private IconFactory(@NonNull Context context) {
         mContext = context;
         DisplayMetrics realMetrics = null;
         DisplayMetrics metrics = new DisplayMetrics();
@@ -61,21 +61,21 @@ public final class SpriteFactory {
         }
     }
 
-    public Sprite fromBitmap(@NonNull Bitmap bitmap) {
+    public Icon fromBitmap(@NonNull Bitmap bitmap) {
         if (mNextId < 0) {
-            throw new TooManySpritesException();
+            throw new TooManyIconsException();
         }
-        String id = SPRITE_ID_PREFIX + ++mNextId;
-        return new Sprite(id, bitmap);
+        String id = ICON_ID_PREFIX + ++mNextId;
+        return new Icon(id, bitmap);
     }
 
-    public Sprite fromDrawable(@NonNull Drawable drawable) {
+    public Icon fromDrawable(@NonNull Drawable drawable) {
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
         return fromDrawable(drawable, width, height);
     }
 
-    public Sprite fromDrawable(@NonNull Drawable drawable, int width, int height) {
+    public Icon fromDrawable(@NonNull Drawable drawable, int width, int height) {
         if ((width < 0) || (height < 0)) {
             return null;
         }
@@ -90,7 +90,7 @@ public final class SpriteFactory {
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromResource(@DrawableRes int resourceId) {
+    public Icon fromResource(@DrawableRes int resourceId) {
         Drawable drawable = ContextCompat.getDrawable(mContext, resourceId);
         Bitmap bitmap;
         if (drawable instanceof BitmapDrawable) {
@@ -110,19 +110,19 @@ public final class SpriteFactory {
         return fromBitmap(bitmap);
     }
 
-    public Sprite defaultMarker() {
+    public Icon defaultMarker() {
         if (mDefaultMarker == null) {
             mDefaultMarker = fromResource(R.drawable.default_marker);
         }
         return mDefaultMarker;
     }
 
-    private Sprite fromInputStream(@NonNull InputStream is) {
+    private Icon fromInputStream(@NonNull InputStream is) {
         Bitmap bitmap = BitmapFactory.decodeStream(is, null, mOptions);
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromAsset(@NonNull String assetName) {
+    public Icon fromAsset(@NonNull String assetName) {
         InputStream is;
         try {
             is = mContext.getAssets().open(assetName);
@@ -132,12 +132,12 @@ public final class SpriteFactory {
         return fromInputStream(is);
     }
 
-    public Sprite fromPath(@NonNull String absolutePath) {
+    public Icon fromPath(@NonNull String absolutePath) {
         Bitmap bitmap = BitmapFactory.decodeFile(absolutePath, mOptions);
         return fromBitmap(bitmap);
     }
 
-    public Sprite fromFile(@NonNull String fileName) {
+    public Icon fromFile(@NonNull String fileName) {
         FileInputStream is;
         try {
             is = mContext.openFileInput(fileName);

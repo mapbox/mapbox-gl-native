@@ -50,8 +50,8 @@ extern jfieldID bboxLatSouthId;
 extern jfieldID bboxLonEastId;
 extern jfieldID bboxLonWestId;
 
-extern jclass spriteClass;
-extern jfieldID spriteIdId;
+extern jclass iconClass;
+extern jfieldID iconIdId;
 
 extern jclass markerClass;
 extern jfieldID markerPositionId;

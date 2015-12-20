@@ -41,9 +41,9 @@ public final class MarkerOptions implements Parcelable {
         marker = new Marker();
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
-        String spriteId = in.readString();
-        Bitmap spriteBitmap = in.readParcelable(Bitmap.class.getClassLoader());
-        Sprite icon = new Sprite(spriteId, spriteBitmap);
+        String iconId = in.readString();
+        Bitmap iconBitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        Icon icon = new Icon(iconId, iconBitmap);
         icon(icon);
         title(in.readString());
     }
@@ -87,7 +87,7 @@ public final class MarkerOptions implements Parcelable {
         return marker.getTitle();
     }
 
-    public Sprite getIcon() {
+    public Icon getIcon() {
         return marker.getIcon();
     }
 
@@ -101,7 +101,7 @@ public final class MarkerOptions implements Parcelable {
         return this;
     }
 
-    public MarkerOptions icon(@Nullable Sprite icon) {
+    public MarkerOptions icon(@Nullable Icon icon) {
         marker.setIcon(icon);
         return this;
     }

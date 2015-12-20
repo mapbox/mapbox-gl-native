@@ -48,8 +48,8 @@ public class MarkerTest {
     }
 
     @Test
-    public void testSprite() {
-        // find a way to test Sprite
+    public void testIcon() {
+        // find a way to test Icon
     }
 
     @Test

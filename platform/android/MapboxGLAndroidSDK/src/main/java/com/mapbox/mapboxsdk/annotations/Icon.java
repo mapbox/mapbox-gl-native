@@ -2,11 +2,11 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
 
-public final class Sprite {
+public final class Icon {
     private Bitmap mBitmap;
     private String mId;
 
-    Sprite(String id, Bitmap bitmap) {
+    Icon(String id, Bitmap bitmap) {
         mId = id;
         mBitmap = bitmap;
     }
@@ -24,10 +24,10 @@ public final class Sprite {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Sprite sprite = (Sprite) o;
+        Icon icon = (Icon) o;
 
-        if (!mBitmap.equals(sprite.mBitmap)) return false;
-        return mId.equals(sprite.mId);
+        if (!mBitmap.equals(icon.mBitmap)) return false;
+        return mId.equals(icon.mId);
 
     }
 
