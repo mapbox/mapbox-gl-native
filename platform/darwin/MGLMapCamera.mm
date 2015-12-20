@@ -94,8 +94,8 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MKMapCamera %p centerCoordinate:%f, %f altitude:%.0fm heading:%.0f° pitch:%.0f°>",
-            self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
+    return [NSString stringWithFormat:@"<%@ %p centerCoordinate:%f, %f altitude:%.0fm heading:%.0f° pitch:%.0f°>",
+            NSStringFromClass([self class]), self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
 }
 
 @end
