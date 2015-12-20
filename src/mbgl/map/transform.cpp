@@ -256,6 +256,7 @@ void Transform::_easeTo(const CameraOptions& options, double new_scale, double n
     double angle = _normalizeAngle(new_angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
     double pitch = easeOptions.pitch ? *easeOptions.pitch : state.pitch;
+    pitch = util::clamp(pitch, 0., util::PITCH_MAX);
 
     if (!easeOptions.duration) {
         easeOptions.duration = Duration::zero();
@@ -366,6 +367,8 @@ void Transform::flyTo(const CameraOptions &options) {
     // Minimize rotation by taking the shorter path around the circle.
     double normalizedAngle = _normalizeAngle(angle, state.angle);
     state.angle = _normalizeAngle(state.angle, normalizedAngle);
+    
+    pitch = util::clamp(pitch, 0., util::PITCH_MAX);
     
     const double startZoom = state.scaleZoom(state.scale);
     const double startAngle = state.angle;
@@ -492,7 +495,7 @@ void Transform::flyTo(const CameraOptions &options) {
                 state.angle = util::wrap(util::interpolate(startAngle, normalizedAngle, k), -M_PI, M_PI);
             }
             if (pitch != startPitch) {
-                state.pitch = util::clamp(util::interpolate(startPitch, pitch, k), 0., 60.);
+                state.pitch = util::interpolate(startPitch, pitch, k);
             }
             
             // At k = 1.0, a DidChangeAnimated notification should be sent from finish().
