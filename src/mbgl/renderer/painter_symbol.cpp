@@ -153,8 +153,8 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
     }
 
     // TODO remove the `true ||` when #1673 is implemented
-    const bool drawAcrossEdges = true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
-          layout.text.ignorePlacement || layout.icon.ignorePlacement);
+    const bool drawAcrossEdges = (data.mode == MapMode::Continuous) && (true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
+          layout.text.ignorePlacement || layout.icon.ignorePlacement));
 
     // Disable the stencil test so that labels aren't clipped to tile boundaries.
     //
