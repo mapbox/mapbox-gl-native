@@ -2,10 +2,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// -
 typedef void (^MGLCustomStyleLayerPreparationHandler)(void);
 
-/// -
 typedef void (^MGLCustomStyleLayerDrawingHandler)(CGSize size,
                                                   CLLocationCoordinate2D centerCoordinate,
                                                   double zoomLevel,
@@ -13,7 +11,6 @@ typedef void (^MGLCustomStyleLayerDrawingHandler)(CGSize size,
                                                   CGFloat pitch,
                                                   CGFloat perspectiveSkew);
 
-/// -
 typedef void (^MGLCustomStyleLayerCompletionHandler)(void);
 
 @interface MGLMapView (MGLCustomStyleLayerAdditions)

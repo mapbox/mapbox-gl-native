@@ -568,11 +568,12 @@ IB_DESIGNABLE
 #pragma mark Converting Geographic Coordinates
 
 /**
- Converts a point in the specified view’s coordinate system to a map coordinate.
+ Converts a point in the given view's coordinate system to a geographic
+ coordinate.
  
- @param point The point you want to convert.
- @param view The view that serves as the reference coordinate system for the `point` parameter.
- @return The map coordinate at the specified point.
+ @param point The point to convert.
+ @param view The view in whose coordinate system the point is expressed.
+ @return The geographic coordinate at the given point.
  */
 - (CLLocationCoordinate2D)convertPoint:(CGPoint)point toCoordinateFromView:(nullable UIView *)view;
 
