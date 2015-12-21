@@ -79,7 +79,7 @@ xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
 
 
 step "Building static library..."
-LIBS=(core.a platform-ios.a asset-fs.a cache-sqlite.a http-nsurl.a)
+LIBS=(core.a platform-ios.a asset-fs.a http-nsurl.a)
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
     libtool -static -no_warning_for_no_symbols \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \

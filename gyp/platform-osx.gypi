@@ -15,6 +15,9 @@
         '../platform/default/timer.cpp',
         '../platform/default/default_file_source.cpp',
         '../platform/default/online_file_source.cpp',
+        '../platform/default/sqlite_cache.cpp',
+        '../platform/default/sqlite3.hpp',
+        '../platform/default/sqlite3.cpp',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/application_root.mm',
@@ -59,9 +62,16 @@
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
           '<@(variant_cflags)',
+          '<@(sqlite_cflags)',
+          '<@(zlib_cflags)',
+        ],
+        'ldflags': [
+          '<@(zlib_ldflags)',
         ],
         'libraries': [
           '<@(libuv_static_libs)',
+          '<@(sqlite_static_libs)',
+          '<@(zlib_static_libs)',
           '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
           '$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework',
           '$(SDKROOT)/System/Library/Frameworks/OpenGL.framework',
@@ -85,6 +95,9 @@
 
       'link_settings': {
         'libraries': [ '<@(libraries)' ],
+        'xcode_settings': {
+          'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+        },
       },
 
       'direct_dependent_settings': {

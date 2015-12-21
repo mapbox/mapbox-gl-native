@@ -8,7 +8,6 @@
         'platform-<(platform_lib)',
         'http-<(http_lib)',
         'asset-<(asset_lib)',
-        'cache-<(cache_lib)',
         'headless-<(headless_lib)',
         'standalone',
       ],

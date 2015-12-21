@@ -15,6 +15,9 @@
         '../platform/default/timer.cpp',
         '../platform/default/default_file_source.cpp',
         '../platform/default/online_file_source.cpp',
+        '../platform/default/sqlite_cache.cpp',
+        '../platform/default/sqlite3.hpp',
+        '../platform/default/sqlite3.cpp',
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/application_root.mm',
@@ -85,9 +88,13 @@
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
           '<@(variant_cflags)',
+          '<@(sqlite_cflags)',
+          '<@(zlib_cflags)',
         ],
         'libraries': [
           '<@(libuv_static_libs)',
+          '<@(sqlite_static_libs)',
+          '<@(zlib_static_libs)',
         ],
         'ldflags': [
           '-framework CoreLocation',

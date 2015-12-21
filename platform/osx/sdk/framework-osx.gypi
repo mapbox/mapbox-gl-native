@@ -14,7 +14,6 @@
         'mbgl.gyp:platform-<(platform_lib)',
         'mbgl.gyp:http-<(http_lib)',
         'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:cache-<(cache_lib)',
       ],
 
       'xcode_settings': {

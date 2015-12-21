@@ -2,7 +2,6 @@ HEADLESS = none
 PLATFORM ?= ios
 ASSET ?= fs
 HTTP ?= nsurl
-CACHE ?= sqlite
 
 HOST_VERSION = all
 

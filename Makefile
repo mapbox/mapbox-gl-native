@@ -96,16 +96,16 @@ apackage: android-lib-mips
 
 # Builds the Node.js library
 .PHONY: node
-node: ; $(RUN) HTTP=none ASSET=none CACHE=none Makefile/node
+node: ; $(RUN) HTTP=none ASSET=none Makefile/node
 
 
 .PHONY: Xcode/node
-Xcode/node: ; $(RUN) HTTP=none ASSET=none CACHE=none Xcode/node
+Xcode/node: ; $(RUN) HTTP=none ASSET=none Xcode/node
 
 .PHONY: xnode
 xnode: Xcode/node ; @open ./build/binding.xcodeproj
 nproj:
-	$(RUN) HTTP=none ASSET=none CACHE=none node/xproj
+	$(RUN) HTTP=none ASSET=none node/xproj
 	@open ./build/binding.xcodeproj
 
 .PHONY: test

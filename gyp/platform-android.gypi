@@ -22,6 +22,9 @@
         '../platform/default/timer.cpp',
         '../platform/default/default_file_source.cpp',
         '../platform/default/online_file_source.cpp',
+        '../platform/default/sqlite_cache.cpp',
+        '../platform/default/sqlite3.hpp',
+        '../platform/default/sqlite3.cpp',
       ],
 
       'variables': {
@@ -32,18 +35,23 @@
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
           '<@(variant_cflags)',
+          '<@(sqlite_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
           '<@(jpeg_ldflags)',
           '<@(libuv_ldflags)',
           '<@(nunicode_ldflags)',
+          '<@(sqlite_ldflags)',
+          '<@(zlib_ldflags)',
         ],
         'libraries': [
           '<@(libpng_static_libs)',
           '<@(jpeg_static_libs)',
           '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
+          '<@(sqlite_static_libs)',
+          '<@(zlib_static_libs)',
         ],
       },
 
