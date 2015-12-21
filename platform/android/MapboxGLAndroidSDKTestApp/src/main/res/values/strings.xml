@@ -26,6 +26,7 @@
     <string name="action_gps">Toggle GPS location</string>
     <string name="action_user_location_tracking">User location tracking</string>
     <string name="action_compass">Toggle compass</string>
+    <string name="action_custom_layer">Custom Layer</string>
     <string name="action_debug">Cycle map debug options</string>
     <string name="action_point_annotations">Toggle point annotations</string>
     <string name="action_info_window_adapter">InfoWindow Adapter</string>

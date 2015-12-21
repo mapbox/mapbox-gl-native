@@ -20,6 +20,12 @@
                     android:id="@+id/action_compass"
                     android:icon="@drawable/ic_navigation_24dp"
                     android:title="@string/action_compass" />
+
+                <item
+                    android:id="@+id/action_custom_layer"
+                    android:icon="@drawable/ic_now_wallpaper_24dp"
+                    android:title="@string/action_custom_layer" />
+
             </group>
         </menu>
     </item>
@@ -142,12 +148,6 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_trending_up_24dp"
                 android:title="@string/activity_polyline" />
-
-            <item
-                android:id="@+id/action_custom_layer"
-                android:checkable="false"
-                android:icon="@drawable/ic_trending_up_24dp"
-                android:title="@string/activity_custom_layer" />
 
         </menu>
     </item>

@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp;
+package com.mapbox.mapboxsdk.testapp.layers;
 
 public class ExampleCustomLayer {
     static {
