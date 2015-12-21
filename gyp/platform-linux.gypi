@@ -21,6 +21,8 @@
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
         '../platform/default/timer.cpp',
+        '../platform/default/default_file_source.cpp',
+        '../platform/default/online_file_source.cpp',
       ],
 
       'variables': {

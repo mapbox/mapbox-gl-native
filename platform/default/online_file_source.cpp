@@ -1,4 +1,4 @@
-#include <mbgl/storage/online_file_source.hpp>
+#include "online_file_source.hpp"
 #include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/network_status.hpp>

@@ -1,5 +1,6 @@
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/online_file_source.hpp>
+
+#include "online_file_source.hpp"
 
 namespace mbgl {
 
