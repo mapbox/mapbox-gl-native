@@ -2,6 +2,13 @@
 
 ## Android master
 
+## 3.0.0
+
+* Added Camera API ([#3244](https://github.com/mapbox/mapbox-gl-native/issues/3244))
+* Custom Layer Support ([#3248](https://github.com/mapbox/mapbox-gl-native/issues/3348))
+* Reverse Tilt Gesutre Detection ([#3245](https://github.com/mapbox/mapbox-gl-native/issues/3245))
+* Decoupled Location Provider ([#2954](https://github.com/mapbox/mapbox-gl-native/issues/2954))
+
 ## 2.3.0
 
 * Added Tilt / Pitch Support ([#2805](https://github.com/mapbox/mapbox-gl-native/issues/2805))
