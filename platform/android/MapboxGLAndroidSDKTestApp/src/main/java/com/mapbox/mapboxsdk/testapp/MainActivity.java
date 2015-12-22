@@ -23,8 +23,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import com.crashlytics.android.Crashlytics;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
@@ -39,12 +37,9 @@ import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
 
         // Load the layout
         setContentView(R.layout.activity_main);

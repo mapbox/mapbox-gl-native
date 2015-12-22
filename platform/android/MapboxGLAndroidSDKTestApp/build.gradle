@@ -1,18 +1,5 @@
-buildscript {
-    repositories {
-        maven { url 'https://maven.fabric.io/public' }
-    }
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
-    }
-}
-repositories {
-    maven { url 'https://maven.fabric.io/public' }
-}
-
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 apply plugin: 'checkstyle'
 
 task accessToken {
@@ -46,8 +33,8 @@ android {
         applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 6
-        versionName "2.2.0"
+        versionCode 7
+        versionName "3.1.0"
 
         // Specify AndroidJUnitRunner as the default test instrumentation runner
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -87,9 +74,6 @@ dependencies {
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
-        transitive = true;
-    }
 
     // Testing dependencies
     testCompile 'junit:junit:4.12'
