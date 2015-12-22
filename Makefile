@@ -22,11 +22,11 @@ default: ; @printf "You must specify a valid target\n"
 
 ifeq ($(BUILD),osx)
 .PHONY: osx xosx nosx run-osx run-xosx
-osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Makefile/osxapp
-xosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
-nosx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Ninja/osxapp
+osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
+xosx: osx
+nosx: osx
 run-osx: osx ; @"build/osx-x86_64/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
-run-xosx: xosx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
+run-xosx: run-xosx
 
 .PHONY: Xcode/osx Xcode/ios
 Xcode/ios: ; $(RUN) HOST=ios Xcode/__project__
