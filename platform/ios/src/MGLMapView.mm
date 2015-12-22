@@ -3531,19 +3531,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
     NSBundle *bundle = [NSBundle mgl_frameworkBundle];
-    NSString *directory = nil;
-    if (![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"]) {
-        // For static libraries, the bundle is the containing application bundle
-        // and the resources are in a bundle alongside the static library.
-        directory = @"Mapbox.bundle";
-    }
     NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
-                                      ofType:extension
-                                 inDirectory:directory];
+                                      ofType:extension];
     if ( ! path)
     {
         [NSException raise:@"Resource not found" format:
-         @"The resource named “%@” could not be found in the Mapbox resource bundle.", imageName];
+         @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
     }
     
     return [UIImage imageWithContentsOfFile:path];
