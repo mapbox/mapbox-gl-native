@@ -6,7 +6,6 @@ export BUILD_RENDER ?= 1
 ifeq ($(shell uname -s), Darwin)
 export BUILD = osx
 export JOBS ?= $(shell sysctl -n hw.ncpu)
-export XCPRETTY := $(shell ./scripts/xcpretty.sh)
 else ifeq ($(shell uname -s), Linux)
 export BUILD = linux
 export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
