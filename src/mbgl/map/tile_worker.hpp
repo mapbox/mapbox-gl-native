@@ -33,8 +33,9 @@ public:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 };
 
-using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
-                                              std::string>;           // error
+using TileParseResult = mapbox::util::variant<
+    TileParseResultBuckets, // success
+    std::exception_ptr>;    // error
 
 class TileWorker : public util::noncopyable {
 public:

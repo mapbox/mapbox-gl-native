@@ -3,7 +3,6 @@
 
 #include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/text/glyph_pbf.hpp>
 #include <mbgl/util/exclusive.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/work_queue.hpp>
@@ -15,21 +14,23 @@
 
 namespace mbgl {
 
+class GlyphPBF;
+
 // The GlyphStore manages the loading and storage of Glyphs
 // and creation of FontStack objects. The GlyphStore lives
 // on the MapThread but can be queried from any thread.
-class GlyphStore : public GlyphPBF::Observer, private util::noncopyable {
+class GlyphStore : private util::noncopyable {
 public:
     class Observer {
     public:
         virtual ~Observer() = default;
 
-        virtual void onGlyphRangeLoaded() = 0;
-        virtual void onGlyphRangeLoadingFailed(std::exception_ptr error) = 0;
+        virtual void onGlyphsLoaded(const std::string& /* fontStack */, const GlyphRange&) {};
+        virtual void onGlyphsError(const std::string& /* fontStack */, const GlyphRange&, std::exception_ptr) {};
     };
 
-    GlyphStore() = default;
-    virtual ~GlyphStore() = default;
+    GlyphStore();
+    ~GlyphStore();
 
     util::exclusive<FontStack> getFontStack(const std::string& fontStack);
 
@@ -38,7 +39,7 @@ public:
     // made and when the glyph if finally parsed, it gets added to the respective
     // FontStack and a signal is emitted to notify the observers. This method
     // can be called from any thread.
-    bool hasGlyphRanges(const std::string& fontStackName, const std::set<GlyphRange>& glyphRanges);
+    bool hasGlyphRanges(const std::string& fontStack, const std::set<GlyphRange>& glyphRanges);
 
     void setURL(const std::string &url) {
         glyphURL = url;
@@ -47,10 +48,6 @@ public:
     std::string getURL() const {
         return glyphURL;
     }
-
-    // GlyphPBF::Observer implementation.
-    void onGlyphPBFLoaded() override;
-    void onGlyphPBFLoadingFailed(std::exception_ptr error) override;
 
     void setObserver(Observer* observer);
 
@@ -67,7 +64,8 @@ private:
 
     util::WorkQueue workQueue;
 
-    Observer* observer = nullptr;
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 };
 
 } // namespace mbgl

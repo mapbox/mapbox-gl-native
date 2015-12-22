@@ -30,8 +30,8 @@ using Sprites = std::map<std::string, SpriteImagePtr>;
 
 
 using SpriteParseResult = mapbox::util::variant<
-    Sprites,      // success
-    std::string>; // error
+    Sprites,             // success
+    std::exception_ptr>; // error
 
 // Parses an image and an associated JSON file and returns the sprite objects.
 SpriteParseResult parseSprite(const std::string& image, const std::string& json);

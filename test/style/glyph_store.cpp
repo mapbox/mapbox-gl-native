@@ -39,11 +39,11 @@ public:
         glyphStore_.reset();
     }
 
-    void onGlyphRangeLoaded() override {
+    void onGlyphsLoaded(const std::string&, const GlyphRange&) override {
         callback_(glyphStore_.get(), nullptr);
     }
 
-    void onGlyphRangeLoadingFailed(std::exception_ptr error) override {
+    void onGlyphsError(const std::string&, const GlyphRange&, std::exception_ptr error) override {
         callback_(glyphStore_.get(), error);
     }
 

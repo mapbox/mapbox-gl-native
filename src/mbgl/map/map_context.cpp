@@ -311,16 +311,13 @@ void MapContext::onLowMemory() {
     style->onLowMemory();
     asyncInvalidate.send();
 }
-    
-void MapContext::onTileDataChanged() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+void MapContext::onResourceLoaded() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }
 
-void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
+void MapContext::onResourceError(std::exception_ptr error) {
     if (data.mode == MapMode::Still && callback) {
         callback(error, {});
         callback = nullptr;

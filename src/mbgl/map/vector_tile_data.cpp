@@ -6,8 +6,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 
-#include <sstream>
-
 namespace mbgl {
 
 VectorTileData::VectorTileData(const TileID& id_,
@@ -32,14 +30,10 @@ VectorTileData::VectorTileData(const TileID& id_,
                                                         Seconds modified_,
                                                         Seconds expires_) {
         if (err) {
-            try {
-                std::rethrow_exception(err);
-            } catch (const std::exception& e) {
-                error = e.what();
-                state = State::obsolete;
-                callback();
-                return;
-            }
+            error = err;
+            state = State::obsolete;
+            callback();
+            return;
         }
 
         if (!tile) {
@@ -86,9 +80,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                     redoPlacement();
                 }
             } else {
-                std::stringstream message;
-                message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
-                error = message.str();
+                error = result.get<std::exception_ptr>();
                 state = State::obsolete;
             }
 
@@ -130,9 +122,7 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
                 redoPlacement();
             }
         } else {
-            std::stringstream message;
-            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
-            error = message.str();
+            error = result.get<std::exception_ptr>();
             state = State::obsolete;
         }
 

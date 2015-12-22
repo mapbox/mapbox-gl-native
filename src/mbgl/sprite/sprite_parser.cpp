@@ -106,7 +106,7 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
     try {
         raster = decodeImage(image);
     } catch (...) {
-        return std::string("Could not parse sprite image");
+        return std::current_exception();
     }
 
     JSDocument doc;
@@ -115,9 +115,9 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
     if (doc.HasParseError()) {
         std::stringstream message;
         message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
-        return message.str();
+        return std::make_exception_ptr(std::runtime_error(message.str()));
     } else if (!doc.IsObject()) {
-        return std::string("Sprite JSON root must be an object");
+        return std::make_exception_ptr(std::runtime_error("Sprite JSON root must be an object"));
     } else {
         for (JSValue::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
             const std::string name = { itr->name.GetString(), itr->name.GetStringLength() };

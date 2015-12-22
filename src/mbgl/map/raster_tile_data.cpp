@@ -6,8 +6,6 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 
-#include <sstream>
-
 using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
@@ -41,9 +39,7 @@ void RasterTileData::request(float pixelRatio,
             if (res.error->reason == Response::Error::Reason::NotFound) {
                 state = State::parsed;
             } else {
-                std::stringstream message;
-                message <<  "Failed to load [" << url << "]: " << res.error->message;
-                error = message.str();
+                error = std::make_exception_ptr(std::runtime_error(res.error->message));
                 state = State::obsolete;
             }
             callback();
@@ -68,9 +64,7 @@ void RasterTileData::request(float pixelRatio,
                 state = State::parsed;
                 bucket = std::move(result.get<std::unique_ptr<Bucket>>());
             } else {
-                std::stringstream message;
-                message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
-                error = message.str();
+                error = result.get<std::exception_ptr>();
                 state = State::obsolete;
             }
 

@@ -88,7 +88,7 @@ public:
         return state;
     }
 
-    std::string getError() const {
+    std::exception_ptr getError() const {
         return error;
     }
 
@@ -103,7 +103,7 @@ public:
 
 protected:
     std::atomic<State> state;
-    std::string error;
+    std::exception_ptr error;
 };
 
 } // namespace mbgl

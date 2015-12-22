@@ -5,7 +5,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/thread_context.hpp>
 
-#include <sstream>
 #include <utility>
 
 namespace mbgl {
@@ -194,9 +193,7 @@ std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMo
                 callback(nullptr, nullptr, res.modified, res.expires);
                 return;
             } else {
-                std::stringstream message;
-                message << "Failed to load [" << url << "]: " << res.error->message;
-                callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr, res.modified, res.expires);
+                callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
                 return;
             }
         }

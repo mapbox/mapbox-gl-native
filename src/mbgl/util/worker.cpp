@@ -18,18 +18,12 @@ public:
     void parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                          const std::shared_ptr<const std::string> data,
                          std::function<void(RasterTileParseResult)> callback) {
-        PremultipliedImage image;
-
         try {
-            image = decodeImage(*data);
+            bucket->setImage(decodeImage(*data));
+            callback(RasterTileParseResult(std::move(bucket)));
         } catch (...) {
-            callback(RasterTileParseResult("error parsing raster image"));
-            return;
+            callback(std::current_exception());
         }
-
-        bucket->setImage(std::move(image));
-
-        callback(RasterTileParseResult(std::move(bucket)));
     }
 
     void parseGeometryTile(TileWorker* worker,
@@ -39,8 +33,8 @@ public:
                            std::function<void(TileParseResult)> callback) {
         try {
             callback(worker->parseAllLayers(std::move(layers), *tile, config));
-        } catch (const std::exception& ex) {
-            callback(TileParseResult(ex.what()));
+        } catch (...) {
+            callback(std::current_exception());
         }
     }
 
@@ -48,8 +42,8 @@ public:
                                         std::function<void(TileParseResult)> callback) {
         try {
             callback(worker->parsePendingLayers());
-        } catch (const std::exception& ex) {
-            callback(TileParseResult(ex.what()));
+        } catch (...) {
+            callback(std::current_exception());
         }
     }
 

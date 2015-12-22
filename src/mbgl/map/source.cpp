@@ -31,6 +31,7 @@
 #include <rapidjson/error/en.h>
 
 #include <algorithm>
+#include <sstream>
 
 namespace mbgl {
 
@@ -75,9 +76,7 @@ void Source::load() {
         req = nullptr;
 
         if (res.error) {
-            std::stringstream message;
-            message <<  "Failed to load [" << info.url << "]: " << res.error->message;
-            emitSourceLoadingFailed(message.str());
+            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;
         }
 
@@ -86,8 +85,8 @@ void Source::load() {
 
         if (d.HasParseError()) {
             std::stringstream message;
-            message << "Failed to parse [" << info.url << "]: " << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-            emitSourceLoadingFailed(message.str());
+            message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
+            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
             return;
         }
 
@@ -98,8 +97,7 @@ void Source::load() {
         }
 
         loaded = true;
-
-        emitSourceLoaded();
+        observer->onSourceLoaded(*this);
     });
 }
 
@@ -166,8 +164,8 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    return tileData->parsePending([this]() {
-        emitTileLoaded(false);
+    return tileData->parsePending([this, id]() {
+        observer->onTileLoaded(*this, id, false);
     });
 }
 
@@ -464,12 +462,12 @@ void Source::onLowMemory() {
     cache.clear();
 }
 
-void Source::setObserver(Observer* observer) {
-    observer_ = observer;
+void Source::setObserver(Observer* observer_) {
+    observer = observer_;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const TransformState& transformState, bool collisionDebug) {
-    auto it = tileDataMap.find(normalized_id);
+void Source::tileLoadingCompleteCallback(const TileID& id, const TransformState& transformState, bool collisionDebug) {
+    auto it = tileDataMap.find(id);
     if (it == tileDataMap.end()) {
         return;
     }
@@ -479,43 +477,13 @@ void Source::tileLoadingCompleteCallback(const TileID& normalized_id, const Tran
         return;
     }
 
-    if (tileData->getState() == TileData::State::obsolete && !tileData->getError().empty()) {
-        emitTileLoadingFailed(tileData->getError());
+    if (tileData->getState() == TileData::State::obsolete && tileData->getError()) {
+        observer->onTileError(*this, id, tileData->getError());
         return;
     }
 
     tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
-    emitTileLoaded(true);
-}
-
-void Source::emitSourceLoaded() {
-    if (observer_) {
-        observer_->onSourceLoaded();
-    }
-}
-
-void Source::emitSourceLoadingFailed(const std::string& message) {
-    if (!observer_) {
-        return;
-    }
-
-    auto error = std::make_exception_ptr(util::SourceLoadingException(message));
-    observer_->onSourceLoadingFailed(error);
-}
-
-void Source::emitTileLoaded(bool isNewTile) {
-    if (observer_) {
-        observer_->onTileLoaded(isNewTile);
-    }
-}
-
-void Source::emitTileLoadingFailed(const std::string& message) {
-    if (!observer_) {
-        return;
-    }
-
-    auto error = std::make_exception_ptr(util::TileLoadingException(message));
-    observer_->onTileLoadingFailed(error);
+    observer->onTileLoaded(*this, id, true);
 }
 
 void Source::dumpDebugLogs() const {

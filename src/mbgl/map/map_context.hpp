@@ -65,14 +65,12 @@ public:
     void onLowMemory();
 
     void cleanup();
-
-    // Style::Observer implementation.
-    void onTileDataChanged() override;
-    void onResourceLoadingFailed(std::exception_ptr error) override;
-
     void dumpDebugLogs() const;
 
 private:
+    void onResourceLoaded() override;
+    void onResourceError(std::exception_ptr) override;
+
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
 

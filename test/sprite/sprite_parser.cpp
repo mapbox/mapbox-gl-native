@@ -5,6 +5,7 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <algorithm>
 
@@ -211,9 +212,9 @@ TEST(Sprite, SpriteParsingInvalidJSON) {
     const auto image_1x = util::read_file("test/fixtures/annotations/emerald.png");
     const auto json_1x = R"JSON({ "image": " })JSON";
 
-    const auto error = parseSprite(image_1x, json_1x).get<std::string>();
+    const auto error = parseSprite(image_1x, json_1x).get<std::exception_ptr>();
 
-    EXPECT_EQ(error,
+    EXPECT_EQ(util::toString(error),
               std::string("Failed to parse JSON: Missing a closing quotation mark in string. at offset 13"));
 }
 

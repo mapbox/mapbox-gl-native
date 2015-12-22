@@ -9,7 +9,6 @@
 
 #include <cassert>
 #include <string>
-#include <sstream>
 
 namespace mbgl {
 
@@ -48,14 +47,11 @@ void SpriteStore::setURL(const std::string& url) {
         loader->jsonRequest = nullptr;
 
         if (res.error) {
-            std::stringstream message;
-            message << "Failed to load [" << jsonURL << "]: " << res.error->message;
-            emitSpriteLoadingFailed(message.str());
-            return;
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else {
             loader->json = res.data;
+            emitSpriteLoadedIfComplete();
         }
-        emitSpriteLoadedIfComplete();
     });
 
     loader->spriteRequest =
@@ -68,14 +64,11 @@ void SpriteStore::setURL(const std::string& url) {
             loader->spriteRequest = nullptr;
 
             if (res.error) {
-                std::stringstream message;
-                message << "Failed to load [" << spriteURL << "]: " << res.error->message;
-                emitSpriteLoadingFailed(message.str());
-                return;
+                observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
             } else {
                 loader->image = res.data;
+                emitSpriteLoadedIfComplete();
             }
-            emitSpriteLoadedIfComplete();
         });
 }
 
@@ -91,21 +84,10 @@ void SpriteStore::emitSpriteLoadedIfComplete() {
     if (result.is<Sprites>()) {
         loaded = true;
         setSprites(result.get<Sprites>());
-        if (observer) {
-            observer->onSpriteLoaded();
-        }
+        observer->onSpriteLoaded();
     } else {
-        emitSpriteLoadingFailed(result.get<std::string>());
+        observer->onSpriteError(result.get<std::exception_ptr>());
     }
-}
-
-void SpriteStore::emitSpriteLoadingFailed(const std::string& message) {
-    if (!observer) {
-        return;
-    }
-
-    auto error = std::make_exception_ptr(util::SpriteLoadingException(message));
-    observer->onSpriteLoadingFailed(error);
 }
 
 void SpriteStore::setObserver(Observer* observer_) {

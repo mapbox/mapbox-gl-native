@@ -176,7 +176,7 @@ public:
         callback_(spriteStore_.get(), nullptr);
     }
 
-    void onSpriteLoadingFailed(std::exception_ptr error) override {
+    void onSpriteError(std::exception_ptr error) override {
         callback_(spriteStore_.get(), error);
     }
 

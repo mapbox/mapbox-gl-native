@@ -17,6 +17,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/layer/background_layer.hpp>
 
@@ -304,73 +305,64 @@ void Style::onLowMemory() {
 
 void Style::setObserver(Observer* observer_) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    assert(!observer);
-
     observer = observer_;
 }
 
-void Style::onGlyphRangeLoaded() {
+void Style::onGlyphsLoaded(const std::string& fontStack, const GlyphRange& glyphRange) {
     shouldReparsePartialTiles = true;
-
-    emitTileDataChanged();
+    observer->onGlyphsLoaded(fontStack, glyphRange);
+    observer->onResourceLoaded();
 }
 
-void Style::onGlyphRangeLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onGlyphsError(const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
+               glyphRange.first, glyphRange.second, fontStack.c_str(), util::toString(error).c_str());
+    observer->onGlyphsError(fontStack, glyphRange, error);
+    observer->onResourceError(error);
 }
 
-void Style::onSourceLoaded() {
-    emitTileDataChanged();
+void Style::onSourceLoaded(Source& source) {
+    observer->onSourceLoaded(source);
+    observer->onResourceLoaded();
 }
 
-void Style::onSourceLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onSourceError(Source& source, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load source %s: %s",
+               source.info.source_id.c_str(), util::toString(error).c_str());
+    observer->onSourceError(source, error);
+    observer->onResourceError(error);
 }
 
-void Style::onTileLoaded(bool isNewTile) {
+void Style::onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) {
     if (isNewTile) {
         shouldReparsePartialTiles = true;
     }
 
-    emitTileDataChanged();
+    observer->onTileLoaded(source, tileID, isNewTile);
+    observer->onResourceLoaded();
 }
 
-void Style::onTileLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onTileError(Source& source, const TileID& tileID, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
+               std::string(tileID).c_str(), source.info.source_id.c_str(), util::toString(error).c_str());
+    observer->onTileError(source, tileID, error);
+    observer->onResourceError(error);
 }
 
 void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
-    emitTileDataChanged();
+    observer->onSpriteLoaded();
+    observer->onResourceLoaded();
 }
 
-void Style::onSpriteLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
-}
-
-void Style::emitTileDataChanged() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (observer) {
-        observer->onTileDataChanged();
-    }
-}
-
-void Style::emitResourceLoadingFailed(std::exception_ptr error) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    try {
-        if (error) {
-            lastError = error;
-            std::rethrow_exception(error);
-        }
-    } catch(const std::exception& e) {
-        Log::Error(Event::Style, "%s", e.what());
-    }
-
-    if (observer) {
-        observer->onResourceLoadingFailed(error);
-    }
+void Style::onSpriteError(std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
+    observer->onSpriteError(error);
+    observer->onResourceError(error);
 }
 
 void Style::dumpDebugLogs() const {
