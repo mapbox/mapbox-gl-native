@@ -25,8 +25,8 @@ ifeq ($(BUILD),osx)
 osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
 xosx: osx
 nosx: osx
-run-osx: osx ; @"build/osx-x86_64/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
-run-xosx: run-xosx
+run-osx: osx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
+run-xosx: run-osx
 
 .PHONY: Xcode/osx Xcode/ios
 Xcode/ios: ; $(RUN) HOST=ios Xcode/__project__
