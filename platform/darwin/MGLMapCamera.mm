@@ -94,8 +94,32 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MKMapCamera %p centerCoordinate:%f, %f altitude:%.0fm heading:%.0f° pitch:%.0f°>",
-            self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
+    return [NSString stringWithFormat:@"<%@ %p centerCoordinate:%f, %f altitude:%.0fm heading:%.0f° pitch:%.0f°>",
+            NSStringFromClass([self class]), self, _centerCoordinate.latitude, _centerCoordinate.longitude, _altitude, _heading, _pitch];
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if ( ! [other isKindOfClass:[self class]])
+    {
+        return NO;
+    }
+    if (other == self)
+    {
+        return YES;
+    }
+    
+    MGLMapCamera *otherCamera = other;
+    return (_centerCoordinate.latitude == otherCamera.centerCoordinate.latitude
+            && _centerCoordinate.longitude == otherCamera.centerCoordinate.longitude
+            && _altitude == otherCamera.altitude
+            && _pitch == otherCamera.pitch && _heading == otherCamera.heading);
+}
+
+- (NSUInteger)hash
+{
+    return (@(_centerCoordinate.latitude).hash + @(_centerCoordinate.longitude).hash
+            + @(_altitude).hash + @(_pitch).hash + @(_heading).hash);
 }
 
 @end
