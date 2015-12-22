@@ -135,7 +135,7 @@ else
     libtool -static -no_warning_for_no_symbols \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
         `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
-        -o ${OUTPUT}/static/lib${NAME}.a \
+        -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
         ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
     
     step "Copying dynamic framework into place for iOS Simulator…"
