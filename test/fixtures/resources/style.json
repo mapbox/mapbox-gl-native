@@ -9,7 +9,7 @@
     "rastersource": {
       "url": "test/fixtures/resources/source_raster.json",
       "type": "raster",
-      "tileSize": 256
+      "tileSize": 512
     }
   },
   "sprite": "test/fixtures/resources/sprite",

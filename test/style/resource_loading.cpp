@@ -11,164 +11,141 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/thread.hpp>
-
-#include <regex>
+#include <mbgl/util/string.hpp>
 
 using namespace mbgl;
 
-namespace {
-
-class MockMapContext : public Style::Observer {
+class StyleObserver : public Style::Observer {
 public:
-    MockMapContext(View& view,
-                   FileSource& fileSource,
-                   const std::function<void(std::exception_ptr error)>& callback)
-        : data_(MapMode::Still, GLContextMode::Unique, view.getPixelRatio()),
-          transform_(view, ConstrainMode::HeightOnly),
-          callback_(callback) {
-        util::ThreadContext::setFileSource(&fileSource);
-
-        transform_.resize({{ 1000, 1000 }});
-        transform_.setLatLngZoom({0, 0}, 16);
-
-        const std::string style = util::read_file("test/fixtures/resources/style.json");
-        style_ = std::make_unique<Style>(data_);
-        style_->setJSON(style, "");
-        style_->setObserver(this);
-    }
-
-    ~MockMapContext() {
-        cleanup();
-    }
-
-    void cleanup() {
-        style_.reset();
-    }
-
-    void update() {
-        const auto now = Clock::now();
-
-        data_.setAnimationTime(now);
-        transform_.updateTransitions(now);
-
-        style_->cascade();
-        style_->recalculate(16);
-        style_->update(transform_.getState(), texturePool_);
-    }
-
-    // Style::Observer implementation.
     void onTileDataChanged() override {
-        update();
+        tileDataChanged();
+    }
 
-        if (style_->isLoaded()) {
-            callback_(nullptr);
+    void onResourceLoadingFailed(std::exception_ptr error) override {
+        resourceLoadingFailed(error);
+    }
+
+    std::function<void ()> tileDataChanged = [] {};
+    std::function<void (std::exception_ptr)> resourceLoadingFailed = [] (auto) {};
+};
+
+std::string resourceErrorString(MockFileSource::Type type, const std::string& param) {
+    Log::setObserver(std::make_unique<Log::NullObserver>()); // Squelch logging.
+
+    util::RunLoop loop;
+
+    util::ThreadContext context("Map", util::ThreadType::Map, util::ThreadPriority::Regular);
+    util::ThreadContext::Set(&context);
+
+    MockFileSource fileSource(type, param);
+    util::ThreadContext::setFileSource(&fileSource);
+
+    MapData data(MapMode::Still, GLContextMode::Unique, 1.0);
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    TexturePool texturePool;
+    Style style(data);
+
+    StyleObserver observer;
+    std::string result;
+
+    observer.tileDataChanged = [&] () {
+        // Prompt tile loading after sources load.
+        style.update(transform.getState(), texturePool);
+
+        if (style.isLoaded()) {
+            loop.stop();
         }
     };
 
-    void onResourceLoadingFailed(std::exception_ptr error) override {
-        callback_(error);
-    }
-
-private:
-    MapData data_;
-    Transform transform_;
-    TexturePool texturePool_;
-
-    std::unique_ptr<Style> style_;
-
-    std::function<void(std::exception_ptr error)> callback_;
-};
-
-void runTestCase(MockFileSource::Type type,
-                 const std::string& param,
-                 const std::string& message) {
-    util::RunLoop loop;
-
-    MockView view;
-    MockFileSource fileSource(type, param);
-
-    FixtureLogObserver* log = new FixtureLogObserver();
-    Log::setObserver(std::unique_ptr<Log::Observer>(log));
-
-    auto callback = [type, &loop, &param](std::exception_ptr error) {
-        if (type == MockFileSource::Success) {
-            EXPECT_TRUE(error == nullptr);
-        } else {
-            EXPECT_TRUE(error != nullptr);
-        }
-
-        try {
-            if (error) {
-                std::rethrow_exception(error);
-            }
-        } catch (const util::GlyphRangeLoadingException&) {
-            EXPECT_EQ(param, "glyphs.pbf");
-        } catch (const util::SourceLoadingException&) {
-            EXPECT_TRUE(param == "source_raster.json" || param == "source_vector.json");
-        } catch (const util::SpriteLoadingException&) {
-            EXPECT_TRUE(param == "sprite.png" || param == "sprite.json");
-        } catch (const util::TileLoadingException&) {
-            EXPECT_TRUE(param == "raster.png" || param == "vector.pbf");
-        } catch (const std::exception&) {
-            EXPECT_TRUE(false) << "Unhandled exception.";
-        }
-
+    observer.resourceLoadingFailed = [&] (std::exception_ptr error) {
+        result = util::toString(error);
         loop.stop();
     };
 
-    std::unique_ptr<util::Thread<MockMapContext>> context(
-        std::make_unique<util::Thread<MockMapContext>>(
-            util::ThreadContext{"Map", util::ThreadType::Map, util::ThreadPriority::Regular}, view, fileSource, callback));
+    transform.resize({{ 512, 512 }});
+    transform.setLatLngZoom({0, 0}, 0);
+
+    style.setObserver(&observer);
+    style.setJSON(util::read_file("test/fixtures/resources/style.json"), "");
+    style.cascade();
+    style.recalculate(16);
 
     loop.run();
 
-    // Needed because it will make the Map thread
-    // join and cease logging after this point.
-    context->invoke(&MockMapContext::cleanup);
-    context.reset();
-
-    uint32_t match = 0;
-    std::vector<FixtureLogObserver::LogMessage> logMessages = log->unchecked();
-
-    for (auto& logMessage : logMessages) {
-        if (std::regex_match(logMessage.msg, std::regex(message))) {
-            match++;
-        }
-    }
-
-    if (type == MockFileSource::Success) {
-        EXPECT_EQ(match, 0u);
-    } else {
-        EXPECT_GT(match, 0u);
-    }
+    return result;
 }
 
-} // namespace
-
-class ResourceLoading : public ::testing::TestWithParam<std::pair<std::string, std::string>> {
-};
-
-TEST_P(ResourceLoading, Success) {
-    runTestCase(MockFileSource::Success, GetParam().first, std::string());
+TEST(ResourceLoading, Success) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::Success, ""), "");
 }
 
-TEST_P(ResourceLoading, RequestFail) {
-    std::stringstream message;
-    message << "Failed to load \\[test\\/fixtures\\/resources\\/" << GetParam().first << "\\]\\: Failed by the test case";
-
-    runTestCase(MockFileSource::RequestFail, GetParam().first, message.str());
+TEST(ResourceLoading, RasterSourceFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "source_raster.json"),
+        "Failed to load [test/fixtures/resources/source_raster.json]: Failed by the test case");
 }
 
-TEST_P(ResourceLoading, RequestWithCorruptedData) {
-    runTestCase(MockFileSource::RequestWithCorruptedData, GetParam().first, GetParam().second);
+TEST(ResourceLoading, VectorSourceFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "source_vector.json"),
+        "Failed to load [test/fixtures/resources/source_vector.json]: Failed by the test case");
 }
 
-INSTANTIATE_TEST_CASE_P(Style, ResourceLoading,
-    ::testing::Values(
-        std::make_pair("source_raster.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_raster.json\\]: 0 - Invalid value."),
-        std::make_pair("source_vector.json", "Failed to parse \\[test\\/fixtures\\/resources\\/source_vector.json\\]: 0 - Invalid value."),
-        std::make_pair("sprite.json", "Failed to parse JSON: Invalid value. at offset 0"),
-        std::make_pair("sprite.png", "Could not parse sprite image"),
-        std::make_pair("raster.png", "Failed to parse \\[17\\/6553(4|5|6|7)\\/6553(4|5|6|7)\\]\\: error parsing raster image"),
-        std::make_pair("vector.pbf", "Failed to parse \\[1(5|6)\\/1638(3|4)\\/1638(3|4)\\]\\: pbf unknown field type exception"),
-        std::make_pair("glyphs.pbf", "Failed to parse \\[test\\/fixtures\\/resources\\/glyphs.pbf\\]: pbf unknown field type exception")));
+TEST(ResourceLoading, SpriteJSONFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "sprite.json"),
+        "Failed to load [test/fixtures/resources/sprite.json]: Failed by the test case");
+}
+
+TEST(ResourceLoading, SpriteImageFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "sprite.png"),
+        "Failed to load [test/fixtures/resources/sprite.png]: Failed by the test case");
+}
+
+TEST(ResourceLoading, RasterTileFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "raster.png"),
+        "Failed to load [test/fixtures/resources/raster.png]: Failed by the test case");
+}
+
+TEST(ResourceLoading, VectorTileFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "vector.pbf"),
+        "Failed to load [test/fixtures/resources/vector.pbf]: Failed by the test case");
+}
+
+TEST(ResourceLoading, GlyphsFail) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestFail, "glyphs.pbf"),
+        "Failed to load [test/fixtures/resources/glyphs.pbf]: Failed by the test case");
+}
+
+TEST(ResourceLoading, RasterSourceCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "source_raster.json"),
+        "Failed to parse [test/fixtures/resources/source_raster.json]: 0 - Invalid value.");
+}
+
+TEST(ResourceLoading, VectorSourceCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "source_vector.json"),
+        "Failed to parse [test/fixtures/resources/source_vector.json]: 0 - Invalid value.");
+}
+
+TEST(ResourceLoading, SpriteJSONCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "sprite.json"),
+        "Failed to parse JSON: Invalid value. at offset 0");
+}
+
+TEST(ResourceLoading, SpriteImageCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "sprite.png"),
+        "Could not parse sprite image");
+}
+
+TEST(ResourceLoading, RasterTileCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "raster.png"),
+        "Failed to parse [0/0/0]: error parsing raster image");
+}
+
+TEST(ResourceLoading, VectorTileCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "vector.pbf"),
+        "Failed to parse [0/0/0]: pbf unknown field type exception");
+}
+
+TEST(ResourceLoading, GlyphsCorrupt) {
+    EXPECT_EQ(resourceErrorString(MockFileSource::RequestWithCorruptedData, "glyphs.pbf"),
+        "Failed to parse [test/fixtures/resources/glyphs.pbf]: pbf unknown field type exception");
+}
