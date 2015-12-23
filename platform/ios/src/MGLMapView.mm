@@ -3027,6 +3027,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 //
 - (void)unrotateIfNeededAnimated:(BOOL)animated
 {
+    double snapTolerance = 7;
+
     // don't worry about it in the midst of pinch or rotate gestures
     //
     if (self.pinch.state  == UIGestureRecognizerStateChanged || self.rotate.state == UIGestureRecognizerStateChanged) return;
@@ -3056,6 +3058,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         {
             [self resetNorthAnimated:NO];
         }
+    }
+    else if (self.direction < snapTolerance || self.direction > 360 - snapTolerance)
+    {
+        [self resetNorthAnimated:animated];
     }
 }
 
