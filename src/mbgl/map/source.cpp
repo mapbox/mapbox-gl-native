@@ -353,7 +353,7 @@ int32_t Source::coveringZoomLevel(const TransformState& state) const {
     } else {
         zoom = std::floor(zoom);
     }
-    return zoom;
+    return util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
 }
 
 std::forward_list<TileID> Source::coveringTiles(const TransformState& state) const {
@@ -440,12 +440,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         return allTilesUpdated;
     }
 
-    double zoom = getZoom(parameters.transformState);
-    if (info.type == SourceType::Raster || info.type == SourceType::Video) {
-        zoom = ::round(zoom);
-    } else {
-        zoom = std::floor(zoom);
-    }
+    double zoom = coveringZoomLevel(parameters.transformState);
     std::forward_list<TileID> required = coveringTiles(parameters.transformState);
 
     // Determine the overzooming/underzooming amounts.
