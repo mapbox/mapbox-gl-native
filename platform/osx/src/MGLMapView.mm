@@ -865,6 +865,12 @@ public:
     _mbglMap->setZoom(zoomLevel, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
 }
 
+- (void)zoomBy:(double)zoomDelta animated:(BOOL)animated {
+    [self willChangeValueForKey:@"zoomLevel"];
+    _mbglMap->setZoom(self.zoomLevel + zoomDelta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self didChangeValueForKey:@"zoomLevel"];
+}
+
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
     [self willChangeValueForKey:@"zoomLevel"];
     mbgl::PrecisionPoint center(point.x, point.y);
@@ -1299,13 +1305,13 @@ public:
 
 - (IBAction)moveToBeginningOfParagraph:(__unused id)sender {
     if (self.zoomEnabled) {
-        [self scaleBy:2 atPoint:NSZeroPoint animated:YES];
+        [self zoomBy:1 animated:YES];
     }
 }
 
 - (IBAction)moveToEndOfParagraph:(__unused id)sender {
     if (self.zoomEnabled) {
-        [self scaleBy:0.5 atPoint:NSZeroPoint animated:YES];
+        [self zoomBy:-1 animated:YES];
     }
 }
 
