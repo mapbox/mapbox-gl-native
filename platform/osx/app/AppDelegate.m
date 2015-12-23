@@ -86,6 +86,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         [self showPreferences:nil];
     }
     
+    NSURL *savedURL = [[NSUserDefaults standardUserDefaults] URLForKey:@"MBXCurrentStyleURL"];
+    if (savedURL) {
+        self.mapView.styleURL = savedURL;
+    }
+    
     _spellOutNumberFormatter = [[NSNumberFormatter alloc] init];
     
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
@@ -186,28 +191,30 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             break;
     }
     self.mapView.styleURL = styleURL;
+    [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCurrentStyleURL"];
     [self.window.toolbar validateVisibleItems];
 }
 
 - (IBAction)chooseCustomStyle:(id)sender {
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = @"Apply custom style";
-    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox GL style specification:";
+    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox GL style specification, such as a style designed in Mapbox Studio:";
     NSTextField *textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
     [textField sizeToFit];
     NSRect textFieldFrame = textField.frame;
     textFieldFrame.size.width = 300;
     textField.frame = textFieldFrame;
-    NSString *savedURLString = [[NSUserDefaults standardUserDefaults] stringForKey:@"MBXCustomStyleURL"];
-    if (savedURLString) {
-        textField.stringValue = savedURLString;
+    NSURL *savedURL = [[NSUserDefaults standardUserDefaults] URLForKey:@"MBXCustomStyleURL"];
+    if (savedURL) {
+        textField.stringValue = savedURL.absoluteString;
     }
     alert.accessoryView = textField;
     [alert addButtonWithTitle:@"Apply"];
     [alert addButtonWithTitle:@"Cancel"];
     if ([alert runModal] == NSAlertFirstButtonReturn) {
-        [[NSUserDefaults standardUserDefaults] setObject:textField.stringValue forKey:@"MBXCustomStyleURL"];
         self.mapView.styleURL = [NSURL URLWithString:textField.stringValue];
+        [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCustomStyleURL"];
+        [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCurrentStyleURL"];
         [self.window.toolbar validateVisibleItems];
     }
 }
