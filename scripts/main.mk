@@ -12,16 +12,16 @@ export HOST_VERSION ?= $(BUILD_VERSION)
 
 # Optionally include version-specific host defaults
 -include scripts/$(HOST)/$(HOST_VERSION)/defaults.mk
+-include platform/$(HOST)/scripts/$(HOST)/defaults.mk
 
 export MASON_PLATFORM=$(HOST)
 export MASON_PLATFORM_VERSION=$(HOST_VERSION)
 
-ifneq (,$(wildcard platform/$(HOST)/scripts/$(HOST_VERSION)/configure.sh))
-	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
-endif
-
 export HOST_SLUG = $(HOST)-$(HOST_VERSION)
 CONFIGURE_FILES = platform/$(HOST)/scripts/configure.sh
+ifneq (,$(wildcard scripts/$(HOST)/$(HOST_VERSION)/configure.sh))
+	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
+endif
 ifneq (,$(wildcard platform/$(HOST)/scripts/$(HOST_VERSION)/configure.sh))
 	CONFIGURE_FILES += platform/$(HOST)/scripts/$(HOST_VERSION)/configure.sh
 endif
