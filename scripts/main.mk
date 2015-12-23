@@ -12,7 +12,7 @@ export HOST_VERSION ?= $(BUILD_VERSION)
 
 # Optionally include version-specific host defaults
 -include scripts/$(HOST)/$(HOST_VERSION)/defaults.mk
--include platform/$(HOST)/scripts/$(HOST)/defaults.mk
+-include platform/$(HOST)/scripts/$(HOST_VERSION)/defaults.mk
 
 export MASON_PLATFORM=$(HOST)
 export MASON_PLATFORM_VERSION=$(HOST_VERSION)
