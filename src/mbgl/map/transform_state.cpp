@@ -169,16 +169,16 @@ double TransformState::getScale() const {
 }
 
 double TransformState::getMinZoom() const {
-    double test_scale = scale;
+    double test_scale = min_scale;
     double unused_x = x;
     double unused_y = y;
     constrain(test_scale, unused_x, unused_y);
 
-    return ::log2(::fmin(min_scale, test_scale));
+    return scaleZoom(test_scale);
 }
 
 double TransformState::getMaxZoom() const {
-    return ::log2(max_scale);
+    return scaleZoom(max_scale);
 }
 
 
