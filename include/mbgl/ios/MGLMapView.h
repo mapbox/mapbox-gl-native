@@ -261,13 +261,15 @@ IB_DESIGNABLE
 *   @return The point (in the appropriate view or window coordinate system) corresponding to the specified latitude and longitude value. */
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view;
 
-/** Returns the distance spanned by one pixel at the specified latitude and current zoom level.
+/** Returns the distance spanned by one point in the map view’s coordinate system at the given latitude and current zoom level.
 *
-*   The distance between pixels decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
+*   The distance between points decreases as the latitude approaches the poles. This relationship parallels the relationship between longitudinal coordinates at different latitudes.
 *
-*   @param latitude The latitude for which to return the value.
-*   @return The distance (in meters) spanned by a single pixel. */
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude;
+*   @param latitude The latitude of the geographic coordinate represented by the point.
+*   @return The distance in meters spanned by a single point. */
+- (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
+
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((deprecated("Call -metersPerPointAtLatitude: instead.")));
 
 #pragma mark - Styling the Map
 

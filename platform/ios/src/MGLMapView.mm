@@ -1915,9 +1915,14 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return bounds;
 }
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
+- (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude
 {
     return _mbglMap->getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
+}
+
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
+{
+    return [self metersPerPointAtLatitude:latitude];
 }
 
 #pragma mark - Styling -

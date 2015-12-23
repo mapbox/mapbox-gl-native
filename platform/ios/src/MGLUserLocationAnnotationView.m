@@ -436,7 +436,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 - (CGFloat)calculateAccuracyRingSize
 {
     CGFloat latRadians = self.annotation.coordinate.latitude * M_PI / 180.0f;
-    CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPixelAtLatitude:self.annotation.coordinate.latitude];
+    CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPointAtLatitude:self.annotation.coordinate.latitude];
 
     return pixelRadius * 2;
 }
