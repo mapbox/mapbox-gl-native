@@ -212,13 +212,6 @@ double Transform::getScale() const {
 }
 
 void Transform::_setScale(double new_scale, const PrecisionPoint& center, const Duration& duration) {
-    // Ensure that we don't zoom in further than the maximum allowed.
-    if (new_scale < state.min_scale) {
-        new_scale = state.min_scale;
-    } else if (new_scale > state.max_scale) {
-        new_scale = state.max_scale;
-    }
-
     const double factor = new_scale / state.scale;
     double dx = 0;
     double dy = 0;

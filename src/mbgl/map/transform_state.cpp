@@ -355,11 +355,9 @@ bool TransformState::rotatedNorth() const {
 
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
-    if (constrainMode == ConstrainMode::WidthAndHeight) {
-        scale_ = std::max(scale_, static_cast<double>((rotatedNorth() ? height : width) / util::tileSize));
-    }
-
-    scale_ = std::max(scale_, static_cast<double>((rotatedNorth() ? width : height) / util::tileSize));
+    scale_ = util::max(scale_,
+                       static_cast<double>((rotatedNorth() ? height : width) / util::tileSize),
+                       static_cast<double>((rotatedNorth() ? width : height) / util::tileSize));
 
     // Constrain min/max pan to avoid showing off-world areas.
     if (constrainMode == ConstrainMode::WidthAndHeight) {
