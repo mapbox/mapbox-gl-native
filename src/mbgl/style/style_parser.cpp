@@ -112,7 +112,7 @@ bool StyleParser::parseVectorSource(Source& source, const JSValue& sourceVal) {
 
     } else {
         // ...or the TileJSON directly.
-        source.info.parseTileJSONProperties(sourceVal);
+        source.parseTileJSON(sourceVal);
     }
 
     return true;
@@ -149,7 +149,7 @@ bool StyleParser::parseRasterSource(Source& source, const JSValue& sourceVal) {
 
     } else {
         // ...or the TileJSON directly.
-        source.info.parseTileJSONProperties(sourceVal);
+        source.parseTileJSON(sourceVal);
     }
 
     return true;
@@ -167,7 +167,7 @@ bool StyleParser::parseGeoJSONSource(Source& source, const JSValue& sourceVal) {
         source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
     } else if (dataVal.IsObject()) {
         // We need to parse dataVal as a GeoJSON object
-        source.info.parseGeoJSON(dataVal);
+        source.parseGeoJSON(dataVal);
     } else {
         Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
         return false;

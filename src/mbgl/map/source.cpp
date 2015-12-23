@@ -28,12 +28,93 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/gl/debugging.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+#include <mapbox/geojsonvt/convert.hpp>
+
 #include <rapidjson/error/en.h>
 
 #include <algorithm>
 #include <sstream>
 
 namespace mbgl {
+
+namespace {
+
+void parse(const JSValue& value, std::vector<std::string>& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsArray()) {
+        return;
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        if (!property[i].IsString()) {
+            return;
+        }
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        target.emplace_back(std::string(property[i].GetString(), property[i].GetStringLength()));
+    }
+}
+
+void parse(const JSValue& value, std::string& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsString()) {
+        return;
+    }
+
+    target = { property.GetString(), property.GetStringLength() };
+}
+
+void parse(const JSValue& value, uint16_t& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsUint()) {
+        return;
+    }
+
+    unsigned int uint = property.GetUint();
+    if (uint > std::numeric_limits<uint16_t>::max()) {
+        return;
+    }
+
+    target = uint;
+}
+
+template <size_t N>
+void parse(const JSValue& value, std::array<float, N>& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsArray() || property.Size() != N) {
+        return;
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        if (!property[i].IsNumber()) {
+            return;
+        }
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        target[i] = property[i].GetDouble();
+    }
+}
+
+} // end namespace
 
 Source::Source() {}
 
@@ -91,14 +172,36 @@ void Source::load() {
         }
 
         if (info.type == SourceType::Vector || info.type == SourceType::Raster) {
-            info.parseTileJSONProperties(d);
+            parseTileJSON(d);
         } else if (info.type == SourceType::GeoJSON) {
-            info.parseGeoJSON(d);
+            parseGeoJSON(d);
         }
 
         loaded = true;
         observer->onSourceLoaded(*this);
     });
+}
+
+void Source::parseTileJSON(const JSValue& value) {
+    parse(value, info.tiles, "tiles");
+    parse(value, info.min_zoom, "minzoom");
+    parse(value, info.max_zoom, "maxzoom");
+    parse(value, info.attribution, "attribution");
+    parse(value, info.center, "center");
+    parse(value, info.bounds, "bounds");
+}
+
+void Source::parseGeoJSON(const JSValue& value) {
+    using namespace mapbox::geojsonvt;
+
+    try {
+        geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(value, 0));
+    } catch (const std::exception& ex) {
+        Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
+        // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
+        // tiles to load.
+        geojsonvt = std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
+    }
 }
 
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
@@ -217,7 +320,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
             } else if (info.type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
             } else if (info.type == SourceType::GeoJSON) {
-                monitor = std::make_unique<GeoJSONTileMonitor>(info.geojsonvt.get(), normalized_id);
+                monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), normalized_id);
             } else {
                 Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(info.type).c_str());
                 return TileData::State::invalid;

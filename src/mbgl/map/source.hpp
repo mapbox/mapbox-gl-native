@@ -5,9 +5,16 @@
 #include <mbgl/map/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <forward_list>
 #include <map>
+
+namespace mapbox {
+namespace geojsonvt {
+class GeoJSONVT;
+} // namespace geojsonvt
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -34,6 +41,9 @@ public:
 
     Source();
     ~Source();
+
+    void parseTileJSON(const JSValue&);
+    void parseGeoJSON(const JSValue&);
 
     bool loaded = false;
     void load();
@@ -75,6 +85,8 @@ private:
     void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
+
+    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
