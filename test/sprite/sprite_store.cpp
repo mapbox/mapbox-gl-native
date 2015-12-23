@@ -220,15 +220,15 @@ TEST(SpriteStore, LoadingCorrupted) {
 }
 
 TEST(SpriteStore, LoadingCancel) {
-    SpriteStoreTest test(MockFileSource::SuccessWithDelay, "sprite.json");
+    SpriteStoreTest test(MockFileSource::Success, "sprite.json");
 
     test.observer.spriteLoaded = [&] () {
         FAIL() << "Should never be called";
     };
 
-    test.fileSource.setOnRequestDelayedCallback([&]{
+    test.fileSource.requestEnqueuedCallback = [&]{
         test.end();
-    });
+    };
 
     test.run("test/fixtures/resources/sprite");
 }

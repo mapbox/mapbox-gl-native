@@ -109,15 +109,15 @@ TEST(GlyphStore, LoadingCorrupted) {
 }
 
 TEST(GlyphStore, LoadingCancel) {
-    GlyphStoreTest test(MockFileSource::SuccessWithDelay, "glyphs.pbf");
+    GlyphStoreTest test(MockFileSource::Success, "glyphs.pbf");
 
     test.observer.glyphsLoaded = [&] (const std::string&, const GlyphRange&) {
         FAIL() << "Should never be called";
     };
 
-    test.fileSource.setOnRequestDelayedCallback([&]{
+    test.fileSource.requestEnqueuedCallback = [&]{
         test.end();
-    });
+    };
 
     test.run(
         "test/fixtures/resources/glyphs.pbf",

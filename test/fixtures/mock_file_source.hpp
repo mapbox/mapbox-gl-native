@@ -2,10 +2,10 @@
 #define TEST_RESOURCES_MOCK_FILE_SOURCE
 
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/thread.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <string>
-#include <memory>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -15,12 +15,6 @@ class MockFileSource : public FileSource {
 public:
     // Success:
     //     Will reply to every request correctly with valid data.
-    //
-    // SuccessWithDelay:
-    //     Will reply to every request correctly with valid data,
-    //     but the ones that contains the "match" string on the
-    //     URL will be answered after a delay. This can be useful
-    //     for testing request cancellation.
     //
     // RequestFail:
     //     Will reply with an error to requests that contains
@@ -32,28 +26,28 @@ public:
     //     string on the URL.
     enum Type {
         Success,
-        SuccessWithDelay,
         RequestFail,
         RequestWithCorruptedData
     };
 
-    class Impl;
+    MockFileSource(Type, const std::string& match);
+    ~MockFileSource() override;
 
-    MockFileSource(Type type, const std::string& match);
-    ~MockFileSource() override = default;
-
-    // Function that gets called when a delayed resource is enqueued. The
-    // callback must be safe to call from any thread.
-    void setOnRequestDelayedCallback(std::function<void(void)> callback);
+    // Function that gets called when a matching resource is enqueued.
+    std::function<void (void)> requestEnqueuedCallback;
 
     // FileSource implementation.
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
-    friend class MockFileRequest;
-    void cancel(FileRequest*);
+    void respond(Resource, Callback) const;
 
-    const std::unique_ptr<util::Thread<Impl>> thread_;
+    friend class MockFileRequest;
+
+    Type type;
+    std::string match;
+    std::unordered_map<FileRequest*, std::pair<Resource, Callback>> pending;
+    util::Timer timer;
 };
 
 }

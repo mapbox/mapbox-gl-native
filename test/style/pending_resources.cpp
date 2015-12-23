@@ -24,7 +24,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 1000, 1000);
-    MockFileSource fileSource(MockFileSource::SuccessWithDelay, GetParam());
+    MockFileSource fileSource(MockFileSource::Success, GetParam());
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
 
@@ -34,7 +34,7 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
     });
 
     endTest.unref();
-    fileSource.setOnRequestDelayedCallback([&endTest] { endTest.send(); });
+    fileSource.requestEnqueuedCallback = [&endTest] { endTest.send(); };
 
     const std::string style = util::read_file("test/fixtures/resources/style.json");
     map->setStyleJSON(style, ".");
