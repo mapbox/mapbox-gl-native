@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -12,9 +12,9 @@ TEST_F(Storage, AssetReadDirectory) {
     util::RunLoop loop;
 
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
+    OnlineFileSource fs(nullptr, "test/fixtures/storage/assets.zip");
 #else
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 #endif
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {

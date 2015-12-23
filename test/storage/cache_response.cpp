@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -12,7 +12,7 @@ TEST_F(Storage, CacheResponse) {
 
     util::RunLoop loop;
     SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache);
+    OnlineFileSource fs(&cache);
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;

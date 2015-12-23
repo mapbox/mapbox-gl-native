@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -12,7 +12,7 @@ TEST_F(Storage, HTTPExpiresParsing) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
@@ -38,7 +38,7 @@ TEST_F(Storage, HTTPCacheControlParsing) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const Seconds now = toSeconds(SystemClock::now());
 

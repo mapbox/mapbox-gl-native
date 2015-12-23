@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -11,7 +11,7 @@ TEST_F(Storage, HTTPOtherLoop) {
 
     // This file source launches a separate thread to do the processing.
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {

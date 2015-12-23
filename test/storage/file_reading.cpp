@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -18,7 +18,7 @@ std::string getFileSourceRoot() {
 
 class TestWorker {
 public:
-    TestWorker(mbgl::DefaultFileSource* fs_) : fs(fs_) {}
+    TestWorker(mbgl::OnlineFileSource* fs_) : fs(fs_) {}
 
     void run(std::function<void()> endCallback) {
         const std::string asset("asset://TEST_DATA/fixtures/storage/nonempty");
@@ -46,7 +46,7 @@ public:
 private:
     unsigned numRequests = 1000;
 
-    mbgl::DefaultFileSource* fs;
+    mbgl::OnlineFileSource* fs;
     std::unique_ptr<mbgl::FileRequest> request;
 
     std::function<void(mbgl::Response)> requestCallback;
@@ -61,7 +61,7 @@ TEST_F(Storage, AssetStress) {
 
     util::RunLoop loop;
 
-    mbgl::DefaultFileSource fs(nullptr, getFileSourceRoot());
+    mbgl::OnlineFileSource fs(nullptr, getFileSourceRoot());
 
     unsigned numThreads = 50;
 
@@ -97,7 +97,7 @@ TEST_F(Storage, AssetEmptyFile) {
 
     util::RunLoop loop;
 
-    DefaultFileSource fs(nullptr, getFileSourceRoot());
+    OnlineFileSource fs(nullptr, getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, [&](Response res) {
         req.reset();
@@ -122,7 +122,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     util::RunLoop loop;
 
-    DefaultFileSource fs(nullptr, getFileSourceRoot());
+    OnlineFileSource fs(nullptr, getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" }, [&](Response res) {
         req.reset();
@@ -149,7 +149,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     util::RunLoop loop;
 
-    DefaultFileSource fs(nullptr, getFileSourceRoot());
+    OnlineFileSource fs(nullptr, getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" }, [&](Response res) {
         req.reset();

@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -12,7 +12,7 @@ TEST_F(Storage, CacheRevalidateSame) {
 
     util::RunLoop loop;
     SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache);
+    OnlineFileSource fs(&cache);
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
     std::unique_ptr<FileRequest> req1;
@@ -72,7 +72,7 @@ TEST_F(Storage, CacheRevalidateModified) {
 
     util::RunLoop loop;
     SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache);
+    OnlineFileSource fs(&cache);
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
@@ -132,7 +132,7 @@ TEST_F(Storage, CacheRevalidateEtag) {
 
     util::RunLoop loop;
     SQLiteCache cache(":memory:");
-    DefaultFileSource fs(&cache);
+    OnlineFileSource fs(&cache);
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
     std::unique_ptr<FileRequest> req1;
