@@ -1,6 +1,5 @@
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/async_task.hpp>
@@ -19,7 +18,7 @@ class HTTPNSURLContext;
 class HTTPNSURLRequest : public HTTPRequestBase {
 public:
     HTTPNSURLRequest(HTTPNSURLContext*,
-                const Resource&,
+                const std::string& url,
                 Callback,
                 std::shared_ptr<const Response>);
     ~HTTPNSURLRequest();
@@ -45,7 +44,7 @@ public:
     HTTPNSURLContext();
     ~HTTPNSURLContext();
 
-    HTTPRequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const std::string& url,
                                RequestBase::Callback,
                                std::shared_ptr<const Response>) final;
 
@@ -81,24 +80,24 @@ HTTPNSURLContext::~HTTPNSURLContext() {
     userAgent = nullptr;
 }
 
-HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPNSURLContext::createRequest(const std::string& url,
                                              RequestBase::Callback callback,
                                              std::shared_ptr<const Response> response) {
-    return new HTTPNSURLRequest(this, resource, callback, response);
+    return new HTTPNSURLRequest(this, url, callback, response);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
-                                   const Resource& resource_,
+                                   const std::string& url_,
                                    Callback callback_,
                                    std::shared_ptr<const Response> existingResponse_)
-    : HTTPRequestBase(resource_, callback_),
+    : HTTPRequestBase(url_, callback_),
       context(context_),
       existingResponse(existingResponse_),
       async([this] { handleResponse(); }) {
     @autoreleasepool {
-        NSURL* url = [NSURL URLWithString:@(resource.url.c_str())];
+        NSURL* url = [NSURL URLWithString:@(url_.c_str())];
         if (context->accountType == 0 &&
             ([url.host isEqualToString:@"mapbox.com"] || [url.host hasSuffix:@".mapbox.com"])) {
             NSString* absoluteString = [url.absoluteString

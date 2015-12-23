@@ -1,5 +1,4 @@
 #include <mbgl/storage/asset_context_base.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/util.hpp>
@@ -97,7 +96,7 @@ class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequest(const Resource&, Callback, const std::string& assetRoot,
+    AssetRequest(const std::string& url, Callback, const std::string& assetRoot,
                  AssetZipContext* context, util::Thread<ZipIOWorker>* worker);
     ~AssetRequest();
 
@@ -136,10 +135,10 @@ public:
     AssetZipContext();
     ~AssetZipContext();
 
-    RequestBase* createRequest(const Resource& resource,
+    RequestBase* createRequest(const std::string& url,
                                RequestBase::Callback callback,
                                const std::string& assetRoot) final {
-        return new AssetRequest(resource, callback, assetRoot, this, &worker);
+        return new AssetRequest(url, callback, assetRoot, this, &worker);
     }
 
     struct zip *getHandle(const std::string &path);
@@ -182,11 +181,11 @@ void AssetZipContext::returnHandle(const std::string &path, struct zip* archive)
     handles[path].push_front(archive);
 }
 
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+AssetRequest::AssetRequest(const std::string& url_, Callback callback_,
     const std::string& assetRoot, AssetZipContext* context_, util::Thread<ZipIOWorker>* worker_)
-    : RequestBase(resource_, callback_),
+    : RequestBase(url_, callback_),
       root(assetRoot),
-      path(std::string("assets/") + resource.url.substr(8)),
+      path(std::string("assets/") + url.substr(8)),
       context(context_),
       worker(worker_) {
     archive = context->getHandle(root);

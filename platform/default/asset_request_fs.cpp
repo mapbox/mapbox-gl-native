@@ -1,5 +1,4 @@
 #include <mbgl/storage/asset_context_base.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
@@ -67,7 +66,7 @@ class AssetRequest : public RequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    AssetRequest(const Resource&, Callback, const std::string& assetRoot,
+    AssetRequest(const std::string& url, Callback, const std::string& assetRoot,
                  util::Thread<FileIOWorker> *worker);
     ~AssetRequest();
 
@@ -100,10 +99,10 @@ public:
         : worker({"FileIOWorker", util::ThreadType::Worker, util::ThreadPriority::Regular}) {}
 
 private:
-    RequestBase* createRequest(const Resource& resource,
+    RequestBase* createRequest(const std::string& url,
                                RequestBase::Callback callback,
                                const std::string& assetRoot) final {
-        return new AssetRequest(resource, callback, assetRoot, &worker);
+        return new AssetRequest(url, callback, assetRoot, &worker);
     }
 
     util::Thread<FileIOWorker> worker;
@@ -113,12 +112,11 @@ AssetRequest::~AssetRequest() {
     MBGL_VERIFY_THREAD(tid);
 }
 
-AssetRequest::AssetRequest(const Resource& resource_, Callback callback_,
+AssetRequest::AssetRequest(const std::string& url_, Callback callback_,
     const std::string& assetRoot_, util::Thread<FileIOWorker> *worker_)
-    : RequestBase(resource_, callback_),
+    : RequestBase(url_, callback_),
       assetRoot(assetRoot_),
       worker(worker_) {
-    const auto &url = resource.url;
     std::string path;
     if (url.size() <= 8 || url[8] == '/') {
         // This is an empty or absolute path.

@@ -1,6 +1,5 @@
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 #include "jni.hpp"
@@ -25,7 +24,7 @@ public:
     explicit HTTPAndroidContext();
     ~HTTPAndroidContext();
 
-    HTTPRequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const std::string& url,
                                RequestBase::Callback,
                                std::shared_ptr<const Response>) final;
 
@@ -36,7 +35,7 @@ public:
 class HTTPAndroidRequest : public HTTPRequestBase {
 public:
     HTTPAndroidRequest(HTTPAndroidContext*,
-                const Resource&,
+                const std::string& url,
                 Callback,
                 std::shared_ptr<const Response>);
     ~HTTPAndroidRequest();
@@ -110,14 +109,14 @@ HTTPAndroidContext::~HTTPAndroidContext() {
     vm = nullptr;
 }
 
-HTTPRequestBase* HTTPAndroidContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPAndroidContext::createRequest(const std::string& url,
                                             RequestBase::Callback callback,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPAndroidRequest(this, resource, callback, response);
+    return new HTTPAndroidRequest(this, url, callback, response);
 }
 
-HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
-    : HTTPRequestBase(resource_, callback_),
+HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const std::string& url_, Callback callback_, std::shared_ptr<const Response> response_)
+    : HTTPRequestBase(url_, callback_),
       context(context_),
       existingResponse(response_),
       async([this] { finish(); }) {
@@ -135,7 +134,7 @@ HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resou
     JNIEnv *env = nullptr;
     bool detach = mbgl::android::attach_jni_thread(context->vm, &env, "HTTPAndroidContext::HTTPAndroidRequest()");
 
-    jstring resourceUrl = mbgl::android::std_string_to_jstring(env, resource.url);
+    jstring resourceUrl = mbgl::android::std_string_to_jstring(env, url);
     jstring userAgent = mbgl::android::std_string_to_jstring(env, "MapboxGL/1.0");
     jstring etag = mbgl::android::std_string_to_jstring(env, etagStr);
     jstring modified = mbgl::android::std_string_to_jstring(env, modifiedStr);

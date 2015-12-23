@@ -14,7 +14,7 @@ public:
     static std::unique_ptr<HTTPContextBase> createContext();
 
     virtual ~HTTPContextBase() = default;
-    virtual HTTPRequestBase* createRequest(const Resource&,
+    virtual HTTPRequestBase* createRequest(const std::string& url,
                                        RequestBase::Callback,
                                        std::shared_ptr<const Response>) = 0;
 };

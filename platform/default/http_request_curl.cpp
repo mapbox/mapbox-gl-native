@@ -1,6 +1,5 @@
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
-#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -47,7 +46,7 @@ public:
     HTTPCURLContext();
     ~HTTPCURLContext();
 
-    HTTPRequestBase* createRequest(const Resource&,
+    HTTPRequestBase* createRequest(const std::string& url,
                                RequestBase::Callback,
                                std::shared_ptr<const Response>) final;
 
@@ -80,7 +79,7 @@ class HTTPCURLRequest : public HTTPRequestBase {
 
 public:
     HTTPCURLRequest(HTTPCURLContext*,
-                const Resource&,
+                const std::string& url,
                 Callback,
                 std::shared_ptr<const Response>);
     ~HTTPCURLRequest();
@@ -139,10 +138,10 @@ HTTPCURLContext::~HTTPCURLContext() {
     timeout.stop();
 }
 
-HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
+HTTPRequestBase* HTTPCURLContext::createRequest(const std::string& url,
                                             RequestBase::Callback callback,
                                             std::shared_ptr<const Response> response) {
-    return new HTTPCURLRequest(this, resource, callback, response);
+    return new HTTPCURLRequest(this, url, callback, response);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -353,8 +352,8 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
-    : HTTPRequestBase(resource_, callback_),
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const std::string& url_, Callback callback_, std::shared_ptr<const Response> response_)
+    : HTTPRequestBase(url_, callback_),
       context(context_),
       existingResponse(response_),
       handle(context->getHandle()) {
@@ -387,7 +386,7 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& reso
     handleError(curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
 #endif
     handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
-    handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
+    handleError(curl_easy_setopt(handle, CURLOPT_URL, url.c_str()));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));

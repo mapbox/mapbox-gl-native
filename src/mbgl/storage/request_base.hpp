@@ -3,11 +3,11 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/file_cache.hpp>
-#include <mbgl/storage/resource.hpp>
 
 #include <memory>
 #include <functional>
 #include <utility>
+#include <string>
 
 namespace mbgl {
 
@@ -17,8 +17,8 @@ class RequestBase : private util::noncopyable {
 public:
     using Callback = std::function<void (std::shared_ptr<const Response> response)>;
 
-    RequestBase(const Resource& resource_, Callback notify_)
-        : resource(resource_)
+    RequestBase(const std::string& url_, Callback notify_)
+        : url(url_)
         , notify(std::move(notify_)) {
     }
 
@@ -26,7 +26,7 @@ public:
     virtual void cancel() = 0;
 
 protected:
-    Resource resource;
+    std::string url;
     Callback notify;
 };
 

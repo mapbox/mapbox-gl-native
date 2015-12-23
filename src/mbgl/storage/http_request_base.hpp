@@ -8,8 +8,8 @@ namespace mbgl {
 
     class HTTPRequestBase : public RequestBase {
 public:
-    HTTPRequestBase(const Resource& resource_, Callback notify_)
-        : RequestBase(resource_, notify_)
+    HTTPRequestBase(const std::string& url_, Callback notify_)
+        : RequestBase(url_, notify_)
         , cancelled(false) {
     }
 

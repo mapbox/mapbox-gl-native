@@ -10,7 +10,7 @@ public:
     static std::unique_ptr<AssetContextBase> createContext();
 
     virtual ~AssetContextBase() = default;
-    virtual RequestBase* createRequest(const Resource&,
+    virtual RequestBase* createRequest(const std::string& url,
                                        RequestBase::Callback,
                                        const std::string& assetRoot) = 0;
 };

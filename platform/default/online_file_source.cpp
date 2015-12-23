@@ -301,10 +301,10 @@ void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
 
     if (algo::starts_with(request.resource.url, "asset://")) {
         request.realRequest =
-            assetContext->createRequest(request.resource, callback, assetRoot);
+            assetContext->createRequest(request.resource.url, callback, assetRoot);
     } else {
         request.realRequest =
-            httpContext->createRequest(request.resource, callback, request.getResponse());
+            httpContext->createRequest(request.resource.url, callback, request.getResponse());
     }
 }
 
