@@ -97,6 +97,8 @@
           '<@(zlib_static_libs)',
         ],
         'ldflags': [
+          '<@(sqlite_ldflags)',
+          '<@(zlib_ldflags)',
           '-framework CoreLocation',
           '-framework GLKit',
           '-framework ImageIO',
