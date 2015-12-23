@@ -90,7 +90,6 @@
         'style/pending_resources.cpp',
         'style/resource_loading.cpp',
         'style/style_layer.cpp',
-        'style/unused_sources.cpp',
 
         'sprite/sprite_atlas.cpp',
         'sprite/sprite_image.cpp',
