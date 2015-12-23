@@ -11,8 +11,8 @@ BUILDTYPE=${BUILDTYPE:-Release}
 # Build
 ################################################################################
 
-mapbox_time "compile_program" \
-make xosx -j${JOBS} BUILDTYPE=${BUILDTYPE}
+mapbox_time "run_sdk_tests" \
+make xctest -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 mapbox_time "compile_render_binary" \
 make xrender -j${JOBS} BUILDTYPE=${BUILDTYPE}

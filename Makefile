@@ -56,9 +56,10 @@ ipackage-no-bitcode: Xcode/ios ; @JOBS=$(JOBS) ./platform/ios/scripts/package.sh
 iframework: ipackage-strip ; ./platform/ios/scripts/framework.sh
 itest: ipackage-sim ; ./platform/ios/scripts/test.sh
 
-.PHONY: xpackage xpackage-strip
+.PHONY: xpackage xpackage-strip xctest
 xpackage: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh
 xpackage-strip: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh strip
+xctest: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/test.sh
 endif
 
 #### All platforms targets #####################################################
