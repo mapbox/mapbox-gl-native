@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.http;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -80,7 +81,7 @@ class HTTPContext {
 
         @Override
         public void onFailure(Request request, IOException e) {
-            Log.d(LOG_TAG, "onFailure: " + e.getMessage());
+            Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
 
             int type = PERMANENT_ERROR;
             if ((e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
@@ -96,7 +97,15 @@ class HTTPContext {
 
         @Override
         public void onResponse(Response response) throws IOException {
-            Log.d(LOG_TAG, "onResponse");
+            if (response.isSuccessful()) {
+                Log.d(LOG_TAG, String.format("[HTTP] Request was successful (code = %d).", response.code()));
+            } else {
+                // We don't want to call this unsuccessful because a 304 isn't really an error
+                String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
+                Log.d(LOG_TAG, String.format(
+                        "[HTTP] Request with response code = %d: %s",
+                        response.code(), message));
+            }
 
             byte[] body;
             try {
