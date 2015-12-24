@@ -55,9 +55,10 @@ workflows:
         - channel: "#gl-bots"
         - from_username: Bitrise
         - from_username_on_error: Bitrise
-        - message: 'Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL}) for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}
-            by ${GIT_CLONE_COMMIT_COMMITER_NAME} passed'
-        - message_on_error: 'Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL})
+        - message: ':robot_face: Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL})
+            for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH} by ${GIT_CLONE_COMMIT_COMMITER_NAME}
+            passed'
+        - message_on_error: ':robot_face: Build #${BITRISE_BUILD_NUMBER} (${BITRISE_BUILD_URL})
             for mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH} by ${GIT_CLONE_COMMIT_COMMITER_NAME}
             failed'
         - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
