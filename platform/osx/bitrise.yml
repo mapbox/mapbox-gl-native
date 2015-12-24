@@ -39,12 +39,12 @@ workflows:
             brew install pkgconfig
             brew install automake
     - script:
-        title: Build osxapp
+        title: Run SDK unit tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
-            make osx
+            make xctest BUILDTYPE=Debug
         - is_debug: 'yes'
     - slack:
         title: Post to Slack
