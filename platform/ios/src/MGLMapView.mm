@@ -2653,8 +2653,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         }
     }
 
+    CGFloat defaultPadding = 100;
+    CGFloat yPadding = (self.frame.size.height / 2 <= defaultPadding) ? (self.frame.size.height / 5) : defaultPadding;
+    CGFloat xPadding = (self.frame.size.width / 2 <= defaultPadding) ? (self.frame.size.width / 5) : defaultPadding;
+
     [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
-                         edgePadding:UIEdgeInsetsMake(100, 100, 100, 100)
+                         edgePadding:UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding)
                             animated:animated];
 }
 

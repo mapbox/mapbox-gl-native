@@ -44,6 +44,7 @@ Known issues:
 - A new method on MGLMapView, `-flyToCamera:withDuration:completionHandler:`, lets you transition between viewpoints along an arc as if by aircraft. ([#3171](https://github.com/mapbox/mapbox-gl-native/pull/3171), [#3301](https://github.com/mapbox/mapbox-gl-native/pull/3301))
 - MGLMapCamera’s `altitude` values now match those of MKMapCamera. ([#3362](https://github.com/mapbox/mapbox-gl-native/pull/3362))
 - The user dot’s callout view is now centered above the user dot. It was previously offset slightly to the left. ([#3261](https://github.com/mapbox/mapbox-gl-native/pull/3261))
+- Fixed an issue with small map views not properly fitting annotations within bounds. (#[3407](https://github.com/mapbox/mapbox-gl-native/pull/3407))
 
 ## iOS 3.0.1
 
