@@ -1,17 +1,16 @@
 #include "../fixtures/util.hpp"
 #include "../fixtures/fixture_log_observer.hpp"
 #include "../fixtures/mock_file_source.hpp"
+#include "../fixtures/stub_style_observer.hpp"
 
 #include <mbgl/sprite/sprite_store.hpp>
-
-#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread.hpp>
+
 #include <utility>
 
 using namespace mbgl;
 
-TEST(Sprite, SpriteStore) {
+TEST(SpriteStore, SpriteStore) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -77,7 +76,7 @@ TEST(Sprite, SpriteStore) {
     EXPECT_EQ(Sprites(), store.getDirty());
 }
 
-TEST(Sprite, SpriteStoreOtherPixelRatio) {
+TEST(SpriteStore, OtherPixelRatio) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 1, std::string(8 * 8 * 4, '\0'));
@@ -90,7 +89,7 @@ TEST(Sprite, SpriteStoreOtherPixelRatio) {
     EXPECT_EQ(Sprites({ { "one", sprite1 } }), store.getDirty());
 }
 
-TEST(Sprite, SpriteStoreMultiple) {
+TEST(SpriteStore, Multiple) {
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
     const auto sprite2 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
 
@@ -107,7 +106,7 @@ TEST(Sprite, SpriteStoreMultiple) {
     EXPECT_EQ(Sprites(), store.getDirty());
 }
 
-TEST(Sprite, SpriteStoreReplace) {
+TEST(SpriteStore, Replace) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -124,7 +123,7 @@ TEST(Sprite, SpriteStoreReplace) {
     EXPECT_EQ(Sprites({ { "sprite", sprite2 } }), store.getDirty());
 }
 
-TEST(Sprite, SpriteStoreReplaceWithDifferentDimensions) {
+TEST(SpriteStore, ReplaceWithDifferentDimensions) {
     FixtureLog log;
 
     const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 2, std::string(16 * 16 * 4, '\0'));
@@ -148,167 +147,100 @@ TEST(Sprite, SpriteStoreReplaceWithDifferentDimensions) {
     EXPECT_EQ(Sprites({ { "sprite", sprite1 } }), store.getDirty());
 }
 
-using SpriteTestCallback = std::function<void(SpriteStore*, std::exception_ptr)>;
-
-struct SpriteParams {
-    const std::string baseUrl;
-    const float pixelRatio;
-};
-
-class SpriteThread : public SpriteStore::Observer {
+class SpriteStoreTest {
 public:
-    SpriteThread(FileSource* fileSource, SpriteTestCallback callback) : callback_(std::move(callback)) {
-        util::ThreadContext::setFileSource(fileSource);
-    }
+    SpriteStoreTest(MockFileSource::Type type, const std::string& resource)
+        : fileSource(type, resource),
+          spriteStore(1.0) {}
 
-    void loadSprite(const SpriteParams& params) {
-        spriteStore_.reset(new SpriteStore(params.pixelRatio));
-        spriteStore_->setObserver(this);
-        spriteStore_->setURL(params.baseUrl);
-    }
+    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
+    util::RunLoop loop;
+    MockFileSource fileSource;
+    StubStyleObserver observer;
+    SpriteStore spriteStore;
 
-    void unloadSprite() {
-        spriteStore_->setObserver(nullptr);
-        spriteStore_.reset();
-    }
+    void run(const std::string& url) {
+        // Squelch logging.
+        Log::setObserver(std::make_unique<Log::NullObserver>());
 
-    void onSpriteLoaded() override {
-        callback_(spriteStore_.get(), nullptr);
-    }
+        util::ThreadContext::Set(&context);
+        util::ThreadContext::setFileSource(&fileSource);
 
-    void onSpriteError(std::exception_ptr error) override {
-        callback_(spriteStore_.get(), error);
-    }
-
-private:
-    std::unique_ptr<SpriteStore> spriteStore_;
-    SpriteTestCallback callback_;
-};
-
-class SpriteTest : public testing::Test {
-protected:
-    void runTest(const SpriteParams& params, FileSource* fileSource, SpriteTestCallback callback) {
-        util::RunLoop loop;
-
-        async_ = std::make_unique<util::AsyncTask>([&] { loop.stop(); });
-        async_->unref();
-
-        const util::ThreadContext context = {"Map", util::ThreadType::Map, util::ThreadPriority::Regular};
-
-        util::Thread<SpriteThread> tester(context, fileSource, callback);
-        tester.invoke(&SpriteThread::loadSprite, params);
+        spriteStore.setObserver(&observer);
+        spriteStore.setURL(url);
 
         loop.run();
-
-        tester.invoke(&SpriteThread::unloadSprite);
     }
 
-    void stopTest() {
-        async_->send();
+    void end() {
+        loop.stop();
     }
-
-private:
-    std::unique_ptr<util::AsyncTask> async_;
 };
 
-TEST_F(SpriteTest, LoadingSuccess) {
-    SpriteParams params = {
-        "test/fixtures/resources/sprite",
-        1.0,
+TEST(SpriteStore, LoadingSuccess) {
+    SpriteStoreTest test(MockFileSource::Success, "");
+
+    test.observer.spriteError = [&] (std::exception_ptr) {
+        FAIL();
+        test.end();
     };
 
-    auto callback = [this, &params](SpriteStore* spriteStore, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-        ASSERT_TRUE(error == nullptr);
-
-        ASSERT_TRUE(!spriteStore->getDirty().empty());
-
-        ASSERT_EQ(spriteStore->pixelRatio, params.pixelRatio);
-        ASSERT_NE(spriteStore->pixelRatio, 1.5);
-        ASSERT_NE(spriteStore->pixelRatio, 2.0);
-
-        ASSERT_TRUE(spriteStore->isLoaded());
-
-        stopTest();
+    test.observer.spriteLoaded = [&] () {
+        ASSERT_TRUE(!test.spriteStore.getDirty().empty());
+        ASSERT_EQ(test.spriteStore.pixelRatio, 1.0);
+        ASSERT_TRUE(test.spriteStore.isLoaded());
+        test.end();
     };
 
-    MockFileSource fileSource(MockFileSource::Success, "");
-    runTest(params, &fileSource, callback);
+    test.run("test/fixtures/resources/sprite");
 }
 
-TEST_F(SpriteTest, LoadingFail) {
-    SpriteParams params = {
-        "test/fixtures/resources/sprite",
-        1.0,
-    };
+TEST(SpriteStore, LoadingFail) {
+    SpriteStoreTest test(MockFileSource::RequestFail, "sprite.json");
 
-    auto callback = [this, &params](SpriteStore* spriteStore, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
+    test.observer.spriteError = [&] (std::exception_ptr error) {
         ASSERT_TRUE(error != nullptr);
-
-        ASSERT_EQ(spriteStore->pixelRatio, params.pixelRatio);
-        ASSERT_NE(spriteStore->pixelRatio, 1.5);
-        ASSERT_NE(spriteStore->pixelRatio, 2.0);
-
-        ASSERT_FALSE(spriteStore->isLoaded());
-
-        stopTest();
+        ASSERT_FALSE(test.spriteStore.isLoaded());
+        test.end();
     };
 
-    MockFileSource fileSourceFailSpriteJSON(MockFileSource::RequestFail, "sprite.json");
-    runTest(params, &fileSourceFailSpriteJSON, callback);
-
-    MockFileSource fileSourceFailSpriteImage(MockFileSource::RequestFail, "sprite.png");
-    runTest(params, &fileSourceFailSpriteImage, callback);
-
-    MockFileSource fileSourceCorruptedSpriteJSON(MockFileSource::RequestWithCorruptedData, "sprite.json");
-    runTest(params, &fileSourceCorruptedSpriteJSON, callback);
-
-    MockFileSource fileSourceCorruptedSpriteImage(MockFileSource::RequestWithCorruptedData, "sprite.png");
-    runTest(params, &fileSourceCorruptedSpriteImage, callback);
+    test.run("test/fixtures/resources/sprite");
 }
 
-TEST_F(SpriteTest, LoadingCancel) {
-    SpriteParams params = {
-        "test/fixtures/resources/sprite",
-        1.0,
+TEST(SpriteStore, LoadingCorrupted) {
+    SpriteStoreTest test(MockFileSource::RequestWithCorruptedData, "sprite.json");
+
+    test.observer.spriteError = [&] (std::exception_ptr error) {
+        ASSERT_TRUE(error != nullptr);
+        ASSERT_FALSE(test.spriteStore.isLoaded());
+        test.end();
     };
 
-    auto callback = [this](SpriteStore*, std::exception_ptr) {
+    test.run("test/fixtures/resources/sprite");
+}
+
+TEST(SpriteStore, LoadingCancel) {
+    SpriteStoreTest test(MockFileSource::SuccessWithDelay, "sprite.json");
+
+    test.observer.spriteLoaded = [&] () {
         FAIL() << "Should never be called";
     };
 
-    MockFileSource fileSourceDelaySpriteJSON(MockFileSource::SuccessWithDelay, "sprite.json");
-    fileSourceDelaySpriteJSON.setOnRequestDelayedCallback([this]{
-        stopTest();
+    test.fileSource.setOnRequestDelayedCallback([&]{
+        test.end();
     });
-    runTest(params, &fileSourceDelaySpriteJSON, callback);
 
-    MockFileSource fileSourceDelaySpriteImage(MockFileSource::SuccessWithDelay, "sprite.png");
-    fileSourceDelaySpriteImage.setOnRequestDelayedCallback([this]{
-        stopTest();
-    });
-    runTest(params, &fileSourceDelaySpriteImage, callback);
+    test.run("test/fixtures/resources/sprite");
 }
 
-TEST_F(SpriteTest, InvalidURL) {
-    SpriteParams params = {
-        "foo bar",
-        1.0,
-    };
+TEST(SpriteStore, InvalidURL) {
+    SpriteStoreTest test(MockFileSource::Success, "");
 
-    auto callback = [this](SpriteStore* spriteStore, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
+    test.observer.spriteError = [&] (std::exception_ptr error) {
         ASSERT_TRUE(error != nullptr);
-
-        ASSERT_EQ(spriteStore->isLoaded(), false);
-
-        stopTest();
+        ASSERT_EQ(test.spriteStore.isLoaded(), false);
+        test.end();
     };
 
-    MockFileSource fileSource(MockFileSource::Success, "");
-    runTest(params, &fileSource, callback);
+    test.run("foo bar");
 }

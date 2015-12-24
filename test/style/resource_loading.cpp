@@ -2,6 +2,7 @@
 #include "../fixtures/util.hpp"
 #include "../fixtures/mock_file_source.hpp"
 #include "../fixtures/mock_view.hpp"
+#include "../fixtures/stub_style_observer.hpp"
 
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform.hpp>
@@ -15,72 +16,16 @@
 
 using namespace mbgl;
 
-class StyleObserver : public Style::Observer {
-public:
-    void onGlyphsLoaded(const std::string& fontStack, const GlyphRange& glyphRange) override {
-        if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
-    }
-
-    void onGlyphsError(const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
-        if (glyphsError) glyphsError(fontStack, glyphRange, error);
-    }
-
-    void onSpriteLoaded() override {
-        if (spriteLoaded) spriteLoaded();
-    }
-
-    void onSpriteError(std::exception_ptr error) override {
-        if (spriteError) spriteError(error);
-    }
-
-    void onSourceLoaded(Source& source) override {
-        if (sourceLoaded) sourceLoaded(source);
-    }
-
-    void onSourceError(Source& source, std::exception_ptr error) override {
-        if (sourceError) sourceError(source, error);
-    }
-
-    void onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) override {
-        if (tileLoaded) tileLoaded(source, tileID, isNewTile);
-    }
-
-    void onTileError(Source& source, const TileID& tileID, std::exception_ptr error) override {
-        if (tileError) tileError(source, tileID, error);
-    }
-
-    void onResourceLoaded() override {
-        if (resourceLoaded) resourceLoaded();
-    };
-
-    void onResourceError(std::exception_ptr error) override {
-        if (resourceError) resourceError(error);
-    };
-
-    std::function<void (const std::string& fontStack, const GlyphRange&)> glyphsLoaded;
-    std::function<void (const std::string& fontStack, const GlyphRange&, std::exception_ptr)> glyphsError;
-    std::function<void ()> spriteLoaded;
-    std::function<void (std::exception_ptr)> spriteError;
-    std::function<void (Source&)> sourceLoaded;
-    std::function<void (Source&, std::exception_ptr)> sourceError;
-    std::function<void (Source&, const TileID&, bool isNewTile)> tileLoaded;
-    std::function<void (Source&, const TileID&, std::exception_ptr)> tileError;
-    std::function<void ()> resourceLoaded;
-    std::function<void (std::exception_ptr)> resourceError;
-
-    std::function<void ()> fullyLoaded;
-};
-
 class ResourceLoadingTest {
 public:
     ResourceLoadingTest(MockFileSource::Type type, const std::string& resource)
         : fileSource(type, resource) {}
 
     util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
-
-    MockFileSource fileSource;
-    StyleObserver observer;
     util::RunLoop loop;
+    MockFileSource fileSource;
+    StubStyleObserver observer;
+    std::function<void ()> onFullyLoaded;
 
     MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
     MockView view;
@@ -97,8 +42,8 @@ public:
 
         observer.resourceLoaded = [&] () {
             style.update(transform.getState(), texturePool);
-            if (style.isLoaded() && observer.fullyLoaded) {
-                observer.fullyLoaded();
+            if (style.isLoaded() && onFullyLoaded) {
+                onFullyLoaded();
             }
         };
 
@@ -125,7 +70,7 @@ TEST(ResourceLoading, Success) {
         FAIL() << util::toString(error);
     };
 
-    test.observer.fullyLoaded = [&] () {
+    test.onFullyLoaded = [&] () {
         SUCCEED();
         test.end();
     };
@@ -306,7 +251,7 @@ TEST(ResourceLoading, GlyphsCorrupt) {
 TEST(ResourceLoading, UnusedSource) {
     ResourceLoadingTest test(MockFileSource::Success, "");
 
-    test.observer.fullyLoaded = [&] () {
+    test.onFullyLoaded = [&] () {
         Source *usedSource = test.style.getSource("usedsource");
         EXPECT_TRUE(usedSource);
         EXPECT_TRUE(usedSource->isLoaded());
@@ -326,7 +271,7 @@ TEST(ResourceLoading, UnusedSourceActiveViaClassUpdate) {
 
     test.data.addClass("visible");
 
-    test.observer.fullyLoaded = [&] () {
+    test.onFullyLoaded = [&] () {
         Source *unusedSource = test.style.getSource("unusedsource");
         EXPECT_TRUE(unusedSource);
         EXPECT_TRUE(unusedSource->isLoaded());
