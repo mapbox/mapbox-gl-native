@@ -1502,7 +1502,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public final void animateCamera (CameraUpdate update) {
-        animateCamera(update, 0, null);
+        animateCamera(update, 1, null);
     }
 
 
@@ -1515,7 +1515,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public final void animateCamera (CameraUpdate update, MapView.CancelableCallback callback) {
-        animateCamera(update, 0, callback);
+        animateCamera(update, 1, callback);
     }
 
     /**
@@ -1541,7 +1541,7 @@ public final class MapView extends FrameLayout {
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
+                    if (change == REGION_DID_CHANGE_ANIMATED) {
                         callback.onFinish();
 
                         // Clean up after self
@@ -1596,7 +1596,7 @@ public final class MapView extends FrameLayout {
             addOnMapChangedListener(new OnMapChangedListener() {
                 @Override
                 public void onMapChanged(@MapChange int change) {
-                    if (change == REGION_DID_CHANGE_ANIMATED || change == REGION_DID_CHANGE) {
+                    if (change == REGION_DID_CHANGE_ANIMATED) {
                         callback.onFinish();
 
                         // Clean up after self
