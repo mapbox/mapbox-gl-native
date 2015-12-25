@@ -68,13 +68,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [self applyPendingState];
 }
 
-- (NSString *)displayName {
-    // Temporarily set the display name to the default center coordinate instead
-    // of “Untitled” until the binding kicks in.
-    NSValue *nullIsland = [NSValue valueWithCLLocationCoordinate2D:CLLocationCoordinate2DMake(0, 0)];
-    return [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"] transformedValue:nullIsland];
-}
-
 - (NSWindow *)window {
     return self.windowControllers.firstObject.window;
 }
@@ -213,6 +206,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (appDelegate.pendingDebugMask) {
         self.mapView.debugMask = appDelegate.pendingDebugMask;
     }
+    
+    // Temporarily set the display name to the default center coordinate instead
+    // of “Untitled” until the binding kicks in.
+    NSValue *coordinateValue = [NSValue valueWithCLLocationCoordinate2D:self.mapView.centerCoordinate];
+    self.displayName = [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"]
+                        transformedValue:coordinateValue];
 }
 
 #pragma mark Debug methods
