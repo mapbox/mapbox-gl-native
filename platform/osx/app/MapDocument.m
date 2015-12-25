@@ -65,12 +65,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
     [self.mapView addGestureRecognizer:pressGestureRecognizer];
     
-    if (_inheritedStyleURL) {
-        self.mapView.styleURL = _inheritedStyleURL;
-    }
-    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
-    [self populateFromURL:appDelegate.pendingURL];
-    appDelegate.pendingURL = nil;
+    [self applyPendingState];
 }
 
 - (NSString *)displayName {
@@ -118,47 +113,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [NSString stringWithFormat:@"https://api.mapbox.com/styles/v1/%@/%@.html?access_token=%@#%.2f/%.5f/%.5f/%.f",
              components[1], components[2], [MGLAccountManager accessToken],
              self.mapView.zoomLevel, centerCoordinate.latitude, centerCoordinate.longitude, self.mapView.direction]];
-}
-
-- (void)populateFromURL:(NSURL *)url {
-    if (![url.scheme isEqualToString:@"mapboxgl"]) {
-        return;
-    }
-    
-    // mapboxgl://?center=29.95,-90.066667&zoom=14&bearing=45&pitch=30
-    NS_MUTABLE_DICTIONARY_OF(NSString *, NSString *) *params = [[NSMutableDictionary alloc] init];
-    for (NSString *param in [url.query componentsSeparatedByString:@"&"]) {
-        NSArray *parts = [param componentsSeparatedByString:@"="];
-        if (parts.count >= 2) {
-            params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        }
-    }
-    
-    NSString *zoomLevelString = params[@"zoom"];
-    if (zoomLevelString.length) {
-        _mapView.zoomLevel = zoomLevelString.doubleValue;
-    }
-    
-    NSString *directionString = params[@"bearing"];
-    if (directionString.length) {
-        _mapView.direction = directionString.doubleValue;
-    }
-    
-    NSString *centerString = params[@"center"];
-    if (centerString) {
-        NSArray *coordinateValues = [centerString componentsSeparatedByString:@","];
-        if (coordinateValues.count == 2) {
-            _mapView.centerCoordinate = CLLocationCoordinate2DMake([coordinateValues[0] doubleValue],
-                                                                   [coordinateValues[1] doubleValue]);
-        }
-    }
-    
-    NSString *pitchString = params[@"pitch"];
-    if (pitchString.length) {
-        MGLMapCamera *camera = _mapView.camera;
-        camera.pitch = pitchString.doubleValue;
-        _mapView.camera = camera;
-    }
 }
 
 #pragma mark View methods
@@ -235,6 +189,30 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (IBAction)reload:(id)sender {
     [self.mapView reloadStyle:sender];
+}
+
+- (void)applyPendingState {
+    if (_inheritedStyleURL) {
+        self.mapView.styleURL = _inheritedStyleURL;
+        _inheritedStyleURL = nil;
+    }
+    
+    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
+    if (appDelegate.pendingStyleURL) {
+        self.mapView.styleURL = appDelegate.pendingStyleURL;
+    }
+    if (appDelegate.pendingCamera) {
+        if (appDelegate.pendingZoomLevel >= 0) {
+            self.mapView.zoomLevel = appDelegate.pendingZoomLevel;
+            appDelegate.pendingCamera.altitude = self.mapView.camera.altitude;
+        }
+        self.mapView.camera = appDelegate.pendingCamera;
+        appDelegate.pendingZoomLevel = -1;
+        appDelegate.pendingCamera = nil;
+    }
+    if (appDelegate.pendingDebugMask) {
+        self.mapView.debugMask = appDelegate.pendingDebugMask;
+    }
 }
 
 #pragma mark Debug methods
