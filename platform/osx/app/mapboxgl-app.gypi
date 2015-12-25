@@ -13,6 +13,7 @@
         'Credits.rtf',
         'Icon.icns',
         'MainMenu.xib',
+        'MapDocument.xib',
       ],
 
       'dependencies': [
@@ -26,6 +27,8 @@
         './DroppedPinAnnotation.m',
         './LocationCoordinate2DTransformer.h',
         './LocationCoordinate2DTransformer.m',
+        './MapDocument.h',
+        './MapDocument.m',
         './TimeIntervalTransformer.h',
         './TimeIntervalTransformer.m',
         './NSValue+Additions.h',

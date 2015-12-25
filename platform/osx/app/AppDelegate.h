@@ -2,6 +2,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+@property (weak) IBOutlet NSWindow *preferencesWindow;
 
 @end
 
