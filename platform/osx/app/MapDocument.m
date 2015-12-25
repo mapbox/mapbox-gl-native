@@ -1,6 +1,7 @@
 #import "MapDocument.h"
 
 #import "DroppedPinAnnotation.h"
+#import "NSValue+Additions.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -13,13 +14,17 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
 
-@interface MapDocument () <NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
+@interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
 
 @property (weak) IBOutlet NSMenu *mapViewContextMenu;
 
 @end
 
 @implementation MapDocument {
+    /// Style URL inherited from an existing document at the time this document
+    /// was created.
+    NSURL *_inheritedStyleURL;
+    
     NSPoint _mouseLocationForMapViewContextMenu;
     NSUInteger _droppedPinCounter;
     NSNumberFormatter *_spellOutNumberFormatter;
@@ -35,41 +40,31 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return @"MapDocument";
 }
 
-- (void)windowControllerDidLoadNib:(NSWindowController *)aController {
-    [super windowControllerDidLoadNib:aController];
-    
-    NSURL *savedURL = [[NSUserDefaults standardUserDefaults] URLForKey:@"MBXCurrentStyleURL"];
-    if (savedURL) {
-        self.mapView.styleURL = savedURL;
+- (void)windowControllerWillLoadNib:(NSWindowController *)windowController {
+    NSDocument *sourceDocument = [[NSDocumentController sharedDocumentController] documentForWindow:NSApp.mainWindow];
+    if ([sourceDocument isKindOfClass:[MapDocument class]]) {
+        _inheritedStyleURL = [(MapDocument *)sourceDocument mapView].styleURL;
     }
+}
+
+- (void)windowControllerDidLoadNib:(NSWindowController *)controller {
+    [super windowControllerDidLoadNib:controller];
     
     _spellOutNumberFormatter = [[NSNumberFormatter alloc] init];
     
     NSPressGestureRecognizer *pressGestureRecognizer = [[NSPressGestureRecognizer alloc] initWithTarget:self action:@selector(handlePressGesture:)];
     [self.mapView addGestureRecognizer:pressGestureRecognizer];
-}
-
-- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-    // Insert code here to write your document to data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning nil.
-    // You can also choose to override -fileWrapperOfType:error:, -writeToURL:ofType:error:, or -writeToURL:ofType:forSaveOperation:originalContentsURL:error: instead.
-    if (outError) {
-        *outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:nil];
+    
+    if (_inheritedStyleURL) {
+        self.mapView.styleURL = _inheritedStyleURL;
     }
-    return nil;
 }
 
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    // Insert code here to read your document from the given data of the specified type. If outError != NULL, ensure that you create and set an appropriate error when returning NO.
-    // You can also choose to override -readFromFileWrapper:ofType:error: or -readFromURL:ofType:error: instead.
-    // If you override either of these, you should also override -isEntireFileLoaded to return NO if the contents are lazily loaded.
-    if (outError) {
-        *outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:unimpErr userInfo:nil];
-    }
-    return NO;
-}
-
-+ (BOOL)autosavesInPlace {
-    return YES;
+- (NSString *)displayName {
+    // Temporarily set the display name to the default center coordinate instead
+    // of “Untitled” until the binding kicks in.
+    NSValue *nullIsland = [NSValue valueWithCLLocationCoordinate2D:CLLocationCoordinate2DMake(0, 0)];
+    return [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"] transformedValue:nullIsland];
 }
 
 - (NSWindow *)window {
@@ -127,7 +122,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             break;
     }
     self.mapView.styleURL = styleURL;
-    [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCurrentStyleURL"];
     [self.window.toolbar validateVisibleItems];
 }
 
@@ -150,7 +144,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if ([alert runModal] == NSAlertFirstButtonReturn) {
         self.mapView.styleURL = [NSURL URLWithString:textField.stringValue];
         [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCustomStyleURL"];
-        [[NSUserDefaults standardUserDefaults] setURL:self.mapView.styleURL forKey:@"MBXCurrentStyleURL"];
         [self.window.toolbar validateVisibleItems];
     }
 }
@@ -469,6 +462,16 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         [popUpButton selectItemAtIndex:index];
     }
     return NO;
+}
+
+#pragma mark NSWindowDelegate methods
+
+- (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
+    [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
+}
+
+- (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
+    self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
 }
 
 #pragma mark NSSharingServicePickerDelegate methods

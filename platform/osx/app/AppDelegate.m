@@ -1,8 +1,6 @@
 #import "AppDelegate.h"
 
-#import "LocationCoordinate2DTransformer.h"
 #import "MapDocument.h"
-#import "NSValue+Additions.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -43,14 +41,6 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
                                                        andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                      forEventClass:kInternetEventClass
                                                         andEventID:kAEGetURL];
-    
-    // Normally, an application should respect the “Close windows when quitting
-    // an application” setting in the General pane of System Preferences. But
-    // the map would only be restored to its last opened location if the user
-    // quits the application using Quit and Keep Windows. An application that
-    // displays only a map should restore the last viewed map, like Maps.app
-    // does.
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"NSQuitAlwaysKeepsWindows"];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -79,7 +69,7 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
 }
 
 - (MapDocument *)mainDocument {
-    NSDocument *mainDocument = [NSApp mainWindow].windowController.document;
+    NSDocument *mainDocument = NSApp.mainWindow.windowController.document;
     return [mainDocument isKindOfClass:[MapDocument class]] ? (MapDocument *)mainDocument : nil;
 }
 
