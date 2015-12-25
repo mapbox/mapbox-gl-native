@@ -872,10 +872,12 @@ public:
 }
 
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
+    [self willChangeValueForKey:@"centerCoordinate"];
     [self willChangeValueForKey:@"zoomLevel"];
     mbgl::PrecisionPoint center(point.x, point.y);
     _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
+    [self didChangeValueForKey:@"centerCoordinate"];
 }
 
 - (double)maximumZoomLevel {
@@ -1214,6 +1216,17 @@ public:
     [self scaleBy:2 atPoint:NSMakePoint(gesturePoint.x, self.bounds.size.height - gesturePoint.y) animated:YES];
 }
 
+- (void)smartMagnifyWithEvent:(NSEvent *)event {
+    if (!self.zoomEnabled) {
+        return;
+    }
+    
+    _mbglMap->cancelTransitions();
+    
+    NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
+    [self scaleBy:0.5 atPoint:NSMakePoint(gesturePoint.x, self.bounds.size.height - gesturePoint.y) animated:YES];
+}
+
 /// Rotate fingers to rotate.
 - (void)handleRotationGesture:(NSRotationGestureRecognizer *)gestureRecognizer {
     if (!self.rotateEnabled) {
@@ -1242,18 +1255,15 @@ public:
 
 - (void)scrollWheel:(NSEvent *)event {
     // https://developer.apple.com/library/mac/releasenotes/AppKit/RN-AppKitOlderNotes/#10_7Dragging
-    if (event.phase == NSEventPhaseNone && event.momentumPhase == NSEventPhaseNone) {
+    if (event.phase == NSEventPhaseNone && event.momentumPhase == NSEventPhaseNone && !event.hasPreciseScrollingDeltas) {
         // A traditional, vertical scroll wheel zooms instead of panning.
         if (self.zoomEnabled && std::abs(event.scrollingDeltaX) < std::abs(event.scrollingDeltaY)) {
             _mbglMap->cancelTransitions();
             
-            [self willChangeValueForKey:@"zoomLevel"];
-            [self willChangeValueForKey:@"centerCoordinate"];
             NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
-            mbgl::PrecisionPoint center(gesturePoint.x, self.bounds.size.height - gesturePoint.y);
-            _mbglMap->scaleBy(exp2(event.scrollingDeltaY / 20), center);
-            [self didChangeValueForKey:@"centerCoordinate"];
-            [self didChangeValueForKey:@"zoomLevel"];
+            gesturePoint.y = self.bounds.size.height - gesturePoint.y;
+            double zoomDelta = event.scrollingDeltaY / 4;
+            [self scaleBy:exp2(zoomDelta) atPoint:gesturePoint animated:YES];
         }
     } else if (self.scrollEnabled
                && _magnificationGestureRecognizer.state == NSGestureRecognizerStatePossible
