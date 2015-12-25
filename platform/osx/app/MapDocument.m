@@ -324,7 +324,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 - (IBAction)giveFeedback:(id)sender {
     CLLocationCoordinate2D centerCoordinate = self.mapView.centerCoordinate;
     NSURL *feedbackURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.mapbox.com/map-feedback/#/%.5f/%.5f/%.0f",
-                                               centerCoordinate.longitude, centerCoordinate.latitude, round(self.mapView.zoomLevel)]];
+                                               centerCoordinate.longitude, centerCoordinate.latitude, round(self.mapView.zoomLevel + 1)]];
     [[NSWorkspace sharedWorkspace] openURL:feedbackURL];
 }
 
