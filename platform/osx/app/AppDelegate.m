@@ -4,7 +4,7 @@
 
 #import <Mapbox/Mapbox.h>
 
-static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken";
+NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken";
 
 @interface AppDelegate ()
 
@@ -32,11 +32,6 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(userDefaultsDidChange:)
-                                                 name:NSUserDefaultsDidChangeNotification
-                                               object:nil];
-    
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                        andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                      forEventClass:kInternetEventClass
@@ -55,56 +50,11 @@ static NSString * const MGLMapboxAccessTokenDefaultsKey = @"MGLMapboxAccessToken
     }
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)userDefaultsDidChange:(NSNotification *)notification {
-    NSUserDefaults *userDefaults = notification.object;
-    NSString *accessToken = [userDefaults stringForKey:MGLMapboxAccessTokenDefaultsKey];
-    if (![accessToken isEqualToString:[MGLAccountManager accessToken]]) {
-        [MGLAccountManager setAccessToken:accessToken];
-        [self.mainDocument reload:self];
-    }
-}
-
-- (MapDocument *)mainDocument {
-    NSDocument *mainDocument = NSApp.mainWindow.windowController.document;
-    return [mainDocument isKindOfClass:[MapDocument class]] ? (MapDocument *)mainDocument : nil;
-}
-
 #pragma mark Services
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-    [[NSDocumentController sharedDocumentController] newDocument:self];
-    
-    NSURL *url = [NSURL URLWithString:[event paramDescriptorForKeyword:keyDirectObject].stringValue];
-    NS_MUTABLE_DICTIONARY_OF(NSString *, NSString *) *params = [[NSMutableDictionary alloc] init];
-    for (NSString *param in [url.query componentsSeparatedByString:@"&"]) {
-        NSArray *parts = [param componentsSeparatedByString:@"="];
-        if (parts.count >= 2) {
-            params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        }
-    }
-    
-    NSString *centerString = params[@"center"];
-    if (centerString) {
-        NSArray *coordinateValues = [centerString componentsSeparatedByString:@","];
-        if (coordinateValues.count == 2) {
-            self.mainDocument.mapView.centerCoordinate = CLLocationCoordinate2DMake([coordinateValues[0] doubleValue],
-                                                                                    [coordinateValues[1] doubleValue]);
-        }
-    }
-    
-    NSString *zoomLevelString = params[@"zoom"];
-    if (zoomLevelString.length) {
-        self.mainDocument.mapView.zoomLevel = zoomLevelString.doubleValue;
-    }
-    
-    NSString *directionString = params[@"bearing"];
-    if (directionString.length) {
-        self.mainDocument.mapView.direction = directionString.doubleValue;
-    }
+    self.pendingURL = [NSURL URLWithString:[event paramDescriptorForKeyword:keyDirectObject].stringValue];
+    [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
 }
 
 #pragma mark Help methods

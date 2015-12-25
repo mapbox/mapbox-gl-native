@@ -1,5 +1,6 @@
 #import "MapDocument.h"
 
+#import "AppDelegate.h"
 #import "DroppedPinAnnotation.h"
 #import "NSValue+Additions.h"
 
@@ -40,15 +41,24 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return @"MapDocument";
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)windowControllerWillLoadNib:(NSWindowController *)windowController {
-    NSDocument *sourceDocument = [[NSDocumentController sharedDocumentController] documentForWindow:NSApp.mainWindow];
-    if ([sourceDocument isKindOfClass:[MapDocument class]]) {
-        _inheritedStyleURL = [(MapDocument *)sourceDocument mapView].styleURL;
+    NSDocument *currentDocument = [NSDocumentController sharedDocumentController].currentDocument;
+    if ([currentDocument isKindOfClass:[MapDocument class]]) {
+        _inheritedStyleURL = [(MapDocument *)currentDocument mapView].styleURL;
     }
 }
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)controller {
     [super windowControllerDidLoadNib:controller];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(userDefaultsDidChange:)
+                                                 name:NSUserDefaultsDidChangeNotification
+                                               object:nil];
     
     _spellOutNumberFormatter = [[NSNumberFormatter alloc] init];
     
@@ -58,6 +68,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (_inheritedStyleURL) {
         self.mapView.styleURL = _inheritedStyleURL;
     }
+    AppDelegate *appDelegate = (AppDelegate *)NSApp.delegate;
+    [self populateFromURL:appDelegate.pendingURL];
+    appDelegate.pendingURL = nil;
 }
 
 - (NSString *)displayName {
@@ -69,6 +82,25 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (NSWindow *)window {
     return self.windowControllers.firstObject.window;
+}
+
+- (void)userDefaultsDidChange:(NSNotification *)notification {
+    NSUserDefaults *userDefaults = notification.object;
+    NSString *accessToken = [userDefaults stringForKey:MGLMapboxAccessTokenDefaultsKey];
+    if (![accessToken isEqualToString:[MGLAccountManager accessToken]]) {
+        [MGLAccountManager setAccessToken:accessToken];
+        [self reload:self];
+    }
+}
+
+#pragma mark NSWindowDelegate methods
+
+- (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
+    [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
+}
+
+- (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
+    self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
 }
 
 #pragma mark Services
@@ -86,6 +118,47 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [NSString stringWithFormat:@"https://api.mapbox.com/styles/v1/%@/%@.html?access_token=%@#%.2f/%.5f/%.5f/%.f",
              components[1], components[2], [MGLAccountManager accessToken],
              self.mapView.zoomLevel, centerCoordinate.latitude, centerCoordinate.longitude, self.mapView.direction]];
+}
+
+- (void)populateFromURL:(NSURL *)url {
+    if (![url.scheme isEqualToString:@"mapboxgl"]) {
+        return;
+    }
+    
+    // mapboxgl://?center=29.95,-90.066667&zoom=14&bearing=45&pitch=30
+    NS_MUTABLE_DICTIONARY_OF(NSString *, NSString *) *params = [[NSMutableDictionary alloc] init];
+    for (NSString *param in [url.query componentsSeparatedByString:@"&"]) {
+        NSArray *parts = [param componentsSeparatedByString:@"="];
+        if (parts.count >= 2) {
+            params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        }
+    }
+    
+    NSString *zoomLevelString = params[@"zoom"];
+    if (zoomLevelString.length) {
+        _mapView.zoomLevel = zoomLevelString.doubleValue;
+    }
+    
+    NSString *directionString = params[@"bearing"];
+    if (directionString.length) {
+        _mapView.direction = directionString.doubleValue;
+    }
+    
+    NSString *centerString = params[@"center"];
+    if (centerString) {
+        NSArray *coordinateValues = [centerString componentsSeparatedByString:@","];
+        if (coordinateValues.count == 2) {
+            _mapView.centerCoordinate = CLLocationCoordinate2DMake([coordinateValues[0] doubleValue],
+                                                                   [coordinateValues[1] doubleValue]);
+        }
+    }
+    
+    NSString *pitchString = params[@"pitch"];
+    if (pitchString.length) {
+        MGLMapCamera *camera = _mapView.camera;
+        camera.pitch = pitchString.doubleValue;
+        _mapView.camera = camera;
+    }
 }
 
 #pragma mark View methods
@@ -462,16 +535,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         [popUpButton selectItemAtIndex:index];
     }
     return NO;
-}
-
-#pragma mark NSWindowDelegate methods
-
-- (void)window:(NSWindow *)window willEncodeRestorableState:(NSCoder *)state {
-    [state encodeObject:self.mapView.styleURL forKey:@"MBXMapViewStyleURL"];
-}
-
-- (void)window:(NSWindow *)window didDecodeRestorableState:(NSCoder *)state {
-    self.mapView.styleURL = [state decodeObjectForKey:@"MBXMapViewStyleURL"];
 }
 
 #pragma mark NSSharingServicePickerDelegate methods
