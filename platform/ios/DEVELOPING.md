@@ -1,16 +1,14 @@
-# Developing for iOS on OS X
+# Contributing to the Mapbox iOS SDK
 
-This process gives you a native iOS app for testing changes to mapbox-gl-native
-on a simulator or device. Normally production use of the library is via a
-precompiled binary linked into the app target: this process instead compiles
-Mapbox GL Native from source along with your application, so it can include
-latest development and your own modifications.
+This document explains how to build the Mapbox iOS SDK and the osxapp demo application for the purpose of developing the SDK itself.
 
-Developing for iOS implies an OS X host system.
+### Requirements
+
+The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK and require Xcode on a computer running OS X.
 
 ### Build
 
-Run
+[Install core dependencies](../../INSTALL.md), then run
 
     make iproj
 

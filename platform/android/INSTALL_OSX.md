@@ -1,4 +1,4 @@
-# Developing for Android on OS X
+# Installing the Mapbox Android SDK on OS X
 
 Install Oracle JDK 7+ and Android Studio:
 

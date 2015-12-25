@@ -1,6 +1,7 @@
 # node-mapbox-gl-native
 
-[![NPM](https://nodei.co/npm/mapbox-gl-native.png)](https://npmjs.org/package/mapbox-gl-native)
+[![NPM](https://nodei.co/npm/mapbox-gl-native.png)](https://npmjs.org/package/mapbox-gl-native)  
+[![Travis](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
 ## Installing
 
@@ -245,3 +246,7 @@ map.render({}, function(err, image) {
 });
 
 ```
+
+## Contributing
+
+See [DEVELOPING.md](DEVELOPING.md) for instructions on building this module for development.

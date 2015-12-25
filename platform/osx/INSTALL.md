@@ -1,9 +1,14 @@
-# Building Mapbox GL Native for OS X
+# Integrating the Mapbox OS X SDK into your application
 
-This project provides an OS X SDK analogous to the Mapbox iOS SDK. Mapbox does not officially support it to the same extent as the iOS SDK; however, bug reports and pull requests are certainly welcome. This document explains how to build the OS X SDK and integrate it into your own Cocoa application.
+This document explains how to build the Mapbox OS X SDK and integrate it into your own Cocoa application.
+
+### Requirements
+
+The Mapbox OS X SDK requires the OS X 10.10.0 SDK or above.
 
 ### Build
 
+1. [Install core dependencies](../../INSTALL.md).
 1. Run `make xpackage`, which produces a `Mapbox.framework` in the `gyp/build/Release/` folder.
 
 ### Install
@@ -15,6 +20,10 @@ This project provides an OS X SDK analogous to the Mapbox iOS SDK. Mapbox does n
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 
 1. In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
+
+## Use
+
+The [Mapbox iOS SDK’s API documentation](https://www.mapbox.com/ios-sdk/api/3.0.1/) applies to the Mapbox OS X SDK with few differences, mostly around unimplemented features like user location tracking.
 
 ## Troubleshooting
 

@@ -1,8 +1,18 @@
-# Building Mapbox GL Native for iOS
+# Integrating the Mapbox iOS SDK into your application
 
-This section is for people contributing to Mapbox GL directly in the context of their own app.
+This document explains how to build a development version of Mapbox iOS SDK for the purpose of incorporating it into your own Cocoa Touch application.
+
+### Requirements
+
+The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. They are intended to run on iOS 7.0 and above on the following devices and their simulators:
+
+* iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
+* iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
+* iPod touch 5th generation and above
 
 ### Build
+
+1. [Install core dependencies](../../INSTALL.md).
 
 1. Install [appledoc](http://appledoc.gentlebytes.com/appledoc/) for API docs generation.
 

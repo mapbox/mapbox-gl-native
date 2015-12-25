@@ -51,20 +51,10 @@ dependencies:
 
 ## 3: Setting up a development environment & building
 
-This depends on what operating systems you're using, and what platforms you're
-developing for:
+See the relevant SDK documentation for next steps:
 
-**on OS X**
-
-* [For OS X on OS X](docs/DEVELOP_OSX.md)
-* [For iOS on OS X](docs/DEVELOP_IOS_OSX.md)
-* [For Android on OS X](docs/DEVELOP_ANDROID_OSX.md)
-
-**on Linux**
-
-* [For Linux on Linux](docs/DEVELOP_LINUX.md)
-* [For Android on Linux](docs/DEVELOP_ANDROID_LINUX.md)
-
-**Node.js bindings**
-
-* [Developing Node.js bindings](docs/DEVELOP_NODE.md)
+* [Mapbox Android SDK](platform/android/)
+* [Mapbox iOS SDK](platform/ios/)
+* [Mapbox OS X SDK](platform/osx/)
+* [Mapbox GL Native on Linux](platform/linux/)
+* [node-mapbox-gl-native](platform/node/)
