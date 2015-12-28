@@ -1,5 +1,9 @@
 #import <Foundation/Foundation.h>
 
+#import "MGLTypes.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol MGLCalloutViewDelegate;
 
 @protocol MGLCalloutViewProtocol <NSObject>
@@ -27,3 +31,5 @@
 - (void)calloutViewClicked:(UIView<MGLCalloutViewProtocol> *)calloutView;
 
 @end
+
+NS_ASSUME_NONNULL_END
