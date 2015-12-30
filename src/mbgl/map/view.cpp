@@ -1,5 +1,4 @@
 #include <mbgl/map/view.hpp>
-#include <mbgl/map/map.hpp>
 
 #include <cassert>
 
@@ -18,5 +17,8 @@ void View::notifyMapChange(MapChange) {
     // no-op
 }
 
+mbgl::EdgeInsets getInsets() {
+    return {0, 0, 0, 0};
+}
 
 } // namespace mbgl
