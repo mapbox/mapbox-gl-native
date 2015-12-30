@@ -270,7 +270,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
-    _mbglView = new MBGLView(self, scaleFactor);
+    mbgl::EdgeInsets mapViewInsets = {self.mapViewInsets.top, self.mapViewInsets.left, self.mapViewInsets.bottom, self.mapViewInsets.right};
+    _mbglView = new MBGLView(self, scaleFactor, mapViewInsets);
 
     // setup mbgl cache & file source
     NSString *fileCachePath = @"";
@@ -554,6 +555,16 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     [super setBounds:bounds];
 
+    [self setNeedsLayout];
+}
+
+- (void)setMapViewInsets:(UIEdgeInsets)mapViewInsets
+{
+    if (UIEdgeInsetsEqualToEdgeInsets(mapViewInsets, _mapViewInsets)) {
+        return;
+    }
+    _mapViewInsets = mapViewInsets;
+    _mbglView->setInsets({_mapViewInsets.top, _mapViewInsets.left, _mapViewInsets.bottom, _mapViewInsets.right});
     [self setNeedsLayout];
 }
 
@@ -3363,14 +3374,22 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 class MBGLView : public mbgl::View
 {
     public:
-        MBGLView(MGLMapView* nativeView_, const float scaleFactor_)
-            : nativeView(nativeView_), scaleFactor(scaleFactor_) {
+    MBGLView(MGLMapView* nativeView_, const float scaleFactor_, mbgl::EdgeInsets insets_)
+            : nativeView(nativeView_), scaleFactor(scaleFactor_), insets(insets_) {
         }
         virtual ~MBGLView() {}
 
 
     float getPixelRatio() const override {
         return scaleFactor;
+    }
+    
+    void setInsets(mbgl::EdgeInsets insets_) override {
+        insets = insets_;
+    }
+    
+    mbgl::EdgeInsets getInsets() override {
+        return insets;
     }
 
     std::array<uint16_t, 2> getSize() const override {
@@ -3424,6 +3443,7 @@ class MBGLView : public mbgl::View
     private:
         __weak MGLMapView *nativeView = nullptr;
         const float scaleFactor;
+        mbgl::EdgeInsets insets;
 };
 
 @end

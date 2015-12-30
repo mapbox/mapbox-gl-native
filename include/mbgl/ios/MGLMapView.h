@@ -82,6 +82,8 @@ IB_DESIGNABLE
 /** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
+@property (nonatomic) UIEdgeInsets mapViewInsets;
+
 #pragma mark - Accessing the Delegate
 
 /** @name Accessing the Delegate */
