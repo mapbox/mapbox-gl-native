@@ -2232,9 +2232,13 @@ public class MapView extends FrameLayout {
     // Called when MapView is being created
     private boolean isConnected() {
         Context appContext = getContext().getApplicationContext();
-        ConnectivityManager connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+        if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_NETWORK_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            return (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+        }
+        return false;
     }
 
     // Called when our Internet connectivity has changed
