@@ -20,8 +20,8 @@ public:
     void setMaximumCacheEntrySize(uint64_t size);
 
     // FileCache API
-    std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) override;
-    void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
+    std::unique_ptr<WorkRequest> get(const std::string& url, Callback callback) override;
+    void put(const std::string& url, std::shared_ptr<const Response> response, Hint hint) override;
 
     class Impl;
 
