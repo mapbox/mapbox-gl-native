@@ -105,12 +105,6 @@ void MapContext::setStyleURL(const std::string& url) {
 
     FileSource* fs = util::ThreadContext::getFileSource();
     styleRequest = fs->request({ Resource::Kind::Style, styleURL }, [this, base](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        styleRequest = nullptr;
-
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(styleURL)) {
@@ -120,9 +114,11 @@ void MapContext::setStyleURL(const std::string& url) {
                 data.loading = false;
             }
         } else {
-            loadStyleJSON(*res.data, base);
+            // We got a new stylesheet; only update when it's different from the previous one.
+            if (styleJSON != *res.data) {
+                loadStyleJSON(*res.data, base);
+            }
         }
-
     });
 }
 
@@ -132,7 +128,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     }
 
     styleURL.clear();
-    styleJSON = json;
+    styleJSON.clear();
 
     style = std::make_unique<Style>(data);
 
@@ -144,6 +140,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     style->setJSON(json, base);
     style->setObserver(this);
+    styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
     style->cascade();

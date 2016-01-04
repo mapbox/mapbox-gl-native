@@ -72,6 +72,7 @@
         'storage/cache_revalidate.cpp',
         'storage/cache_shared.cpp',
         'storage/cache_size.cpp',
+        'storage/cache_stale.cpp',
         'storage/database.cpp',
         'storage/asset_file_source.cpp',
         'storage/headers.cpp',

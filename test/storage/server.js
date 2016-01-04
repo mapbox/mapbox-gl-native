@@ -32,6 +32,9 @@ app.get('/test', function (req, res) {
     res.send('Hello World!');
 });
 
+app.get('/stale/*', function() {
+    // Never respond.
+});
 
 var cacheCounter = 0;
 app.get('/cache', function(req, res) {
