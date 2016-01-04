@@ -3,6 +3,7 @@
 
 #include <mbgl/util/image.hpp>
 
+#include <chrono>
 #include <cstdint>
 
 #include <gtest/gtest.h>
@@ -35,13 +36,13 @@ private:
 uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
 
-PremultipliedImage render(Map&);
+PremultipliedImage render(Map&,
+                          std::chrono::milliseconds timeout = std::chrono::milliseconds(1000));
 
 void checkImage(const std::string& base,
                 const PremultipliedImage& actual,
                 double imageThreshold = 0,
                 double pixelThreshold = 0);
-
 }
 }
 

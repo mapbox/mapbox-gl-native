@@ -108,12 +108,20 @@ uint64_t crc64(const std::string& str) {
     return crc64(str.data(), str.size());
 }
 
-PremultipliedImage render(Map& map) {
+PremultipliedImage render(Map& map, std::chrono::milliseconds timeout) {
     std::promise<PremultipliedImage> promise;
     map.renderStill([&](std::exception_ptr, PremultipliedImage&& image) {
         promise.set_value(std::move(image));
     });
-    return promise.get_future().get();
+
+    // Limit maximum wait time.
+    auto future = promise.get_future();
+    if (future.wait_for(timeout) != std::future_status::ready) {
+        // Alas, we didn't get the promised future :(
+        Log::Error(Event::Image, "Failed to generate image within %dms", timeout.count());
+        return { 0, 0 };
+    }
+    return future.get();
 }
 
 void checkImage(const std::string& base,
