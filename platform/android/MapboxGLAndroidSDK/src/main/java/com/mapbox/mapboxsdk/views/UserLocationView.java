@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -77,6 +79,9 @@ final class UserLocationView extends View implements LocationListener {
     private ObjectAnimator mMarkerDirectionAnimator;
     private float mMarkerAccuracy;
     private ObjectAnimator mMarkerAccuracyAnimator;
+
+    private LatLng mCurrentMapViewCoordinate;
+    private double mCurrentBearing;
 
     private boolean mPaused = false;
     private Location mUserLocation;
@@ -238,6 +243,7 @@ final class UserLocationView extends View implements LocationListener {
 
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
             // center map directly if we have a location fix
+            mMarkerCoordinate = new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude());
             mMapView.setCenterCoordinate(new LatLng(mUserLocation));
         }
     }
@@ -268,9 +274,35 @@ final class UserLocationView extends View implements LocationListener {
                 mMarkerScreenMatrix.setTranslate(
                         mMarkerScreenPoint.x,
                         mMarkerScreenPoint.y);
+
             } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                mMarkerScreenMatrix.setTranslate(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
-                mMapView.setCenterCoordinate(mMarkerCoordinate, true);
+                float bearing;
+                if (mShowDirection) {
+                    bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : mGpsMarkerDirection;
+                } else {
+                    bearing = (float) mMapView.getBearing();
+                }
+
+                if (mCurrentMapViewCoordinate == null) {
+                    mCurrentMapViewCoordinate = mMapView.getCenterCoordinate();
+                }
+
+                // only update if there is an actual change
+                if ((!mCurrentMapViewCoordinate.equals(mMarkerCoordinate)) || (!(mCurrentBearing == bearing))) {
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(mMarkerCoordinate)
+                            .bearing(bearing)
+                            .build();
+                    mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+                    mMarkerScreenMatrix.reset();
+                    mMarkerScreenMatrix.setTranslate(
+                            getMeasuredWidth() / 2,
+                            getMeasuredHeight() / 2);
+
+                    // set values for next check for actual change
+                    mCurrentMapViewCoordinate = mMarkerCoordinate;
+                    mCurrentBearing = bearing;
+                }
             }
 
             // rotate so arrow in points to bearing
@@ -357,7 +389,7 @@ final class UserLocationView extends View implements LocationListener {
 
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
             mShowAccuracy = false;
-            mShowDirection = false;
+            mShowDirection = true;
             mBearingChangeListener.onStart(getContext());
         } else {
             mBearingChangeListener.onStop();
@@ -367,6 +399,7 @@ final class UserLocationView extends View implements LocationListener {
                 mShowDirection = false;
             }
         }
+        update();
     }
 
     @MyBearingTracking.Mode
@@ -411,7 +444,7 @@ final class UserLocationView extends View implements LocationListener {
         }
 
         public float getCompassBearing() {
-            return mCompassBearing;
+            return mCurrentDegree;
         }
 
         @Override
@@ -438,11 +471,19 @@ final class UserLocationView extends View implements LocationListener {
                 SensorManager.getOrientation(mR, mOrientation);
                 float azimuthInRadians = mOrientation[0];
                 float azimuthInDegress = (float) (Math.toDegrees(azimuthInRadians) + 360) % 360;
-                mCompassBearing = mCurrentDegree;
-                mCurrentDegree = -azimuthInDegress;
+
+                mCompassBearing = azimuthInDegress;
+                if (mCompassBearing < 0) {
+                    // only allow positive degrees
+                    mCompassBearing += 360;
+                }
+
+                if (mCompassBearing > mCurrentDegree + 15 || mCompassBearing < mCurrentDegree - 15) {
+                    mCurrentDegree = mCompassBearing;
+                    setCompass(mCurrentDegree);
+                }
             }
             mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
-            setCompass(mCompassBearing);
         }
 
         @Override
@@ -465,7 +506,7 @@ final class UserLocationView extends View implements LocationListener {
     }
 
     private boolean isStale(Location location) {
-        if (location != null) {
+        if (location != null && mMyBearingTrackingMode != MyBearingTracking.COMPASS) {
             long ageInNanos;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 ageInNanos = SystemClock.elapsedRealtimeNanos() -
@@ -529,7 +570,6 @@ final class UserLocationView extends View implements LocationListener {
         } else {
             // moving map under the tracker
             mMarkerCoordinate = new LatLng(location);
-            mMapView.setCenterCoordinate(mMarkerCoordinate, true);
         }
 
         if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE && mMyBearingTrackingMode == MyBearingTracking.GPS) {
@@ -603,7 +643,7 @@ final class UserLocationView extends View implements LocationListener {
                 mShowDirection = true;
                 mGpsMarkerDirection = 0;
                 mCompassMarkerDirection = 0;
-                mMapView.setBearing(bearing, BEARING_DURATION);
+                update();
             }
         }
     }
