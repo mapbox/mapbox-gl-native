@@ -22,6 +22,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/url.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
@@ -307,16 +308,15 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
         if (info.type == SourceType::Raster) {
             auto tileData = std::make_shared<RasterTileData>(normalized_id,
                                                              parameters.texturePool,
-                                                             info,
                                                              parameters.worker);
 
-            tileData->request(parameters.pixelRatio, callback);
+            tileData->request(util::templateTileURL(info.tiles.at(0), normalized_id, parameters.pixelRatio), callback);
             newTile->data = tileData;
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
             if (info.type == SourceType::Vector) {
-                monitor = std::make_unique<VectorTileMonitor>(info, normalized_id, parameters.pixelRatio);
+                monitor = std::make_unique<VectorTileMonitor>(normalized_id, info.tiles.at(0));
             } else if (info.type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
             } else if (info.type == SourceType::GeoJSON) {

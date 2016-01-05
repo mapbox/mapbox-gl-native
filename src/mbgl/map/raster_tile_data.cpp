@@ -10,11 +10,9 @@ using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
                                TexturePool &texturePool_,
-                               const SourceInfo &source_,
                                Worker& worker_)
     : TileData(id_),
       texturePool(texturePool_),
-      source(source_),
       worker(worker_) {
 }
 
@@ -22,9 +20,8 @@ RasterTileData::~RasterTileData() {
     cancel();
 }
 
-void RasterTileData::request(float pixelRatio,
+void RasterTileData::request(const std::string& url,
                              const RasterTileData::Callback& callback) {
-    std::string url = source.tileURL(id, pixelRatio);
     state = State::loading;
 
     FileSource* fs = util::ThreadContext::getFileSource();

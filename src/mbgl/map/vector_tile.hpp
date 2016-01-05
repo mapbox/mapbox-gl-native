@@ -2,6 +2,7 @@
 #define MBGL_MAP_VECTOR_TILE
 
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/pbf.hpp>
 
 #include <map>
@@ -56,17 +57,17 @@ private:
     mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
-class SourceInfo;
 class TileID;
 
 class VectorTileMonitor : public GeometryTileMonitor {
 public:
-    VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
+    VectorTileMonitor(const TileID&, const std::string& urlTemplate);
 
     std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
 private:
-    std::string url;
+    TileID tileID;
+    std::string urlTemplate;
     std::shared_ptr<const std::string> data;
 };
 

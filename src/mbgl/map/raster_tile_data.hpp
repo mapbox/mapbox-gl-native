@@ -6,7 +6,6 @@
 
 namespace mbgl {
 
-class SourceInfo;
 class FileRequest;
 class StyleLayer;
 class TexturePool;
@@ -14,12 +13,12 @@ class WorkRequest;
 
 class RasterTileData : public TileData {
 public:
-    RasterTileData(const TileID&, TexturePool&, const SourceInfo&, Worker&);
+    RasterTileData(const TileID&, TexturePool&, Worker&);
     ~RasterTileData();
 
     using Callback = std::function<void()>;
 
-    void request(float pixelRatio,
+    void request(const std::string& url,
                  const Callback& callback);
 
     void cancel() override;
@@ -28,7 +27,6 @@ public:
 
 private:
     TexturePool& texturePool;
-    const SourceInfo& source;
     Worker& worker;
     std::unique_ptr<FileRequest> req;
 
