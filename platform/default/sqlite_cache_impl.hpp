@@ -42,6 +42,9 @@ private:
     void createDatabase();
     void createSchema();
 
+    int schemaVersion() const;
+    void ensureSchemaVersion();
+
     int pageSize = 0;
 
     uint64_t maximumCacheSize;
