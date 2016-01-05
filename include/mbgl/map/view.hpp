@@ -36,9 +36,6 @@ public:
     // i.e. it may not change over time.
     virtual float getPixelRatio() const = 0;
 
-    virtual void setInsets(mbgl::EdgeInsets insets) = 0;
-    virtual mbgl::EdgeInsets getInsets() = 0;
-
     // Called from the main thread when the View signaled a dimension change. Must return the
     // logical dimension of this map in pixels.
     virtual std::array<uint16_t, 2> getSize() const = 0;

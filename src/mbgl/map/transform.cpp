@@ -98,6 +98,8 @@ void Transform::easeTo(const CameraOptions& options) {
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
+    xn += (easeOptions.center && !state.isGestureInProgress()) ? (state.insets.left - state.insets.right) / 2 : 0;
+    yn += (easeOptions.center && !state.isGestureInProgress()) ? (state.insets.top - state.insets.bottom) / 2 : 0;
 
     easeOptions.center.reset();
     easeOptions.zoom.reset();
@@ -166,6 +168,11 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration&
     options.zoom = zoom;
     options.duration = duration;
     easeTo(options);
+}
+
+void Transform::setInsets(EdgeInsets insets) {
+    state.insets = insets;
+    setLatLng(getLatLng());
 }
 
 

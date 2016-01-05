@@ -146,6 +146,16 @@ bool Map::isPanning() const {
     return transform->isPanning();
 }
 
+#pragma mark - Insets
+
+void Map::setInsets(EdgeInsets insets) {
+    transform->setInsets(insets);
+}
+    
+EdgeInsets Map::getInsets() const {
+    return transform->getInsets();
+}
+
 #pragma mark -
 
 void Map::jumpTo(const CameraOptions& options) {

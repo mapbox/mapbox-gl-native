@@ -17,8 +17,4 @@ void View::notifyMapChange(MapChange) {
     // no-op
 }
 
-mbgl::EdgeInsets getInsets() {
-    return {0, 0, 0, 0};
-}
-
 } // namespace mbgl

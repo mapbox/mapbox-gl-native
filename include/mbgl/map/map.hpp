@@ -187,6 +187,10 @@ public:
 
     bool isFullyLoaded() const;
     void dumpDebugLogs() const;
+    
+    // Insets
+    void setInsets(EdgeInsets insets);
+    EdgeInsets getInsets() const;
 
 private:
     View& view;

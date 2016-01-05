@@ -36,6 +36,10 @@ public:
     void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     LatLng getLatLng() const { return state.getLatLng(); }
+    
+    // Insets
+    void setInsets(EdgeInsets insets);
+    EdgeInsets getInsets() const {return state.getInsets();};
 
     // Zoom
     void scaleBy(double ds, const PrecisionPoint& center = { 0, 0 }, const Duration& = Duration::zero());

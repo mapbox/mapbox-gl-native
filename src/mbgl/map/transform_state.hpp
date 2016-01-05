@@ -12,6 +12,8 @@
 #include <array>
 #include <limits>
 
+#include <mbgl/map/map.hpp>
+
 namespace mbgl {
 
 class TileID;
@@ -45,6 +47,9 @@ public:
     LatLng getLatLng() const;
     double pixel_x() const;
     double pixel_y() const;
+    
+    // Insets
+    EdgeInsets getInsets() const {return insets;};
 
     // Zoom
     float getNormalizedZoom() const;
@@ -115,7 +120,7 @@ private:
 
     // map position
     double x = 0, y = 0;
-    double angle = 0;
+    EdgeInsets insets = {0,0,0,0};    double angle = 0;
     double scale = 1;
     double altitude = 1.5;
     double pitch = 0.0;

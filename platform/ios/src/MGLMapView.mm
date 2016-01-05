@@ -564,7 +564,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         return;
     }
     _mapViewInsets = mapViewInsets;
-    _mbglView->setInsets({_mapViewInsets.top, _mapViewInsets.left, _mapViewInsets.bottom, _mapViewInsets.right});
+    _mbglMap->setInsets({_mapViewInsets.top, _mapViewInsets.left, _mapViewInsets.bottom, _mapViewInsets.right});
     [self setNeedsLayout];
 }
 
@@ -3382,14 +3382,6 @@ class MBGLView : public mbgl::View
 
     float getPixelRatio() const override {
         return scaleFactor;
-    }
-    
-    void setInsets(mbgl::EdgeInsets insets_) override {
-        insets = insets_;
-    }
-    
-    mbgl::EdgeInsets getInsets() override {
-        return insets;
     }
 
     std::array<uint16_t, 2> getSize() const override {

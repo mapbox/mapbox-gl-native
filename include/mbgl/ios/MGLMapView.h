@@ -82,6 +82,7 @@ IB_DESIGNABLE
 /** The button shown in the lower-right of the map which when pressed displays the map attribution information. */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
+/** Defines with insets an area where the contents (marker, user position) of the map will be centered.*/
 @property (nonatomic) UIEdgeInsets mapViewInsets;
 
 #pragma mark - Accessing the Delegate
