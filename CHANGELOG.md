@@ -46,6 +46,7 @@ Known issues:
 - The user dot’s callout view is now centered above the user dot. It was previously offset slightly to the left. ([#3261](https://github.com/mapbox/mapbox-gl-native/pull/3261))
 - Fixed an issue with small map views not properly fitting annotations within bounds. (#[3407](https://github.com/mapbox/mapbox-gl-native/pull/3407))
 - The map will now snap to north. ([#3403](https://github.com/mapbox/mapbox-gl-native/pull/3403))
+- New API to provide a custom callout view to the map for annotations. ([#3322](https://github.com/mapbox/mapbox-gl-native/pull/3322))
 
 ## iOS 3.0.1
 

@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 @protocol MGLOverlay;
+@protocol MGLCalloutViewProtocol;
 
 /** An MGLMapView object provides an embeddable map interface, similar to the one provided by Apple's MapKit. You use this class to display map information and to manipulate the map contents from your application. You can center the map on a given coordinate, specify the size of the area you want to display, and style the features of the map to fit your application's use case.
 *
@@ -592,6 +593,16 @@ IB_DESIGNABLE
 *   @param annotation The object representing the annotation.
 *   @return A Boolean indicating whether the annotation should show a callout. */
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
+
+/** Returns a custom callout view to display for the specified annotation.
+ *
+ *   If the method is present in the delegate, it can return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view.
+ *   If the method returns nil, the map will use the default callout view.
+ *
+ *   @param mapView The map view that requested the callout view.
+ *   @param annotation The object representing the annotation.
+ *   @return A view following the MGLCalloutView protocol. */
+- (nullable UIView<MGLCalloutViewProtocol> *)mapView:(MGLMapView *)mapView customCalloutViewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /** Return the view to display on the left side of the standard callout bubble.
 *
