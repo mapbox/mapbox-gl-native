@@ -8,7 +8,6 @@
 
 namespace mbgl {
 
-struct Resource;
 class Response;
 class WorkRequest;
 
@@ -19,8 +18,8 @@ public:
     enum class Hint : bool { Full, Refresh };
     using Callback = std::function<void(std::unique_ptr<Response>)>;
 
-    virtual std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) = 0;
-    virtual void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) = 0;
+    virtual std::unique_ptr<WorkRequest> get(const std::string& url, Callback callback) = 0;
+    virtual void put(const std::string& url, std::shared_ptr<const Response> response, Hint hint) = 0;
 };
 
 } // namespace mbgl

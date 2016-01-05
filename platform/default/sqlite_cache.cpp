@@ -75,7 +75,7 @@ void SQLiteCache::Impl::createSchema() {
         "CREATE TABLE IF NOT EXISTS `http_cache` ("
         "    `url` TEXT PRIMARY KEY NOT NULL,"
         "    `status` INTEGER NOT NULL," // The response status (Successful or Error).
-        "    `kind` INTEGER NOT NULL," // The kind of file.
+        "    `kind` INTEGER NOT NULL," // The kind of file. (No longer used; column remains only for backward compatibility.)
         "    `modified` INTEGER," // Timestamp when the file was last modified.
         "    `etag` TEXT,"
         "    `expires` INTEGER," // Timestamp when the server says the file expires.
@@ -298,15 +298,15 @@ void SQLiteCache::Impl::pruneEntries() {
     }
 }
 
-std::unique_ptr<WorkRequest> SQLiteCache::get(const Resource &resource, Callback callback) {
+std::unique_ptr<WorkRequest> SQLiteCache::get(const std::string& url, Callback callback) {
     // Can be called from any thread, but most likely from the file source thread.
     // Will try to load the URL from the SQLite database and call the callback when done.
     // Note that the callback is probably going to invoked from another thread, so the caller
     // must make sure that it can run in that thread.
-    return thread->invokeWithCallback(&Impl::get, callback, resource);
+    return thread->invokeWithCallback(&Impl::get, callback, url);
 }
 
-void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
+void SQLiteCache::Impl::get(const std::string& url, Callback callback) {
     try {
         initializeDatabase();
 
@@ -319,7 +319,7 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             getStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        const auto canonicalURL = util::mapbox::canonicalURL(url);
         getStmt->bind(1, canonicalURL.c_str());
         if (getStmt->run()) {
             // There is data.
@@ -367,18 +367,18 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
     }
 }
 
-void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) {
+void SQLiteCache::put(const std::string& url, std::shared_ptr<const Response> response, Hint hint) {
     // Can be called from any thread, but most likely from the file source thread. We are either
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
-        thread->invoke(&Impl::put, resource, response);
+        thread->invoke(&Impl::put, url, response);
     } else if (hint == Hint::Refresh) {
-        thread->invoke(&Impl::refresh, resource, response->expires);
+        thread->invoke(&Impl::refresh, url, response->expires);
     }
 }
 
-void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Response> response) {
+void SQLiteCache::Impl::put(const std::string& url, std::shared_ptr<const Response> response) {
     try {
         initializeDatabase();
         pruneEntries();
@@ -406,24 +406,20 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
             putStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        const auto canonicalURL = util::mapbox::canonicalURL(url);
         putStmt->bind(1 /* url */, canonicalURL.c_str());
         if (response->error) {
             putStmt->bind(2 /* status */, int(response->error->reason));
         } else {
             putStmt->bind(2 /* status */, 1 /* success */);
         }
-        putStmt->bind(3 /* kind */, int(resource.kind));
+        putStmt->bind(3 /* kind */, 0);
         putStmt->bind(4 /* modified */, response->modified.count());
         putStmt->bind(5 /* etag */, response->etag.c_str());
         putStmt->bind(6 /* expires */, response->expires.count());
         putStmt->bind(7 /* accessed */, toSeconds(SystemClock::now()).count());
 
-        std::string data;
-        if (resource.kind != Resource::SpriteImage && response->data) {
-            // Do not compress images, since they are typically compressed already.
-            data = util::compress(*response->data);
-        }
+        std::string data = util::compress(*response->data);
 
         if (!data.empty() && data.size() < response->data->size()) {
             // Store the compressed data when it is smaller than the original
@@ -447,7 +443,7 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
     }
 }
 
-void SQLiteCache::Impl::refresh(const Resource& resource, Seconds expires) {
+void SQLiteCache::Impl::refresh(const std::string& url, Seconds expires) {
     try {
         initializeDatabase();
 
@@ -460,7 +456,7 @@ void SQLiteCache::Impl::refresh(const Resource& resource, Seconds expires) {
             refreshStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
+        const auto canonicalURL = util::mapbox::canonicalURL(url);
         refreshStmt->bind(1, toSeconds(SystemClock::now()).count());
         refreshStmt->bind(2, expires.count());
         refreshStmt->bind(3, canonicalURL.c_str());

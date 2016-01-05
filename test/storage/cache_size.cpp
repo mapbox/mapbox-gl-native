@@ -24,8 +24,7 @@ bool tileIsCached(mbgl::SQLiteCache* cache, unsigned id) {
         response = std::move(res);
     };
 
-    Resource resource{ Resource::Kind::Tile, url };
-    auto req = cache->get(resource, callback);
+    auto req = cache->get(url, callback);
 
     while (!replied) {
         util::RunLoop::Get()->runOnce();
@@ -53,8 +52,7 @@ void insertTile(mbgl::SQLiteCache* cache, unsigned id, uint64_t size) {
 
     response->data = data;
 
-    Resource resource{ Resource::Kind::Tile, url };
-    cache->put(resource, response, SQLiteCache::Hint::Full);
+    cache->put(url, response, SQLiteCache::Hint::Full);
 }
 
 void refreshTile(mbgl::SQLiteCache* cache, unsigned id) {
@@ -66,8 +64,7 @@ void refreshTile(mbgl::SQLiteCache* cache, unsigned id) {
     response->modified = toSeconds(SystemClock::now());
     response->expires = toSeconds(SystemClock::now()) + Seconds(5000);
 
-    Resource resource{ Resource::Kind::Tile, url };
-    cache->put(resource, response, SQLiteCache::Hint::Refresh);
+    cache->put(url, response, SQLiteCache::Hint::Refresh);
 }
 
 uint64_t cacheSize(mbgl::SQLiteCache* cache, unsigned entryCount, uint64_t entrySize) {

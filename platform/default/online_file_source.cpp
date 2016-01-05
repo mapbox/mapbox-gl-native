@@ -254,7 +254,7 @@ void OnlineFileSource::Impl::startCacheRequest(OnlineFileRequestImpl& request) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
     request.cacheRequest =
-        cache->get(request.resource, [this, &request](std::shared_ptr<Response> response) {
+        cache->get(request.resource.url, [this, &request](std::shared_ptr<Response> response) {
             request.cacheRequest = nullptr;
             if (response) {
                 response->stale = response->isExpired();
@@ -291,7 +291,7 @@ void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
             if (request.getResponse() && response->data == request.getResponse()->data) {
                 hint = FileCache::Hint::Refresh;
             }
-            cache->put(request.resource, response, hint);
+            cache->put(request.resource.url, response, hint);
         }
 
         request.setResponse(response);

@@ -21,9 +21,9 @@ public:
     void setMaximumCacheSize(uint64_t size);
     void setMaximumCacheEntrySize(uint64_t size);
 
-    void get(const Resource&, Callback);
-    void put(const Resource& resource, std::shared_ptr<const Response> response);
-    void refresh(const Resource& resource, Seconds expires);
+    void get(const std::string& url, Callback);
+    void put(const std::string& url, std::shared_ptr<const Response> response);
+    void refresh(const std::string& url, Seconds expires);
 
 private:
     void initializeDatabase();
