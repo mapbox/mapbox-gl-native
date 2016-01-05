@@ -38,7 +38,7 @@
 		</dict>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>(c) 2014 Mapbox</string>
+	<string>© 2014–2016 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The map will ALWAYS display the user's location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
