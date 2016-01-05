@@ -28,12 +28,19 @@ std::string getFileSourceRoot() {
 #endif
 }
 
-pid_t startServer(const char *executable) {
-    int pipefd[2];
+Server::Server(const char* executable) {
+    int input[2];
+    int output[2];
 
-    if (pipe(pipefd)) {
-        throw std::runtime_error("Cannot create server pipe");
+    if (pipe(input)) {
+        throw std::runtime_error("Cannot create server input pipe");
     }
+    if (pipe(output)) {
+        throw std::runtime_error("Cannot create server output pipe");
+    }
+
+    // Store the parent => child pipe so that we can close it in the destructor.
+    fd = input[1];
 
     pid_t pid = fork();
     if (pid < 0) {
@@ -42,15 +49,20 @@ pid_t startServer(const char *executable) {
     } else if (pid == 0) {
         // This is the child process.
 
-        // Close the input side of the pipe.
-        close(pipefd[0]);
+        // Connect the parent => child pipe to stdin.
+        while ((dup2(input[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
+        close(input[0]);
+        close(input[1]);
+
+        // Move the child => parent side of the pipe to stdout.
+        while ((dup2(output[1], STDOUT_FILENO) == -1) && (errno == EINTR)) {}
+        close(output[1]);
+        close(output[0]);
 
         // Launch the actual server process, with the pipe ID as the first argument.
-        char *args[] = { const_cast<char *>(executable),
-                         const_cast<char *>(std::to_string(pipefd[1]).c_str()),
-                         nullptr };
-        int ret = execv(executable, args);
-        // This call should not return. In case execve failed, we exit anyway.
+        int ret = execl(executable, executable);
+
+        // This call should not return. In case execl failed, we exit anyway.
         if (ret < 0) {
             Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
         }
@@ -58,30 +70,31 @@ pid_t startServer(const char *executable) {
     } else {
         // This is the parent process.
 
-        // Close output side of the pipe.
-        close(pipefd[1]);
+        // Close the unneeded sides of the pipes.
+        close(output[1]);
+        close(input[0]);
 
-        // Wait until the server process closes the handle.
+        // Wait until the server process sends at least 2 bytes or closes the handle.
         char buffer[2];
-        ssize_t bytes = 0, total = 0;
-        while ((bytes = read(pipefd[0], buffer, sizeof(buffer))) != 0) {
+        ssize_t bytes, total = 0;
+        while (total < 2 && (bytes = read(output[0], buffer + total, 2 - total)) != 0) {
             total += bytes;
         }
-        if (bytes < 0) {
-            Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
-            exit(1);
-        }
+
+        // Close child => parent pipe.
+        close(output[0]);
+
+        // Check signature
         if (total != 2 || strncmp(buffer, "OK", 2) != 0) {
-            Log::Error(Event::Setup, "Failed to start server");
-            exit(1);
+            throw std::runtime_error("Failed to start server: Invalid signature");
         }
-        close(pipefd[0]);
     }
-    return pid;
 }
 
-void stopServer(pid_t pid) {
-    kill(pid, SIGTERM);
+Server::~Server() {
+    if (fd > 0) {
+        close(fd);
+    }
 }
 
 // from https://gist.github.com/ArtemGr/997887

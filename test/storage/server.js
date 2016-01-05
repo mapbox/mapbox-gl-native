@@ -2,6 +2,13 @@
 /* jshint node: true */
 'use strict';
 
+// This needs to be here to make sure the pipe stays open.
+// We're waiting until the stdin pipe gets closed (e.g. because the parent
+// process dies)
+process.stdin.on('readable', function() {});
+process.stdin.on('end', function() { process.exit(0); });
+
+
 var fs = require('fs');
 var express = require('express');
 var app = express();
@@ -101,13 +108,6 @@ app.get('/load/:number(\\d+)', function(req, res) {
 });
 
 var server = app.listen(3000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
-    console.warn('Storage test server listening at http://%s:%s', host, port);
-
-    if (process.argv[2]) {
-        // Allow the test to continue running.
-        fs.write(+process.argv[2], 'OK');
-        fs.close(+process.argv[2]);
-    }
+    // Tell parent that we're now listening.
+    process.stdout.write("OK");
 });

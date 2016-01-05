@@ -4,6 +4,7 @@
 #include "../fixtures/util.hpp"
 #include <mbgl/storage/response.hpp>
 #include <iostream>
+#include <memory>
 
 class Storage : public testing::Test {
 public:
@@ -11,7 +12,7 @@ public:
     static void TearDownTestCase();
 
 protected:
-    static pid_t pid;
+    static std::unique_ptr<mbgl::test::Server> server;
 };
 
 namespace mbgl {

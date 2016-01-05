@@ -16,19 +16,25 @@
     } name;
 
 namespace mbgl {
-    
+
 class Map;
-    
+
 namespace test {
-    
+
 std::string getFileSourceRoot();
 
-pid_t startServer(const char *executable);
-void stopServer(pid_t pid);
+class Server {
+public:
+    Server(const char* executable);
+    ~Server();
+
+private:
+    int fd = -1;
+};
 
 uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
-    
+
 PremultipliedImage render(Map&);
 
 void checkImage(const std::string& base,
