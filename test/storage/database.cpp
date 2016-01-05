@@ -64,6 +64,40 @@ TEST_F(Storage, DatabaseCreate) {
     Log::removeObserver();
 }
 
+TEST_F(Storage, DatabaseVersion) {
+    using namespace mbgl;
+
+    createDir("test/fixtures/database");
+    deleteFile("test/fixtures/database/cache.db");
+    std::string path("test/fixtures/database/cache.db");
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+
+    {
+        SQLiteCache::Impl cache(path);
+
+        auto response = std::make_shared<Response>();
+        cache.put({ Resource::Unknown, "mapbox://test" }, response);
+    }
+
+    sqlite3* db;
+    sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_READWRITE, nullptr);
+    sqlite3_exec(db, "PRAGMA user_version = 999999", nullptr, nullptr, nullptr);
+    sqlite3_close_v2(db);
+
+    // Changing the version will force the database to get recreated
+    // thus removing every pre-existing cache entry.
+    {
+        SQLiteCache::Impl cache(path);
+
+        cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
+            EXPECT_EQ(nullptr, res.get());
+        });
+    }
+
+    Log::removeObserver();
+}
+
 class FileLock {
 public:
     FileLock(const std::string& path) {
@@ -124,7 +158,7 @@ TEST_F(Storage, DatabaseLockedRead) {
         // Make sure that we got a few "database locked" errors
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-        EXPECT_EQ(2ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
+        EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
     }
 
     // Then, unlock the file and try again.
@@ -167,7 +201,7 @@ TEST_F(Storage, DatabaseLockedWrite) {
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-        EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
+        EXPECT_EQ(8ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
     }
 
     // Then, unlock the file and try again.
@@ -219,7 +253,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
 
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-        EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
+        EXPECT_EQ(8ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
     }
 
     {
@@ -236,7 +270,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         // Make sure that we got the right errors.
         auto observer = Log::removeObserver();
         auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-        EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
+        EXPECT_EQ(8ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
     }
 }
 
