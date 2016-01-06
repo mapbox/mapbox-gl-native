@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case PERMISSIONS_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableGps();
+                    toggleGps(true);
                 }
                 break;
 
@@ -473,29 +474,25 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                         PERMISSIONS_LOCATION);
             } else {
-                enableGps();
+                mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
+                    @Override
+                    public void onMyLocationChange(@Nullable Location location) {
+                        if (location != null) {
+                            mMapView.setZoomLevel(16);
+                            mMapView.setCenterCoordinate(new LatLng(location));
+                            mMapView.setOnMyLocationChangeListener(null);
+                        }
+                    }
+                });
+                mMapView.setMyLocationEnabled(true);
+                mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                mMapView.setMyBearingTrackingMode(MyBearingTracking.GPS);
+                mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
             }
         } else {
             mMapView.setMyLocationEnabled(false);
             mLocationFAB.setColorFilter(Color.TRANSPARENT);
         }
-    }
-
-    private void enableGps() {
-        mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
-            @Override
-            public void onMyLocationChange(@Nullable Location location) {
-                if (location != null) {
-                    mMapView.setZoomLevel(16);
-                    mMapView.setCenterCoordinate(new LatLng(location));
-                    mMapView.setOnMyLocationChangeListener(null);
-                }
-            }
-        });
-        mMapView.setMyLocationEnabled(true);
-        mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-        mMapView.setMyBearingTrackingMode(MyBearingTracking.GPS);
-        mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
     }
 
     /**

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
@@ -45,20 +46,47 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         mLocationSpinner = (Spinner) findViewById(R.id.spinner_location);
         mLocationSpinner.setAdapter(locationTrackingAdapter);
         mLocationSpinner.setOnItemSelectedListener(this);
-//        mLocationSpinner.setEnabled(false);
 
         ArrayAdapter<CharSequence> bearingTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_bearing_mode, android.R.layout.simple_spinner_item);
         bearingTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mBearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
         mBearingSpinner.setAdapter(bearingTrackingAdapter);
         mBearingSpinner.setOnItemSelectedListener(this);
-//        mBearingSpinner.setEnabled(false);
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.setOnMyLocationChangeListener(this);
-        mMapView.setMyLocationEnabled(true);
+
+        try {
+            mMapView.setMyLocationEnabled(true);
+        } catch (SecurityException e) {
+            //should not occur, permission was checked in MainActivity
+            Toast.makeText(this, "Location permission is not availlable", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        mMapView.setOnMyLocationTrackingModeChangeListener(new MapView.OnMyLocationTrackingModeChangeListener() {
+            @Override
+            public void onMyLocationTrackingModeChange(@MyLocationTracking.Mode int myLocationTrackingMode) {
+                if (MyLocationTracking.TRACKING_NONE == myLocationTrackingMode) {
+                    mLocationSpinner.setOnItemSelectedListener(null);
+                    mLocationSpinner.setSelection(0);
+                    mLocationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                }
+            }
+        });
+        
+        mMapView.setOnMyBearingTrackingModeChangeListener(new MapView.OnMyBearingTrackingModeChangeListener() {
+            @Override
+            public void onMyBearingTrackingModeChange(@MyBearingTracking.Mode int myBearingTrackingMode) {
+                if (MyBearingTracking.NONE == myBearingTrackingMode) {
+                    mBearingSpinner.setOnItemSelectedListener(null);
+                    mBearingSpinner.setSelection(0);
+                    mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+                }
+            }
+        });
     }
 
     @Override
@@ -93,7 +121,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) throws SecurityException {
         if (parent.getId() == R.id.spinner_location) {
             switch (position) {
                 case 0:
@@ -117,10 +145,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 case 2:
                     mMapView.setMyBearingTrackingMode(MyBearingTracking.COMPASS);
                     break;
-
-//                case 3:
-//                    mMapView.setMyBearingTrackingMode(MyBearingTracking.COMBINED);
-//                    break;
             }
         }
     }

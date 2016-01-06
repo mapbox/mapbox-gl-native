@@ -245,6 +245,12 @@ final class UserLocationView extends View implements LocationListener {
             // center map directly if we have a location fix
             mMarkerCoordinate = new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude());
             mMapView.setCenterCoordinate(new LatLng(mUserLocation));
+
+            // center view directly
+            mMarkerScreenMatrix.reset();
+            mMarkerScreenMatrix.setTranslate(
+                    getMeasuredWidth() / 2,
+                    getMeasuredHeight() / 2);
         }
     }
 
