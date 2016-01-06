@@ -11,7 +11,7 @@
 #pragma mark - Debugging
 
 /** Triggers another render pass even when it is not necessary. */
-- (void)invalidate;
+- (void)setNeedsGLDisplay;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;
@@ -119,7 +119,7 @@ static const int benchmarkDuration = 200; // frames
             idx++;
             [self startBenchmarkIteration];
         } else {
-            [mapView invalidate];
+            [mapView setNeedsGLDisplay];
         }
         return;
     }
@@ -134,7 +134,7 @@ static const int benchmarkDuration = 200; // frames
             started = Clock::now();
             NSLog(@"- Benchmarking for %d frames...", benchmarkDuration);
         }
-        [mapView invalidate];
+        [mapView setNeedsGLDisplay];
         return;
     }
 
@@ -146,7 +146,7 @@ static const int benchmarkDuration = 200; // frames
             state = State::WarmingUp;
             [self.mapView emptyMemoryCache];
             NSLog(@"- Warming up for %d frames...", warmupDuration);
-            [mapView invalidate];
+            [mapView setNeedsGLDisplay];
         }
         return;
     }
