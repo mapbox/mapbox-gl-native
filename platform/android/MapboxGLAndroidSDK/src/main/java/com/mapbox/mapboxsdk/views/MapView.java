@@ -1025,9 +1025,9 @@ public final class MapView extends FrameLayout {
         mConnectivityReceiver = new ConnectivityReceiver();
         getContext().registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        mUserLocationView.resume();
         mNativeMapView.resume();
         mNativeMapView.update();
+        mUserLocationView.resume();
     }
 
     /**
