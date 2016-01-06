@@ -129,8 +129,8 @@ IB_DESIGNABLE
 @property (nonatomic, readonly) UIImageView *logoView;
 
 /** 
- A view showing legally required copyright notices, positioned at the
- bottom-right of the map view.
+ A view showing legally required copyright notices and telemetry settings,
+ positioned at the bottom-right of the map view.
  
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
@@ -139,6 +139,14 @@ IB_DESIGNABLE
     OpenStreetMap data, or other Mapbox data such as satellite or terrain
     data. If that applies to this map view, do not hide this view or remove
     any notices from it.
+
+ @note You are additionally
+    [required](https://www.mapbox.com/help/metrics-opt-out-for-users/) to
+    provide users with the option to disable anonymous usage and location
+    sharing (telemetry). If this view is hidden, you must implement this
+    setting elsewhere in your app or via `Settings.bundle`. See our
+    [website](https://www.mapbox.com/ios-sdk/#telemetry_opt_out) for
+    implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
 

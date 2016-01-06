@@ -66,7 +66,10 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 + (void) flush;
 
 // Main thread only
-+ (void)validate;
++ (void) validate;
+
+// Main thread only
++ (void) ensureMetricsOptoutExists;
 
 @end
 

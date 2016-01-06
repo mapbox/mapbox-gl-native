@@ -8,7 +8,6 @@
 
 @interface MGLAccountManager() <FABKit>
 
-@property (atomic) BOOL mapboxMetricsEnabledSettingShownInApp;
 @property (atomic) NSString *accessToken;
 
 @end
@@ -21,15 +20,8 @@
     // Load all referenced categories due to absence of -ObjC linker flag
     [MGLCategoryLoader loadCategories];
 
-    // Read the initial configuration from Info.plist. The shown-in-app setting
-    // preempts the Settings bundle check in -[MGLMapboxEvents init] triggered
-    // by setting the access token.
-    NSBundle *bundle = [NSBundle mainBundle];
-    NSNumber *shownInAppNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
-    if (shownInAppNumber) {
-        [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp = [shownInAppNumber boolValue];
-    }
-    NSString *accessToken = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
+    // Read the initial configuration from Info.plist.
+    NSString *accessToken = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAccessToken"];
     if (accessToken.length) {
         self.accessToken = accessToken;
     }
@@ -60,7 +52,7 @@
 }
 
 + (BOOL) mapboxMetricsEnabledSettingShownInApp {
-    return [MGLAccountManager sharedManager].mapboxMetricsEnabledSettingShownInApp;
+    NSLog(@"mapboxMetricsEnabledSettingShownInApp is no longer necessary; the Mapbox iOS SDK has changed to always provide a telemetry setting in-app.");
 }
 
 + (void) setAccessToken:(NSString *) accessToken {

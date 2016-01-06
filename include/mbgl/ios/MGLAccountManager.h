@@ -26,12 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (nullable NSString *)accessToken;
 
-#pragma mark Providing User Metrics Opt-Out
-
-/**
- Whether in-app user metrics opt-out is configured. If set to the default value of `NO`, a user opt-out preference is expected in a `Settings.bundle` that shows in the application's section within the system Settings app.
- */
-+ (BOOL)mapboxMetricsEnabledSettingShownInApp;
++ (BOOL)mapboxMetricsEnabledSettingShownInApp __attribute__((deprecated("Telemetry settings are now always shown in the ℹ️ menu.")));
 
 @end
 
