@@ -184,6 +184,7 @@ void Source::load() {
 
 void Source::parseTileJSON(const JSValue& value) {
     parse(value, info.tiles, "tiles");
+    parse(value, info.scheme, "scheme");
     parse(value, info.min_zoom, "minzoom");
     parse(value, info.max_zoom, "maxzoom");
     parse(value, info.attribution, "attribution");

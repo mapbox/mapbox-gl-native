@@ -15,7 +15,11 @@ std::string SourceInfo::tileURL(const TileID& id, float pixelRatio) const {
         } else if (token == "x") {
             return util::toString(id.x);
         } else if (token == "y") {
-            return util::toString(id.y);
+            if (scheme == "tms") {
+                return util::toString((1 << id.z) - id.y - 1);
+            } else {
+                return util::toString(id.y);
+            }
         } else if (token == "prefix") {
             std::string prefix{ 2 };
             prefix[0] = "0123456789abcdef"[id.x % 16];
