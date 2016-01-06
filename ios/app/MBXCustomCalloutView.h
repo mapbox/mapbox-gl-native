@@ -1,16 +1,10 @@
 #import <UIKit/UIKit.h>
-#import <mbgl/ios/MGLCalloutViewProtocol.h>
+#import <mbgl/ios/MGLCalloutView.h>
 
-/*
+/**
  * Basic custom callout view to demonstrate how to
  * add your own on your app. Will only show the
  * callout title for demonstration purpose.
  */
-
-@interface MBXCustomCalloutView : UIView <MGLCalloutViewProtocol>
-
-@property (nonatomic, copy) NSString *title, *subtitle;
-@property (nonatomic, strong) UIView *leftAccessoryView, *rightAccessoryView;
-@property (nonatomic, weak) id<MGLCalloutViewDelegate> delegate;
-
+@interface MBXCustomCalloutView : UIView <MGLCalloutView>
 @end

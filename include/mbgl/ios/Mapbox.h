@@ -1,7 +1,7 @@
 #import "MGLAccountManager.h"
 #import "MGLAnnotation.h"
 #import "MGLAnnotationImage.h"
-#import "MGLCalloutViewProtocol.h"
+#import "MGLCalloutView.h"
 #import "MGLGeometry.h"
 #import "MGLMapCamera.h"
 #import "MGLMapView.h"

@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLMapViewDelegate;
 @protocol MGLAnnotation;
 @protocol MGLOverlay;
-@protocol MGLCalloutViewProtocol;
+@protocol MGLCalloutView;
 
 /**
  An interactive, customizable map view with an interface similar to the one
@@ -963,15 +963,15 @@ IB_DESIGNABLE
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
 /**
- Returns a custom callout view to display for the specified annotation.
+ Returns a callout view to display for the specified annotation.
  
- If the method is present in the delegate, it must return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view.
+ If this method is present in the delegate, it must return a new instance of a view dedicated to display the callout bubble. It will be configured by the map view. If this method is not present, or if it returns `nil`, a standard, two-line, bubble-like callout view is displayed by default.
  
  @param mapView The map view that requested the callout view.
  @param annotation The object representing the annotation.
- @return A view following the MGLCalloutView protocol.
+ @return A view conforming to the `MGLCalloutView` protocol, or `nil` to use the default callout view.
  */
-- (nullable UIView <MGLCalloutViewProtocol> *)mapView:(MGLMapView *)mapView customCalloutViewForAnnotation:(id <MGLAnnotation>)annotation;
+- (nullable UIView <MGLCalloutView> *)mapView:(MGLMapView *)mapView calloutViewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
  Returns the view to display on the left side of the standard callout bubble.

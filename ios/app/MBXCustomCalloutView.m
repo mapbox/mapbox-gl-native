@@ -1,5 +1,7 @@
 #import "MBXCustomCalloutView.h"
 
+#import <mbgl/darwin/MGLAnnotation.h>
+
 static CGFloat const tipHeight = 10.0;
 static CGFloat const tipWidth = 10.0;
 
@@ -9,7 +11,17 @@ static CGFloat const tipWidth = 10.0;
 
 @end
 
-@implementation MBXCustomCalloutView
+@implementation MBXCustomCalloutView {
+    id <MGLAnnotation> _representedObject;
+    UIView *_leftAccessoryView;
+    UIView *_rightAccessoryView;
+    __weak id <MGLCalloutViewDelegate> _delegate;
+}
+
+@synthesize representedObject = _representedObject;
+@synthesize leftAccessoryView = _leftAccessoryView;
+@synthesize rightAccessoryView = _rightAccessoryView;
+@synthesize delegate = _delegate;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -32,8 +44,11 @@ static CGFloat const tipWidth = 10.0;
 {
     [view addSubview:self];
     // prepare title label
-    self.mainLabel.text = self.title;
-    [self.mainLabel sizeToFit];
+    if ([self.representedObject respondsToSelector:@selector(title)])
+    {
+        self.mainLabel.text = self.representedObject.title;
+        [self.mainLabel sizeToFit];
+    }
     // prepare our frame
     CGFloat frameWidth = self.mainLabel.bounds.size.width;
     CGFloat frameHeight = self.mainLabel.bounds.size.height * 2.0;
