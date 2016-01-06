@@ -138,6 +138,7 @@ cat ios/docs/pod-README.md > ${README}
 echo >> ${README}
 echo -n "#" >> ${README}
 cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' >> ${README}
+cp ${README} "${OUTPUT}"
 
 jazzy \
     --sdk ${SDK} \
