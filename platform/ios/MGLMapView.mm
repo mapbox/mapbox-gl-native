@@ -858,7 +858,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
-        if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        if (!self.shouldDecelerate || sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
         {
             // Not enough velocity to overcome friction
             velocity = CGPointZero;
@@ -1474,7 +1474,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
             [self.attributionSheet addButtonWithTitle:@"Adjust Privacy Settings"];
         }
     }
-    
+
     [self.attributionSheet showFromRect:self.attributionButton.frame inView:self animated:YES];
 }
 
@@ -1788,7 +1788,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
     {
         self.userTrackingMode = MGLUserTrackingModeFollow;
     }
-    
+
     [self _setDirection:direction animated:animated];
 }
 
@@ -1952,7 +1952,7 @@ mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coord
         options.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     _mbglMap->easeTo(options);
-    
+
     if (duration > 0)
     {
         __weak MGLMapView *weakSelf = self;

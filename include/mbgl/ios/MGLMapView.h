@@ -73,6 +73,8 @@ IB_DESIGNABLE
  *   The default value of this property is `YES`. */
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
+@property(nonatomic) BOOL shouldDecelerate;
+
 /** The compass image view shown in the upper-right when the map is rotated. */
 @property (nonatomic, readonly) UIImageView *compassView;
 
@@ -95,7 +97,7 @@ IB_DESIGNABLE
 
 /** The map coordinate at the center of the map view.
 *
-*   Changing the value in this property centers the map on the new coordinate without changing the current zoom level. 
+*   Changing the value in this property centers the map on the new coordinate without changing the current zoom level.
 *
 *   Changing the value of this property updates the map view immediately. If you want to animate the change, use the setCenterCoordinate:animated: method instead. */
 @property (nonatomic) CLLocationCoordinate2D centerCoordinate;
@@ -121,13 +123,13 @@ IB_DESIGNABLE
 *   Changing the zoom level scales the map without changing the current center coordinate. At zoom level 0, tiles cover the entire world map; at zoom level 1, tiles cover 1/4 of the world; at zoom level 2, tiles cover 1/16 of the world, and so on. */
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
-/** Changes the center coordinate and zoom level of the map and optionally animates the change. 
+/** Changes the center coordinate and zoom level of the map and optionally animates the change.
 *   @param centerCoordinate The new center coordinate for the map.
 *   @param zoomLevel The new zoom level for the map.
 *   @param animated Specify `YES` if you want the map view to animate scrolling and zooming to the new location or `NO` if you want the map to display the new location immediately. */
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
-/** Changes the center coordinate, zoom level, and direction of the map and optionally animates the change. 
+/** Changes the center coordinate, zoom level, and direction of the map and optionally animates the change.
 *   @param centerCoordinate The new center coordinate for the map.
 *   @param zoomLevel The new zoom level for the map.
 *   @param direction The new direction for the map, measured in degrees relative to true north.
@@ -135,7 +137,7 @@ IB_DESIGNABLE
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated;
 
 /** The coordinate bounds visible in the receiver’s viewport.
-*   
+*
 *   Changing the value of this property updates the receiver immediately. If you want to animate the change, call `setVisibleCoordinateBounds:animated:` instead. */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
@@ -164,14 +166,14 @@ IB_DESIGNABLE
 *   @param animated `YES` if you want the map region change to be animated, or `NO` if you want the map to display the new region immediately without animations. */
 - (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
 
-/** The heading of the map (measured in degrees) relative to true north. 
+/** The heading of the map (measured in degrees) relative to true north.
 *
 *   The value `0` means that the top edge of the map view corresponds to true north. The value `90` means the top of the map is pointing due east. The value `180` means the top of the map points due south, and so on. */
 @property (nonatomic) CLLocationDirection direction;
 
 /** Changes the heading of the map and optionally animates the changes.
 *   @param direction The heading of the map (measured in degrees) relative to true north.
-*   @param animated Specify `YES` if you want the map view to animate the change to the new heading or `NO` if you want the map to display the new heading immediately. 
+*   @param animated Specify `YES` if you want the map view to animate the change to the new heading or `NO` if you want the map to display the new heading immediately.
 *
 *   Changing the heading rotates the map without changing the current center coordinate or zoom level. */
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated;
@@ -246,7 +248,7 @@ IB_DESIGNABLE
     @param styleClass The style class to activate. */
 - (void)addStyleClass:(NSString *)styleClass;
 
-/** Deactivates the style class with the given identifier. 
+/** Deactivates the style class with the given identifier.
     @param styleClass The style class to deactivate. */
 - (void)removeStyleClass:(NSString *)styleClass;
 
@@ -372,7 +374,7 @@ IB_DESIGNABLE
 
 /** @name Debugging */
 
-/** A Boolean value that determines whether map debugging information is shown. 
+/** A Boolean value that determines whether map debugging information is shown.
 *
 *   The default value of this property is `NO`. */
 @property (nonatomic, getter=isDebugActive) BOOL debugActive;
