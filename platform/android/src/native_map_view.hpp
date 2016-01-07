@@ -53,6 +53,9 @@ public:
     void resizeView(int width, int height);
     void resizeFramebuffer(int width, int height);
 
+    void setInsets(EdgeInsets insets);
+    EdgeInsets getInsets();
+
 private:
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
 

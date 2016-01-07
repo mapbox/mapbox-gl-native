@@ -98,8 +98,13 @@ void Transform::easeTo(const CameraOptions& options) {
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
-    xn += (easeOptions.center && !state.isGestureInProgress()) ? (state.insets.left - state.insets.right) / 2 : 0;
-    yn += (easeOptions.center && !state.isGestureInProgress()) ? (state.insets.top - state.insets.bottom) / 2 : 0;
+    bool useInsets = !state.isGestureInProgress();
+    if (useInsets) {
+        double insetX = (state.insets.left - state.insets.right) / 2;
+        double insetY = (state.insets.top - state.insets.bottom) / 2;
+        xn = xn + std::cos(angle) * insetX + std::sin( angle) * insetY;
+        yn = yn + std::cos(angle) * insetY + std::sin(-angle) * insetX;
+    }
 
     easeOptions.center.reset();
     easeOptions.zoom.reset();

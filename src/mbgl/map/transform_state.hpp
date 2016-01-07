@@ -120,7 +120,8 @@ private:
 
     // map position
     double x = 0, y = 0;
-    EdgeInsets insets = {0,0,0,0};    double angle = 0;
+    EdgeInsets insets = {0,0,0,0};
+    double angle = 0;
     double scale = 1;
     double altitude = 1.5;
     double pitch = 0.0;
