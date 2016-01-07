@@ -1,3 +1,7 @@
+# 2.2.1
+
+- Fixes a bug which clipped labels at tile boundaries [#2829](https://github.com/mapbox/mapbox-gl-native/pull/2829)
+
 # 2.2.0
 
 - Adds support for GeoJSON sources [#2161](https://github.com/mapbox/mapbox-gl-native/pull/2161)
