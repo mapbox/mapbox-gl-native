@@ -5,15 +5,16 @@
 
 namespace mbgl {
 
-class FileCache;
-
 class DefaultFileSource : public FileSource {
 public:
-    DefaultFileSource(FileCache*, const std::string& root = "");
+    DefaultFileSource(const std::string& cachePath = ":memory:", const std::string& root = "");
     ~DefaultFileSource() override;
 
     void setAccessToken(const std::string&);
     std::string getAccessToken() const;
+
+    void setMaximumCacheSize(uint64_t size);
+    void setMaximumCacheEntrySize(uint64_t size);
 
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 

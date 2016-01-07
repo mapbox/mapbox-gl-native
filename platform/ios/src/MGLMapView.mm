@@ -16,7 +16,6 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/darwin/reachability.h>
-#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/geo.hpp>
@@ -154,7 +153,6 @@ public:
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
-    std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
     
     BOOL _opaque;
@@ -281,8 +279,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         NSString *libraryDirectory = [paths objectAtIndex:0];
         fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
     }
-    _mbglFileCache = mbgl::SharedSQLiteCache::get([fileCachePath UTF8String]);
-    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache.get());
+    _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String]);
 
     // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);

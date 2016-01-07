@@ -5,7 +5,6 @@
 #include <mbgl/platform/default/settings_json.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 
 #include <signal.h>
 #include <getopt.h>
@@ -106,11 +105,9 @@ int main(int argc, char *argv[]) {
 
     view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
-    mbgl::SQLiteCache cache("/tmp/mbgl-cache.db");
-    cache.setMaximumCacheEntrySize(1 * 1024 * 1024); // 1 MB
-    cache.setMaximumCacheSize(50 * 1024 * 1024); // 50 MB
-
-    mbgl::DefaultFileSource fileSource(&cache);
+    mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db");
+    fileSource.setMaximumCacheEntrySize(1 * 1024 * 1024); // 1 MB
+    fileSource.setMaximumCacheSize(50 * 1024 * 1024); // 50 MB
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");

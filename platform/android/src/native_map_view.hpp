@@ -4,7 +4,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
 #include <string>
@@ -91,7 +90,6 @@ private:
     JNIEnv *renderEnv = nullptr;
 
     // Ensure these are initialised last
-    std::shared_ptr<mbgl::SQLiteCache> fileCache;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
     std::unique_ptr<mbgl::Map> map;
 };

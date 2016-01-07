@@ -6,7 +6,6 @@
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -65,8 +64,7 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache(cache_file);
-    DefaultFileSource fileSource(&cache);
+    DefaultFileSource fileSource(cache_file);
 
     // Try to load the token from the environment.
     if (!token.size()) {

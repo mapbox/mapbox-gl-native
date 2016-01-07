@@ -75,8 +75,7 @@ NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int a
         return;
     }
 
-    fileCache = mbgl::SharedSQLiteCache::get(mbgl::android::cachePath + "/mbgl-cache.db");
-    fileSource = std::make_unique<mbgl::DefaultFileSource>(fileCache.get());
+    fileSource = std::make_unique<mbgl::DefaultFileSource>(mbgl::android::cachePath + "/mbgl-cache.db");
     map = std::make_unique<mbgl::Map>(*this, *fileSource, MapMode::Continuous);
 
     float zoomFactor   = map->getMaxZoom() - map->getMinZoom() + 1;
@@ -103,7 +102,6 @@ NativeMapView::~NativeMapView() {
 
     map.reset();
     fileSource.reset();
-    fileCache.reset();
 
     jint ret;
     JNIEnv *env = nullptr;

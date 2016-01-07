@@ -22,7 +22,6 @@
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
-#import <mbgl/storage/sqlite_cache.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/math.hpp>
 #import <mbgl/util/std.hpp>
@@ -152,7 +151,6 @@ public:
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
     MGLMapViewImpl *_mbglView;
-    std::shared_ptr<mbgl::SQLiteCache> _mbglFileCache;
     mbgl::DefaultFileSource *_mbglFileSource;
     
     NSPanGestureRecognizer *_panGestureRecognizer;
@@ -248,8 +246,7 @@ public:
                                                    error:nil];
     NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     NSString *cachePath = cacheURL ? cacheURL.path : @"";
-    _mbglFileCache = mbgl::SharedSQLiteCache::get(cachePath.UTF8String);
-    _mbglFileSource = new mbgl::DefaultFileSource(_mbglFileCache.get());
+    _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String);
     
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
     
