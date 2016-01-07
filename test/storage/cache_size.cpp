@@ -6,11 +6,10 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/time.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <memory>
 #include <random>
-
-#include <unistd.h>
 
 bool tileIsCached(mbgl::SQLiteCache* cache, unsigned id) {
     using namespace mbgl;
@@ -184,7 +183,16 @@ TEST_F(Storage, CacheSizePruneLeastAccessed) {
             // entry, that should update the
             // `accessed` time, so it won't get
             // pruned when we need more space.
-            sleep(1);
+            bool done = false;
+
+            util::Timer timer;
+            timer.start(std::chrono::milliseconds(1300),
+                        Duration::zero(),
+                        [&done] { done = true; });
+
+            while (!done) {
+                loop.runOnce();
+            }
 
             EXPECT_TRUE(tileIsCached(&cache, 7));
 
