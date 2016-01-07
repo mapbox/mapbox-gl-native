@@ -1,8 +1,10 @@
 package com.mapbox.mapboxsdk.views;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -20,6 +22,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -367,18 +370,24 @@ final class UserLocationView extends View implements LocationListener {
      * @param enableGps true if GPS is to be enabled, false if GPS is to be disabled
      */
     private void toggleGps(boolean enableGps) {
-
-        LocationServices locationServices = LocationServices.getLocationServices(getContext());
+        final Context context = getContext();
+        LocationServices locationServices = LocationServices.getLocationServices(context);
 
         if (enableGps) {
-            // Set an initial location if one available
-            Location lastLocation = locationServices.getLastLocation();
-            if (lastLocation != null) {
-                setLocation(lastLocation);
-            }
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Location lastLocation = locationServices.getLastLocation();
+                if (lastLocation != null) {
+                    setLocation(lastLocation);
+                }
 
-            // Register for Location Updates
-            locationServices.addLocationListener(this);
+                // Register for Location Updates
+                locationServices.addLocationListener(this);
+            }
+            else {
+                setEnabled(false); // disable the gps if the permission are not granted anymore
+                return;
+            }
         } else {
             // Disable location and user dot
             setLocation(null);
