@@ -15,7 +15,7 @@ public:
                              float horizontalAlign, float verticalAlign, float justify,
                              float spacing, const vec2<float> &translate) const;
     void lineWrap(Shaping &shaping, float lineHeight, float maxWidth, float horizontalAlign,
-                  float verticalAlign, float justify) const;
+                  float verticalAlign, float justify, const vec2<float> &translate) const;
 
 private:
     std::map<uint32_t, std::string> bitmaps;

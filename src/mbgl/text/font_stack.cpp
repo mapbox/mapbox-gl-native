@@ -27,8 +27,8 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
 
-    float x = ::round(translate.x * 24); // one em
-    const float y = ::round(translate.y * 24) + yOffset; // one em
+    float x = 0;
+    const float y = yOffset;
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
@@ -42,16 +42,16 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
     if (shaping.positionedGlyphs.empty())
         return shaping;
 
-    lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify);
+    lineWrap(shaping, lineHeight, maxWidth, horizontalAlign, verticalAlign, justify, translate);
 
     return shaping;
 }
 
 void align(Shaping &shaping, const float justify, const float horizontalAlign,
            const float verticalAlign, const uint32_t maxLineLength, const float lineHeight,
-           const uint32_t line) {
-    const float shiftX = (justify - horizontalAlign) * maxLineLength;
-    const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight;
+           const uint32_t line, const vec2<float> &translate) {
+    const float shiftX = (justify - horizontalAlign) * maxLineLength + ::round(translate.x * 24/* one em */);
+    const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight + ::round(translate.y * 24/* one em */);
 
     for (auto& glyph : shaping.positionedGlyphs) {
         glyph.x += shiftX;
@@ -75,7 +75,7 @@ void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<
 
 void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
                          const float horizontalAlign, const float verticalAlign,
-                         const float justify) const {
+                         const float justify, const vec2<float> &translate) const {
     uint32_t lastSafeBreak = 0;
 
     uint32_t lengthBeforeCurrentLine = 0;
@@ -146,7 +146,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     const uint32_t height = (line + 1) * lineHeight;
 
     justifyLine(positionedGlyphs, metrics, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
-    align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line);
+    align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line, translate);
 
     // Calculate the bounding box
     shaping.top += -verticalAlign * height;
