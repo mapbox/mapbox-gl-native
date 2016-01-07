@@ -11,6 +11,7 @@ namespace mbgl {
 
 class TransformState;
 class SourceInfo;
+class LatLngBounds;
 
 int32_t coveringZoomLevel(double zoom,
                           SourceType type,
@@ -18,6 +19,11 @@ int32_t coveringZoomLevel(double zoom,
 
 std::forward_list<TileID> tileCover(const TransformState&,
                                     SourceType,
+                                    uint16_t tileSize,
+                                    const SourceInfo&);
+
+std::forward_list<TileID> tileCover(const LatLngBounds&,
+                                    uint8_t zoom,
                                     uint16_t tileSize,
                                     const SourceInfo&);
 
