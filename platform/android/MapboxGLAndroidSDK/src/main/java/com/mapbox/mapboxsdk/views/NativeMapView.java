@@ -468,6 +468,8 @@ final class NativeMapView {
         nativeRemoveCustomLayer(mNativeMapViewPtr, id);
     }
 
+    public void setInsets(double top, double left, double bottom, double right) {nativeSetInsets(mNativeMapViewPtr, top, left, bottom, right);}
+
     //
     // Callbacks
     //
@@ -658,4 +660,6 @@ final class NativeMapView {
     private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
 
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
+
+    private native void nativeSetInsets(long nativeMapViewPtr, double top, double left, double bottom, double right);
 }

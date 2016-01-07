@@ -1544,6 +1544,14 @@ void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
     nativeMapView->getMap().easeTo(options);
 }
 
+void JNICALL nativeSetInsets(JNIEnv *env, jobject obj,long nativeMapViewPtr, double top, double left, double bottom, double right) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetInsets");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::EdgeInsets insets = {top, left, bottom, right};
+    nativeMapView->setInsets(insets);
+}
+
 void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeFlyTo");
     assert(nativeMapViewPtr != 0);
@@ -2130,6 +2138,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeAddCustomLayer)},
         {"nativeRemoveCustomLayer", "(JLjava/lang/String;)V",
          reinterpret_cast<void *>(&nativeRemoveCustomLayer)},
+        {"nativeSetInsets", "(JDDDD)V",
+         reinterpret_cast<void *>(&nativeSetInsets)}
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {

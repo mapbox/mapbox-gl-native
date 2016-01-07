@@ -57,6 +57,7 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -64,7 +65,6 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -1366,6 +1366,10 @@ public final class MapView extends FrameLayout {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         mNativeMapView.setZoom(zoomLevel, duration);
+    }
+
+    public void setMapPadding(int left, int top, int right, int bottom) {
+        mNativeMapView.setInsets(top / mScreenDensity, left / mScreenDensity, bottom / mScreenDensity, right / mScreenDensity);
     }
 
     /**

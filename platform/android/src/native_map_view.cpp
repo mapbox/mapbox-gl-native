@@ -751,5 +751,12 @@ void NativeMapView::resizeFramebuffer(int w, int h) {
     map->update(mbgl::Update::Repaint);
 }
 
+void NativeMapView::setInsets(EdgeInsets insets) {
+    map->setInsets(insets);
+}
+
+EdgeInsets NativeMapView::getInsets() {
+    return map->getInsets();
+}
 }
 }
