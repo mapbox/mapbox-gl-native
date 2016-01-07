@@ -33,12 +33,16 @@ VectorTileData::VectorTileData(const TileID& id_,
                                                         Seconds expires_) {
         if (err) {
             error = err;
-            state = State::obsolete;
             callback();
             return;
         }
 
+        // Reset the error if we didn't receive one for this request. This is to prevent old error
+        // messages from being displayed again, e.g. after a connection trouble cleared up.
+        error = nullptr;
+
         if (!tile) {
+            // This is a 404 response. We're treating these as empty tiles.
             state = State::parsed;
             buckets.clear();
             callback();

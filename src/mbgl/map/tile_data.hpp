@@ -88,6 +88,10 @@ public:
         return state;
     }
 
+    bool hasError() const {
+        return error.operator bool();
+    }
+
     std::exception_ptr getError() const {
         return error;
     }
