@@ -340,6 +340,8 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     [self addGestureRecognizer:_twoFingerDrag];
     _pitchEnabled = YES;
 
+    _decelerationEnabled = YES;
+
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
         _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
@@ -858,7 +860,7 @@ std::chrono::steady_clock::duration durationInSeconds(float duration)
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
-        if (!self.shouldDecelerate || sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        if (!self.isDecelerationEanbled || sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
         {
             // Not enough velocity to overcome friction
             velocity = CGPointZero;

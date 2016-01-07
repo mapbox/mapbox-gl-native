@@ -73,7 +73,7 @@ IB_DESIGNABLE
  *   The default value of this property is `YES`. */
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
-@property(nonatomic) BOOL shouldDecelerate;
+@property(nonatomic, getter=isDecelerationEanbled) BOOL decelerationEnabled;
 
 /** The compass image view shown in the upper-right when the map is rotated. */
 @property (nonatomic, readonly) UIImageView *compassView;
