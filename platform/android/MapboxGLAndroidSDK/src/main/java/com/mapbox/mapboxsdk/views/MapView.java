@@ -875,7 +875,12 @@ public final class MapView extends FrameLayout {
                     , typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP));
 
             // User location
-            setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
+            try {
+                setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
+            }catch (SecurityException ignore){
+                // User did not accept location permissions
+            }
+
         } finally {
             typedArray.recycle();
         }
@@ -918,7 +923,13 @@ public final class MapView extends FrameLayout {
             }
             mNativeMapView.setDefaultTransitionDuration(
                     savedInstanceState.getLong(STATE_DEFAULT_TRANSITION_DURATION));
-            setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
+
+            // User location
+            try {
+                setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
+            }catch (SecurityException ignore){
+                // User did not accept location permissions
+            }
 
             // Compass
             setCompassEnabled(savedInstanceState.getBoolean(STATE_COMPASS_ENABLED));
@@ -2929,14 +2940,20 @@ public final class MapView extends FrameLayout {
 
         // Must always return true otherwise all events are ignored
         @Override
-        public boolean onDown(MotionEvent e) {
+        public boolean onDown(MotionEvent event) {
             // Show the zoom controls
             if (mZoomControlsEnabled && mZoomEnabled) {
                 mZoomButtonsController.setVisible(true);
             }
 
-            setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-            setMyBearingTrackingMode(MyBearingTracking.NONE);
+            // Disable tracking mode if a gesture occurs
+            try {
+                setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                setMyBearingTrackingMode(MyBearingTracking.NONE);
+            }catch(SecurityException ignore){
+                // User did not accept location permissions
+            }
+
             return true;
         }
 
