@@ -255,8 +255,8 @@ std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> StyleParser::parseGeoJSON(const JS
 std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {
     auto info = std::make_unique<SourceInfo>();
     parseTileJSONMember(value, info->tiles, "tiles");
-    parseTileJSONMember(value, info->min_zoom, "minzoom");
-    parseTileJSONMember(value, info->max_zoom, "maxzoom");
+    parseTileJSONMember(value, info->minZoom, "minzoom");
+    parseTileJSONMember(value, info->maxZoom, "maxzoom");
     parseTileJSONMember(value, info->attribution, "attribution");
     parseTileJSONMember(value, info->center, "center");
     parseTileJSONMember(value, info->bounds, "bounds");

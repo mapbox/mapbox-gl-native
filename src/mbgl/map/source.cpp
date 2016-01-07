@@ -169,7 +169,7 @@ void Source::load() {
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info->max_zoom), tile.id.z));
+        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info->maxZoom), tile.id.z));
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
@@ -325,8 +325,8 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
         type == SourceType::Vector ||
         type == SourceType::Annotations;
 
-    if (z < info->min_zoom) return {{}};
-    if (z > info->max_zoom) z = info->max_zoom;
+    if (z < info->minZoom) return {{}};
+    if (z > info->maxZoom) z = info->maxZoom;
 
     // Map four viewport corners to pixel coordinates
     box points = state.cornersToBox(z);
@@ -355,7 +355,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
     bool complete = true;
     int32_t z = tileID.z;
-    auto ids = tileID.children(info->max_zoom);
+    auto ids = tileID.children(info->maxZoom);
     for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
@@ -383,7 +383,7 @@ bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, s
  */
 void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = tileID.z - 1; z >= minCoveringZoom; --z) {
-        const TileID parent_id = tileID.parent(z, info->max_zoom);
+        const TileID parent_id = tileID.parent(z, info->maxZoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);
@@ -405,8 +405,8 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     std::forward_list<TileID> required = coveringTiles(parameters.transformState);
 
     // Determine the overzooming/underzooming amounts.
-    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info->min_zoom, info->max_zoom);
-    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->min_zoom, info->max_zoom);
+    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info->minZoom, info->maxZoom);
+    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->minZoom, info->maxZoom);
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
