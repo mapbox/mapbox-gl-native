@@ -81,6 +81,10 @@ app.get('/revalidate-etag', function(req, res) {
     revalidateEtagCounter++;
 });
 
+app.get('/not-found', function(req, res) {
+    res.status(404).send('Not Found!');
+});
+
 app.get('/permanent-error', function(req, res) {
     res.status(500).send('Server Error!');
 });
