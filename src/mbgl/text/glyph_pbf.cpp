@@ -75,15 +75,9 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     });
 
     auto requestCallback = [this, store, fontStack, glyphRange](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        req = nullptr;
-
         if (res.error) {
             observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else {
+        } else if (data != res.data || (*data != *res.data)) {
             data = res.data;
             parse(store, fontStack, glyphRange);
         }

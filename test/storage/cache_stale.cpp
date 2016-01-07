@@ -15,8 +15,13 @@ using namespace std::literals::string_literals;
 
 namespace {
 
-void checkRendering(Map& map, const char *name, std::chrono::milliseconds timeout) {
-    test::checkImage("test/fixtures/stale/"s + name, test::render(map, timeout), 0.001, 0.1);
+void checkRendering(Map& map,
+                    const char* name,
+                    std::chrono::milliseconds timeout,
+                    double imageThreshold = 0.001,
+                    double pixelThreshold = 0.1) {
+    test::checkImage("test/fixtures/stale/"s + name, test::render(map, timeout), imageThreshold,
+                     pixelThreshold);
 }
 
 Response expiredItem(const std::string& path) {
@@ -99,4 +104,28 @@ TEST_F(Storage, CacheStaleStyleAndSprite) {
     map.setStyleURL(styleResource.url);
 
     checkRendering(map, "stale_style_and_sprite", 1000ms);
+}
+
+TEST_F(Storage, CacheStaleStyleAndGlyphs) {
+    HeadlessView view(display, 1);
+
+    auto cache = SQLiteCache::getShared(":memory:");
+
+    // Rig the cache with an expired stylesheet.
+    const std::string stylePath = "stale/style_and_glyphs.json";
+    const Resource styleResource{ Resource::Kind::Style, prefix + "/" + stylePath };
+    cache->put(styleResource, expiredItem(stylePath));
+
+    // Rig the cache with an expired glyph PBF.
+    const std::string glyphPath = "stale/glyph.pbf";
+    const Resource glyphResource{ Resource::Kind::Glyphs, prefix + "/stale/Open%20Sans%20Regular%2c%20Arial%20Unicode%20MS%20Regular/0-255.pbf" };
+    cache->put(glyphResource, expiredItem(glyphPath));
+
+    DefaultFileSource fileSource(":memory:", ".");
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleURL(styleResource.url);
+
+    // TODO: this shouldn't take > 1 second
+    checkRendering(map, "stale_style_and_glyphs", 2000ms, 0.0015);
 }
