@@ -26,20 +26,22 @@ void RasterTileData::request(const std::string& url,
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, [url, callback, this](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        req = nullptr;
-
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound) {
+                // This is a 404 response. We're treating these as empty tiles.
+                workRequest.reset();
                 state = State::parsed;
+                bucket.reset();
             } else {
+                // This is a different error, e.g. a connection or server error.
                 error = std::make_exception_ptr(std::runtime_error(res.error->message));
-                state = State::obsolete;
             }
             callback();
+            return;
+        }
+
+        if (res.notModified) {
+            // We got the same data again. Abort early.
             return;
         }
 
@@ -51,6 +53,7 @@ void RasterTileData::request(const std::string& url,
         modified = res.modified;
         expires = res.expires;
 
+        workRequest.reset();
         workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
             workRequest.reset();
             if (state != State::loaded) {
@@ -63,6 +66,7 @@ void RasterTileData::request(const std::string& url,
             } else {
                 error = result.get<std::exception_ptr>();
                 state = State::obsolete;
+                bucket.reset();
             }
 
             callback();
