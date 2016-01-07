@@ -72,3 +72,31 @@ TEST_F(Storage, CacheStaleStyleAndTileJSON) {
 
     checkRendering(map, "stale_style_and_tilejson", 1000ms);
 }
+
+TEST_F(Storage, CacheStaleStyleAndSprite) {
+    HeadlessView view(display, 1);
+
+    auto cache = SQLiteCache::getShared(":memory:");
+
+    // Rig the cache with an expired stylesheet.
+    const std::string stylePath = "stale/style_and_sprite.json";
+    const Resource styleResource{ Resource::Kind::Style, prefix + "/" + stylePath };
+    cache->put(styleResource, expiredItem(stylePath));
+
+    // Rig the cache with an expired sprite JSON.
+    const std::string spritejsonPath = "stale/sprite.json";
+    const Resource spritejsonResource{ Resource::Kind::SpriteJSON, prefix + "/" + spritejsonPath };
+    cache->put(spritejsonResource, expiredItem(spritejsonPath));
+
+    // Rig the cache with an expired sprite JSON.
+    const std::string spriteimagePath = "stale/sprite.png";
+    const Resource spriteimageResource{ Resource::Kind::SpriteImage, prefix + "/" + spriteimagePath };
+    cache->put(spriteimageResource, expiredItem(spriteimagePath));
+
+    DefaultFileSource fileSource(":memory:", ".");
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleURL(styleResource.url);
+
+    checkRendering(map, "stale_style_and_sprite", 1000ms);
+}
