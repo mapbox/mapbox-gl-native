@@ -19,7 +19,13 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
         ratio: options.pixelRatio,
         request: function(req, callback) {
             request(req.url, {encoding: null}, function (err, response, body) {
-                callback(err, {data: body});
+                if (err) {
+                    callback(err);
+                } else if (response.statusCode != 200) {
+                    callback(response.statusMessage);
+                } else {
+                    callback(null, {data: body});
+                }
             });
         }
     });
