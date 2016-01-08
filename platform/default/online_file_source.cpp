@@ -62,8 +62,10 @@ public:
     void removeObserver(FileRequest*);
     bool hasObservers() const;
 
-    // Updates/gets the response of this request object.
+    // Set the response of this request object and notify all observers.
     void setResponse(const std::shared_ptr<const Response>&);
+
+    // Get the response of this request object.
     const std::shared_ptr<const Response>& getResponse() const;
 
     // Returns the seconds we have to wait until we need to redo this request. A value of 0
@@ -74,10 +76,6 @@ public:
     // Checks the currently stored response and replaces it with an idential one, except with the
     // stale flag set, if the response is expired.
     void checkResponseFreshness();
-
-    // Notifies all observers.
-    void notify();
-
 
 private:
     // Stores a set of all observing Request objects.
@@ -258,9 +256,6 @@ void OnlineFileSource::Impl::startCacheRequest(OnlineFileRequestImpl& request) {
                 startRealRequest(request);
             }
 
-            // Notify in all cases; requestors can decide whether they want to use stale responses.
-            request.notify();
-
             reschedule(request);
         });
 }
@@ -290,7 +285,6 @@ void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
         }
 
         request.setResponse(response);
-        request.notify();
         reschedule(request);
     };
 
@@ -364,14 +358,6 @@ bool OnlineFileRequestImpl::hasObservers() const {
     return !observers.empty();
 }
 
-void OnlineFileRequestImpl::notify() {
-    if (response) {
-        for (auto& req : observers) {
-            req.second(*response);
-        }
-    }
-}
-
 void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& response_) {
     response = response_;
 
@@ -380,6 +366,11 @@ void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& r
     } else {
         // Reset the number of subsequent failed requests after we got a successful one.
         failedRequests = 0;
+    }
+
+    // Notify in all cases; requestors can decide whether they want to use stale responses.
+    for (auto& req : observers) {
+        req.second(*response);
     }
 }
 
