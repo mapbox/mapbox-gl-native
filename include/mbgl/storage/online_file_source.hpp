@@ -22,6 +22,8 @@ public:
 
 private:
     friend class OnlineFileRequest;
+    friend class OnlineFileRequestImpl;
+
     void cancel(const Resource&, FileRequest*);
 
     class Impl;
