@@ -49,7 +49,6 @@ TEST_F(Storage, CacheRevalidateSame) {
             EXPECT_EQ(nullptr, res2.error);
             EXPECT_EQ(false, res2.stale);
             ASSERT_TRUE(res2.data.get());
-            EXPECT_EQ(res.data, res2.data);
             EXPECT_EQ("Response", *res2.data);
             // We use this to indicate that a 304 reply came back.
             EXPECT_LT(Seconds::zero(), res2.expires);
@@ -111,7 +110,6 @@ TEST_F(Storage, CacheRevalidateModified) {
             EXPECT_EQ(false, res2.stale);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ("Response", *res2.data);
-            EXPECT_EQ(res.data, res2.data);
             // We use this to indicate that a 304 reply came back.
             EXPECT_LT(Seconds::zero(), res2.expires);
             EXPECT_EQ(1420070400, res2.modified.count());

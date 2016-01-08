@@ -76,7 +76,6 @@
         'storage/asset_file_source.cpp',
         'storage/headers.cpp',
         'storage/http_cancel.cpp',
-        'storage/http_coalescing.cpp',
         'storage/http_error.cpp',
         'storage/http_header_parsing.cpp',
         'storage/http_issue_1369.cpp',

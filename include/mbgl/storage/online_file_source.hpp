@@ -24,7 +24,7 @@ private:
     friend class OnlineFileRequest;
     friend class OnlineFileRequestImpl;
 
-    void cancel(const Resource&, FileRequest*);
+    void cancel(FileRequest*);
 
     class Impl;
     const std::unique_ptr<util::Thread<Impl>> thread;

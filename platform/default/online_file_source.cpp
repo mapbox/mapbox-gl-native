@@ -24,19 +24,15 @@ class RequestBase;
 
 class OnlineFileRequest : public FileRequest {
 public:
-    OnlineFileRequest(const Resource& resource_,
-                       OnlineFileSource& fileSource_)
-        : resource(resource_),
-          fileSource(fileSource_) {
+    OnlineFileRequest(OnlineFileSource& fileSource_)
+        : fileSource(fileSource_) {
     }
 
     ~OnlineFileRequest() {
-        fileSource.cancel(resource, this);
+        fileSource.cancel(this);
     }
 
-    Resource resource;
     OnlineFileSource& fileSource;
-
     std::unique_ptr<WorkRequest> workRequest;
 };
 
@@ -44,13 +40,8 @@ class OnlineFileRequestImpl : public util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
 
-    OnlineFileRequestImpl(const Resource&);
+    OnlineFileRequestImpl(const Resource&, Callback, OnlineFileSource::Impl&);
     ~OnlineFileRequestImpl();
-
-    // Observer accessors.
-    void addObserver(FileRequest*, Callback, OnlineFileSource::Impl&);
-    void removeObserver(FileRequest*);
-    bool hasObservers() const;
 
     void networkIsReachableAgain(OnlineFileSource::Impl&);
 
@@ -62,13 +53,10 @@ private:
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
     util::Timer realRequestTimer;
+    Callback callback;
 
-    // Stores a set of all observing Request objects.
-    std::unordered_map<FileRequest*, Callback> observers;
-
-    // The current response data. We're storing it because we can satisfy requests for the same
-    // resource directly by returning this response object. We also need it to create conditional
-    // HTTP requests, and to check whether new responses we got changed any data.
+    // The current response data. Used to create conditional HTTP requests, and to check whether
+    // new responses we got changed any data.
     std::shared_ptr<const Response> response;
 
     // Counts the number of subsequent failed requests. We're using this value for exponential
@@ -86,12 +74,12 @@ public:
     void networkIsReachableAgain();
 
     void add(Resource, FileRequest*, Callback);
-    void cancel(Resource, FileRequest*);
+    void cancel(FileRequest*);
 
 private:
     friend OnlineFileRequestImpl;
 
-    std::unordered_map<Resource, std::unique_ptr<OnlineFileRequestImpl>, Resource::Hash> pending;
+    std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> pending;
     FileCache* const cache;
     const std::unique_ptr<HTTPContextBase> httpContext;
     util::AsyncTask reachability;
@@ -135,13 +123,13 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
     }
 
     Resource res { resource.kind, url };
-    auto req = std::make_unique<OnlineFileRequest>(res, *this);
+    auto req = std::make_unique<OnlineFileRequest>(*this);
     req->workRequest = thread->invokeWithCallback(&Impl::add, callback, res, req.get());
     return std::move(req);
 }
 
-void OnlineFileSource::cancel(const Resource& res, FileRequest* req) {
-    thread->invoke(&Impl::cancel, res, req);
+void OnlineFileSource::cancel(FileRequest* req) {
+    thread->invoke(&Impl::cancel, req);
 }
 
 // ----- Impl -----
@@ -167,34 +155,23 @@ void OnlineFileSource::Impl::networkIsReachableAgain() {
 }
 
 void OnlineFileSource::Impl::add(Resource resource, FileRequest* req, Callback callback) {
-    auto& request = *pending.emplace(resource,
-        std::make_unique<OnlineFileRequestImpl>(resource)).first->second;
-
-    // Add this request as an observer so that it'll get notified when something about this
-    // request changes.
-    request.addObserver(req, callback, *this);
+    pending[req] = std::make_unique<OnlineFileRequestImpl>(resource, callback, *this);
 }
 
-void OnlineFileSource::Impl::cancel(Resource resource, FileRequest* req) {
-    auto it = pending.find(resource);
-    if (it != pending.end()) {
-        // If the number of dependent requests of the OnlineFileRequest drops to zero,
-        // cancel the request and remove it from the pending list.
-        auto& request = *it->second;
-        request.removeObserver(req);
-        if (!request.hasObservers()) {
-            pending.erase(it);
-        }
-    } else {
-        // There is no request for this URL anymore. Likely, the request already completed
-        // before we got around to process the cancelation request.
-    }
+void OnlineFileSource::Impl::cancel(FileRequest* req) {
+    pending.erase(req);
 }
 
 // ----- OnlineFileRequest -----
 
-OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_)
-    : resource(resource_) {
+OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
+    : resource(resource_),
+      callback(callback_) {
+    if (impl.cache) {
+        scheduleCacheRequest(impl);
+    } else {
+        scheduleRealRequest(impl);
+    }
 }
 
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {
@@ -203,55 +180,6 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
         realRequest = nullptr;
     }
     // realRequestTimer and cacheRequest are automatically canceled upon destruction.
-}
-
-void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback, OnlineFileSource::Impl& impl) {
-    if (response) {
-        // We've at least obtained a cache value, potentially we also got a final response.
-        // Before returning the existing response, update the `stale` flag if necessary.
-        if (!response->stale && response->isExpired()) {
-            // Create a new Response object with `stale = true`, but the same data, and
-            // replace the current request object we have.
-            // We're not immediately swapping the member variable because it's declared as `const`, and
-            // we first have to update the `stale` flag.
-            auto staleResponse = std::make_shared<Response>(*response);
-            staleResponse->stale = true;
-            response = staleResponse;
-        }
-
-        callback(*response);
-
-        if (response->stale && !realRequest) {
-            // We've returned a stale response; now make sure the requester also gets a fresh
-            // response eventually. It's possible that there's already a request in progress.
-            // Note that this will also trigger updates to all other existing listeners.
-            // Since we already have data, we're going to verify
-            scheduleRealRequest(impl);
-        } else {
-            // The response is still fresh (or there's already a request for refreshing the resource
-            // in progress), so there's nothing we need to do.
-        }
-    } else if (!cacheRequest && !realRequest) {
-        // There is no request in progress, and we don't have a response yet. This means we'll have
-        // to start the request ourselves.
-        if (impl.cache) {
-            scheduleCacheRequest(impl);
-        } else {
-            scheduleRealRequest(impl);
-        }
-    } else {
-        // There is a request in progress. We just have to wait.
-    }
-
-    observers.emplace(req, callback);
-}
-
-void OnlineFileRequestImpl::removeObserver(FileRequest* req) {
-    observers.erase(req);
-}
-
-bool OnlineFileRequestImpl::hasObservers() const {
-    return !observers.empty();
 }
 
 void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
@@ -263,9 +191,7 @@ void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
         if (response_) {
             response_->stale = response_->isExpired();
             response = response_;
-            for (auto& req : observers) {
-                req.second(*response);
-            }
+            callback(*response);
         }
 
         scheduleRealRequest(impl);
@@ -341,10 +267,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 failedRequests = 0;
             }
 
-            for (auto& req : observers) {
-                req.second(*response);
-            }
-
+            callback(*response);
             scheduleRealRequest(impl);
         }, response);
     });
