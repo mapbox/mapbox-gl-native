@@ -70,11 +70,6 @@ private:
     // Set the response of this request object and notify all observers.
     void setResponse(const std::shared_ptr<const Response>&);
 
-    // Returns the seconds we have to wait until we need to redo this request. A value of 0
-    // means that we need to redo it immediately, and a negative value means that we're not setting
-    // a timeout at all.
-    Seconds getRetryTimeout() const;
-
     // Stores a set of all observing Request objects.
     std::unordered_map<FileRequest*, Callback> observers;
 
@@ -332,7 +327,39 @@ void OnlineFileRequestImpl::reschedule(OnlineFileSource::Impl& impl) {
         return;
     }
 
-    const Seconds timeout = getRetryTimeout();
+    // If we don't have a response, we should retry immediately.
+    // A value < 0 means that we should not retry.
+    Seconds timeout = response ? Seconds(-1) : Seconds::zero();
+
+    if (response && response->error) {
+        assert(failedRequests > 0);
+        switch (response->error->reason) {
+        case Response::Error::Reason::Server: {
+            // Retry immediately, unless we have a certain number of attempts already
+            const int graceRetries = 3;
+            if (failedRequests <= graceRetries) {
+                timeout = Seconds(1);
+            } else {
+                timeout = Seconds(1 << std::min(failedRequests - graceRetries, 31));
+            }
+        } break;
+        case Response::Error::Reason::Connection: {
+            // Exponential backoff
+            timeout = Seconds(1 << std::min(failedRequests - 1, 31));
+        } break;
+        default:
+            // Do not retry due to error.
+            break;
+        }
+    }
+
+    // Check to see if this response expires earlier than a potential error retry.
+    if (response && response->expires > Seconds::zero()) {
+        const Seconds secsToExpire = response->expires - toSeconds(SystemClock::now());
+        // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
+        // than the previous one.
+        timeout = timeout < Seconds::zero() ? secsToExpire: std::min(timeout, std::max(Seconds::zero(), secsToExpire));
+    }
 
     if (timeout >= Seconds::zero()) {
         realRequestTimer.start(timeout, Duration::zero(), [this, &impl] {
@@ -364,50 +391,6 @@ void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& r
     for (auto& req : observers) {
         req.second(*response);
     }
-}
-
-Seconds OnlineFileRequestImpl::getRetryTimeout() const {
-    Seconds timeout = Seconds::zero();
-
-    if (!response) {
-        // If we don't have a response, we should retry immediately.
-        return timeout;
-    }
-
-    // A value < 0 means that we should not retry.
-    timeout = Seconds(-1);
-
-    if (response->error) {
-        assert(failedRequests > 0);
-        switch (response->error->reason) {
-        case Response::Error::Reason::Server: {
-            // Retry immediately, unless we have a certain number of attempts already
-            const int graceRetries = 3;
-            if (failedRequests <= graceRetries) {
-                timeout = Seconds(1);
-            } else {
-                timeout = Seconds(1 << std::min(failedRequests - graceRetries, 31));
-            }
-        } break;
-        case Response::Error::Reason::Connection: {
-            // Exponential backoff
-            timeout = Seconds(1 << std::min(failedRequests - 1, 31));
-        } break;
-        default:
-            // Do not retry due to error.
-            break;
-        }
-    }
-
-    // Check to see if this response expires earlier than a potential error retry.
-    if (response->expires > Seconds::zero()) {
-        const Seconds secsToExpire = response->expires - toSeconds(SystemClock::now());
-        // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
-        // than the previous one.
-        timeout = timeout < Seconds::zero() ? secsToExpire: std::min(timeout, std::max(Seconds::zero(), secsToExpire));
-    }
-
-    return timeout;
 }
 
 } // namespace mbgl
