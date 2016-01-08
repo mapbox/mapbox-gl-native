@@ -50,7 +50,7 @@ public:
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
-    std::unique_ptr<util::Timer> timerRequest;
+    util::Timer realRequestTimer;
 
     inline OnlineFileRequestImpl(const Resource& resource_)
         : resource(resource_) {}
@@ -268,10 +268,8 @@ void OnlineFileSource::Impl::startCacheRequest(OnlineFileRequestImpl& request) {
 void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
     assert(!request.realRequest);
 
-    // Cancel the timer if we have one.
-    if (request.timerRequest) {
-        request.timerRequest->stop();
-    }
+    // Ensure the timer is stopped.
+    request.realRequestTimer.stop();
 
     auto callback = [this, &request](std::shared_ptr<const Response> response) {
         request.realRequest = nullptr;
@@ -332,11 +330,7 @@ void OnlineFileSource::Impl::reschedule(OnlineFileRequestImpl& request) {
     if (timeout == Seconds::zero()) {
         update(request);
     } else if (timeout > Seconds::zero()) {
-        if (!request.timerRequest) {
-            request.timerRequest = std::make_unique<util::Timer>();
-        }
-
-        request.timerRequest->start(timeout, Duration::zero(), [this, &request] {
+        request.realRequestTimer.start(timeout, Duration::zero(), [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
         });
@@ -350,7 +344,7 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
         realRequest->cancel();
         realRequest = nullptr;
     }
-    // timerRequest and cacheRequest are automatically canceld upon destruction.
+    // realRequestTimer and cacheRequest are automatically canceled upon destruction.
 }
 
 void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback) {
