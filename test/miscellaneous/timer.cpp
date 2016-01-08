@@ -177,3 +177,11 @@ TEST(Timer, StartOverrides) {
     EXPECT_GE(totalTime, expectedTotalTime * 0.8);
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
+
+TEST(Timer, CanStopNonStartedTimer) {
+    RunLoop loop;
+
+    Timer timer;
+    timer.unref();
+    timer.stop();
+}
