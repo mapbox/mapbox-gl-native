@@ -178,7 +178,7 @@ public final class MapView extends FrameLayout {
     /**
      * The currently supported maximum and minimum tilt values.
      *
-     * @see MapView#setTilt(double)
+     * @see MapView#setTilt(Double, Long)
      */
     private static final double MINIMUM_TILT = 0;
     private static final double MAXIMUM_TILT = 60;
@@ -3933,7 +3933,8 @@ public final class MapView extends FrameLayout {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        if(!isMyLocationEnabled()){
+        if(myLocationTrackingMode!=MyLocationTracking.TRACKING_NONE && !isMyLocationEnabled()){
+            //noinspection ResourceType
             setMyLocationEnabled(true);
         }
 
@@ -3989,7 +3990,8 @@ public final class MapView extends FrameLayout {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        if(!isMyLocationEnabled()){
+        if(myBearingTrackingMode!=MyBearingTracking.NONE && !isMyLocationEnabled()){
+            //noinspection ResourceType
             setMyLocationEnabled(true);
         }
 
