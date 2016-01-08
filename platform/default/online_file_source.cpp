@@ -47,26 +47,28 @@ class OnlineFileRequestImpl : public util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
 
+    OnlineFileRequestImpl(const Resource&);
+    ~OnlineFileRequestImpl();
+
+    // Observer accessors.
+    void addObserver(FileRequest*, Callback, OnlineFileSource::Impl&);
+    void removeObserver(FileRequest*);
+    bool hasObservers() const;
+
+    void networkIsReachableAgain(OnlineFileSource::Impl&);
+
+private:
+    void startCacheRequest(OnlineFileSource::Impl&);
+    void startRealRequest(OnlineFileSource::Impl&);
+    void reschedule(OnlineFileSource::Impl&);
+
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     RequestBase* realRequest = nullptr;
     util::Timer realRequestTimer;
 
-    inline OnlineFileRequestImpl(const Resource& resource_)
-        : resource(resource_) {}
-
-    ~OnlineFileRequestImpl();
-
-    // Observer accessors.
-    void addObserver(FileRequest*, Callback);
-    void removeObserver(FileRequest*);
-    bool hasObservers() const;
-
     // Set the response of this request object and notify all observers.
     void setResponse(const std::shared_ptr<const Response>&);
-
-    // Get the response of this request object.
-    const std::shared_ptr<const Response>& getResponse() const;
 
     // Returns the seconds we have to wait until we need to redo this request. A value of 0
     // means that we need to redo it immediately, and a negative value means that we're not setting
@@ -77,7 +79,6 @@ public:
     // stale flag set, if the response is expired.
     void checkResponseFreshness();
 
-private:
     // Stores a set of all observing Request objects.
     std::unordered_map<FileRequest*, Callback> observers;
 
@@ -104,9 +105,7 @@ public:
     void cancel(Resource, FileRequest*);
 
 private:
-    void startCacheRequest(OnlineFileRequestImpl&);
-    void startRealRequest(OnlineFileRequestImpl&);
-    void reschedule(OnlineFileRequestImpl&);
+    friend OnlineFileRequestImpl;
 
     std::unordered_map<Resource, std::unique_ptr<OnlineFileRequestImpl>, Resource::Hash> pending;
     FileCache* const cache;
@@ -184,13 +183,7 @@ OnlineFileSource::Impl::~Impl() {
 
 void OnlineFileSource::Impl::networkIsReachableAgain() {
     for (auto& req : pending) {
-        auto& request = *req.second;
-        auto& response = request.getResponse();
-        if (!request.realRequest && response && response->error && response->error->reason == Response::Error::Reason::Connection) {
-            // We need all requests to fail at least once before we are going to start retrying
-            // them, and we only immediately restart request that failed due to connection issues.
-            startRealRequest(request);
-        }
+        req.second->networkIsReachableAgain(*this);
     }
 }
 
@@ -198,95 +191,9 @@ void OnlineFileSource::Impl::add(Resource resource, FileRequest* req, Callback c
     auto& request = *pending.emplace(resource,
         std::make_unique<OnlineFileRequestImpl>(resource)).first->second;
 
-    if (request.getResponse()) {
-        // We've at least obtained a cache value, potentially we also got a final response.
-        // Before returning the existing response, make sure that it is still fresh, or update the
-        // `stale` flag.
-        request.checkResponseFreshness();
-        callback(*request.getResponse());
-
-        if (request.getResponse()->stale && !request.realRequest) {
-            // We've returned a stale response; now make sure the requester also gets a fresh
-            // response eventually. It's possible that there's already a request in progress.
-            // Note that this will also trigger updates to all other existing listeners.
-            // Since we already have data, we're going to verify
-            startRealRequest(request);
-        } else {
-            // The response is still fresh (or there's already a request for refreshing the resource
-            // in progress), so there's nothing we need to do.
-        }
-    } else if (!request.cacheRequest && !request.realRequest) {
-        // There is no request in progress, and we don't have a response yet. This means we'll have
-        // to start the request ourselves.
-        if (cache && !util::isAssetURL(request.resource.url)) {
-            startCacheRequest(request);
-        } else {
-            startRealRequest(request);
-        }
-    } else {
-        // There is a request in progress. We just have to wait.
-    }
-
     // Add this request as an observer so that it'll get notified when something about this
     // request changes.
-    request.addObserver(req, callback);
-}
-
-void OnlineFileSource::Impl::startCacheRequest(OnlineFileRequestImpl& request) {
-    // Check the cache for existing data so that we can potentially
-    // revalidate the information without having to redownload everything.
-    request.cacheRequest =
-        cache->get(request.resource, [this, &request](std::shared_ptr<Response> response) {
-            request.cacheRequest = nullptr;
-            if (response) {
-                response->stale = response->isExpired();
-                request.setResponse(response);
-            }
-
-            if (!response || response->stale) {
-                // No response or stale cache. Run the real request.
-                startRealRequest(request);
-            }
-
-            reschedule(request);
-        });
-}
-
-void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
-    assert(!request.realRequest);
-
-    // Ensure the timer is stopped.
-    request.realRequestTimer.stop();
-
-    auto callback = [this, &request](std::shared_ptr<const Response> response) {
-        request.realRequest = nullptr;
-
-        // Only update the cache for successful or 404 responses.
-        // In particular, we don't want to write a Canceled request, or one that failed due to
-        // connection errors to the cache. Server errors are hopefully also temporary, so we're not
-        // caching them either.
-        if (cache && !util::isAssetURL(request.resource.url) &&
-            (!response->error || (response->error->reason == Response::Error::Reason::NotFound))) {
-            // Store response in database. Make sure we only refresh the expires column if the data
-            // didn't change.
-            FileCache::Hint hint = FileCache::Hint::Full;
-            if (request.getResponse() && response->data == request.getResponse()->data) {
-                hint = FileCache::Hint::Refresh;
-            }
-            cache->put(request.resource, response, hint);
-        }
-
-        request.setResponse(response);
-        reschedule(request);
-    };
-
-    if (util::isAssetURL(request.resource.url)) {
-        request.realRequest =
-            assetContext->createRequest(request.resource.url, callback, assetRoot);
-    } else {
-        request.realRequest =
-            httpContext->createRequest(request.resource.url, callback, request.getResponse());
-    }
+    request.addObserver(req, callback, *this);
 }
 
 void OnlineFileSource::Impl::cancel(Resource resource, FileRequest* req) {
@@ -305,23 +212,11 @@ void OnlineFileSource::Impl::cancel(Resource resource, FileRequest* req) {
     }
 }
 
-void OnlineFileSource::Impl::reschedule(OnlineFileRequestImpl& request) {
-    if (request.realRequest) {
-        // There's already a request in progress; don't start another one.
-        return;
-    }
-
-    const Seconds timeout = request.getRetryTimeout();
-
-    if (timeout >= Seconds::zero()) {
-        request.realRequestTimer.start(timeout, Duration::zero(), [this, &request] {
-            assert(!request.realRequest);
-            startRealRequest(request);
-        });
-    }
-}
-
 // ----- OnlineFileRequest -----
+
+OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_)
+    : resource(resource_) {
+}
 
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {
     if (realRequest) {
@@ -331,7 +226,36 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
     // realRequestTimer and cacheRequest are automatically canceled upon destruction.
 }
 
-void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback) {
+void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback, OnlineFileSource::Impl& impl) {
+    if (response) {
+        // We've at least obtained a cache value, potentially we also got a final response.
+        // Before returning the existing response, make sure that it is still fresh, or update the
+        // `stale` flag.
+        checkResponseFreshness();
+        callback(*response);
+
+        if (response->stale && !realRequest) {
+            // We've returned a stale response; now make sure the requester also gets a fresh
+            // response eventually. It's possible that there's already a request in progress.
+            // Note that this will also trigger updates to all other existing listeners.
+            // Since we already have data, we're going to verify
+            startRealRequest(impl);
+        } else {
+            // The response is still fresh (or there's already a request for refreshing the resource
+            // in progress), so there's nothing we need to do.
+        }
+    } else if (!cacheRequest && !realRequest) {
+        // There is no request in progress, and we don't have a response yet. This means we'll have
+        // to start the request ourselves.
+        if (impl.cache && !util::isAssetURL(resource.url)) {
+            startCacheRequest(impl);
+        } else {
+            startRealRequest(impl);
+        }
+    } else {
+        // There is a request in progress. We just have to wait.
+    }
+
     observers.emplace(req, callback);
 }
 
@@ -341,6 +265,85 @@ void OnlineFileRequestImpl::removeObserver(FileRequest* req) {
 
 bool OnlineFileRequestImpl::hasObservers() const {
     return !observers.empty();
+}
+
+void OnlineFileRequestImpl::startCacheRequest(OnlineFileSource::Impl& impl) {
+    // Check the cache for existing data so that we can potentially
+    // revalidate the information without having to redownload everything.
+    cacheRequest =
+        impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response_) {
+            cacheRequest = nullptr;
+            if (response_) {
+                response_->stale = response_->isExpired();
+                setResponse(response_);
+            }
+
+            if (!response_ || response_->stale) {
+                // No response or stale cache. Run the real request.
+                startRealRequest(impl);
+            }
+
+            reschedule(impl);
+        });
+}
+
+void OnlineFileRequestImpl::startRealRequest(OnlineFileSource::Impl& impl) {
+    assert(!realRequest);
+
+    // Ensure the timer is stopped.
+    realRequestTimer.stop();
+
+    auto callback = [this, &impl](std::shared_ptr<const Response> response_) {
+        realRequest = nullptr;
+
+        // Only update the cache for successful or 404 responses.
+        // In particular, we don't want to write a Canceled request, or one that failed due to
+        // connection errors to the cache. Server errors are hopefully also temporary, so we're not
+        // caching them either.
+        if (impl.cache && !util::isAssetURL(resource.url) &&
+            (!response_->error || (response_->error->reason == Response::Error::Reason::NotFound))) {
+            // Store response in database. Make sure we only refresh the expires column if the data
+            // didn't change.
+            FileCache::Hint hint = FileCache::Hint::Full;
+            if (response && response_->data == response->data) {
+                hint = FileCache::Hint::Refresh;
+            }
+            impl.cache->put(resource, response_, hint);
+        }
+
+        setResponse(response_);
+        reschedule(impl);
+    };
+
+    if (util::isAssetURL(resource.url)) {
+        realRequest = impl.assetContext->createRequest(resource.url, callback, impl.assetRoot);
+    } else {
+        realRequest = impl.httpContext->createRequest(resource.url, callback, response);
+    }
+}
+
+void OnlineFileRequestImpl::reschedule(OnlineFileSource::Impl& impl) {
+    if (realRequest) {
+        // There's already a request in progress; don't start another one.
+        return;
+    }
+
+    const Seconds timeout = getRetryTimeout();
+
+    if (timeout >= Seconds::zero()) {
+        realRequestTimer.start(timeout, Duration::zero(), [this, &impl] {
+            assert(!realRequest);
+            startRealRequest(impl);
+        });
+    }
+}
+
+void OnlineFileRequestImpl::networkIsReachableAgain(OnlineFileSource::Impl& impl) {
+    // We need all requests to fail at least once before we are going to start retrying
+    // them, and we only immediately restart request that failed due to connection issues.
+    if (!realRequest && response && response->error && response->error->reason == Response::Error::Reason::Connection) {
+        startRealRequest(impl);
+    }
 }
 
 void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& response_) {
@@ -357,10 +360,6 @@ void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& r
     for (auto& req : observers) {
         req.second(*response);
     }
-}
-
-const std::shared_ptr<const Response>& OnlineFileRequestImpl::getResponse() const {
-    return response;
 }
 
 Seconds OnlineFileRequestImpl::getRetryTimeout() const {
