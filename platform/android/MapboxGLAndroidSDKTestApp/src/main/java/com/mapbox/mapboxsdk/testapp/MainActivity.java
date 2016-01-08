@@ -405,6 +405,10 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 return true;
 
+                            case R.id.action_directions:
+                                startActivity(new Intent(getApplicationContext(), DirectionsActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
