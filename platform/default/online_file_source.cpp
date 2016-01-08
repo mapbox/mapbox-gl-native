@@ -104,7 +104,6 @@ public:
     void cancel(Resource, FileRequest*);
 
 private:
-    void update(OnlineFileRequestImpl&);
     void startCacheRequest(OnlineFileRequestImpl&);
     void startRealRequest(OnlineFileRequestImpl&);
     void reschedule(OnlineFileRequestImpl&);
@@ -199,15 +198,6 @@ void OnlineFileSource::Impl::add(Resource resource, FileRequest* req, Callback c
     auto& request = *pending.emplace(resource,
         std::make_unique<OnlineFileRequestImpl>(resource)).first->second;
 
-    // Trigger a potentially required refresh of this Request
-    update(request);
-
-    // Add this request as an observer so that it'll get notified when something about this
-    // request changes.
-    request.addObserver(req, callback);
-}
-
-void OnlineFileSource::Impl::update(OnlineFileRequestImpl& request) {
     if (request.getResponse()) {
         // We've at least obtained a cache value, potentially we also got a final response.
         // The observers have been notified already; send what we have to the new one as well.
@@ -237,6 +227,10 @@ void OnlineFileSource::Impl::update(OnlineFileRequestImpl& request) {
     } else {
         // There is a request in progress. We just have to wait.
     }
+
+    // Add this request as an observer so that it'll get notified when something about this
+    // request changes.
+    request.addObserver(req, callback);
 }
 
 void OnlineFileSource::Impl::startCacheRequest(OnlineFileRequestImpl& request) {
