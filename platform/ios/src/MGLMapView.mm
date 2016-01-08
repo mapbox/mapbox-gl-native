@@ -1926,6 +1926,19 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return MGLCoordinateBoundsFromLatLngBounds([self convertRect:rect toLatLngBoundsFromView:view]);
 }
 
+- (CGRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable UIView *)view
+{
+    return [self convertLatLngBounds:MGLLatLngBoundsFromCoordinateBounds(bounds) toRectToView:view];
+}
+
+/// Converts a geographic bounding box to a rectangle in the view’s coordinate
+/// system.
+- (CGRect)convertLatLngBounds:(mbgl::LatLngBounds)bounds toRectToView:(nullable UIView *)view {
+    CGRect rect = { [self convertLatLng:bounds.sw toPointToView:view], CGSizeZero };
+    rect = MGLExtendRect(rect, [self convertLatLng:bounds.ne toPointToView:view]);
+    return rect;
+}
+
 /// Converts a rectangle in the given view’s coordinate system to a geographic
 /// bounding box.
 - (mbgl::LatLngBounds)convertRect:(CGRect)rect toLatLngBoundsFromView:(nullable UIView *)view

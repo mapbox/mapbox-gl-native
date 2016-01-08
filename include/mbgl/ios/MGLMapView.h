@@ -593,6 +593,28 @@ IB_DESIGNABLE
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view;
 
 /**
+ Converts a rectangle in the given view’s coordinate system to a geographic
+ bounding box.
+ 
+ @param rect The rectangle to convert.
+ @param view The view in whose coordinate system the rectangle is expressed.
+ @return The geographic bounding box coextensive with the given rectangle.
+ */
+- (MGLCoordinateBounds)convertRect:(CGRect)rect toCoordinateBoundsFromView:(nullable UIView *)view;
+
+/**
+ Converts a geographic bounding box to a rectangle in the given view’s
+ coordinate system.
+ 
+ @param bounds The geographic bounding box to convert.
+ @param view The view in whose coordinate system the returned rectangle should
+    be expressed. If this parameter is `nil`, the returned rectangle is
+    expressed in the window’s coordinate system. If `view` is not `nil`, it must
+    belong to the same window as the map view.
+ */
+- (CGRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable UIView *)view;
+
+/**
  Returns the distance spanned by one point in the map view's coordinate system
  at the given latitude and current zoom level.
  
