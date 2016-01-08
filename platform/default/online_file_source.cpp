@@ -66,9 +66,6 @@ private:
     RequestBase* realRequest = nullptr;
     util::Timer realRequestTimer;
 
-    // Set the response of this request object and notify all observers.
-    void setResponse(const std::shared_ptr<const Response>&);
-
     // Stores a set of all observing Request objects.
     std::unordered_map<FileRequest*, Callback> observers;
 
@@ -268,17 +265,19 @@ bool OnlineFileRequestImpl::hasObservers() const {
 void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
-    cacheRequest =
-        impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response_) {
-            cacheRequest = nullptr;
+    cacheRequest = impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response_) {
+        cacheRequest = nullptr;
 
-            if (response_) {
-                response_->stale = response_->isExpired();
-                setResponse(response_);
+        if (response_) {
+            response_->stale = response_->isExpired();
+            response = response_;
+            for (auto& req : observers) {
+                req.second(*response);
             }
+        }
 
-            scheduleRealRequest(impl);
-        });
+        scheduleRealRequest(impl);
+    });
 }
 
 void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bool forceImmediate) {
@@ -350,7 +349,19 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 impl.cache->put(resource, response_, hint);
             }
 
-            setResponse(response_);
+            response = response_;
+
+            if (response->error) {
+                failedRequests++;
+            } else {
+                // Reset the number of subsequent failed requests after we got a successful one.
+                failedRequests = 0;
+            }
+
+            for (auto& req : observers) {
+                req.second(*response);
+            }
+
             scheduleRealRequest(impl);
         };
 
@@ -367,22 +378,6 @@ void OnlineFileRequestImpl::networkIsReachableAgain(OnlineFileSource::Impl& impl
     // them, and we only immediately restart request that failed due to connection issues.
     if (response && response->error && response->error->reason == Response::Error::Reason::Connection) {
         scheduleRealRequest(impl, true);
-    }
-}
-
-void OnlineFileRequestImpl::setResponse(const std::shared_ptr<const Response>& response_) {
-    response = response_;
-
-    if (response->error) {
-        failedRequests++;
-    } else {
-        // Reset the number of subsequent failed requests after we got a successful one.
-        failedRequests = 0;
-    }
-
-    // Notify in all cases; requestors can decide whether they want to use stale responses.
-    for (auto& req : observers) {
-        req.second(*response);
     }
 }
 
