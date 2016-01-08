@@ -232,7 +232,7 @@ void OnlineFileSource::Impl::update(OnlineFileRequestImpl& request) {
     } else if (!request.cacheRequest && !request.realRequest) {
         // There is no request in progress, and we don't have a response yet. This means we'll have
         // to start the request ourselves.
-        if (cache) {
+        if (cache && !util::isAssetURL(request.resource.url)) {
             startCacheRequest(request);
         } else {
             startRealRequest(request);
@@ -276,7 +276,7 @@ void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
     auto callback = [this, &request](std::shared_ptr<const Response> response) {
         request.realRequest = nullptr;
 
-        if (cache) {
+        if (cache && !util::isAssetURL(request.resource.url)) {
             // Store response in database. Make sure we only refresh the expires column if the data
             // didn't change.
             FileCache::Hint hint = FileCache::Hint::Full;

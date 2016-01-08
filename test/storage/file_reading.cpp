@@ -1,6 +1,7 @@
 #include "storage.hpp"
 
 #include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -167,6 +168,47 @@ TEST_F(Storage, AssetNonExistentFile) {
 #endif
         loop.stop();
         NonExistentFile.finish();
+    });
+
+    loop.run();
+}
+
+TEST_F(Storage, AssetNotCached) {
+    SCOPED_TEST(NotCached)
+
+    using namespace mbgl;
+
+    const Resource resource { Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" };
+
+    util::RunLoop loop;
+
+    SQLiteCache cache(":memory:");
+
+    // Add a fake response to the cache to verify that we don't retrieve it.
+    {
+        auto response = std::make_shared<Response>();
+        response->data = std::make_shared<const std::string>("cached data");
+        cache.put(resource, response, FileCache::Hint::Full);
+    }
+
+    OnlineFileSource fs(&cache, getFileSourceRoot());
+
+    std::unique_ptr<WorkRequest> workReq;
+    std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
+        req.reset();
+
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("content is here\n", *res.data);
+
+        workReq = cache.get(resource, [&](std::shared_ptr<Response> response) {
+            // Check that we didn't put the file into the cache
+            ASSERT_TRUE(response->data.get());
+            EXPECT_EQ(*response->data, "cached data");
+
+            loop.stop();
+            NotCached.finish();
+        });
     });
 
     loop.run();
