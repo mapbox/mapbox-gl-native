@@ -200,11 +200,10 @@ void OnlineFileSource::Impl::add(Resource resource, FileRequest* req, Callback c
 
     if (request.getResponse()) {
         // We've at least obtained a cache value, potentially we also got a final response.
-        // The observers have been notified already; send what we have to the new one as well.
-
         // Before returning the existing response, make sure that it is still fresh, or update the
         // `stale` flag.
         request.checkResponseFreshness();
+        callback(*request.getResponse());
 
         if (request.getResponse()->stale && !request.realRequest) {
             // We've returned a stale response; now make sure the requester also gets a fresh
@@ -334,11 +333,6 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
 
 void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback) {
     observers.emplace(req, callback);
-
-    if (response) {
-        // We've got a response, so send the (potentially stale) response to the requester.
-        callback(*response);
-    }
 }
 
 void OnlineFileRequestImpl::removeObserver(FileRequest* req) {
