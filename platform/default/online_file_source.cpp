@@ -320,9 +320,7 @@ void OnlineFileSource::Impl::reschedule(OnlineFileRequestImpl& request) {
 
     const Seconds timeout = request.getRetryTimeout();
 
-    if (timeout == Seconds::zero()) {
-        update(request);
-    } else if (timeout > Seconds::zero()) {
+    if (timeout >= Seconds::zero()) {
         request.realRequestTimer.start(timeout, Duration::zero(), [this, &request] {
             assert(!request.realRequest);
             startRealRequest(request);
