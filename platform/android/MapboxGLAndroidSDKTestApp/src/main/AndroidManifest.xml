@@ -39,8 +39,9 @@
             android:name=".BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/activity_add_bulk_markers" />
-        <activity android:name=".CameraActivity"
-                  android:label="@string/activity_camera"/>
+        <activity
+            android:name=".CameraActivity"
+            android:label="@string/activity_camera" />
         <activity
             android:name=".TiltActivity"
             android:label="@string/activity_tilt" />
@@ -62,11 +63,13 @@
         <activity
             android:name=".CoordinateChangeActivity"
             android:label="@string/activity_animate_coordinate_change" />
+        <activity
+            android:name=".DirectionsActivity"
+            android:label="@string/activity_directions" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"
             android:value="" />
-
     </application>
 
 </manifest>

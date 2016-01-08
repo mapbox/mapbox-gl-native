@@ -149,6 +149,12 @@
                 android:icon="@drawable/ic_trending_up_24dp"
                 android:title="@string/activity_polyline" />
 
+            <item
+                android:id="@+id/action_directions"
+                android:checkable="false"
+                android:icon="@drawable/ic_directions"
+                android:title="@string/activity_directions" />
+
         </menu>
     </item>
 
