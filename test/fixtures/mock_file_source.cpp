@@ -18,7 +18,6 @@ public:
 
 MockFileSource::MockFileSource(Type type_, const std::string& match_)
     : type(type_), match(match_) {
-    timer.unref();
     timer.start(std::chrono::milliseconds(10), std::chrono::milliseconds(10), [this] {
         // Explicit move to avoid iterator invalidation if ~MockFileRequest gets called within the loop.
         auto pending_ = std::move(pending);

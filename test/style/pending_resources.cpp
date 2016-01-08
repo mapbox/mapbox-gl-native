@@ -33,7 +33,6 @@ TEST_P(PendingResources, DeleteMapObjectWithPendingRequest) {
         loop.stop();
     });
 
-    endTest.unref();
     fileSource.requestEnqueuedCallback = [&endTest] { endTest.send(); };
 
     const std::string style = util::read_file("test/fixtures/resources/style.json");

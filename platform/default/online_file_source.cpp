@@ -177,7 +177,6 @@ OnlineFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
     // loop alive; otherwise our app wouldn't terminate. After all, we only need status change
     // notifications when our app is still running.
     NetworkStatus::Subscribe(&reachability);
-    reachability.unref();
 }
 
 OnlineFileSource::Impl::~Impl() {

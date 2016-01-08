@@ -28,6 +28,7 @@ public:
         }
 
         handle()->data = this;
+        uv_unref(handle());
     }
 
     ~Impl() {
@@ -41,10 +42,6 @@ public:
         if (uv_async_send(async) != 0) {
             throw std::runtime_error("Failed to async send.");
         }
-    }
-
-    void unref() {
-        uv_unref(handle());
     }
 
 private:
@@ -69,10 +66,6 @@ AsyncTask::~AsyncTask() = default;
 
 void AsyncTask::send() {
     impl->maySend();
-}
-
-void AsyncTask::unref() {
-    impl->unref();
 }
 
 } // namespace util

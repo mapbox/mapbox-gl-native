@@ -22,6 +22,7 @@ public:
         }
 
         handle()->data = this;
+        uv_unref(handle());
     }
 
     ~Impl() {
@@ -42,10 +43,6 @@ public:
         if (uv_timer_stop(timer) != 0) {
             throw std::runtime_error("Failed to stop timer.");
         }
-    }
-
-    void unref() {
-        uv_unref(handle());
     }
 
 private:
@@ -76,10 +73,6 @@ void Timer::start(Duration timeout, Duration repeat, std::function<void()>&& cb)
 
 void Timer::stop() {
     impl->stop();
-}
-
-void Timer::unref() {
-    impl->unref();
 }
 
 } // namespace util

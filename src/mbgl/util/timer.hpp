@@ -17,7 +17,6 @@ public:
 
     void start(Duration timeout, Duration repeat, std::function<void()>&&);
     void stop();
-    void unref();
 
 private:
     class Impl;

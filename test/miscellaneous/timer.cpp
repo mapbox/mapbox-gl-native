@@ -12,7 +12,6 @@ TEST(Timer, Basic) {
     RunLoop loop;
 
     Timer timer;
-    timer.unref();
 
     auto callback = [&loop] { loop.stop(); };
 
@@ -38,7 +37,6 @@ TEST(Timer, Repeat) {
     RunLoop loop;
 
     Timer timer;
-    timer.unref();
 
     unsigned count = 10;
     auto callback = [&] {
@@ -66,10 +64,7 @@ TEST(Timer, Stop) {
     RunLoop loop;
 
     Timer timer1;
-    timer1.unref();
-
     Timer timer2;
-    timer2.unref();
 
     auto interval1 = std::chrono::milliseconds(50);
     auto interval2 = std::chrono::milliseconds(250);
@@ -106,10 +101,7 @@ TEST(Timer, DestroyShouldStop) {
     RunLoop loop;
 
     auto timer1 = std::make_unique<Timer>();
-    timer1->unref();
-
     Timer timer2;
-    timer2.unref();
 
     auto interval1 = std::chrono::milliseconds(50);
     auto interval2 = std::chrono::milliseconds(250);
@@ -146,7 +138,6 @@ TEST(Timer, StartOverrides) {
     RunLoop loop;
 
     Timer timer;
-    timer.unref();
 
     auto interval1 = std::chrono::milliseconds(50);
     auto interval2 = std::chrono::milliseconds(250);
@@ -182,6 +173,5 @@ TEST(Timer, CanStopNonStartedTimer) {
     RunLoop loop;
 
     Timer timer;
-    timer.unref();
     timer.stop();
 }

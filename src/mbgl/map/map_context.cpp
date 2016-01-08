@@ -39,9 +39,6 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLCon
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
-    asyncUpdate.unref();
-    asyncInvalidate.unref();
-
     view.activate();
 }
 
