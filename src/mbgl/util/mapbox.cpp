@@ -13,7 +13,7 @@ const std::string protocol = "mapbox://";
 const std::string baseURL = "https://api.mapbox.com/";
 
 bool isMapboxURL(const std::string& url) {
-    return url.compare(0, protocol.length(), protocol) == 0;
+    return std::equal(protocol.begin(), protocol.end(), url.begin());
 }
 
 std::vector<std::string> getMapboxURLPathname(const std::string& url) {

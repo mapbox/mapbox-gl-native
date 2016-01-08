@@ -14,20 +14,12 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/timer.hpp>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#include <boost/algorithm/string.hpp>
-#pragma GCC diagnostic pop
+#include <mbgl/util/url.hpp>
 
 #include <algorithm>
 #include <cassert>
 #include <set>
 #include <unordered_map>
-
-namespace algo = boost::algorithm;
 
 namespace mbgl {
 
@@ -299,7 +291,7 @@ void OnlineFileSource::Impl::startRealRequest(OnlineFileRequestImpl& request) {
         reschedule(request);
     };
 
-    if (algo::starts_with(request.resource.url, "asset://")) {
+    if (util::isAssetURL(request.resource.url)) {
         request.realRequest =
             assetContext->createRequest(request.resource.url, callback, assetRoot);
     } else {

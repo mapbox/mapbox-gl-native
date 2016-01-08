@@ -21,6 +21,7 @@
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <algorithm>
 
@@ -114,7 +115,8 @@ void MapContext::setStyleURL(const std::string& url) {
         styleRequest = nullptr;
 
         if (res.error) {
-            if (res.error->reason == Response::Error::Reason::NotFound && styleURL.find("mapbox://") == 0) {
+            if (res.error->reason == Response::Error::Reason::NotFound &&
+                util::mapbox::isMapboxURL(styleURL)) {
                 Log::Error(Event::Setup, "style %s could not be found or is an incompatible legacy map or style", styleURL.c_str());
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());

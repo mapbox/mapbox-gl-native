@@ -8,6 +8,8 @@ namespace mbgl {
 namespace util {
 namespace mapbox {
 
+bool isMapboxURL(const std::string& url);
+
 std::string normalizeSourceURL(const std::string& url, const std::string& accessToken);
 std::string normalizeStyleURL(const std::string& url, const std::string& accessToken);
 std::string normalizeSpriteURL(const std::string& url, const std::string& accessToken);
