@@ -33,7 +33,6 @@
     <string name="action_tilt">Tilt</string>
     <string name="action_map_fragment">MapFragment</string>
     <string name="action_press_for_marker">Press For Marker</string>
-    <string name="action_manual_zoom">Manual Zoom</string>
     <string name="action_info_window">InfoWindow</string>
     <string name="action_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="action_info_window_concurrent">InfoWindow (Concurrent)</string>

@@ -2,6 +2,8 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,16 +11,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.MapFragment;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
+import com.mapbox.mapboxsdk.views.OnMapReadyCallback;
 
 public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
 
-    private MapView mMapView;
+    private static final LatLng CITY_LOS_ANGELES = new LatLng(34.053940, -118.242622);
+    private static final LatLng CITY_NEW_YORK = new LatLng(40.712730, -74.005953);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,79 +40,39 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyle(Style.DARK);
-        mMapView.onCreate(savedInstanceState);
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                mapboxMap.setStyle(Style.DARK);
 
-        final LatLng losAngeles = new LatLng(34.053940, -118.242622);
-        final LatLng newYork = new LatLng(40.712730, -74.005953);
+                mapboxMap.setAllGesturesEnabled(false);
 
-        mMapView.addMarker(new MarkerOptions()
-                .title("Los Angeles")
-                .snippet("City Hall")
-                .position(losAngeles));
+                mapboxMap.addMarker(new MarkerOptions()
+                        .title("Los Angeles")
+                        .snippet("City Hall")
+                        .position(CITY_LOS_ANGELES));
 
-        mMapView.addMarker(new MarkerOptions()
-                .title("New York")
-                .snippet("City Hall")
-                .position(newYork));
+                mapboxMap.addMarker(new MarkerOptions()
+                        .title("New York")
+                        .snippet("City Hall")
+                        .position(CITY_NEW_YORK));
 
-        Snackbar.make(findViewById(android.R.id.content), R.string.action_visible_bounds_explanation, Snackbar.LENGTH_INDEFINITE)
-                .setAction(android.R.string.ok, new View.OnClickListener() {
+                // bug, need to post on queu to execute
+                new Handler().post(new Runnable() {
+
+                    float margin = getResources().getDimension(R.dimen.coordinatebounds_margin);
+
                     @Override
-                    public void onClick(View v) {
-                        // Disable UserInput
-                        mMapView.setScrollEnabled(false);
-                        mMapView.setZoomEnabled(false);
-
-                        // Reposition coordinate bounds
-                        float margin = getResources().getDimension(R.dimen.coordinatebounds_margin);
-                        mMapView.setVisibleCoordinateBounds(new CoordinateBounds(losAngeles, newYork), new RectF(margin, 0, margin, 0), true);
+                    public void run() {
+                        mapboxMap.setVisibleCoordinateBounds(
+                                new CoordinateBounds(CITY_LOS_ANGELES, CITY_NEW_YORK),
+                                new RectF(margin, 0, margin, 0),
+                                true);
                     }
-                }).show();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
+                });
+            }
+        });
     }
 
     @Override

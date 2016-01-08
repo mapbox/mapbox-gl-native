@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
+import com.mapbox.mapboxsdk.views.OnMapReadyCallback;
 
 public class MapFragment extends Fragment {
 
@@ -25,6 +27,8 @@ public class MapFragment extends Fragment {
 
     // The map
     private MapView mMap;
+
+    private OnMapReadyCallback mMapReadyCallback;
 
     //
     // Lifecycle events
@@ -44,6 +48,10 @@ public class MapFragment extends Fragment {
 
         // Need to pass on any saved state to the map
         mMap.onCreate(savedInstanceState);
+
+        if(mMapReadyCallback!=null){
+            mMapReadyCallback.onMapReady(new MapboxMap(mMap));
+        }
 
         // Return the map as the root view
         return mMap;
@@ -122,8 +130,20 @@ public class MapFragment extends Fragment {
     //
     // Property methods
     //
-
+    /**
+     *  @deprecated in favor of
+     */
+    @Deprecated
     public MapView getMap() {
         return mMap;
     }
+
+    public void getMapAsync(OnMapReadyCallback callback){
+        if(mMap!=null){
+            callback.onMapReady(new MapboxMap(mMap));
+        }else {
+            mMapReadyCallback = callback;
+        }
+    }
+
 }

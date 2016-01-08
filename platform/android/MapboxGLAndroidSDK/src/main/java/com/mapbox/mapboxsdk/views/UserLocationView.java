@@ -86,7 +86,7 @@ final class UserLocationView extends View implements LocationListener {
     private boolean mPaused = false;
     private Location mUserLocation;
 
-    MapView.OnMyLocationChangeListener mOnMyLocationChangeListener;
+    private MapboxMap.OnMyLocationChangeListener mOnMyLocationChangeListener;
 
     @MyLocationTracking.Mode
     private int mMyLocationTrackingMode;
@@ -244,7 +244,7 @@ final class UserLocationView extends View implements LocationListener {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
             // center map directly if we have a location fix
             mMarkerCoordinate = new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude());
-            mMapView.setCenterCoordinate(new LatLng(mUserLocation));
+            mMapView.setCenterCoordinate(new LatLng(mUserLocation), false);
 
             // center view directly
             mMarkerScreenMatrix.reset();
@@ -676,7 +676,7 @@ final class UserLocationView extends View implements LocationListener {
         }
     }
 
-    public void setOnMyLocationChangeListener(@Nullable MapView.OnMyLocationChangeListener listener) {
+    public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mOnMyLocationChangeListener = listener;
     }
 

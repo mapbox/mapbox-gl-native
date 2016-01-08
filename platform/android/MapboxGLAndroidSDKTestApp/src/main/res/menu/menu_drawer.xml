@@ -114,12 +114,6 @@
                 android:title="@string/action_press_for_marker" />
 
             <item
-                android:id="@+id/action_manual_zoom"
-                android:checkable="false"
-                android:icon="@drawable/ic_filter_center_focus_24dp"
-                android:title="@string/action_manual_zoom" />
-
-            <item
                 android:id="@+id/action_coordinate_change"
                 android:checkable="false"
                 android:icon="@drawable/ic_animate_coordinates"

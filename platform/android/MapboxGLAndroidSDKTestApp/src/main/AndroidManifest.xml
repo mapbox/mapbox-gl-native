@@ -38,8 +38,9 @@
             android:name=".BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/activity_add_bulk_markers" />
-        <activity android:name=".CameraActivity"
-                  android:label="@string/activity_camera"/>
+        <activity
+            android:name=".CameraActivity"
+            android:label="@string/activity_camera"/>
         <activity
             android:name=".TiltActivity"
             android:label="@string/activity_tilt" />
@@ -49,9 +50,6 @@
         <activity
             android:name=".PressForMarkerActivity"
             android:label="@string/activity_press_for_marker" />
-        <activity
-            android:name=".ManualZoomActivity"
-            android:label="@string/action_manual_zoom" />
         <activity
             android:name=".MyLocationTrackingModeActivity"
             android:label="@string/activity_user_tracking_mode" />

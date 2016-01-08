@@ -22,10 +22,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.mapbox.mapboxsdk.views.MapView
-                android:id="@+id/mapView"
+            <fragment
+                android:id="@+id/mapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:name="com.mapbox.mapboxsdk.MapFragment" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

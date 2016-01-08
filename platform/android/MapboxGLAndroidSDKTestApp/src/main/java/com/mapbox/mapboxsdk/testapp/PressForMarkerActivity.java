@@ -9,22 +9,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.MapFragment;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
+import com.mapbox.mapboxsdk.views.OnMapReadyCallback;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
-public class PressForMarkerActivity extends AppCompatActivity implements MapView.OnMapLongClickListener {
+public class PressForMarkerActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMapLongClickListener {
 
-    private MapView mMapView;
-    private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
-
+    private MapboxMap mMapboxMap;
+    private ArrayList<MarkerOptions> mMarkerList;
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
-
     private static String STATE_MARKER_LIST = "markerList";
 
     @Override
@@ -41,31 +43,35 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapView
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = new MapView(this, ApiAccess.getToken(this));
-        mMapView.setStyleUrl(Style.EMERALD);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.setCenterCoordinate(new LatLng(45.1855569, 5.7215506));
-        mMapView.setZoomLevel(11);
-        mMapView.setOnMapLongClickListener(this);
-        ((ViewGroup) findViewById(R.id.activity_container)).addView(mMapView);
-
         if (savedInstanceState != null) {
             mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-            mMapView.addMarkers(mMarkerList);
+        }else{
+            mMarkerList = new ArrayList<>();
         }
+
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        mMapboxMap = mapboxMap;
+        mMapboxMap.setStyleUrl(Style.EMERALD);
+        mMapboxMap.setLatLng(new LatLng(45.1855569, 5.7215506));
+        mMapboxMap.setZoom(11);
+        mMapboxMap.setOnMapLongClickListener(this);
+        mapboxMap.addMarkers(mMarkerList);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        mMapView.onSaveInstanceState(outState);
         outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
     }
 
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
-        final PointF pixel = mMapView.toScreenLocation(point);
+        final PointF pixel = mMapboxMap.toScreenLocation(point);
 
         String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " + LAT_LON_FORMATTER.format(point.getLongitude());
         String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
@@ -76,53 +82,7 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapView
                 .snippet(snippet);
 
         mMarkerList.add(marker);
-        mMapView.addMarker(marker);
-    }
-
-    /**
-     * Dispatch onStart() to all fragments.  Ensure any created loaders are
-     * now started.
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    // Called when our app goes into the background
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mMapView.onPause();
-    }
-
-    // Called when our app comes into the foreground
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mMapView.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    // Called when the system is running low on memory
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-
-        mMapView.onLowMemory();
+        mMapboxMap.addMarker(marker);
     }
 
     @Override

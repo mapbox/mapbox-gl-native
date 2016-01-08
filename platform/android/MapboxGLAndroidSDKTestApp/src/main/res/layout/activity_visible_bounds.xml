@@ -11,9 +11,10 @@
         android:background="@color/primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <com.mapbox.mapboxsdk.views.MapView
-        android:id="@+id/mapView"
+    <fragment
+        android:id="@+id/mapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:name="com.mapbox.mapboxsdk.MapFragment" />
 
 </LinearLayout>

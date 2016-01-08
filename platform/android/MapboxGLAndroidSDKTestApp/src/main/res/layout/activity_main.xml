@@ -29,10 +29,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.mapbox.mapboxsdk.views.MapView
-                    android:id="@+id/mainMapView"
+                <fragment
+                    android:id="@+id/mapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:name="com.mapbox.mapboxsdk.MapFragment" />
 
                 <TextView
                     android:id="@+id/view_fps"

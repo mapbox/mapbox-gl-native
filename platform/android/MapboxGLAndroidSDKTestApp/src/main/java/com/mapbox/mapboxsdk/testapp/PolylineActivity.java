@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,23 +10,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.MapFragment;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
+import com.mapbox.mapboxsdk.views.OnMapReadyCallback;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PolylineActivity extends AppCompatActivity {
+public class PolylineActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener{
 
     private static final String STATE_POLYLINE_OPTIONS = "polylineOptions";
 
+    private MapboxMap mMapboxMap;
     private List<Polyline> mPolylines;
-    private ArrayList<PolylineOptions> mPolylineOptions = new ArrayList<>();
-    private MapView mMapView;
+    private List<PolylineOptions> mPolylineOptions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,84 +47,42 @@ public class PolylineActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
+        findViewById(R.id.fab).setOnClickListener(this);
 
         if (savedInstanceState != null) {
             mPolylineOptions = savedInstanceState.getParcelableArrayList(STATE_POLYLINE_OPTIONS);
         } else {
             mPolylineOptions.addAll(PolylineProvider.getAll());
         }
-        mPolylines = mMapView.addPolylines(mPolylineOptions);
 
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mPolylines != null && mPolylines.size() > 0) {
-                    if (mPolylines.size() == 1) {
-                        // test for removing annotation
-                        mMapView.removeAnnotation(mPolylines.get(0));
-                    } else {
-                        // test for removing annotations
-                        mMapView.removeAnnotations(mPolylines);
-                    }
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        mMapboxMap = mapboxMap;
+        mMapboxMap.setLatLng(new LatLngZoom(47.798202,7.573781,4));
+        mMapboxMap.setStyle(Style.EMERALD);
+        mPolylines = mapboxMap.addPolylines(mPolylineOptions);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(mMapboxMap!=null) {
+            if (mPolylines != null && mPolylines.size() > 0) {
+                if (mPolylines.size() == 1) {
+                    // test for removing annotation
+                    mMapboxMap.removeAnnotation(mPolylines.get(0));
+                } else {
+                    // test for removing annotations
+                    mMapboxMap.removeAnnotations(mPolylines);
                 }
-                mPolylineOptions.clear();
-                mPolylineOptions.addAll(PolylineProvider.getRandomLine());
-                mPolylines = mMapView.addPolylines(mPolylineOptions);
             }
-        });
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(STATE_POLYLINE_OPTIONS, mPolylineOptions);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_polyline, menu);
-        return super.onCreateOptionsMenu(menu);
+            mPolylineOptions.clear();
+            mPolylineOptions.addAll(PolylineProvider.getRandomLine());
+            mPolylines = mMapboxMap.addPolylines(mPolylineOptions);
+        }
     }
 
     @Override
@@ -127,7 +91,7 @@ public class PolylineActivity extends AppCompatActivity {
             case R.id.action_id_remove:
                 // test to remove all annotations
                 mPolylineOptions.clear();
-                mMapView.removeAllAnnotations();
+                mMapboxMap.removeAllAnnotations();
                 return true;
 
             case android.R.id.home:
@@ -174,7 +138,5 @@ public class PolylineActivity extends AppCompatActivity {
             randomLines.add(POLYLINES.get(0));
             return randomLines;
         }
-
     }
-
 }

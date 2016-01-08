@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -14,15 +15,20 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.MapFragment;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
+import com.mapbox.mapboxsdk.views.OnMapReadyCallback;
 
-public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapView.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
+public class MyLocationTrackingModeActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
 
-    private MapView mMapView;
+    private MapboxMap mMapboxMap;
     private Spinner mLocationSpinner, mBearingSpinner;
     private Location mLocation;
 
@@ -53,20 +59,25 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         mBearingSpinner.setAdapter(bearingTrackingAdapter);
         mBearingSpinner.setOnItemSelectedListener(this);
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
-        mMapView.setOnMyLocationChangeListener(this);
+        MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        mMapboxMap = mapboxMap;
+        mMapboxMap.setStyle(Style.MAPBOX_STREETS);
+        mapboxMap.setOnMyLocationChangeListener(this);
 
         try {
-            mMapView.setMyLocationEnabled(true);
+            mMapboxMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
             //should not occur, permission was checked in MainActivity
             Toast.makeText(this, "Location permission is not availlable", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        mMapView.setOnMyLocationTrackingModeChangeListener(new MapView.OnMyLocationTrackingModeChangeListener() {
+        mMapboxMap.setOnMyLocationTrackingModeChangeListener(new MapboxMap.OnMyLocationTrackingModeChangeListener() {
             @Override
             public void onMyLocationTrackingModeChange(@MyLocationTracking.Mode int myLocationTrackingMode) {
                 if (MyLocationTracking.TRACKING_NONE == myLocationTrackingMode) {
@@ -76,8 +87,8 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 }
             }
         });
-        
-        mMapView.setOnMyBearingTrackingModeChangeListener(new MapView.OnMyBearingTrackingModeChangeListener() {
+
+        mMapboxMap.setOnMyBearingTrackingModeChangeListener(new MapboxMap.OnMyBearingTrackingModeChangeListener() {
             @Override
             public void onMyBearingTrackingModeChange(@MyBearingTracking.Mode int myBearingTrackingMode) {
                 if (MyBearingTracking.NONE == myBearingTrackingMode) {
@@ -94,7 +105,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         if (location != null) {
             if (mLocation == null) {
                 // initial location to reposition map
-                mMapView.setCenterCoordinate(new LatLng(location.getLatitude(), location.getLongitude()));
+                mMapboxMap.setLatLng(new LatLngZoom(location.getLatitude(), location.getLongitude(), 15));
                 mLocationSpinner.setEnabled(true);
                 mBearingSpinner.setEnabled(true);
             }
@@ -125,25 +136,25 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         if (parent.getId() == R.id.spinner_location) {
             switch (position) {
                 case 0:
-                    mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                    mMapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
                     break;
 
                 case 1:
-                    mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                    mMapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
                     break;
             }
         } else if (parent.getId() == R.id.spinner_bearing) {
             switch (position) {
                 case 0:
-                    mMapView.setMyBearingTrackingMode(MyBearingTracking.NONE);
+                    mMapboxMap.setMyBearingTrackingMode(MyBearingTracking.NONE);
                     break;
 
                 case 1:
-                    mMapView.setMyBearingTrackingMode(MyBearingTracking.GPS);
+                    mMapboxMap.setMyBearingTrackingMode(MyBearingTracking.GPS);
                     break;
 
                 case 2:
-                    mMapView.setMyBearingTrackingMode(MyBearingTracking.COMPASS);
+                    mMapboxMap.setMyBearingTrackingMode(MyBearingTracking.COMPASS);
                     break;
             }
         }
@@ -152,48 +163,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapView.onPause();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mMapView.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mMapView.onLowMemory();
     }
 
     @Override

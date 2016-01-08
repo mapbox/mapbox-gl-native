@@ -57,9 +57,6 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     protected MapView getMapView() {
-        if (mapView == null) {
-            return null;
-        }
         return mapView;
     }
 

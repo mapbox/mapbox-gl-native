@@ -6,6 +6,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.views.MapboxMap;
 
 /**
  * A marker is a map overlay that shows an icon image at a specific
@@ -89,7 +90,7 @@ public final class Marker extends Annotation {
             return null;
         }
 
-        MapView.InfoWindowAdapter infoWindowAdapter = getMapView().getInfoWindowAdapter();
+        MapboxMap.InfoWindowAdapter infoWindowAdapter = getMapView().getInfoWindowAdapter();
         if (infoWindowAdapter != null) {
             // end developer is using a custom InfoWindowAdapter
             View content = infoWindowAdapter.getInfoWindow(this);
