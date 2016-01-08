@@ -75,10 +75,6 @@ private:
     // a timeout at all.
     Seconds getRetryTimeout() const;
 
-    // Checks the currently stored response and replaces it with an idential one, except with the
-    // stale flag set, if the response is expired.
-    void checkResponseFreshness();
-
     // Stores a set of all observing Request objects.
     std::unordered_map<FileRequest*, Callback> observers;
 
@@ -229,9 +225,17 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
 void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback, OnlineFileSource::Impl& impl) {
     if (response) {
         // We've at least obtained a cache value, potentially we also got a final response.
-        // Before returning the existing response, make sure that it is still fresh, or update the
-        // `stale` flag.
-        checkResponseFreshness();
+        // Before returning the existing response, update the `stale` flag if necessary.
+        if (!response->stale && response->isExpired()) {
+            // Create a new Response object with `stale = true`, but the same data, and
+            // replace the current request object we have.
+            // We're not immediately swapping the member variable because it's declared as `const`, and
+            // we first have to update the `stale` flag.
+            auto staleResponse = std::make_shared<Response>(*response);
+            staleResponse->stale = true;
+            response = staleResponse;
+        }
+
         callback(*response);
 
         if (response->stale && !realRequest) {
@@ -404,18 +408,6 @@ Seconds OnlineFileRequestImpl::getRetryTimeout() const {
     }
 
     return timeout;
-}
-
-void OnlineFileRequestImpl::checkResponseFreshness() {
-    if (response && !response->stale && response->isExpired()) {
-        // Create a new Response object with `stale = true`, but the same data, and
-        // replace the current request object we have.
-        // We're not immediately swapping the member variable because it's declared as `const`, and
-        // we first have to update the `stale` flag.
-        auto staleResponse = std::make_shared<Response>(*response);
-        staleResponse->stale = true;
-        response = staleResponse;
-    }
 }
 
 } // namespace mbgl
