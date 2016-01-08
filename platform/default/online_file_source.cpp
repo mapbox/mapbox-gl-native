@@ -286,9 +286,9 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         return;
     }
 
-    // If we don't have a response, we should retry immediately.
-    // A value < 0 means that we should not retry.
-    Seconds timeout = (response && !response->stale) ? Seconds(-1) : Seconds::zero();
+    // If we don't have a fresh response, we'll retry immediately. Otherwise, the timeout will
+    // depend on how many consecutive errors we've encountered, and on the expiration time.
+    Seconds timeout = (!response || response->stale) ? Seconds::zero() : Seconds::max();
 
     if (response && response->error) {
         assert(failedRequests > 0);
@@ -314,17 +314,16 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
 
     // Check to see if this response expires earlier than a potential error retry.
     if (response && response->expires > Seconds::zero()) {
-        const Seconds secsToExpire = response->expires - toSeconds(SystemClock::now());
         // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
         // than the previous one.
-        timeout = timeout < Seconds::zero() ? secsToExpire: std::min(timeout, std::max(Seconds::zero(), secsToExpire));
+        timeout = std::min(timeout, std::max(Seconds::zero(), response->expires - toSeconds(SystemClock::now())));
     }
 
     if (forceImmediate) {
         timeout = Seconds::zero();
     }
 
-    if (timeout < Seconds::zero()) {
+    if (timeout == Seconds::max()) {
         return;
     }
 
