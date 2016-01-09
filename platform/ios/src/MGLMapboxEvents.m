@@ -543,7 +543,19 @@ const NSTimeInterval MGLFlushInterval = 60;
             [request setHTTPBody:jsonData];
 
             // Send non blocking HTTP Request to server
-            [[_session dataTaskWithRequest:request] resume];
+            if ( ! strongSelf.paused) {
+                [[strongSelf.session dataTaskWithRequest:request] resume];
+            } else {
+                for (MGLMapboxEventAttributes *event in events) {
+                    if ([event[@"event"] isEqualToString:MGLEventTypeAppUserTurnstile]) {
+                        NSURLSession *temporarySession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                                                       delegate:strongSelf
+                                                                                  delegateQueue:nil];
+                        [[temporarySession dataTaskWithRequest:request] resume];
+                        [temporarySession finishTasksAndInvalidate];
+                    }
+                }
+            }
         }
     });
 }
@@ -880,7 +892,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
         }
     }
-    
+
 }
 
 @end
