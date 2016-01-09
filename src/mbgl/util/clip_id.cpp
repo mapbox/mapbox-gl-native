@@ -73,23 +73,19 @@ void ClipIDGenerator::update(std::forward_list<Tile *> tiles) {
         }
     }
 
-    if (!pool.empty()) {
-        const uint32_t bit_count = util::ceil_log2(pool.size() + 1);
-        const std::bitset<8> mask = uint64_t(((1ul << bit_count) - 1) << bit_offset);
+    uint32_t maxIdValue = (1ul << kStencilBufferBitLength) - 1;
 
-        // We are starting our count with 1 since we need at least 1 bit set to distinguish between
-        // areas without any tiles whatsoever and the current area.
-        uint8_t count = 1;
+    if (!pool.empty()) {
+      const std::bitset<8> mask = static_cast<uint64_t>(maxIdValue);
         for (auto& leaf : pool) {
             leaf.tile.clip.mask = mask;
-            leaf.tile.clip.reference = uint32_t(count++) << bit_offset;
+            leaf.tile.clip.reference = clipIdSerial++;
         }
 
-        bit_offset += bit_count;
         pools.push_front(std::move(pool));
     }
 
-    if (bit_offset > 8) {
+    if (clipIdSerial > maxIdValue) {
         Log::Error(Event::OpenGL, "stencil mask overflow");
     }
 }
