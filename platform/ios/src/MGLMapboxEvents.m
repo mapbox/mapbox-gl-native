@@ -417,37 +417,33 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void) pushTurnstileEvent {
-
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
-
         MGLMapboxEvents *strongSelf = weakSelf;
 
         if ( ! strongSelf) return;
 
-            // Build only IDFV event
-            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        NSString *idfv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 
-            if (!vid) return;
+        if ( ! idfv) return;
 
-            NSDictionary *vevt = @{
-                @"event" : MGLEventTypeAppUserTurnstile,
-                @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                @"vendorId": vid,
-                @"version": @(version)
-            };
+        NSDictionary *vevt = @{
+            @"event" : MGLEventTypeAppUserTurnstile,
+            @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+            @"vendorId": idfv,
+            @"version": @(version),
+            @"enabled.telemetry": @([[strongSelf class] isEnabled])
+        };
 
-            // Add to Queue
-            [_eventQueue addObject:vevt];
+        [_eventQueue addObject:vevt];
 
-            // Flush
-            [strongSelf flush];
+        // Flush
+        [strongSelf flush];
 
         if ([strongSelf debugLoggingEnabled]) {
             [strongSelf writeEventToLocalDebugLog:vevt];
         }
-
     });
 }
 
@@ -477,7 +473,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             return;
         }
         
-        if (!event) return;
+        if ( ! event) return;
 
         MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
         // Send these keys with every event
