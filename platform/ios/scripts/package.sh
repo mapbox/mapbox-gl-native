@@ -125,7 +125,7 @@ if [ -z `which jazzy` ]; then
     step "Installing jazzy..."
     gem install jazzy
     if [ -z `which jazzy` ]; then
-        echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/docs/BUILD_IOS_OSX.md"
+        echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/INSTALL.md"
         exit 1
     fi
 fi

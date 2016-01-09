@@ -11,13 +11,9 @@
 
 namespace mbgl {
 
-/** Various options for describing the viewpoint of a map, along with parameters
-    for transitioning to the viewpoint with animation. All fields are optional;
-    the default values of transition options depend on how this struct is used.
- */
+/** Various options for describing the viewpoint of a map. All fields are
+    optional. */
 struct CameraOptions {
-    // Viewpoint options
-    
     /** Coordinate at the center of the map. */
     mapbox::util::optional<LatLng> center;
     
@@ -32,9 +28,12 @@ struct CameraOptions {
     /** Pitch toward the horizon measured in radians, with 0 rad resulting in a
         two-dimensional map. */
     mapbox::util::optional<double> pitch;
-    
-    // Transition options
-    
+};
+
+/** Various options for describing a transition between viewpoints with
+    animation. All fields are optional; the default values depend on how this
+    struct is used. */
+struct AnimationOptions {
     /** Time to animate to the viewpoint defined herein. */
     mapbox::util::optional<Duration> duration;
     

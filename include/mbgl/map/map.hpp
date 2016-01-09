@@ -28,6 +28,7 @@ class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
 struct CameraOptions;
+struct AnimationOptions;
 
 namespace util {
 template <class T> class Thread;
@@ -99,8 +100,8 @@ public:
 
     // Camera
     void jumpTo(const CameraOptions&);
-    void easeTo(const CameraOptions&);
-    void flyTo(const CameraOptions&);
+    void easeTo(const CameraOptions&, const AnimationOptions&);
+    void flyTo(const CameraOptions&, const AnimationOptions&);
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());

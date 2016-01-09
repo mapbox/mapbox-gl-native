@@ -25,10 +25,10 @@ public:
     bool resize(std::array<uint16_t, 2> size);
 
     void jumpTo(const CameraOptions&);
-    void easeTo(const CameraOptions&);
+    void easeTo(const CameraOptions&, const AnimationOptions&);
     /** Smoothly zoom out, pan, and zoom back into the given camera along a
         great circle, as though the viewer is aboard a supersonic jetcopter. */
-    void flyTo(const CameraOptions&);
+    void flyTo(const CameraOptions&, const AnimationOptions&);
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
@@ -76,8 +76,7 @@ public:
 private:
     void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void _setScale(double scale, const PrecisionPoint& center, const Duration& = Duration::zero());
-    void _setScaleXY(double new_scale, double xn, double yn, const Duration& = Duration::zero());
-    void _easeTo(const CameraOptions&, double new_scale, double new_angle, double xn, double yn);
+    void _easeTo(const CameraOptions&, const AnimationOptions&, double new_scale, double new_angle, double xn, double yn);
     void _setAngle(double angle, const Duration& = Duration::zero());
 
     View &view;

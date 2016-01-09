@@ -1621,31 +1621,33 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     _mbglMap->cancelTransitions();
     
-    NSTimeInterval duration = animated ? MGLAnimationDuration : 0;
-    mbgl::CameraOptions options;
-    options.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
-    options.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
+    mbgl::CameraOptions cameraOptions;
+    cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+    cameraOptions.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
     if (direction >= 0)
     {
-        options.angle = MGLRadiansFromDegrees(-direction);
+        cameraOptions.angle = MGLRadiansFromDegrees(-direction);
     }
+    
+    NSTimeInterval duration = animated ? MGLAnimationDuration : 0;
+    mbgl::AnimationOptions animationOptions;
     if (animated)
     {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(nil);
+        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(nil);
     }
     if (completion)
     {
-        options.transitionFinishFn = [completion]() {
+        animationOptions.transitionFinishFn = [completion]() {
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCenterCoordinate: within the completion
             // handler would reenter the completion handler’s caller.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
-    _mbglMap->easeTo(options);
+    _mbglMap->easeTo(cameraOptions, animationOptions);
 
     [self unrotateIfNeededAnimated:animated];
 }
@@ -1734,32 +1736,35 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     
     // NOTE: does not disrupt tracking mode
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
-    mbgl::EdgeInsets mbglInsets = {insets.top, insets.left, insets.bottom, insets.right};
+    mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
     mbgl::AnnotationSegment segment;
     segment.reserve(count);
     for (NSUInteger i = 0; i < count; i++)
     {
         segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
-    mbgl::CameraOptions options = _mbglMap->cameraForLatLngs(segment, mbglInsets);
+    
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, mbglInsets);
     if (direction >= 0)
     {
-        options.angle = MGLRadiansFromDegrees(-direction);
+        cameraOptions.angle = MGLRadiansFromDegrees(-direction);
     }
+    
+    mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     if (completion)
     {
-        options.transitionFinishFn = [completion]() {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        animationOptions.transitionFinishFn = [completion]() {
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
-    _mbglMap->easeTo(options);
+    _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
 
     [self unrotateIfNeededAnimated:duration > 0];
@@ -1848,23 +1853,24 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         return;
     }
 
-    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::AnimationOptions animationOptions;
     if (duration > 0)
     {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     if (completion)
     {
-        options.transitionFinishFn = [completion]() {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        animationOptions.transitionFinishFn = [completion]() {
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
     
     [self willChangeValueForKey:@"camera"];
-    _mbglMap->easeTo(options);
+    _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
 
@@ -1886,29 +1892,30 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         return;
     }
 
-    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::AnimationOptions animationOptions;
     if (duration >= 0)
     {
-        options.duration = MGLDurationInSeconds(duration);
+        animationOptions.duration = MGLDurationInSeconds(duration);
     }
     if (peakAltitude >= 0)
     {
         CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
         CLLocationDegrees peakPitch = (self.camera.pitch + camera.pitch) / 2;
-        options.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
-                                                  peakLatitude, self.frame.size);
+        animationOptions.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
+                                                           peakLatitude, self.frame.size);
     }
     if (completion)
     {
-        options.transitionFinishFn = [completion]() {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        animationOptions.transitionFinishFn = [completion]() {
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
     
     [self willChangeValueForKey:@"camera"];
-    _mbglMap->flyTo(options);
+    _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
 

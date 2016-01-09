@@ -148,20 +148,20 @@ bool Map::isPanning() const {
 
 #pragma mark -
 
-void Map::jumpTo(const CameraOptions& options) {
-    transform->jumpTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::jumpTo(const CameraOptions& camera) {
+    transform->jumpTo(camera);
+    update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
 
-void Map::easeTo(const CameraOptions& options) {
-    transform->easeTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    transform->easeTo(camera, animation);
+    update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
     
     
-void Map::flyTo(const CameraOptions& options) {
-    transform->flyTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    transform->flyTo(camera, animation);
+    update(Update::Zoom);
 }
 
 #pragma mark - Position

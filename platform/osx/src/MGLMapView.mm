@@ -954,24 +954,25 @@ public:
         return;
     }
     
-    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        options.duration = MGLDurationInSeconds(duration);
-        options.easing = MGLUnitBezierForMediaTimingFunction(function);
+        animationOptions.duration = MGLDurationInSeconds(duration);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     if (completion) {
-        options.transitionFinishFn = [completion]() {
+        animationOptions.transitionFinishFn = [completion]() {
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCamera: within the completion handler
             // would reenter the completion handler’s caller.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
     
     [self willChangeValueForKey:@"camera"];
-    _mbglMap->easeTo(options);
+    _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
 
@@ -989,29 +990,30 @@ public:
         return;
     }
     
-    mbgl::CameraOptions options = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::AnimationOptions animationOptions;
     if (duration >= 0) {
-        options.duration = MGLDurationInSeconds(duration);
+        animationOptions.duration = MGLDurationInSeconds(duration);
     }
     if (peakAltitude >= 0) {
         CLLocationDegrees peakLatitude = (self.centerCoordinate.latitude + camera.centerCoordinate.latitude) / 2;
         CLLocationDegrees peakPitch = (self.camera.pitch + camera.pitch) / 2;
-        options.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
-                                                  peakLatitude, self.frame.size);
+        animationOptions.minZoom = MGLZoomLevelForAltitude(peakAltitude, peakPitch,
+                                                           peakLatitude, self.frame.size);
     }
     if (completion) {
-        options.transitionFinishFn = [completion]() {
+        animationOptions.transitionFinishFn = [completion]() {
             // Must run asynchronously after the transition is completely over.
             // Otherwise, a call to -setCamera: within the completion handler
             // would reenter the completion handler’s caller.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 completion();
             });
         };
     }
     
     [self willChangeValueForKey:@"camera"];
-    _mbglMap->flyTo(options);
+    _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
 
@@ -1052,16 +1054,17 @@ public:
     _mbglMap->cancelTransitions();
     
     mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    mbgl::CameraOptions options = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets);
+    mbgl::AnimationOptions animationOptions;
     if (animated) {
-        options.duration = MGLDurationInSeconds(MGLAnimationDuration);
+        animationOptions.duration = MGLDurationInSeconds(MGLAnimationDuration);
     }
     
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
-    options.transitionFinishFn = ^() {
+    animationOptions.transitionFinishFn = ^() {
         [self didChangeValueForKey:@"visibleCoordinateBounds"];
     };
-    _mbglMap->easeTo(options);
+    _mbglMap->easeTo(cameraOptions, animationOptions);
 }
 
 #pragma mark Mouse events and gestures

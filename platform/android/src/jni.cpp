@@ -1290,19 +1290,19 @@ void JNICALL nativeSetVisibleCoordinateBounds(JNIEnv *env, jobject obj, jlong na
         segment.push_back(mbgl::LatLng(latitude, longitude));
     }
 
-    mbgl::CameraOptions options = nativeMapView->getMap().cameraForLatLngs(segment, mbglInsets);
-
+    mbgl::CameraOptions cameraOptions = nativeMapView->getMap().cameraForLatLngs(segment, mbglInsets);
     if (direction >= 0) {
         // convert from degrees to radians
-        options.angle = (-direction * M_PI) / 180;
+        cameraOptions.angle = (-direction * M_PI) / 180;
     }
+    mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        options.duration = std::chrono::milliseconds(duration);
+        animationOptions.duration = std::chrono::milliseconds(duration);
         // equivalent to kCAMediaTimingFunctionDefault in iOS
-        options.easing = {0.25, 0.1, 0.25, 0.1};
+        animationOptions.easing = {0.25, 0.1, 0.25, 0.1};
     }
 
-    nativeMapView->getMap().easeTo(options);
+    nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
 }
 
 void JNICALL nativeOnLowMemory(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1528,20 +1528,21 @@ void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
         return;
     }
 
-    mbgl::CameraOptions options;
+    mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        options.angle = angle;
+        cameraOptions.angle = angle;
     }
-    options.center = mbgl::LatLng(latitude, longitude);
-    options.duration = mbgl::Duration(duration);
+    cameraOptions.center = mbgl::LatLng(latitude, longitude);
     if (pitch != -1) {
-        options.pitch = pitch;
+        cameraOptions.pitch = pitch;
     }
     if (zoom != -1) {
-        options.zoom = zoom;
+        cameraOptions.zoom = zoom;
     }
+    mbgl::AnimationOptions animationOptions;
+    animationOptions.duration = mbgl::Duration(duration);
 
-    nativeMapView->getMap().easeTo(options);
+    nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
 }
 
 void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
@@ -1561,20 +1562,21 @@ void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdoub
         return;
     }
 
-    mbgl::CameraOptions options;
+    mbgl::CameraOptions cameraOptions;
     if (angle != -1) {
-        options.angle = angle;
+        cameraOptions.angle = angle;
     }
-    options.center = mbgl::LatLng(latitude, longitude);
-    options.duration = mbgl::Duration(duration);
+    cameraOptions.center = mbgl::LatLng(latitude, longitude);
     if (pitch != -1) {
-        options.pitch = pitch;
+        cameraOptions.pitch = pitch;
     }
     if (zoom != -1) {
-        options.zoom = zoom;
+        cameraOptions.zoom = zoom;
     }
+    mbgl::AnimationOptions animationOptions;
+    animationOptions.duration = mbgl::Duration(duration);
 
-    nativeMapView->getMap().flyTo(options);
+    nativeMapView->getMap().flyTo(cameraOptions, animationOptions);
 }
 
 void JNICALL nativeAddCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject customLayer, jstring before) {
