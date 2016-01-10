@@ -27,6 +27,8 @@ custom_categories:
     children:
       - MGLAnnotation
       - MGLAnnotationImage
+      - MGLCalloutView
+      - MGLCalloutViewDelegate
       - MGLMultiPoint
       - MGLPointAnnotation
       - MGLPolygon
