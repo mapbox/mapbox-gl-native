@@ -71,7 +71,6 @@ public:
 
     Map::StillImageCallback callback;
     size_t sourceCacheSize;
-    TransformState transformState;
     TimePoint timePoint;
     bool loading = false;
 };
@@ -147,9 +146,7 @@ void Map::update(Update flags) {
         impl->transform.resize(impl->view.getSize());
     }
 
-    impl->transformState = impl->transform.getState();
     impl->updateFlags |= flags;
-
     impl->asyncUpdate.send();
 }
 
@@ -214,13 +211,13 @@ void Map::Impl::update() {
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transformState.getZoom(), timePoint, mode);
+        style->recalculate(transform.getZoom(), timePoint, mode);
     }
 
     StyleUpdateParameters parameters(pixelRatio,
                                      debugOptions,
                                      timePoint,
-                                     transformState,
+                                     transform.getState(),
                                      style->workers,
                                      fileSource,
                                      *texturePool,
@@ -243,10 +240,8 @@ void Map::Impl::update() {
 }
 
 void Map::Impl::render() {
-    transformState = transform.getState();
-
     if (!painter) {
-        painter = std::make_unique<Painter>(transformState, glObjectStore);
+        painter = std::make_unique<Painter>(transform.getState(), glObjectStore);
     }
 
     FrameData frameData { view.getFramebufferSize(),

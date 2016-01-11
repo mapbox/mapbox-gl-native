@@ -83,7 +83,7 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(TransformState&, gl::GLObjectStore&);
+    Painter(const TransformState&, gl::GLObjectStore&);
     ~Painter();
 
     void render(const Style& style,
@@ -155,7 +155,7 @@ private:
         return identity;
     }();
 
-    TransformState& state;
+    const TransformState& state;
     gl::GLObjectStore& glObjectStore;
 
     FrameData frame;
