@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".MapboxApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@drawable/icon_burned"
