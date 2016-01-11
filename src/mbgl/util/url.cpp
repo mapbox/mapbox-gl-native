@@ -71,13 +71,5 @@ std::string templateTileURL(const std::string& url, const TileID& id, float pixe
     });
 }
 
-namespace {
-const std::string assetProtocol = "asset://";
-}
-
-bool isAssetURL(const std::string& url) {
-    return std::equal(assetProtocol.begin(), assetProtocol.end(), url.begin());
-}
-
 } // namespace util
 } // namespace mbgl

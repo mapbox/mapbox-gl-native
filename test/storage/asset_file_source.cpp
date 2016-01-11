@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -19,7 +19,7 @@ std::string getFileSourceRoot() {
 
 class TestWorker {
 public:
-    TestWorker(mbgl::OnlineFileSource* fs_) : fs(fs_) {}
+    TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
 
     void run(std::function<void()> endCallback) {
         const std::string asset("asset://TEST_DATA/fixtures/storage/nonempty");
@@ -47,7 +47,7 @@ public:
 private:
     unsigned numRequests = 1000;
 
-    mbgl::OnlineFileSource* fs;
+    mbgl::AssetFileSource* fs;
     std::unique_ptr<mbgl::FileRequest> request;
 
     std::function<void(mbgl::Response)> requestCallback;
@@ -62,7 +62,7 @@ TEST_F(Storage, AssetStress) {
 
     util::RunLoop loop;
 
-    mbgl::OnlineFileSource fs(nullptr, getFileSourceRoot());
+    AssetFileSource fs(getFileSourceRoot());
 
     unsigned numThreads = 50;
 
@@ -98,7 +98,7 @@ TEST_F(Storage, AssetEmptyFile) {
 
     util::RunLoop loop;
 
-    OnlineFileSource fs(nullptr, getFileSourceRoot());
+    AssetFileSource fs(getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, [&](Response res) {
         req.reset();
@@ -106,9 +106,6 @@ TEST_F(Storage, AssetEmptyFile) {
         EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("", *res.data);
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_LT(1420000000, res.modified.count());
-        EXPECT_NE("", res.etag);
         loop.stop();
         EmptyFile.finish();
     });
@@ -123,17 +120,12 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     util::RunLoop loop;
 
-    OnlineFileSource fs(nullptr, getFileSourceRoot());
+    AssetFileSource fs(getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_LT(1420000000, res.modified.count());
-        EXPECT_NE("", res.etag);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
         loop.stop();
@@ -150,7 +142,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     util::RunLoop loop;
 
-    OnlineFileSource fs(nullptr, getFileSourceRoot());
+    AssetFileSource fs(getFileSourceRoot());
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" }, [&](Response res) {
         req.reset();
@@ -158,14 +150,7 @@ TEST_F(Storage, AssetNonExistentFile) {
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
-#ifdef MBGL_ASSET_ZIP
-        EXPECT_EQ("Could not stat file in zip archive", res.error->message);
-#elif MBGL_ASSET_FS
-        EXPECT_EQ("No such file or directory", res.error->message);
-#endif
+        // Do not assert on platform-specific error message.
         loop.stop();
         NonExistentFile.finish();
     });
@@ -173,42 +158,24 @@ TEST_F(Storage, AssetNonExistentFile) {
     loop.run();
 }
 
-TEST_F(Storage, AssetNotCached) {
-    SCOPED_TEST(NotCached)
+TEST_F(Storage, AssetReadDirectory) {
+    SCOPED_TEST(ReadDirectory)
 
     using namespace mbgl;
 
-    const Resource resource { Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" };
-
     util::RunLoop loop;
 
-    SQLiteCache cache(":memory:");
+    AssetFileSource fs(getFileSourceRoot());
 
-    // Add a fake response to the cache to verify that we don't retrieve it.
-    {
-        auto response = std::make_shared<Response>();
-        response->data = std::make_shared<const std::string>("cached data");
-        cache.put(resource, response, FileCache::Hint::Full);
-    }
-
-    OnlineFileSource fs(&cache, getFileSourceRoot());
-
-    std::unique_ptr<WorkRequest> workReq;
-    std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {
         req.reset();
-
-        EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
-
-        workReq = cache.get(resource, [&](std::shared_ptr<Response> response) {
-            // Check that we didn't put the file into the cache
-            ASSERT_TRUE(response->data.get());
-            EXPECT_EQ(*response->data, "cached data");
-
-            loop.stop();
-            NotCached.finish();
-        });
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ(false, res.stale);
+        ASSERT_FALSE(res.data.get());
+        // Do not assert on platform-specific error message.
+        loop.stop();
+        ReadDirectory.finish();
     });
 
     loop.run();

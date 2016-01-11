@@ -4,7 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
 
@@ -18,9 +18,9 @@ TEST(API, RepeatedRender) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 256, 512);
 #ifdef MBGL_ASSET_ZIP
-    OnlineFileSource fileSource(nullptr, "test/fixtures/api/assets.zip");
+    DefaultFileSource fileSource(":memory", "test/fixtures/api/assets.zip");
 #else
-    OnlineFileSource fileSource(nullptr);
+    DefaultFileSource fileSource;
 #endif
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
