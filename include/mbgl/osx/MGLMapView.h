@@ -69,7 +69,7 @@ IB_DESIGNABLE
     
     @param frame The frame for the view, measured in points.
     @return An initialized map view. */
-- (instancetype)initWithFrame:(CGRect)frame;
+- (instancetype)initWithFrame:(NSRect)frame;
 
 /** Initializes and returns a newly allocated map view with the specified frame
     and style URL.
@@ -80,7 +80,7 @@ IB_DESIGNABLE
         (`mapbox://styles/<user>/<style>`), or a path to a local file relative
         to the application’s resource path. Specify `nil` for the default style.
     @return An initialized map view. */
-- (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
+- (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL;
 
 #pragma mark Accessing the delegate
 /** @name Accessing the Delegate */

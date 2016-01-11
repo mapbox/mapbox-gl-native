@@ -200,7 +200,7 @@ public:
     return self;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL {
+- (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL {
     if (self = [super initWithFrame:frame]) {
         [self commonInit];
         self.styleURL = styleURL;
