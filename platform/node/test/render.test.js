@@ -22,7 +22,7 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
                 if (err) {
                     callback(err);
                 } else if (response.statusCode != 200) {
-                    callback(response.statusMessage);
+                    callback(new Error(response.statusMessage));
                 } else {
                     callback(null, {data: body});
                 }
