@@ -59,8 +59,8 @@ Server::Server(const char* executable) {
         close(output[1]);
         close(output[0]);
 
-        // Launch the actual server process, with the pipe ID as the first argument.
-        int ret = execl(executable, executable);
+        // Launch the actual server process.
+        int ret = execl(executable, executable, nullptr);
 
         // This call should not return. In case execl failed, we exit anyway.
         if (ret < 0) {
