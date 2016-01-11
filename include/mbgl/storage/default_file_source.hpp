@@ -7,7 +7,7 @@ namespace mbgl {
 
 class DefaultFileSource : public FileSource {
 public:
-    DefaultFileSource(const std::string& cachePath = ":memory:", const std::string& root = "");
+    DefaultFileSource(const std::string& cachePath, const std::string& assetRoot);
     ~DefaultFileSource() override;
 
     void setAccessToken(const std::string&);

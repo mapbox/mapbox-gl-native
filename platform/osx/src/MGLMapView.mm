@@ -246,7 +246,7 @@ public:
                                                    error:nil];
     NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     NSString *cachePath = cacheURL ? cacheURL.path : @"";
-    _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String);
+    _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
     
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
     
@@ -524,8 +524,7 @@ public:
     }
     
     if (![styleURL scheme]) {
-        // Assume a relative path into the application’s resource folder,
-        // defined in mbgl::platform::assetRoot().
+        // Assume a relative path into the application’s resource folder.
         styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:styleURL.absoluteString]];
     }
     

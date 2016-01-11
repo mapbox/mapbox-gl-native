@@ -11,9 +11,10 @@ namespace {
 
 std::string getFileSourceRoot() {
 #ifdef MBGL_ASSET_ZIP
+    // Regenerate with `cd test/fixtures/storage/ && zip -r assets.zip assets/`
     return "test/fixtures/storage/assets.zip";
 #else
-    return "";
+    return "test/fixtures/storage/assets";
 #endif
 }
 
@@ -22,7 +23,7 @@ public:
     TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
 
     void run(std::function<void()> endCallback) {
-        const std::string asset("asset://TEST_DATA/fixtures/storage/nonempty");
+        const std::string asset("asset://nonempty");
 
         requestCallback = [this, asset, endCallback](mbgl::Response res) {
             EXPECT_EQ(nullptr, res.error);
@@ -100,7 +101,7 @@ TEST_F(Storage, AssetEmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/empty" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -122,7 +123,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/nonempty" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_EQ(false, res.stale);
@@ -144,7 +145,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage/does_not_exist" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
@@ -167,7 +168,7 @@ TEST_F(Storage, AssetReadDirectory) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://TEST_DATA/fixtures/storage" }, [&](Response res) {
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
