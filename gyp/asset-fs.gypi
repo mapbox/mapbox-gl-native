@@ -7,7 +7,7 @@
       'hard_dependency': 1,
 
       'sources': [
-        '../platform/default/asset_request_fs.cpp',
+        '../platform/default/asset_file_source.cpp',
       ],
 
       'include_dirs': [

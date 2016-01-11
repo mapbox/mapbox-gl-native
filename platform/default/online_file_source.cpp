@@ -1,10 +1,8 @@
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/asset_context_base.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
-#include <mbgl/platform/platform.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/thread.hpp>
@@ -14,7 +12,6 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/timer.hpp>
-#include <mbgl/util/url.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -83,7 +80,7 @@ class OnlineFileSource::Impl {
 public:
     using Callback = std::function<void (Response)>;
 
-    Impl(FileCache*, const std::string& = "");
+    Impl(FileCache*);
     ~Impl();
 
     void networkIsReachableAgain();
@@ -96,17 +93,14 @@ private:
 
     std::unordered_map<Resource, std::unique_ptr<OnlineFileRequestImpl>, Resource::Hash> pending;
     FileCache* const cache;
-    const std::string assetRoot;
-    const std::unique_ptr<AssetContextBase> assetContext;
     const std::unique_ptr<HTTPContextBase> httpContext;
     util::AsyncTask reachability;
 };
 
-OnlineFileSource::OnlineFileSource(FileCache* cache, const std::string& root)
+OnlineFileSource::OnlineFileSource(FileCache* cache)
     : thread(std::make_unique<util::Thread<Impl>>(
           util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low },
-          cache,
-          root)) {
+          cache)) {
 }
 
 OnlineFileSource::~OnlineFileSource() = default;
@@ -152,10 +146,8 @@ void OnlineFileSource::cancel(const Resource& res, FileRequest* req) {
 
 // ----- Impl -----
 
-OnlineFileSource::Impl::Impl(FileCache* cache_, const std::string& root)
+OnlineFileSource::Impl::Impl(FileCache* cache_)
     : cache(cache_),
-      assetRoot(root.empty() ? platform::assetRoot() : root),
-      assetContext(AssetContextBase::createContext()),
       httpContext(HTTPContextBase::createContext()),
       reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
     // Subscribe to network status changes, but make sure that this async handle doesn't keep the
@@ -242,7 +234,7 @@ void OnlineFileRequestImpl::addObserver(FileRequest* req, Callback callback, Onl
     } else if (!cacheRequest && !realRequest) {
         // There is no request in progress, and we don't have a response yet. This means we'll have
         // to start the request ourselves.
-        if (impl.cache && !util::isAssetURL(resource.url)) {
+        if (impl.cache) {
             scheduleCacheRequest(impl);
         } else {
             scheduleRealRequest(impl);
@@ -330,7 +322,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
             // In particular, we don't want to write a Canceled request, or one that failed due to
             // connection errors to the cache. Server errors are hopefully also temporary, so we're not
             // caching them either.
-            if (impl.cache && !util::isAssetURL(resource.url) &&
+            if (impl.cache &&
                 (!response_->error || (response_->error->reason == Response::Error::Reason::NotFound))) {
                 // Store response in database. Make sure we only refresh the expires column if the data
                 // didn't change.
@@ -357,11 +349,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
             scheduleRealRequest(impl);
         };
 
-        if (util::isAssetURL(resource.url)) {
-            realRequest = impl.assetContext->createRequest(resource.url, callback, impl.assetRoot);
-        } else {
-            realRequest = impl.httpContext->createRequest(resource.url, callback, response);
-        }
+        realRequest = impl.httpContext->createRequest(resource.url, callback, response);
     });
 }
 

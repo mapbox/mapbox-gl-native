@@ -20,14 +20,6 @@
 namespace mbgl {
 namespace test {
 
-std::string getFileSourceRoot() {
-#ifdef MBGL_ASSET_ZIP
-    return "test/fixtures/annotations/assets.zip";
-#else
-    return "";
-#endif
-}
-
 Server::Server(const char* executable) {
     int input[2];
     int output[2];

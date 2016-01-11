@@ -1,16 +1,32 @@
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
+
+#include <mbgl/platform/platform.hpp>
+#include <mbgl/util/url.hpp>
+
+namespace {
+
+const std::string assetProtocol = "asset://";
+
+bool isAssetURL(const std::string& url) {
+    return std::equal(assetProtocol.begin(), assetProtocol.end(), url.begin());
+}
+
+} // namespace
 
 namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(const std::string& cachePath, const std::string& root)
-        : cache(SharedSQLiteCache::get(cachePath)),
-          onlineFileSource(cache.get(), root) {
+    Impl(const std::string& cachePath, const std::string& assetRoot)
+        : assetFileSource(assetRoot),
+          cache(SharedSQLiteCache::get(cachePath)),
+          onlineFileSource(cache.get()) {
     }
 
+    AssetFileSource assetFileSource;
     std::shared_ptr<SQLiteCache> cache;
     OnlineFileSource onlineFileSource;
 };
@@ -38,7 +54,11 @@ void DefaultFileSource::setMaximumCacheEntrySize(uint64_t size) {
 }
 
 std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
-    return impl->onlineFileSource.request(resource, callback);
+    if (isAssetURL(resource.url)) {
+        return impl->assetFileSource.request(resource, callback);
+    } else {
+        return impl->onlineFileSource.request(resource, callback);
+    }
 }
 
 } // namespace mbgl
