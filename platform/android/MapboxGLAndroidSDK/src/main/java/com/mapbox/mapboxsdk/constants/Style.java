@@ -2,7 +2,7 @@ package com.mapbox.mapboxsdk.constants;
 
 import android.support.annotation.StringDef;
 
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

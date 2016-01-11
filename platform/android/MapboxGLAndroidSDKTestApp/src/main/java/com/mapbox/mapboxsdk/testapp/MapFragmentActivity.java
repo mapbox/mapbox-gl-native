@@ -1,23 +1,22 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.mapbox.mapboxsdk.MapFragment;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 public class MapFragmentActivity extends AppCompatActivity {
-
-    private static final String TAG_FRAGMENT = "map";
-    private MyMapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,31 +32,28 @@ public class MapFragmentActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
+        MapFragment mapFragment;
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.fragment_container, mMapFragment = new MyMapFragment(), TAG_FRAGMENT);
+            transaction.add(R.id.fragment_container, mapFragment = new MapFragment(), "com.mapbox.map");
             transaction.commit();
         } else {
-            mMapFragment = (MyMapFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAGMENT);
+            mapFragment = (MapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
-    }
 
-    public static class MyMapFragment extends MapFragment {
-
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-
-            MapView mapView = getMap();
-            mapView.setStyleUrl(Style.EMERALD);
-            mapView.setZoom(12);
-            mapView.setLatLng(new LatLng(50.853658, 4.352419));
-
-            // move attribution control to right of screen
-            mapView.setAttributionGravity(Gravity.BOTTOM | Gravity.END);
-            int tenDp =  (int) getResources().getDimension(R.dimen.attr_margin);
-            mapView.setAttributionMargins(0, 0, tenDp, tenDp);
-        }
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(new LatLng(48.861431, 2.334166))
+                                .zoom(10)
+                                .bearing(0)
+                                .tilt(0)
+                                .build()));
+            }
+        });
     }
 
     @Override

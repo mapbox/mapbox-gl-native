@@ -1,9 +1,17 @@
 package com.mapbox.mapboxsdk.camera;
 
+import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
+
+import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 public final class CameraPosition implements Parcelable {
 
@@ -44,34 +52,21 @@ public final class CameraPosition implements Parcelable {
     public final float zoom;
 
     /**
-     *
      * Constructs a CameraPosition.
-     * @param target The target location to align with the center of the screen.
-     * @param zoom Zoom level at target. See zoom(float) for details of restrictions.
-     * @param tilt The camera angle, in degrees, from the nadir (directly down). See tilt(float) for details of restrictions.
+     *
+     * @param target  The target location to align with the center of the screen.
+     * @param zoom    Zoom level at target. See zoom(float) for details of restrictions.
+     * @param tilt    The camera angle, in degrees, from the nadir (directly down). See tilt(float) for details of restrictions.
      * @param bearing Direction that the camera is pointing in, in degrees clockwise from north. This value will be normalized to be within 0 degrees inclusive and 360 degrees exclusive.
-     * @throws NullPointerException if target is null
+     * @throws NullPointerException     if target is null
      * @throws IllegalArgumentException if tilt is outside the range of 0 to 90 degrees inclusive.
      */
-    public CameraPosition (LatLng target, float zoom, float tilt, float bearing) throws NullPointerException, IllegalArgumentException{
-        super();
-        if (target == null) {
-            throw new NullPointerException("target is NULL");
-        }
+    CameraPosition(LatLng target, float zoom, float tilt, float bearing) {
         this.target = target;
-
-        // Allow for default value of -1
-        if (tilt != -1) {
-            if (tilt < 0.0f || tilt > 90.0f) {
-                throw new IllegalArgumentException("tilt is outside of 0 to 90 degrees range");
-            }
-        }
-        this.tilt = tilt;
-
         this.bearing = bearing;
+        this.tilt = tilt;
         this.zoom = zoom;
     }
-
 
     @Override
     public int describeContents() {
@@ -84,6 +79,36 @@ public final class CameraPosition implements Parcelable {
         out.writeParcelable(target, flags);
         out.writeFloat(tilt);
         out.writeFloat(zoom);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CameraPosition cameraPosition = (CameraPosition) o;
+        if (!target.equals(cameraPosition.target)) {
+            return false;
+        } else if (zoom != cameraPosition.zoom) {
+            return false;
+        } else if (tilt != cameraPosition.tilt) {
+            return false;
+        } else if (bearing != cameraPosition.bearing) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * result + (target != null ? target.hashCode() : 0);
+        return result;
     }
 
     /**
@@ -105,6 +130,7 @@ public final class CameraPosition implements Parcelable {
 
         /**
          * Create Builder with an existing CameraPosition data.
+         *
          * @param previous Existing CameraPosition values to use
          */
         public Builder(CameraPosition previous) {
@@ -118,17 +144,64 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
+         * Create Builder with an existing CameraPosition data.
+         *
+         * @param typedArray TypedArray containgin attribute values
+         */
+        public Builder(TypedArray typedArray){
+            super();
+            if(typedArray!=null) {
+                this.bearing = typedArray.getFloat(R.styleable.MapView_direction, 0.0f);
+                double lat = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
+                double lng = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
+                this.target= new LatLng(lat, lng);
+                this.tilt = typedArray.getFloat(R.styleable.MapView_tilt, 0.0f);
+                this.zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
+            }
+        }
+
+        /**
+         * Create Builder from an existing PositionCameraUpdate update.
+         *
+         * @param update Update containing camera options
+         */
+        public Builder(CameraUpdateFactory.PositionCameraUpdate update) {
+            super();
+            if (update != null) {
+                this.bearing = update.getBearing();
+                this.target = update.getTarget();
+                this.tilt = update.getTilt();
+                this.zoom = update.getZoom();
+            }
+        }
+
+
+        /**
+         * Create Builder from an existing PositionCameraUpdate update.
+         *
+         * @param update Update containing camera options
+         */
+        public Builder(CameraUpdateFactory.ZoomUpdate update){
+            super();
+            if(update!=null){
+                this.zoom = update.getZoom();
+            }
+        }
+
+        /**
          * Sets the direction that the camera is pointing in, in degrees clockwise from north.
+         *
          * @param bearing Bearing
          * @return Builder
          */
-        public Builder bearing (float bearing) {
-            this.bearing = bearing;
+        public Builder bearing(float bearing) {
+            this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
             return this;
         }
 
         /**
          * Builds a CameraPosition.
+         *
          * @return CameraPosition
          */
         public CameraPosition build() {
@@ -137,6 +210,7 @@ public final class CameraPosition implements Parcelable {
 
         /**
          * Sets the location that the camera is pointing at.
+         *
          * @param location Location
          * @return Builder
          */
@@ -147,17 +221,19 @@ public final class CameraPosition implements Parcelable {
 
         /**
          * Set the tilt
+         *
          * @param tilt Tilt value
          * @return Builder
          */
         @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(float tilt) {
-            this.tilt = tilt;
+            this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
             return this;
         }
 
         /**
          * Set the zoom
+         *
          * @param zoom Zoom value
          * @return Builder
          */

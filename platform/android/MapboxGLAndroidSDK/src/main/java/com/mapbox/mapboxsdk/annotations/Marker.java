@@ -4,15 +4,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
  * Marker is an annotation that shows an icon image at a geographical location.
  * </p>
  * An {@link InfoWindow} can be shown when a Marker is pressed
- * <p>
+ * <p/>
  */
 public final class Marker extends Annotation {
 
@@ -55,8 +56,6 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
-     *
-     * @return boolean State of a InfoWindow
      */
     public boolean isInfoWindowShown() {
         return infoWindowShown;
@@ -72,8 +71,6 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
-     *
-     * @param icon The icon to be used as Marker image
      */
     public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
@@ -89,25 +86,25 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
-     *
-     * @param mapView The MapView to show the InfoWindow on.
-     * @return infoWindow The infoWindow to show
      */
-    public InfoWindow showInfoWindow(@NonNull MapView mapView) {
-        setMapView(mapView);
-        MapView.InfoWindowAdapter infoWindowAdapter = getMapView().getInfoWindowAdapter();
+    public InfoWindow showInfoWindow(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
+        setMapboxMap(mapboxMap);
+        MapboxMap.InfoWindowAdapter infoWindowAdapter = getMapboxMap().getInfoWindowAdapter();
         if (infoWindowAdapter != null) {
             // end developer is using a custom InfoWindowAdapter
             View content = infoWindowAdapter.getInfoWindow(this);
             if (content != null) {
-                infoWindow = new InfoWindow(content, getMapView());
+                infoWindow = new InfoWindow(content, mapboxMap);
                 showInfoWindow(infoWindow, mapView);
                 return infoWindow;
             }
         }
 
-        getInfoWindow().adaptDefaultMarker(this, mapView);
-        return showInfoWindow(getInfoWindow(), mapView);
+        InfoWindow infoWindow = getInfoWindow(mapView);
+        if (mapView.getContext() != null) {
+            infoWindow.adaptDefaultMarker(this, mapboxMap, mapView);
+        }
+        return showInfoWindow(infoWindow, mapView);
     }
 
     private InfoWindow showInfoWindow(InfoWindow iw, MapView mapView) {
@@ -116,27 +113,15 @@ public final class Marker extends Annotation {
         return iw;
     }
 
-    private InfoWindow getInfoWindow() {
-        if (infoWindow == null) {
-            infoWindow = new InfoWindow(R.layout.infowindow_view, getMapView());
+    private InfoWindow getInfoWindow(@NonNull MapView mapView) {
+        if (infoWindow == null && mapView.getContext() != null) {
+            infoWindow = new InfoWindow(mapView, R.layout.infowindow_view, getMapboxMap());
         }
         return infoWindow;
     }
 
-    /*
-    @Override
-    void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (!visible && infoWindowShown) {
-            hideInfoWindow();
-        }
-    }
-    */
-
     /**
      * Do not use this method. Used internally by the SDK.
-     *
-     * @param topOffsetPixels the pixels to have as offset
      */
     public void setTopOffsetPixels(int topOffsetPixels) {
         this.topOffsetPixels = topOffsetPixels;

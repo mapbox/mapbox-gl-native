@@ -1,3 +1,5 @@
+package com.mapbox.mapboxsdk.maps;
+
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 

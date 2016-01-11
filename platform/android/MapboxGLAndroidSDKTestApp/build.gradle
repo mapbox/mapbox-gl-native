@@ -58,6 +58,10 @@ android {
         disable 'InvalidPackage'
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     buildTypes {
         debug{
             // run code coverage reports

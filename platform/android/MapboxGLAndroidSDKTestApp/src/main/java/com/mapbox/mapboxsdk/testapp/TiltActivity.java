@@ -1,18 +1,26 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 public class TiltActivity extends AppCompatActivity {
 
-    private MapView mMapView = null;
+    private final static LatLng WASHINGTON_DC = new LatLng(38.90252, -77.02291);
+
+    private MapView mMapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +36,34 @@ public class TiltActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        LatLng dc = new LatLng(38.90252, -77.02291);
-
         // Set up the map
         mMapView = (MapView) findViewById(R.id.tiltMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mMapView.setLatLng(dc);
-        mMapView.setZoom(11);
         mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                mapboxMap.setStyle(Style.MAPBOX_STREETS);
+
+                // Move camera to Washington DC
+                CameraPosition normalCameraPosition = new CameraPosition.Builder()
+                        .target(WASHINGTON_DC)
+                        .zoom(11)
+                        .bearing(0)
+                        .tilt(0)
+                        .build();
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(normalCameraPosition));
+
+                // Animate camera tilting
+                CameraPosition tiltedCameraPosition = new CameraPosition.Builder()
+                        .target(WASHINGTON_DC)
+                        .zoom(11)
+                        .bearing(0)
+                        .tilt(45.0f)
+                        .build();
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(tiltedCameraPosition), 10000);
+            }
+        });
     }
 
     @Override
@@ -52,7 +79,7 @@ public class TiltActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause()  {
+    public void onPause() {
         super.onPause();
         mMapView.onPause();
     }
@@ -61,9 +88,6 @@ public class TiltActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
-
-        // Tilt Map 45 degrees over 10 seconds
-        mMapView.setTilt(45.0, 10000l);
     }
 
     @Override

@@ -8,7 +8,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -24,6 +23,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
@@ -34,10 +37,12 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     // Used for the UI
     private DrawerLayout mDrawerLayout;
     private MapView mMapView;
+    private MapboxMap mMapboxMap;
     private TextView mFpsTextView;
     private int mSelectedStyle = R.id.actionStyleMapboxStreets;
     private NavigationView mNavigationView;
@@ -88,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Called when activity is created
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Load the layout
@@ -112,73 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
 
-        mMapView = (MapView) findViewById(R.id.mainMapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
-
-        mMapView.setOnFpsChangedListener(new MyOnFpsChangedListener());
-
-        mMapView.setOnMapLongClickListener(new MapView.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(@NonNull LatLng point) {
-                MarkerOptions marker = new MarkerOptions()
-                        .position(point)
-                        .title("Dropped Pin")
-                        .snippet(LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
-                                LAT_LON_FORMATTER.format(point.getLongitude()))
-                        .icon(null);
-
-                mMarkerList.add(marker);
-                mMapView.addMarker(marker);
-            }
-        });
-
-        mMapView.setOnMapClickListener(new MapView.OnMapClickListener() {
-            @Override
-            public void onMapClick(@NonNull LatLng point) {
-                String location = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
-                        LAT_LON_FORMATTER.format(point.getLongitude());
-                Snackbar.make(mCoordinatorLayout, "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
-            }
-        });
-
-        mMapView.setOnMarkerClickListener(new MapView.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Snackbar.make(mCoordinatorLayout, "Marker Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-        mMapView.setOnInfoWindowClickListener(new MapView.OnInfoWindowClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Snackbar.make(mCoordinatorLayout, "InfoWindow Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
-                marker.hideInfoWindow();
-                return true;
-            }
-        });
-
-        mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
-            @Override
-            public void onMyLocationChange(@Nullable Location location) {
-                String desc = "Loc Chg: ";
-                boolean noInfo = true;
-                if (location.hasSpeed()) {
-                    desc += String.format("Spd = %.1f km/h ", location.getSpeed() * 3.6f);
-                    noInfo = false;
-                }
-                if (location.hasAltitude()) {
-                    desc += String.format("Alt = %.0f m ", location.getAltitude());
-                    noInfo = false;
-                }
-                if (noInfo) {
-                    desc += "No extra info";
-                }
-                Snackbar.make(mCoordinatorLayout, desc, Snackbar.LENGTH_SHORT).show();
-            }
-        });
-
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
@@ -187,24 +126,102 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Toggle GPS position updates
-                toggleGps(!mMapView.isMyLocationEnabled());
+                if (mMapboxMap != null) {
+                    toggleGps(!mMapboxMap.isMyLocationEnabled());
+                }
             }
         });
 
-        // Restore saved state
-        if (savedInstanceState != null) {
-            mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
-            mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
-            mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-            mMapView.addMarkers(mMarkerList);
-        }
+        mMapView = (MapView) findViewById(R.id.mainMapView);
+        mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                mMapboxMap = mapboxMap;
 
-        // Set default UI state
-        mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mMapView.isCompassEnabled());
-        mNavigationView.getMenu().findItem(R.id.action_debug).setChecked(mMapView.isDebugActive());
-        mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
-        changeMapStyle(mSelectedStyle);
-        toggleGps(mMapView.isMyLocationEnabled());
+                mMapboxMap.setOnFpsChangedListener(new MyOnFpsChangedListener());
+
+                // add location listener to MapboxMap
+                mapboxMap.setOnMyLocationChangeListener(new MapboxMap.OnMyLocationChangeListener() {
+                    @Override
+                    public void onMyLocationChange(@Nullable Location location) {
+                        String desc = "Loc Chg: ";
+                        boolean noInfo = true;
+                        if (location.hasSpeed()) {
+                            desc += String.format("Spd = %.1f km/h ", location.getSpeed() * 3.6f);
+                            noInfo = false;
+                        }
+                        if (location.hasAltitude()) {
+                            desc += String.format("Alt = %.0f m ", location.getAltitude());
+                            noInfo = false;
+                        }
+                        if (noInfo) {
+                            desc += "No extra info";
+                        }
+                        Snackbar.make(mCoordinatorLayout, desc, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
+                // Set default UI state
+                mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mapboxMap.isCompassEnabled());
+                mNavigationView.getMenu().findItem(R.id.action_debug).setChecked(mapboxMap.isDebugActive());
+                mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
+                toggleGps(mapboxMap.isMyLocationEnabled());
+
+                // Listeners
+                mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(@NonNull LatLng point) {
+                        MarkerOptions marker = new MarkerOptions()
+                                .position(point)
+                                .title("Dropped Pin")
+                                .snippet(LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
+                                        LAT_LON_FORMATTER.format(point.getLongitude()))
+                                .icon(null);
+
+                        mMarkerList.add(marker);
+                        mapboxMap.addMarker(marker);
+                    }
+                });
+
+                // Restore saved state
+                if (savedInstanceState != null) {
+                    mIsAnnotationsOn = savedInstanceState.getBoolean(STATE_IS_ANNOTATIONS_ON);
+                    mSelectedStyle = savedInstanceState.getInt(STATE_SELECTED_STYLE);
+                    mMarkerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+                    mapboxMap.addMarkers(mMarkerList);
+                }
+
+                mMapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        Snackbar.make(mCoordinatorLayout, "Marker Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
+
+                mMapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(@NonNull LatLng point) {
+                        String location = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " +
+                                LAT_LON_FORMATTER.format(point.getLongitude());
+                        Snackbar.make(mCoordinatorLayout, "Map Click Listener " + location, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
+                mMapboxMap.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        Snackbar.make(mCoordinatorLayout, "InfoWindow Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
+                        marker.hideInfoWindow();
+                        return true;
+                    }
+                });
+
+                changeMapStyle(mSelectedStyle);
+            }
+        });
     }
 
     /**
@@ -320,8 +337,8 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_debug:
                                 // Cycle map debug options
-                                mMapView.cycleDebugOptions();
-                                toggleFpsCounter(mMapView.isDebugActive());
+                                mMapboxMap.cycleDebugOptions();
+                                toggleFpsCounter(mMapboxMap.isDebugActive());
                                 return true;
 
                             case R.id.action_markers:
@@ -331,7 +348,11 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_compass:
                                 // Toggle compass
-                                mMapView.setCompassEnabled(!mMapView.isCompassEnabled());
+                                mMapboxMap.setCompassEnabled(!mMapboxMap.isCompassEnabled());
+                                return true;
+
+                            case R.id.action_mapboxmap:
+                                startActivity(new Intent(getApplicationContext(), MapboxMapActivity.class));
                                 return true;
 
                             case R.id.action_info_window_adapter:
@@ -356,6 +377,10 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_manual_zoom:
                                 startActivity(new Intent(getApplicationContext(), ManualZoomActivity.class));
+                                return true;
+
+                            case R.id.action_minmax_zoom:
+                                startActivity(new Intent(getApplicationContext(), MaxMinZoomActivity.class));
                                 return true;
 
                             case R.id.action_coordinate_change:
@@ -444,32 +469,32 @@ public class MainActivity extends AppCompatActivity {
     private boolean changeMapStyle(int id) {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
-                mMapView.setStyle(Style.MAPBOX_STREETS);
+                mMapboxMap.setStyle(Style.MAPBOX_STREETS);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
-                mMapView.setStyle(Style.EMERALD);
+                mMapboxMap.setStyle(Style.EMERALD);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
-                mMapView.setStyle(Style.LIGHT);
+                mMapboxMap.setStyle(Style.LIGHT);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
-                mMapView.setStyle(Style.DARK);
+                mMapboxMap.setStyle(Style.DARK);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
-                mMapView.setStyle(Style.SATELLITE);
+                mMapboxMap.setStyle(Style.SATELLITE);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatelliteStreets:
-                mMapView.setStyle(Style.SATELLITE_STREETS);
+                mMapboxMap.setStyle(Style.SATELLITE_STREETS);
                 mSelectedStyle = id;
                 return true;
 
@@ -493,23 +518,27 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
                         PERMISSIONS_LOCATION);
             } else {
-                mMapView.setOnMyLocationChangeListener(new MapView.OnMyLocationChangeListener() {
+                mMapboxMap.setOnMyLocationChangeListener(new MapboxMap.OnMyLocationChangeListener() {
                     @Override
                     public void onMyLocationChange(@Nullable Location location) {
                         if (location != null) {
-                            mMapView.setZoom(16);
-                            mMapView.setLatLng(new LatLng(location));
-                            mMapView.setOnMyLocationChangeListener(null);
+                            mMapboxMap.setCameraPosition(new CameraPosition.Builder()
+                                    .target(new LatLng(location))
+                                    .zoom(16)
+                                    .bearing(0)
+                                    .tilt(0)
+                                    .build());
+                            mMapboxMap.setOnMyLocationChangeListener(null);
                         }
                     }
                 });
-                mMapView.setMyLocationEnabled(true);
-                mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-                mMapView.setMyBearingTrackingMode(MyBearingTracking.GPS);
+                mMapboxMap.setMyLocationEnabled(true);
+                mMapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                mMapboxMap.setMyBearingTrackingMode(MyBearingTracking.GPS);
                 mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
             }
         } else {
-            mMapView.setMyLocationEnabled(false);
+            mMapboxMap.setMyLocationEnabled(false);
             mLocationFAB.setColorFilter(Color.TRANSPARENT);
         }
     }
@@ -526,8 +555,13 @@ public class MainActivity extends AppCompatActivity {
                 addMarkers();
                 addPolyline();
                 addPolygon();
-                mMapView.setZoom(7);
-                mMapView.setLatLng(new LatLng(38.11727, -122.22839));
+                mMapboxMap.setCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(new LatLng(38.11727, -122.22839))
+                                .zoom(7)
+                                .bearing(0)
+                                .tilt(0)
+                                .build());
             }
         } else {
             if (mIsAnnotationsOn) {
@@ -543,11 +577,11 @@ public class MainActivity extends AppCompatActivity {
         final MarkerOptions backLot = generateMarker("Back Lot", "The back lot behind my house", null, 38.649441, -121.369064);
         markerOptionsList.add(backLot);
 
-        final Icon dogIcon = mMapView.getIconFactory().fromAsset("dog-park-24.png");
+        final Icon dogIcon = IconFactory.getInstance(this).fromAsset("dog-park-24.png");
         final MarkerOptions cheeseRoom = generateMarker("Cheese Room", "The only air conditioned room on the property", dogIcon, 38.531577, -122.010646);
         markerOptionsList.add(cheeseRoom);
 
-        List<Marker> markers = mMapView.addMarkers(markerOptionsList);
+        mMapboxMap.addMarkers(markerOptionsList);
     }
 
     private MarkerOptions generateMarker(String title, String snippet, Icon icon, double lat, double lng) {
@@ -562,8 +596,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             String geojsonStr = GeoParseUtil.loadStringFromAssets(this, "small_line.geojson");
             List<LatLng> latLngs = GeoParseUtil.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mMapView;
-            map.addPolyline(new PolylineOptions()
+            mMapboxMap.addPolyline(new PolylineOptions()
                     .add(latLngs.toArray(new LatLng[latLngs.size()]))
                     .width(2)
                     .color(Color.RED));
@@ -577,13 +610,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             String geojsonStr = GeoParseUtil.loadStringFromAssets(this, "small_poly.geojson");
             List<LatLng> latLngs = GeoParseUtil.parseGeoJSONCoordinates(geojsonStr);
-            MapView map = mMapView;
-            ArrayList<PolygonOptions> opts = new ArrayList<>();
-            opts.add(new PolygonOptions()
+            List<PolygonOptions> polygonOptions = new ArrayList<>();
+            polygonOptions.add(new PolygonOptions()
                     .add(latLngs.toArray(new LatLng[latLngs.size()]))
                     .strokeColor(Color.MAGENTA)
                     .fillColor(Color.BLUE).alpha(0.5f));
-            map.addPolygons(opts).get(0);
+            mMapboxMap.addPolygons(polygonOptions).get(0);
         } catch (Exception e) {
             Log.e(TAG, "Error adding Polygon: " + e);
             e.printStackTrace();
@@ -592,27 +624,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeAnnotations() {
         mMarkerList.clear();
-        mMapView.removeAllAnnotations();
+        mMapboxMap.removeAllAnnotations();
     }
 
     private void addCustomLayer() {
         mIsShowingCustomLayer = true;
-        mMapView.addCustomLayer(
-            new CustomLayer("custom",
-                ExampleCustomLayer.createContext(),
-                ExampleCustomLayer.InitializeFunction,
-                ExampleCustomLayer.RenderFunction,
-                ExampleCustomLayer.DeinitializeFunction),
-            null);
+        mMapboxMap.addCustomLayer(
+                new CustomLayer("custom",
+                        ExampleCustomLayer.createContext(),
+                        ExampleCustomLayer.InitializeFunction,
+                        ExampleCustomLayer.RenderFunction,
+                        ExampleCustomLayer.DeinitializeFunction),
+                null);
     }
 
     private void removeCustomLayer() {
         mIsShowingCustomLayer = false;
-        mMapView.removeCustomLayer("custom");
+        mMapboxMap.removeCustomLayer("custom");
     }
 
     // Called when FPS changes
-    private class MyOnFpsChangedListener implements MapView.OnFpsChangedListener {
+    private class MyOnFpsChangedListener implements MapboxMap.OnFpsChangedListener {
 
         @Override
         public void onFpsChanged(double fps) {

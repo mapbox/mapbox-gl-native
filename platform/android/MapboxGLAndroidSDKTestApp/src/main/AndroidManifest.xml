@@ -23,6 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MapboxMapActivity"
+            android:label="@string/action_mapboxmap" />
         <activity
             android:name=".VisibleCoordinateBoundsActivity"
             android:label="@string/activity_visible_coordinate_bounds" />
@@ -54,6 +56,9 @@
         <activity
             android:name=".ManualZoomActivity"
             android:label="@string/action_manual_zoom" />
+        <activity
+            android:name=".MaxMinZoomActivity"
+            android:label="@string/action_minmax_zoom" />
         <activity
             android:name=".MyLocationTrackingModeActivity"
             android:label="@string/activity_user_tracking_mode" />

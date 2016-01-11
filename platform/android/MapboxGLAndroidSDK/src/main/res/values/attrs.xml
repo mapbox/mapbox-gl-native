@@ -4,8 +4,8 @@
         <attr name="center_longitude" format="float" />
         <attr name="center_latitude" format="float" />
         <attr name="zoom" format="float" />
-        <attr name="zoom_level" format="float" />
         <attr name="direction" format="float" />
+        <attr name="tilt" format="float" />
         <attr name="zoom_enabled" format="boolean" />
         <attr name="scroll_enabled" format="boolean" />
         <attr name="rotate_enabled" format="boolean" />

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -9,15 +10,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngZoom;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 public class CoordinateChangeActivity extends AppCompatActivity {
 
     private MapView mMapView;
+    private MapboxMap mMapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,16 +42,24 @@ public class CoordinateChangeActivity extends AppCompatActivity {
         mMapView.setTag(true);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
-        mMapView.setStyle(Style.MAPBOX_STREETS);
-        mMapView.setLatLng(new LatLngZoom(38.87031, -77.00897, 16));
-        mMapView.setCompassEnabled(false);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                mMapboxMap = mapboxMap;
+                mapboxMap.setStyle(Style.MAPBOX_STREETS);
+                mapboxMap.setCompassEnabled(false);
+                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getNextLatLng(), 16));
+            }
+        });
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMapView.setLatLng(getNextLatLng(), true);
+                if (mMapboxMap != null) {
+                    mMapboxMap.animateCamera(CameraUpdateFactory.newLatLng(getNextLatLng()));
+                }
             }
         });
     }

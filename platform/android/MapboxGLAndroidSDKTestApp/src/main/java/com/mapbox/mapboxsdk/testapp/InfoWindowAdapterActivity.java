@@ -13,13 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
@@ -48,30 +50,34 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         mIconFactory = IconFactory.getInstance(this);
         mIconDrawable = ContextCompat.getDrawable(this, R.drawable.ic_location_city_24dp);
 
-        mMapView.setInfoWindowAdapter(new MapView.InfoWindowAdapter() {
-
-            private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
-
+        mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public View getInfoWindow(@NonNull Marker marker) {
-                TextView textView = new TextView(InfoWindowAdapterActivity.this);
-                textView.setText(marker.getTitle());
-                textView.setTextColor(Color.WHITE);
-                textView.setBackgroundColor(Color.parseColor(marker.getSnippet()));
-                textView.setPadding(tenDp, tenDp, tenDp, tenDp);
-                return textView;
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                // add markers
+                mapboxMap.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
+                mapboxMap.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
+                mapboxMap.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
+                mapboxMap.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
+                mapboxMap.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
+                mapboxMap.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
+
+                // add custom window adapter
+                mapboxMap.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
+
+                    private int tenDp = (int) getResources().getDimension(R.dimen.attr_margin);
+
+                    @Override
+                    public View getInfoWindow(@NonNull Marker marker) {
+                        TextView textView = new TextView(InfoWindowAdapterActivity.this);
+                        textView.setText(marker.getTitle());
+                        textView.setTextColor(Color.WHITE);
+                        textView.setBackgroundColor(Color.parseColor(marker.getSnippet()));
+                        textView.setPadding(tenDp, tenDp, tenDp, tenDp);
+                        return textView;
+                    }
+                });
             }
         });
-
-        // Enable to let concurrent multiple infowindows to be shown.
-        //mMapView.setAllowConcurrentMultipleOpenInfoWindows(true);
-
-        mMapView.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
-        mMapView.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
-        mMapView.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
-        mMapView.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
-        mMapView.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
-        mMapView.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
     }
 
     private MarkerOptions generateMarker(String title, double lat, double lng, String color) {

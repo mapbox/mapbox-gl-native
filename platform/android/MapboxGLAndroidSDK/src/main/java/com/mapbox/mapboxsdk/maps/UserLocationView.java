@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.views;
+package com.mapbox.mapboxsdk.maps;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -40,7 +40,8 @@ import java.lang.ref.WeakReference;
  * This view shows the user's location, as determined from GPS, on the map
  * as a dot annotation.
  */
-final class UserLocationView extends View {
+
+public final class UserLocationView extends View {
 
     private MapView mMapView;
 
@@ -89,7 +90,7 @@ final class UserLocationView extends View {
     private Location mUserLocation;
     private UserLocationListener mUserLocationListener;
 
-    MapView.OnMyLocationChangeListener mOnMyLocationChangeListener;
+    private MapboxMap.OnMyLocationChangeListener mOnMyLocationChangeListener;
 
     @MyLocationTracking.Mode
     private int mMyLocationTrackingMode;
@@ -247,7 +248,7 @@ final class UserLocationView extends View {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
             // center map directly if we have a location fix
             mMarkerCoordinate = new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude());
-            mMapView.setLatLng(new LatLng(mUserLocation));
+            mMapView.getMapboxMap().moveCamera(CameraUpdateFactory.newLatLng(new LatLng(mUserLocation)));
 
             // center view directly
             mMarkerScreenMatrix.reset();
@@ -293,7 +294,7 @@ final class UserLocationView extends View {
                 }
 
                 if (mCurrentMapViewCoordinate == null) {
-                    mCurrentMapViewCoordinate = mMapView.getLatLng();
+                    mCurrentMapViewCoordinate = mMapView.getMapboxMap().getCameraPosition().target;
                 }
 
                 // only update if there is an actual change
@@ -302,7 +303,7 @@ final class UserLocationView extends View {
                             .target(mMarkerCoordinate)
                             .bearing(bearing)
                             .build();
-                    mMapView.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+                    mMapView.getMapboxMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
                     mMarkerScreenMatrix.reset();
                     mMarkerScreenMatrix.setTranslate(
                             getMeasuredWidth() / 2,
@@ -691,7 +692,7 @@ final class UserLocationView extends View {
         }
     }
 
-    public void setOnMyLocationChangeListener(@Nullable MapView.OnMyLocationChangeListener listener) {
+    public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mOnMyLocationChangeListener = listener;
     }
 

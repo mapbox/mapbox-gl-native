@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,15 +11,21 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
 
     private MapView mMapView;
+    private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
+    private static final LatLng NEW_YORK = new LatLng(40.712730, -74.005953);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,35 +43,37 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyle(Style.DARK);
         mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                mapboxMap.setStyle(Style.DARK);
+                mapboxMap.setAllGesturesEnabled(false);
 
-        final LatLng losAngeles = new LatLng(34.053940, -118.242622);
-        final LatLng newYork = new LatLng(40.712730, -74.005953);
+                mapboxMap.addMarker(new MarkerOptions()
+                        .title("Los Angeles")
+                        .snippet("City Hall")
+                        .position(LOS_ANGELES));
 
-        mMapView.addMarker(new MarkerOptions()
-                .title("Los Angeles")
-                .snippet("City Hall")
-                .position(losAngeles));
+                mapboxMap.addMarker(new MarkerOptions()
+                        .title("New York")
+                        .snippet("City Hall")
+                        .position(NEW_YORK));
 
-        mMapView.addMarker(new MarkerOptions()
-                .title("New York")
-                .snippet("City Hall")
-                .position(newYork));
+                Snackbar.make(findViewById(android.R.id.content), R.string.action_visible_bounds_explanation, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(android.R.string.ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // Reposition coordinate bounds
+                                LatLngBounds bounds = new LatLngBounds(NEW_YORK, LOS_ANGELES);
+                                int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+                                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                            }
+                        }).show();
+            }
+        });
 
-        Snackbar.make(findViewById(android.R.id.content), R.string.action_visible_bounds_explanation, Snackbar.LENGTH_INDEFINITE)
-                .setAction(android.R.string.ok, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Disable UserInput
-                        mMapView.setScrollEnabled(false);
-                        mMapView.setZoomEnabled(false);
 
-                        // Reposition coordinate bounds
-                        float margin = getResources().getDimension(R.dimen.coordinatebounds_margin);
-                        mMapView.setVisibleCoordinateBounds(new CoordinateBounds(losAngeles, newYork), new RectF(margin, 0, margin, 0), true);
-                    }
-                }).show();
     }
 
     @Override

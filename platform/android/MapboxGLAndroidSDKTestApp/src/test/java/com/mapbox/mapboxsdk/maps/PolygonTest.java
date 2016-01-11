@@ -1,3 +1,5 @@
+package com.mapbox.mapboxsdk.maps;
+
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;

@@ -1,3 +1,5 @@
+package com.mapbox.mapboxsdk.maps;
+
 import android.location.Location;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;

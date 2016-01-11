@@ -1,3 +1,5 @@
+package com.mapbox.mapboxsdk.maps;
+
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;

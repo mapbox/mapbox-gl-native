@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,11 +13,14 @@ import com.mapbox.geocoder.GeocoderCriteria;
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.util.List;
 
@@ -27,6 +31,7 @@ import retrofit.Retrofit;
 public class GeocoderActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "GeocoderActivity";
+    private static final LatLng DC_DUPONT_CIRCLE = new LatLng(38.90962, -77.04341);
 
     private MapView mapView;
     private TextView textView;
@@ -48,24 +53,38 @@ public class GeocoderActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.message);
         setMessage("Tap the map to trigger the geocoder.");
 
-        LatLng dupontCircle = new LatLng(38.90962, -77.04341);
-
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(ApiAccess.getToken(this));
-        mapView.setStyleUrl(Style.MAPBOX_STREETS);
-        mapView.setCenterCoordinate(dupontCircle);
-        mapView.setZoomLevel(15);
         mapView.onCreate(savedInstanceState);
-
-        mapView.setOnMapClickListener(new MapView.OnMapClickListener() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapClick(LatLng point) {
-                setMessage("Geocoding...");
-                mapView.removeAllAnnotations();
-                mapView.addMarker(new MarkerOptions()
-                        .position(point)
-                        .title("Your finger is here"));
-                geocode(point);
+            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+
+                // Style
+                mapboxMap.setStyle(Style.EMERALD);
+
+                // Camera position
+                mapboxMap.setCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(DC_DUPONT_CIRCLE)
+                                .zoom(15)
+                                .bearing(0)
+                                .tilt(0)
+                                .build()
+                );
+
+                // Click listener
+                mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(@NonNull LatLng point) {
+                        setMessage("Geocoding...");
+                        mapboxMap.removeAllAnnotations();
+                        mapboxMap.addMarker(new MarkerOptions()
+                                .position(point)
+                                .title("Your finger is here"));
+                        geocode(point);
+                    }
+                });
             }
         });
     }
@@ -83,7 +102,7 @@ public class GeocoderActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause()  {
+    public void onPause() {
         super.onPause();
         mapView.onPause();
     }
