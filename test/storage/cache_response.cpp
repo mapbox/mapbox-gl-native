@@ -51,7 +51,7 @@ TEST_F(Storage, CacheResponse) {
     loop.run();
 }
 
-// Make sure we don't store a bad server response into the cache
+// Make sure we /do/ store 404 Not Found responses into the cache
 TEST_F(Storage, CacheNotFound) {
     SCOPED_TEST(CacheNotFound);
 
@@ -109,7 +109,7 @@ TEST_F(Storage, CacheNotFound) {
     loop.run();
 }
 
-// Make sure we don't store a bad server response into the cache
+// Make sure we don't store a connection error into the cache
 TEST_F(Storage, DontCacheConnectionErrors) {
     SCOPED_TEST(DontCacheConnectionErrors);
 
