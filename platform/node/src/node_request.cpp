@@ -52,10 +52,24 @@ NAN_METHOD(NodeRequest::Respond) {
         response.error = std::make_unique<Error>(Error::Reason::NotFound);
 
     } else if (info[0]->BooleanValue()) {
+        std::unique_ptr<Nan::Utf8String> message;
+
         // Store the error string.
-        const Nan::Utf8String message { info[0]->ToString() };
+        if (info[0]->IsObject()) {
+            auto err = info[0]->ToObject();
+            if (Nan::Has(err, Nan::New("message").ToLocalChecked()).FromJust()) {
+                message = std::make_unique<Nan::Utf8String>(
+                    Nan::Get(err, Nan::New("message").ToLocalChecked())
+                        .ToLocalChecked()
+                        ->ToString());
+            }
+        }
+
+        if (!message) {
+            message = std::make_unique<Nan::Utf8String>(info[0]->ToString());
+        }
         response.error = std::make_unique<Error>(
-            Error::Reason::Other, std::string{ *message, size_t(message.length()) });
+            Error::Reason::Other, std::string{ **message, size_t(message->length()) });
 
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
