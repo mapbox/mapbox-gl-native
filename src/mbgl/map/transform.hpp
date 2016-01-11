@@ -25,10 +25,10 @@ public:
     bool resize(std::array<uint16_t, 2> size);
 
     void jumpTo(const CameraOptions&);
-    void easeTo(const CameraOptions&, const AnimationOptions&);
+    void easeTo(const CameraOptions&, const AnimationOptions& = {});
     /** Smoothly zoom out, pan, and zoom back into the given camera along a
         great circle, as though the viewer is aboard a supersonic jetcopter. */
-    void flyTo(const CameraOptions&, const AnimationOptions&);
+    void flyTo(const CameraOptions&, const AnimationOptions& = {});
 
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
@@ -38,8 +38,8 @@ public:
     LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
-    void scaleBy(double ds, const PrecisionPoint& center = { 0, 0 }, const Duration& = Duration::zero());
-    void setScale(double scale, const PrecisionPoint& center = { 0, 0 }, const Duration& = Duration::zero());
+    void scaleBy(double ds, const PrecisionPoint& center = {NAN, NAN}, const Duration& = Duration::zero());
+    void setScale(double scale, const PrecisionPoint& center = {NAN, NAN}, const Duration& = Duration::zero());
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;
     double getScale() const;
@@ -47,7 +47,7 @@ public:
     // Angle
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
     void setAngle(double angle, const Duration& = Duration::zero());
-    void setAngle(double angle, const PrecisionPoint& center);
+    void setAngle(double angle, const PrecisionPoint& center, const Duration& = Duration::zero());
     double getAngle() const;
 
     // Pitch
@@ -74,11 +74,6 @@ public:
     bool isPanning() const { return state.isPanning(); }
 
 private:
-    void _moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
-    void _setScale(double scale, const PrecisionPoint& center, const Duration& = Duration::zero());
-    void _easeTo(const CameraOptions&, const AnimationOptions&, double new_scale, double new_angle, double xn, double yn);
-    void _setAngle(double angle, const Duration& = Duration::zero());
-
     View &view;
 
     TransformState state;

@@ -248,8 +248,8 @@ double TransformState::scaleZoom(double s) const {
     return ::log2(s);
 }
 
-float TransformState::worldSize() const {
-    return util::tileSize * scale;
+double TransformState::worldSize() const {
+    return scale * util::tileSize;
 }
 
 PrecisionPoint TransformState::latLngToPoint(const LatLng& latLng) const {

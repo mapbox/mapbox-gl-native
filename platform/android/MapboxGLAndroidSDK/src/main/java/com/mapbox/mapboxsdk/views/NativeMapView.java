@@ -264,7 +264,7 @@ final class NativeMapView {
     }
 
     public void scaleBy(double ds) {
-        scaleBy(ds, -1.0, -1.0);
+        scaleBy(ds, Double.NaN, Double.NaN);
     }
 
     public void scaleBy(double ds, double cx, double cy) {
@@ -276,7 +276,7 @@ final class NativeMapView {
     }
 
     public void setScale(double scale) {
-        setScale(scale, -1.0, -1.0);
+        setScale(scale, Double.NaN, Double.NaN);
     }
 
     public void setScale(double scale, double cx, double cy) {

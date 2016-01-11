@@ -59,6 +59,13 @@ struct AnimationOptions {
     /** A function that is called once on the last frame of the transition, just
         before the corresponding screen update. */
     std::function<void()> transitionFinishFn;
+    
+    /** Creates an animation with no options specified. */
+    inline AnimationOptions() {}
+    
+    /** Creates an animation with the specified duration. */
+    inline AnimationOptions(Duration d)
+        : duration(d) {}
 };
 
 } // namespace mbgl

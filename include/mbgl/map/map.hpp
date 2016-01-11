@@ -111,8 +111,8 @@ public:
     void resetPosition();
 
     // Scale
-    void scaleBy(double ds, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
-    void setScale(double scale, const PrecisionPoint& = { 0, 0 }, const Duration& = Duration::zero());
+    void scaleBy(double ds, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
+    void setScale(double scale, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     double getZoom() const;

@@ -96,7 +96,7 @@ private:
     double latY(double lat) const;
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
-    float worldSize() const;
+    double worldSize() const;
 
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
