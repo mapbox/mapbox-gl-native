@@ -41,7 +41,11 @@ private:
 
     typedef std::vector<Leaf> Pool;
     std::forward_list<Pool> pools;
-    uint8_t bit_offset = 0;
+
+    const size_t kStencilBufferBitLength = 8;
+    // We are starting our count with 1 since we need at least 1 bit set to distinguish between
+    // areas without any tiles whatsoever and the current area.
+    uint32_t clipIdSerial = 1;
 
 private:
     bool reuseExisting(Leaf &leaf);
