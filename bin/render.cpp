@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
     double pixelRatio = 1.0;
     static std::string output = "out.png";
     std::string cache_file = "cache.sqlite";
+    std::string asset_root = ".";
     std::vector<std::string> classes;
     std::string token;
     bool debug = false;
@@ -48,6 +49,7 @@ int main(int argc, char *argv[]) {
         ("debug", po::bool_switch(&debug)->default_value(debug), "Debug mode")
         ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output file name")
         ("cache,d", po::value(&cache_file)->value_name("file")->default_value(cache_file), "Cache database file name")
+        ("assets,d", po::value(&asset_root)->value_name("file")->default_value(asset_root), "Directory to which asset:// URLs will resolve")
     ;
 
     try {
@@ -64,7 +66,7 @@ int main(int argc, char *argv[]) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fileSource(cache_file);
+    DefaultFileSource fileSource(cache_file, asset_root);
 
     // Try to load the token from the environment.
     if (!token.size()) {

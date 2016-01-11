@@ -31,8 +31,8 @@ public:
     OnlineFileSource onlineFileSource;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& root)
-    : impl(std::make_unique<DefaultFileSource::Impl>(cachePath, root)) {
+DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetRoot)
+    : impl(std::make_unique<DefaultFileSource::Impl>(cachePath, assetRoot)) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;

@@ -18,9 +18,10 @@ TEST(API, RepeatedRender) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1, 256, 512);
 #ifdef MBGL_ASSET_ZIP
-    DefaultFileSource fileSource(":memory", "test/fixtures/api/assets.zip");
+    // Regenerate with `cd test/fixtures/api/ && zip -r assets.zip assets/`
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets.zip");
 #else
-    DefaultFileSource fileSource;
+    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
 #endif
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
@@ -40,7 +41,7 @@ TEST(API, RepeatedRender) {
     }
 
     {
-        map.setStyleJSON(style, "TEST_DATA/suite");
+        map.setStyleJSON(style, "");
         std::promise<PremultipliedImage> promise;
         map.renderStill([&promise](std::exception_ptr, PremultipliedImage&& image) {
             promise.set_value(std::move(image));
