@@ -1239,7 +1239,7 @@ public:
         _directionAtBeginningOfGesture = self.direction;
     } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
         NSPoint rotationPoint = [gestureRecognizer locationInView:self];
-        mbgl::PrecisionPoint center(rotationPoint.x, rotationPoint.y);
+        mbgl::PrecisionPoint center(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
         _mbglMap->setBearing(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees, center);
     } else if (gestureRecognizer.state == NSGestureRecognizerStateEnded
                || gestureRecognizer.state == NSGestureRecognizerStateCancelled) {

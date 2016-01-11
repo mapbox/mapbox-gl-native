@@ -3471,7 +3471,7 @@ public final class MapView extends FrameLayout {
                 // around gesture
                 mNativeMapView.setBearing(bearing,
                         detector.getFocusX() / mScreenDensity,
-                        (getHeight() - detector.getFocusY()) / mScreenDensity);
+                        detector.getFocusY() / mScreenDensity);
             } else {
                 // around center map
                 mNativeMapView.setBearing(bearing,

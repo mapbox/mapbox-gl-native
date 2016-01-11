@@ -1119,7 +1119,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         }
 
         mbgl::PrecisionPoint center([rotate locationInView:rotate.view].x,
-                                    self.bounds.size.height - [rotate locationInView:rotate.view].y);
+                                    [rotate locationInView:rotate.view].y);
         _mbglMap->setBearing(newDegrees, center);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];

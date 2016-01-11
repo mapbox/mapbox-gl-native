@@ -26,28 +26,54 @@ public:
 
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions& = {});
-    /** Smoothly zoom out, pan, and zoom back into the given camera along a
+    /** Smoothly zooms out, pan, and zoom back into the given camera along a
         great circle, as though the viewer is aboard a supersonic jetcopter. */
     void flyTo(const CameraOptions&, const AnimationOptions& = {});
 
     // Position
-    void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
+    
+    /** Pans the map by the given amount.
+        @param offset The distance to pan the map by, measured in pixels from
+            top to bottom and from left to right. */
+    void moveBy(const PrecisionPoint& offset, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     LatLng getLatLng() const { return state.getLatLng(); }
 
     // Zoom
-    void scaleBy(double ds, const PrecisionPoint& center = {NAN, NAN}, const Duration& = Duration::zero());
-    void setScale(double scale, const PrecisionPoint& center = {NAN, NAN}, const Duration& = Duration::zero());
+
+    /** Scales the map, keeping the given point fixed within the view.
+        @param ds The difference in scale factors to scale the map by.
+        @param anchor A point relative to the top-left corner of the view. */
+    void scaleBy(double ds, const PrecisionPoint& anchor = {NAN, NAN}, const Duration& = Duration::zero());
+    /** Sets the scale factor, keeping the given point fixed within the view.
+        @param scale The new scale factor.
+        @param anchor A point relative to the top-left corner of the view. */
+    void setScale(double scale, const PrecisionPoint& anchor = {NAN, NAN}, const Duration& = Duration::zero());
+    /** Sets the zoom level.
+        @param zoom The new zoom level. */
     void setZoom(double zoom, const Duration& = Duration::zero());
+    /** Returns the zoom level. */
     double getZoom() const;
+    /** Returns the scale factor. */
     double getScale() const;
 
     // Angle
+
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
+    /** Sets the angle of rotation.
+        @param angle The new angle of rotation, measured in radians
+            counterclockwise from true north. */
     void setAngle(double angle, const Duration& = Duration::zero());
-    void setAngle(double angle, const PrecisionPoint& center, const Duration& = Duration::zero());
+    /** Sets the angle of rotation, keeping the given point fixed within the view.
+        @param angle The new angle of rotation, measured in radians
+            counterclockwise from true north.
+        @param anchor A point relative to the top-left corner of the view. */
+    void setAngle(double angle, const PrecisionPoint& anchor, const Duration& = Duration::zero());
+    /** Returns the angle of rotation.
+        @return The angle of rotation, measured in radians counterclockwise from
+            true north. */
     double getAngle() const;
 
     // Pitch

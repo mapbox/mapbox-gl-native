@@ -153,26 +153,25 @@ double Transform::getScale() const {
     return state.scale;
 }
 
-void Transform::setScale(double scale, const PrecisionPoint& anchor, const Duration& duration) {
+void Transform::setScale(double scale, const PrecisionPoint& flippedAnchor, const Duration& duration) {
     if (std::isnan(scale)) {
         return;
     }
     
-    const double factor = scale / state.scale;
-    PrecisionPoint offset = { 0, 0 };
-    PrecisionPoint center = {
-        state.width / 2.0f,
-        state.height / 2.0f,
-    };
-    if (anchor) {
-        offset = {
-            anchor.x - center.x,
-            center.y - anchor.y,
-        };
-    }
-
     CameraOptions camera;
-    camera.center = state.pointToLatLng(center + offset / factor);
+    if (flippedAnchor) {
+        const double factor = scale / state.scale;
+        PrecisionPoint center = {
+            state.width / 2.0,
+            state.height / 2.0,
+        };
+        PrecisionPoint anchor = {
+            flippedAnchor.x,
+            state.height - flippedAnchor.y,
+        };
+        PrecisionPoint offset = anchor - center;
+        camera.center = state.pointToLatLng(anchor - offset / factor);
+    }
     camera.zoom = state.scaleZoom(scale);
     easeTo(camera, duration);
 }
@@ -202,15 +201,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
             latLng.longitude -= 360;
         }
     }
-    
-    const PrecisionPoint startPoint = {
-        state.lngX(startLatLng.longitude),
-        state.latY(startLatLng.latitude),
-    };
-    const PrecisionPoint endPoint = {
-        state.lngX(latLng.longitude),
-        state.latY(latLng.latitude),
-    };
     
     Update update = state.getZoom() == zoom ? Update::Repaint : Update::Zoom;
     
@@ -255,15 +245,11 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
                 return ease.solve(t, 0.001);
             },
             [=](double t) {
-                // Calculate the current point and zoom level along the flight path.
-                PrecisionPoint framePoint = util::interpolate(startPoint, endPoint, t);
-                double frameScale = util::interpolate(startScale, scale, t);
-                
-                // Convert to geographic coordinates and set the new viewpoint.
                 LatLng frameLatLng = {
-                    state.yLat(framePoint.y, startWorldSize),
-                    state.xLng(framePoint.x, startWorldSize),
+                    util::interpolate(startLatLng.latitude, latLng.latitude, t),
+                    util::interpolate(startLatLng.longitude, latLng.longitude, t),
                 };
+                double frameScale = util::interpolate(startScale, scale, t);
                 state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
                 
                 if (angle != startAngle) {
@@ -523,24 +509,28 @@ void Transform::setAngle(double angle, const Duration& duration) {
     setAngle(angle, {NAN, NAN}, duration);
 }
 
-void Transform::setAngle(double angle, const PrecisionPoint& center, const Duration& duration) {
+void Transform::setAngle(double angle, const PrecisionPoint& flippedAnchor, const Duration& duration) {
     if (std::isnan(angle)) {
         return;
     }
 
-    LatLng rotationCenter;
+    PrecisionPoint anchor = {
+        flippedAnchor.x,
+        state.height - flippedAnchor.y,
+    };
+    LatLng anchorLatLng;
 
-    if (center) {
-        rotationCenter = state.pointToLatLng(center);
-        setLatLng(rotationCenter);
+    if (flippedAnchor) {
+        anchorLatLng = state.pointToLatLng(anchor);
+        setLatLng(anchorLatLng);
     }
     
     CameraOptions camera;
     camera.angle = angle;
     easeTo(camera, duration);
 
-    if (center) {
-        setLatLng(rotationCenter, center);
+    if (flippedAnchor) {
+        setLatLng(anchorLatLng, anchor);
     }
 }
 

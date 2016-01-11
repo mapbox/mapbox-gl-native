@@ -396,5 +396,3 @@ void TransformState::setScalePoint(const double newScale, const PrecisionPoint &
     Bc = worldSize() / 360;
     Cc = worldSize() / util::M2PI;
 }
-
-
