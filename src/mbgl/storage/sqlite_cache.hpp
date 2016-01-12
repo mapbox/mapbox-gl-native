@@ -1,27 +1,36 @@
 #ifndef MBGL_STORAGE_DEFAULT_SQLITE_CACHE
 #define MBGL_STORAGE_DEFAULT_SQLITE_CACHE
 
-#include <mbgl/storage/file_cache.hpp>
+#include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/chrono.hpp>
 
+#include <functional>
+#include <memory>
 #include <string>
 
 namespace mbgl {
+
+struct Resource;
+class Response;
+class WorkRequest;
 
 namespace util {
 template <typename T> class Thread;
 } // namespace util
 
-class SQLiteCache : public FileCache {
+class SQLiteCache : private util::noncopyable {
 public:
     SQLiteCache(const std::string &path = ":memory:");
-    ~SQLiteCache() override;
+    ~SQLiteCache();
 
     void setMaximumCacheSize(uint64_t size);
     void setMaximumCacheEntrySize(uint64_t size);
 
-    // FileCache API
-    std::unique_ptr<WorkRequest> get(const Resource &resource, Callback callback) override;
-    void put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) override;
+    enum class Hint : bool { Full, Refresh };
+    using Callback = std::function<void(std::unique_ptr<Response>)>;
+
+    std::unique_ptr<WorkRequest> get(const Resource&, Callback);
+    void put(const Resource&, std::shared_ptr<const Response> response, Hint hint);
 
     class Impl;
 

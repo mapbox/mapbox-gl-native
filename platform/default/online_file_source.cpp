@@ -1,6 +1,7 @@
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/storage/sqlite_cache.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
@@ -68,7 +69,7 @@ class OnlineFileSource::Impl {
 public:
     using Callback = std::function<void (Response)>;
 
-    Impl(FileCache*);
+    Impl(SQLiteCache*);
     ~Impl();
 
     void networkIsReachableAgain();
@@ -80,12 +81,12 @@ private:
     friend OnlineFileRequestImpl;
 
     std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> pending;
-    FileCache* const cache;
+    SQLiteCache* const cache;
     const std::unique_ptr<HTTPContextBase> httpContext;
     util::AsyncTask reachability;
 };
 
-OnlineFileSource::OnlineFileSource(FileCache* cache)
+OnlineFileSource::OnlineFileSource(SQLiteCache* cache)
     : thread(std::make_unique<util::Thread<Impl>>(
           util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low },
           cache)) {
@@ -134,7 +135,7 @@ void OnlineFileSource::cancel(FileRequest* req) {
 
 // ----- Impl -----
 
-OnlineFileSource::Impl::Impl(FileCache* cache_)
+OnlineFileSource::Impl::Impl(SQLiteCache* cache_)
     : cache(cache_),
       httpContext(HTTPContextBase::createContext()),
       reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
@@ -251,9 +252,9 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 (!response_->error || (response_->error->reason == Response::Error::Reason::NotFound))) {
                 // Store response in database. Make sure we only refresh the expires column if the data
                 // didn't change.
-                FileCache::Hint hint = FileCache::Hint::Full;
+                SQLiteCache::Hint hint = SQLiteCache::Hint::Full;
                 if (response && response_->data == response->data) {
-                    hint = FileCache::Hint::Refresh;
+                    hint = SQLiteCache::Hint::Refresh;
                 }
                 impl.cache->put(resource, response_, hint);
             }
