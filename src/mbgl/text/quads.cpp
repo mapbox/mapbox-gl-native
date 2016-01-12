@@ -13,11 +13,13 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
         const bool alongLine) {
 
+    auto image = *(shapedIcon.image);
+
     const float border = 1.0;
     auto left = shapedIcon.left - border;
-    auto right = left + shapedIcon.image.w;
+    auto right = left + image.pos.w / image.relativePixelRatio;
     auto top = shapedIcon.top - border;
-    auto bottom = top + shapedIcon.image.h;
+    auto bottom = top + image.pos.h / image.relativePixelRatio;
     vec2<float> tl{left, top};
     vec2<float> tr{right, top};
     vec2<float> br{right, bottom};
@@ -51,7 +53,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     }
 
     SymbolQuads quads;
-    quads.emplace_back(tl, tr, bl, br, shapedIcon.image, 0, anchor, globalMinScale, std::numeric_limits<float>::infinity());
+    quads.emplace_back(tl, tr, bl, br, image.pos, 0, anchor, globalMinScale, std::numeric_limits<float>::infinity());
     return quads;
 }
 

@@ -187,8 +187,9 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         const float fontScale = fontSize / 1.0f;
 
         SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
-        activeSpriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
-                || angleOffset != 0 || fontScale != 1 || sdf || state.getPitch() != 0);
+        const bool iconScaled = fontScale != 1 || data.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
+        const bool iconTransformed = layout.placement == PlacementType::Line || angleOffset != 0 || state.getPitch() != 0;
+        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed);
 
         if (sdf) {
             renderSDF(bucket,

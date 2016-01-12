@@ -27,7 +27,11 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_,
       dirty(true) {
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(float src_width, float src_height) {
+
+    const uint16_t pixel_width = std::ceil(src_width / pixelRatio);
+    const uint16_t pixel_height = std::ceil(src_height / pixelRatio);
+
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
@@ -52,7 +56,7 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
 
     auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
-        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.texture };
+        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.texture, rect_it->second.texture->pixelRatio / pixelRatio };
     }
 
     auto sprite = store.getSprite(name);
@@ -60,7 +64,7 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
         return {};
     }
 
-    Rect<dimension> rect = allocateImage(sprite->width, sprite->height);
+    Rect<dimension> rect = allocateImage(sprite->width * sprite->pixelRatio, sprite->height * sprite->pixelRatio);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
@@ -71,7 +75,7 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
     const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
     copy(holder, wrap);
 
-    return SpriteAtlasElement { rect, sprite };
+    return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
 }
 
 mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
@@ -83,25 +87,17 @@ mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::
     }
 
     auto rect = (*img).pos;
-    if (repeating) {
-        // When the image is repeating, get the correct position of the image, rather than the
-        // one rounded up to 4 pixels.
-        // TODO: Can't we just use originalW/originalH?
-        auto sprite = store.getSprite(name);
-        if (!sprite) {
-            return SpriteAtlasPosition {};
-        }
-
-        rect.w = sprite->width;
-        rect.h = sprite->height;
-    }
 
     const float padding = 1;
+    auto image = (*img).texture;
+
+    const float w = image->width * (*img).relativePixelRatio;
+    const float h = image->height * (*img).relativePixelRatio;
 
     return SpriteAtlasPosition {
-        {{ float(rect.w), float(rect.h) }},
-        {{ float(rect.x + padding)          / width, float(rect.y + padding)          / height }},
-        {{ float(rect.x + padding + rect.w) / width, float(rect.y + padding + rect.h) / height }}
+        {{ float(image->width), float(image->height) }},
+        {{ float(rect.x + padding)     / width, float(rect.y + padding)     / height }},
+        {{ float(rect.x + padding + w) / width, float(rect.y + padding + h) / height }}
     };
 }
 

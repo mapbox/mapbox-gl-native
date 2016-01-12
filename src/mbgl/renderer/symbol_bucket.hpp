@@ -112,6 +112,7 @@ private:
 public:
     SymbolLayoutProperties layout;
     bool sdfIcons = false;
+    bool iconsNeedLinear = false;
 
 private:
 
