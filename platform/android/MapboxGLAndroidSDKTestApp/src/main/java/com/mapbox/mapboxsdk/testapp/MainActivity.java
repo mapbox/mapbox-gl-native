@@ -479,7 +479,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onMyLocationChange(@Nullable Location location) {
                         if (location != null) {
                             mMapView.setZoom(16);
-                            mMapView.setCenterCoordinate(new LatLng(location));
+                            mMapView.setLatLng(new LatLng(location));
                             mMapView.setOnMyLocationChangeListener(null);
                         }
                     }
@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity {
                 addPolyline();
                 addPolygon();
                 mMapView.setZoom(7);
-                mMapView.setCenterCoordinate(new LatLng(38.11727, -122.22839));
+                mMapView.setLatLng(new LatLng(38.11727, -122.22839));
             }
         } else {
             if (mIsAnnotationsOn) {

@@ -244,7 +244,7 @@ final class UserLocationView extends View implements LocationListener {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && mUserLocation != null) {
             // center map directly if we have a location fix
             mMarkerCoordinate = new LatLng(mUserLocation.getLatitude(), mUserLocation.getLongitude());
-            mMapView.setCenterCoordinate(new LatLng(mUserLocation));
+            mMapView.setLatLng(new LatLng(mUserLocation));
 
             // center view directly
             mMarkerScreenMatrix.reset();
@@ -290,7 +290,7 @@ final class UserLocationView extends View implements LocationListener {
                 }
 
                 if (mCurrentMapViewCoordinate == null) {
-                    mCurrentMapViewCoordinate = mMapView.getCenterCoordinate();
+                    mCurrentMapViewCoordinate = mMapView.getLatLng();
                 }
 
                 // only update if there is an actual change

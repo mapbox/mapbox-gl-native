@@ -51,7 +51,7 @@ public class MapFragmentActivity extends AppCompatActivity {
             MapView mapView = getMap();
             mapView.setStyleUrl(Style.EMERALD);
             mapView.setZoom(12);
-            mapView.setCenterCoordinate(new LatLng(50.853658, 4.352419));
+            mapView.setLatLng(new LatLng(50.853658, 4.352419));
 
             // move attribution control to right of screen
             mapView.setAttributionGravity(Gravity.BOTTOM | Gravity.END);

@@ -53,7 +53,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
-        mMapView.setCenterCoordinate(new LatLngZoom(38.87031, -77.00897, 10));
+        mMapView.setLatLng(new LatLngZoom(38.87031, -77.00897, 10));
         mMapView.setCompassEnabled(false);
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);

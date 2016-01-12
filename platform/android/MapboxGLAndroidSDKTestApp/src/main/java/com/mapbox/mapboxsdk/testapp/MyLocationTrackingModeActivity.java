@@ -94,7 +94,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         if (location != null) {
             if (mLocation == null) {
                 // initial location to reposition map
-                mMapView.setCenterCoordinate(new LatLng(location.getLatitude(), location.getLongitude()));
+                mMapView.setLatLng(new LatLng(location.getLatitude(), location.getLongitude()));
                 mLocationSpinner.setEnabled(true);
                 mBearingSpinner.setEnabled(true);
             }

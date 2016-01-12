@@ -123,7 +123,7 @@ public final class MapView extends FrameLayout {
     private static final long ANIMATION_DURATION = 300;
 
     // Used for saving instance state
-    private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
+    private static final String STATE_CENTER_LATLNG = "centerLatLng";
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
     private static final String STATE_ZOOM = "zoomLevel";
     private static final String STATE_TILT = "tilt";
@@ -830,11 +830,16 @@ public final class MapView extends FrameLayout {
         try {
             double centerLatitude = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
             double centerLongitude = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
-            LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
-            setCenterCoordinate(centerCoordinate);
+            setLatLng(new LatLng(centerLatitude, centerLongitude));
+
             // need to set zoom level first because of limitation on rotating when zoomed out
-            setZoom(typedArray.getFloat(R.styleable.MapView_zoom, 0.0f));
-            setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoom_level, 0.0f));
+            float zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
+            if(zoom != 0.0f){
+                setZoom(zoom);
+            }else{
+                setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoom_level, 0.0f));
+            }
+
             setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
             setScrollEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
@@ -914,7 +919,7 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
+            setLatLng((LatLng) savedInstanceState.getParcelable(STATE_CENTER_LATLNG));
             // need to set zoom level first because of limitation on rotating when zoomed out
             setZoom(savedInstanceState.getDouble(STATE_ZOOM));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
@@ -1003,7 +1008,7 @@ public final class MapView extends FrameLayout {
             return;
         }
 
-        outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
+        outState.putParcelable(STATE_CENTER_LATLNG, getLatLng());
         // need to set zoom level first because of limitation on rotating when zoomed out
         outState.putDouble(STATE_ZOOM, getZoom());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
@@ -1117,12 +1122,108 @@ public final class MapView extends FrameLayout {
     //
 
     /**
-     * Returns the current coordinate at the center of the map view.
+     * Returns the current {@link LatLng} at the center of the map view.
      *
-     * @return The current coordinate.
+     * @return The current center.
      */
     @UiThread
     @NonNull
+    public LatLng getLatLng() {
+        return mNativeMapView.getLatLng();
+    }
+
+    /**
+     * <p>
+     * Centers the map on a new {@link LatLng} immediately without changing the zoom level.
+     * </p>
+     * <p>
+     * The initial {@link LatLng} is (0, 0).
+     * </p>
+     * If you want to animate the change, use {@link MapView#setLatLng(LatLng, boolean)}.
+     *
+     * @param latLng The new center.
+     * @see MapView#setLatLng(LatLng, boolean)
+     */
+    @UiThread
+    public void setLatLng(@NonNull LatLng latLng) {
+        setLatLng(latLng, false);
+    }
+
+    /**
+     * <p>
+     * Centers the map on a new {@link LatLng} without changing the zoom level and optionally animates the change.
+     * </p>
+     * The initial {@link LatLng} is (0, 0).
+     *
+     * @param latLng    The new center.
+     * @param animated  If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
+    public void setLatLng(@NonNull LatLng latLng, boolean animated) {
+        if (latLng == null) {
+            Log.w(TAG, "latLng was null, so just returning");
+            return;
+        }
+
+        if (animated) {
+            CameraPosition cameraPosition = new CameraPosition.Builder(getCameraPosition())
+                    .target(latLng)
+                    .build();
+            animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition),
+                    (int) ANIMATION_DURATION, null);
+        } else {
+            jumpTo(mNativeMapView.getBearing(), latLng, mNativeMapView.getPitch(), mNativeMapView.getZoom());
+        }
+    }
+
+
+    /**
+     * <p>
+     * Centers the map on a new {@link LatLng} immediately while changing the current zoom level.
+     * </p>
+     * <p>
+     * The initial value is a center {@link LatLng} of (0, 0) and a zoom level of 0.
+     * </p>
+     * If you want to animate the change, use {@link MapView#setLatLng(LatLng, boolean)}.
+     *
+     * @param latLngZoom The new center and zoom level.
+     * @see MapView#setLatLng(LatLngZoom, boolean)
+     */
+    @UiThread
+    public void setLatLng(@NonNull LatLngZoom latLngZoom) {
+        setLatLng(latLngZoom, false);
+    }
+
+    /**
+     * <p>
+     * Centers the map on a new {@link LatLng} while changing the zoom level and optionally animates the change.
+     * </p>
+     * The initial value is a center {@link LatLng} of (0, 0) and a zoom level of 0.
+     *
+     * @param latLngZoom  The new center and zoom level.
+     * @param animated    If true, animates the change. If false, immediately changes the map.
+     */
+    @UiThread
+    public void setLatLng(@NonNull LatLngZoom latLngZoom, boolean animated) {
+        if (latLngZoom == null) {
+            Log.w(TAG, "latLngZoom was null, so just returning");
+            return;
+        }
+        long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
+        mNativeMapView.setLatLngZoom(latLngZoom, duration);
+    }
+
+
+    /**
+     * Returns the current coordinate at the center of the map view.
+     *
+     * @return The current coordinate.
+     * @deprecated use {@link #getLatLng()} instead.
+     */
+    @UiThread
+    @NonNull
+    @Deprecated
     public LatLng getCenterCoordinate() {
         return mNativeMapView.getLatLng();
     }
@@ -1138,8 +1239,10 @@ public final class MapView extends FrameLayout {
      *
      * @param centerCoordinate The new coordinate.
      * @see MapView#setCenterCoordinate(LatLng, boolean)
+     * @deprecated use {@link #setLatLng(LatLng)}} instead.
      */
     @UiThread
+    @Deprecated
     public void setCenterCoordinate(@NonNull LatLng centerCoordinate) {
         setCenterCoordinate(centerCoordinate, false);
     }
@@ -1152,8 +1255,10 @@ public final class MapView extends FrameLayout {
      *
      * @param centerCoordinate The new coordinate.
      * @param animated         If true, animates the change. If false, immediately changes the map.
+     * @deprecated use {@link #setLatLng(LatLng, boolean)}} instead.
      */
     @UiThread
+    @Deprecated
     public void setCenterCoordinate(@NonNull LatLng centerCoordinate, boolean animated) {
         if (centerCoordinate == null) {
             Log.w(TAG, "centerCoordinate was null, so just returning");
@@ -1183,20 +1288,12 @@ public final class MapView extends FrameLayout {
      *
      * @param centerCoordinate The new coordinate and zoom level.
      * @see MapView#setCenterCoordinate(LatLngZoom, boolean)
+     * @deprecated use {@link #setLatLng(LatLngZoom)} instead.
      */
     @UiThread
+    @Deprecated
     public void setCenterCoordinate(@NonNull LatLngZoom centerCoordinate) {
         setCenterCoordinate(centerCoordinate, false);
-    }
-
-    /**
-     * Resets the map to the minimum zoom level, a center coordinate of (0, 0), a true north heading,
-     * and animates the change.
-     */
-    @UiThread
-    public void resetPosition() {
-        mNativeMapView.cancelTransitions();
-        mNativeMapView.resetPosition();
     }
 
     /**
@@ -1207,8 +1304,10 @@ public final class MapView extends FrameLayout {
      *
      * @param centerCoordinate The new coordinate and zoom level.
      * @param animated         If true, animates the change. If false, immediately changes the map.
+     * @deprecated use {@link #setLatLng(LatLngZoom, boolean)}} instead.
      */
     @UiThread
+    @Deprecated
     public void setCenterCoordinate(@NonNull LatLngZoom centerCoordinate,
                                     boolean animated) {
         if (centerCoordinate == null) {
@@ -1218,6 +1317,16 @@ public final class MapView extends FrameLayout {
         long duration = animated ? ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         mNativeMapView.setLatLngZoom(centerCoordinate, duration);
+    }
+
+    /**
+     * Resets the map to the minimum zoom level, a center coordinate of (0, 0), a true north heading,
+     * and animates the change.
+     */
+    @UiThread
+    public void resetPosition() {
+        mNativeMapView.cancelTransitions();
+        mNativeMapView.resetPosition();
     }
 
     /**
@@ -1633,7 +1742,7 @@ public final class MapView extends FrameLayout {
      * @return The current position of the Camera.
      */
     public final CameraPosition getCameraPosition() {
-        return new CameraPosition(getCenterCoordinate(), (float) getZoom(), (float) getTilt(), (float) getBearing());
+        return new CameraPosition(getLatLng(), (float) getZoom(), (float) getTilt(), (float) getBearing());
     }
 
     /**
@@ -4314,7 +4423,7 @@ public final class MapView extends FrameLayout {
             Context context = ((Dialog) dialog).getContext();
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
             if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
-                LatLng latLng = mMapView.getCenterCoordinate();
+                LatLng latLng = mMapView.getLatLng();
                 url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mMapView.getZoom());
             }
             Intent intent = new Intent(Intent.ACTION_VIEW);

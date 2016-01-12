@@ -38,7 +38,7 @@ public class CoordinateChangeActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.setStyle(Style.MAPBOX_STREETS);
-        mMapView.setCenterCoordinate(new LatLngZoom(38.87031, -77.00897, 16));
+        mMapView.setLatLng(new LatLngZoom(38.87031, -77.00897, 16));
         mMapView.setCompassEnabled(false);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -46,12 +46,12 @@ public class CoordinateChangeActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMapView.setCenterCoordinate(getCoordinate(), true);
+                mMapView.setLatLng(getNextLatLng(), true);
             }
         });
     }
 
-    private LatLng getCoordinate() {
+    private LatLng getNextLatLng() {
         boolean first = (boolean) mMapView.getTag();
         mMapView.setTag(!first);
         return first ? new LatLng(38.87000, -77.00800) : new LatLng(38.87031, -77.00897);
