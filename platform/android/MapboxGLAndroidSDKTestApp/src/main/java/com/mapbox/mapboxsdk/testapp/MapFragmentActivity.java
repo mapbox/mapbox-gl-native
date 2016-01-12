@@ -50,7 +50,7 @@ public class MapFragmentActivity extends AppCompatActivity {
 
             MapView mapView = getMap();
             mapView.setStyleUrl(Style.EMERALD);
-            mapView.setZoomLevel(12);
+            mapView.setZoom(12);
             mapView.setCenterCoordinate(new LatLng(50.853658, 4.352419));
 
             // move attribution control to right of screen

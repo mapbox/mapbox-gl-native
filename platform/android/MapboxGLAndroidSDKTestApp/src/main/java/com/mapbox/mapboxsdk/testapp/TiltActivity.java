@@ -35,7 +35,7 @@ public class TiltActivity extends AppCompatActivity {
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.setStyleUrl(Style.MAPBOX_STREETS);
         mMapView.setCenterCoordinate(dc);
-        mMapView.setZoomLevel(11);
+        mMapView.setZoom(11);
         mMapView.onCreate(savedInstanceState);
     }
 

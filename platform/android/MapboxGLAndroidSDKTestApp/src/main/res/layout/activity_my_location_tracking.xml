@@ -43,6 +43,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:style_url="@string/style_mapbox_streets"
-        app:zoom_level="15" />
+        app:zoom="15" />
 
 </LinearLayout>

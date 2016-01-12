@@ -125,7 +125,7 @@ public final class MapView extends FrameLayout {
     // Used for saving instance state
     private static final String STATE_CENTER_COORDINATE = "centerCoordinate";
     private static final String STATE_CENTER_DIRECTION = "centerDirection";
-    private static final String STATE_ZOOM_LEVEL = "zoomLevel";
+    private static final String STATE_ZOOM = "zoomLevel";
     private static final String STATE_TILT = "tilt";
     private static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     private static final String STATE_SCROLL_ENABLED = "scrollEnabled";
@@ -172,8 +172,16 @@ public final class MapView extends FrameLayout {
      * The currently supported maximum zoom level.
      *
      * @see MapView#setZoomLevel(double)
+     * @deprecated use #MAXIMUM_ZOOM instead.
      */
     public static final double MAXIMUM_ZOOM_LEVEL = 18.0;
+
+    /**
+     * The currently supported maximum zoom level.
+     *
+     * @see MapView#setZoom(double)
+     */
+    public static final double MAXIMUM_ZOOM = 18.0;
 
     /**
      * The currently supported maximum and minimum tilt values.
@@ -825,6 +833,7 @@ public final class MapView extends FrameLayout {
             LatLng centerCoordinate = new LatLng(centerLatitude, centerLongitude);
             setCenterCoordinate(centerCoordinate);
             // need to set zoom level first because of limitation on rotating when zoomed out
+            setZoom(typedArray.getFloat(R.styleable.MapView_zoom, 0.0f));
             setZoomLevel(typedArray.getFloat(R.styleable.MapView_zoom_level, 0.0f));
             setDirection(typedArray.getFloat(R.styleable.MapView_direction, 0.0f));
             setZoomEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
@@ -907,7 +916,7 @@ public final class MapView extends FrameLayout {
         if (savedInstanceState != null) {
             setCenterCoordinate((LatLng) savedInstanceState.getParcelable(STATE_CENTER_COORDINATE));
             // need to set zoom level first because of limitation on rotating when zoomed out
-            setZoomLevel(savedInstanceState.getDouble(STATE_ZOOM_LEVEL));
+            setZoom(savedInstanceState.getDouble(STATE_ZOOM));
             setDirection(savedInstanceState.getDouble(STATE_CENTER_DIRECTION));
             setTilt(savedInstanceState.getDouble(STATE_TILT), null);
             setZoomEnabled(savedInstanceState.getBoolean(STATE_ZOOM_ENABLED));
@@ -996,7 +1005,7 @@ public final class MapView extends FrameLayout {
 
         outState.putParcelable(STATE_CENTER_COORDINATE, getCenterCoordinate());
         // need to set zoom level first because of limitation on rotating when zoomed out
-        outState.putDouble(STATE_ZOOM_LEVEL, getZoomLevel());
+        outState.putDouble(STATE_ZOOM, getZoom());
         outState.putDouble(STATE_CENTER_DIRECTION, getDirection());
         outState.putDouble(STATE_TILT, getTilt());
         outState.putBoolean(STATE_ZOOM_ENABLED, isZoomEnabled());
@@ -1379,10 +1388,72 @@ public final class MapView extends FrameLayout {
     /**
      * Returns the current zoom level of the map view.
      *
+     * @return The current zoom.
+     */
+    @UiThread
+    @FloatRange(from = 0.0, to = MAXIMUM_ZOOM)
+    public double getZoom() {
+        return mNativeMapView.getZoom();
+    }
+
+    /**
+     * <p>
+     * Zooms the map to a new zoom level immediately without changing the center coordinate.
+     * </p>
+     * <p>
+     * At zoom level 0, tiles cover the entire world map;
+     * at zoom level 1, tiles cover 1/14 of the world;
+     * at zoom level 2, tiles cover 1/16 of the world, and so on.
+     * </p>
+     * <p>
+     * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM}.
+     * </p>
+     * If you want to animate the change, use {@link MapView#setZoom(double, boolean)}.
+     *
+     * @param zoomLevel The new zoom.
+     * @see MapView#setZoom(double, boolean)
+     * @see MapView#MAXIMUM_ZOOM
+     */
+    @UiThread
+    public void setZoom(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM) double zoomLevel) {
+        setZoom(zoomLevel, false);
+        setZoom(zoomLevel, false);
+    }
+
+    /**
+     * <p>
+     * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
+     * </p>
+     * <p>
+     * At zoom level 0, tiles cover the entire world map;
+     * at zoom level 1, tiles cover 1/14 of the world;
+     * at zoom level 2, tiles cover 1/16 of the world, and so on.
+     * </p>
+     * The initial zoom level is 0. The maximum zoom level is {@link MapView#MAXIMUM_ZOOM}.
+     *
+     * @param zoomLevel The new zoom level.
+     * @param animated  If true, animates the change. If false, immediately changes the map.
+     * @see MapView#MAXIMUM_ZOOM
+     */
+    @UiThread
+    public void setZoom(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL) double zoomLevel, boolean animated) {
+        if ((zoomLevel < 0.0) || (zoomLevel > MAXIMUM_ZOOM_LEVEL)) {
+            throw new IllegalArgumentException("zoomLevel is < 0 or > MapView.MAXIMUM_ZOOM_LEVEL");
+        }
+        long duration = animated ? ANIMATION_DURATION : 0;
+        mNativeMapView.cancelTransitions();
+        mNativeMapView.setZoom(zoomLevel, duration);
+    }
+
+    /**
+     * Returns the current zoom level of the map view.
+     *
      * @return The current zoom level.
+     * @deprecated use {@link #getZoom()} instead.
      */
     @UiThread
     @FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL)
+    @Deprecated
     public double getZoomLevel() {
         return mNativeMapView.getZoom();
     }
@@ -1404,8 +1475,10 @@ public final class MapView extends FrameLayout {
      * @param zoomLevel The new coordinate.
      * @see MapView#setZoomLevel(double, boolean)
      * @see MapView#MAXIMUM_ZOOM_LEVEL
+     * @deprecated use {@link #setZoom(double)} instead.
      */
     @UiThread
+    @Deprecated
     public void setZoomLevel(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL) double zoomLevel) {
         setZoomLevel(zoomLevel, false);
     }
@@ -1424,8 +1497,10 @@ public final class MapView extends FrameLayout {
      * @param zoomLevel The new coordinate.
      * @param animated  If true, animates the change. If false, immediately changes the map.
      * @see MapView#MAXIMUM_ZOOM_LEVEL
+     * @deprecated use {@link #setZoom(double, boolean)} instead.
      */
     @UiThread
+    @Deprecated
     public void setZoomLevel(@FloatRange(from = 0.0, to = MAXIMUM_ZOOM_LEVEL) double zoomLevel, boolean animated) {
         if ((zoomLevel < 0.0) || (zoomLevel > MAXIMUM_ZOOM_LEVEL)) {
             throw new IllegalArgumentException("zoomLevel is < 0 or > MapView.MAXIMUM_ZOOM_LEVEL");
@@ -1558,7 +1633,7 @@ public final class MapView extends FrameLayout {
      * @return The current position of the Camera.
      */
     public final CameraPosition getCameraPosition() {
-        return new CameraPosition(getCenterCoordinate(), (float) getZoomLevel(), (float) getTilt(), (float) getBearing());
+        return new CameraPosition(getCenterCoordinate(), (float) getZoom(), (float) getTilt(), (float) getBearing());
     }
 
     /**
@@ -2480,7 +2555,7 @@ public final class MapView extends FrameLayout {
      */
     @UiThread
     public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
-        return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoomLevel()) / mScreenDensity;
+        return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoom()) / mScreenDensity;
     }
 
     /**
@@ -2954,7 +3029,7 @@ public final class MapView extends FrameLayout {
                 setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
                 //noinspection ResourceType
                 setMyBearingTrackingMode(MyBearingTracking.NONE);
-            }catch(SecurityException ignore){
+            } catch (SecurityException ignore) {
                 // User did not accept location permissions
             }
 
@@ -3884,7 +3959,6 @@ public final class MapView extends FrameLayout {
      * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
      *
      * @param enabled True to enable; false to disable.
-     *
      * @throws SecurityException if no suitable permission is present
      */
     @UiThread
@@ -3928,16 +4002,15 @@ public final class MapView extends FrameLayout {
      * See {@link MyLocationTracking} for different values.
      *
      * @param myLocationTrackingMode The location tracking mode to be used.
-     * @see MyLocationTracking
-     *
      * @throws SecurityException if no suitable permission is present
+     * @see MyLocationTracking
      */
     @UiThread
     @RequiresPermission(anyOf = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        if(myLocationTrackingMode!=MyLocationTracking.TRACKING_NONE && !isMyLocationEnabled()){
+        if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && !isMyLocationEnabled()) {
             //noinspection ResourceType
             setMyLocationEnabled(true);
         }
@@ -3985,16 +4058,15 @@ public final class MapView extends FrameLayout {
      * See {@link MyBearingTracking} for different values.
      *
      * @param myBearingTrackingMode The bearing tracking mode to be used.
-     * @see MyBearingTracking
-     *
      * @throws SecurityException if no suitable permission is present
+     * @see MyBearingTracking
      */
     @UiThread
     @RequiresPermission(anyOf = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        if(myBearingTrackingMode!=MyBearingTracking.NONE && !isMyLocationEnabled()){
+        if (myBearingTrackingMode != MyBearingTracking.NONE && !isMyLocationEnabled()) {
             //noinspection ResourceType
             setMyLocationEnabled(true);
         }
@@ -4243,7 +4315,7 @@ public final class MapView extends FrameLayout {
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
             if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
                 LatLng latLng = mMapView.getCenterCoordinate();
-                url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mMapView.getZoomLevel());
+                url = String.format(url, latLng.getLongitude(), latLng.getLatitude(), (int) mMapView.getZoom());
             }
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
