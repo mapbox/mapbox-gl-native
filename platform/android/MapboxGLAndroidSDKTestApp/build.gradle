@@ -76,7 +76,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
 
     // Directions SDK
-    compile ('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0-SNAPSHOT@aar'){
+    compile ('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0@aar'){
         transitive=true
     }
 
