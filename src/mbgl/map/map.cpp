@@ -129,6 +129,10 @@ void Map::setGestureInProgress(bool inProgress) {
     transform->setGestureInProgress(inProgress);
     update(Update::Repaint);
 }
+    
+void Map::setPitching(bool pitching) {
+    transform->setPitching(pitching);
+}
 
 bool Map::isGestureInProgress() const {
     return transform->isGestureInProgress();

@@ -1295,12 +1295,14 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         CGFloat pitchNew = currentPitch - (gestureDistance / slowdown);
 
+        _mbglMap->setPitching(pitchNew != currentPitch);
         _mbglMap->setPitch(pitchNew);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
+        _mbglMap->setPitching(NO);
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededAnimated:YES];
     }

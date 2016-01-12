@@ -132,6 +132,7 @@ public:
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());
     double getPitch() const;
+    void setPitching(bool pitching);
 
     // North Orientation
     void setNorthOrientation(NorthOrientation);

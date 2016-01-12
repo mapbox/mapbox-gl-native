@@ -70,6 +70,7 @@ public:
     bool isRotating() const;
     bool isScaling() const;
     bool isPanning() const;
+    bool isPitching() const;
     bool isGestureInProgress() const;
 
     // Conversion and projection
@@ -108,6 +109,8 @@ private:
     
     void setLatLngZoom(const LatLng &latLng, double zoom);
     void setScalePoint(const double scale, const PrecisionPoint &point);
+    double getInsetX() const;
+    double getInsetY() const;
 
 private:
     ConstrainMode constrainMode;
@@ -116,6 +119,7 @@ private:
     bool rotating = false;
     bool scaling = false;
     bool panning = false;
+    bool pitching = false;
     bool gestureInProgress = false;
 
     // map position

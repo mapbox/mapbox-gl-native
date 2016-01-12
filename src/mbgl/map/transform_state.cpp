@@ -33,9 +33,13 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     matrix::perspective(projMatrix, 2.0f * std::atan((getHeight() / 2.0f) / getAltitude()),
             double(getWidth()) / getHeight(), 0.1, farZ);
-
-    matrix::translate(projMatrix, projMatrix, 0, 0, -getAltitude());
-
+    
+    // translate center according to insets
+    double insetX = isPitching() ? getInsetX() : 0;
+    double insetY = isPitching() ? getInsetY() : 0;
+    
+    matrix::translate(projMatrix, projMatrix, insetX, -insetY, -getAltitude());
+    
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
     matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
@@ -101,6 +105,7 @@ double TransformState::getNorthOrientationAngle() const {
 #pragma mark - Position
 
 LatLng TransformState::getLatLng() const {
+//return    pointToLatLng(PrecisionPoint(width/2 + getInsetX(), height/2 + getInsetY()));
     LatLng ll;
 
     ll.longitude = -x / Bc;
@@ -215,10 +220,13 @@ bool TransformState::isPanning() const {
     return panning;
 }
 
+bool TransformState::isPitching() const {
+    return pitching && pitch != 0;
+}
+
 bool TransformState::isGestureInProgress() const {
     return gestureInProgress;
 }
-
 
 #pragma mark - Projection
 
@@ -379,8 +387,8 @@ void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
     const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude), -m, m);
     
     PrecisionPoint point = {
-        -latLng.longitude * Bc,
-        0.5 * Cc * std::log((1 + f) / (1 - f)),
+        -latLng.longitude * Bc + getInsetX(),
+        0.5 * Cc * std::log((1 + f) / (1 - f)) + getInsetY(),
     };
     setScalePoint(newScale, point);
 }
@@ -397,4 +405,11 @@ void TransformState::setScalePoint(const double newScale, const PrecisionPoint &
     Cc = worldSize() / util::M2PI;
 }
 
+double TransformState::getInsetX() const {
+    return (insets.left - insets.right) / 2;
+}
+
+double TransformState::getInsetY() const {
+    return (insets.top - insets.bottom) / 2;
+}
 

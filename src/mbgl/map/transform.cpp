@@ -98,12 +98,13 @@ void Transform::easeTo(const CameraOptions& options) {
 
     double xn = -latLng.longitude * state.Bc;
     double yn = 0.5 * state.Cc * std::log((1 + f) / (1 - f));
-    bool useInsets = !state.isGestureInProgress();
-    if (useInsets) {
-        double insetX = (state.insets.left - state.insets.right) / 2;
-        double insetY = (state.insets.top - state.insets.bottom) / 2;
-        xn = xn + std::cos(angle) * insetX + std::sin( angle) * insetY;
-        yn = yn + std::cos(angle) * insetY + std::sin(-angle) * insetX;
+    
+    if (!state.isGestureInProgress()) {
+        double insetX = state.getInsetX();
+        double insetY = state.getInsetY();
+        xn = xn + insetX * std::cos( angle) + insetY * std::cos(state.pitch) * std::sin(angle);
+        yn = yn + insetX * std::sin(-angle) + insetY * std::cos(angle) * std::cos(state.pitch);
+        
     }
 
     easeOptions.center.reset();
@@ -604,6 +605,10 @@ void Transform::setPitch(double pitch, const Duration& duration) {
     options.pitch = pitch;
     options.duration = duration;
     easeTo(options);
+}
+
+void Transform::setPitching(bool pitching) {
+    state.pitching = pitching;
 }
 
 double Transform::getPitch() const {

@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Used for info window
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
+    public static final int LEFT = 100;
+    public static final int TOP = 400;
+    public static final int RIGHT = 200;
+    public static final int BOTTOM = 10;
 
     //
     // Instance members
@@ -177,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(mCoordinatorLayout, desc, Snackbar.LENGTH_SHORT).show();
             }
         });
+
+        findViewById(R.id.debugView).setPadding(LEFT, TOP, RIGHT, BOTTOM);
+        mMapView.setMapPadding(LEFT, TOP, RIGHT, BOTTOM);
 
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");

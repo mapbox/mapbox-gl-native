@@ -6,6 +6,8 @@
 #import <CoreLocation/CoreLocation.h>
 #import <OpenGLES/ES2/gl.h>
 
+#import "MBXDebugView.h"
+
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
@@ -61,6 +63,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [super viewDidLoad];
 
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds];
+    self.mapView.mapViewInsets = UIEdgeInsetsMake(0, 300, 200, 0);
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;
     [self.view addSubview:self.mapView];
@@ -91,6 +94,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [self.mapView addGestureRecognizer:[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)]];
 
     [self restoreState:nil];
+    
+    MBXDebugView *debugView = [[MBXDebugView alloc] initWithFrame:self.mapView.frame andWithInsets:self.mapView.mapViewInsets];
+    [self.view addSubview:debugView];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
