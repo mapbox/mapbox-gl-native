@@ -82,7 +82,7 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
 
     // Directions SDK
-    compile ('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0-SNAPSHOT@aar'){
+    compile ('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0@aar'){
         transitive=true
     }
 
