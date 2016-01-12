@@ -34,8 +34,6 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(20, metro.pos.w);
     EXPECT_EQ(20, metro.pos.h);
-    EXPECT_EQ(18, metro.pos.originalW);
-    EXPECT_EQ(18, metro.pos.originalH);
     EXPECT_EQ(18, metro.texture->width);
     EXPECT_EQ(18, metro.texture->height);
     EXPECT_EQ(18, metro.texture->pixelWidth);
@@ -45,12 +43,12 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_TRUE(atlas.getData());
 
     auto pos = *atlas.getPosition("metro", false);
-    EXPECT_DOUBLE_EQ(20, pos.size[0]);
-    EXPECT_DOUBLE_EQ(20, pos.size[1]);
+    EXPECT_DOUBLE_EQ(18, pos.size[0]);
+    EXPECT_DOUBLE_EQ(18, pos.size[1]);
     EXPECT_DOUBLE_EQ(1.0f / 63, pos.tl[0]);
     EXPECT_DOUBLE_EQ(1.0f / 112, pos.tl[1]);
-    EXPECT_DOUBLE_EQ(21.0f / 63, pos.br[0]);
-    EXPECT_DOUBLE_EQ(21.0f / 112, pos.br[1]);
+    EXPECT_DOUBLE_EQ(19.0f / 63, pos.br[0]);
+    EXPECT_DOUBLE_EQ(19.0f / 112, pos.br[1]);
 
     auto missing = atlas.getImage("doesnotexist", false);
     EXPECT_FALSE(missing);
@@ -68,12 +66,10 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(0, metro2.pos.y);
     EXPECT_EQ(20, metro2.pos.w);
     EXPECT_EQ(20, metro2.pos.h);
-    EXPECT_EQ(18, metro2.pos.originalW);
-    EXPECT_EQ(18, metro2.pos.originalH);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x9875FC0595489A9Fu, hash) << std::hex << hash;
+    EXPECT_EQ(11868256915183397177u, hash) << std::hex << hash;
 
     // util::write_file(
     //     "test/fixtures/annotations/atlas1.png",
@@ -98,10 +94,8 @@ TEST(Sprite, SpriteAtlasSize) {
     auto metro = *atlas.getImage("metro", false);
     EXPECT_EQ(0, metro.pos.x);
     EXPECT_EQ(0, metro.pos.y);
-    EXPECT_EQ(20, metro.pos.w);
-    EXPECT_EQ(20, metro.pos.h);
-    EXPECT_EQ(18, metro.pos.originalW);
-    EXPECT_EQ(18, metro.pos.originalH);
+    EXPECT_EQ(16, metro.pos.w);
+    EXPECT_EQ(16, metro.pos.h);
     EXPECT_EQ(18, metro.texture->width);
     EXPECT_EQ(18, metro.texture->height);
     EXPECT_EQ(18, metro.texture->pixelWidth);
@@ -110,7 +104,7 @@ TEST(Sprite, SpriteAtlasSize) {
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x2CDDA7DBB04D116Du, hash) << std::hex << hash;
+    EXPECT_EQ(18324190582232646342u, hash) << std::hex << hash;
 
     // util::write_file(
     //     "test/fixtures/annotations/atlas2.png",
@@ -134,8 +128,6 @@ TEST(Sprite, SpriteAtlasUpdates) {
     EXPECT_EQ(0, one.pos.y);
     EXPECT_EQ(20, one.pos.w);
     EXPECT_EQ(16, one.pos.h);
-    EXPECT_EQ(16, one.pos.originalW);
-    EXPECT_EQ(12, one.pos.originalH);
     EXPECT_EQ(16, one.texture->width);
     EXPECT_EQ(12, one.texture->height);
     EXPECT_EQ(16, one.texture->pixelWidth);

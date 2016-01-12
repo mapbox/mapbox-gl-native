@@ -7,7 +7,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/scaling.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
@@ -44,9 +43,6 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(float src_width, float s
     if (rect.w == 0) {
         return rect;
     }
-
-    rect.originalW = pixel_width;
-    rect.originalH = pixel_height;
 
     return rect;
 }
@@ -101,6 +97,34 @@ mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::
     };
 }
 
+void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
+        uint32_t *const dst, const uint32_t dstStride, const uint32_t dstX, const uint32_t dstY, int dstSize,
+        const int width, const int height, const bool wrap) {
+
+    int srcI = srcY * srcStride + srcX;
+    int dstI = dstY * dstStride + dstX;
+    int x, y;
+
+    if (wrap) {
+        // add 1 pixel wrapped padding on each side of the image
+        dstI -= dstStride;
+        for (y = -1; y <= height; y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
+            for (x = -1; x <= width; x++) {
+                const int dstIndex = (dstI + x + dstSize) % dstSize;
+                dst[dstIndex] = src[srcI + ((x + width) % width)];
+            }
+        }
+
+    } else {
+        for (y = 0; y < height; y++, srcI += srcStride, dstI += dstStride) {
+            for (x = 0; x < width; x++) {
+                const int dstIndex = (dstI + x + dstSize) % dstSize;
+                dst[dstIndex] = src[srcI + x];
+            }
+        }
+    }
+}
+
 void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     if (!data) {
         data = std::make_unique<uint32_t[]>(pixelWidth * pixelHeight);
@@ -109,51 +133,13 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
 
     const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
     if (!srcData) return;
-    const vec2<uint32_t> srcSize { holder.texture->pixelWidth, holder.texture->pixelHeight };
-    const Rect<uint32_t> srcPos { 0, 0, srcSize.x, srcSize.y };
-    const auto& dst = holder.pos;
-
-    const int offset = 1;
-
     uint32_t *const dstData = data.get();
-    const vec2<uint32_t> dstSize{ pixelWidth, pixelHeight };
-    const Rect<uint32_t> dstPos{ static_cast<uint32_t>((offset + dst.x) * pixelRatio),
-                                 static_cast<uint32_t>((offset + dst.y) * pixelRatio),
-                                 static_cast<uint32_t>(dst.originalW * pixelRatio),
-                                 static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
-    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
+    const int padding = 1;
 
-    // Add borders around the copied image if required.
-    if (wrap) {
-        // We're copying from the same image so we don't have to scale again.
-        const uint32_t border = 1;
-        const uint32_t borderX = dstPos.x != 0 ? border : 0;
-        const uint32_t borderY = dstPos.y != 0 ? border : 0;
-
-        // Left border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x + dstPos.w - borderX, dstPos.y, borderX, dstPos.h },
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y, borderX, dstPos.h });
-
-        // Right border
-        util::nearestNeighborScale(dstData, dstSize, { dstPos.x, dstPos.y, border, dstPos.h },
-                                   dstData, dstSize,
-                                   { dstPos.x + dstPos.w, dstPos.y, border, dstPos.h });
-
-        // Top border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y + dstPos.h - borderY,
-                                dstPos.w + border + borderX, borderY },
-            dstData, dstSize,
-            { dstPos.x - borderX, dstPos.y - borderY, dstPos.w + 2 * borderX, borderY });
-
-        // Bottom border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y, dstPos.w + 2 * borderX, border },
-            dstData, dstSize,
-            { dstPos.x - borderX, dstPos.y + dstPos.h, dstPos.w + border + borderX, border });
-    }
+    copyBitmap(srcData, holder.texture->pixelWidth, 0, 0,
+            dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
+            holder.texture->pixelWidth, holder.texture->pixelHeight, wrap);
 
     dirty = true;
 }
