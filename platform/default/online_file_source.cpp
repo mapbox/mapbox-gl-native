@@ -76,7 +76,7 @@ private:
 
     // Counts the number of subsequent failed requests. We're using this value for exponential
     // backoff when retrying requests.
-    int failedRequests = 0;
+    uint32_t failedRequests = 0;
 };
 
 class OnlineFileSource::Impl {
@@ -280,48 +280,41 @@ void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
     });
 }
 
+static Seconds errorRetryTimeout(const Response& response, uint32_t failedRequests) {
+    if (response.error && response.error->reason == Response::Error::Reason::Server) {
+        // Retry after one second three times, then start exponential backoff.
+        return Seconds(failedRequests <= 3 ? 1 : 1 << std::min(failedRequests - 3, 31u));
+    } else if (response.error && response.error->reason == Response::Error::Reason::Connection) {
+        // Immediate exponential backoff.
+        assert(failedRequests > 0);
+        return Seconds(1 << std::min(failedRequests - 1, 31u));
+    } else {
+        // No error, or not an error that triggers retries.
+        return Seconds::max();
+    }
+}
+
+static Seconds expirationTimeout(const Response& response) {
+    // Seconds::zero() is a special value meaning "no expiration".
+    if (response.expires > Seconds::zero()) {
+        return std::max(Seconds::zero(), response.expires - toSeconds(SystemClock::now()));
+    } else {
+        return Seconds::max();
+    }
+}
+
 void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bool forceImmediate) {
     if (realRequest) {
         // There's already a request in progress; don't start another one.
         return;
     }
 
-    // If we don't have a fresh response, we'll retry immediately. Otherwise, the timeout will
-    // depend on how many consecutive errors we've encountered, and on the expiration time.
-    Seconds timeout = (!response || response->stale) ? Seconds::zero() : Seconds::max();
-
-    if (response && response->error) {
-        assert(failedRequests > 0);
-        switch (response->error->reason) {
-        case Response::Error::Reason::Server: {
-            // Retry immediately, unless we have a certain number of attempts already
-            const int graceRetries = 3;
-            if (failedRequests <= graceRetries) {
-                timeout = Seconds(1);
-            } else {
-                timeout = Seconds(1 << std::min(failedRequests - graceRetries, 31));
-            }
-        } break;
-        case Response::Error::Reason::Connection: {
-            // Exponential backoff
-            timeout = Seconds(1 << std::min(failedRequests - 1, 31));
-        } break;
-        default:
-            // Do not retry due to error.
-            break;
-        }
-    }
-
-    // Check to see if this response expires earlier than a potential error retry.
-    if (response && response->expires > Seconds::zero()) {
-        // Only update the timeout if we don't have one yet, and only if the new timeout is shorter
-        // than the previous one.
-        timeout = std::min(timeout, std::max(Seconds::zero(), response->expires - toSeconds(SystemClock::now())));
-    }
-
-    if (forceImmediate) {
-        timeout = Seconds::zero();
-    }
+    // If we don't have a fresh response, retry immediately. Otherwise, calculate a timeout
+    // that depends on how many consecutive errors we've encountered, and on the expiration time.
+    Seconds timeout = (!response || response->stale || forceImmediate)
+        ? Seconds::zero()
+        : std::min(errorRetryTimeout(*response, failedRequests),
+                   expirationTimeout(*response));
 
     if (timeout == Seconds::max()) {
         return;
