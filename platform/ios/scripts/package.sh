@@ -141,7 +141,7 @@ cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' >> ${REA
 cp ${README} "${OUTPUT}"
 
 jazzy \
-    --sdk ${SDK} \
+    --sdk iphonesimulator \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${HASH} \
     --module-version ${DOCS_VERSION} \
     --readme ${README} \
