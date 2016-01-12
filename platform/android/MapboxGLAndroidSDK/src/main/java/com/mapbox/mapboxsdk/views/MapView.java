@@ -876,6 +876,7 @@ public final class MapView extends FrameLayout {
 
             // User location
             try {
+                //noinspection ResourceType
                 setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
             }catch (SecurityException ignore){
                 // User did not accept location permissions
@@ -926,6 +927,7 @@ public final class MapView extends FrameLayout {
 
             // User location
             try {
+                //noinspection ResourceType
                 setMyLocationEnabled(savedInstanceState.getBoolean(STATE_MY_LOCATION_ENABLED));
             }catch (SecurityException ignore){
                 // User did not accept location permissions
@@ -2948,7 +2950,9 @@ public final class MapView extends FrameLayout {
 
             // Disable tracking mode if a gesture occurs
             try {
+                //noinspection ResourceType
                 setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                //noinspection ResourceType
                 setMyBearingTrackingMode(MyBearingTracking.NONE);
             }catch(SecurityException ignore){
                 // User did not accept location permissions
