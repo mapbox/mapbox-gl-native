@@ -11,12 +11,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -31,6 +33,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -83,6 +86,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngZoom;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.utils.MaterialUtils;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.annotation.Retention;
@@ -881,6 +885,7 @@ public final class MapView extends FrameLayout {
                     , typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP));
 
             // Attribution
+            MaterialUtils.setTintList(mAttributionsView);
             setAttributionVisibility(typedArray.getInt(R.styleable.MapView_attribution_visibility, View.VISIBLE));
             setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
             setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTYSIX_DP)
@@ -4414,7 +4419,8 @@ public final class MapView extends FrameLayout {
             AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
             builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
-            builder.show();
+            AlertDialog dialog = builder.show();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(MaterialUtils.getPrimaryDarkColor(context)));
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
