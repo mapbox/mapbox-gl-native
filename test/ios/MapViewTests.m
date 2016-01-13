@@ -317,30 +317,6 @@
                                @"disabling rotation show disallow rotation gestures");
 }
 
-- (void)testCenterSet {
-    CLLocationCoordinate2D newCenterCoordinate = CLLocationCoordinate2DMake(45.23237263, -122.23287129);
-
-    XCTAssertNotEqual(tester.mapView.centerCoordinate.latitude,
-                      newCenterCoordinate.latitude,
-                      @"initial setup should have differing center latitude");
-
-    XCTAssertNotEqual(tester.mapView.centerCoordinate.longitude,
-                      newCenterCoordinate.longitude,
-                      @"initial setup should have differing center longitude");
-
-    tester.mapView.centerCoordinate = newCenterCoordinate;
-
-    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.latitude,
-                   newCenterCoordinate.latitude,
-                   0.001,
-                   @"setting center should change latitude");
-
-    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.longitude,
-                   newCenterCoordinate.longitude,
-                   0.001,
-                   @"setting center should change longitude");
-}
-
 - (void)testZoomSet {
     double newZoom = 11.65;
 
