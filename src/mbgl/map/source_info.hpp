@@ -18,6 +18,7 @@ public:
     SourceType type = SourceType::Vector;
     std::string url;
     std::vector<std::string> tiles;
+    std::string scheme = "xyz";
     uint16_t tile_size = util::tileSize;
     uint16_t min_zoom = 0;
     uint16_t max_zoom = 22;
