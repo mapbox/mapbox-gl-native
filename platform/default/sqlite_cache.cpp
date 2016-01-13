@@ -329,9 +329,9 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
                 // Status codes > 1 indicate an error
                 response->error = std::make_unique<Response::Error>(Response::Error::Reason(status));
             }
-            response->modified = Seconds(getStmt->get<Seconds::rep>(1));
+            response->modified = Seconds(getStmt->get<int64_t>(1));
             response->etag = getStmt->get<std::string>(2);
-            response->expires = Seconds(getStmt->get<Seconds::rep>(3));
+            response->expires = Seconds(getStmt->get<int64_t>(3));
             response->data = std::make_shared<std::string>(getStmt->get<std::string>(4));
             if (getStmt->get<int>(5)) { // == compressed
                 response->data = std::make_shared<std::string>(util::decompress(*response->data));
@@ -354,7 +354,7 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
                 accessedStmt->reset();
             }
 
-            accessedStmt->bind(1, toSeconds(SystemClock::now()).count());
+            accessedStmt->bind(1, int64_t(toSeconds(SystemClock::now()).count()));
             accessedStmt->bind(2, canonicalURL.c_str());
             accessedStmt->run();
         }
@@ -414,10 +414,10 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
             putStmt->bind(2 /* status */, 1 /* success */);
         }
         putStmt->bind(3 /* kind */, int(resource.kind));
-        putStmt->bind(4 /* modified */, response->modified.count());
+        putStmt->bind(4 /* modified */, int64_t(response->modified.count()));
         putStmt->bind(5 /* etag */, response->etag.c_str());
-        putStmt->bind(6 /* expires */, response->expires.count());
-        putStmt->bind(7 /* accessed */, toSeconds(SystemClock::now()).count());
+        putStmt->bind(6 /* expires */, int64_t(response->expires.count()));
+        putStmt->bind(7 /* accessed */, int64_t(toSeconds(SystemClock::now()).count()));
 
         std::string data;
         if (resource.kind != Resource::SpriteImage && response->data) {
@@ -461,8 +461,8 @@ void SQLiteCache::Impl::refresh(const Resource& resource, Seconds expires) {
         }
 
         const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
-        refreshStmt->bind(1, toSeconds(SystemClock::now()).count());
-        refreshStmt->bind(2, expires.count());
+        refreshStmt->bind(1, int64_t(toSeconds(SystemClock::now()).count()));
+        refreshStmt->bind(2, int64_t(expires.count()));
         refreshStmt->bind(3, canonicalURL.c_str());
         refreshStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
