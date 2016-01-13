@@ -409,6 +409,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), DirectionsActivity.class));
                                 return true;
 
+                            case R.id.action_geocoder:
+                                startActivity(new Intent(getApplicationContext(), GeocoderActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
