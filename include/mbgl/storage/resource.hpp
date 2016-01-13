@@ -1,12 +1,15 @@
 #ifndef MBGL_STORAGE_RESOURCE
 #define MBGL_STORAGE_RESOURCE
 
+#include <mbgl/storage/response.hpp>
+#include <mbgl/util/optional.hpp>
+
 #include <string>
-#include <functional>
 
 namespace mbgl {
 
-struct Resource {
+class Resource {
+public:
     enum Kind : uint8_t {
         Unknown = 0,
         Style,
@@ -17,19 +20,17 @@ struct Resource {
         SpriteJSON
     };
 
+    Resource(Kind kind_, const std::string& url_)
+        : kind(kind_),
+          url(url_) {
+    }
+
     const Kind kind;
     const std::string url;
 
-    inline bool operator==(const Resource &res) const {
-        return kind == res.kind && url == res.url;
-    }
-
-    struct Hash {
-        std::size_t operator()(Resource const& r) const {
-            return std::hash<std::string>()(r.url) ^ (std::hash<uint8_t>()(r.kind) << 1);
-        }
-    };
-
+    optional<SystemTimePoint> priorModified;
+    optional<SystemTimePoint> priorExpires;
+    optional<std::string> priorEtag;
 };
 
 } // namespace mbgl

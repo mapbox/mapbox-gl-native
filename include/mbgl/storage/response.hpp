@@ -23,7 +23,7 @@ public:
     // This is set to true for 304 Not Modified responses.
     bool notModified = false;
 
-    // The actual data of the response. This is guaranteed to never be empty.
+    // The actual data of the response. This is null if notModified is true.
     std::shared_ptr<const std::string> data;
 
     optional<SystemTimePoint> modified;
@@ -34,7 +34,7 @@ public:
 class Response::Error {
 public:
     enum class Reason : uint8_t {
-        // Success = 1, // Reserve 1 for Success.
+        Success = 1,
         NotFound = 2,
         Server = 3,
         Connection = 4,

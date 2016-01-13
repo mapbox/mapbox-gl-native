@@ -1,14 +1,14 @@
 #ifndef MBGL_STORAGE_HTTP_REQUEST_BASE
 #define MBGL_STORAGE_HTTP_REQUEST_BASE
 
+#include <mbgl/storage/response.hpp>
+#include <mbgl/storage/resource.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <memory>
 #include <functional>
-#include <utility>
-#include <string>
 
 namespace mbgl {
 
@@ -16,10 +16,10 @@ class Response;
 
 class HTTPRequestBase : private util::noncopyable {
 public:
-    using Callback = std::function<void (std::shared_ptr<const Response> response)>;
+    using Callback = std::function<void (Response)>;
 
-    HTTPRequestBase(const std::string& url_, Callback notify_)
-        : url(url_)
+    HTTPRequestBase(const Resource& resource_, Callback notify_)
+        : resource(resource_)
         , notify(std::move(notify_))
         , cancelled(false) {
     }
@@ -30,7 +30,7 @@ public:
 protected:
     static optional<SystemTimePoint> parseCacheControl(const char *value);
 
-    std::string url;
+    Resource resource;
     Callback notify;
     bool cancelled;
 };
