@@ -237,7 +237,7 @@ std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {
     parseTileJSONMember(value, info->attribution, "attribution");
     parseTileJSONMember(value, info->center, "center");
     parseTileJSONMember(value, info->bounds, "bounds");
-    return std::move(info);
+    return info;
 }
 
 void StyleParser::parseLayers(const JSValue& value) {
