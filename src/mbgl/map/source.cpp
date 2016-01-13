@@ -27,6 +27,7 @@
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mapbox/geojsonvt.hpp>
@@ -39,85 +40,17 @@
 
 namespace mbgl {
 
-namespace {
-
-void parse(const JSValue& value, std::vector<std::string>& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsArray()) {
-        return;
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        if (!property[i].IsString()) {
-            return;
-        }
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        target.emplace_back(std::string(property[i].GetString(), property[i].GetStringLength()));
-    }
+Source::Source(SourceType type_,
+               const std::string& id_,
+               const std::string& url_,
+               std::unique_ptr<SourceInfo>&& info_,
+               std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
+    : type(type_),
+      id(id_),
+      url(url_),
+      info(std::move(info_)),
+      geojsonvt(std::move(geojsonvt_)) {
 }
-
-void parse(const JSValue& value, std::string& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsString()) {
-        return;
-    }
-
-    target = { property.GetString(), property.GetStringLength() };
-}
-
-void parse(const JSValue& value, uint16_t& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsUint()) {
-        return;
-    }
-
-    unsigned int uint = property.GetUint();
-    if (uint > std::numeric_limits<uint16_t>::max()) {
-        return;
-    }
-
-    target = uint;
-}
-
-template <size_t N>
-void parse(const JSValue& value, std::array<float, N>& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsArray() || property.Size() != N) {
-        return;
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        if (!property[i].IsNumber()) {
-            return;
-        }
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        target[i] = property[i].GetDouble();
-    }
-}
-
-} // end namespace
-
-Source::Source(SourceType type_, const std::string& id_) : type(type_), id(id_) {}
 
 Source::~Source() = default;
 
@@ -141,16 +74,22 @@ bool Source::isLoading() const {
 // The reason this isn't part of the constructor is that calling shared_from_this() in
 // the constructor fails.
 void Source::load() {
-    if (info.url.empty()) {
+    if (url.empty()) {
+        // In case there is no URL set, we assume that we already have all of the data because the
+        // TileJSON was specified inline in the stylesheet.
         loaded = true;
         return;
     }
 
-    if (req) return;
+    if (req) {
+        // We don't have a SourceInfo object yet, but there's already a request underway to load
+        // the data.
+        return;
+    }
 
     // URL may either be a TileJSON file, or a GeoJSON file.
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Source, info.url }, [this](Response res) {
+    req = fs->request({ Resource::Kind::Source, url }, [this](Response res) {
         if (res.stale) {
             // Only handle fresh responses.
             return;
@@ -173,17 +112,22 @@ void Source::load() {
         }
 
         if (type == SourceType::Vector || type == SourceType::Raster) {
-            parseTileJSON(d);
+            // Create a new copy of the SourceInfo object that holds the base values we've parsed
+            // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
+            // via the URL.
+            auto newInfo = StyleParser::parseTileJSON(d);
 
             // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-            if (type == SourceType::Raster && util::mapbox::isMapboxURL(info.url)) {
+            if (type == SourceType::Raster && util::mapbox::isMapboxURL(url)) {
                 // We need to insert {ratio} into raster source URLs that are loaded from mapbox://
                 // TileJSONs.
-                std::transform(info.tiles.begin(), info.tiles.end(), info.tiles.begin(),
+                std::transform(newInfo->tiles.begin(), newInfo->tiles.end(), newInfo->tiles.begin(),
                                util::mapbox::normalizeRasterTileURL);
             }
+            info = std::move(newInfo);
         } else if (type == SourceType::GeoJSON) {
-            parseGeoJSON(d);
+            info = std::make_unique<SourceInfo>();
+            geojsonvt = StyleParser::parseGeoJSON(d);
         }
 
         loaded = true;
@@ -191,32 +135,10 @@ void Source::load() {
     });
 }
 
-void Source::parseTileJSON(const JSValue& value) {
-    parse(value, info.tiles, "tiles");
-    parse(value, info.min_zoom, "minzoom");
-    parse(value, info.max_zoom, "maxzoom");
-    parse(value, info.attribution, "attribution");
-    parse(value, info.center, "center");
-    parse(value, info.bounds, "bounds");
-}
-
-void Source::parseGeoJSON(const JSValue& value) {
-    using namespace mapbox::geojsonvt;
-
-    try {
-        geojsonvt = std::make_unique<GeoJSONVT>(Convert::convert(value, 0));
-    } catch (const std::exception& ex) {
-        Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
-        // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
-        // tiles to load.
-        geojsonvt = std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
-    }
-}
-
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info.max_zoom), tile.id.z));
+        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info->max_zoom), tile.id.z));
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
@@ -315,14 +237,13 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
             auto tileData = std::make_shared<RasterTileData>(normalizedID,
                                                              parameters.texturePool,
                                                              parameters.worker);
-
-            tileData->request(util::templateTileURL(info.tiles.at(0), normalizedID, parameters.pixelRatio), callback);
+            tileData->request(util::templateTileURL(info->tiles.at(0), normalizedID, parameters.pixelRatio), callback);
             newTile->data = tileData;
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
             if (type == SourceType::Vector) {
-                monitor = std::make_unique<VectorTileMonitor>(normalizedID, info.tiles.at(0));
+                monitor = std::make_unique<VectorTileMonitor>(normalizedID, info->tiles.at(0));
             } else if (type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.data);
             } else if (type == SourceType::GeoJSON) {
@@ -349,7 +270,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 }
 
 double Source::getZoom(const TransformState& state) const {
-    double offset = std::log(util::tileSize / info.tile_size) / std::log(2);
+    double offset = std::log(util::tileSize / info->tile_size) / std::log(2);
     return state.getZoom() + offset;
 }
 
@@ -371,8 +292,8 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
         type == SourceType::Vector ||
         type == SourceType::Annotations;
 
-    if (z < info.min_zoom) return {{}};
-    if (z > info.max_zoom) z = info.max_zoom;
+    if (z < info->min_zoom) return {{}};
+    if (z > info->max_zoom) z = info->max_zoom;
 
     // Map four viewport corners to pixel coordinates
     box points = state.cornersToBox(z);
@@ -401,7 +322,7 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
     bool complete = true;
     int32_t z = tileID.z;
-    auto ids = tileID.children(info.max_zoom);
+    auto ids = tileID.children(info->max_zoom);
     for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
@@ -429,7 +350,7 @@ bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, s
  */
 void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
     for (int32_t z = tileID.z - 1; z >= minCoveringZoom; --z) {
-        const TileID parent_id = tileID.parent(z, info.max_zoom);
+        const TileID parent_id = tileID.parent(z, info->max_zoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);
@@ -451,8 +372,8 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     std::forward_list<TileID> required = coveringTiles(parameters.transformState);
 
     // Determine the overzooming/underzooming amounts.
-    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info.min_zoom, info.max_zoom);
-    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info.min_zoom, info.max_zoom);
+    int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info->min_zoom, info->max_zoom);
+    int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->min_zoom, info->max_zoom);
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like

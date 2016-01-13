@@ -28,11 +28,11 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
 
+    static std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);
+    static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);
+
 private:
     void parseSources(const JSValue&);
-    bool parseVectorSource(Source&, const JSValue&);
-    bool parseRasterSource(Source&, const JSValue&);
-    bool parseGeoJSONSource(Source&, const JSValue&);
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSValue& value);

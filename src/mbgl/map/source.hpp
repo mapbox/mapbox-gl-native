@@ -39,11 +39,12 @@ public:
         virtual void onTileError(Source&, const TileID&, std::exception_ptr) {};
     };
 
-    Source(SourceType, const std::string& id);
+    Source(SourceType,
+           const std::string& id,
+           const std::string& url,
+           std::unique_ptr<SourceInfo>&&,
+           std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~Source();
-
-    void parseTileJSON(const JSValue&);
-    void parseGeoJSON(const JSValue&);
 
     bool loaded = false;
     void load();
@@ -71,7 +72,7 @@ public:
 
     const SourceType type;
     const std::string id;
-    SourceInfo info;
+    const std::string url;
     bool enabled = false;
 
 private:
@@ -87,6 +88,9 @@ private:
     void updateTilePtrs();
 
     double getZoom(const TransformState &state) const;
+
+private:
+    std::unique_ptr<const SourceInfo> info;
 
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
