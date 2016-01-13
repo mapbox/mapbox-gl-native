@@ -251,11 +251,11 @@ const std::vector<Tile*>& Source::getTiles() const {
     return tilePtrs;
 }
 
-TileData::State Source::hasTile(const TileID& id) {
-    auto it = tiles.find(id);
+TileData::State Source::hasTile(const TileID& tileID) {
+    auto it = tiles.find(tileID);
     if (it != tiles.end()) {
         Tile& tile = *it->second;
-        if (tile.id == id && tile.data) {
+        if (tile.id == tileID && tile.data) {
             return tile.data->getState();
         }
     }
@@ -263,10 +263,8 @@ TileData::State Source::hasTile(const TileID& id) {
     return TileData::State::invalid;
 }
 
-bool Source::handlePartialTile(const TileID& id, Worker&) {
-    const TileID normalized_id = id.normalized();
-
-    auto it = tileDataMap.find(normalized_id);
+bool Source::handlePartialTile(const TileID& tileID, Worker&) {
+    auto it = tileDataMap.find(tileID.normalized());
     if (it == tileDataMap.end()) {
         return true;
     }
@@ -276,25 +274,25 @@ bool Source::handlePartialTile(const TileID& id, Worker&) {
         return true;
     }
 
-    return tileData->parsePending([this, id]() {
-        observer->onTileLoaded(*this, id, false);
+    return tileData->parsePending([this, tileID]() {
+        observer->onTileLoaded(*this, tileID, false);
     });
 }
 
-TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& parameters) {
-    const TileData::State state = hasTile(id);
+TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameters& parameters) {
+    const TileData::State state = hasTile(tileID);
 
     if (state != TileData::State::invalid) {
         return state;
     }
 
-    auto newTile = std::make_unique<Tile>(id);
+    auto newTile = std::make_unique<Tile>(tileID);
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
-    const TileID normalized_id = id.normalized();
+    const TileID normalizedID = tileID.normalized();
 
-    auto it = tileDataMap.find(normalized_id);
+    auto it = tileDataMap.find(normalizedID);
     if (it != tileDataMap.end()) {
         // Create a shared_ptr handle. Note that this might be empty!
         newTile->data = it->second.lock();
@@ -306,35 +304,35 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
     }
 
     if (!newTile->data) {
-        newTile->data = cache.get(normalized_id.to_uint64());
+        newTile->data = cache.get(normalizedID.to_uint64());
     }
 
     if (!newTile->data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
-            auto tileData = std::make_shared<RasterTileData>(normalized_id,
+            auto tileData = std::make_shared<RasterTileData>(normalizedID,
                                                              parameters.texturePool,
                                                              parameters.worker);
 
-            tileData->request(util::templateTileURL(info.tiles.at(0), normalized_id, parameters.pixelRatio), callback);
+            tileData->request(util::templateTileURL(info.tiles.at(0), normalizedID, parameters.pixelRatio), callback);
             newTile->data = tileData;
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
             if (type == SourceType::Vector) {
-                monitor = std::make_unique<VectorTileMonitor>(normalized_id, info.tiles.at(0));
+                monitor = std::make_unique<VectorTileMonitor>(normalizedID, info.tiles.at(0));
             } else if (type == SourceType::Annotations) {
-                monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
+                monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.data);
             } else if (type == SourceType::GeoJSON) {
-                monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), normalized_id);
+                monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), normalizedID);
             } else {
                 Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(type).c_str());
                 return TileData::State::invalid;
             }
 
-            newTile->data = std::make_shared<VectorTileData>(normalized_id,
+            newTile->data = std::make_shared<VectorTileData>(normalizedID,
                                                              std::move(monitor),
                                                              info.source_id,
                                                              parameters.style,
@@ -346,7 +344,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
     }
 
     const auto newState = newTile->data->getState();
-    tiles.emplace(id, std::move(newTile));
+    tiles.emplace(tileID, std::move(newTile));
     return newState;
 }
 
@@ -400,10 +398,10 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
  *
  * @return boolean Whether the children found completely cover the tile.
  */
-bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
+bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
     bool complete = true;
-    int32_t z = id.z;
-    auto ids = id.children(info.max_zoom);
+    int32_t z = tileID.z;
+    auto ids = tileID.children(info.max_zoom);
     for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
@@ -429,9 +427,9 @@ bool Source::findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::
  *
  * @return boolean Whether a parent was found.
  */
-void Source::findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
-    for (int32_t z = id.z - 1; z >= minCoveringZoom; --z) {
-        const TileID parent_id = id.parent(z, info.max_zoom);
+void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
+    for (int32_t z = tileID.z - 1; z >= minCoveringZoom; --z) {
+        const TileID parent_id = tileID.parent(z, info.max_zoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
             retain.emplace_front(parent_id);
@@ -462,19 +460,19 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     std::forward_list<TileID> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
-    for (const auto& id : required) {
-        TileData::State state = hasTile(id);
+    for (const auto& tileID : required) {
+        TileData::State state = hasTile(tileID);
 
         switch (state) {
         case TileData::State::partial:
             if (parameters.shouldReparsePartialTiles) {
-                if (!handlePartialTile(id, parameters.worker)) {
+                if (!handlePartialTile(tileID, parameters.worker)) {
                     allTilesUpdated = false;
                 }
             }
             break;
         case TileData::State::invalid:
-            state = addTile(id, parameters);
+            state = addTile(tileID, parameters);
             break;
         default:
             break;
@@ -486,12 +484,12 @@ bool Source::update(const StyleUpdateParameters& parameters) {
 
             // First, try to find existing child tiles that completely cover the
             // missing tile.
-            bool complete = findLoadedChildren(id, maxCoveringZoom, retain);
+            bool complete = findLoadedChildren(tileID, maxCoveringZoom, retain);
 
             // Then, if there are no complete child tiles, try to find existing
             // parent tiles that completely cover the missing tile.
             if (!complete) {
-                findLoadedParent(id, minCoveringZoom, retain);
+                findLoadedParent(tileID, minCoveringZoom, retain);
             }
         }
     }
@@ -572,8 +570,8 @@ void Source::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& id, const TransformState& transformState, bool collisionDebug) {
-    auto it = tileDataMap.find(id);
+void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformState& transformState, bool collisionDebug) {
+    auto it = tileDataMap.find(tileID);
     if (it == tileDataMap.end()) {
         return;
     }
@@ -584,12 +582,12 @@ void Source::tileLoadingCompleteCallback(const TileID& id, const TransformState&
     }
 
     if (tileData->getState() == TileData::State::obsolete && tileData->getError()) {
-        observer->onTileError(*this, id, tileData->getError());
+        observer->onTileError(*this, tileID, tileData->getError());
         return;
     }
 
     tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
-    observer->onTileLoaded(*this, id, true);
+    observer->onTileLoaded(*this, tileID, true);
 }
 
 void Source::dumpDebugLogs() const {
