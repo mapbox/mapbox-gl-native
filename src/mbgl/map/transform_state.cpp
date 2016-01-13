@@ -369,6 +369,26 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     y_ = std::max(-max_y, std::min(y_, max_y));
 }
 
+void TransformState::moveLatLng(const LatLng& latLng, const PrecisionPoint& anchor) {
+    if (!latLng || !anchor) {
+        return;
+    }
+    
+    auto coord = latLngToCoordinate(latLng);
+    auto coordAtPoint = pointToCoordinate(anchor);
+    auto coordCenter = pointToCoordinate({ width / 2.0f, height / 2.0f });
+    
+    float columnDiff = coordAtPoint.column - coord.column;
+    float rowDiff = coordAtPoint.row - coord.row;
+    
+    auto newLatLng = coordinateToLatLng({
+        coordCenter.column - columnDiff,
+        coordCenter.row - rowDiff,
+        coordCenter.zoom
+    });
+    setLatLngZoom(newLatLng, coordCenter.zoom);
+}
+
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
     double newScale = zoomScale(zoom);
     const double newWorldSize = newScale * util::tileSize;

@@ -177,3 +177,28 @@ TEST(Transform, ConstrainWidthAndHeight) {
     ASSERT_NEAR(85.021422866378742, loc.latitude, 0.0001);
     ASSERT_NEAR(179.65667724609358, std::abs(loc.longitude), 0.0001);
 }
+
+TEST(Transform, Anchor) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
+    ASSERT_DOUBLE_EQ(1, transform.getScale());
+
+    transform.setLatLngZoom({ 10, -100 }, 10);
+
+    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(-100, transform.getLatLng().longitude);
+    ASSERT_DOUBLE_EQ(10, transform.getZoom());
+    ASSERT_DOUBLE_EQ(0, transform.getAngle());
+
+    const auto size = view.getSize();
+    const PrecisionPoint anchorPoint = { size[0] * 0.8, size[1] * 0.3 };
+    const LatLng anchorLatLng = transform.getState().pointToLatLng(anchorPoint);
+    transform.setAngle(M_PI_4, anchorPoint);
+
+    ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
+    ASSERT_NE(anchorLatLng, transform.getLatLng());
+    ASSERT_DOUBLE_EQ(anchorLatLng, transform.getState().pointToLatLng(anchorPoint));
+}

@@ -101,8 +101,11 @@ private:
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
     
+    /** Recenter the map so that the given coordinate is located at the given
+        point on screen. */
+    void moveLatLng(const LatLng&, const PrecisionPoint&);
     void setLatLngZoom(const LatLng &latLng, double zoom);
-    void setScalePoint(const double scale, const PrecisionPoint &point);
+    void setScalePoint(const double scale, const PrecisionPoint& point);
 
 private:
     ConstrainMode constrainMode;

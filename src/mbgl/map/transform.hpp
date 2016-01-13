@@ -100,6 +100,8 @@ public:
     bool isPanning() const { return state.isPanning(); }
 
 private:
+    void moveLatLng(const LatLng&, const PrecisionPoint&);
+    
     View &view;
 
     TransformState state;
