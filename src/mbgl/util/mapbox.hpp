@@ -14,7 +14,7 @@ std::string normalizeSourceURL(const std::string& url, const std::string& access
 std::string normalizeStyleURL(const std::string& url, const std::string& accessToken);
 std::string normalizeSpriteURL(const std::string& url, const std::string& accessToken);
 std::string normalizeGlyphsURL(const std::string& url, const std::string& accessToken);
-std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType);
+std::string normalizeRasterTileURL(const std::string& url);
 
 // Canonicalizes Mapbox URLs by removing [a-d] subdomain prefixes, access tokens, and protocol.
 // Note that this is close, but not exactly the reverse operation as above, as this retains certain

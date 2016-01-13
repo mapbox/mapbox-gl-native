@@ -37,19 +37,15 @@ TEST(Mapbox, SpriteURL) {
 
 TEST(Mapbox, TileURL) {
     try {
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png32", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png32");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png70", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png70");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png?access_token=foo", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.png?access_token=foo");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", "http://path", SourceType::Raster), "http://path.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png", "", SourceType::Raster), "http://path.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.png", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf", "mapbox://user.map", SourceType::Vector), "http://path.png/tile.pbf");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar");
-        EXPECT_EQ(mbgl::util::mapbox::normalizeTileURL("http://path.png/tile.pbf?access_token=foo.png/bar.png", "mapbox://user.map", SourceType::Raster), "http://path.png/tile{ratio}.pbf?access_token=foo.png/bar.png");
+        EXPECT_EQ("http://path.png/tile{ratio}.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png"));
+        EXPECT_EQ("http://path.png/tile{ratio}.png32", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png32"));
+        EXPECT_EQ("http://path.png/tile{ratio}.png70", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png70"));
+        EXPECT_EQ("http://path.png/tile{ratio}.png?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png?access_token=foo"));
+        EXPECT_EQ("http://path.png/tile{ratio}.pbf", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf"));
+        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo"));
+        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png"));
+        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png/bar", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png/bar"));
+        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png/bar.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png/bar.png"));
     } catch (const std::regex_error& e) {
         const char *error = "unknown";
         switch (e.code()) {

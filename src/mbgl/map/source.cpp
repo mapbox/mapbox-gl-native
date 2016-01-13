@@ -174,6 +174,14 @@ void Source::load() {
 
         if (info.type == SourceType::Vector || info.type == SourceType::Raster) {
             parseTileJSON(d);
+
+            // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
+            if (info.type == SourceType::Raster && util::mapbox::isMapboxURL(info.url)) {
+                // We need to insert {ratio} into raster source URLs that are loaded from mapbox://
+                // TileJSONs.
+                std::transform(info.tiles.begin(), info.tiles.end(), info.tiles.begin(),
+                               util::mapbox::normalizeRasterTileURL);
+            }
         } else if (info.type == SourceType::GeoJSON) {
             parseGeoJSON(d);
         }

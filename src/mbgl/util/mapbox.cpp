@@ -111,11 +111,7 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
     return baseURL + "fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
 }
 
-std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
-    if (sourceURL.empty() || !isMapboxURL(sourceURL) || sourceType != SourceType::Raster) {
-        return url;
-    }
-
+std::string normalizeRasterTileURL(const std::string& url) {
     std::string::size_type queryIdx = url.rfind("?");
     // Trim off the right end but never touch anything before the extension dot.
     std::string urlSansParams((queryIdx == std::string::npos) ? url : url.substr(0, queryIdx));
