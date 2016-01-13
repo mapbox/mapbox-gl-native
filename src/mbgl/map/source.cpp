@@ -117,7 +117,7 @@ void parse(const JSValue& value, std::array<float, N>& target, const char* name)
 
 } // end namespace
 
-Source::Source() {}
+Source::Source(SourceType type_) : type(type_) {}
 
 Source::~Source() = default;
 
@@ -172,17 +172,17 @@ void Source::load() {
             return;
         }
 
-        if (info.type == SourceType::Vector || info.type == SourceType::Raster) {
+        if (type == SourceType::Vector || type == SourceType::Raster) {
             parseTileJSON(d);
 
             // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-            if (info.type == SourceType::Raster && util::mapbox::isMapboxURL(info.url)) {
+            if (type == SourceType::Raster && util::mapbox::isMapboxURL(info.url)) {
                 // We need to insert {ratio} into raster source URLs that are loaded from mapbox://
                 // TileJSONs.
                 std::transform(info.tiles.begin(), info.tiles.end(), info.tiles.begin(),
                                util::mapbox::normalizeRasterTileURL);
             }
-        } else if (info.type == SourceType::GeoJSON) {
+        } else if (type == SourceType::GeoJSON) {
             parseGeoJSON(d);
         }
 
@@ -313,7 +313,7 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
         auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalized_id, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
-        if (info.type == SourceType::Raster) {
+        if (type == SourceType::Raster) {
             auto tileData = std::make_shared<RasterTileData>(normalized_id,
                                                              parameters.texturePool,
                                                              parameters.worker);
@@ -323,14 +323,14 @@ TileData::State Source::addTile(const TileID& id, const StyleUpdateParameters& p
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
-            if (info.type == SourceType::Vector) {
+            if (type == SourceType::Vector) {
                 monitor = std::make_unique<VectorTileMonitor>(normalized_id, info.tiles.at(0));
-            } else if (info.type == SourceType::Annotations) {
+            } else if (type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalized_id, parameters.data);
-            } else if (info.type == SourceType::GeoJSON) {
+            } else if (type == SourceType::GeoJSON) {
                 monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), normalized_id);
             } else {
-                Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(info.type).c_str());
+                Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(type).c_str());
                 return TileData::State::invalid;
             }
 
@@ -357,7 +357,7 @@ double Source::getZoom(const TransformState& state) const {
 
 int32_t Source::coveringZoomLevel(const TransformState& state) const {
     double zoom = getZoom(state);
-    if (info.type == SourceType::Raster || info.type == SourceType::Video) {
+    if (type == SourceType::Raster || type == SourceType::Video) {
         zoom = ::round(zoom);
     } else {
         zoom = std::floor(zoom);
@@ -370,8 +370,8 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
 
     auto actualZ = z;
     const bool reparseOverscaled =
-        info.type == SourceType::Vector ||
-        info.type == SourceType::Annotations;
+        type == SourceType::Vector ||
+        type == SourceType::Annotations;
 
     if (z < info.min_zoom) return {{}};
     if (z > info.max_zoom) z = info.max_zoom;
@@ -496,7 +496,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         }
     }
 
-    if (info.type != SourceType::Raster && cache.getSize() == 0) {
+    if (type != SourceType::Raster && cache.getSize() == 0) {
         size_t conservativeCacheSize = ((float)parameters.transformState.getWidth()  / util::tileSize) *
                                        ((float)parameters.transformState.getHeight() / util::tileSize) *
                                        (parameters.transformState.getMaxZoom() - parameters.transformState.getMinZoom() + 1) *
@@ -505,12 +505,11 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     }
 
     auto& tileCache = cache;
-    auto& type = info.type;
 
     // Remove tiles that we definitely don't need, i.e. tiles that are not on
     // the required list.
     std::set<TileID> retain_data;
-    util::erase_if(tiles, [&retain, &retain_data, &tileCache, &type](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
+    util::erase_if(tiles, [this, &retain, &retain_data, &tileCache](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
         Tile &tile = *pair.second;
         bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
         if (!obsolete) {

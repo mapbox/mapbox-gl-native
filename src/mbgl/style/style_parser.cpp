@@ -56,10 +56,6 @@ void StyleParser::parseSources(const JSValue& value) {
         const JSValue& nameVal = itr->name;
         const JSValue& sourceVal = itr->value;
 
-        std::unique_ptr<Source> source = std::make_unique<Source>();
-
-        source->info.source_id = { nameVal.GetString(), nameVal.GetStringLength() };
-
         if (!sourceVal.HasMember("type")) {
             Log::Warning(Event::ParseStyle, "source must have a type");
             continue;
@@ -71,9 +67,11 @@ void StyleParser::parseSources(const JSValue& value) {
             continue;
         }
 
-        source->info.type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
+        const auto type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
+        std::unique_ptr<Source> source = std::make_unique<Source>(type);
+        source->info.source_id = { nameVal.GetString(), nameVal.GetStringLength() };
 
-        switch (source->info.type) {
+        switch (type) {
         case SourceType::Vector:
             if (!parseVectorSource(*source, sourceVal)) {
                 continue;
@@ -90,7 +88,7 @@ void StyleParser::parseSources(const JSValue& value) {
             }
             break;
         default:
-            Log::Warning(Event::ParseStyle, "source type %s is not supported", SourceTypeClass(source->info.type).c_str());
+            Log::Warning(Event::ParseStyle, "source type %s is not supported", type.c_str());
         }
 
         sourcesMap.emplace(source->info.source_id, source.get());

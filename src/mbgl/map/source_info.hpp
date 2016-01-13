@@ -15,7 +15,6 @@ class TileID;
 
 class SourceInfo {
 public:
-    SourceType type = SourceType::Vector;
     std::string url;
     std::vector<std::string> tiles;
     uint16_t tile_size = util::tileSize;

@@ -39,7 +39,7 @@ public:
         virtual void onTileError(Source&, const TileID&, std::exception_ptr) {};
     };
 
-    Source();
+    Source(SourceType);
     ~Source();
 
     void parseTileJSON(const JSValue&);
@@ -69,6 +69,7 @@ public:
     void setObserver(Observer* observer);
     void dumpDebugLogs() const;
 
+    const SourceType type;
     SourceInfo info;
     bool enabled = false;
 
