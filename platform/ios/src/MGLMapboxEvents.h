@@ -10,6 +10,7 @@ extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
 extern NSString *const MGLEventTypeLocation;
 extern NSString *const MGLEventTypeVisit;
+extern NSString *const MGLEventTypeLocalDebug;
 
 extern NSString *const MGLEventKeyLatitude;
 extern NSString *const MGLEventKeyLongitude;
@@ -24,6 +25,7 @@ extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
 extern NSString *const MGLEventKeyArrivalDate;
 extern NSString *const MGLEventKeyDepartureDate;
+extern NSString *const MGLEventKeyLocalDebugDescription;
 
 extern NSString *const MGLEventGestureSingleTap;
 extern NSString *const MGLEventGestureDoubleTap;
@@ -56,6 +58,10 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 // class for threadsafe access to UIKit classes.
 //
 + (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
+
++ (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
+
++ (BOOL) debugLoggingEnabled;
 
 // You can call these methods from any thread.
 //

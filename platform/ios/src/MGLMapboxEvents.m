@@ -22,6 +22,7 @@ NSString *const MGLEventTypeMapTap = @"map.click";
 NSString *const MGLEventTypeMapDragEnd = @"map.dragend";
 NSString *const MGLEventTypeLocation = @"location";
 NSString *const MGLEventTypeVisit = @"visit";
+NSString *const MGLEventTypeLocalDebug = @"debug";
 
 NSString *const MGLEventKeyLatitude = @"lat";
 NSString *const MGLEventKeyLongitude = @"lng";
@@ -36,6 +37,7 @@ NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
 NSString *const MGLEventKeyGestureID = @"gesture";
 NSString *const MGLEventKeyArrivalDate = @"arrivalDate";
 NSString *const MGLEventKeyDepartureDate = @"departureDate";
+NSString *const MGLEventKeyLocalDebugDescription = @"debug.description";
 
 NSString *const MGLEventGestureSingleTap = @"SingleTap";
 NSString *const MGLEventGestureDoubleTap = @"DoubleTap";
@@ -151,6 +153,10 @@ const NSTimeInterval MGLFlushInterval = 60;
 //
 @property (nonatomic) dispatch_queue_t serialQueue;
 
+@property (atomic) BOOL canEnableDebugLogging;
+@property (nonatomic) dispatch_queue_t debugLogSerialQueue;
+@property (nonatomic) NSString *dateForDebugLogFile;
+
 @end
 
 @implementation MGLMapboxEvents {
@@ -164,6 +170,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
              @"MGLMapboxAccountType": accountTypeNumber ? accountTypeNumber : @0,
              @"MGLMapboxMetricsEnabled": @YES,
+             @"MGLMapboxMetricsDebugLoggingEnabled": @NO,
          }];
     }
 }
@@ -171,6 +178,15 @@ const NSTimeInterval MGLFlushInterval = 60;
 + (BOOL)isEnabled {
     return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
+}
+
+- (BOOL)debugLoggingEnabled {
+    return (self.canEnableDebugLogging &&
+            [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"]);
+}
+
++ (BOOL)debugLoggingEnabled {
+    return [[MGLMapboxEvents sharedManager] debugLoggingEnabled];
 }
 
 // Must be called from the main thread. Only called internally.
@@ -237,7 +253,19 @@ const NSTimeInterval MGLFlushInterval = 60;
         
         // Enable Battery Monitoring
         [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-        
+
+        // Configure logging
+        if ([self isProbablyAppStoreBuild]) {
+            self.canEnableDebugLogging = NO;
+
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"]) {
+                NSLog(@"Telemetry logging is only enabled in non-app store builds.");
+            }
+        } else {
+            self.canEnableDebugLogging = YES;
+        }
+
+        // Watch for changes to telemetry settings by the user
         __weak MGLMapboxEvents *weakSelf = self;
         _userDefaultsObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
                                                                                   object:nil
@@ -381,9 +409,9 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
-    
+
     [_locationManager startUpdatingLocation];
-    
+
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
     if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
         [_locationManager startMonitoringVisits];
@@ -419,6 +447,11 @@ const NSTimeInterval MGLFlushInterval = 60;
 
             // Flush
             [strongSelf flush];
+
+        if ([strongSelf debugLoggingEnabled]) {
+            [strongSelf writeEventToLocalDebugLog:vevt];
+        }
+
     });
 }
 
@@ -458,7 +491,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         [evt setObject:strongSelf.instanceID forKey:@"instance"];
         [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
         [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
-        
+
         // mapbox-events-ios stock attributes
         [evt setValue:strongSelf.data.model forKey:@"model"];
         [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
@@ -485,6 +518,10 @@ const NSTimeInterval MGLFlushInterval = 60;
         } else if (_eventQueue.count ==  1) {
             // If this is first new event on queue start timer,
             [strongSelf startTimer];
+        }
+
+        if ([strongSelf debugLoggingEnabled]) {
+            [strongSelf writeEventToLocalDebugLog:finalEvent];
         }
     });
 }
@@ -521,6 +558,12 @@ const NSTimeInterval MGLFlushInterval = 60;
             strongSelf.timer = nil;
         }
     });
+
+    if ([self debugLoggingEnabled]) {
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{
+            MGLEventKeyLocalDebugDescription: @"flush"
+        }];
+    }
 }
 
 // Can be called from any thread. Called implicitly from public
@@ -558,6 +601,13 @@ const NSTimeInterval MGLFlushInterval = 60;
                         [temporarySession finishTasksAndInvalidate];
                     }
                 }
+            }
+
+            if ([self debugLoggingEnabled]) {
+                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{
+                    MGLEventKeyLocalDebugDescription: @"post",
+                    @"debug.eventsCount": @(events.count)
+                }];
             }
         }
     });
@@ -896,6 +946,128 @@ const NSTimeInterval MGLFlushInterval = 60;
         }
     }
 
+}
+
+#pragma mark MGLMapboxEvents Debug
+
+// Can be called from any thread.
+//
++ (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [[MGLMapboxEvents sharedManager] pushDebugEvent:event withAttributes:attributeDictionary];
+    });
+}
+
+// Can be called from any thread. Called implicitly from public
+// use of +pushDebugEvent:withAttributes:.
+//
+- (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    __weak MGLMapboxEvents *weakSelf = self;
+
+    if (![self debugLoggingEnabled] || !event) return;
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+
+        MGLMapboxEvents *strongSelf = weakSelf;
+
+        if (!strongSelf) return;
+
+        MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
+
+        [evt setObject:event forKey:@"event"];
+        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+        [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
+        [evt setValue:@([[self class] isEnabled]) forKey:@"telemetryEnabled"];
+        [evt setObject:strongSelf.instanceID forKey:@"instance"];
+
+        // Make immutable version
+        MGLMapboxEventAttributes *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+
+        [strongSelf writeEventToLocalDebugLog:finalEvent];
+
+    });
+}
+
+- (void) writeEventToLocalDebugLog:(MGLMapboxEventAttributes *)event {
+    if (![self debugLoggingEnabled]) return;
+
+    NSLog(@"%@", [self stringForDebugEvent:event]);
+
+    if ( ! self.dateForDebugLogFile) {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
+        [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+        self.dateForDebugLogFile = [dateFormatter stringFromDate:[NSDate date]];
+    }
+
+    if ( ! _debugLogSerialQueue) {
+        NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
+        _debugLogSerialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.debugLog", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+    }
+
+    dispatch_sync(_debugLogSerialQueue, ^{
+        if ([NSJSONSerialization isValidJSONObject:event]) {
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:event options:NSJSONWritingPrettyPrinted error:nil];
+            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+
+            jsonString = [jsonString stringByAppendingString:@",\n"];
+
+            NSString *logFilePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", self.dateForDebugLogFile]];
+
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+            if ([fileManager fileExistsAtPath:logFilePath]) {
+                NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
+                [fileHandle seekToEndOfFile];
+                [fileHandle writeData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+            } else {
+                [fileManager createFileAtPath:logFilePath contents:[jsonString dataUsingEncoding:NSUTF8StringEncoding] attributes:@{ NSFileProtectionKey: NSFileProtectionCompleteUntilFirstUserAuthentication }];
+            }
+        }
+
+    });
+}
+
+- (NSString *) stringForDebugEvent:(MGLMapboxEventAttributes *)event {
+    // redact potentially sensitive location details from system console log
+    if ([event[@"event"] isEqualToString:MGLEventTypeLocation] ||
+        [event[@"event"] isEqualToString:MGLEventTypeVisit]) {
+        MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:event];
+        [evt setObject:@"<redacted>" forKey:@"lat"];
+        [evt setObject:@"<redacted>" forKey:@"lng"];
+        event = evt;
+    }
+
+    return [NSString stringWithFormat:@"Mapbox Telemetry event %@", event];
+}
+
+- (BOOL) isProbablyAppStoreBuild {
+#if TARGET_IPHONE_SIMULATOR
+    return NO;
+#else
+    // BugshotKit by Marco Arment https://github.com/marcoarment/BugshotKit/
+    // Adapted from https://github.com/blindsightcorp/BSMobileProvision
+
+    NSString *binaryMobileProvision = [NSString stringWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"] encoding:NSISOLatin1StringEncoding error:NULL];
+    if (! binaryMobileProvision) return YES; // no provision
+
+    NSScanner *scanner = [NSScanner scannerWithString:binaryMobileProvision];
+    NSString *plistString;
+    if (! [scanner scanUpToString:@"<plist" intoString:nil] || ! [scanner scanUpToString:@"</plist>" intoString:&plistString]) return YES; // no XML plist found in provision
+    plistString = [plistString stringByAppendingString:@"</plist>"];
+
+    NSData *plistdata_latin1 = [plistString dataUsingEncoding:NSISOLatin1StringEncoding];
+    NSError *error = nil;
+    NSDictionary *mobileProvision = [NSPropertyListSerialization propertyListWithData:plistdata_latin1 options:NSPropertyListImmutable format:NULL error:&error];
+    if (error) return YES; // unknown plist format
+
+    if (! mobileProvision || ! mobileProvision.count) return YES; // no entitlements
+
+    if (mobileProvision[@"ProvisionsAllDevices"]) return NO; // enterprise provisioning
+
+    if (mobileProvision[@"ProvisionedDevices"] && [mobileProvision[@"ProvisionedDevices"] count]) return NO; // development or ad-hoc
+    
+    return YES; // expected development/enterprise/ad-hoc entitlements not found
+#endif
 }
 
 @end
