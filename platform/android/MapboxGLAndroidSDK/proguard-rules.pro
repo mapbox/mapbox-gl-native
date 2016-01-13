@@ -17,3 +17,12 @@
 
 # Package views
 -keep class com.mapbox.mapboxsdk.views.** { *; }
+
+# Package layers
+-keep class com.mapbox.mapboxsdk.layers.** { *; }
+
+# Package camera
+-keep class com.mapbox.mapboxsdk.camera.** { *; }
+
+# Gesture package
+-keep class almeros.android.multitouch.gesturedetectors.** { *; }
