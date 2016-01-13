@@ -54,6 +54,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
     sdfShader.u_skewed = skewed;
+    sdfShader.u_texture = 0;
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
@@ -232,6 +233,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
             iconShader->u_skewed = skewed;
             iconShader->u_extra = extra;
+            iconShader->u_texture = 0;
 
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.icon.size) / std::log(2);
