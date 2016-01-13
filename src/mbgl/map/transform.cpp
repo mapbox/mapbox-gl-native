@@ -64,7 +64,7 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
     }
 }
 
-#pragma mark - Position
+#pragma mark - Camera
 
 /**
  * Change any combination of center, zoom, bearing, and pitch, without
@@ -73,99 +73,6 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
  */
 void Transform::jumpTo(const CameraOptions& camera) {
     easeTo(camera);
-}
-
-void Transform::moveBy(const PrecisionPoint& offset, const Duration& duration) {
-    if (!_validPoint(offset)) {
-        return;
-    }
-
-    PrecisionPoint centerOffset = {
-        offset.x,
-        -offset.y,
-    };
-    PrecisionPoint centerPoint = state.latLngToPoint(state.getLatLng()) - centerOffset;
-
-    CameraOptions camera;
-    camera.center = state.pointToLatLng(centerPoint);
-    easeTo(camera, duration);
-}
-
-void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
-    if (!latLng) {
-        return;
-    }
-
-    CameraOptions camera;
-    camera.center = latLng;
-    easeTo(camera, duration);
-}
-
-void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Duration& duration) {
-    if (!latLng || !point) {
-        return;
-    }
-
-    auto coord = state.latLngToCoordinate(latLng);
-    auto coordAtPoint = state.pointToCoordinate(point);
-    auto coordCenter = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f });
-
-    float columnDiff = coordAtPoint.column - coord.column;
-    float rowDiff = coordAtPoint.row - coord.row;
-
-    auto newLatLng = state.coordinateToLatLng({
-        coordCenter.column - columnDiff,
-        coordCenter.row - rowDiff,
-        coordCenter.zoom
-    });
-
-    setLatLng(newLatLng, duration);
-}
-
-void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
-    if (!latLng || std::isnan(zoom)) {
-        return;
-    }
-
-    CameraOptions camera;
-    camera.center = latLng;
-    camera.zoom = zoom;
-    easeTo(camera, duration);
-}
-
-
-#pragma mark - Zoom
-
-void Transform::scaleBy(double ds, const PrecisionPoint& center, const Duration& duration) {
-    if (std::isnan(ds)) {
-        return;
-    }
-
-    double scale = util::clamp(state.scale * ds, state.min_scale, state.max_scale);
-    setScale(scale, center, duration);
-}
-
-void Transform::setZoom(double zoom, const Duration& duration) {
-    setScale(state.zoomScale(zoom), {NAN, NAN}, duration);
-}
-
-double Transform::getZoom() const {
-    return state.getZoom();
-}
-
-double Transform::getScale() const {
-    return state.scale;
-}
-
-void Transform::setScale(double scale, const PrecisionPoint& anchor, const Duration& duration) {
-    if (std::isnan(scale)) {
-        return;
-    }
-    
-    CameraOptions camera;
-    camera.zoom = state.scaleZoom(scale);
-    camera.anchor = anchor;
-    easeTo(camera, duration);
 }
 
 /**
@@ -488,6 +395,101 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
             view.notifyMapChange(MapChangeRegionDidChangeAnimated);
         }, duration);
 };
+
+#pragma mark - Position
+
+void Transform::moveBy(const PrecisionPoint& offset, const Duration& duration) {
+    if (!_validPoint(offset)) {
+        return;
+    }
+
+    PrecisionPoint centerOffset = {
+        offset.x,
+        -offset.y,
+    };
+    PrecisionPoint centerPoint = state.latLngToPoint(state.getLatLng()) - centerOffset;
+
+    CameraOptions camera;
+    camera.center = state.pointToLatLng(centerPoint);
+    easeTo(camera, duration);
+}
+
+void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
+    if (!latLng) {
+        return;
+    }
+
+    CameraOptions camera;
+    camera.center = latLng;
+    easeTo(camera, duration);
+}
+
+void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Duration& duration) {
+    if (!latLng || !point) {
+        return;
+    }
+
+    auto coord = state.latLngToCoordinate(latLng);
+    auto coordAtPoint = state.pointToCoordinate(point);
+    auto coordCenter = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f });
+
+    float columnDiff = coordAtPoint.column - coord.column;
+    float rowDiff = coordAtPoint.row - coord.row;
+
+    auto newLatLng = state.coordinateToLatLng({
+        coordCenter.column - columnDiff,
+        coordCenter.row - rowDiff,
+        coordCenter.zoom
+    });
+
+    setLatLng(newLatLng, duration);
+}
+
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
+    if (!latLng || std::isnan(zoom)) {
+        return;
+    }
+
+    CameraOptions camera;
+    camera.center = latLng;
+    camera.zoom = zoom;
+    easeTo(camera, duration);
+}
+
+
+#pragma mark - Zoom
+
+void Transform::scaleBy(double ds, const PrecisionPoint& center, const Duration& duration) {
+    if (std::isnan(ds)) {
+        return;
+    }
+
+    double scale = util::clamp(state.scale * ds, state.min_scale, state.max_scale);
+    setScale(scale, center, duration);
+}
+
+void Transform::setZoom(double zoom, const Duration& duration) {
+    setScale(state.zoomScale(zoom), {NAN, NAN}, duration);
+}
+
+double Transform::getZoom() const {
+    return state.getZoom();
+}
+
+double Transform::getScale() const {
+    return state.scale;
+}
+
+void Transform::setScale(double scale, const PrecisionPoint& anchor, const Duration& duration) {
+    if (std::isnan(scale)) {
+        return;
+    }
+    
+    CameraOptions camera;
+    camera.zoom = state.scaleZoom(scale);
+    camera.anchor = anchor;
+    easeTo(camera, duration);
+}
 
 #pragma mark - Angle
 

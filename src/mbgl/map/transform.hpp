@@ -24,10 +24,16 @@ public:
     // Map view
     bool resize(std::array<uint16_t, 2> size);
 
+    // Camera
+    
+    /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
+    /** Asynchronously transitions all specified camera options linearly along
+        an optional time curve. */
     void easeTo(const CameraOptions&, const AnimationOptions& = {});
-    /** Smoothly zooms out, pan, and zoom back into the given camera along a
-        great circle, as though the viewer is aboard a supersonic jetcopter. */
+    /** Asynchronously zooms out, pans, and zooms back into the given camera
+        along a great circle, as though the viewer is riding a supersonic
+        jetcopter. */
     void flyTo(const CameraOptions&, const AnimationOptions& = {});
 
     // Position
