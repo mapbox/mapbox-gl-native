@@ -194,7 +194,7 @@ void Style::recalculate(float z) {
 
 Source* Style::getSource(const std::string& id) const {
     const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->info.source_id == id;
+        return source->id == id;
     });
 
     return it != sources.end() ? it->get() : nullptr;
@@ -331,7 +331,7 @@ void Style::onSourceLoaded(Source& source) {
 void Style::onSourceError(Source& source, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load source %s: %s",
-               source.info.source_id.c_str(), util::toString(error).c_str());
+               source.id.c_str(), util::toString(error).c_str());
     observer->onSourceError(source, error);
     observer->onResourceError(error);
 }
@@ -348,7 +348,7 @@ void Style::onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) {
 void Style::onTileError(Source& source, const TileID& tileID, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               std::string(tileID).c_str(), source.info.source_id.c_str(), util::toString(error).c_str());
+               std::string(tileID).c_str(), source.id.c_str(), util::toString(error).c_str());
     observer->onTileError(source, tileID, error);
     observer->onResourceError(error);
 }

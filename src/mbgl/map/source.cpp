@@ -117,7 +117,7 @@ void parse(const JSValue& value, std::array<float, N>& target, const char* name)
 
 } // end namespace
 
-Source::Source(SourceType type_) : type(type_) {}
+Source::Source(SourceType type_, const std::string& id_) : type(type_), id(id_) {}
 
 Source::~Source() = default;
 
@@ -334,7 +334,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 
             newTile->data = std::make_shared<VectorTileData>(normalizedID,
                                                              std::move(monitor),
-                                                             info.source_id,
+                                                             id,
                                                              parameters.style,
                                                              parameters.mode,
                                                              callback);
@@ -591,7 +591,7 @@ void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformSt
 }
 
 void Source::dumpDebugLogs() const {
-    Log::Info(Event::General, "Source::id: %s", info.source_id.c_str());
+    Log::Info(Event::General, "Source::id: %s", id.c_str());
     Log::Info(Event::General, "Source::loaded: %d", loaded);
 
     for (const auto& tile : tiles) {

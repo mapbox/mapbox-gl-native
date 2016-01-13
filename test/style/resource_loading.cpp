@@ -82,7 +82,7 @@ TEST(ResourceLoading, RasterSourceFail) {
     ResourceLoadingTest test(MockFileSource::RequestFail, "source_raster.json");
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "rastersource");
+        EXPECT_EQ(source.id, "rastersource");
         EXPECT_EQ(util::toString(error), "Failed by the test case");
         test.end();
     };
@@ -94,7 +94,7 @@ TEST(ResourceLoading, VectorSourceFail) {
     ResourceLoadingTest test(MockFileSource::RequestFail, "source_vector.json");
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "vectorsource");
+        EXPECT_EQ(source.id, "vectorsource");
         EXPECT_EQ(util::toString(error), "Failed by the test case");
         test.end();
     };
@@ -128,7 +128,7 @@ TEST(ResourceLoading, RasterTileFail) {
     ResourceLoadingTest test(MockFileSource::RequestFail, "raster.png");
 
     test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "rastersource");
+        EXPECT_EQ(source.id, "rastersource");
         EXPECT_EQ(std::string(tileID), "0/0/0");
         EXPECT_EQ(util::toString(error), "Failed by the test case");
         test.end();
@@ -141,7 +141,7 @@ TEST(ResourceLoading, VectorTileFail) {
     ResourceLoadingTest test(MockFileSource::RequestFail, "vector.pbf");
 
     test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "vectorsource");
+        EXPECT_EQ(source.id, "vectorsource");
         EXPECT_EQ(std::string(tileID), "0/0/0");
         EXPECT_EQ(util::toString(error), "Failed by the test case");
         test.end();
@@ -166,7 +166,7 @@ TEST(ResourceLoading, RasterSourceCorrupt) {
     ResourceLoadingTest test(MockFileSource::RequestWithCorruptedData, "source_raster.json");
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "rastersource");
+        EXPECT_EQ(source.id, "rastersource");
         EXPECT_EQ(util::toString(error), "0 - Invalid value.");
         test.end();
     };
@@ -178,7 +178,7 @@ TEST(ResourceLoading, VectorSourceCorrupt) {
     ResourceLoadingTest test(MockFileSource::RequestWithCorruptedData, "source_vector.json");
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "vectorsource");
+        EXPECT_EQ(source.id, "vectorsource");
         EXPECT_EQ(util::toString(error), "0 - Invalid value.");
         test.end();
     };
@@ -213,7 +213,7 @@ TEST(ResourceLoading, RasterTileCorrupt) {
     ResourceLoadingTest test(MockFileSource::RequestWithCorruptedData, "raster.png");
 
     test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "rastersource");
+        EXPECT_EQ(source.id, "rastersource");
         EXPECT_EQ(std::string(tileID), "0/0/0");
         EXPECT_TRUE(bool(error));
         // Not asserting on platform-specific error text.
@@ -227,7 +227,7 @@ TEST(ResourceLoading, VectorTileCorrupt) {
     ResourceLoadingTest test(MockFileSource::RequestWithCorruptedData, "vector.pbf");
 
     test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
-        EXPECT_EQ(source.info.source_id, "vectorsource");
+        EXPECT_EQ(source.id, "vectorsource");
         EXPECT_EQ(std::string(tileID), "0/0/0");
         EXPECT_EQ(util::toString(error), "pbf unknown field type exception");
         test.end();

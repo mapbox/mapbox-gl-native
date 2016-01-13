@@ -68,8 +68,8 @@ void StyleParser::parseSources(const JSValue& value) {
         }
 
         const auto type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
-        std::unique_ptr<Source> source = std::make_unique<Source>(type);
-        source->info.source_id = { nameVal.GetString(), nameVal.GetStringLength() };
+        const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
+        std::unique_ptr<Source> source = std::make_unique<Source>(type, id);
 
         switch (type) {
         case SourceType::Vector:
@@ -91,7 +91,7 @@ void StyleParser::parseSources(const JSValue& value) {
             Log::Warning(Event::ParseStyle, "source type %s is not supported", type.c_str());
         }
 
-        sourcesMap.emplace(source->info.source_id, source.get());
+        sourcesMap.emplace(id, source.get());
         sources.emplace_back(std::move(source));
     }
 }
