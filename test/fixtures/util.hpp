@@ -22,8 +22,6 @@ class Map;
 
 namespace test {
 
-std::string getFileSourceRoot();
-
 class Server {
 public:
     Server(const char* executable);

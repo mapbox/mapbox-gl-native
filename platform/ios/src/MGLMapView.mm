@@ -280,7 +280,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         NSString *libraryDirectory = [paths objectAtIndex:0];
         fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
     }
-    _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String]);
+    _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String], [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
 
     // setup mbgl map
     _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);

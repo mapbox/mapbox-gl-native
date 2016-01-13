@@ -21,7 +21,6 @@
         '../platform/darwin/log_nslog.mm',
         '../platform/darwin/string_nsstring.mm',
         '../platform/darwin/application_root.mm',
-        '../platform/darwin/asset_root.mm',
         '../platform/darwin/image.mm',
         '../platform/darwin/nsthread.mm',
         '../platform/darwin/reachability.m',

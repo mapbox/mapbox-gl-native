@@ -18,9 +18,6 @@ std::string lowercase(const std::string &string);
 // Returns the path to the root folder of the application.
 const std::string &applicationRoot();
 
-// Returns the path to the asset location.
-const std::string &assetRoot();
-
 // Makes the current thread low priority.
 void makeThreadLowPriority();
 

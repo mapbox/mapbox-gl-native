@@ -4,7 +4,7 @@
   "sources": {
     "mapbox": {
       "type": "vector",
-      "url": "asset://TEST_DATA/fixtures/tiles/streets.json"
+      "url": "asset://streets.json"
     }
   },
   "layers": [{

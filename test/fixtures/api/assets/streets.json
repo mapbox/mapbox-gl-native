@@ -10,5 +10,5 @@
   "name": "Streets",
   "scheme": "xyz",
   "tilejson": "2.0.0",
-  "tiles": [ "asset://TEST_DATA/fixtures/tiles/streets/{z}-{x}-{y}.vector.pbf" ]
+  "tiles": [ "asset://streets/{z}-{x}-{y}.vector.pbf" ]
 }
