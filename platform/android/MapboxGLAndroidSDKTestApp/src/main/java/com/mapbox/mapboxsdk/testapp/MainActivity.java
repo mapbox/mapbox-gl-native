@@ -182,8 +182,6 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
-        mMapView.setRotateEnabled(false);
-
         mLocationFAB = (FloatingActionButton) findViewById(R.id.locationFAB);
         mLocationFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -420,6 +418,10 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     startActivity(new Intent(getApplicationContext(), DoubleMapActivity.class));
                                 }
+                                return true;
+
+                            case R.id.action_geocoder:
+                                startActivity(new Intent(getApplicationContext(), GeocoderActivity.class));
                                 return true;
 
                             default:

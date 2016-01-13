@@ -20,6 +20,7 @@
     <string name="activity_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_directions">Directions Activity</string>
+    <string name="activity_geocoder">Geocoder Activity</string>
     <string name="activity_double_map">Double Map Activity</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
