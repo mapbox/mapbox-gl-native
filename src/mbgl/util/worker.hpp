@@ -46,6 +46,7 @@ public:
                               std::function<void(TileParseResult)> callback);
 
     Request parsePendingGeometryTileLayers(TileWorker&,
+                                           PlacementConfig config,
                                            std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,

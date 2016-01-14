@@ -177,8 +177,7 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
         bucket->addFeatures(parameters.tileUID,
                             *spriteAtlas,
                             parameters.glyphAtlas,
-                            parameters.glyphStore,
-                            parameters.collisionTile);
+                            parameters.glyphStore);
     }
 
     return std::move(bucket);

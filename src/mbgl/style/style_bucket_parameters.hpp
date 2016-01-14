@@ -27,7 +27,6 @@ public:
                           SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
-                          CollisionTile& collisionTile_,
                           const MapMode mode_)
         : tileID(tileID_),
           layer(layer_),
@@ -37,7 +36,6 @@ public:
           spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
-          collisionTile(collisionTile_),
           mode(mode_) {}
 
     bool cancelled() const {
@@ -54,7 +52,6 @@ public:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    CollisionTile& collisionTile;
     const MapMode mode;
 };
 
