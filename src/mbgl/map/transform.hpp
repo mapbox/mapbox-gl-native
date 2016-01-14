@@ -106,16 +106,16 @@ public:
     bool isPanning() const { return state.isPanning(); }
 
 private:
-    void moveLatLng(const LatLng&, const PrecisionPoint&);
+    void unwrapLatLng(LatLng&);
     
     View &view;
 
     TransformState state;
 
-    void startTransition(std::function<double(double)> easing,
-                         std::function<Update(double)> frame,
-                         std::function<void()> finish,
-                         const Duration& duration);
+    void startTransition(const CameraOptions&,
+                         const AnimationOptions&,
+                         std::function<Update(double)>,
+                         const Duration&);
 
     TimePoint transitionStart;
     Duration transitionDuration;

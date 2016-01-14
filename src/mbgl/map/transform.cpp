@@ -90,116 +90,59 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         return;
     }
     
-    // If a path crossing the antemeridian would be shorter, extend the final
-    // coordinate so that interpolating between the two endpoints will cross it.
-    LatLng startLatLng = getLatLng();
-    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > 180) {
-        if (startLatLng.longitude > 0 && latLng.longitude < 0) {
-            latLng.longitude += 360;
-        } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {
-            latLng.longitude -= 360;
-        }
-    }
-    
-    PrecisionPoint anchor = camera.anchor ? *camera.anchor : PrecisionPoint(NAN, NAN);
-    LatLng anchorLatLng;
-    if (_validPoint(anchor)) {
-        anchor.y = state.getHeight() - anchor.y;
-        anchorLatLng = state.pointToLatLng(anchor);
-    }
-    
+    // Determine endpoints.
+    const LatLng startLatLng = getLatLng();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
+    unwrapLatLng(latLng);
     const PrecisionPoint endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
-    
-    Update update = state.getZoom() == zoom ? Update::Repaint : Update::Zoom;
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
     const double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, 0., util::PITCH_MAX);
     
+    Update update = state.getZoom() == zoom ? Update::Repaint : Update::Zoom;
+    
     // Minimize rotation by taking the shorter path around the circle.
     angle = _normalizeAngle(angle, state.angle);
     state.angle = _normalizeAngle(state.angle, angle);
 
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
-    if (duration == Duration::zero()) {
-        view.notifyMapChange(MapChangeRegionWillChange);
+    
+    const double startWorldSize = state.worldSize();
+    state.Bc = startWorldSize / 360;
+    state.Cc = startWorldSize / util::M2PI;
+    
+    const double startScale = state.scale;
+    const double startAngle = state.angle;
+    const double startPitch = state.pitch;
+    state.panning = latLng != startLatLng;
+    state.scaling = scale != startScale;
+    state.rotating = angle != startAngle;
 
-        state.setLatLngZoom(latLng, zoom);
-        state.angle = angle;
-        state.pitch = pitch;
-        if (_validPoint(anchor)) {
-            state.moveLatLng(anchorLatLng, anchor);
-        }
-
-        if (animation.transitionFinishFn) {
-            animation.transitionFinishFn();
-        }
-        view.notifyMapChange(MapChangeRegionDidChange);
-    } else {
-        view.notifyMapChange(MapChangeRegionWillChangeAnimated);
+    startTransition(camera, animation, [=](double t) {
+        PrecisionPoint framePoint = util::interpolate(startPoint, endPoint, t);
+        LatLng frameLatLng = {
+            state.yLat(framePoint.y, startWorldSize),
+            state.xLng(framePoint.x, startWorldSize),
+        };
+        double frameScale = util::interpolate(startScale, scale, t);
+        state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
         
-        const double startWorldSize = state.worldSize();
-        state.Bc = startWorldSize / 360;
-        state.Cc = startWorldSize / util::M2PI;
-        
-        const double startScale = state.scale;
-        const double startAngle = state.angle;
-        const double startPitch = state.pitch;
-        state.panning = latLng != startLatLng;
-        state.scaling = scale != startScale;
-        state.rotating = angle != startAngle;
-
-        startTransition(
-            [=](double t) {
-                util::UnitBezier ease = animation.easing ? *animation.easing : util::UnitBezier(0, 0, 0.25, 1);
-                return ease.solve(t, 0.001);
-            },
-            [=](double t) {
-                PrecisionPoint framePoint = util::interpolate(startPoint, endPoint, t);
-                LatLng frameLatLng = {
-                    state.yLat(framePoint.y, startWorldSize),
-                    state.xLng(framePoint.x, startWorldSize),
-                };
-                double frameScale = util::interpolate(startScale, scale, t);
-                state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
-                
-                if (angle != startAngle) {
-                    state.angle = util::wrap(util::interpolate(startAngle, angle, t), -M_PI, M_PI);
-                }
-                if (pitch != startPitch) {
-                    state.pitch = util::interpolate(startPitch, pitch, t);
-                }
-                if (_validPoint(anchor)) {
-                    state.moveLatLng(anchorLatLng, anchor);
-                }
-                
-                // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
-                if (t < 1.0) {
-                    if (animation.transitionFrameFn) {
-                        animation.transitionFrameFn(t);
-                    }
-                    view.notifyMapChange(MapChangeRegionIsChanging);
-                }
-                return update;
-            },
-            [=] {
-                state.panning = false;
-                state.scaling = false;
-                state.rotating = false;
-                if (animation.transitionFinishFn) {
-                    animation.transitionFinishFn();
-                }
-                view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-            }, duration);
-    }
+        if (angle != startAngle) {
+            state.angle = util::wrap(util::interpolate(startAngle, angle, t), -M_PI, M_PI);
+        }
+        if (pitch != startPitch) {
+            state.pitch = util::interpolate(startPitch, pitch, t);
+        }
+        return update;
+    }, duration);
 }
 
 /** This method implements an “optimal path” animation, as detailed in:
@@ -220,26 +163,19 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return;
     }
     
-    // If a path crossing the antemeridian would be shorter, extend the final
-    // coordinate so that interpolating between the two endpoints will cross it.
-    LatLng startLatLng = getLatLng();
-    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > 180) {
-        if (startLatLng.longitude > 0 && latLng.longitude < 0) {
-            latLng.longitude += 360;
-        } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {
-            latLng.longitude -= 360;
-        }
-    }
-    
+    // Determine endpoints.
+    const LatLng startLatLng = getLatLng();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
+    unwrapLatLng(latLng);
     const PrecisionPoint endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
     
+    // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
     pitch = util::clamp(pitch, 0., util::PITCH_MAX);
     
@@ -337,8 +273,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         return;
     }
     
-    view.notifyMapChange(MapChangeRegionWillChangeAnimated);
-    
     const double startWorldSize = state.worldSize();
     state.Bc = startWorldSize / 360;
     state.Cc = startWorldSize / util::M2PI;
@@ -347,54 +281,45 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     state.scaling = true;
     state.rotating = angle != startAngle;
     
-    startTransition(
-        [=](double t) {
-            util::UnitBezier ease = animation.easing ? *animation.easing : util::UnitBezier(0, 0, 0.25, 1);
-            return ease.solve(t, 0.001);
-        },
-        [=](double k) {
-            /// s: The distance traveled along the flight path, measured in
-            /// ρ-screenfuls.
-            double s = k * S;
-            double us = u(s);
-            
-            // Calculate the current point and zoom level along the flight path.
-            PrecisionPoint framePoint = util::interpolate(startPoint, endPoint, us);
-            double frameZoom = startZoom + state.scaleZoom(1 / w(s));
-            
-            // Convert to geographic coordinates and set the new viewpoint.
-            LatLng frameLatLng = {
-                state.yLat(framePoint.y, startWorldSize),
-                state.xLng(framePoint.x, startWorldSize),
-            };
-            state.setLatLngZoom(frameLatLng, frameZoom);
-            
-            if (angle != startAngle) {
-                state.angle = util::wrap(util::interpolate(startAngle, angle, k), -M_PI, M_PI);
-            }
-            if (pitch != startPitch) {
-                state.pitch = util::interpolate(startPitch, pitch, k);
-            }
-            
-            // At k = 1.0, a DidChangeAnimated notification should be sent from finish().
-            if (k < 1.0) {
-                if (animation.transitionFrameFn) {
-                    animation.transitionFrameFn(k);
-                }
-                view.notifyMapChange(MapChangeRegionIsChanging);
-            }
-            return Update::Zoom;
-        },
-        [=] {
-            state.panning = false;
-            state.scaling = false;
-            state.rotating = false;
-            if (animation.transitionFinishFn) {
-                animation.transitionFinishFn();
-            }
-            view.notifyMapChange(MapChangeRegionDidChangeAnimated);
-        }, duration);
-};
+    startTransition(camera, animation, [=](double k) {
+        /// s: The distance traveled along the flight path, measured in
+        /// ρ-screenfuls.
+        double s = k * S;
+        double us = u(s);
+        
+        // Calculate the current point and zoom level along the flight path.
+        PrecisionPoint framePoint = util::interpolate(startPoint, endPoint, us);
+        double frameZoom = startZoom + state.scaleZoom(1 / w(s));
+        
+        // Convert to geographic coordinates and set the new viewpoint.
+        LatLng frameLatLng = {
+            state.yLat(framePoint.y, startWorldSize),
+            state.xLng(framePoint.x, startWorldSize),
+        };
+        state.setLatLngZoom(frameLatLng, frameZoom);
+        
+        if (angle != startAngle) {
+            state.angle = util::wrap(util::interpolate(startAngle, angle, k), -M_PI, M_PI);
+        }
+        if (pitch != startPitch) {
+            state.pitch = util::interpolate(startPitch, pitch, k);
+        }
+        return Update::Zoom;
+    }, duration);
+}
+
+/** If a path crossing the antemeridian would be shorter, extend the final
+ coordinate so that interpolating between the two endpoints will cross it. */
+void Transform::unwrapLatLng(LatLng& latLng) {
+    LatLng startLatLng = getLatLng();
+    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > 180) {
+        if (startLatLng.longitude > 0 && latLng.longitude < 0) {
+            latLng.longitude += 360;
+        } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {
+            latLng.longitude -= 360;
+        }
+    }
+}
 
 #pragma mark - Position
 
@@ -570,31 +495,69 @@ NorthOrientation Transform::getNorthOrientation() const {
 
 #pragma mark - Transition
 
-void Transform::startTransition(std::function<double(double)> easing,
+void Transform::startTransition(const CameraOptions& camera,
+                                const AnimationOptions& animation,
                                 std::function<Update(double)> frame,
-                                std::function<void()> finish,
                                 const Duration& duration) {
     if (transitionFinishFn) {
         transitionFinishFn();
+    }
+    
+    bool isAnimated = duration != Duration::zero();
+    view.notifyMapChange(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
+    
+    // Associate the anchor, if given, with a coordinate.
+    PrecisionPoint anchor = camera.anchor ? *camera.anchor : PrecisionPoint(NAN, NAN);
+    LatLng anchorLatLng;
+    if (_validPoint(anchor)) {
+        anchor.y = state.getHeight() - anchor.y;
+        anchorLatLng = state.pointToLatLng(anchor);
     }
 
     transitionStart = Clock::now();
     transitionDuration = duration;
 
-    transitionFrameFn = [easing, frame, this](const TimePoint now) {
-        float t = std::chrono::duration<float>(now - transitionStart) / transitionDuration;
+    transitionFrameFn = [isAnimated, animation, frame, anchor, anchorLatLng, this](const TimePoint now) {
+        float t = isAnimated ? (std::chrono::duration<float>(now - transitionStart) / transitionDuration) : 1.0;
+        Update result;
         if (t >= 1.0) {
-            Update result = frame(1.0);
+            result = frame(1.0);
+        } else {
+            util::UnitBezier ease = animation.easing ? *animation.easing : util::UnitBezier(0, 0, 0.25, 1);
+            result = frame(ease.solve(t, 0.001));
+        }
+        
+        if (_validPoint(anchor)) {
+            state.moveLatLng(anchorLatLng, anchor);
+        }
+        
+        // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
+        if (t < 1.0) {
+            if (animation.transitionFrameFn) {
+                animation.transitionFrameFn(t);
+            }
+            view.notifyMapChange(MapChangeRegionIsChanging);
+        } else {
             transitionFinishFn();
             transitionFrameFn = nullptr;
             transitionFinishFn = nullptr;
-            return result;
-        } else {
-            return frame(easing(t));
         }
+        return result;
     };
 
-    transitionFinishFn = finish;
+    transitionFinishFn = [isAnimated, animation, this] {
+        state.panning = false;
+        state.scaling = false;
+        state.rotating = false;
+        if (animation.transitionFinishFn) {
+            animation.transitionFinishFn();
+        }
+        view.notifyMapChange(isAnimated ? MapChangeRegionDidChangeAnimated : MapChangeRegionDidChange);
+    };
+    
+    if (!isAnimated) {
+        transitionFrameFn(Clock::now());
+    }
 }
 
 bool Transform::inTransition() const {
