@@ -367,14 +367,16 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
     }
 }
 
-void SQLiteCache::put(const Resource &resource, const Response& response, Hint hint) {
-    // Can be called from any thread, but most likely from the file source thread. We are either
-    // storing a new response or updating the currently stored response, potentially setting a new
-    // expiry date.
-    if (hint == Hint::Full) {
-        thread->invoke(&Impl::put, resource, response);
-    } else if (hint == Hint::Refresh) {
+void SQLiteCache::put(const Resource& resource, const Response& response) {
+    // Except for 404s, don't store errors in the cache.
+    if (response.error && response.error->reason != Response::Error::Reason::NotFound) {
+        return;
+    }
+
+    if (response.notModified) {
         thread->invoke(&Impl::refresh, resource, response.expires);
+    } else {
+        thread->invoke(&Impl::put, resource, response);
     }
 }
 

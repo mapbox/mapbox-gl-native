@@ -66,7 +66,7 @@ TEST_F(Storage, CacheNotFound) {
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, SQLiteCache::Hint::Full);
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -124,7 +124,7 @@ TEST_F(Storage, DontCacheConnectionErrors) {
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, SQLiteCache::Hint::Full);
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -180,7 +180,7 @@ TEST_F(Storage, DontCacheServerErrors) {
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, SQLiteCache::Hint::Full);
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;

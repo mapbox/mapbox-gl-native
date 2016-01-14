@@ -244,15 +244,8 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         realRequest = impl.httpContext->createRequest(resource.url, [this, &impl](std::shared_ptr<const Response> response_) {
             realRequest = nullptr;
 
-            // Only update the cache for successful or 404 responses.
-            // In particular, we don't want to write a Canceled request, or one that failed due to
-            // connection errors to the cache. Server errors are hopefully also temporary, so we're not
-            // caching them either.
-            if (impl.cache &&
-                (!response_->error || (response_->error->reason == Response::Error::Reason::NotFound))) {
-                // Store response in database. Make sure we only refresh the expires column if the data
-                // didn't change.
-                impl.cache->put(resource, *response_, response_->notModified ? SQLiteCache::Hint::Refresh : SQLiteCache::Hint::Full);
+            if (impl.cache) {
+                impl.cache->put(resource, *response_);
             }
 
             response = response_;

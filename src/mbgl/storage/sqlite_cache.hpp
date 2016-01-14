@@ -26,11 +26,10 @@ public:
     void setMaximumCacheSize(uint64_t size);
     void setMaximumCacheEntrySize(uint64_t size);
 
-    enum class Hint : bool { Full, Refresh };
     using Callback = std::function<void(std::unique_ptr<Response>)>;
 
     std::unique_ptr<WorkRequest> get(const Resource&, Callback);
-    void put(const Resource&, const Response&, Hint hint);
+    void put(const Resource&, const Response&);
 
     class Impl;
 

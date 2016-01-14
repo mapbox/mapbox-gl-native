@@ -53,7 +53,7 @@ void insertTile(mbgl::SQLiteCache* cache, unsigned id, uint64_t size) {
     response.data = data;
 
     Resource resource{ Resource::Kind::Tile, url };
-    cache->put(resource, response, SQLiteCache::Hint::Full);
+    cache->put(resource, response);
 }
 
 void refreshTile(mbgl::SQLiteCache* cache, unsigned id) {
@@ -64,9 +64,10 @@ void refreshTile(mbgl::SQLiteCache* cache, unsigned id) {
     Response response;
     response.modified = toSeconds(SystemClock::now());
     response.expires = toSeconds(SystemClock::now()) + Seconds(5000);
+    response.notModified = true;
 
     Resource resource{ Resource::Kind::Tile, url };
-    cache->put(resource, response, SQLiteCache::Hint::Refresh);
+    cache->put(resource, response);
 }
 
 uint64_t cacheSize(mbgl::SQLiteCache* cache, unsigned entryCount, uint64_t entrySize) {
