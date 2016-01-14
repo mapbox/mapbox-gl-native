@@ -37,7 +37,6 @@ public:
 
 private:
     const std::unique_ptr<util::Thread<Impl>> thread;
-    static std::weak_ptr<SQLiteCache> masterPtr;
 };
 
 } // namespace mbgl

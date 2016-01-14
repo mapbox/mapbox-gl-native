@@ -12,6 +12,9 @@
 #include "sqlite3.hpp"
 #include <sqlite3.h>
 
+#include <unordered_map>
+#include <mutex>
+
 namespace {
 
 // The cache won't accept entries larger than this arbitrary size
@@ -472,16 +475,31 @@ void SQLiteCache::Impl::refresh(const Resource& resource, Seconds expires) {
     }
 }
 
+namespace {
+
+static std::mutex sharedMutex;
+static std::unordered_map<std::string, std::weak_ptr<SQLiteCache>> shared;
+
+} // namespace
+
 std::shared_ptr<SQLiteCache> SQLiteCache::getShared(const std::string &path) {
-    std::shared_ptr<SQLiteCache> temp = masterPtr.lock();
-    if (!temp) {
-        temp.reset(new SQLiteCache(path));
-        masterPtr = temp;
+    std::lock_guard<std::mutex> lock(sharedMutex);
+
+    std::shared_ptr<SQLiteCache> cache;
+
+    auto it = shared.find(path);
+    if (it != shared.end()) {
+        cache = it->second.lock();
+        if (!cache) {
+            cache = std::make_shared<SQLiteCache>(path);
+            it->second = cache;
+        }
+    } else {
+        cache = std::make_shared<SQLiteCache>(path);
+        shared.emplace(path, cache);
     }
 
-    return temp;
+    return cache;
 }
-
-std::weak_ptr<SQLiteCache> SQLiteCache::masterPtr;
 
 } // namespace mbgl
