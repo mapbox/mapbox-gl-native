@@ -76,32 +76,6 @@
                           @"compass rotation should indicate map rotation");
 }
 
-- (void)testCompassTap {
-    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
-        [tester.mapView setDirection:180 animated:YES];
-    }];
-
-    XCTAssertEqual(tester.mapView.direction,
-                   180,
-                   @"setting direction should take effect");
-
-    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
-        [tester.compass tap];
-    }];
-
-    XCTAssertEqual(tester.mapView.direction,
-                   0,
-                   @"tapping compass should reset map direction");
-    
-    [tester waitForAnimationsToFinish];
-    XCTAssertEqual(tester.compass.alpha,
-                   0,
-                   @"compass should not be visible when map is unrotated");
-
-    XCTAssert(CGAffineTransformEqualToTransform(tester.compass.transform, CGAffineTransformIdentity),
-              @"compass rotation should indicate map rotation");
-}
-
 - (void)testDirectionReset {
     [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
         [tester.mapView setDirection:90 animated:YES];
