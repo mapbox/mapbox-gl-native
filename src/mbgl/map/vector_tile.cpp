@@ -185,7 +185,7 @@ VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, const std::string& u
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
     const std::string url = util::templateTileURL(urlTemplate, tileID);
     return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](Response res) {
-        if (res.data && data == res.data) {
+        if (res.notModified) {
             // We got the same data again. Abort early.
             return;
         }
@@ -200,8 +200,7 @@ std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMo
             }
         }
 
-        data = res.data;
-        callback(nullptr, std::make_unique<VectorTile>(data), res.modified, res.expires);
+        callback(nullptr, std::make_unique<VectorTile>(res.data), res.modified, res.expires);
     });
 }
 

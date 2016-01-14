@@ -68,7 +68,6 @@ public:
 private:
     TileID tileID;
     std::string urlTemplate;
-    std::shared_ptr<const std::string> data;
 };
 
 } // namespace mbgl
