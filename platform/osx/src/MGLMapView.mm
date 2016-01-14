@@ -1929,7 +1929,7 @@ public:
 
 - (void)popoverDidShow:(__unused NSNotification *)notification {
     id <MGLAnnotation> annotation = self.selectedAnnotation;
-    if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)]) {
+    if (annotation && [self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)]) {
         [self.delegate mapView:self didSelectAnnotation:annotation];
     }
 }

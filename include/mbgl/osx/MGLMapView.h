@@ -442,7 +442,7 @@ IB_DESIGNABLE
 /** Deselects an annotation and hides its callout popover.
     
     @param annotation The annotation object to deselect. */
-- (void)deselectAnnotation:(id <MGLAnnotation>)annotation;
+- (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation;
 
 /** A common view controller for managing a callout popover’s content view.
     
