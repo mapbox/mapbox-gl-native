@@ -3132,16 +3132,6 @@ public final class MapView extends FrameLayout {
                 mZoomButtonsController.setVisible(true);
             }
 
-            // Disable tracking mode if a gesture occurs
-            try {
-                //noinspection ResourceType
-                setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-                //noinspection ResourceType
-                setMyBearingTrackingMode(MyBearingTracking.NONE);
-            } catch (SecurityException ignore) {
-                // User did not accept location permissions
-            }
-
             return true;
         }
 
@@ -3294,6 +3284,9 @@ public final class MapView extends FrameLayout {
                 return false;
             }
 
+            // reset tracking modes if gesture occurs
+            resetTrackingModes();
+
             // Fling the map
             float ease = 0.25f;
 
@@ -3323,6 +3316,9 @@ public final class MapView extends FrameLayout {
                 return false;
             }
 
+            // reset tracking modes if gesture occurs
+            resetTrackingModes();
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -3349,6 +3345,9 @@ public final class MapView extends FrameLayout {
             if (!mZoomEnabled) {
                 return false;
             }
+
+            // reset tracking modes if gesture occurs
+            resetTrackingModes();
 
             mBeginTime = detector.getEventTime();
             return true;
@@ -3419,6 +3418,9 @@ public final class MapView extends FrameLayout {
             if (!mRotateEnabled) {
                 return false;
             }
+
+            // reset tracking modes if gesture occurs
+            resetTrackingModes();
 
             mBeginTime = detector.getEventTime();
             return true;
@@ -3495,6 +3497,9 @@ public final class MapView extends FrameLayout {
             if (!mTiltEnabled) {
                 return false;
             }
+
+            // reset tracking modes if gesture occurs
+            resetTrackingModes();
 
             mBeginTime = detector.getEventTime();
             return true;
@@ -4210,6 +4215,17 @@ public final class MapView extends FrameLayout {
     @UiThread
     public void setOnMyBearingTrackingModeChangeListener(@Nullable OnMyBearingTrackingModeChangeListener listener) {
         mOnMyBearingTrackingModeChangeListener = listener;
+    }
+
+    private void resetTrackingModes(){
+        try {
+            //noinspection ResourceType
+            setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+            //noinspection ResourceType
+            setMyBearingTrackingMode(MyBearingTracking.NONE);
+        } catch (SecurityException ignore) {
+            // User did not accept location permissions
+        }
     }
 
     //
