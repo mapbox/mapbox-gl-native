@@ -256,7 +256,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 if (response && response_->data == response->data) {
                     hint = SQLiteCache::Hint::Refresh;
                 }
-                impl.cache->put(resource, response_, hint);
+                impl.cache->put(resource, *response_, hint);
             }
 
             response = response_;

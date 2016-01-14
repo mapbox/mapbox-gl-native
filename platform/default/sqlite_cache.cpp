@@ -367,24 +367,24 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
     }
 }
 
-void SQLiteCache::put(const Resource &resource, std::shared_ptr<const Response> response, Hint hint) {
+void SQLiteCache::put(const Resource &resource, const Response& response, Hint hint) {
     // Can be called from any thread, but most likely from the file source thread. We are either
     // storing a new response or updating the currently stored response, potentially setting a new
     // expiry date.
     if (hint == Hint::Full) {
         thread->invoke(&Impl::put, resource, response);
     } else if (hint == Hint::Refresh) {
-        thread->invoke(&Impl::refresh, resource, response->expires);
+        thread->invoke(&Impl::refresh, resource, response.expires);
     }
 }
 
-void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Response> response) {
+void SQLiteCache::Impl::put(const Resource& resource, const Response& response) {
     try {
         initializeDatabase();
         pruneEntries();
 
-        if (response->data) {
-            auto entrySize = response->data->size();
+        if (response.data) {
+            auto entrySize = response.data->size();
 
             if (entrySize > maximumCacheEntrySize) {
                 Log::Warning(Event::Database, "Entry too big for caching.");
@@ -408,30 +408,30 @@ void SQLiteCache::Impl::put(const Resource& resource, std::shared_ptr<const Resp
 
         const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
         putStmt->bind(1 /* url */, canonicalURL.c_str());
-        if (response->error) {
-            putStmt->bind(2 /* status */, int(response->error->reason));
+        if (response.error) {
+            putStmt->bind(2 /* status */, int(response.error->reason));
         } else {
             putStmt->bind(2 /* status */, 1 /* success */);
         }
         putStmt->bind(3 /* kind */, int(resource.kind));
-        putStmt->bind(4 /* modified */, int64_t(response->modified.count()));
-        putStmt->bind(5 /* etag */, response->etag.c_str());
-        putStmt->bind(6 /* expires */, int64_t(response->expires.count()));
+        putStmt->bind(4 /* modified */, int64_t(response.modified.count()));
+        putStmt->bind(5 /* etag */, response.etag.c_str());
+        putStmt->bind(6 /* expires */, int64_t(response.expires.count()));
         putStmt->bind(7 /* accessed */, int64_t(toSeconds(SystemClock::now()).count()));
 
         std::string data;
-        if (resource.kind != Resource::SpriteImage && response->data) {
+        if (resource.kind != Resource::SpriteImage && response.data) {
             // Do not compress images, since they are typically compressed already.
-            data = util::compress(*response->data);
+            data = util::compress(*response.data);
         }
 
-        if (!data.empty() && data.size() < response->data->size()) {
+        if (!data.empty() && data.size() < response.data->size()) {
             // Store the compressed data when it is smaller than the original
             // uncompressed data.
             putStmt->bind(8 /* data */, data, false); // do not retain the string internally.
             putStmt->bind(9 /* compressed */, true);
-        } else if (response->data) {
-            putStmt->bind(8 /* data */, *response->data, false); // do not retain the string internally.
+        } else if (response.data) {
+            putStmt->bind(8 /* data */, *response.data, false); // do not retain the string internally.
             putStmt->bind(9 /* compressed */, false);
         } else {
             putStmt->bind(8 /* data */, "", false);

@@ -30,7 +30,7 @@ public:
     using Callback = std::function<void(std::unique_ptr<Response>)>;
 
     std::unique_ptr<WorkRequest> get(const Resource&, Callback);
-    void put(const Resource&, std::shared_ptr<const Response> response, Hint hint);
+    void put(const Resource&, const Response&, Hint hint);
 
     class Impl;
 
