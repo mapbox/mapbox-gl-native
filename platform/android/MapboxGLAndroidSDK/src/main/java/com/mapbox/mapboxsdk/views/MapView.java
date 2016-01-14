@@ -139,6 +139,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
     private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     private static final String STATE_MY_LOCATION_TRACKING_MODE = "myLocationTracking";
+    private static final String STATE_MY_BEARING_TRACKING_MODE = "myBearingTracking";
     private static final String STATE_COMPASS_ENABLED = "compassEnabled";
     private static final String STATE_COMPASS_GRAVITY = "compassGravity";
     private static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";
@@ -973,6 +974,8 @@ public final class MapView extends FrameLayout {
 
             //noinspection ResourceType
             setMyLocationTrackingMode(savedInstanceState.getInt(STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+            //noinspection ResourceType
+            setMyBearingTrackingMode(savedInstanceState.getInt(STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         }
 
         // Force a check for an access token
@@ -1025,6 +1028,7 @@ public final class MapView extends FrameLayout {
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
         outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationView.getMyLocationTrackingMode());
+        outState.putInt(STATE_MY_BEARING_TRACKING_MODE, mUserLocationView.getMyBearingTrackingMode());
 
         // Compass
         LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
