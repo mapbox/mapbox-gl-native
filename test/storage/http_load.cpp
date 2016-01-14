@@ -10,7 +10,7 @@ TEST_F(Storage, HTTPLoad) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const int concurrency = 50;
     const int max = 10000;

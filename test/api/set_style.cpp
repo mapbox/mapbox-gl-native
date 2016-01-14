@@ -12,7 +12,7 @@ TEST(API, SetStyle) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
@@ -57,7 +57,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const auto start = Clock::now();
 

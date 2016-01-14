@@ -12,7 +12,7 @@ TEST_F(Storage, HTTPExpiresParsing) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" },
@@ -37,7 +37,7 @@ TEST_F(Storage, HTTPCacheControlParsing) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" },
                [&](Response res) {

@@ -13,7 +13,7 @@ TEST_F(Storage, HTTPTemporaryError) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const auto start = Clock::now();
 
@@ -58,7 +58,7 @@ TEST_F(Storage, HTTPConnectionError) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const auto start = Clock::now();
 
