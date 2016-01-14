@@ -192,6 +192,9 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     response = std::make_unique<Response>();
     using Error = Response::Error;
 
+    // the message param is unused, this generates a warning at build time
+    // this was breaking builds for `make android -j4`
+    (void)message;
     response->modified = Seconds(parse_date(modified.c_str()));
     response->etag = etag;
     response->expires = parseCacheControl(cacheControl.c_str());
