@@ -13,7 +13,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                                std::string sourceID,
                                Style& style_,
                                const MapMode mode_,
-                               const std::function<void()>& callback)
+                               const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
       style(style_),
       worker(style_.workers),
@@ -32,14 +32,9 @@ VectorTileData::VectorTileData(const TileID& id_,
                                                         Seconds modified_,
                                                         Seconds expires_) {
         if (err) {
-            error = err;
-            callback();
+            callback(err);
             return;
         }
-
-        // Reset the error if we didn't receive one for this request. This is to prevent old error
-        // messages from being displayed again, e.g. after a connection trouble cleared up.
-        error = nullptr;
 
         modified = modified_;
         expires = expires_;
@@ -49,7 +44,7 @@ VectorTileData::VectorTileData(const TileID& id_,
             workRequest.reset();
             state = State::parsed;
             buckets.clear();
-            callback();
+            callback(err);
             return;
         }
 
@@ -69,6 +64,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 return;
             }
 
+            std::exception_ptr error;
             if (result.is<TileParseResultBuckets>()) {
                 auto& resultBuckets = result.get<TileParseResultBuckets>();
                 state = resultBuckets.state;
@@ -91,7 +87,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 state = State::obsolete;
             }
 
-            callback();
+            callback(error);
         });
     });
 }
@@ -100,7 +96,7 @@ VectorTileData::~VectorTileData() {
     cancel();
 }
 
-bool VectorTileData::parsePending(std::function<void()> callback) {
+bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
     if (workRequest) {
         // There's already parsing or placement going on.
         return false;
@@ -113,6 +109,7 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             return;
         }
 
+        std::exception_ptr error;
         if (result.is<TileParseResultBuckets>()) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
             state = resultBuckets.state;
@@ -137,7 +134,7 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             state = State::obsolete;
         }
 
-        callback();
+        callback(error);
     });
 
     return true;

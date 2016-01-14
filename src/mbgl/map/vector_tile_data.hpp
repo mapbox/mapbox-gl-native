@@ -23,13 +23,13 @@ public:
                    std::string sourceID,
                    Style&,
                    const MapMode,
-                   const std::function<void()>& callback);
+                   const std::function<void(std::exception_ptr)>& callback);
 
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
 
-    bool parsePending(std::function<void()> callback) override;
+    bool parsePending(std::function<void(std::exception_ptr)> callback) override;
 
     void redoPlacement(PlacementConfig config) override;
     void redoPlacement();

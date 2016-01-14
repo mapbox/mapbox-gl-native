@@ -225,7 +225,12 @@ bool Source::handlePartialTile(const TileID& tileID, Worker&) {
         return true;
     }
 
-    return tileData->parsePending([this, tileID]() {
+    return tileData->parsePending([this, tileID](std::exception_ptr error) {
+        if (error) {
+            observer->onTileError(*this, tileID, error);
+            return;
+        }
+
         observer->onTileLoaded(*this, tileID, false);
     });
 }
@@ -259,7 +264,9 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
     }
 
     if (!newTile->data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID,
+                                  std::placeholders::_1, parameters.transformState,
+                                  parameters.debugOptions & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
@@ -520,7 +527,10 @@ void Source::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformState& transformState, bool collisionDebug) {
+void Source::tileLoadingCompleteCallback(const TileID& tileID,
+                                         std::exception_ptr error,
+                                         const TransformState& transformState,
+                                         bool collisionDebug) {
     auto it = tileDataMap.find(tileID);
     if (it == tileDataMap.end()) {
         return;
@@ -531,8 +541,8 @@ void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformSt
         return;
     }
 
-    if (tileData->hasError()) {
-        observer->onTileError(*this, tileID, tileData->getError());
+    if (error) {
+        observer->onTileError(*this, tileID, error);
         return;
     }
 

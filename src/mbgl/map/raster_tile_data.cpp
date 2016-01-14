@@ -27,6 +27,7 @@ void RasterTileData::request(const std::string& url,
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, [url, callback, this](Response res) {
         if (res.error) {
+            std::exception_ptr error;
             if (res.error->reason == Response::Error::Reason::NotFound) {
                 // This is a 404 response. We're treating these as empty tiles.
                 workRequest.reset();
@@ -36,7 +37,7 @@ void RasterTileData::request(const std::string& url,
                 // This is a different error, e.g. a connection or server error.
                 error = std::make_exception_ptr(std::runtime_error(res.error->message));
             }
-            callback();
+            callback(error);
             return;
         }
 
@@ -60,6 +61,7 @@ void RasterTileData::request(const std::string& url,
                 return;
             }
 
+            std::exception_ptr error;
             if (result.is<std::unique_ptr<Bucket>>()) {
                 state = State::parsed;
                 bucket = std::move(result.get<std::unique_ptr<Bucket>>());
@@ -69,7 +71,7 @@ void RasterTileData::request(const std::string& url,
                 bucket.reset();
             }
 
-            callback();
+            callback(error);
         });
     });
 }

@@ -77,7 +77,7 @@ public:
 
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 
-    virtual bool parsePending(std::function<void ()>) { return true; }
+    virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
     virtual void redoPlacement(PlacementConfig) {}
 
     bool isReady() const {
@@ -86,14 +86,6 @@ public:
 
     State getState() const {
         return state;
-    }
-
-    bool hasError() const {
-        return error.operator bool();
-    }
-
-    std::exception_ptr getError() const {
-        return error;
     }
 
     void dumpDebugLogs() const;
@@ -107,7 +99,6 @@ public:
 
 protected:
     std::atomic<State> state;
-    std::exception_ptr error;
 };
 
 } // namespace mbgl
