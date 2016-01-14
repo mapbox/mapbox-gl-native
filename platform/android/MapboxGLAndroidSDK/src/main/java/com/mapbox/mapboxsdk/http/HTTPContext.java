@@ -4,12 +4,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -18,6 +12,13 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import javax.net.ssl.SSLException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 class HTTPContext {
 
@@ -80,23 +81,7 @@ class HTTPContext {
         }
 
         @Override
-        public void onFailure(Request request, IOException e) {
-            Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
-
-            int type = PERMANENT_ERROR;
-            if ((e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
-                type = CONNECTION_ERROR;
-            } else if ((e instanceof InterruptedIOException)) {
-                type = TEMPORARY_ERROR;
-            } else if (mCall.isCanceled()) {
-                type = CANCELED_ERROR;
-            }
-
-            nativeOnFailure(mNativePtr, type, e.getMessage());
-        }
-
-        @Override
-        public void onResponse(Response response) throws IOException {
+        public void onResponse(Call call, Response response) throws IOException {
             if (response.isSuccessful()) {
                 Log.d(LOG_TAG, String.format("[HTTP] Request was successful (code = %d).", response.code()));
             } else {
@@ -117,8 +102,24 @@ class HTTPContext {
             } finally {
                 response.body().close();
             }
-            
+
             nativeOnResponse(mNativePtr, response.code(), response.message(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
+        }
+
+        @Override
+        public void onFailure(Call call, IOException e) {
+            Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
+
+            int type = PERMANENT_ERROR;
+            if ((e instanceof UnknownHostException) || (e instanceof SocketException) || (e instanceof ProtocolException) || (e instanceof SSLException)) {
+                type = CONNECTION_ERROR;
+            } else if ((e instanceof InterruptedIOException)) {
+                type = TEMPORARY_ERROR;
+            } else if (mCall.isCanceled()) {
+                type = CANCELED_ERROR;
+            }
+
+            nativeOnFailure(mNativePtr, type, e.getMessage());
         }
     }
 
