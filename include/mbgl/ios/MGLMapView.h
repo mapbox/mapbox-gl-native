@@ -734,7 +734,7 @@ IB_DESIGNABLE
  @param annotation The annotation object to deselect.
  @param animated If `YES`, the callout view is animated offscreen.
  */
-- (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+- (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
 #pragma mark Overlaying the Map
 
