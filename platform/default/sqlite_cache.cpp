@@ -472,7 +472,7 @@ void SQLiteCache::Impl::refresh(const Resource& resource, Seconds expires) {
     }
 }
 
-std::shared_ptr<SQLiteCache> SharedSQLiteCache::get(const std::string &path) {
+std::shared_ptr<SQLiteCache> SQLiteCache::getShared(const std::string &path) {
     std::shared_ptr<SQLiteCache> temp = masterPtr.lock();
     if (!temp) {
         temp.reset(new SQLiteCache(path));
@@ -482,6 +482,6 @@ std::shared_ptr<SQLiteCache> SharedSQLiteCache::get(const std::string &path) {
     return temp;
 }
 
-std::weak_ptr<SQLiteCache> SharedSQLiteCache::masterPtr;
+std::weak_ptr<SQLiteCache> SQLiteCache::masterPtr;
 
 } // namespace mbgl

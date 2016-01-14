@@ -20,6 +20,8 @@ template <typename T> class Thread;
 
 class SQLiteCache : private util::noncopyable {
 public:
+    static std::shared_ptr<SQLiteCache> getShared(const std::string &path = ":memory:");
+
     SQLiteCache(const std::string &path = ":memory:");
     ~SQLiteCache();
 
@@ -35,15 +37,6 @@ public:
 
 private:
     const std::unique_ptr<util::Thread<Impl>> thread;
-};
-
-class SharedSQLiteCache : util::noncopyable {
-public:
-    static std::shared_ptr<SQLiteCache> get(const std::string &path = ":memory:");
-
-private:
-    SharedSQLiteCache() {}
-
     static std::weak_ptr<SQLiteCache> masterPtr;
 };
 

@@ -22,7 +22,7 @@ class DefaultFileSource::Impl {
 public:
     Impl(const std::string& cachePath, const std::string& assetRoot)
         : assetFileSource(assetRoot),
-          cache(SharedSQLiteCache::get(cachePath)),
+          cache(SQLiteCache::getShared(cachePath)),
           onlineFileSource(cache.get()) {
     }
 
