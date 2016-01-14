@@ -25,8 +25,8 @@ public:
           url(url_) {
     }
 
-    const Kind kind;
-    const std::string url;
+    Kind kind;
+    std::string url;
 
     optional<SystemTimePoint> priorModified;
     optional<SystemTimePoint> priorExpires;

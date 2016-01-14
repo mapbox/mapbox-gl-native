@@ -5,6 +5,9 @@
 
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/url.hpp>
+#include <mbgl/util/work_request.hpp>
+
+#include <cassert>
 
 namespace {
 
@@ -22,8 +25,7 @@ class DefaultFileSource::Impl {
 public:
     Impl(const std::string& cachePath, const std::string& assetRoot)
         : assetFileSource(assetRoot),
-          cache(SQLiteCache::getShared(cachePath)),
-          onlineFileSource(cache.get()) {
+          cache(SQLiteCache::getShared(cachePath)) {
     }
 
     AssetFileSource assetFileSource;
@@ -53,11 +55,43 @@ void DefaultFileSource::setMaximumCacheEntrySize(uint64_t size) {
     impl->cache->setMaximumCacheEntrySize(size);
 }
 
+SQLiteCache& DefaultFileSource::getCache() {
+    return *impl->cache;
+}
+
+class DefaultFileRequest : public FileRequest {
+public:
+    DefaultFileRequest(Resource resource, FileSource::Callback callback, DefaultFileSource::Impl* impl) {
+        cacheRequest = impl->cache->get(resource, [=](std::shared_ptr<Response> cacheResponse) mutable {
+            cacheRequest.reset();
+
+            if (cacheResponse) {
+                resource.priorModified = cacheResponse->modified;
+                resource.priorExpires = cacheResponse->expires;
+                resource.priorEtag = cacheResponse->etag;
+            }
+
+            onlineRequest = impl->onlineFileSource.request(resource, [=] (Response onlineResponse) {
+                impl->cache->put(resource, onlineResponse);
+                callback(onlineResponse);
+            });
+
+            // Do this last because it may result in deleting this DefaultFileRequest.
+            if (cacheResponse) {
+                callback(*cacheResponse);
+            }
+        });
+    }
+
+    std::unique_ptr<WorkRequest> cacheRequest;
+    std::unique_ptr<FileRequest> onlineRequest;
+};
+
 std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
     if (isAssetURL(resource.url)) {
         return impl->assetFileSource.request(resource, callback);
     } else {
-        return impl->onlineFileSource.request(resource, callback);
+        return std::make_unique<DefaultFileRequest>(resource, callback, impl.get());
     }
 }
 

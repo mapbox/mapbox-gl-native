@@ -12,7 +12,7 @@ TEST(Map, PauseResume) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Continuous);
 
@@ -25,7 +25,7 @@ TEST(Map, DoublePause) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Continuous);
 
@@ -39,7 +39,7 @@ TEST(Map, ResumeWithoutPause) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Continuous);
 
@@ -51,7 +51,7 @@ TEST(Map, DestroyPaused) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Continuous);
 

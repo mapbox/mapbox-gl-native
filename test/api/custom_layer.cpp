@@ -66,7 +66,7 @@ public:
 TEST(CustomLayer, Basic) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");

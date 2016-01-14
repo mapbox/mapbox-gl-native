@@ -14,7 +14,7 @@ TEST_F(Storage, HTTPTest) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {
@@ -39,7 +39,7 @@ TEST_F(Storage, HTTP404) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
                [&](Response res) {
@@ -66,7 +66,7 @@ TEST_F(Storage, HTTP500) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
                [&](Response res) {
@@ -93,7 +93,7 @@ TEST_F(Storage, HTTPNoCallback) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     try {
         fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },

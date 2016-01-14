@@ -11,7 +11,7 @@ TEST_F(Storage, HTTPOtherLoop) {
 
     // This file source launches a separate thread to do the processing.
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {

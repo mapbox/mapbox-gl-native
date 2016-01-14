@@ -5,6 +5,8 @@
 
 namespace mbgl {
 
+class SQLiteCache;
+
 class DefaultFileSource : public FileSource {
 public:
     DefaultFileSource(const std::string& cachePath, const std::string& assetRoot);
@@ -18,8 +20,13 @@ public:
 
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
+    // For testing purposes only.
+    SQLiteCache& getCache();
+
 private:
     class Impl;
+    friend class DefaultFileRequest;
+
     const std::unique_ptr<Impl> impl;
 };
 

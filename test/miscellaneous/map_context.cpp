@@ -12,7 +12,7 @@ using namespace mbgl;
 TEST(MapContext, DoubleStyleLoad) {
     std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
     HeadlessView view(display, 1, 512, 512);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular},
         view, fileSource, MapMode::Continuous, GLContextMode::Unique, view.getPixelRatio());

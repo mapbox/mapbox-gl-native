@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/online_file_source.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -11,8 +11,7 @@ TEST_F(Storage, CacheResponse) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache(":memory:");
-    OnlineFileSource fs(&cache);
+    DefaultFileSource fs(":memory:", ".");
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
@@ -56,15 +55,14 @@ TEST_F(Storage, CacheNotFound) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache(":memory:");
-    OnlineFileSource fs(&cache);
+    DefaultFileSource fs(":memory:", ".");
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3000/not-found" };
 
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response);
+    fs.getCache().put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -89,7 +87,7 @@ TEST_F(Storage, CacheNotFound) {
             req1.reset();
 
             // Finally, check the cache to make sure we cached the 404 response.
-            req2 = cache.get(resource, [&](std::unique_ptr<Response> res2) {
+            req2 = fs.getCache().get(resource, [&](std::unique_ptr<Response> res2) {
                 EXPECT_NE(nullptr, res2->error);
                 EXPECT_EQ(Response::Error::Reason::NotFound, res2->error->reason);
                 ASSERT_TRUE(res2->data.get());
@@ -113,15 +111,14 @@ TEST_F(Storage, DontCacheConnectionErrors) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache(":memory:");
-    OnlineFileSource fs(&cache);
+    DefaultFileSource fs(":memory:", ".");
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001" };
 
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response);
+    fs.getCache().put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -145,7 +142,7 @@ TEST_F(Storage, DontCacheConnectionErrors) {
 
             // Finally, check the cache to make sure we still have our original data in there rather
             // than the failed connection attempt.
-            req2 = cache.get(resource, [&](std::unique_ptr<Response> res2) {
+            req2 = fs.getCache().get(resource, [&](std::unique_ptr<Response> res2) {
                 EXPECT_EQ(nullptr, res2->error);
                 ASSERT_TRUE(res2->data.get());
                 EXPECT_EQ("existing data", *res2->data);
@@ -168,15 +165,14 @@ TEST_F(Storage, DontCacheServerErrors) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache(":memory:");
-    OnlineFileSource fs(&cache);
+    DefaultFileSource fs(":memory:", ".");
 
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" };
 
     // Insert existing data into the cache that will be marked as stale.
     Response response;
     response.data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response);
+    fs.getCache().put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -202,7 +198,7 @@ TEST_F(Storage, DontCacheServerErrors) {
 
             // Finally, check the cache to make sure we still have our original data in there rather
             // than the failed connection attempt.
-            req2 = cache.get(resource, [&](std::unique_ptr<Response> res2) {
+            req2 = fs.getCache().get(resource, [&](std::unique_ptr<Response> res2) {
                 EXPECT_EQ(nullptr, res2->error);
                 ASSERT_TRUE(res2->data.get());
                 EXPECT_EQ("existing data", *res2->data);
