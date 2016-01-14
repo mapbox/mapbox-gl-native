@@ -252,11 +252,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 (!response_->error || (response_->error->reason == Response::Error::Reason::NotFound))) {
                 // Store response in database. Make sure we only refresh the expires column if the data
                 // didn't change.
-                SQLiteCache::Hint hint = SQLiteCache::Hint::Full;
-                if (response && response_->data == response->data) {
-                    hint = SQLiteCache::Hint::Refresh;
-                }
-                impl.cache->put(resource, *response_, hint);
+                impl.cache->put(resource, *response_, response_->notModified ? SQLiteCache::Hint::Refresh : SQLiteCache::Hint::Full);
             }
 
             response = response_;

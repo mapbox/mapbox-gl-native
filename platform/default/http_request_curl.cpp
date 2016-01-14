@@ -529,18 +529,20 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         if (responseCode == 200) {
             // Nothing to do; this is what we want.
         } else if (responseCode == 304) {
+            response->notModified = true;
+
             if (existingResponse) {
-                // We're going to copy over the existing response's data.
-                if (existingResponse->error) {
-                    response->error = std::make_unique<Error>(*existingResponse->error);
+                if (response->expires == Seconds::zero()) {
+                    response->expires = existingResponse->expires;
                 }
-                response->data = existingResponse->data;
-                response->modified = existingResponse->modified;
-                // We're not updating `expired`, it was probably set during the request.
-                response->etag = existingResponse->etag;
-            } else {
-                // This is an unsolicited 304 response and should only happen on malfunctioning
-                // HTTP servers. It likely doesn't include any data, but we don't have much options.
+
+                if (response->modified == Seconds::zero()) {
+                    response->modified = existingResponse->modified;
+                }
+
+                if (response->etag.empty()) {
+                    response->etag = existingResponse->etag;
+                }
             }
         } else if (responseCode == 404) {
             response->error =
