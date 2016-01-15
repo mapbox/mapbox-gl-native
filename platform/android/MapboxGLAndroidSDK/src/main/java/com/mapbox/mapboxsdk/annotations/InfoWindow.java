@@ -194,9 +194,11 @@ public class InfoWindow {
      *
      * @param overlayItem the tapped overlay item
      */
-    void adaptDefaultMarker(Marker overlayItem) {
+    void adaptDefaultMarker(Marker overlayItem, MapView mapView) {
         View view = mView.get();
         if (view != null) {
+            mMapView = new WeakReference<>(mapView);
+            overlayItem.setMapView(mapView);
             String title = overlayItem.getTitle();
             ((TextView) view.findViewById(mTitleId /*R.id.title*/)).setText(title);
             String snippet = overlayItem.getSnippet();
