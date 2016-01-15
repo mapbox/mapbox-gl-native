@@ -402,6 +402,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 
             // Build only IDFV event
             NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+
+            if (!vid) return;
+
             NSDictionary *vevt = @{
                 @"event" : MGLEventTypeAppUserTurnstile,
                 @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
