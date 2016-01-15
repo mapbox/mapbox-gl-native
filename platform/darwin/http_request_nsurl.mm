@@ -229,6 +229,8 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
             response->notModified = true;
 
             if (existingResponse) {
+                response->data = existingResponse->data;
+
                 if (response->expires == Seconds::zero()) {
                     response->expires = existingResponse->expires;
                 }
