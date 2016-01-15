@@ -2705,7 +2705,7 @@ public final class MapView extends FrameLayout {
 
         if (!handledDefaultClick) {
             if (isInfoWindowValidForMarker(marker)) {
-                mInfoWindows.add(marker.showInfoWindow());
+                mInfoWindows.add(marker.showInfoWindow(this));
             }
         }
 
@@ -2888,10 +2888,8 @@ public final class MapView extends FrameLayout {
 
         for (Marker marker : mSelectedMarkers) {
             if (marker.isInfoWindowShown()) {
-                Marker temp = marker;
-                temp.hideInfoWindow();
-                temp.showInfoWindow();
-                marker = temp;
+                marker.hideInfoWindow();
+                marker.showInfoWindow(this);
             }
         }
     }
