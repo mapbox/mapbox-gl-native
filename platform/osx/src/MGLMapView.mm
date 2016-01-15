@@ -284,8 +284,10 @@ public:
     _annotationsNearbyLastClick = {};
     
     // Jump to Null Island initially.
+    self.automaticallyAdjustsContentInsets = YES;
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     options.zoom = _mbglMap->getMinZoom();
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
@@ -442,6 +444,8 @@ public:
 
 - (void)dealloc {
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
+    [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
+    [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
     
     // Close any annotation callout immediately.
     [self.calloutForSelectedAnnotation close];
@@ -468,6 +472,9 @@ public:
         if (![accessToken isKindOfClass:[NSNull class]]) {
             _mbglFileSource->setAccessToken((std::string)accessToken.UTF8String);
         }
+    } else if ([keyPath isEqualToString:@"contentLayoutRect"] ||
+               [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
+        [self adjustContentInsets];
     }
 }
 
@@ -546,6 +553,9 @@ public:
         self.dormant = YES;
         _mbglMap->pause();
     }
+    
+    [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
+    [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
 }
 
 - (void)viewDidMoveToWindow {
@@ -553,6 +563,15 @@ public:
         _mbglMap->resume();
         self.dormant = NO;
     }
+    
+    [self.window addObserver:self
+                  forKeyPath:@"contentLayoutRect"
+                     options:NSKeyValueObservingOptionInitial
+                     context:NULL];
+    [self.window addObserver:self
+                  forKeyPath:@"titlebarAppearsTransparent"
+                     options:NSKeyValueObservingOptionInitial
+                     context:NULL];
 }
 
 - (BOOL)wantsLayer {
@@ -808,7 +827,8 @@ public:
 }
 
 - (CLLocationCoordinate2D)centerCoordinate {
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng(padding));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate {
@@ -818,6 +838,7 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
+                        MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
                         MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
@@ -1023,6 +1044,7 @@ public:
 - (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera {
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
@@ -1054,8 +1076,9 @@ public:
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
     _mbglMap->cancelTransitions();
     
-    mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets);
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
     mbgl::AnimationOptions animationOptions;
     if (animated) {
         animationOptions.duration = MGLDurationInSeconds(MGLAnimationDuration);
@@ -1066,6 +1089,41 @@ public:
         [self didChangeValueForKey:@"visibleCoordinateBounds"];
     };
     _mbglMap->easeTo(cameraOptions, animationOptions);
+}
+
+- (void)setAutomaticallyAdjustsContentInsets:(BOOL)automaticallyAdjustsContentInsets {
+    _automaticallyAdjustsContentInsets = automaticallyAdjustsContentInsets;
+    [self adjustContentInsets];
+}
+
+/// Updates `contentInsets` to reflect the current window geometry.
+- (void)adjustContentInsets {
+    if (!_automaticallyAdjustsContentInsets) {
+        return;
+    }
+    
+    NSEdgeInsets contentInsets = self.contentInsets;
+    if ((self.window.styleMask & NSFullSizeContentViewWindowMask)
+        && !self.window.titlebarAppearsTransparent) {
+        NSRect contentLayoutRect = [self convertRect:self.window.contentLayoutRect fromView:nil];
+        if (NSMaxX(contentLayoutRect) > 0 && NSMaxY(contentLayoutRect) > 0) {
+            contentInsets = NSEdgeInsetsMake(NSHeight(self.bounds) - NSMaxY(contentLayoutRect),
+                                             NSMinX(contentLayoutRect),
+                                             NSMinY(contentLayoutRect),
+                                             NSWidth(self.bounds) - NSMaxX(contentLayoutRect));
+        }
+    } else {
+        contentInsets = NSEdgeInsetsZero;
+    }
+    
+    if (!NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
+        // After adjusting the content insets, move the center coordinate from
+        // the old frame of reference to the new one represented by the newly
+        // set content insets.
+        CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+        self.contentInsets = contentInsets;
+        self.centerCoordinate = oldCenter;
+    }
 }
 
 #pragma mark Mouse events and gestures

@@ -308,6 +308,31 @@ IB_DESIGNABLE
         and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
 
+/** A Boolean value indicating whether the receiver automatically adjusts its
+    content insets.
+    
+    When the value of this property is `YES`, the map view automatically updates
+    its `contentInsets` property to account for any overlapping title bar or
+    toolbar. To overlap with the title bar or toolbar, the containing window’s
+    style mask must have `NSFullSizeContentViewWindowMask` set, and the title
+    bar must not be transparent.
+    
+    The default value of this property is `YES`. */
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentInsets;
+
+/** The distance from the edges of the map view’s frame to the edges of the map
+    view’s logical viewport.
+    
+    When the value of this property is equal to `NSEdgeInsetsZero`, viewport
+    properties such as `centerCoordinate` assume a viewport that matches the map
+    view’s frame. Otherwise, those properties are inset, excluding part of the
+    frame from the viewport. For instance, if the only the top edge is inset,
+    the map center is effectively shifted downward.
+    
+    When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
+    the value of this property may be overridden at any time. */
+@property (nonatomic, assign) NSEdgeInsets contentInsets;
+
 #pragma mark Configuring gesture recognition
 /** @name Configuring How the User Interacts with the Map */
 
