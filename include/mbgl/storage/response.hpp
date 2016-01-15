@@ -14,15 +14,10 @@ public:
     Response(const Response&);
     Response& operator=(const Response&);
 
-    bool isExpired() const;
-
 public:
     class Error;
     // When this object is empty, the response was successful.
     std::unique_ptr<const Error> error;
-
-    // Stale responses are fetched from cache and are expired.
-    bool stale = false;
 
     // This is set to true for 304 Not Modified responses.
     bool notModified = false;

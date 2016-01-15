@@ -23,7 +23,6 @@ TEST_F(Storage, CacheResponse) {
     req1 = fs.request(resource, [&](Response res) {
         req1.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
         EXPECT_LT(Seconds::zero(), res.expires);
@@ -36,7 +35,6 @@ TEST_F(Storage, CacheResponse) {
         req2 = fs.request(resource, [&](Response res2) {
             req2.reset();
             EXPECT_EQ(response.error, res2.error);
-            EXPECT_EQ(response.stale, res2.stale);
             ASSERT_TRUE(res2.data.get());
             EXPECT_EQ(*response.data, *res2.data);
             EXPECT_EQ(response.expires, res2.expires);
@@ -78,7 +76,6 @@ TEST_F(Storage, CacheNotFound) {
     req1 = fs.request(resource, [&](Response res) {
         if (counter == 0) {
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(true, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
             EXPECT_EQ(Seconds::zero(), res.expires);
@@ -136,7 +133,6 @@ TEST_F(Storage, DontCacheConnectionErrors) {
     req1 = fs.request(resource, [&](Response res) {
         if (counter == 0) {
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(true, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
             EXPECT_EQ(Seconds::zero(), res.expires);
@@ -192,7 +188,6 @@ TEST_F(Storage, DontCacheServerErrors) {
     req1 = fs.request(resource, [&](Response res) {
         if (counter == 0) {
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(true, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
             EXPECT_EQ(Seconds::zero(), res.expires);

@@ -26,7 +26,6 @@ TEST_F(Storage, HTTPTemporaryError) {
             ASSERT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
             EXPECT_EQ("HTTP status code 500", res.error->message);
-            EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("", *res.data);
             EXPECT_EQ(Seconds::zero(), res.expires);
@@ -39,7 +38,6 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_LT(0.99, duration) << "Backoff timer didn't wait 1 second";
             EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("Hello World!", *res.data);
             EXPECT_EQ(Seconds::zero(), res.expires);
@@ -83,7 +81,6 @@ TEST_F(Storage, HTTPConnectionError) {
 #else
         FAIL();
 #endif
-        EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
         EXPECT_EQ(Seconds::zero(), res.expires);
         EXPECT_EQ(Seconds::zero(), res.modified);

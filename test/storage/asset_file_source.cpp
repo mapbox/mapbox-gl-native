@@ -30,10 +30,6 @@ public:
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("content is here\n", *res.data);
 
-            if (res.stale) {
-                return;
-            }
-
             if (!--numRequests) {
                 endCallback();
                 request.reset();
@@ -104,7 +100,6 @@ TEST_F(Storage, AssetEmptyFile) {
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("", *res.data);
         loop.stop();
@@ -126,7 +121,6 @@ TEST_F(Storage, AssetNonEmptyFile) {
     std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
         loop.stop();
@@ -149,7 +143,6 @@ TEST_F(Storage, AssetNonExistentFile) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
@@ -172,7 +165,6 @@ TEST_F(Storage, AssetReadDirectory) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();

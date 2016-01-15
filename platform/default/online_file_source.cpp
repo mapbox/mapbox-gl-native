@@ -188,12 +188,14 @@ void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
         cacheRequest = nullptr;
 
         if (response_) {
-            response_->stale = response_->isExpired();
             response = response_;
             callback(*response);
         }
 
-        scheduleRealRequest(impl);
+        // Force an immediate request if the cached response is stale. Note that this is not
+        // quite the same as what `expirationTimeout` would calculate, because in `expirationTimeout`
+        // Seconds::zero() is treated as "no expiration", but here we want it to force a revalidation.
+        scheduleRealRequest(impl, response && response->expires <= toSeconds(SystemClock::now()));
     });
 }
 
@@ -226,15 +228,17 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         return;
     }
 
-    // If we don't have a fresh response, retry immediately. Otherwise, calculate a timeout
-    // that depends on how many consecutive errors we've encountered, and on the expiration time.
-    Seconds timeout = (!response || response->stale || forceImmediate)
-        ? Seconds::zero()
-        : std::min(errorRetryTimeout(*response, failedRequests),
-                   expirationTimeout(*response));
+    Seconds timeout = Seconds::zero();
 
-    if (timeout == Seconds::max()) {
-        return;
+    // If there was a prior response and we're not being asked for a forced refresh, calculate a timeout
+    // that depends on how many consecutive errors we've encountered, and on the expiration time.
+    if (response && !forceImmediate) {
+        timeout = std::min(errorRetryTimeout(*response, failedRequests),
+                           expirationTimeout(*response));
+
+        if (timeout == Seconds::max()) {
+            return;
+        }
     }
 
     realRequestTimer.start(timeout, Duration::zero(), [this, &impl] {

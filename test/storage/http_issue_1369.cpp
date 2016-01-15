@@ -34,7 +34,6 @@ TEST_F(Storage, HTTPIssue1369) {
     req = fs.request(resource, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(Seconds::zero(), res.expires);

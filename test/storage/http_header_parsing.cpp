@@ -19,7 +19,6 @@ TEST_F(Storage, HTTPExpiresParsing) {
                [&](Response res) {
         req1.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(1420797926, res.expires.count());
@@ -46,7 +45,6 @@ TEST_F(Storage, HTTPCacheControlParsing) {
                [&](Response res) {
         req2.reset();
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_GT(2, std::abs(res.expires.count() - now.count() - 120)) << "Expiration date isn't about 120 seconds in the future";

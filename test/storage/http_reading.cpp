@@ -21,7 +21,6 @@ TEST_F(Storage, HTTPTest) {
         req1.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(Seconds::zero(), res.expires);
@@ -48,7 +47,6 @@ TEST_F(Storage, HTTP404) {
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Cannot GET /doesnotexist\n", *res.data);
         EXPECT_EQ("HTTP status code 404", res.error->message);
@@ -76,7 +74,6 @@ TEST_F(Storage, HTTP500) {
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
-        EXPECT_EQ(false, res.stale);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Server Error!", *res.data);
         EXPECT_EQ("HTTP status code 500", res.error->message);
