@@ -259,12 +259,13 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     PrecisionPoint nePixel = {-INFINITY, -INFINITY};
     PrecisionPoint swPixel = {INFINITY, INFINITY};
+    double viewportHeight = getHeight();
     for (LatLng latLng : latLngs) {
         PrecisionPoint pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
-        swPixel.y = std::min(swPixel.y, pixel.y);
-        nePixel.y = std::max(nePixel.y, pixel.y);
+        swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
+        nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
     }
     double width = nePixel.x - swPixel.x;
     double height = nePixel.y - swPixel.y;
@@ -289,6 +290,9 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
+    
+    // CameraOptions origin is at the top-left corner.
+    centerPixel.y = viewportHeight - centerPixel.y;
 
     options.center = latLngForPixel(centerPixel);
     options.zoom = zoom;
@@ -397,11 +401,11 @@ LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) con
 }
 
 PrecisionPoint Map::pixelForLatLng(const LatLng& latLng) const {
-    return transform->getState().latLngToPoint(latLng);
+    return transform->latLngToPoint(latLng);
 }
 
 LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
-    return transform->getState().pointToLatLng(pixel);
+    return transform->pointToLatLng(pixel);
 }
 
 #pragma mark - Annotations

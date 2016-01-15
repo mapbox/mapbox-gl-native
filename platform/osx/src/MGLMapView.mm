@@ -2133,6 +2133,8 @@ public:
 /// Converts a geographic coordinate to a point in the view’s coordinate system.
 - (NSPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable NSView *)view {
     mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
+    // Cocoa origin is at the lower-left corner.
+    pixel.y = NSHeight(self.bounds) - pixel.y;
     return [self convertPoint:NSMakePoint(pixel.x, pixel.y) toView:view];
 }
 
@@ -2143,7 +2145,11 @@ public:
 /// Converts a point in the view’s coordinate system to a geographic coordinate.
 - (mbgl::LatLng)convertPoint:(NSPoint)point toLatLngFromView:(nullable NSView *)view {
     NSPoint convertedPoint = [self convertPoint:point fromView:view];
-    return _mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y));
+    return _mbglMap->latLngForPixel({
+        convertedPoint.x,
+        // mbgl origin is at the top-left corner.
+        NSHeight(self.bounds) - convertedPoint.y,
+    });
 }
 
 - (NSRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable NSView *)view {

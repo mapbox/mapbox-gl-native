@@ -2264,9 +2264,6 @@ public final class MapView extends FrameLayout {
         float x = point.x;
         float y = point.y;
 
-        // flip y direction vertically to match core GL
-        y = getHeight() - y;
-
         return mNativeMapView.latLngForPixel(new PointF(x / mScreenDensity, y / mScreenDensity));
     }
 
@@ -2288,9 +2285,6 @@ public final class MapView extends FrameLayout {
 
         float x = point.x * mScreenDensity;
         float y = point.y * mScreenDensity;
-
-        // flip y direction vertically to match core GL
-        y = getHeight() - y;
 
         return new PointF(x, y);
     }

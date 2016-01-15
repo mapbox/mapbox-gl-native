@@ -144,7 +144,6 @@ public:
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
 @property (nonatomic) CLLocationManager *locationManager;
-@property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
@@ -964,27 +963,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
 
-        self.centerPoint = CGPointMake(0, 0);
-
         self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
     else if (pan.state == UIGestureRecognizerStateChanged)
     {
-        CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.centerPoint.x,
-                                    [pan translationInView:pan.view].y - self.centerPoint.y);
-
-        double flippedY = self.bounds.size.height - [pan locationInView:pan.view].y;
-        _mbglMap->setLatLng(
-            _mbglMap->latLngForPixel(mbgl::PrecisionPoint(
-                [pan locationInView:pan.view].x - delta.x,
-                flippedY + delta.y)),
-            mbgl::PrecisionPoint(
-                [pan locationInView:pan.view].x,
-                flippedY));
-
-        self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
+        CGPoint delta = [pan translationInView:pan.view];
+        _mbglMap->moveBy({ delta.x, delta.y });
+        [pan setTranslation:CGPointZero inView:pan.view];
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1946,10 +1933,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (mbgl::LatLng)convertPoint:(CGPoint)point toLatLngFromView:(nullable UIView *)view
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
-    
-    // Flip y coordinate for iOS view origin in the top left corner.
-    convertedPoint.y = self.bounds.size.height - convertedPoint.y;
-    
     return _mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y));
 }
 
@@ -1962,10 +1945,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (CGPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable UIView *)view
 {
     mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
-    
-    // Flip y coordinate for iOS view origin in the top left corner.
-    pixel.y = self.bounds.size.height - pixel.y;
-    
     return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
 }
 

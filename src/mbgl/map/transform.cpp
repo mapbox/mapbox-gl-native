@@ -641,3 +641,17 @@ void Transform::cancelTransitions() {
 void Transform::setGestureInProgress(bool inProgress) {
     state.gestureInProgress = inProgress;
 }
+
+#pragma mark Conversion and projection
+
+PrecisionPoint Transform::latLngToPoint(const LatLng& latLng) const {
+    PrecisionPoint point = state.latLngToPoint(latLng);
+    point.y = state.height - point.y;
+    return point;
+}
+
+LatLng Transform::pointToLatLng(const PrecisionPoint& point) const {
+    PrecisionPoint flippedPoint = point;
+    flippedPoint.y = state.height - flippedPoint.y;
+    return state.pointToLatLng(flippedPoint);
+}

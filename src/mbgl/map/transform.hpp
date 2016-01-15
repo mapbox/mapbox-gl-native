@@ -123,6 +123,10 @@ public:
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }
+    
+    // Conversion and projection
+    PrecisionPoint latLngToPoint(const LatLng&) const;
+    LatLng pointToLatLng(const PrecisionPoint&) const;
 
 private:
     void unwrapLatLng(LatLng&);

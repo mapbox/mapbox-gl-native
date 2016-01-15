@@ -182,11 +182,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 }
 
 mbgl::LatLng GLFWView::makeRandomPoint() const {
-    const auto sw = map->latLngForPixel({ 0, 0 });
-    const auto ne = map->latLngForPixel({ double(width), double(height) });
+    const auto nw = map->latLngForPixel({ 0, 0 });
+    const auto se = map->latLngForPixel({ double(width), double(height) });
 
-    const double lon = sw.longitude + (ne.longitude - sw.longitude) * (double(std::rand()) / RAND_MAX);
-    const double lat = sw.latitude + (ne.latitude - sw.latitude) * (double(std::rand()) / RAND_MAX);
+    const double lon = nw.longitude + (se.longitude - nw.longitude) * (double(std::rand()) / RAND_MAX);
+    const double lat = se.latitude + (nw.latitude - se.latitude) * (double(std::rand()) / RAND_MAX);
 
     return { lat, lon };
 }
@@ -368,10 +368,9 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
         double dx = x - view->lastX;
         double dy = y - view->lastY;
         if (dx || dy) {
-            double flippedY = view->height - y;
             view->map->setLatLng(
-                    view->map->latLngForPixel(mbgl::PrecisionPoint(x - dx, flippedY + dy)),
-                    mbgl::PrecisionPoint(x, flippedY));
+                    view->map->latLngForPixel(mbgl::PrecisionPoint(x - dx, y + dy)),
+                    mbgl::PrecisionPoint(x, y));
         }
     } else if (view->rotating) {
         view->map->rotateBy({ view->lastX, view->lastY }, { x, y });
