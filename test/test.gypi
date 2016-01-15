@@ -41,6 +41,7 @@
         'api/annotations.cpp',
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
+        'api/render_missing.cpp',
         'api/set_style.cpp',
         'api/custom_layer.cpp',
 

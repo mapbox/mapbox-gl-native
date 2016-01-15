@@ -1,0 +1,25 @@
+{
+  "version": 8,
+  "name": "Water",
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "asset://streets_missing_tiles.json"
+    }
+  },
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "red"
+    }
+  }, {
+    "id": "water",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "water",
+    "paint": {
+      "fill-color": "blue"
+    }
+  }]
+}
