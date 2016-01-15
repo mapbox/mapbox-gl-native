@@ -48,15 +48,6 @@
     tester.mapView.delegate = self;
 }
 
-- (void)approveLocationIfNeeded {
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        [UIAutomationHelper acknowledgeSystemAlert];
-        [tester waitForTimeInterval:1];
-    }
-    XCTAssertTrue([CLLocationManager locationServicesEnabled]);
-    XCTAssertEqual([CLLocationManager authorizationStatus], kCLAuthorizationStatusAuthorizedAlways);
-}
-
 - (void)testDirectionSet {
     [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
         [tester.mapView setDirection:270 animated:YES];
@@ -542,44 +533,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"regionDidChangeAnimated"
                                                         object:mapView
                                                       userInfo:@{ @"animated" : @(animated) }];
-}
-
-- (void)testDelegatesStartStopLocatingUser {
-    NSNotification *notification = [system waitForNotificationName:@"mapViewWillStartLocatingUser"
-                                                            object:tester.mapView
-                                               whileExecutingBlock:^{
-                                                   tester.mapView.showsUserLocation = YES;
-                                                   [self approveLocationIfNeeded];
-                                               }];
-
-    XCTAssertEqualObjects(notification.name,
-                          @"mapViewWillStartLocatingUser",
-                          @"mapViewWillStartLocatingUser delegate should receive message");
-    XCTAssertNotNil([tester.mapView valueForKeyPath:@"locationManager"],
-                 "map view location manager should not be nil");
-
-    notification = [system waitForNotificationName:@"mapViewDidStopLocatingUser"
-                                            object:tester.mapView
-                               whileExecutingBlock:^{
-                                   tester.mapView.showsUserLocation = NO;
-                               }];
-
-    XCTAssertEqualObjects(notification.name,
-                          @"mapViewDidStopLocatingUser",
-                          @"mapViewDidStopLocatingUser delegate should receive message");
-    XCTAssertEqual(tester.mapView.userTrackingMode,
-                   MGLUserTrackingModeNone,
-                   @"user tracking mode should be none");
-    XCTAssertNil([tester.mapView valueForKeyPath:@"locationManager"],
-                 "map view location manager should be nil");
-}
-
-- (void)mapViewWillStartLocatingUser:(MGLMapView *)mapView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"mapViewWillStartLocatingUser" object:mapView];
-}
-
-- (void)mapViewDidStopLocatingUser:(MGLMapView *)mapView {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"mapViewDidStopLocatingUser" object:mapView];
 }
 
 @end
