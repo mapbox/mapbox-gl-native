@@ -21,8 +21,6 @@
 
 namespace mbgl {
 
-class RequestBase;
-
 class OnlineFileRequest : public FileRequest {
 public:
     OnlineFileRequest(OnlineFileSource& fileSource_)
@@ -52,7 +50,7 @@ private:
 
     const Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
-    RequestBase* realRequest = nullptr;
+    HTTPRequestBase* realRequest = nullptr;
     util::Timer realRequestTimer;
     Callback callback;
 

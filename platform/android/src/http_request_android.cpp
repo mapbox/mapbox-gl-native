@@ -25,7 +25,7 @@ public:
     ~HTTPAndroidContext();
 
     HTTPRequestBase* createRequest(const std::string& url,
-                               RequestBase::Callback,
+                               HTTPRequestBase::Callback,
                                std::shared_ptr<const Response>) final;
 
     JavaVM *vm = nullptr;
@@ -110,7 +110,7 @@ HTTPAndroidContext::~HTTPAndroidContext() {
 }
 
 HTTPRequestBase* HTTPAndroidContext::createRequest(const std::string& url,
-                                            RequestBase::Callback callback,
+                                            HTTPRequestBase::Callback callback,
                                             std::shared_ptr<const Response> response) {
     return new HTTPAndroidRequest(this, url, callback, response);
 }

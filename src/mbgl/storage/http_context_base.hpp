@@ -1,7 +1,6 @@
 #ifndef MBGL_STORAGE_HTTP_CONTEXT_BASE
 #define MBGL_STORAGE_HTTP_CONTEXT_BASE
 
-#include <mbgl/storage/request_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
 #include <mbgl/storage/network_status.hpp>
 
@@ -15,7 +14,7 @@ public:
 
     virtual ~HTTPContextBase() = default;
     virtual HTTPRequestBase* createRequest(const std::string& url,
-                                       RequestBase::Callback,
+                                       HTTPRequestBase::Callback,
                                        std::shared_ptr<const Response>) = 0;
 };
 

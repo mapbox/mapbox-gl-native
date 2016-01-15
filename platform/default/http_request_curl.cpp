@@ -47,7 +47,7 @@ public:
     ~HTTPCURLContext();
 
     HTTPRequestBase* createRequest(const std::string& url,
-                               RequestBase::Callback,
+                               HTTPRequestBase::Callback,
                                std::shared_ptr<const Response>) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
@@ -139,7 +139,7 @@ HTTPCURLContext::~HTTPCURLContext() {
 }
 
 HTTPRequestBase* HTTPCURLContext::createRequest(const std::string& url,
-                                            RequestBase::Callback callback,
+                                            HTTPRequestBase::Callback callback,
                                             std::shared_ptr<const Response> response) {
     return new HTTPCURLRequest(this, url, callback, response);
 }
