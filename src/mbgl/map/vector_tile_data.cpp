@@ -102,7 +102,7 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
     }
 
     workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, [this, callback] (TileParseResult result) {
+    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
         if (state == State::obsolete) {
             return;
@@ -117,6 +117,10 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             for (auto& bucket : resultBuckets.buckets) {
                 buckets[bucket.first] = std::move(bucket.second);
             }
+
+            // Persist the configuration we just placed so that we can later check whether we need to
+            // place again in case the configuration has changed.
+            placedConfig = config;
 
             // The target configuration could have changed since we started placement. In this case,
             // we're starting another placement run.

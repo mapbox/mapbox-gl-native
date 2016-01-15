@@ -41,13 +41,11 @@ TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLaye
                                            PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
+    placementPending.clear();
     partialParse = false;
 
     // Store the layers for use in redoPlacement.
     layers = std::move(layers_);
-
-    // Reset the collision tile so we have a clean slate; we're placing all features anyway.
-    collisionTile = std::make_unique<CollisionTile>(config);
 
     // We're storing a set of bucket names we've parsed to avoid parsing a bucket twice that is
     // referenced from more than one layer
@@ -62,10 +60,15 @@ TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLaye
     }
 
     result.state = pending.empty() ? TileData::State::parsed : TileData::State::partial;
+
+    if (result.state == TileData::State::parsed) {
+        placeLayers(config);
+    }
+
     return std::move(result);
 }
 
-TileParseResult TileWorker::parsePendingLayers() {
+TileParseResult TileWorker::parsePendingLayers(const PlacementConfig config) {
     // Try parsing the remaining layers that we couldn't parse in the first step due to missing
     // dependencies.
     for (auto it = pending.begin(); it != pending.end();) {
@@ -77,9 +80,8 @@ TileParseResult TileWorker::parsePendingLayers() {
             bucket->addFeatures(reinterpret_cast<uintptr_t>(this),
                                 *layer.spriteAtlas,
                                 glyphAtlas,
-                                glyphStore,
-                                *collisionTile);
-            insertBucket(layer.bucketName(), std::move(it->second));
+                                glyphStore);
+            placementPending.emplace(layer.bucketName(), std::move(it->second));
             pending.erase(it++);
             continue;
         }
@@ -89,20 +91,33 @@ TileParseResult TileWorker::parsePendingLayers() {
     }
 
     result.state = pending.empty() ? TileData::State::parsed : TileData::State::partial;
+
+    if (result.state == TileData::State::parsed) {
+        placeLayers(config);
+    }
+
     return std::move(result);
+}
+
+void TileWorker::placeLayers(const PlacementConfig config) {
+    redoPlacement(&placementPending, config);
+    for (auto &p : placementPending) {
+        p.second->swapRenderData();
+        insertBucket(p.first, std::move(p.second));
+    }
+    placementPending.clear();
 }
 
 void TileWorker::redoPlacement(
     const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
     PlacementConfig config) {
 
-    // Reset the collision tile so we have a clean slate; we're placing all features anyway.
-    collisionTile = std::make_unique<CollisionTile>(config);
+    CollisionTile collisionTile(config);
 
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
         const auto it = buckets->find((*i)->id);
         if (it != buckets->end()) {
-            it->second->placeFeatures(*collisionTile);
+            it->second->placeFeatures(collisionTile);
         }
     }
 }
@@ -142,14 +157,17 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
                                      spriteStore,
                                      glyphAtlas,
                                      glyphStore,
-                                     *collisionTile,
                                      mode);
 
     std::unique_ptr<Bucket> bucket = layer->createBucket(parameters);
 
-    if (layer->is<SymbolLayer>() && partialParse) {
-        // We cannot parse this bucket yet. Instead, we're saving it for later.
-        pending.emplace_back(layer->as<SymbolLayer>(), std::move(bucket));
+    if (layer->is<SymbolLayer>()) {
+        if (partialParse) {
+            // We cannot parse this bucket yet. Instead, we're saving it for later.
+            pending.emplace_back(layer->as<SymbolLayer>(), std::move(bucket));
+        } else {
+            placementPending.emplace(layer->bucketName(), std::move(bucket));
+        }
     } else {
         insertBucket(layer->bucketName(), std::move(bucket));
     }

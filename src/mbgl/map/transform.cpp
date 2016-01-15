@@ -539,8 +539,11 @@ void Transform::startTransition(const CameraOptions& camera,
             view.notifyMapChange(MapChangeRegionIsChanging);
         } else {
             transitionFinishFn();
-            transitionFrameFn = nullptr;
             transitionFinishFn = nullptr;
+
+            // This callback gets destroyed here,
+            // we can only return after this point.
+            transitionFrameFn = nullptr;
         }
         return result;
     };

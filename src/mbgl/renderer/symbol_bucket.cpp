@@ -173,8 +173,7 @@ bool SymbolBucket::needsDependencies(GlyphStore& glyphStore, SpriteStore& sprite
 void SymbolBucket::addFeatures(uintptr_t tileUID,
                                SpriteAtlas& spriteAtlas,
                                GlyphAtlas& glyphAtlas,
-                               GlyphStore& glyphStore,
-                               CollisionTile& collisionTile) {
+                               GlyphStore& glyphStore) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -266,8 +265,6 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
     }
 
     features.clear();
-
-    placeFeatures(collisionTile, true);
 }
 
 
@@ -358,10 +355,6 @@ bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repe
 }
 
 void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
-    placeFeatures(collisionTile, false);
-}
-
-void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediately) {
 
     renderDataInProgress = std::make_unique<SymbolRenderData>();
 
@@ -448,8 +441,6 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
     if (collisionTile.config.debug) {
         addToDebugBuffers(collisionTile);
     }
-
-    if (swapImmediately) swapRenderData();
 }
 
 template <typename Buffer, typename GroupType>

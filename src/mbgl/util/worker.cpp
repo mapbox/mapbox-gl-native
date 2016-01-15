@@ -39,9 +39,10 @@ public:
     }
 
     void parsePendingGeometryTileLayers(TileWorker* worker,
+                                        PlacementConfig config,
                                         std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parsePendingLayers());
+            callback(worker->parsePendingLayers(config));
         } catch (...) {
             callback(std::current_exception());
         }
@@ -87,10 +88,11 @@ Worker::parseGeometryTile(TileWorker& worker,
 
 std::unique_ptr<WorkRequest>
 Worker::parsePendingGeometryTileLayers(TileWorker& worker,
+                                       PlacementConfig config,
                                        std::function<void(TileParseResult)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::parsePendingGeometryTileLayers,
-                                                callback, &worker);
+                                                callback, &worker, config);
 }
 
 std::unique_ptr<WorkRequest>

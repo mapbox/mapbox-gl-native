@@ -79,8 +79,7 @@ public:
     void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
                      GlyphAtlas&,
-                     GlyphStore&,
-                     CollisionTile&);
+                     GlyphStore&);
 
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
@@ -101,7 +100,6 @@ private:
     
     void addToDebugBuffers(CollisionTile &collisionTile);
 
-    void placeFeatures(CollisionTile& collisionTile, bool swapImmediately);
     void swapRenderData() override;
 
     // Adds placed items to the buffer.
