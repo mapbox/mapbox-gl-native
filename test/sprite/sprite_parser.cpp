@@ -106,10 +106,10 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     ASSERT_TRUE(sprite2.get());
     EXPECT_EQ(24, sprite2->width);
     EXPECT_EQ(24, sprite2->height);
-    EXPECT_EQ(36, sprite2->pixelWidth);
-    EXPECT_EQ(36, sprite2->pixelHeight);
+    EXPECT_EQ(35, sprite2->pixelWidth);
+    EXPECT_EQ(35, sprite2->pixelHeight);
     EXPECT_EQ(1.5, sprite2->pixelRatio);
-    EXPECT_EQ(0x134A530C742DD141u, test::crc64(sprite2->data));
+    EXPECT_EQ(14312995667113444493u, test::crc64(sprite2->data));
 }
 
 TEST(Sprite, SpriteParsing) {

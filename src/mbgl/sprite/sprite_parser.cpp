@@ -15,37 +15,30 @@ namespace mbgl {
 SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
                                  const uint16_t srcX,
                                  const uint16_t srcY,
-                                 const uint16_t srcWidth,
-                                 const uint16_t srcHeight,
+                                 const uint16_t width,
+                                 const uint16_t height,
                                  const double ratio,
                                  const bool sdf) {
     // Disallow invalid parameter configurations.
-    if (srcWidth == 0 || srcHeight == 0 || ratio <= 0 || ratio > 10 || srcWidth > 1024 ||
-        srcHeight > 1024) {
+    if (width == 0 || height == 0 || ratio <= 0 || ratio > 10 || width > 1024 ||
+        height > 1024) {
         Log::Warning(Event::Sprite, "Can't create sprite with invalid metrics");
         return nullptr;
     }
 
-    const uint16_t width = std::ceil(double(srcWidth) / ratio);
-    const uint16_t dstWidth = std::ceil(width * ratio);
-    assert(dstWidth >= srcWidth);
-    const uint16_t height = std::ceil(double(srcHeight) / ratio);
-    const uint16_t dstHeight = std::ceil(height * ratio);
-    assert(dstHeight >= srcHeight);
-
-    std::string data(dstWidth * dstHeight * 4, '\0');
+    std::string data(width * height * 4, '\0');
 
     auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
     auto dstData = reinterpret_cast<uint32_t*>(const_cast<char*>(data.data()));
 
-    const int32_t maxX = std::min(uint32_t(image.width), uint32_t(srcWidth + srcX)) - srcX;
+    const int32_t maxX = std::min(uint32_t(image.width), uint32_t(width + srcX)) - srcX;
     assert(maxX <= int32_t(image.width));
-    const int32_t maxY = std::min(uint32_t(image.height), uint32_t(srcHeight + srcY)) - srcY;
+    const int32_t maxY = std::min(uint32_t(image.height), uint32_t(height + srcY)) - srcY;
     assert(maxY <= int32_t(image.height));
 
     // Copy from the source image into our individual sprite image
     for (uint16_t y = 0; y < maxY; ++y) {
-        const auto dstRow = y * dstWidth;
+        const auto dstRow = y * width;
         const auto srcRow = (y + srcY) * image.width + srcX;
         for (uint16_t x = 0; x < maxX; ++x) {
             dstData[dstRow + x] = srcData[srcRow + x];

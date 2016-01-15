@@ -2,6 +2,8 @@
 
 ## Android master
 
+* Fixed crash caused by annotation image with non-integer width or height ([#3031](https://github.com/mapbox/mapbox-gl-native/issues/3031))
+
 ## 3.0.0
 
 * Added Camera API ([#3244](https://github.com/mapbox/mapbox-gl-native/issues/3244))
@@ -53,6 +55,7 @@ Known issues:
 - New API to provide a custom callout view to the map for annotations. ([#3456](https://github.com/mapbox/mapbox-gl-native/pull/3456))
 - Made telemetry on/off setting available in-app. ([#3445](https://github.com/mapbox/mapbox-gl-native/pull/3445))
 - Fixed an issue with users not being counted by Mapbox if they had disabled telemetry. ([#3495](https://github.com/mapbox/mapbox-gl-native/pull/3495))
+- Fixed crash caused by MGLAnnotationImage with non-integer width or height ([#2198](https://github.com/mapbox/mapbox-gl-native/issues/2198))
 
 ## iOS 3.0.1
 

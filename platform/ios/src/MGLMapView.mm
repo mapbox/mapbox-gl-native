@@ -2346,8 +2346,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     // add sprite
     auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-        uint16_t(annotationImage.image.size.width),
-        uint16_t(annotationImage.image.size.height),
+        uint16_t(width),
+        uint16_t(height),
         float(annotationImage.image.scale),
         std::move(pixels));
 

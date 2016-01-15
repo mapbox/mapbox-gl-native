@@ -28,7 +28,7 @@ TEST(Sprite, SpriteImageZeroRatio) {
         SpriteImage(16, 16, 0, "");
         FAIL() << "Expected exception";
     } catch (util::SpriteImageException& ex) {
-        EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
+        EXPECT_STREQ("Sprite image pixel count mismatch", ex.what());
     }
 }
 
@@ -43,7 +43,7 @@ TEST(Sprite, SpriteImageMismatchedData) {
 
 TEST(Sprite, SpriteImage) {
     std::string pixels(32 * 24 * 4, '\0');
-    SpriteImage sprite(16, 12, 2, std::move(pixels));
+    SpriteImage sprite(32, 24, 2, std::move(pixels));
     EXPECT_EQ(16, sprite.width);
     EXPECT_EQ(32, sprite.pixelWidth);
     EXPECT_EQ(12, sprite.height);
@@ -54,8 +54,8 @@ TEST(Sprite, SpriteImage) {
 
 TEST(Sprite, SpriteImageFractionalRatio) {
     std::string pixels(20 * 12 * 4, '\0');
-    SpriteImage sprite(13, 8, 1.5, std::move(pixels));
-    EXPECT_EQ(13, sprite.width);
+    SpriteImage sprite(20, 12, 1.5, std::move(pixels));
+    EXPECT_EQ(14, sprite.width);
     EXPECT_EQ(20, sprite.pixelWidth);
     EXPECT_EQ(8, sprite.height);
     EXPECT_EQ(12, sprite.pixelHeight);
