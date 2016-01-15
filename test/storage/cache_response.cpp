@@ -222,3 +222,71 @@ TEST_F(Storage, DontCacheServerErrors) {
 
     loop.run();
 }
+
+// Make sure we update the existing cache record when there is no expires time.
+TEST_F(Storage, CacheNoExpiresTime) {
+    SCOPED_TEST(CacheNoExpiresTime);
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    SQLiteCache cache(":memory:");
+    OnlineFileSource fs(&cache);
+
+    const Resource resource{ Resource::Unknown, "http://127.0.0.1:3000/test?etag=4dec51c0f422115cd401" };
+
+    // Insert existing data into the cache that will be marked as stale.
+    Response response;
+    response.data = std::make_shared<const std::string>("Hello World!");
+    response.etag = "4dec51c0f422115cd401";
+    response.expires = Seconds(1);
+    cache.put(resource, response);
+
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<WorkRequest> req2;
+
+    int counter = 0;
+
+    // Then, request the actual URL and check that we're getting the rigged cache response first,
+    // then the actual server response.
+    req1 = fs.request(resource, [&](Response res) {
+        if (counter == 0) {
+            EXPECT_EQ(nullptr, res.error);
+            EXPECT_EQ(true, res.stale);
+            ASSERT_TRUE(res.data.get());
+            EXPECT_EQ(*response.data, *res.data);
+            EXPECT_EQ(Seconds(1), res.expires);
+            EXPECT_EQ(Seconds::zero(), res.modified);
+            EXPECT_EQ(response.etag, res.etag);
+        } else if (counter == 1) {
+            // The second time we're getting an expires value of 0 instead of the 1 we put into the
+            // cache.
+            EXPECT_EQ(nullptr, res.error);
+            EXPECT_EQ(false, res.stale);
+            ASSERT_TRUE(res.data.get());
+            EXPECT_EQ(*response.data, *res.data);
+            EXPECT_EQ(Seconds::zero(), res.expires);
+            EXPECT_EQ(Seconds::zero(), res.modified);
+            EXPECT_EQ(response.etag, res.etag);
+            req1.reset();
+
+            // Finally, check the cache to make sure we updated the expires
+            req2 = cache.get(resource, [&](std::unique_ptr<Response> res2) {
+                EXPECT_EQ(nullptr, res2->error);
+                EXPECT_EQ(false, res2->stale);
+                ASSERT_TRUE(res2->data.get());
+                EXPECT_EQ(*response.data, *res2->data);
+                EXPECT_EQ(Seconds::zero(), res2->expires);
+                EXPECT_EQ(Seconds::zero(), res2->modified);
+                EXPECT_EQ(response.etag, res2->etag);
+                CacheNoExpiresTime.finish();
+                loop.stop();
+            });
+        } else {
+            FAIL() << "Got too many responses";
+        }
+        counter++;
+    });
+
+    loop.run();
+}
