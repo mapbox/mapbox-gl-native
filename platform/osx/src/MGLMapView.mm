@@ -880,13 +880,15 @@ public:
 }
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated {
-    _mbglMap->setZoom(zoomLevel, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self willChangeValueForKey:@"zoomLevel"];
+    _mbglMap->setZoom(zoomLevel,
+                      MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
+                      MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self didChangeValueForKey:@"zoomLevel"];
 }
 
 - (void)zoomBy:(double)zoomDelta animated:(BOOL)animated {
-    [self willChangeValueForKey:@"zoomLevel"];
-    _mbglMap->setZoom(self.zoomLevel + zoomDelta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
-    [self didChangeValueForKey:@"zoomLevel"];
+    [self setZoomLevel:self.zoomLevel + zoomDelta animated:animated];
 }
 
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
@@ -936,15 +938,14 @@ public:
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated {
     [self willChangeValueForKey:@"direction"];
-    _mbglMap->setBearing(direction, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    _mbglMap->setBearing(direction,
+                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
+                         MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
 - (void)offsetDirectionBy:(CLLocationDegrees)delta animated:(BOOL)animated {
-    [self willChangeValueForKey:@"direction"];
-    _mbglMap->cancelTransitions();
-    _mbglMap->setBearing(_mbglMap->getBearing() + delta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
-    [self didChangeValueForKey:@"direction"];
+    [self setDirection:_mbglMap->getBearing() + delta animated:animated];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera {

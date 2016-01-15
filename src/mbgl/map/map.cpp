@@ -189,12 +189,15 @@ LatLng Map::getLatLng(const EdgeInsets& padding) const {
     return transform->getLatLng(padding);
 }
 
-void Map::resetPosition() {
-    CameraOptions options;
-    options.angle = 0;
-    options.center = LatLng(0, 0);
-    options.zoom = 0;
-    transform->jumpTo(options);
+void Map::resetPosition(const EdgeInsets& padding) {
+    CameraOptions camera;
+    camera.angle = 0;
+    camera.center = LatLng(0, 0);
+    if (padding) {
+        camera.padding = padding;
+    }
+    camera.zoom = 0;
+    transform->jumpTo(camera);
     update(Update::Zoom);
 }
 
@@ -216,7 +219,11 @@ double Map::getScale() const {
 }
 
 void Map::setZoom(double zoom, const Duration& duration) {
-    transform->setZoom(zoom, duration);
+    setZoom(zoom, {}, duration);
+}
+
+void Map::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setZoom(zoom, padding, duration);
     update(Update::Zoom);
 }
 
@@ -225,7 +232,11 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
-    transform->setLatLngZoom(latLng, zoom, duration);
+    setLatLngZoom(latLng, zoom, {}, duration);
+}
+
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLngZoom(latLng, zoom, padding, duration);
     update(Update::Zoom);
 }
 
@@ -316,12 +327,16 @@ void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, co
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, duration);
+    setBearing(degrees, EdgeInsets(), duration);
+}
+
+void Map::setBearing(double degrees, const PrecisionPoint& center, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, center, duration);
     update(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, const PrecisionPoint& center) {
-    transform->setAngle(-degrees * M_PI / 180, center);
+void Map::setBearing(double degrees, const EdgeInsets& padding, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, padding, duration);
     update(Update::Repaint);
 }
 

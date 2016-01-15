@@ -397,12 +397,19 @@ void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, con
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
+    setLatLngZoom(latLng, zoom, {}, duration);
+}
+
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
     if (!latLng || std::isnan(zoom)) {
         return;
     }
 
     CameraOptions camera;
     camera.center = latLng;
+    if (padding) {
+        camera.padding = padding;
+    }
     camera.zoom = zoom;
     easeTo(camera, duration);
 }
@@ -429,8 +436,13 @@ void Transform::scaleBy(double ds, const PrecisionPoint& center, const Duration&
     setScale(scale, center, duration);
 }
 
-void Transform::setZoom(double zoom, const Duration& duration) {
-    setScale(state.zoomScale(zoom), {NAN, NAN}, duration);
+void Transform::setZoom(double zoom, const PrecisionPoint& anchor, const Duration& duration) {
+    setScale(state.zoomScale(zoom), anchor, duration);
+}
+
+void Transform::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setZoom(zoom, center, duration);
 }
 
 double Transform::getZoom() const {
@@ -450,6 +462,11 @@ void Transform::setScale(double scale, const PrecisionPoint& anchor, const Durat
     camera.zoom = state.scaleZoom(scale);
     camera.anchor = anchor;
     easeTo(camera, duration);
+}
+
+void Transform::setScale(double scale, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setScale(scale, center, duration);
 }
 
 #pragma mark - Angle
@@ -496,6 +513,11 @@ void Transform::setAngle(double angle, const PrecisionPoint& anchor, const Durat
     camera.angle = angle;
     camera.anchor = anchor;
     easeTo(camera, duration);
+}
+
+void Transform::setAngle(double angle, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setAngle(angle, center, duration);
 }
 
 double Transform::getAngle() const {
