@@ -156,12 +156,25 @@ void StyleParser::parseSources(const JSValue& value) {
         // parameters are specified inline.
         std::string url;
 
+        uint16_t tileSize = util::tileSize;
+
         std::unique_ptr<SourceInfo> info;
         std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
         switch (type) {
-        case SourceType::Vector:
         case SourceType::Raster:
+            if (sourceVal.HasMember("tileSize")) {
+                const JSValue& tileSizeVal = sourceVal["tileSize"];
+                if (tileSizeVal.IsNumber() && tileSizeVal.GetUint64() <= std::numeric_limits<uint16_t>::max()) {
+                    tileSize = tileSizeVal.GetUint64();
+                } else {
+                    Log::Error(Event::ParseStyle, "invalid tileSize");
+                    continue;
+                }
+            }
+            // Fall through. Vector sources are forbidden from having a tileSize.
+
+        case SourceType::Vector:
             if (sourceVal.HasMember("url")) {
                 const JSValue& urlVal = sourceVal["url"];
                 if (urlVal.IsString()) {
@@ -208,7 +221,7 @@ void StyleParser::parseSources(const JSValue& value) {
         }
 
         const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
-        std::unique_ptr<Source> source = std::make_unique<Source>(type, id, url, std::move(info), std::move(geojsonvt));
+        std::unique_ptr<Source> source = std::make_unique<Source>(type, id, url, tileSize, std::move(info), std::move(geojsonvt));
 
         sourcesMap.emplace(id, source.get());
         sources.emplace_back(std::move(source));
@@ -231,7 +244,6 @@ std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> StyleParser::parseGeoJSON(const JS
 std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {
     auto info = std::make_unique<SourceInfo>();
     parseTileJSONMember(value, info->tiles, "tiles");
-    parseTileJSONMember(value, info->tile_size, "tileSize");
     parseTileJSONMember(value, info->min_zoom, "minzoom");
     parseTileJSONMember(value, info->max_zoom, "maxzoom");
     parseTileJSONMember(value, info->attribution, "attribution");

@@ -42,6 +42,7 @@ public:
     Source(SourceType,
            const std::string& id,
            const std::string& url,
+           uint16_t tileSize,
            std::unique_ptr<SourceInfo>&&,
            std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~Source();
@@ -73,6 +74,7 @@ public:
     const SourceType type;
     const std::string id;
     const std::string url;
+    uint16_t tileSize = util::tileSize;
     bool enabled = false;
 
 private:

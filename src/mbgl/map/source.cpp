@@ -43,11 +43,13 @@ namespace mbgl {
 Source::Source(SourceType type_,
                const std::string& id_,
                const std::string& url_,
+               uint16_t tileSize_,
                std::unique_ptr<SourceInfo>&& info_,
                std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
     : type(type_),
       id(id_),
       url(url_),
+      tileSize(tileSize_),
       info(std::move(info_)),
       geojsonvt(std::move(geojsonvt_)) {
 }
@@ -306,7 +308,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 }
 
 double Source::getZoom(const TransformState& state) const {
-    double offset = std::log(util::tileSize / info->tile_size) / std::log(2);
+    double offset = std::log(util::tileSize / tileSize) / std::log(2);
     return state.getZoom() + offset;
 }
 
