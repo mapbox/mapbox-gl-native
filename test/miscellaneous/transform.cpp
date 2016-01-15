@@ -2,6 +2,7 @@
 #include "../fixtures/mock_view.hpp"
 
 #include <mbgl/map/transform.hpp>
+#include <mbgl/util/geo.hpp>
 
 using namespace mbgl;
 
@@ -193,12 +194,43 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const auto size = view.getSize();
-    const PrecisionPoint anchorPoint = { size[0] * 0.8, size[1] * 0.3 };
+    const PrecisionPoint anchorPoint = {0, 0};
     const LatLng anchorLatLng = transform.getState().pointToLatLng(anchorPoint);
     transform.setAngle(M_PI_4, anchorPoint);
 
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
     ASSERT_NE(anchorLatLng, transform.getLatLng());
     ASSERT_DOUBLE_EQ(anchorLatLng, transform.getState().pointToLatLng(anchorPoint));
+}
+
+TEST(Transform, Padding) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
+
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
+
+    transform.setLatLngZoom({ 10, -100 }, 10);
+
+    const LatLng trueCenter = transform.getLatLng();
+    ASSERT_DOUBLE_EQ(10, trueCenter.latitude);
+    ASSERT_DOUBLE_EQ(-100, trueCenter.longitude);
+    ASSERT_DOUBLE_EQ(10, transform.getZoom());
+    
+    const LatLng manualShiftedCenter = transform.getState().pointToLatLng({
+        1000.0 / 2.0,
+        1000.0 / 4.0,
+    });
+    
+    EdgeInsets padding;
+    padding.top = 1000.0 / 2.0;
+    ASSERT_GT(padding.top, 0);
+    ASSERT_TRUE(padding);
+    
+    const LatLng shiftedCenter = transform.getLatLng(padding);
+    ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);
+    ASSERT_DOUBLE_EQ(trueCenter.longitude, shiftedCenter.longitude);
+    ASSERT_DOUBLE_EQ(manualShiftedCenter.latitude, shiftedCenter.latitude);
+    ASSERT_DOUBLE_EQ(manualShiftedCenter.longitude, shiftedCenter.longitude);
 }

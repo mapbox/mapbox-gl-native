@@ -43,9 +43,10 @@ public:
             top to bottom and from left to right. */
     void moveBy(const PrecisionPoint& offset, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    LatLng getLatLng() const { return state.getLatLng(); }
+    LatLng getLatLng(const EdgeInsets& = {}) const;
 
     // Zoom
 

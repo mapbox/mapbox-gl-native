@@ -17,6 +17,10 @@ struct CameraOptions {
     /** Coordinate at the center of the map. */
     mapbox::util::optional<LatLng> center;
     
+    /** Padding around the interior of the view that affects the frame of
+        reference for `center`. */
+    mapbox::util::optional<EdgeInsets> padding;
+    
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */
     mapbox::util::optional<PrecisionPoint> anchor;

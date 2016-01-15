@@ -172,7 +172,11 @@ void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
 }
 
 void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
-    transform->setLatLng(latLng, duration);
+    setLatLng(latLng, EdgeInsets(), duration);
+}
+
+void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLng(latLng, padding, duration);
     update(Update::Repaint);
 }
 
@@ -181,8 +185,8 @@ void Map::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Dur
     update(Update::Repaint);
 }
 
-LatLng Map::getLatLng() const {
-    return transform->getLatLng();
+LatLng Map::getLatLng(const EdgeInsets& padding) const {
+    return transform->getLatLng(padding);
 }
 
 void Map::resetPosition() {
@@ -259,7 +263,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     double scaleY = (getHeight() - padding.top - padding.bottom) / height;
     double minScale = ::fmin(scaleX, scaleY);
     double zoom = ::log2(getScale() * minScale);
-    zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
+    zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     PrecisionPoint paddedNEPixel = {

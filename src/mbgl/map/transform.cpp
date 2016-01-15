@@ -91,7 +91,12 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     }
     
     // Determine endpoints.
-    const LatLng startLatLng = getLatLng();
+    EdgeInsets padding;
+    if (camera.padding) {
+        padding = *camera.padding;
+    }
+    const LatLng startLatLng = getLatLng(padding);
+    padding.flip();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -141,6 +146,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, t);
         }
+        
+        if (padding) {
+            state.moveLatLng(frameLatLng, padding.getCenter(state.width, state.height));
+        }
         return update;
     }, duration);
 }
@@ -164,7 +173,12 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
     
     // Determine endpoints.
-    const LatLng startLatLng = getLatLng();
+    EdgeInsets padding;
+    if (camera.padding) {
+        padding = *camera.padding;
+    }
+    const LatLng startLatLng = getLatLng(padding);
+    padding.flip();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -189,7 +203,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = std::max(state.width, state.height);
+    double w0 = std::max(state.width - padding.left - padding.right,
+                         state.height - padding.top - padding.bottom);
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);
@@ -304,6 +319,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, k);
         }
+        
+        if (padding) {
+            state.moveLatLng(frameLatLng, padding.getCenter(state.width, state.height));
+        }
         return Update::Zoom;
     }, duration);
 }
@@ -340,12 +359,19 @@ void Transform::moveBy(const PrecisionPoint& offset, const Duration& duration) {
 }
 
 void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
+    setLatLng(latLng, EdgeInsets(), duration);
+}
+
+void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
     if (!latLng) {
         return;
     }
 
     CameraOptions camera;
     camera.center = latLng;
+    if (padding) {
+        camera.padding = padding;
+    }
     easeTo(camera, duration);
 }
 
@@ -379,6 +405,16 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration&
     camera.center = latLng;
     camera.zoom = zoom;
     easeTo(camera, duration);
+}
+
+LatLng Transform::getLatLng(const EdgeInsets& padding) const {
+    if (padding) {
+        EdgeInsets flippedPadding = padding;
+        flippedPadding.flip();
+        return state.pointToLatLng(flippedPadding.getCenter(state.width, state.height));
+    } else {
+        return state.getLatLng();
+    }
 }
 
 

@@ -34,13 +34,6 @@ namespace util {
 template <class T> class Thread;
 } // namespace util
 
-struct EdgeInsets {
-    double top = 0;
-    double left = 0;
-    double bottom = 0;
-    double right = 0;
-};
-
 class Map : private util::noncopyable {
     friend class View;
 
@@ -106,8 +99,9 @@ public:
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
-    LatLng getLatLng() const;
+    LatLng getLatLng(const EdgeInsets& = {}) const;
     void resetPosition();
 
     // Scale

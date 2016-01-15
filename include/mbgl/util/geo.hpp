@@ -108,6 +108,40 @@ enum class NorthOrientation : uint8_t {
     Leftwards,
 };
 
+/// The distance on each side between a rectangle and a rectangle within.
+struct EdgeInsets {
+    double top = 0;     ///< Number of pixels inset from the top edge.
+    double left = 0;    ///< Number of pixels inset from the left edge.
+    double bottom = 0;  ///< Number of pixels inset from the bottom edge.
+    double right = 0;   ///< Number of pixels inset from the right edge.
+    
+    inline EdgeInsets() {}
+    
+    inline EdgeInsets(const double t, const double l, const double b, const double r)
+        : top(t), left(l), bottom(b), right(r) {}
+    
+    inline operator bool() const {
+        return top || left || bottom || right;
+    }
+    
+    inline void operator+=(const EdgeInsets& o) {
+        top += o.top;
+        left += o.left;
+        bottom += o.bottom;
+        right += o.right;
+    }
+
+    inline EdgeInsets operator+(const EdgeInsets& o) const {
+        return {
+            top + o.top, left + o.left, bottom + o.bottom, right + o.right,
+        };
+    }
+    
+    PrecisionPoint getCenter(uint16_t width, uint16_t height) const;
+    
+    void flip();
+};
+
 } // namespace mbgl
 
 #endif

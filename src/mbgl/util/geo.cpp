@@ -28,4 +28,16 @@ LatLngBounds::LatLngBounds(const TileID& id)
       ne(TileID{ id.z, id.x + 1, id.y, id.sourceZ }) {
 }
 
+PrecisionPoint EdgeInsets::getCenter(uint16_t width, uint16_t height) const {
+    return {
+        (width - left - right) / 2.0f + left,
+        (height - top - bottom) / 2.0f + top,
+    };
+}
+
+void EdgeInsets::flip() {
+    std::swap(top, bottom);
+    std::swap(left, right);
+}
+
 } // end namespace mbgl
