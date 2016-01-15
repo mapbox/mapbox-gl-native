@@ -40,6 +40,9 @@ void RasterTileData::request(const std::string& url,
             return;
         }
 
+        modified = res.modified;
+        expires = res.expires;
+
         if (res.notModified) {
             // We got the same data again. Abort early.
             return;
@@ -49,9 +52,6 @@ void RasterTileData::request(const std::string& url,
             // Only overwrite the state when we didn't have a previous tile.
             state = State::loaded;
         }
-
-        modified = res.modified;
-        expires = res.expires;
 
         workRequest.reset();
         workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {

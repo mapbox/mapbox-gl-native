@@ -41,6 +41,9 @@ VectorTileData::VectorTileData(const TileID& id_,
         // messages from being displayed again, e.g. after a connection trouble cleared up.
         error = nullptr;
 
+        modified = modified_;
+        expires = expires_;
+
         if (!tile) {
             // This is a 404 response. We're treating these as empty tiles.
             state = State::parsed;
@@ -54,9 +57,6 @@ VectorTileData::VectorTileData(const TileID& id_,
         } else if (isReady()) {
             state = State::partial;
         }
-
-        modified = modified_;
-        expires = expires_;
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
         // when tile data changed. Replacing the workdRequest will cancel a pending work
