@@ -2700,8 +2700,9 @@ public final class MapView extends FrameLayout {
         }
 
         if (!handledDefaultClick) {
-            // default behaviour show InfoWindow
-            mInfoWindows.add(marker.showInfoWindow());
+            if (isInfoWindowValid(marker)) {
+                mInfoWindows.add(marker.showInfoWindow());
+            }
         }
 
         mSelectedMarkers.add(marker);
@@ -2740,6 +2741,10 @@ public final class MapView extends FrameLayout {
         }
 
         mSelectedMarkers.remove(marker);
+    }
+
+    private boolean isInfoWindowValid(@NonNull Marker marker) {
+        return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
     }
 
     //
