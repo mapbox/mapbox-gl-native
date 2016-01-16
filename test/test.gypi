@@ -109,7 +109,6 @@
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(geojsonvt_cflags)',
-          '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
         ],
