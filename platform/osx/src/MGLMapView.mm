@@ -1590,10 +1590,11 @@ public:
     
     // Get the image’s raw pixel data as an RGBA buffer.
     std::string pixelString((const char *)rep.bitmapData, rep.pixelsWide * rep.pixelsHigh * 4 /* RGBA */);
-    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>((uint16_t)rep.pixelsWide,
-                                                            (uint16_t)rep.pixelsHigh,
-                                                            (float)(rep.pixelsWide / size.width),
-                                                            std::move(pixelString));
+
+    mbgl::PremultipliedImage cPremultipliedImage(rep.pixelsWide, rep.pixelsHigh);
+    std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
+    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(std::move(cPremultipliedImage),
+                                                            (float)(rep.pixelsWide / size.width));
     NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
     _mbglMap->addAnnotationIcon(symbolName.UTF8String, cSpriteImage);
     

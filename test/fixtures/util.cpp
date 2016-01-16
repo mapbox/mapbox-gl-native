@@ -89,6 +89,7 @@ Server::~Server() {
     }
 }
 
+
 // from https://gist.github.com/ArtemGr/997887
 uint64_t crc64(const char* data, size_t size) {
     boost::crc_optimal<64, 0x04C11DB7, 0, 0, false, false> crc;
@@ -98,6 +99,10 @@ uint64_t crc64(const char* data, size_t size) {
 
 uint64_t crc64(const std::string& str) {
     return crc64(str.data(), str.size());
+}
+
+uint64_t crc64(const PremultipliedImage &image) {
+    return crc64(reinterpret_cast<const char*>(image.data.get()), image.size());
 }
 
 PremultipliedImage render(Map& map, std::chrono::milliseconds timeout) {

@@ -43,34 +43,34 @@ TEST(Sprite, SpriteImageCreation1x) {
     { // "museum_icon":{"x":177,"y":187,"width":18,"height":18,"pixelRatio":1,"sdf":false}
         const auto sprite = createSpriteImage(image_1x, 177, 187, 18, 18, 1, false);
         ASSERT_TRUE(sprite.get());
-        EXPECT_EQ(18, sprite->width);
-        EXPECT_EQ(18, sprite->height);
-        EXPECT_EQ(18, sprite->pixelWidth);
-        EXPECT_EQ(18, sprite->pixelHeight);
+        EXPECT_EQ(18, sprite->getWidth());
+        EXPECT_EQ(18, sprite->getHeight());
+        EXPECT_EQ(18, sprite->image.width);
+        EXPECT_EQ(18, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0x7FCC5F263D1FFE16u, test::crc64(sprite->data));
+        EXPECT_EQ(0x7FCC5F263D1FFE16u, test::crc64(sprite->image));
     }
 
     { // outside image == blank
         const auto sprite = createSpriteImage(image_1x, 200, 0, 16, 16, 1, false);
         ASSERT_TRUE(sprite.get());
-        EXPECT_EQ(16, sprite->width);
-        EXPECT_EQ(16, sprite->height);
-        EXPECT_EQ(16, sprite->pixelWidth);
-        EXPECT_EQ(16, sprite->pixelHeight);
+        EXPECT_EQ(16, sprite->getWidth());
+        EXPECT_EQ(16, sprite->getHeight());
+        EXPECT_EQ(16, sprite->image.width);
+        EXPECT_EQ(16, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0x0000000000000000u, test::crc64(sprite->data)) << std::hex << test::crc64(sprite->data);
+        EXPECT_EQ(0x0000000000000000u, test::crc64(sprite->image)) << std::hex << test::crc64(sprite->image);
     }
 
     { // outside image == blank
         const auto sprite = createSpriteImage(image_1x, 0, 300, 16, 16, 1, false);
         ASSERT_TRUE(sprite.get());
-        EXPECT_EQ(16, sprite->width);
-        EXPECT_EQ(16, sprite->height);
-        EXPECT_EQ(16, sprite->pixelWidth);
-        EXPECT_EQ(16, sprite->pixelHeight);
+        EXPECT_EQ(16, sprite->getWidth());
+        EXPECT_EQ(16, sprite->getHeight());
+        EXPECT_EQ(16, sprite->image.width);
+        EXPECT_EQ(16, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0x0000000000000000u, test::crc64(sprite->data)) << std::hex << test::crc64(sprite->data);
+        EXPECT_EQ(0x0000000000000000u, test::crc64(sprite->image)) << std::hex << test::crc64(sprite->image);
     }
 }
 
@@ -80,12 +80,12 @@ TEST(Sprite, SpriteImageCreation2x) {
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 2, false);
     ASSERT_TRUE(sprite.get());
-    EXPECT_EQ(18, sprite->width);
-    EXPECT_EQ(18, sprite->height);
-    EXPECT_EQ(36, sprite->pixelWidth);
-    EXPECT_EQ(36, sprite->pixelHeight);
+    EXPECT_EQ(18, sprite->getWidth());
+    EXPECT_EQ(18, sprite->getHeight());
+    EXPECT_EQ(36, sprite->image.width);
+    EXPECT_EQ(36, sprite->image.height);
     EXPECT_EQ(2, sprite->pixelRatio);
-    EXPECT_EQ(0x85F345098DD4F9E3u, test::crc64(sprite->data));
+    EXPECT_EQ(0x85F345098DD4F9E3u, test::crc64(sprite->image));
 }
 
 TEST(Sprite, SpriteImageCreation1_5x) {
@@ -94,22 +94,22 @@ TEST(Sprite, SpriteImageCreation1_5x) {
     // "museum_icon":{"x":354,"y":374,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite = createSpriteImage(image_2x, 354, 374, 36, 36, 1.5, false);
     ASSERT_TRUE(sprite.get());
-    EXPECT_EQ(24, sprite->width);
-    EXPECT_EQ(24, sprite->height);
-    EXPECT_EQ(36, sprite->pixelWidth);
-    EXPECT_EQ(36, sprite->pixelHeight);
+    EXPECT_EQ(24, sprite->getWidth());
+    EXPECT_EQ(24, sprite->getHeight());
+    EXPECT_EQ(36, sprite->image.width);
+    EXPECT_EQ(36, sprite->image.height);
     EXPECT_EQ(1.5, sprite->pixelRatio);
-    EXPECT_EQ(0x85F345098DD4F9E3u, test::crc64(sprite->data));
+    EXPECT_EQ(0x85F345098DD4F9E3u, test::crc64(sprite->image));
 
     // "hospital_icon":{"x":314,"y":518,"width":36,"height":36,"pixelRatio":2,"sdf":false}
     const auto sprite2 = createSpriteImage(image_2x, 314, 518, 35, 35, 1.5, false);
     ASSERT_TRUE(sprite2.get());
-    EXPECT_EQ(24, sprite2->width);
-    EXPECT_EQ(24, sprite2->height);
-    EXPECT_EQ(35, sprite2->pixelWidth);
-    EXPECT_EQ(35, sprite2->pixelHeight);
+    EXPECT_EQ(float(35 / 1.5), sprite2->getWidth());
+    EXPECT_EQ(float(35 / 1.5), sprite2->getHeight());
+    EXPECT_EQ(35, sprite2->image.width);
+    EXPECT_EQ(35, sprite2->image.height);
     EXPECT_EQ(1.5, sprite2->pixelRatio);
-    EXPECT_EQ(14312995667113444493u, test::crc64(sprite2->data));
+    EXPECT_EQ(14312995667113444493u, test::crc64(sprite2->image));
 }
 
 TEST(Sprite, SpriteParsing) {
@@ -199,12 +199,12 @@ TEST(Sprite, SpriteParsing) {
 
     {
         auto sprite = images.find("generic-metro")->second;
-        EXPECT_EQ(18, sprite->width);
-        EXPECT_EQ(18, sprite->height);
-        EXPECT_EQ(18, sprite->pixelWidth);
-        EXPECT_EQ(18, sprite->pixelHeight);
+        EXPECT_EQ(18, sprite->getWidth());
+        EXPECT_EQ(18, sprite->getHeight());
+        EXPECT_EQ(18, sprite->image.width);
+        EXPECT_EQ(18, sprite->image.height);
         EXPECT_EQ(1, sprite->pixelRatio);
-        EXPECT_EQ(0xFF56F5F48F707147u, test::crc64(sprite->data));
+        EXPECT_EQ(0xFF56F5F48F707147u, test::crc64(sprite->image));
     }
 }
 

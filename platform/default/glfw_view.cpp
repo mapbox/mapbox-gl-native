@@ -200,8 +200,8 @@ GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
     const int w = std::ceil(pixelRatio * width);
     const int h = std::ceil(pixelRatio * height);
 
-    std::string pixels(w * h * 4, '\x00');
-    auto data = reinterpret_cast<uint32_t*>(const_cast<char*>(pixels.data()));
+    mbgl::PremultipliedImage image(w, h);
+    auto data = reinterpret_cast<uint32_t*>(image.data.get());
     const int dist = (w / 2) * (w / 2);
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
@@ -217,7 +217,7 @@ GLFWView::makeSpriteImage(int width, int height, float pixelRatio) {
         }
     }
 
-    return std::make_shared<mbgl::SpriteImage>(width, height, pixelRatio, std::move(pixels));
+    return std::make_shared<mbgl::SpriteImage>(std::move(image), pixelRatio);
 }
 
 void GLFWView::nextOrientation() {

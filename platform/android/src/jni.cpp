@@ -24,6 +24,7 @@
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/exception.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
@@ -1225,16 +1226,18 @@ void JNICALL nativeAddAnnotationIcon(JNIEnv *env, jobject obj, jlong nativeMapVi
 
     const std::string symbolName = std_string_from_jstring(env, symbol);
 
-    jbyte* pixelData = env->GetByteArrayElements(jpixels, nullptr);
     jsize size = env->GetArrayLength(jpixels);
-    std::string pixels(reinterpret_cast<char*>(pixelData), size);
-    env->ReleaseByteArrayElements(jpixels, pixelData, JNI_ABORT);
+    mbgl::PremultipliedImage premultipliedImage(width, height);
+
+    if (premultipliedImage.size() != uint32_t(size)) {
+        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
+    }
+
+    env->GetByteArrayRegion(jpixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
 
     auto iconImage = std::make_shared<mbgl::SpriteImage>(
-        uint16_t(width),
-        uint16_t(height),
-        float(scale),
-        std::move(pixels));
+        std::move(premultipliedImage),
+        float(scale));
 
     nativeMapView->getMap().addAnnotationIcon(symbolName, iconImage);
 }

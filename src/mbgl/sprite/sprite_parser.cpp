@@ -26,10 +26,10 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
         return nullptr;
     }
 
-    std::string data(width * height * 4, '\0');
+    PremultipliedImage dstImage(width, height);
 
     auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
-    auto dstData = reinterpret_cast<uint32_t*>(const_cast<char*>(data.data()));
+    auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
 
     const int32_t maxX = std::min(uint32_t(image.width), uint32_t(width + srcX)) - srcX;
     assert(maxX <= int32_t(image.width));
@@ -45,7 +45,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
         }
     }
 
-    return std::make_unique<const SpriteImage>(width, height, ratio, std::move(data), sdf);
+    return std::make_unique<const SpriteImage>(std::move(dstImage), ratio, sdf);
 }
 
 namespace {

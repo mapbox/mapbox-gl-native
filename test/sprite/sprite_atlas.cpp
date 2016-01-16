@@ -34,11 +34,11 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(20, metro.pos.w);
     EXPECT_EQ(20, metro.pos.h);
-    EXPECT_EQ(18, metro.texture->width);
-    EXPECT_EQ(18, metro.texture->height);
-    EXPECT_EQ(18, metro.texture->pixelWidth);
-    EXPECT_EQ(18, metro.texture->pixelHeight);
-    EXPECT_EQ(1.0f, metro.texture->pixelRatio);
+    EXPECT_EQ(18, metro.spriteImage->getWidth());
+    EXPECT_EQ(18, metro.spriteImage->getHeight());
+    EXPECT_EQ(18, metro.spriteImage->image.width);
+    EXPECT_EQ(18, metro.spriteImage->image.height);
+    EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     EXPECT_TRUE(atlas.getData());
 
@@ -96,11 +96,11 @@ TEST(Sprite, SpriteAtlasSize) {
     EXPECT_EQ(0, metro.pos.y);
     EXPECT_EQ(16, metro.pos.w);
     EXPECT_EQ(16, metro.pos.h);
-    EXPECT_EQ(18, metro.texture->width);
-    EXPECT_EQ(18, metro.texture->height);
-    EXPECT_EQ(18, metro.texture->pixelWidth);
-    EXPECT_EQ(18, metro.texture->pixelHeight);
-    EXPECT_EQ(1.0f, metro.texture->pixelRatio);
+    EXPECT_EQ(18, metro.spriteImage->getWidth());
+    EXPECT_EQ(18, metro.spriteImage->getHeight());
+    EXPECT_EQ(18, metro.spriteImage->image.width);
+    EXPECT_EQ(18, metro.spriteImage->image.height);
+    EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
@@ -122,24 +122,28 @@ TEST(Sprite, SpriteAtlasUpdates) {
     EXPECT_EQ(32, atlas.getTextureWidth());
     EXPECT_EQ(32, atlas.getTextureHeight());
 
-    store.setSprite("one", std::make_shared<SpriteImage>(16, 12, 1, std::string(16 * 12 * 4, '\x00')));
+    store.setSprite("one", std::make_shared<SpriteImage>(PremultipliedImage(16, 12), 1));
     auto one = *atlas.getImage("one", false);
     EXPECT_EQ(0, one.pos.x);
     EXPECT_EQ(0, one.pos.y);
     EXPECT_EQ(20, one.pos.w);
     EXPECT_EQ(16, one.pos.h);
-    EXPECT_EQ(16, one.texture->width);
-    EXPECT_EQ(12, one.texture->height);
-    EXPECT_EQ(16, one.texture->pixelWidth);
-    EXPECT_EQ(12, one.texture->pixelHeight);
-    EXPECT_EQ(1.0f, one.texture->pixelRatio);
+    EXPECT_EQ(16, one.spriteImage->getWidth());
+    EXPECT_EQ(12, one.spriteImage->getHeight());
+    EXPECT_EQ(16, one.spriteImage->image.width);
+    EXPECT_EQ(12, one.spriteImage->image.height);
+    EXPECT_EQ(1.0f, one.spriteImage->pixelRatio);
 
     const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
     const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
     EXPECT_EQ(0x0000000000000000u, hash) << std::hex << hash;
 
     // Update sprite
-    auto newSprite = std::make_shared<SpriteImage>(16, 12, 1, std::string(16 * 12 * 4, '\xFF'));
+    PremultipliedImage image2(16, 12);
+    for (size_t i = 0; i < image2.size(); i++) {
+        image2.data.get()[i] = 255;
+    }
+    auto newSprite = std::make_shared<SpriteImage>(std::move(image2), 1);
     store.setSprite("one", newSprite);
     ASSERT_EQ(newSprite, store.getSprite("one"));
 

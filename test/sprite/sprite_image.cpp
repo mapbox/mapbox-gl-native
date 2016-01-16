@@ -1,13 +1,15 @@
 #include "../fixtures/util.hpp"
 
 #include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/util/image.hpp>
 #include <mbgl/util/exception.hpp>
 
 using namespace mbgl;
 
 TEST(Sprite, SpriteImageZeroWidth) {
+    PremultipliedImage image(0, 16);
     try {
-        SpriteImage(0, 16, 2, "");
+        SpriteImage(std::move(image), 2.0);
         FAIL() << "Expected exception";
     } catch (util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
@@ -15,8 +17,9 @@ TEST(Sprite, SpriteImageZeroWidth) {
 }
 
 TEST(Sprite, SpriteImageZeroHeight) {
+    PremultipliedImage image(16, 0);
     try {
-        SpriteImage(16, 0, 2, "");
+        SpriteImage(std::move(image), 2.0);
         FAIL() << "Expected exception";
     } catch (util::SpriteImageException& ex) {
         EXPECT_STREQ("Sprite image dimensions may not be zero", ex.what());
@@ -24,41 +27,31 @@ TEST(Sprite, SpriteImageZeroHeight) {
 }
 
 TEST(Sprite, SpriteImageZeroRatio) {
+    PremultipliedImage image(16, 16);
     try {
-        SpriteImage(16, 16, 0, "");
+        SpriteImage(std::move(image), 0.0);
         FAIL() << "Expected exception";
     } catch (util::SpriteImageException& ex) {
-        EXPECT_STREQ("Sprite image pixel count mismatch", ex.what());
-    }
-}
-
-TEST(Sprite, SpriteImageMismatchedData) {
-    try {
-        SpriteImage(16, 16, 2, "");
-        FAIL() << "Expected exception";
-    } catch (util::SpriteImageException& ex) {
-        EXPECT_STREQ("Sprite image pixel count mismatch", ex.what());
+        EXPECT_STREQ("Sprite pixelRatio may not be <= 0", ex.what());
     }
 }
 
 TEST(Sprite, SpriteImage) {
-    std::string pixels(32 * 24 * 4, '\0');
-    SpriteImage sprite(32, 24, 2, std::move(pixels));
-    EXPECT_EQ(16, sprite.width);
-    EXPECT_EQ(32, sprite.pixelWidth);
-    EXPECT_EQ(12, sprite.height);
-    EXPECT_EQ(24, sprite.pixelHeight);
+    PremultipliedImage image(32, 24);
+    SpriteImage sprite(std::move(image), 2.0);
+    EXPECT_EQ(16, sprite.getWidth());
+    EXPECT_EQ(32, sprite.image.width);
+    EXPECT_EQ(12, sprite.getHeight());
+    EXPECT_EQ(24, sprite.image.height);
     EXPECT_EQ(2, sprite.pixelRatio);
-    EXPECT_EQ(32u * 24 * 4, sprite.data.size());
 }
 
 TEST(Sprite, SpriteImageFractionalRatio) {
-    std::string pixels(20 * 12 * 4, '\0');
-    SpriteImage sprite(20, 12, 1.5, std::move(pixels));
-    EXPECT_EQ(14, sprite.width);
-    EXPECT_EQ(20, sprite.pixelWidth);
-    EXPECT_EQ(8, sprite.height);
-    EXPECT_EQ(12, sprite.pixelHeight);
+    PremultipliedImage image(20, 12);
+    SpriteImage sprite(std::move(image), 1.5);
+    EXPECT_EQ(float(20.0 / 1.5), sprite.getWidth());
+    EXPECT_EQ(20, sprite.image.width);
+    EXPECT_EQ(float(12.0 / 1.5), sprite.getHeight());
+    EXPECT_EQ(12, sprite.image.height);
     EXPECT_EQ(1.5, sprite.pixelRatio);
-    EXPECT_EQ(20u * 12 * 4, sprite.data.size());
 }

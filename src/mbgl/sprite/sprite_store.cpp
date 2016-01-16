@@ -113,7 +113,7 @@ void SpriteStore::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end()) {
             // There is already a sprite with that name in our store.
-            if ((it->second->width != sprite->width || it->second->height != sprite->height)) {
+            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
                 Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
                 return;
             }

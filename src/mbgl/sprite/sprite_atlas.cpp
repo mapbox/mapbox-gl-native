@@ -26,10 +26,10 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_,
       dirty(true) {
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(float src_width, float src_height) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
 
-    const uint16_t pixel_width = std::ceil(src_width / pixelRatio);
-    const uint16_t pixel_height = std::ceil(src_height / pixelRatio);
+    const uint16_t pixel_width = std::ceil(spriteImage.image.width / pixelRatio);
+    const uint16_t pixel_height = std::ceil(spriteImage.image.height / pixelRatio);
 
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
@@ -52,7 +52,7 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, cons
 
     auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
-        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.texture, rect_it->second.texture->pixelRatio / pixelRatio };
+        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
     }
 
     auto sprite = store.getSprite(name);
@@ -60,7 +60,7 @@ optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, cons
         return {};
     }
 
-    Rect<dimension> rect = allocateImage(sprite->width * sprite->pixelRatio, sprite->height * sprite->pixelRatio);
+    Rect<dimension> rect = allocateImage(*sprite);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
@@ -85,13 +85,13 @@ optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, 
     auto rect = (*img).pos;
 
     const float padding = 1;
-    auto image = (*img).texture;
+    auto spriteImage = (*img).spriteImage;
 
-    const float w = image->width * (*img).relativePixelRatio;
-    const float h = image->height * (*img).relativePixelRatio;
+    const float w = spriteImage->getWidth() * (*img).relativePixelRatio;
+    const float h = spriteImage->getHeight() * (*img).relativePixelRatio;
 
     return SpriteAtlasPosition {
-        {{ float(image->width), float(image->height) }},
+        {{ float(spriteImage->getWidth()), spriteImage->getHeight() }},
         {{ float(rect.x + padding)     / width, float(rect.y + padding)     / height }},
         {{ float(rect.x + padding + w) / width, float(rect.y + padding + h) / height }}
     };
@@ -131,15 +131,15 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
         std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
     }
 
-    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
+    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.spriteImage->image.data.get());
     if (!srcData) return;
     uint32_t *const dstData = data.get();
 
     const int padding = 1;
 
-    copyBitmap(srcData, holder.texture->pixelWidth, 0, 0,
+    copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0,
             dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
-            holder.texture->pixelWidth, holder.texture->pixelHeight, wrap);
+            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), wrap);
 
     dirty = true;
 }
@@ -168,8 +168,8 @@ void SpriteAtlas::updateDirty() {
         } else {
             // The two names match;
             Holder& holder = imageIterator->second;
-            holder.texture = spriteIterator->second;
-            if (holder.texture != nullptr) {
+            holder.spriteImage = spriteIterator->second;
+            if (holder.spriteImage != nullptr) {
                 copy(holder, imageIterator->first.second);
                 ++imageIterator;
             } else {
@@ -255,10 +255,10 @@ SpriteAtlas::~SpriteAtlas() {
     }
 }
 
-SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& texture_,
+SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& spriteImage_,
                             const Rect<dimension>& pos_)
-    : texture(texture_), pos(pos_) {
+    : spriteImage(spriteImage_), pos(pos_) {
 }
 
-SpriteAtlas::Holder::Holder(Holder&& h) : texture(std::move(h.texture)), pos(h.pos) {
+SpriteAtlas::Holder::Holder(Holder&& h) : spriteImage(std::move(h.spriteImage)), pos(h.pos) {
 }

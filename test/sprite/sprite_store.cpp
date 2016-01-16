@@ -13,9 +13,9 @@ using namespace mbgl;
 TEST(SpriteStore, SpriteStore) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
-    const auto sprite2 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
-    const auto sprite3 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite3 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
     SpriteStore store(1);
@@ -79,7 +79,7 @@ TEST(SpriteStore, SpriteStore) {
 TEST(SpriteStore, OtherPixelRatio) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(8, 8, 1, std::string(8 * 8 * 4, '\0'));
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(8, 8), 1);
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
     SpriteStore store(1);
@@ -90,8 +90,8 @@ TEST(SpriteStore, OtherPixelRatio) {
 }
 
 TEST(SpriteStore, Multiple) {
-    const auto sprite1 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
-    const auto sprite2 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
     SpriteStore store(1);
@@ -109,8 +109,8 @@ TEST(SpriteStore, Multiple) {
 TEST(SpriteStore, Replace) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
-    const auto sprite2 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
     SpriteStore store(1);
@@ -126,8 +126,10 @@ TEST(SpriteStore, Replace) {
 TEST(SpriteStore, ReplaceWithDifferentDimensions) {
     FixtureLog log;
 
-    const auto sprite1 = std::make_shared<SpriteImage>(16, 16, 2, std::string(16 * 16 * 4, '\0'));
-    const auto sprite2 = std::make_shared<SpriteImage>(18, 18, 2, std::string(18 * 18 * 4, '\0'));
+    PremultipliedImage image(16, 16);
+    PremultipliedImage image2(18, 18);
+    const auto sprite1 = std::make_shared<SpriteImage>(PremultipliedImage(16, 16), 2);
+    const auto sprite2 = std::make_shared<SpriteImage>(PremultipliedImage(18, 18), 2);
 
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
     SpriteStore store(1);

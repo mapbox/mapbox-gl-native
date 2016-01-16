@@ -32,7 +32,7 @@ struct SpriteAtlasPosition {
 
 struct SpriteAtlasElement {
     Rect<uint16_t> pos;
-    std::shared_ptr<const SpriteImage> texture;
+    std::shared_ptr<const SpriteImage> spriteImage;
     float relativePixelRatio;
 };
 
@@ -77,13 +77,13 @@ private:
     struct Holder : private util::noncopyable {
         inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
         inline Holder(Holder&&);
-        std::shared_ptr<const SpriteImage> texture;
+        std::shared_ptr<const SpriteImage> spriteImage;
         const Rect<dimension> pos;
     };
 
     using Key = std::pair<std::string, bool>;
 
-    Rect<SpriteAtlas::dimension> allocateImage(float width, float height);
+    Rect<SpriteAtlas::dimension> allocateImage(const SpriteImage&);
     void copy(const Holder& holder, const bool wrap);
 
     std::recursive_mutex mtx;

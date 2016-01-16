@@ -16,7 +16,7 @@ using namespace mbgl;
 
 std::shared_ptr<SpriteImage> namedMarker(const std::string &name) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/sprites/" + name));
-    return std::make_shared<SpriteImage>(image.width, image.height, 1.0, std::string(reinterpret_cast<char*>(image.data.get()), image.size()));
+    return std::make_shared<SpriteImage>(std::move(image), 1.0);
 }
 
 namespace {
