@@ -3175,7 +3175,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             [self resetNorthAnimated:NO];
         }
     }
-    else if (self.direction < snapTolerance || self.direction > 360 - snapTolerance)
+    else if ((self.direction < snapTolerance || self.direction > 360 - snapTolerance)
+             && self.userTrackingMode != MGLUserTrackingModeFollowWithHeading
+             && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
     {
         [self resetNorthAnimated:animated];
     }
