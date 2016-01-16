@@ -444,15 +444,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
-    // metrics: map load event
-    mbgl::LatLng latLng = _mbglMap->getLatLng(padding);
+    // telemetry: map load event
     int zoom = round(_mbglMap->getZoom());
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
-        MGLEventKeyLatitude: @(latLng.latitude),
-        MGLEventKeyLongitude: @(latLng.longitude),
-        MGLEventKeyZoomLevel: @(zoom),
-        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
+        MGLEventKeyZoomLevel: @(zoom)
     }];
 }
 
@@ -1093,14 +1089,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         [self notifyGestureDidEndWithDrift:drift];
 
-        // metrics: pan end
-        CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
-        CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
+        // telemetry: pan/drag end
         int zoom = round([self zoomLevel]);
 
         [MGLMapboxEvents pushEvent:MGLEventTypeMapDragEnd withAttributes:@{
-            MGLEventKeyLatitude: @(panCoordinate.latitude),
-            MGLEventKeyLongitude: @(panCoordinate.longitude),
             MGLEventKeyZoomLevel: @(zoom)
         }];
     }
@@ -1479,15 +1471,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
+- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(__unused UIGestureRecognizer *)recognizer
 {
-    CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-    CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
     int zoom = round([self zoomLevel]);
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapTap withAttributes:@{
-        MGLEventKeyLatitude: @(gestureCoordinate.latitude),
-        MGLEventKeyLongitude: @(gestureCoordinate.longitude),
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyGestureID: gestureID
     }];

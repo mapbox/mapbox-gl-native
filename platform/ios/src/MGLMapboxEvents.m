@@ -32,8 +32,6 @@ NSString *const MGLEventKeyCourse = @"course";
 NSString *const MGLEventKeyAltitude = @"altitude";
 NSString *const MGLEventKeyHorizontalAccuracy = @"horizontalAccuracy";
 NSString *const MGLEventKeyVerticalAccuracy = @"verticalAccuracy";
-NSString *const MGLEventKeyPushEnabled = @"enabled.push";
-NSString *const MGLEventKeyEmailEnabled = @"enabled.email";
 NSString *const MGLEventKeyGestureID = @"gesture";
 NSString *const MGLEventKeyArrivalDate = @"arrivalDate";
 NSString *const MGLEventKeyDepartureDate = @"departureDate";
@@ -436,10 +434,8 @@ const NSTimeInterval MGLFlushInterval = 60;
             NSDictionary *vevt = @{
                 @"event" : MGLEventTypeAppUserTurnstile,
                 @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                @"appBundleId" : strongSelf.appBundleId,
                 @"vendorId": vid,
-                @"version": @(version),
-                @"instance": strongSelf.instanceID
+                @"version": @(version)
             };
 
             // Add to Queue
@@ -476,7 +472,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         if ( ! strongSelf) return;
 
-        // Metrics Collection Has Been Paused
+        // Telemetry collection has been paused
         if (_paused) {
             return;
         }
@@ -484,39 +480,49 @@ const NSTimeInterval MGLFlushInterval = 60;
         if (!event) return;
 
         MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
-        // mapbox-events stock attributes
+        // Send these keys with every event
         [evt setObject:event forKey:@"event"];
         [evt setObject:@(version) forKey:@"version"];
         [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:strongSelf.instanceID forKey:@"instance"];
-        [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
-        [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
-
-        // mapbox-events-ios stock attributes
-        [evt setValue:strongSelf.data.model forKey:@"model"];
-        [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
-        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-        [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
-
-        MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
-        [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
 
         [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
 
-        [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
+        // Send with every event, but exclude these keys from location & visit events.
+        if ( ! [event isEqualToString:MGLEventTypeLocation] && ! [event isEqualToString:MGLEventTypeVisit]) {
+            [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
 
-        // Make Immutable Version
+            [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+
+            MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
+            [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
+        }
+
+        // Only add IDFV to location events
+        if ([event isEqualToString:MGLEventTypeLocation] || [event isEqualToString:MGLEventTypeVisit]) {
+            [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
+        }
+
+        // Only send these (relatively static) keys with the map load event
+        if ([event isEqualToString:MGLEventTypeMapLoad]) {
+            [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
+            [evt setValue:strongSelf.data.model forKey:@"model"];
+            [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
+            [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
+            [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
+            [evt setValue:@([strongSelf checkPushEnabled]) forKey:@"enabled.push"];
+        }
+
+        // Make immutable version
         NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
         
-        // Put On The Queue
+        // Put on the queue
         [_eventQueue addObject:finalEvent];
         
-        // Has Flush Limit Been Reached?
+        // Has flush limit been reached?
         if (_eventQueue.count >= MGLMaximumEventsPerFlush) {
             [strongSelf flush];
         } else if (_eventQueue.count ==  1) {
-            // If this is first new event on queue start timer,
+            // If this is first new event on queue, start timer
             [strongSelf startTimer];
         }
 
@@ -775,7 +781,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 // Can be called from any thread.
 //
-+ (BOOL) checkPushEnabled {
+- (BOOL) checkPushEnabled {
     BOOL (^pushCheckBlock)(void) = ^{
         BOOL blockResult;
         if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
