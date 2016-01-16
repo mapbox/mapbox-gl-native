@@ -42,6 +42,7 @@ void SpriteStore::setURL(const std::string& url) {
                                       [this, jsonURL](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            return;
         }
 
         if (res.notModified) {
@@ -61,6 +62,7 @@ void SpriteStore::setURL(const std::string& url) {
                     [this, spriteURL](Response res) {
             if (res.error) {
                 observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+                return;
             }
 
             if (res.notModified) {
