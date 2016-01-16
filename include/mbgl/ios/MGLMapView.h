@@ -574,6 +574,22 @@ IB_DESIGNABLE
  */
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
 
+/**
+ The distance from the edges of the map view’s frame to the edges of the map
+ view’s logical viewport.
+ 
+ When the value of this property is equal to `UIEdgeInsetsZero`, viewport
+ properties such as `centerCoordinate` assume a viewport that matches the map
+ view’s frame. Otherwise, those properties are inset, excluding part of the
+ frame from the viewport. For instance, if the only the top edge is inset, the
+ map center is effectively shifted downward.
+ 
+ When the map view’s superview is an instance of `UIViewController` whose
+ `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
+ property may be overridden at any time.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
 #pragma mark Converting Geographic Coordinates
 
 /**

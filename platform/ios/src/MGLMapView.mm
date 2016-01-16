@@ -413,13 +413,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     //
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    options.padding = padding;
     options.zoom = _mbglMap->getMinZoom();
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
     // metrics: map load event
-    mbgl::LatLng latLng = _mbglMap->getLatLng();
+    mbgl::LatLng latLng = _mbglMap->getLatLng(padding);
     int zoom = round(_mbglMap->getZoom());
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
@@ -750,6 +752,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
+    [self adjustContentInset];
 
     if ( ! _isTargetingInterfaceBuilder)
     {
@@ -766,6 +770,49 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
         [self updateUserLocationAnnotationView];
+    }
+}
+
+/// Updates `contentInset` to reflect the current window geometry.
+- (void)adjustContentInset
+{
+    // We could crawl all the way up the responder chain using
+    // -viewControllerForLayoutGuides, but an intervening view means that any
+    // manual contentInset should not be overridden; something other than the
+    // top and bottom bars may be influencing the manual inset.
+    UIViewController *viewController;
+    if ([self.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is the content view of a view controller.
+        viewController = (UIViewController *)self.nextResponder;
+    }
+    else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is an immediate child of a view controller’s content view.
+        viewController = (UIViewController *)self.superview.nextResponder;
+    }
+    
+    if ( ! viewController.automaticallyAdjustsScrollViewInsets)
+    {
+        return;
+    }
+    
+    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+    CGPoint topPoint = CGPointMake(0, viewController.topLayoutGuide.length);
+    contentInsets.top = [self convertPoint:topPoint fromView:viewController.view].y;
+    CGPoint bottomPoint = CGPointMake(0, CGRectGetMaxY(viewController.view.bounds)
+                                      - viewController.bottomLayoutGuide.length);
+    contentInsets.bottom = (CGRectGetMaxY(self.bounds) - [self convertPoint:bottomPoint
+                                                                   fromView:viewController.view].y);
+    
+    if ( ! UIEdgeInsetsEqualToEdgeInsets(contentInsets, self.contentInset))
+    {
+        // After adjusting the content insets, move the center coordinate from
+        // the old frame of reference to the new one represented by the newly
+        // set content insets.
+        CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+        self.contentInset = contentInsets;
+        self.centerCoordinate = oldCenter;
     }
 }
 
@@ -1587,7 +1634,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng(padding));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1612,6 +1660,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     
     mbgl::CameraOptions cameraOptions;
     cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
+    cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     cameraOptions.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
     if (direction >= 0)
     {
@@ -1723,7 +1772,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     
     // NOTE: does not disrupt tracking mode
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
-    mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     mbgl::AnnotationSegment segment;
     segment.reserve(count);
     for (NSUInteger i = 0; i < count; i++)
@@ -1731,7 +1781,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
     
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, mbglInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, padding);
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
@@ -1785,7 +1835,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    _mbglMap->setBearing(direction, MGLDurationInSeconds(duration));
+    _mbglMap->setBearing(direction,
+                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
+                         MGLDurationInSeconds(duration));
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -1910,6 +1962,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
@@ -2971,7 +3024,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         // center on user location unless we're already centered there (or very close)
         //
-        CGPoint mapCenterPoint    = [self convertPoint:self.center fromView:self.superview];
+        CGPoint mapCenterPoint    = [self convertCoordinate:self.centerCoordinate toPointToView:self];
         CGPoint userLocationPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
         if (std::abs(userLocationPoint.x - mapCenterPoint.x) > 1.0 || std::abs(userLocationPoint.y - mapCenterPoint.y) > 1.0)
