@@ -143,6 +143,8 @@ public:
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
+/// True if the map view has completed its move to the first reported user location in user tracking mode.
+@property (nonatomic) BOOL hasBegunTrackingUserLocation;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
@@ -814,6 +816,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         self.contentInset = contentInsets;
         self.centerCoordinate = oldCenter;
     }
+}
+
+/// Returns the frame of inset content within the map view.
+- (CGRect)contentFrame
+{
+    return UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
 }
 
 #pragma mark - Life Cycle -
@@ -1651,28 +1659,27 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    [self _setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:completion];
+    [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
 
-- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
     _mbglMap->cancelTransitions();
     
     mbgl::CameraOptions cameraOptions;
     cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
-    cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     cameraOptions.zoom = zoomLevel;
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
     }
     
-    NSTimeInterval duration = animated ? MGLAnimationDuration : 0;
     mbgl::AnimationOptions animationOptions;
-    if (animated)
+    if (duration)
     {
         animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(nil);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     if (completion)
     {
@@ -2935,6 +2942,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 
     _userTrackingMode = mode;
+    self.hasBegunTrackingUserLocation = NO;
 
     switch (_userTrackingMode)
     {
@@ -3021,17 +3029,43 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         // center on user location unless we're already centered there (or very close)
         //
-        CGPoint mapCenterPoint    = [self convertCoordinate:self.centerCoordinate toPointToView:self];
-        CGPoint userLocationPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+        CGPoint correctPoint = self.userLocationAnnotationViewCenter;
+        CGPoint currentPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
-        if (std::abs(userLocationPoint.x - mapCenterPoint.x) > 1.0 || std::abs(userLocationPoint.y - mapCenterPoint.y) > 1.0)
+        if (std::abs(currentPoint.x - correctPoint.x) > 1.0 || std::abs(currentPoint.y - correctPoint.y) > 1.0)
         {
             if (round(self.zoomLevel) >= 10)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self _setCenterCoordinate:self.userLocation.location.coordinate zoomLevel:self.zoomLevel direction:course animated:YES completionHandler:NULL];
-                [self unrotateIfNeededAnimated:YES];
+                if (self.hasBegunTrackingUserLocation)
+                {
+                    UIEdgeInsets insets = UIEdgeInsetsMake(correctPoint.y, correctPoint.x,
+                                                           CGRectGetHeight(self.bounds) - correctPoint.y,
+                                                           CGRectGetWidth(self.bounds) - correctPoint.x);
+                    CAMediaTimingFunction *linearFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+                    [self _setCenterCoordinate:self.userLocation.location.coordinate
+                                   edgePadding:insets
+                                     zoomLevel:self.zoomLevel
+                                     direction:course
+                                      duration:1
+                       animationTimingFunction:linearFunction
+                             completionHandler:NULL];
+                }
+                else
+                {
+                    __weak MGLMapView *weakSelf = self;
+                    [self _setCenterCoordinate:self.userLocation.location.coordinate
+                                   edgePadding:self.contentInset
+                                     zoomLevel:self.zoomLevel
+                                     direction:course
+                                      duration:MGLAnimationDuration
+                       animationTimingFunction:nil
+                             completionHandler:^{
+                                 MGLMapView *strongSelf = weakSelf;
+                                 strongSelf.hasBegunTrackingUserLocation = YES;
+                             }];
+                }
             }
             else
             {
@@ -3047,12 +3081,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
                 CGFloat pixelRadius = fminf(self.bounds.size.width, self.bounds.size.height) / 2;
 
-                CLLocationCoordinate2D actualSouthWest = [self convertPoint:CGPointMake(userLocationPoint.x - pixelRadius,
-                                                                                        userLocationPoint.y - pixelRadius)
+                CLLocationCoordinate2D actualSouthWest = [self convertPoint:CGPointMake(currentPoint.x - pixelRadius,
+                                                                                        currentPoint.y - pixelRadius)
                                                        toCoordinateFromView:self];
 
-                CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(userLocationPoint.x + pixelRadius,
-                                                                                        userLocationPoint.y + pixelRadius)
+                CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(currentPoint.x + pixelRadius,
+                                                                                        currentPoint.y + pixelRadius)
                                                        toCoordinateFromView:self];
 
                 if (desiredNorthEast.latitude  != actualNorthEast.latitude  ||
@@ -3062,9 +3096,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                 {
                     // assumes we won't disrupt tracking mode
                     [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
-                    [self unrotateIfNeededAnimated:YES];
                 }
             }
+            [self unrotateIfNeededAnimated:YES];
         }
     }
 
@@ -3332,7 +3366,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
 
-    CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    CGPoint userPoint;
+    if (self.userTrackingMode != MGLUserTrackingModeNone && self.hasBegunTrackingUserLocation)
+    {
+        userPoint = self.userLocationAnnotationViewCenter;
+    }
+    else
+    {
+        userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    }
 
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
         -MGLAnnotationUpdateViewportOutset.height), userPoint))
@@ -3347,6 +3389,22 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         self.userLocationAnnotationView.layer.hidden = YES;
     }
+}
+
+/// Intended center point of the user location annotation view.
+- (CGPoint)userLocationAnnotationViewCenter
+{
+    CGRect contentFrame = self.contentFrame;
+    CGPoint center = CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
+    
+    // When tracking course, it’s more important to see the road ahead, so
+    // weight the user dot down towards the bottom.
+    if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
+    {
+        center.y = CGRectGetHeight(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame);
+    }
+    
+    return center;
 }
 
 - (void)updateCompass
