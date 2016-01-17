@@ -379,21 +379,17 @@ void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, con
     if (!latLng || !point) {
         return;
     }
-
-    auto coord = state.latLngToCoordinate(latLng);
-    auto coordAtPoint = state.pointToCoordinate(point);
-    auto coordCenter = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f });
-
-    float columnDiff = coordAtPoint.column - coord.column;
-    float rowDiff = coordAtPoint.row - coord.row;
-
-    auto newLatLng = state.coordinateToLatLng({
-        coordCenter.column - columnDiff,
-        coordCenter.row - rowDiff,
-        coordCenter.zoom
-    });
-
-    setLatLng(newLatLng, duration);
+    
+    // Pretend the viewport is 0×0 around the passed-in point.
+    CameraOptions camera;
+    camera.center = latLng;
+    EdgeInsets padding;
+    padding.top = point.y;
+    padding.left = point.x;
+    padding.bottom = state.height - point.y;
+    padding.right = state.width - point.x;
+    camera.padding = padding;
+    easeTo(camera, duration);
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
