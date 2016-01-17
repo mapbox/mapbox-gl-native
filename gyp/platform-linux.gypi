@@ -35,6 +35,7 @@
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
+          '<@(webp_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
@@ -43,6 +44,7 @@
           '<@(nunicode_ldflags)',
           '<@(sqlite_ldflags)',
           '<@(zlib_ldflags)',
+          '<@(webp_ldflags)',
         ],
         'libraries': [
           '<@(libpng_static_libs)',
@@ -51,6 +53,7 @@
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
+          '<@(webp_static_libs)',
         ],
       },
 
