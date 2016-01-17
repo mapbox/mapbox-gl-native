@@ -415,7 +415,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     options.center = mbgl::LatLng(0, 0);
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     options.padding = padding;
-    options.zoom = _mbglMap->getMinZoom();
+    options.zoom = 0;
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
@@ -1661,7 +1661,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     mbgl::CameraOptions cameraOptions;
     cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
     cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    cameraOptions.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
+    cameraOptions.zoom = zoomLevel;
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
