@@ -55,6 +55,9 @@ const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
 const NSUInteger MGLTargetFrameInterval = 1;  //Target FPS will be 60 divided by this value
 
+/// Tolerance for snapping to true north, measured in degrees in either direction.
+const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
+
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -1086,7 +1089,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         [self notifyGestureDidEndWithDrift:velocity];
 
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 }
 
@@ -1143,14 +1146,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
             [self animateWithDelay:duration animations:^
              {
-                 [weakSelf unrotateIfNeededAnimated:YES];
+                 [weakSelf unrotateIfNeededForGesture];
              }];
         }
         else
         {
             [self notifyGestureDidEndWithDrift:NO];
-
-            [self unrotateIfNeededAnimated:YES];
+            [self unrotateIfNeededForGesture];
         }
     }
 }
@@ -1234,7 +1236,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         [self animateWithDelay:MGLAnimationDuration animations:^
         {
-            [weakSelf unrotateIfNeededAnimated:YES];
+            [weakSelf unrotateIfNeededForGesture];
         }];
     }
 }
@@ -1273,7 +1275,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         [self animateWithDelay:MGLAnimationDuration animations:^
         {
-            [weakSelf unrotateIfNeededAnimated:YES];
+            [weakSelf unrotateIfNeededForGesture];
         }];
     }
 }
@@ -1310,7 +1312,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     else if (quickZoom.state == UIGestureRecognizerStateEnded || quickZoom.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 }
 
@@ -1340,7 +1342,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 
 }
@@ -1648,8 +1650,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         };
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
-
-    [self unrotateIfNeededAnimated:animated];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel
@@ -1766,8 +1766,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
-
-    [self unrotateIfNeededAnimated:duration > 0];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection
@@ -3004,6 +3002,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                 // at sufficient detail, just re-center the map; don't zoom
                 //
                 [self _setCenterCoordinate:self.userLocation.location.coordinate zoomLevel:self.zoomLevel direction:course animated:YES completionHandler:NULL];
+                [self unrotateIfNeededAnimated:YES];
             }
             else
             {
@@ -3034,6 +3033,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                 {
                     // assumes we won't disrupt tracking mode
                     [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
+                    [self unrotateIfNeededAnimated:YES];
                 }
             }
         }
@@ -3139,18 +3139,30 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return (self.zoomLevel >= self.currentMinimumZoom);
 }
 
-// correct rotations to north as needed
-//
+- (void)unrotateIfNeededForGesture
+{
+    // Avoid contention with in-progress gestures.
+    UIGestureRecognizerState state = self.pinch.state;
+    if (self.direction != 0
+        && state != UIGestureRecognizerStateBegan
+        && state != UIGestureRecognizerStateChanged)
+    {
+        [self unrotateIfNeededAnimated:YES];
+        
+        // Snap to north.
+        if ((self.direction < MGLToleranceForSnappingToNorth
+             || self.direction > 360 - MGLToleranceForSnappingToNorth)
+            && self.userTrackingMode != MGLUserTrackingModeFollowWithHeading
+            && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+        {
+            [self resetNorthAnimated:YES];
+        }
+    }
+}
+
+/// Rotate back to true north if the map view is zoomed too far out.
 - (void)unrotateIfNeededAnimated:(BOOL)animated
 {
-    double snapTolerance = 7;
-
-    // don't worry about it in the midst of pinch or rotate gestures
-    //
-    if (self.pinch.state  == UIGestureRecognizerStateChanged || self.rotate.state == UIGestureRecognizerStateChanged) return;
-
-    // but otherwise, do
-    //
     if (self.direction != 0 && ! self.isRotationAllowed)
     {
         if (animated)
@@ -3174,12 +3186,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         {
             [self resetNorthAnimated:NO];
         }
-    }
-    else if ((self.direction < snapTolerance || self.direction > 360 - snapTolerance)
-             && self.userTrackingMode != MGLUserTrackingModeFollowWithHeading
-             && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
-    {
-        [self resetNorthAnimated:animated];
     }
 }
 
