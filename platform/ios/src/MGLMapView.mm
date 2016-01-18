@@ -48,6 +48,16 @@
 class MBGLView;
 class MGLAnnotationContext;
 
+/// Indicates the manner in which the map view is tracking the user location.
+typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
+    /// The map view is not yet tracking the user location.
+    MGLUserTrackingStatePossible = 0,
+    /// The map view has begun to move to the first reported user location.
+    MGLUserTrackingStateBegan = 1,
+    /// The map view has finished moving to the first reported user location.
+    MGLUserTrackingStateChanged = 2,
+};
+
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
@@ -143,8 +153,8 @@ public:
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
-/// True if the map view has completed its move to the first reported user location in user tracking mode.
-@property (nonatomic) BOOL hasBegunTrackingUserLocation;
+/// Indicates how thoroughly the map view is tracking the user location.
+@property (nonatomic) MGLUserTrackingState userTrackingState;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
@@ -1930,6 +1940,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
+    
+    [self _flyToCamera:camera withDuration:duration peakAltitude:peakAltitude completionHandler:completion];
+}
+
+- (void)_flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+{
     _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
@@ -2942,7 +2959,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 
     _userTrackingMode = mode;
-    self.hasBegunTrackingUserLocation = NO;
+    
+    if (_userTrackingMode == MGLUserTrackingModeNone
+        || _userTrackingMode == MGLUserTrackingModeFollowWithCourse) {
+        self.userTrackingState = MGLUserTrackingStatePossible;
+    }
 
     switch (_userTrackingMode)
     {
@@ -3038,8 +3059,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                if (self.hasBegunTrackingUserLocation)
+                if (self.userTrackingState == MGLUserTrackingStateChanged)
                 {
+                    // Ease incrementally to the new user location.
                     UIEdgeInsets insets = UIEdgeInsetsMake(correctPoint.y, correctPoint.x,
                                                            CGRectGetHeight(self.bounds) - correctPoint.y,
                                                            CGRectGetWidth(self.bounds) - correctPoint.x);
@@ -3052,51 +3074,39 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                        animationTimingFunction:linearFunction
                              completionHandler:NULL];
                 }
-                else
+                else if (self.userTrackingState == MGLUserTrackingStatePossible)
                 {
+                    // Fly to the first reported location, which may be far away
+                    // from the current viewport.
+                    self.userTrackingState = MGLUserTrackingStateBegan;
+                    
+                    MGLMapCamera *camera = self.camera;
+                    camera.centerCoordinate = self.userLocation.location.coordinate;
+                    camera.heading = course;
+                    
                     __weak MGLMapView *weakSelf = self;
-                    [self _setCenterCoordinate:self.userLocation.location.coordinate
-                                   edgePadding:self.contentInset
-                                     zoomLevel:self.zoomLevel
-                                     direction:course
-                                      duration:MGLAnimationDuration
-                       animationTimingFunction:nil
-                             completionHandler:^{
-                                 MGLMapView *strongSelf = weakSelf;
-                                 strongSelf.hasBegunTrackingUserLocation = YES;
-                             }];
+                    [self _flyToCamera:camera withDuration:-1 peakAltitude:-1 completionHandler:^{
+                        MGLMapView *strongSelf = weakSelf;
+                        strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+                    }];
                 }
             }
-            else
+            else if (self.userTrackingState == MGLUserTrackingStatePossible)
             {
                 // otherwise re-center and zoom in to near accuracy confidence
                 //
-                float delta = (newLocation.horizontalAccuracy / 110000) * 1.2; // approx. meter per degree latitude, plus some margin
-
-                CLLocationCoordinate2D desiredSouthWest = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  - delta,
-                                                                                     newLocation.coordinate.longitude - delta);
-
-                CLLocationCoordinate2D desiredNorthEast = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  + delta,
-                                                                                     newLocation.coordinate.longitude + delta);
-
-                CGFloat pixelRadius = fminf(self.bounds.size.width, self.bounds.size.height) / 2;
-
-                CLLocationCoordinate2D actualSouthWest = [self convertPoint:CGPointMake(currentPoint.x - pixelRadius,
-                                                                                        currentPoint.y - pixelRadius)
-                                                       toCoordinateFromView:self];
-
-                CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(currentPoint.x + pixelRadius,
-                                                                                        currentPoint.y + pixelRadius)
-                                                       toCoordinateFromView:self];
-
-                if (desiredNorthEast.latitude  != actualNorthEast.latitude  ||
-                    desiredNorthEast.longitude != actualNorthEast.longitude ||
-                    desiredSouthWest.latitude  != actualSouthWest.latitude  ||
-                    desiredSouthWest.longitude != actualSouthWest.longitude)
-                {
-                    // assumes we won't disrupt tracking mode
-                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
-                }
+                self.userTrackingState = MGLUserTrackingStateBegan;
+                
+                MGLMapCamera *camera = self.camera;
+                camera.centerCoordinate = self.userLocation.location.coordinate;
+                camera.heading = course;
+                camera.altitude = newLocation.horizontalAccuracy;
+                
+                __weak MGLMapView *weakSelf = self;
+                [self _flyToCamera:camera withDuration:-1 peakAltitude:-1 completionHandler:^{
+                    MGLMapView *strongSelf = weakSelf;
+                    strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+                }];
             }
             [self unrotateIfNeededAnimated:YES];
         }
@@ -3367,7 +3377,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
 
     CGPoint userPoint;
-    if (self.userTrackingMode != MGLUserTrackingModeNone && self.hasBegunTrackingUserLocation)
+    if (self.userTrackingMode != MGLUserTrackingModeNone
+        && self.userTrackingState == MGLUserTrackingStateChanged)
     {
         userPoint = self.userLocationAnnotationViewCenter;
     }
