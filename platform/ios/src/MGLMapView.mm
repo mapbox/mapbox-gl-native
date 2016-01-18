@@ -53,9 +53,9 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
     MGLUserTrackingStatePossible = 0,
     /// The map view has begun to move to the first reported user location.
-    MGLUserTrackingStateBegan = 1,
+    MGLUserTrackingStateBegan,
     /// The map view has finished moving to the first reported user location.
-    MGLUserTrackingStateChanged = 2,
+    MGLUserTrackingStateChanged,
 };
 
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
@@ -3030,6 +3030,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 }
 
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment
+{
+    _userLocationVerticalAlignment = alignment;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:YES];
+    }
+}
+
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     [self locationManager:manager didUpdateLocations:locations animated:YES];
@@ -3449,9 +3458,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     
     // When tracking course, it’s more important to see the road ahead, so
     // weight the user dot down towards the bottom.
-    if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        center.y = CGRectGetHeight(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame);
+    switch (self.userLocationVerticalAlignment) {
+        case MGLAnnotationVerticalAlignmentCenter:
+            break;
+        case MGLAnnotationVerticalAlignmentTop:
+            center.y = CGRectGetHeight(self.userLocationAnnotationView.frame);
+            break;
+        case MGLAnnotationVerticalAlignmentBottom:
+            center.y = CGRectGetHeight(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame);
+            break;
     }
     
     return center;

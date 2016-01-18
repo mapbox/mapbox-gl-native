@@ -19,6 +19,16 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay;
 @protocol MGLCalloutView;
 
+/** The vertical alignment of an annotation within a map view. */
+typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
+    /** Aligns the annotation vertically in the center of the map view. */
+    MGLAnnotationVerticalAlignmentCenter = 0,
+    /** Aligns the annotation vertically at the top of the map view. */
+    MGLAnnotationVerticalAlignmentTop,
+    /** Aligns the annotation vertically at the bottom of the map view. */
+    MGLAnnotationVerticalAlignmentBottom,
+};
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple's MapKit.
@@ -217,6 +227,24 @@ IB_DESIGNABLE
  The mode used to track the user location.
  */
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
+
+/**
+ Sets the mode used to track the user location, with an optional transition.
+ 
+ @param mode The mode used to track the user location.
+ @param animated If `YES`, there is an animated transition from the current
+    viewport to a viewport that results from the change to `mode`. If `NO`, the
+    map view instantaneously changes to the new viewport. This parameter only
+    affects the initial transition; subsequent changes to the user location or
+    heading are always animated.
+ */
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
+
+/**
+ The vertical alignment of the user location annotation within the receiver. The
+ default value is `MGLAnnotationVerticalAlignmentCenter`.
+ */
+@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment;
 
 /**
  Whether the map view should display a heading calibration alert when necessary.
