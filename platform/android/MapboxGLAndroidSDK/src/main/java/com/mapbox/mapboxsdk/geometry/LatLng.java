@@ -129,7 +129,6 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
         LatLng latLng = (LatLng) o;
 
         return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0 && Double.compare(latLng.longitude, longitude) == 0;
-
     }
 
     @Override
@@ -168,6 +167,10 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
      * @return distance in meters
      */
     public double distanceTo(LatLng other) {
+        if(latitude == other.latitude && longitude == other.longitude){
+            // return 0.0 to avoid a NaN
+            return 0.0;
+        }
 
         final double a1 = MathConstants.DEG2RAD * this.latitude;
         final double a2 = MathConstants.DEG2RAD * this.longitude;
