@@ -781,8 +781,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
-        [self updateUserLocationAnnotationView];
     }
+    
+    [self updateUserLocationAnnotationView];
 }
 
 /// Updates `contentInset` to reflect the current window geometry.
@@ -2969,7 +2970,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     _userTrackingMode = mode;
     
     if (_userTrackingMode == MGLUserTrackingModeNone
-        || _userTrackingMode == MGLUserTrackingModeFollowWithCourse) {
+        || _userTrackingMode == MGLUserTrackingModeFollowWithCourse)
+    {
         self.userTrackingState = MGLUserTrackingStatePossible;
     }
 
@@ -3290,8 +3292,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
-            id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
-            if (selectedAnnotation != self.userLocation
+            if ( ! _userLocationAnnotationIsSelected
                 || self.userTrackingMode == MGLUserTrackingModeNone
                 || self.userTrackingState != MGLUserTrackingStateChanged)
             {
@@ -3391,12 +3392,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)updateUserLocationAnnotationView
 {
+    MGLUserLocationAnnotationView *annotationView = self.userLocationAnnotationView;
     if ( ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate)) {
-        self.userLocationAnnotationView.layer.hidden = YES;
+        annotationView.layer.hidden = YES;
         return;
     }
 
-    if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
+    if ( ! annotationView.superview) [self.glView addSubview:annotationView];
 
     CGPoint userPoint;
     if (self.userTrackingMode != MGLUserTrackingModeNone
@@ -3412,15 +3414,33 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
         -MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
-        self.userLocationAnnotationView.center = userPoint;
-
-        self.userLocationAnnotationView.layer.hidden = NO;
-
-        [self.userLocationAnnotationView setupLayers];
+        annotationView.center = userPoint;
+        annotationView.layer.hidden = NO;
+        [annotationView setupLayers];
+        
+        if (_userLocationAnnotationIsSelected)
+        {
+            // Ensure the callout view still points to its annotation.
+            UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+            CGRect calloutFrame = calloutView.frame;
+            calloutFrame.origin.x = annotationView.center.x - CGRectGetWidth(calloutFrame) / 2;
+            calloutFrame.origin.y = CGRectGetMinY(annotationView.frame) - CGRectGetHeight(calloutFrame);
+            if ( ! CGRectEqualToRect(calloutView.frame, calloutFrame))
+            {
+                calloutView.frame = calloutFrame;
+            }
+        }
     }
     else
     {
-        self.userLocationAnnotationView.layer.hidden = YES;
+        // User has moved far enough outside of the viewport that showing it or
+        // its callout would be useless.
+        annotationView.layer.hidden = YES;
+        
+        if (_userLocationAnnotationIsSelected)
+        {
+            [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        }
     }
 }
 
