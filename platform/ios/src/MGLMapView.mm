@@ -2638,7 +2638,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (annotation == self.selectedAnnotation) return;
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
+    if (annotation != self.userLocation)
+    {
+        self.userTrackingMode = MGLUserTrackingModeNone;
+    }
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
     
@@ -3032,7 +3035,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         self.userLocation.location = newLocation;
 
         // deselect user if applicable since we don't do callout tracking yet
-        if ([self.selectedAnnotation isEqual:self.userLocation]) [self deselectAnnotation:self.userLocation animated:NO];
+        if (self.selectedAnnotation == self.userLocation
+            && (self.userTrackingMode == MGLUserTrackingModeNone
+                || self.userTrackingState != MGLUserTrackingStateChanged))
+        {
+            [self deselectAnnotation:self.userLocation animated:NO];
+        }
 
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
@@ -3274,7 +3282,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
-            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+            if (selectedAnnotation != self.userLocation
+                || self.userTrackingMode == MGLUserTrackingModeNone
+                || self.userTrackingState != MGLUserTrackingStateChanged)
+            {
+                [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            }
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
             {
