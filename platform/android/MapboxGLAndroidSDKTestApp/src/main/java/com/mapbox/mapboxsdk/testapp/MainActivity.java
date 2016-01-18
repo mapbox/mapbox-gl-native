@@ -182,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
         mFpsTextView = (TextView) findViewById(R.id.view_fps);
         mFpsTextView.setText("");
 
+        mMapView.setRotateEnabled(false);
+
         mLocationFAB = (FloatingActionButton) findViewById(R.id.locationFAB);
         mLocationFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,8 +391,6 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     startActivity(new Intent(getApplicationContext(), MyLocationTrackingModeActivity.class));
                                 }
-
-
                                 return true;
 
                             case R.id.action_polyline:
@@ -407,6 +407,19 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_directions:
                                 startActivity(new Intent(getApplicationContext(), DirectionsActivity.class));
+                                return true;
+
+                            case R.id.action_double_mapview:
+                                if ((ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                        != PackageManager.PERMISSION_GRANTED) ||
+                                        (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                                != PackageManager.PERMISSION_GRANTED)) {
+                                    ActivityCompat.requestPermissions(MainActivity.this,
+                                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                                            PERMISSIONS_TRACKING_MODE_ACTIVITY);
+                                } else {
+                                    startActivity(new Intent(getApplicationContext(), DoubleMapActivity.class));
+                                }
                                 return true;
 
                             default:

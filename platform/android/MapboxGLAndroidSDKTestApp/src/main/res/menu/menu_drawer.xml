@@ -78,10 +78,11 @@
                 android:icon="@drawable/ic_tilt"
                 android:title="@string/action_tilt" />
 
-            <item android:id="@+id/action_camera"
-                  android:checkable="false"
-                  android:icon="@drawable/ic_transform_24dp"
-                  android:title="@string/action_camera"/>
+            <item
+                android:id="@+id/action_camera"
+                android:checkable="false"
+                android:icon="@drawable/ic_transform_24dp"
+                android:title="@string/action_camera" />
 
             <item
                 android:id="@+id/action_map_fragment"
@@ -154,6 +155,12 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_directions"
                 android:title="@string/activity_directions" />
+
+            <item
+                android:id="@+id/action_double_mapview"
+                android:checkable="false"
+                android:icon="@drawable/ic_dns_24dp"
+                android:title="@string/action_double_mapview" />
 
         </menu>
     </item>

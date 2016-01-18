@@ -66,6 +66,9 @@
         <activity
             android:name=".DirectionsActivity"
             android:label="@string/activity_directions" />
+        <activity
+            android:name=".DoubleMapActivity"
+            android:label="@string/activity_double_map" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"
