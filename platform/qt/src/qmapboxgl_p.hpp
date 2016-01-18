@@ -4,6 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <QMapboxGL>
@@ -33,6 +34,7 @@ public:
     void invalidate() final;
     void notifyMapChange(mbgl::MapChange change) final;
 
+    mbgl::EdgeInsets margins;
     QSize size;
 
     QMapboxGL *q_ptr = nullptr;

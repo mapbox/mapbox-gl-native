@@ -12,6 +12,7 @@
 #include <QCoreApplication>
 #include <QImage>
 #include <QMapboxGL>
+#include <QMargins>
 #include <QString>
 #include <QStringList>
 
@@ -140,22 +141,22 @@ void QMapboxGL::setStyleURL(const QString &url)
 
 double QMapboxGL::latitude() const
 {
-    return d_ptr->mapObj->getLatLng().latitude;
+    return d_ptr->mapObj->getLatLng(d_ptr->margins).latitude;
 }
 
 void QMapboxGL::setLatitude(double latitude_)
 {
-    d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude_, longitude() });
+    d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude_, longitude() }, d_ptr->margins);
 }
 
 double QMapboxGL::longitude() const
 {
-    return d_ptr->mapObj->getLatLng().longitude;
+    return d_ptr->mapObj->getLatLng(d_ptr->margins).longitude;
 }
 
 void QMapboxGL::setLongitude(double longitude_)
 {
-    d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude(), longitude_ });
+    d_ptr->mapObj->setLatLng(mbgl::LatLng { latitude(), longitude_ }, d_ptr->margins);
 }
 
 double QMapboxGL::scale() const
@@ -175,7 +176,7 @@ double QMapboxGL::zoom() const
 
 void QMapboxGL::setZoom(double zoom_)
 {
-    d_ptr->mapObj->setZoom(zoom_);
+    d_ptr->mapObj->setZoom(zoom_, d_ptr->margins);
 }
 
 double QMapboxGL::minimumZoom() const
@@ -190,18 +191,19 @@ double QMapboxGL::maximumZoom() const
 
 QMapboxGL::Coordinate QMapboxGL::coordinate() const
 {
-    const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng();
+    const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng(d_ptr->margins);
     return Coordinate(latLng.latitude, latLng.longitude);
 }
 
 void QMapboxGL::setCoordinate(const Coordinate &coordinate_)
 {
-    d_ptr->mapObj->setLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
+    d_ptr->mapObj->setLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second }, d_ptr->margins);
 }
 
 void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_)
 {
-    d_ptr->mapObj->setLatLngZoom(mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_);
+    d_ptr->mapObj->setLatLngZoom(
+            mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_, d_ptr->margins);
 }
 
 double QMapboxGL::bearing() const
@@ -211,7 +213,7 @@ double QMapboxGL::bearing() const
 
 void QMapboxGL::setBearing(double degrees)
 {
-    d_ptr->mapObj->setBearing(degrees);
+    d_ptr->mapObj->setBearing(degrees, d_ptr->margins);
 }
 
 void QMapboxGL::setBearing(double degrees, const QPointF &center)
@@ -454,6 +456,26 @@ QMapboxGL::Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
         d_ptr->mapObj->latLngForPixel(mbgl::ScreenCoordinate { pixel.x(), pixel.y() });
 
     return Coordinate(latLng.latitude, latLng.longitude);
+}
+
+void QMapboxGL::setMargins(const QMargins &margins_)
+{
+    d_ptr->margins = {
+        static_cast<double>(margins_.top()),
+        static_cast<double>(margins_.left()),
+        static_cast<double>(margins_.bottom()),
+        static_cast<double>(margins_.right())
+    };
+}
+
+QMargins QMapboxGL::margins() const
+{
+    return QMargins(
+        d_ptr->margins.left,
+        d_ptr->margins.top,
+        d_ptr->margins.right,
+        d_ptr->margins.bottom
+    );
 }
 
 void QMapboxGL::render()

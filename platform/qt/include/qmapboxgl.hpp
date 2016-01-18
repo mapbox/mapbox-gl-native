@@ -6,6 +6,7 @@
 #include <QPointF>
 
 class QImage;
+class QMargins;
 class QSize;
 class QString;
 class QStringList;
@@ -169,6 +170,9 @@ public:
 
     QPointF pixelForCoordinate(const Coordinate &) const;
     Coordinate coordinateForPixel(const QPointF &) const;
+
+    void setMargins(const QMargins &margins);
+    QMargins margins() const;
 
 public slots:
     void render();
