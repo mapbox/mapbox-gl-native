@@ -34,11 +34,13 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 
+import java.lang.ref.WeakReference;
+
 /**
  * This view shows the user's location, as determined from GPS, on the map
  * as a dot annotation.
  */
-final class UserLocationView extends View implements LocationListener {
+final class UserLocationView extends View {
 
     private MapView mMapView;
 
@@ -85,6 +87,7 @@ final class UserLocationView extends View implements LocationListener {
 
     private boolean mPaused = false;
     private Location mUserLocation;
+    private UserLocationListener mUserLocationListener;
 
     MapView.OnMyLocationChangeListener mOnMyLocationChangeListener;
 
@@ -377,14 +380,18 @@ final class UserLocationView extends View implements LocationListener {
                 setLocation(lastLocation);
             }
 
+            if(mUserLocationListener==null){
+                mUserLocationListener = new UserLocationListener(this);
+            }
+
             // Register for Location Updates
-            locationServices.addLocationListener(this);
+            locationServices.addLocationListener(mUserLocationListener);
         } else {
             // Disable location and user dot
             setLocation(null);
 
             // Deregister for Location Updates
-            locationServices.removeLocationListener(this);
+            locationServices.removeLocationListener(mUserLocationListener);
         }
 
         locationServices.toggleGPS(enableGps);
@@ -498,17 +505,27 @@ final class UserLocationView extends View implements LocationListener {
         }
     }
 
-    /**
-     * Callback method for receiving location updates from LocationServices.
-     *
-     * @param location The new Location data
-     */
-    @Override
-    public void onLocationChanged(Location location) {
-        if (mPaused) {
-            return;
+    private static class UserLocationListener implements LocationListener{
+
+        private WeakReference<UserLocationView> mUserLocationView;
+
+        public UserLocationListener(UserLocationView userLocationView) {
+            mUserLocationView = new WeakReference<>(userLocationView);
         }
-        setLocation(location);
+
+
+        /**
+         * Callback method for receiving location updates from LocationServices.
+         *
+         * @param location The new Location data
+         */
+        @Override
+        public void onLocationChanged(Location location) {
+            UserLocationView locationView = mUserLocationView.get();
+            if(locationView!=null && !locationView.isPaused()){
+                locationView.setLocation(location);
+            }
+        }
     }
 
     private boolean isStale(Location location) {
@@ -749,6 +766,10 @@ final class UserLocationView extends View implements LocationListener {
             mMarkerAccuracyAnimator.cancel();
             mMarkerAccuracyAnimator = null;
         }
+    }
+
+    public boolean isPaused(){
+        return mPaused;
     }
 
 }
