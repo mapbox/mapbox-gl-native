@@ -17,19 +17,22 @@ import java.lang.ref.WeakReference;
 
 /**
  * <p>
- * A tooltip view. This is a UI element placed over a map at a specific geographic
- * location.
+ * InfoWindow is a tooltip shown when a {@link Marker} is tapped.
+ * </p>
+ * <p>
+ * This is a UI element placed over a map at a specific geographic location.
  * </p>
  */
 public class InfoWindow {
 
     private WeakReference<Marker> mBoundMarker;
     private WeakReference<MapView> mMapView;
+    protected WeakReference<View> mView;
+
     private float mMarkerHeightOffset;
     private float mViewWidthOffset;
     private PointF mCoordinates;
     private boolean mIsVisible;
-    protected WeakReference<View> mView;
 
     @LayoutRes
     private int mLayoutRes;

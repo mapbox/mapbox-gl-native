@@ -5,10 +5,12 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.views.MapView;
 
 /**
- * Annotation is the most general kind of overlay on top of a map,
- * from which {@link InfoWindow} and {@link Marker} are derived: it manages
- * attachment to a map and identification, but does not require
+ * Annotation is a overlay on top of a {@link MapView},
+ * from which {@link Polygon}, {@link Polyline} and {@link Marker} are derived.
+ * <p>
+ * it manages attachment to a map and identification, but does not require
  * content to be placed at a geographical point.
+ * </p>
  */
 public abstract class Annotation implements Comparable<Annotation> {
 

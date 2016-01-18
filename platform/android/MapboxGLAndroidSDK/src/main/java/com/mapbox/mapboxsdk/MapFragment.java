@@ -10,6 +10,20 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.views.MapView;
 
+/**
+ * Fragment wrapper around a {@link MapView}.
+ * <p>
+ * A Map component in an app. This fragment is the simplest way to place a map in an application.
+ * It's a wrapper around a view of a map to automatically handle the necessary life cycle needs.
+ * Being a fragment, this component can be added to an activity's layout or can dynamically be added
+ * using a FragmentManager.
+ * </p>
+ * <p>
+ * To get a reference to the MapView, use {@link #getMap()}
+ * </p>
+ *
+ * @see #getMap()
+ */
 public class MapFragment extends Fragment {
 
     //

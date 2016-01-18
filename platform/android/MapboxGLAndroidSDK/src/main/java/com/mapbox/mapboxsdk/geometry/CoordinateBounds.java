@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
- * Implementation of iOS MGLCoordinateBounds
+ * A rectangular geograpical region defined by a south west {@link LatLng} and a north east {@link LatLng}.
  */
 public class CoordinateBounds {
 

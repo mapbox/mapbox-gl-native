@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
- * Implementation of iOS MKCoordinateRegion
+ * A geographical region defined by a {@link LatLng} and a {@link CoordinateSpan}.
  */
 public class CoordinateRegion {
     private LatLng center;

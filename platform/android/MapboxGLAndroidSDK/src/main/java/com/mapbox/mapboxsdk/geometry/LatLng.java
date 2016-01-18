@@ -10,9 +10,10 @@ import com.mapbox.mapboxsdk.constants.MathConstants;
 import java.io.Serializable;
 
 /**
+ * A geographical location which contains a single latitude, longitude pair, with
+ * optional altitude.
  * <p>
- * This class is container for a single latitude, longitude pair, with
- * optional altitude. Latitude and longitude are expressed as decimal degrees
+ * Latitude and longitude are expressed as decimal degrees
  * in the WGS84 datum. By default, altitude is 0.0, or sea level.
  * </p>
  * <p>

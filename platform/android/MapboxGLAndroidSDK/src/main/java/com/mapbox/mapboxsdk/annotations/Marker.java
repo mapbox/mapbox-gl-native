@@ -9,9 +9,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.views.MapView;
 
 /**
- * A marker is a map overlay that shows an icon image at a specific
- * geographical location and can be associated with a {@link InfoWindow}
- * that is shown when the marker is tapped.
+ * Marker is an annotation that shows an icon image at a geographical location.
+ * </p>
+ * An {@link InfoWindow} can be shown when a Marker is pressed
+ * <p>
  */
 public final class Marker extends Annotation {
 
@@ -54,6 +55,8 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @return boolean State of a InfoWindow
      */
     public boolean isInfoWindowShown() {
         return infoWindowShown;
@@ -69,6 +72,8 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @param icon The icon to be used as Marker image
      */
     public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
@@ -84,6 +89,9 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @param mapView The MapView to show the InfoWindow on.
+     * @return infoWindow The infoWindow to show
      */
     public InfoWindow showInfoWindow(@NonNull MapView mapView) {
         setMapView(mapView);
@@ -127,6 +135,8 @@ public final class Marker extends Annotation {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @param topOffsetPixels the pixels to have as offset
      */
     public void setTopOffsetPixels(int topOffsetPixels) {
         this.topOffsetPixels = topOffsetPixels;

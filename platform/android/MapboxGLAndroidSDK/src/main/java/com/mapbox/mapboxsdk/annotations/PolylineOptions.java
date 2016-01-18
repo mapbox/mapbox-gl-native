@@ -8,6 +8,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder for composing {@link Polyline} objects.
+ */
 public final class PolylineOptions implements Parcelable {
 
 
@@ -83,6 +86,7 @@ public final class PolylineOptions implements Parcelable {
      * Sets the color of the polyline.
      *
      * @param color - the color in ARGB format
+     * @return PolyLineOptions The builder used to build a Polyline
      */
     public PolylineOptions color(int color) {
         polyline.setColor(color);
@@ -95,6 +99,7 @@ public final class PolylineOptions implements Parcelable {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     * @return PolyLine The polyline build by this class.
      */
     public Polyline getPolyline() {
         return polyline;

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
- * Implementation of iOS MKCoordinateSpan
+ * A geographical span defined by its latitude and longitude span.
  */
 public class CoordinateSpan {
 
