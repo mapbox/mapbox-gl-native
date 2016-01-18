@@ -3032,7 +3032,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation])
     {
-        self.userLocation.location = newLocation;
+        if (self.userTrackingState != MGLUserTrackingStateBegan)
+        {
+            self.userLocation.location = newLocation;
+        }
 
         // deselect user if applicable since we don't do callout tracking yet
         if (self.selectedAnnotation == self.userLocation
