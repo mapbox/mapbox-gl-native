@@ -78,6 +78,14 @@ TEST(Image, JPEGTile) {
     EXPECT_EQ(256, image.height);
 }
 
+#if !defined(__ANDROID__) && !defined(__APPLE__)
+TEST(Image, WebPTile) {
+    PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.webp"));
+    EXPECT_EQ(256, image.width);
+    EXPECT_EQ(256, image.height);
+}
+#endif // !defined(__ANDROID__) && !defined(__APPLE__)
+
 TEST(Image, Premultiply) {
     UnassociatedImage rgba { 1, 1 };
     rgba.data[0] = 255;
