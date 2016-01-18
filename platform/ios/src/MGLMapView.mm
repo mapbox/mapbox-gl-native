@@ -824,7 +824,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         // set content insets.
         CLLocationCoordinate2D oldCenter = self.centerCoordinate;
         self.contentInset = contentInsets;
-        self.centerCoordinate = oldCenter;
+        // Don’t call -setCenterCoordinate:, which resets the user tracking mode.
+        [self _setCenterCoordinate:oldCenter animated:NO];
     }
 }
 
@@ -1670,6 +1671,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     self.userTrackingMode = MGLUserTrackingModeNone;
 
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
+}
+
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
+    [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
 }
 
 - (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
