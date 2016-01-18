@@ -3044,14 +3044,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             self.userLocation.location = newLocation;
         }
 
-        // deselect user if applicable since we don't do callout tracking yet
-        if (self.selectedAnnotation == self.userLocation
-            && (self.userTrackingMode == MGLUserTrackingModeNone
-                || self.userTrackingState != MGLUserTrackingStateChanged))
-        {
-            [self deselectAnnotation:self.userLocation animated:NO];
-        }
-
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
             [self.delegate mapView:self didUpdateUserLocation:self.userLocation];
