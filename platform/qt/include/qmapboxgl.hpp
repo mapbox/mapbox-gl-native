@@ -115,27 +115,27 @@ public:
     void setLongitude(double longitude);
 
     double scale() const;
-    void setScale(double scale, const QPointF &center = QPointF(), int milliseconds = 0);
+    void setScale(double scale, const QPointF &center = QPointF());
 
     double zoom() const;
-    void setZoom(double zoom, int milliseconds = 0);
+    void setZoom(double zoom);
 
     double minimumZoom() const;
     double maximumZoom() const;
 
     double bearing() const;
-    void setBearing(double degrees, int milliseconds = 0);
+    void setBearing(double degrees);
     void setBearing(double degrees, const QPointF &center);
 
     double pitch() const;
-    void setPitch(double pitch, int milliseconds = 0);
+    void setPitch(double pitch);
 
     NorthOrientation northOrientation() const;
     void setNorthOrientation(NorthOrientation);
 
     Coordinate coordinate() const;
-    void setCoordinate(const Coordinate &, int milliseconds = 0);
-    void setCoordinateZoom(const Coordinate &, double zoom, int milliseconds = 0);
+    void setCoordinate(const Coordinate &);
+    void setCoordinateZoom(const Coordinate &, double zoom);
 
     void setGestureInProgress(bool inProgress);
 
@@ -160,7 +160,7 @@ public:
     bool isFullyLoaded() const;
 
     void moveBy(const QPointF &offset);
-    void scaleBy(double scale, const QPointF &center = QPointF(), int milliseconds = 0);
+    void scaleBy(double scale, const QPointF &center = QPointF());
     void rotateBy(const QPointF &first, const QPointF &second);
 
     void resize(const QSize &size);

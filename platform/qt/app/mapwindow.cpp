@@ -93,9 +93,9 @@ void MapWindow::mousePressEvent(QMouseEvent *ev)
 
     if (ev->type() == QEvent::MouseButtonDblClick) {
         if (ev->buttons() == Qt::LeftButton) {
-            m_map.scaleBy(2.0, m_lastPos, 500);
+            m_map.scaleBy(2.0, m_lastPos);
         } else if (ev->buttons() == Qt::RightButton) {
-            m_map.scaleBy(0.5, m_lastPos, 500);
+            m_map.scaleBy(0.5, m_lastPos);
         }
     }
 
@@ -141,7 +141,7 @@ void MapWindow::wheelEvent(QWheelEvent *ev)
         factor = factor > -1 ? factor : 1 / factor;
     }
 
-    m_map.scaleBy(1 + factor, ev->pos(), 50);
+    m_map.scaleBy(1 + factor, ev->pos());
     ev->accept();
 }
 

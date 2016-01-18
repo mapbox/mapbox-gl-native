@@ -163,9 +163,9 @@ double QMapboxGL::scale() const
     return d_ptr->mapObj->getScale();
 }
 
-void QMapboxGL::setScale(double scale_, const QPointF &center, int milliseconds)
+void QMapboxGL::setScale(double scale_, const QPointF &center)
 {
-    d_ptr->mapObj->setScale(scale_, mbgl::ScreenCoordinate{ center.x(), center.y() }, std::chrono::milliseconds(milliseconds));
+    d_ptr->mapObj->setScale(scale_, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 double QMapboxGL::zoom() const
@@ -173,9 +173,9 @@ double QMapboxGL::zoom() const
     return d_ptr->mapObj->getZoom();
 }
 
-void QMapboxGL::setZoom(double zoom_, int milliseconds)
+void QMapboxGL::setZoom(double zoom_)
 {
-    d_ptr->mapObj->setZoom(zoom_, std::chrono::milliseconds(milliseconds));
+    d_ptr->mapObj->setZoom(zoom_);
 }
 
 double QMapboxGL::minimumZoom() const
@@ -194,18 +194,14 @@ QMapboxGL::Coordinate QMapboxGL::coordinate() const
     return Coordinate(latLng.latitude, latLng.longitude);
 }
 
-void QMapboxGL::setCoordinate(const Coordinate &coordinate_, int milliseconds)
+void QMapboxGL::setCoordinate(const Coordinate &coordinate_)
 {
-    d_ptr->mapObj->setLatLng(
-            mbgl::LatLng { coordinate_.first, coordinate_.second },
-            mbgl::Duration(std::chrono::milliseconds(milliseconds)));
+    d_ptr->mapObj->setLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
 }
 
-void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_, int milliseconds)
+void QMapboxGL::setCoordinateZoom(const Coordinate &coordinate_, double zoom_)
 {
-    d_ptr->mapObj->setLatLngZoom(
-            mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_,
-            std::chrono::milliseconds(milliseconds));
+    d_ptr->mapObj->setLatLngZoom(mbgl::LatLng { coordinate_.first, coordinate_.second }, zoom_);
 }
 
 double QMapboxGL::bearing() const
@@ -213,9 +209,9 @@ double QMapboxGL::bearing() const
     return d_ptr->mapObj->getBearing();
 }
 
-void QMapboxGL::setBearing(double degrees, int milliseconds)
+void QMapboxGL::setBearing(double degrees)
 {
-    d_ptr->mapObj->setBearing(degrees, mbgl::Duration(std::chrono::milliseconds(milliseconds)));
+    d_ptr->mapObj->setBearing(degrees);
 }
 
 void QMapboxGL::setBearing(double degrees, const QPointF &center)
@@ -228,9 +224,9 @@ double QMapboxGL::pitch() const
     return d_ptr->mapObj->getPitch();
 }
 
-void QMapboxGL::setPitch(double pitch_, int milliseconds)
+void QMapboxGL::setPitch(double pitch_)
 {
-    d_ptr->mapObj->setPitch(pitch_, std::chrono::milliseconds(milliseconds));
+    d_ptr->mapObj->setPitch(pitch_);
 }
 
 QMapboxGL::NorthOrientation QMapboxGL::northOrientation() const
@@ -410,10 +406,8 @@ void QMapboxGL::moveBy(const QPointF &offset)
     d_ptr->mapObj->moveBy(mbgl::ScreenCoordinate { offset.x(), offset.y() });
 }
 
-void QMapboxGL::scaleBy(double scale_, const QPointF &center, int milliseconds) {
-    d_ptr->mapObj->scaleBy(
-            scale_, mbgl::ScreenCoordinate { center.x(), center.y() },
-            std::chrono::milliseconds(milliseconds));
+void QMapboxGL::scaleBy(double scale_, const QPointF &center) {
+    d_ptr->mapObj->scaleBy(scale_, mbgl::ScreenCoordinate { center.x(), center.y() });
 }
 
 void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
