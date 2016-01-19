@@ -849,6 +849,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
 }
 
+/// Returns the center point of the inset content within the map view.
+- (CGPoint)contentCenter
+{
+    CGRect contentFrame = self.contentFrame;
+    return CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
+}
+
 #pragma mark - Life Cycle -
 
 - (void)updateFromDisplayLink
@@ -1094,14 +1101,18 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if (_mbglMap->getZoom() <= _mbglMap->getMinZoom() && pinch.scale < 1) return;
 
     _mbglMap->cancelTransitions();
+    
+    CGPoint centerPoint = [pinch locationInView:pinch.view];
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
 
         self.scale = _mbglMap->getScale();
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
@@ -1110,10 +1121,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         CGFloat newScale = self.scale * pinch.scale;
 
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
-
-        mbgl::PrecisionPoint center([pinch locationInView:pinch.view].x,
-                                    [pinch locationInView:pinch.view].y);
-        _mbglMap->setScale(newScale, center);
+        
+        _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1149,9 +1158,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         if (velocity)
         {
-            CGPoint pinchCenter = [pinch locationInView:pinch.view];
-            mbgl::PrecisionPoint center(pinchCenter.x, pinchCenter.y);
-            _mbglMap->setScale(newScale, center, MGLDurationInSeconds(duration));
+            _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
         }
 
         [self notifyGestureDidEndWithDrift:velocity];
@@ -1165,14 +1172,18 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if ( ! self.isRotateEnabled) return;
 
     _mbglMap->cancelTransitions();
+    
+    CGPoint centerPoint = [rotate locationInView:rotate.view];
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
@@ -1187,10 +1198,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-
-        mbgl::PrecisionPoint center([rotate locationInView:rotate.view].x,
-                                    [rotate locationInView:rotate.view].y);
-        _mbglMap->setBearing(newDegrees, center);
+        
+        _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1205,7 +1214,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, MGLDurationInSeconds(duration));
+            _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
 
             [self notifyGestureDidEndWithDrift:YES];
 
@@ -1279,24 +1288,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint doubleTapPoint = [doubleTap locationInView:doubleTap.view];
-
-        CGPoint zoomInPoint = doubleTapPoint;
-        CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
-            CGRect userLocationRect = CGRectMake(userPoint.x - 40, userPoint.y - 40, 80, 80);
-            if (CGRectContainsPoint(userLocationRect, doubleTapPoint))
-            {
-                zoomInPoint = userPoint;
-            }
-        }
-        if ( ! CGPointEqualToPoint(zoomInPoint, userPoint))
-        {
-            self.userTrackingMode = MGLUserTrackingModeNone;
+            gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(zoomInPoint.x, zoomInPoint.y);
+        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
@@ -1322,20 +1320,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint zoomOutPoint;
-
+        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
-            zoomOutPoint = self.center;
-        }
-        else
-        {
-            self.userTrackingMode = MGLUserTrackingModeNone;
-
-            zoomOutPoint = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
+            gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(zoomOutPoint.x, zoomOutPoint.y);
+        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(0.5, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
@@ -1370,9 +1361,14 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         CGFloat newZoom = log2f(self.scale) + (distance / 75);
 
         if (newZoom < _mbglMap->getMinZoom()) return;
-
-        mbgl::PrecisionPoint center(self.bounds.size.width / 2, self.bounds.size.height / 2);
-        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), center);
+        
+        CGPoint centerPoint = self.contentCenter;
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            centerPoint = self.userLocationAnnotationViewCenter;
+        }
+        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(),
+                          { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
