@@ -805,7 +805,7 @@ public final class MapView extends FrameLayout {
         mZoomButtonsController.setOnZoomListener(new OnZoomListener());
 
         // Check current connection status
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
