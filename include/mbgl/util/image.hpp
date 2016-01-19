@@ -21,11 +21,6 @@ public:
           height(h),
           data(std::make_unique<uint8_t[]>(size())) {}
 
-    Image(size_t w, size_t h, std::unique_ptr<uint8_t[]> data_)
-        : width(w),
-          height(h),
-          data(std::move(data_)) {}
-
     size_t stride() const { return width * 4; }
     size_t size() const { return width * height * 4; }
 

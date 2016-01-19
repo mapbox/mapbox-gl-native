@@ -105,7 +105,6 @@ print_flags variant static_libs cflags ldflags
 print_flags rapidjson static_libs cflags ldflags
 print_flags gtest static_libs cflags ldflags
 print_flags pixelmatch static_libs cflags ldflags
-print_flags webp static_libs cflags ldflags
 
 CONFIG+="  }
 }

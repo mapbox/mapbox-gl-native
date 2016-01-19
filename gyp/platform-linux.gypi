@@ -17,7 +17,6 @@
         '../platform/default/application_root.cpp',
         '../platform/default/thread.cpp',
         '../platform/default/image.cpp',
-        '../platform/default/webp_reader.cpp',
         '../platform/default/png_reader.cpp',
         '../platform/default/jpeg_reader.cpp',
         '../platform/default/timer.cpp',
@@ -36,7 +35,6 @@
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
-          '<@(webp_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
@@ -45,7 +43,6 @@
           '<@(nunicode_ldflags)',
           '<@(sqlite_ldflags)',
           '<@(zlib_ldflags)',
-          '<@(webp_ldflags)',
         ],
         'libraries': [
           '<@(libpng_static_libs)',
@@ -54,7 +51,6 @@
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
-          '<@(webp_static_libs)',
         ],
       },
 
