@@ -52,6 +52,8 @@ private:
     Statement(const Statement &) = delete;
     Statement &operator=(const Statement &) = delete;
 
+    void check(int err);
+
 public:
     Statement(sqlite3 *db, const char *sql);
     Statement(Statement &&);
