@@ -391,31 +391,27 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void) pushTurnstileEvent {
-
     __weak MGLMapboxEvents *weakSelf = self;
 
     dispatch_async(_serialQueue, ^{
-
         MGLMapboxEvents *strongSelf = weakSelf;
 
         if ( ! strongSelf) return;
 
-            // Build only IDFV event
-            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-            NSDictionary *vevt = @{
-                @"event" : MGLEventTypeAppUserTurnstile,
-                @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                @"appBundleId" : strongSelf.appBundleId,
-                @"vendorId": vid,
-                @"version": @(version),
-                @"instance": strongSelf.instanceID
-            };
+        NSString *idfv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        NSDictionary *vevt = @{
+            @"event" : MGLEventTypeAppUserTurnstile,
+            @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+            @"appBundleId" : strongSelf.appBundleId,
+            @"vendorId": idfv,
+            @"version": @(version),
+            @"instance": strongSelf.instanceID,
+            @"telemetry": @([[strongSelf class] isEnabled])
+        };
 
-            // Add to Queue
-            [_eventQueue addObject:vevt];
+        [_eventQueue addObject:vevt];
 
-            // Flush
-            [strongSelf flush];
+        [strongSelf flush];
     });
 }
 
