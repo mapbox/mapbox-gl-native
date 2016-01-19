@@ -27,7 +27,7 @@ void checkRendering(Map& map,
 Response expiredItem(const std::string& path) {
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/"s + path));
-    response.expires = 0s;
+    response.expires = SystemClock::from_time_t(0);
     return response;
 }
 

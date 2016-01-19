@@ -21,9 +21,9 @@ TEST_F(Storage, HTTPTimeout) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_LT(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
+        EXPECT_TRUE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
         if (counter == 4) {
             req.reset();
             loop.stop();

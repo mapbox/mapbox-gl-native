@@ -257,7 +257,7 @@ TEST_F(Storage, DatabaseLockedRefresh) {
         // Then, try to refresh it.
         Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-        cache.refresh({ Resource::Unknown, "mapbox://test" }, Seconds::zero());
+        cache.refresh({ Resource::Unknown, "mapbox://test" }, {});
         cache.get({ Resource::Unknown, "mapbox://test" }, [] (std::unique_ptr<Response> res) {
             EXPECT_EQ(nullptr, res.get());
         });

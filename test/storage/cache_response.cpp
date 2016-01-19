@@ -25,9 +25,9 @@ TEST_F(Storage, CacheResponse) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
-        EXPECT_LT(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
+        EXPECT_TRUE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
         response = res;
 
         // Now test that we get the same values as in the previous request. If we'd go to the server
@@ -78,9 +78,9 @@ TEST_F(Storage, CacheNotFound) {
             EXPECT_EQ(nullptr, res.error);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
         } else if (counter == 1) {
             EXPECT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
@@ -135,9 +135,9 @@ TEST_F(Storage, DontCacheConnectionErrors) {
             EXPECT_EQ(nullptr, res.error);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
         } else if (counter == 1) {
             EXPECT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
@@ -190,9 +190,9 @@ TEST_F(Storage, DontCacheServerErrors) {
             EXPECT_EQ(nullptr, res.error);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("existing data", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
         } else if (counter == 1) {
             EXPECT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);

@@ -26,9 +26,9 @@ TEST_F(Storage, CacheRevalidateSame) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("snowfall", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_EQ("snowfall", *res.etag);
 
         // Second request returns the cached response, then immediately revalidates.
         req2 = fs.request(revalidateSame, [&, res](Response res2) {
@@ -42,10 +42,10 @@ TEST_F(Storage, CacheRevalidateSame) {
                 EXPECT_TRUE(res2.notModified);
                 ASSERT_TRUE(res2.data.get());
                 EXPECT_EQ("Response", *res2.data);
-                EXPECT_LT(Seconds::zero(), res2.expires);
-                EXPECT_EQ(Seconds::zero(), res2.modified);
+                EXPECT_TRUE(bool(res2.expires));
+                EXPECT_FALSE(bool(res2.modified));
                 // We're not sending the ETag in the 304 reply, but it should still be there.
-                EXPECT_EQ("snowfall", res2.etag);
+                EXPECT_EQ("snowfall", *res2.etag);
 
                 loop.stop();
                 CacheRevalidateSame.finish();
@@ -78,9 +78,9 @@ TEST_F(Storage, CacheRevalidateModified) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(1420070400, res.modified.count());
-        EXPECT_EQ("", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_EQ(SystemClock::from_time_t(1420070400), *res.modified);
+        EXPECT_FALSE(res.etag);
 
         // Second request returns the cached response, then immediately revalidates.
         req2 = fs.request(revalidateModified, [&, res](Response res2) {
@@ -94,9 +94,9 @@ TEST_F(Storage, CacheRevalidateModified) {
                 EXPECT_TRUE(res2.notModified);
                 ASSERT_TRUE(res2.data.get());
                 EXPECT_EQ("Response", *res2.data);
-                EXPECT_LT(Seconds::zero(), res2.expires);
-                EXPECT_EQ(1420070400, res2.modified.count());
-                EXPECT_EQ("", res2.etag);
+                EXPECT_TRUE(bool(res2.expires));
+                EXPECT_EQ(SystemClock::from_time_t(1420070400), *res2.modified);
+                EXPECT_FALSE(res2.etag);
 
                 loop.stop();
                 CacheRevalidateModified.finish();
@@ -128,9 +128,9 @@ TEST_F(Storage, CacheRevalidateEtag) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response 1", *res.data);
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("response-1", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_EQ("response-1", *res.etag);
 
         // Second request returns the cached response, then immediately revalidates.
         req2 = fs.request(revalidateEtag, [&, res](Response res2) {
@@ -144,9 +144,9 @@ TEST_F(Storage, CacheRevalidateEtag) {
                 ASSERT_TRUE(res2.data.get());
                 EXPECT_NE(res.data, res2.data);
                 EXPECT_EQ("Response 2", *res2.data);
-                EXPECT_EQ(Seconds::zero(), res2.expires);
-                EXPECT_EQ(Seconds::zero(), res2.modified);
-                EXPECT_EQ("response-2", res2.etag);
+                EXPECT_FALSE(bool(res2.expires));
+                EXPECT_FALSE(bool(res2.modified));
+                EXPECT_EQ("response-2", *res2.etag);
 
                 loop.stop();
                 CacheRevalidateEtag.finish();

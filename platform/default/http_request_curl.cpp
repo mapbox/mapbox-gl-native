@@ -363,12 +363,12 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const std::string& u
     // If there's already a response, set the correct etags/modified headers to make sure we are
     // getting a 304 response if possible. This avoids redownloading unchanged data.
     if (existingResponse) {
-        if (!existingResponse->etag.empty()) {
-            const std::string header = std::string("If-None-Match: ") + existingResponse->etag;
+        if (existingResponse->etag) {
+            const std::string header = std::string("If-None-Match: ") + *existingResponse->etag;
             headers = curl_slist_append(headers, header.c_str());
-        } else if (existingResponse->modified != Seconds::zero()) {
+        } else if (existingResponse->modified) {
             const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified.count());
+                std::string("If-Modified-Since: ") + util::rfc1123(SystemClock::to_time_t(*existingResponse->modified));
             headers = curl_slist_append(headers, time.c_str());
         }
     }
@@ -466,15 +466,15 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = Seconds(curl_getdate(value.c_str(), nullptr));
+        baton->response->modified = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
-        baton->response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
+        baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
         baton->response->expires = parseCacheControl(value.c_str());
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = Seconds(curl_getdate(value.c_str(), nullptr));
+        baton->response->expires = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
     }
 
     return length;
@@ -534,15 +534,15 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
             if (existingResponse) {
                 response->data = existingResponse->data;
 
-                if (response->expires == Seconds::zero()) {
+                if (!response->expires) {
                     response->expires = existingResponse->expires;
                 }
 
-                if (response->modified == Seconds::zero()) {
+                if (!response->modified) {
                     response->modified = existingResponse->modified;
                 }
 
-                if (response->etag.empty()) {
+                if (!response->etag) {
                     response->etag = existingResponse->etag;
                 }
             }

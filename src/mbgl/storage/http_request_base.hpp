@@ -3,6 +3,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <memory>
 #include <functional>
@@ -27,7 +28,7 @@ public:
     virtual void cancel() { cancelled = true; };
 
 protected:
-    static Seconds parseCacheControl(const char *value);
+    static optional<SystemTimePoint> parseCacheControl(const char *value);
 
     std::string url;
     Callback notify;

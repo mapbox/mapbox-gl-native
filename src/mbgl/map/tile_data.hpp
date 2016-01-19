@@ -3,6 +3,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
@@ -91,8 +92,8 @@ public:
     void dumpDebugLogs() const;
 
     const TileID id;
-    Seconds modified = Seconds::zero();
-    Seconds expires = Seconds::zero();
+    optional<SystemTimePoint> modified;
+    optional<SystemTimePoint> expires;
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;

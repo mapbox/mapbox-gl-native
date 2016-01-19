@@ -44,7 +44,7 @@ std::unique_ptr<FileRequest> AnnotationTileMonitor::monitorTile(const GeometryTi
 }
 
 void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
-    callback(nullptr, std::move(tile), Seconds::zero(), Seconds::zero());
+    callback(nullptr, std::move(tile), {}, {});
 }
 
 } // namespace mbgl

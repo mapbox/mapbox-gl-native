@@ -124,10 +124,10 @@ HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const std::
     std::string etagStr;
     std::string modifiedStr;
     if (existingResponse) {
-        if (!existingResponse->etag.empty()) {
-            etagStr = existingResponse->etag;
-        } else if (existingResponse->modified != Seconds::zero()) {
-            modifiedStr = util::rfc1123(existingResponse->modified.count());
+        if (existingResponse->etag) {
+            etagStr = *existingResponse->etag;
+        } else if (existingResponse->modified) {
+            modifiedStr = util::rfc1123(SystemClock::to_time_t(*existingResponse->modified));
         }
     }
 
@@ -195,11 +195,11 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
     // the message param is unused, this generates a warning at build time
     // this was breaking builds for `make android -j4`
     (void)message;
-    response->modified = Seconds(parse_date(modified.c_str()));
+    response->modified = SystemClock::from_time_t(parse_date(modified.c_str()));
     response->etag = etag;
     response->expires = parseCacheControl(cacheControl.c_str());
     if (!expires.empty()) {
-        response->expires = Seconds(parse_date(expires.c_str()));
+        response->expires = SystemClock::from_time_t(parse_date(expires.c_str()));
     }
     response->data = std::make_shared<std::string>(body);
 
@@ -211,15 +211,15 @@ void HTTPAndroidRequest::onResponse(int code, std::string message, std::string e
         if (existingResponse) {
             response->data = existingResponse->data;
 
-            if (response->expires == Seconds::zero()) {
+            if (!response->expires) {
                 response->expires = existingResponse->expires;
             }
 
-            if (response->modified == Seconds::zero()) {
+            if (!response->modified) {
                 response->modified = existingResponse->modified;
             }
 
-            if (response->etag.empty()) {
+            if (!response->etag) {
                 response->etag = existingResponse->etag;
             }
         }

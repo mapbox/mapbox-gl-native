@@ -192,14 +192,13 @@ void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
             callback(*response);
         }
 
-        // Force an immediate request if the cached response is stale. Note that this is not
-        // quite the same as what `expirationTimeout` would calculate, because in `expirationTimeout`
-        // Seconds::zero() is treated as "no expiration", but here we want it to force a revalidation.
-        scheduleRealRequest(impl, response && response->expires <= toSeconds(SystemClock::now()));
+        // Force immediate revalidation if the cached response didn't indicate an expiration. If
+        // it did indicate an expiration, revalidation will happen in the normal scheduling flow.
+        scheduleRealRequest(impl, response && !response->expires);
     });
 }
 
-static Seconds errorRetryTimeout(const Response& response, uint32_t failedRequests) {
+static Duration errorRetryTimeout(const Response& response, uint32_t failedRequests) {
     if (response.error && response.error->reason == Response::Error::Reason::Server) {
         // Retry after one second three times, then start exponential backoff.
         return Seconds(failedRequests <= 3 ? 1 : 1 << std::min(failedRequests - 3, 31u));
@@ -209,16 +208,15 @@ static Seconds errorRetryTimeout(const Response& response, uint32_t failedReques
         return Seconds(1 << std::min(failedRequests - 1, 31u));
     } else {
         // No error, or not an error that triggers retries.
-        return Seconds::max();
+        return Duration::max();
     }
 }
 
-static Seconds expirationTimeout(const Response& response) {
-    // Seconds::zero() is a special value meaning "no expiration".
-    if (response.expires > Seconds::zero()) {
-        return std::max(Seconds::zero(), response.expires - toSeconds(SystemClock::now()));
+static Duration expirationTimeout(const Response& response) {
+    if (response.expires) {
+        return std::max(SystemDuration::zero(), *response.expires - SystemClock::now());
     } else {
-        return Seconds::max();
+        return Duration::max();
     }
 }
 
@@ -228,7 +226,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         return;
     }
 
-    Seconds timeout = Seconds::zero();
+    Duration timeout = Duration::zero();
 
     // If there was a prior response and we're not being asked for a forced refresh, calculate a timeout
     // that depends on how many consecutive errors we've encountered, and on the expiration time.
@@ -236,7 +234,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         timeout = std::min(errorRetryTimeout(*response, failedRequests),
                            expirationTimeout(*response));
 
-        if (timeout == Seconds::max()) {
+        if (timeout == Duration::max()) {
             return;
         }
     }

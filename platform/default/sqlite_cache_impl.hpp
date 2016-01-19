@@ -3,6 +3,7 @@
 
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mapbox {
 namespace sqlite {
@@ -23,7 +24,7 @@ public:
 
     void get(const Resource&, Callback);
     void put(const Resource&, const Response&);
-    void refresh(const Resource&, Seconds expires);
+    void refresh(const Resource&, optional<SystemTimePoint> expires);
 
 private:
     void initializeDatabase();

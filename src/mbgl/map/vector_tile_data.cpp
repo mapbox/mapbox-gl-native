@@ -29,8 +29,8 @@ VectorTileData::VectorTileData(const TileID& id_,
     state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
                                                         std::unique_ptr<GeometryTile> tile,
-                                                        Seconds modified_,
-                                                        Seconds expires_) {
+                                                        optional<SystemTimePoint> modified_,
+                                                        optional<SystemTimePoint> expires_) {
         if (err) {
             callback(err);
             return;

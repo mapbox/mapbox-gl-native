@@ -39,8 +39,8 @@ void insertTile(mbgl::SQLiteCache* cache, unsigned id, uint64_t size) {
     auto url = std::string("http://tile") + mbgl::util::toString(id);
 
     Response response;
-    response.modified = toSeconds(SystemClock::now());
-    response.expires = toSeconds(SystemClock::now()) + Seconds(5000);
+    response.modified = SystemClock::now();
+    response.expires = SystemClock::now() + Seconds(5000);
     response.etag = url;
 
     auto data = std::make_shared<std::string>(size, 0);
@@ -62,8 +62,8 @@ void refreshTile(mbgl::SQLiteCache* cache, unsigned id) {
     auto url = std::string("http://tile") + mbgl::util::toString(id);
 
     Response response;
-    response.modified = toSeconds(SystemClock::now());
-    response.expires = toSeconds(SystemClock::now()) + Seconds(5000);
+    response.modified = SystemClock::now();
+    response.expires = SystemClock::now() + Seconds(5000);
     response.notModified = true;
 
     Resource resource{ Resource::Kind::Tile, url };

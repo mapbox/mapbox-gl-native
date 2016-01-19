@@ -55,8 +55,8 @@ public:
 
     using Callback = std::function<void (std::exception_ptr,
                                          std::unique_ptr<GeometryTile>,
-                                         Seconds modified,
-                                         Seconds expires)>;
+                                         optional<SystemTimePoint> modified,
+                                         optional<SystemTimePoint> expires)>;
     /*
      * Monitor the tile held by this object for changes. When the tile is loaded for the first time,
      * or updates, the callback is executed. If an error occurs, the first parameter will be set.

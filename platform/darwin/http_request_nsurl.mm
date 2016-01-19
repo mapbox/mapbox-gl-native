@@ -113,12 +113,12 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
 
         NSMutableURLRequest* req = [NSMutableURLRequest requestWithURL:url];
         if (existingResponse) {
-            if (!existingResponse->etag.empty()) {
-                [req addValue:@(existingResponse->etag.c_str())
-                    forHTTPHeaderField:@"If-None-Match"];
-            } else if (existingResponse->modified != Seconds::zero()) {
-                const std::string time = util::rfc1123(existingResponse->modified.count());
-                [req addValue:@(time.c_str()) forHTTPHeaderField:@"If-Modified-Since"];
+            if (existingResponse->etag) {
+                [req addValue:@((*existingResponse->etag).c_str())
+                     forHTTPHeaderField:@"If-None-Match"];
+            } else if (existingResponse->modified) {
+                [req addValue:@(util::rfc1123(SystemClock::to_time_t(*existingResponse->modified)).c_str())
+                     forHTTPHeaderField:@"If-Modified-Since"];
             }
         }
 
@@ -217,17 +217,17 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
 
         NSString *expires = [headers objectForKey:@"Expires"];
         if (expires) {
-            response->expires = Seconds(parse_date([expires UTF8String]));
+            response->expires = SystemClock::from_time_t(parse_date([expires UTF8String]));
         }
 
         NSString *last_modified = [headers objectForKey:@"Last-Modified"];
         if (last_modified) {
-            response->modified = Seconds(parse_date([last_modified UTF8String]));
+            response->modified = SystemClock::from_time_t(parse_date([last_modified UTF8String]));
         }
 
         NSString *etag = [headers objectForKey:@"ETag"];
         if (etag) {
-            response->etag = [etag UTF8String];
+            response->etag = std::string([etag UTF8String]);
         }
 
         if (responseCode == 200) {
@@ -238,15 +238,15 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
             if (existingResponse) {
                 response->data = existingResponse->data;
 
-                if (response->expires == Seconds::zero()) {
+                if (!response->expires) {
                     response->expires = existingResponse->expires;
                 }
 
-                if (response->modified == Seconds::zero()) {
+                if (!response->modified) {
                     response->modified = existingResponse->modified;
                 }
 
-                if (response->etag.empty()) {
+                if (!response->etag) {
                     response->etag = existingResponse->etag;
                 }
             }

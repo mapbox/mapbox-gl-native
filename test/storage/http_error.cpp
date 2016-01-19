@@ -28,9 +28,9 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_EQ("HTTP status code 500", res.error->message);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
         } break;
         case 1: {
             req1.reset();
@@ -40,9 +40,9 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_EQ(nullptr, res.error);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("Hello World!", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
             loop.stop();
             HTTPTemporaryError.finish();
         } break;
@@ -82,9 +82,9 @@ TEST_F(Storage, HTTPConnectionError) {
         FAIL();
 #endif
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
 
         if (counter == 2) {
             req2.reset();

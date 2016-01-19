@@ -44,7 +44,6 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
-    using Milliseconds = mbgl::Milliseconds;
 
     mbgl::Response response;
 
@@ -80,14 +79,14 @@ NAN_METHOD(NodeRequest::Respond) {
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(modified)) {
-                response.modified = mbgl::asSeconds(Milliseconds(Milliseconds::rep(modified)));
+                response.modified = mbgl::SystemClock::from_time_t(modified / 1000);
             }
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
             const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(expires)) {
-                response.expires = mbgl::asSeconds(Milliseconds(Milliseconds::rep(expires)));
+                response.expires = mbgl::SystemClock::from_time_t(expires / 1000);
             }
         }
 
