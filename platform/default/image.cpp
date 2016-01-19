@@ -70,9 +70,9 @@ std::string encodePNG(const PremultipliedImage& pre) {
     return result;
 }
 
-#if !defined(__ANDROID__) && !defined(__APPLE__)
+#if !defined(__ANDROID__)
 PremultipliedImage decodeWebP(const uint8_t*, size_t);
-#endif // !defined(__ANDROID__) && !defined(__APPLE__)
+#endif // !defined(__ANDROID__)
 
 PremultipliedImage decodePNG(const uint8_t*, size_t);
 PremultipliedImage decodeJPEG(const uint8_t*, size_t);
@@ -81,7 +81,7 @@ PremultipliedImage decodeImage(const std::string& string) {
     const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
     const size_t size = string.size();
 
-#if !defined(__ANDROID__) && !defined(__APPLE__)
+#if !defined(__ANDROID__)
     if (size >= 12) {
         uint32_t riff_magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
         uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
@@ -89,7 +89,7 @@ PremultipliedImage decodeImage(const std::string& string) {
             return decodeWebP(data, size);
         }
     }
-#endif // !defined(__ANDROID__) && !defined(__APPLE__)
+#endif // !defined(__ANDROID__)
 
     if (size >= 4) {
         uint32_t magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];

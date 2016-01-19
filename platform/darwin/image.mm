@@ -2,6 +2,8 @@
 
 #import <ImageIO/ImageIO.h>
 
+#import <webp/decode.h>
+
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
 #else
@@ -65,8 +67,21 @@ std::string encodePNG(const PremultipliedImage& src) {
     return result;
 }
 
+PremultipliedImage decodeWebP(const uint8_t*, size_t);
+
 PremultipliedImage decodeImage(const std::string &source_data) {
-    CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, reinterpret_cast<const unsigned char *>(source_data.data()), source_data.size(), kCFAllocatorNull);
+    // CoreFoundation does not decode WebP natively.
+    size_t size = source_data.size();
+    if (size >= 12) {
+        const uint8_t* data = reinterpret_cast<const uint8_t*>(source_data.data());
+        uint32_t riff_magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+        uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
+        if (riff_magic == 0x52494646 && webp_magic == 0x57454250) {
+            return decodeWebP(data, size);
+        }
+    }
+
+    CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, reinterpret_cast<const unsigned char *>(source_data.data()), size, kCFAllocatorNull);
     if (!data) {
         throw std::runtime_error("CFDataCreateWithBytesNoCopy failed");
     }
