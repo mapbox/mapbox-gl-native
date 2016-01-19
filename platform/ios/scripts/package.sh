@@ -131,6 +131,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
+            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libwebp.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
@@ -155,6 +156,7 @@ else
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
+            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libwebp.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
