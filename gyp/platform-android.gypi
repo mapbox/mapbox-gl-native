@@ -33,7 +33,6 @@
           '<@(libuv_cflags)',
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
-          '<@(variant_cflags)',
           '<@(sqlite_cflags)',
         ],
         'ldflags': [
