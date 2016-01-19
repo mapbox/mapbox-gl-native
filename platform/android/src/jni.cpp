@@ -1297,9 +1297,9 @@ void JNICALL nativeSetVisibleCoordinateBounds(JNIEnv *env, jobject obj, jlong na
     }
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
-        animationOptions.duration = std::chrono::milliseconds(duration);
+        animationOptions.duration = mbgl::Duration(std::chrono::milliseconds(duration));
         // equivalent to kCAMediaTimingFunctionDefault in iOS
-        animationOptions.easing = {0.25, 0.1, 0.25, 0.1};
+        animationOptions.easing = mbgl::util::UnitBezier(0.25, 0.1, 0.25, 0.1);
     }
 
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);

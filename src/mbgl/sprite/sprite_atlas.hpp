@@ -5,8 +5,7 @@
 #include <mbgl/platform/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
-
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <string>
 #include <map>
@@ -32,9 +31,9 @@ struct SpriteAtlasPosition {
 };
 
 struct SpriteAtlasElement {
-    const Rect<uint16_t> pos;
-    const std::shared_ptr<const SpriteImage> texture;
-    const float relativePixelRatio;
+    Rect<uint16_t> pos;
+    std::shared_ptr<const SpriteImage> texture;
+    float relativePixelRatio;
 };
 
 class SpriteAtlas : public util::noncopyable {
@@ -46,10 +45,10 @@ public:
 
     // If the sprite is loaded, copies the requsted image from it into the atlas and returns
     // the resulting icon measurements. If not, returns an empty optional.
-    mapbox::util::optional<SpriteAtlasElement> getImage(const std::string& name, const bool wrap);
+    optional<SpriteAtlasElement> getImage(const std::string& name, const bool wrap);
 
     // This function is used for getting the position during render time.
-    mapbox::util::optional<SpriteAtlasPosition> getPosition(const std::string& name, bool repeating = false);
+    optional<SpriteAtlasPosition> getPosition(const std::string& name, bool repeating = false);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
     void bind(bool linear = false);

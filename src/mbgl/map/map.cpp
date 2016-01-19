@@ -469,7 +469,7 @@ void Map::addCustomLayer(const std::string& id,
                          const char* before) {
     context->invoke(&MapContext::addLayer,
         std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
-        before ? std::string(before) : mapbox::util::optional<std::string>());
+        before ? std::string(before) : optional<std::string>());
 }
 
 void Map::removeCustomLayer(const std::string& id) {

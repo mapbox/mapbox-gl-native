@@ -54,10 +54,10 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
     }
 }
 
-mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key) const {
+optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     auto keyIter = layer.keys.find(key);
     if (keyIter == layer.keys.end()) {
-        return mapbox::util::optional<Value>();
+        return optional<Value>();
     }
 
     pbf tags = tags_pbf;
@@ -82,7 +82,7 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
         }
     }
 
-    return mapbox::util::optional<Value>();
+    return optional<Value>();
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {

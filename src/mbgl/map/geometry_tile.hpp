@@ -2,13 +2,13 @@
 #define MBGL_MAP_GEOMETRY_TILE
 
 #include <mapbox/variant.hpp>
-#include <mapbox/optional.hpp>
 
 #include <mbgl/style/value.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <cstdint>
 #include <string>
@@ -30,7 +30,7 @@ class GeometryTileFeature : private util::noncopyable {
 public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
-    virtual mapbox::util::optional<Value> getValue(const std::string& key) const = 0;
+    virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
 };
 
@@ -73,7 +73,7 @@ public:
     GeometryTileFeatureExtractor(const GeometryTileFeature& feature_)
         : feature(feature_) {}
 
-    mapbox::util::optional<Value> getValue(const std::string& key) const;
+    optional<Value> getValue(const std::string& key) const;
 
 private:
     const GeometryTileFeature& feature;

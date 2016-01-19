@@ -104,7 +104,7 @@ StyleLayer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> before) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> before) {
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();

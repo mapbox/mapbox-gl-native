@@ -279,7 +279,7 @@ double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) 
     return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
 }
 
-void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> after) {
+void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> after) {
     style->addLayer(std::move(layer), after);
     updateFlags |= Update::Classes;
     asyncUpdate.send();

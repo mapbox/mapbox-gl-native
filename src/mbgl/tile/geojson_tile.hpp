@@ -23,7 +23,7 @@ public:
 
     GeoJSONTileFeature(FeatureType, GeometryCollection&&, Tags&& = Tags{});
     FeatureType getType() const override;
-    mapbox::util::optional<Value> getValue(const std::string&) const override;
+    optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override;
 
 private:

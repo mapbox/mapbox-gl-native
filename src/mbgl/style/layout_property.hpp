@@ -29,7 +29,7 @@ public:
     void operator=(const T& v) { value = v; }
     operator T() const { return value; }
 
-    mapbox::util::optional<Function<T>> parsedValue;
+    optional<Function<T>> parsedValue;
     T value;
 };
 

@@ -47,7 +47,7 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(float src_width, float s
     return rect;
 }
 
-mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find({ name, wrap });
@@ -74,7 +74,7 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
     return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
 }
 
-mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
+optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto img = getImage(name, repeating);

@@ -12,12 +12,12 @@ AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollecti
       properties(std::move(properties_)),
       geometries(geometries_) {}
 
-mapbox::util::optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
+optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     auto it = properties.find(key);
     if (it != properties.end()) {
-        return mapbox::util::optional<Value>(it->second);
+        return optional<Value>(it->second);
     }
-    return mapbox::util::optional<Value>();
+    return optional<Value>();
 }
 
 util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) const {

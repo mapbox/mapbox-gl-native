@@ -4,7 +4,7 @@
 
 namespace mbgl {
 
-mapbox::util::optional<Value> GeometryTileFeatureExtractor::getValue(const std::string& key) const {
+optional<Value> GeometryTileFeatureExtractor::getValue(const std::string& key) const {
     if (key == "$type") {
         return Value(uint64_t(feature.getType()));
     }

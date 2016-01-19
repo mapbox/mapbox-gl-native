@@ -4,15 +4,14 @@
 #include <mbgl/style/types.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
-
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <functional>
 
 namespace mbgl {
 
 template <typename T>
-using optional = mapbox::util::optional<T>;
+using optional = optional<T>;
 
 template <typename T>
 optional<T> parseProperty(const char* name, const JSValue&);

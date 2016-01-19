@@ -1,11 +1,10 @@
 #ifndef MBGL_MAP_CAMERA
 #define MBGL_MAP_CAMERA
 
-#include <mapbox/optional.hpp>
-
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/unitbezier.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <functional>
 
@@ -15,27 +14,27 @@ namespace mbgl {
     optional. */
 struct CameraOptions {
     /** Coordinate at the center of the map. */
-    mapbox::util::optional<LatLng> center;
+    optional<LatLng> center;
     
     /** Padding around the interior of the view that affects the frame of
         reference for `center`. */
-    mapbox::util::optional<EdgeInsets> padding;
+    optional<EdgeInsets> padding;
     
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */
-    mapbox::util::optional<PrecisionPoint> anchor;
+    optional<PrecisionPoint> anchor;
     
     /** Zero-based zoom level. Constrained to the minimum and maximum zoom
         levels. */
-    mapbox::util::optional<double> zoom;
+    optional<double> zoom;
     
     /** Bearing, measured in radians counterclockwise from true north. Wrapped
         to [−π rad, π rad). */
-    mapbox::util::optional<double> angle;
+    optional<double> angle;
     
     /** Pitch toward the horizon measured in radians, with 0 rad resulting in a
         two-dimensional map. */
-    mapbox::util::optional<double> pitch;
+    optional<double> pitch;
 };
 
 /** Various options for describing a transition between viewpoints with
@@ -43,21 +42,21 @@ struct CameraOptions {
     struct is used. */
 struct AnimationOptions {
     /** Time to animate to the viewpoint defined herein. */
-    mapbox::util::optional<Duration> duration;
+    optional<Duration> duration;
     
     /** Average velocity of a flyTo() transition, measured in screenfuls per
         second, assuming a linear timing curve.
         
         A <i>screenful</i> is the visible span in pixels. It does not correspond
         to a fixed physical distance but rather varies by zoom level. */
-    mapbox::util::optional<double> velocity;
+    optional<double> velocity;
     
     /** Zero-based zoom level at the peak of the flyTo() transition’s flight
         path. */
-    mapbox::util::optional<double> minZoom;
+    optional<double> minZoom;
     
     /** The easing timing curve of the transition. */
-    mapbox::util::optional<mbgl::util::UnitBezier> easing;
+    optional<mbgl::util::UnitBezier> easing;
     
     /** A function that is called on each frame of the transition, just before a
         screen update, except on the last frame. The first parameter indicates

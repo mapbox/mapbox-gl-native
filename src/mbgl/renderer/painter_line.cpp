@@ -103,8 +103,8 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         bucket.drawLineSDF(*linesdfShader);
 
     } else if (!properties.pattern.value.from.empty()) {
-        mapbox::util::optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        mapbox::util::optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
         
         if (!imagePosA || !imagePosB)
             return;

@@ -262,8 +262,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     const BackgroundPaintProperties& properties = layer.paint;
 
     if (!properties.pattern.value.to.empty()) {
-        mapbox::util::optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        mapbox::util::optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
 
         if (!imagePosA || !imagePosB)
             return;
