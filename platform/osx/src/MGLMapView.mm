@@ -1117,14 +1117,24 @@ public:
         contentInsets = NSEdgeInsetsZero;
     }
     
-    if (!NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
-        // After adjusting the content insets, move the center coordinate from
-        // the old frame of reference to the new one represented by the newly
-        // set content insets.
-        CLLocationCoordinate2D oldCenter = self.centerCoordinate;
-        self.contentInsets = contentInsets;
-        self.centerCoordinate = oldCenter;
+    self.contentInsets = contentInsets;
+}
+
+- (void)setContentInsets:(NSEdgeInsets)contentInsets {
+    [self setContentInsets:contentInsets animated:NO];
+}
+
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {
+    if (NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
+        return;
     }
+    
+    // After adjusting the content insets, move the center coordinate from the
+    // old frame of reference to the new one represented by the newly set
+    // content insets.
+    CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+    _contentInsets = contentInsets;
+    [self setCenterCoordinate:oldCenter animated:animated];
 }
 
 #pragma mark Mouse events and gestures

@@ -810,24 +810,37 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         return;
     }
     
-    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+    UIEdgeInsets contentInset = UIEdgeInsetsZero;
     CGPoint topPoint = CGPointMake(0, viewController.topLayoutGuide.length);
-    contentInsets.top = [self convertPoint:topPoint fromView:viewController.view].y;
+    contentInset.top = [self convertPoint:topPoint fromView:viewController.view].y;
     CGPoint bottomPoint = CGPointMake(0, CGRectGetMaxY(viewController.view.bounds)
                                       - viewController.bottomLayoutGuide.length);
-    contentInsets.bottom = (CGRectGetMaxY(self.bounds) - [self convertPoint:bottomPoint
-                                                                   fromView:viewController.view].y);
-    
-    if ( ! UIEdgeInsetsEqualToEdgeInsets(contentInsets, self.contentInset))
+    contentInset.bottom = (CGRectGetMaxY(self.bounds)
+                           - [self convertPoint:bottomPoint fromView:viewController.view].y);
+    self.contentInset = contentInset;
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset
+{
+    [self setContentInset:contentInset animated:NO];
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated
+{
+    if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset))
     {
-        // After adjusting the content insets, move the center coordinate from
-        // the old frame of reference to the new one represented by the newly
-        // set content insets.
-        CLLocationCoordinate2D oldCenter = self.centerCoordinate;
-        self.contentInset = contentInsets;
-        // Don’t call -setCenterCoordinate:, which resets the user tracking mode.
-        [self _setCenterCoordinate:oldCenter animated:NO];
+        return;
     }
+    
+    // After adjusting the content inset, move the center coordinate from the
+    // old frame of reference to the new one represented by the newly set
+    // content inset.
+    CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+    
+    _contentInset = contentInset;
+    
+    // Don’t call -setCenterCoordinate:, which resets the user tracking mode.
+    [self _setCenterCoordinate:oldCenter animated:animated];
 }
 
 /// Returns the frame of inset content within the map view.

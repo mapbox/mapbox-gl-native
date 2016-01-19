@@ -330,8 +330,30 @@ IB_DESIGNABLE
     the map center is effectively shifted downward.
     
     When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
-    the value of this property may be overridden at any time. */
+    the value of this property may be overridden at any time.
+    
+    Changing the value of this property updates the map view immediately. If you
+    want to animate the change, use the `-setContentInsets:animated:` method
+    instead. */
 @property (nonatomic, assign) NSEdgeInsets contentInsets;
+
+/** Sets the distance from the edges of the map view’s frame to the edges of the
+    map view’s logical viewport, with an optional transition animation.
+    
+    When the value of this property is equal to `NSEdgeInsetsZero`, viewport
+    properties such as `centerCoordinate` assume a viewport that matches the map
+    view’s frame. Otherwise, those properties are inset, excluding part of the
+    frame from the viewport. For instance, if the only the top edge is inset,
+    the map center is effectively shifted downward.
+    
+    When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
+    the value of this property may be overridden at any time.
+    
+    @param contentInsets The new values to inset the content by.
+    @param animated Specify `YES` if you want the map view to animate the change
+        to the content insets or `NO` if you want the map to inset the content
+        immediately. */
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated;
 
 #pragma mark Configuring gesture recognition
 /** @name Configuring How the User Interacts with the Map */
