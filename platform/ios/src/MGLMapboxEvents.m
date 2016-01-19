@@ -493,6 +493,11 @@ const NSTimeInterval MGLFlushInterval = 60;
 
             [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
 
+            UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
+            if (batteryState != UIDeviceBatteryStateUnknown) {
+                [evt setValue:(batteryState == UIDeviceBatteryStateUnplugged ? @NO : @YES) forKey:@"pluggedIn"];
+            }
+
             MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
             [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
         }
