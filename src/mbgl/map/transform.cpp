@@ -96,7 +96,6 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         padding = *camera.padding;
     }
     const LatLng startLatLng = getLatLng(padding);
-    padding.flip();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -106,6 +105,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
+    PrecisionPoint center = padding.getCenter(state.width, state.height);
+    center.y = state.height - center.y;
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
@@ -148,7 +149,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         }
         
         if (padding) {
-            state.moveLatLng(frameLatLng, padding.getCenter(state.width, state.height));
+            state.moveLatLng(frameLatLng, center);
         }
         return update;
     }, duration);
@@ -178,7 +179,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         padding = *camera.padding;
     }
     const LatLng startLatLng = getLatLng(padding);
-    padding.flip();
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -188,6 +188,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
+    PrecisionPoint center = padding.getCenter(state.width, state.height);
+    center.y = state.height - center.y;
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
@@ -321,7 +323,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         }
         
         if (padding) {
-            state.moveLatLng(frameLatLng, padding.getCenter(state.width, state.height));
+            state.moveLatLng(frameLatLng, center);
         }
         return Update::Zoom;
     }, duration);
@@ -412,9 +414,7 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInset
 
 LatLng Transform::getLatLng(const EdgeInsets& padding) const {
     if (padding) {
-        EdgeInsets flippedPadding = padding;
-        flippedPadding.flip();
-        return state.pointToLatLng(flippedPadding.getCenter(state.width, state.height));
+        return pointToLatLng(padding.getCenter(state.width, state.height));
     } else {
         return state.getLatLng();
     }

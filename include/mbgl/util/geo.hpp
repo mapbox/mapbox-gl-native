@@ -138,8 +138,6 @@ struct EdgeInsets {
     }
     
     PrecisionPoint getCenter(uint16_t width, uint16_t height) const;
-    
-    void flip();
 };
 
 } // namespace mbgl
