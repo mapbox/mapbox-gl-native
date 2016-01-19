@@ -1,41 +1,52 @@
 package com.mapbox.mapboxsdk.geometry;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
 /**
  * A rectangular geograpical region defined by a south west {@link LatLng} and a north east {@link LatLng}.
  */
-public class CoordinateBounds {
+public class CoordinateBounds implements Parcelable {
 
-    private LatLng southWest;
-    private LatLng northEast;
+    private LatLng mSouthWest;
+    private LatLng mNorthEast;
 
-    public CoordinateBounds(LatLng southWest, LatLng northEast) {
-        this.southWest = southWest;
-        this.northEast = northEast;
+    public CoordinateBounds(@NonNull Parcel in) {
+        mSouthWest = in.readParcelable(LatLng.class.getClassLoader());
+        mNorthEast = in.readParcelable(LatLng.class.getClassLoader());
     }
 
+    public CoordinateBounds(@NonNull LatLng southWest, @NonNull LatLng northEast) {
+        mSouthWest = southWest;
+        mNorthEast = northEast;
+    }
+
+    @NonNull
     public LatLng getSouthWest() {
-        return southWest;
+        return mSouthWest;
     }
 
-    public void setSouthWest(LatLng southWest) {
-        this.southWest = southWest;
+    public void setSouthWest(@NonNull LatLng mSouthWest) {
+        this.mSouthWest = mSouthWest;
     }
 
+    @NonNull
     public LatLng getNorthEast() {
-        return northEast;
+        return mNorthEast;
     }
 
-    public void setNorthEast(LatLng northEast) {
-        this.northEast = northEast;
+    public void setNorthEast(@NonNull LatLng mNorthEast) {
+        this.mNorthEast = mNorthEast;
     }
 
     @Override
     public int hashCode() {
         int result;
         long temp;
-        temp = southWest.hashCode();
+        temp = mSouthWest.hashCode();
         result = (int) (temp ^ (temp >>> 32));
-        temp = northEast.hashCode();
+        temp = mNorthEast.hashCode();
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -53,6 +64,30 @@ public class CoordinateBounds {
 
     @Override
     public String toString() {
-        return "CoordinateBounds [northEast[" + getNorthEast() + "], southWest[]" + getSouthWest() + "]";
+        return "CoordinateBounds [mNorthEast[" + getNorthEast() + "], mSouthWest[]" + getSouthWest() + "]";
+    }
+
+    public static final Parcelable.Creator<CoordinateBounds> CREATOR =
+            new Parcelable.Creator<CoordinateBounds>() {
+                @Override
+                public CoordinateBounds createFromParcel(Parcel in) {
+                    return new CoordinateBounds(in);
+                }
+
+                @Override
+                public CoordinateBounds[] newArray(int size) {
+                    return new CoordinateBounds[size];
+                }
+            };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int arg1) {
+        out.writeParcelable(mSouthWest, arg1);
+        out.writeParcelable(mNorthEast, arg1);
     }
 }

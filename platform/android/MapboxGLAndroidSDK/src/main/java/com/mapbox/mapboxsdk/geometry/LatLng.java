@@ -21,7 +21,7 @@ import java.io.Serializable;
  * data automatically, so all data enters in the WGS84 datum.
  * </p>
  */
-public class LatLng implements ILatLng, Parcelable, Serializable {
+public class LatLng implements ILatLng, Parcelable {
 
     public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
         public LatLng createFromParcel(Parcel in) {

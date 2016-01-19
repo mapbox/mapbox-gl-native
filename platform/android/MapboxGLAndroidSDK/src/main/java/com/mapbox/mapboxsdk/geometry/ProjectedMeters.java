@@ -13,7 +13,7 @@ import java.io.Serializable;
  * except at the equator.
  * </p>
  */
-public class ProjectedMeters implements IProjectedMeters, Parcelable, Serializable {
+public class ProjectedMeters implements IProjectedMeters, Parcelable {
 
     public static final Creator<ProjectedMeters> CREATOR = new Creator<ProjectedMeters>() {
         public ProjectedMeters createFromParcel(Parcel in) {
