@@ -22,6 +22,12 @@ import java.util.List;
 public class PolylineActivity extends AppCompatActivity {
 
     private static final String STATE_POLYLINE_OPTIONS = "polylineOptions";
+    private static final LatLng ANDORRA = new LatLng(42.505777, 1.52529);
+    private static final LatLng LUXEMBOURG = new LatLng(49.815273, 6.129583);
+    private static final LatLng MONACO = new LatLng(43.738418, 7.424616);
+    private static final LatLng VATICAN_CITY = new LatLng(41.902916, 12.453389);
+    private static final LatLng SAN_MARINO = new LatLng(43.942360, 12.457777);
+    private static final LatLng LIECHTENSTEIN = new LatLng(47.166000, 9.555373);
 
     private List<Polyline> mPolylines;
     private ArrayList<PolylineOptions> mPolylineOptions = new ArrayList<>();
@@ -48,8 +54,9 @@ public class PolylineActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             mPolylineOptions = savedInstanceState.getParcelableArrayList(STATE_POLYLINE_OPTIONS);
         } else {
-            mPolylineOptions.addAll(PolylineProvider.getAll());
+            mPolylineOptions.addAll(getAllPolylines());
         }
+
         mPolylines = mMapView.addPolylines(mPolylineOptions);
 
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
@@ -65,12 +72,38 @@ public class PolylineActivity extends AppCompatActivity {
                     }
                 }
                 mPolylineOptions.clear();
-                mPolylineOptions.addAll(PolylineProvider.getRandomLine());
+                mPolylineOptions.addAll(getRandomLine());
                 mPolylines = mMapView.addPolylines(mPolylineOptions);
             }
         });
     }
 
+    private List<PolylineOptions> getAllPolylines() {
+        List<PolylineOptions> options = new ArrayList<>();
+        options.add(generatePolyline(ANDORRA, LUXEMBOURG, "#F44336"));
+        options.add(generatePolyline(ANDORRA, MONACO, "#FF5722"));
+        options.add(generatePolyline(MONACO, VATICAN_CITY, "#673AB7"));
+        options.add(generatePolyline(VATICAN_CITY, SAN_MARINO, "#009688"));
+        options.add(generatePolyline(SAN_MARINO, LIECHTENSTEIN, "#795548"));
+        options.add(generatePolyline(LIECHTENSTEIN, LUXEMBOURG, "#3F51B5"));
+        return options;
+    }
+
+    private PolylineOptions generatePolyline(LatLng start, LatLng end, String color) {
+        PolylineOptions line = new PolylineOptions();
+        line.add(start);
+        line.add(end);
+        line.color(Color.parseColor(color));
+        return line;
+    }
+
+    public List<PolylineOptions> getRandomLine() {
+        final List<PolylineOptions> randomLines = getAllPolylines();
+        Collections.shuffle(randomLines);
+        return new ArrayList<PolylineOptions>(){{
+            add(randomLines.get(0));
+        }};
+    }
 
     @Override
     protected void onStart() {
@@ -137,44 +170,6 @@ public class PolylineActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private static class PolylineProvider {
-        private static final LatLng ANDORRA = new LatLng(42.505777, 1.52529);
-        private static final LatLng LUXEMBOURG = new LatLng(49.815273, 6.129583);
-        private static final LatLng MONACO = new LatLng(43.738418, 7.424616);
-        private static final LatLng VATICAN_CITY = new LatLng(41.902916, 12.453389);
-        private static final LatLng SAN_MARINO = new LatLng(43.942360, 12.457777);
-        private static final LatLng LIECHTENSTEIN = new LatLng(47.166000, 9.555373);
-
-        private static final List<PolylineOptions> POLYLINES = new ArrayList<PolylineOptions>() {{
-            add(generatePolyline(ANDORRA, LUXEMBOURG, "#F44336"));
-            add(generatePolyline(ANDORRA, MONACO, "#FF5722"));
-            add(generatePolyline(MONACO, VATICAN_CITY, "#673AB7"));
-            add(generatePolyline(VATICAN_CITY, SAN_MARINO, "#009688"));
-            add(generatePolyline(SAN_MARINO, LIECHTENSTEIN, "#795548"));
-            add(generatePolyline(LIECHTENSTEIN, LUXEMBOURG, "#3F51B5"));
-        }};
-
-        private static PolylineOptions generatePolyline(LatLng start, LatLng end, String color) {
-            PolylineOptions line = new PolylineOptions();
-            line.add(start);
-            line.add(end);
-            line.color(Color.parseColor(color));
-            return line;
-        }
-
-        public static List<PolylineOptions> getAll() {
-            return POLYLINES;
-        }
-
-        public static List<PolylineOptions> getRandomLine() {
-            List<PolylineOptions> randomLines = new ArrayList<>();
-            Collections.shuffle(POLYLINES);
-            randomLines.add(POLYLINES.get(0));
-            return randomLines;
-        }
-
     }
 
 }
