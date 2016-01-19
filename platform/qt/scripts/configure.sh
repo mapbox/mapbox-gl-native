@@ -9,6 +9,7 @@ RAPIDJSON_VERSION=1.0.2
 SQLITE_VERSION=3.9.1
 VARIANT_VERSION=1.1.0
 ZLIB_VERSION=system
+WEBP_VERSION=0.5.0
 
 if [ "$MASON_PLATFORM" == "osx" ]; then
     function print_opengl_flags {

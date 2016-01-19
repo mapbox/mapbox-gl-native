@@ -19,10 +19,23 @@ std::string encodePNG(const PremultipliedImage& pre) {
     return std::string(array.constData(), array.size());
 }
 
+PremultipliedImage decodeWebP(const uint8_t*, size_t);
 
-PremultipliedImage decodeImage(const std::string& data) {
+PremultipliedImage decodeImage(const std::string& string) {
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
+    const size_t size = string.size();
+
+    // FIXME: Use Qt WebP decoder plugin.
+    if (size >= 12) {
+        uint32_t riff_magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
+        uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
+        if (riff_magic == 0x52494646 && webp_magic == 0x57454250) {
+            return decodeWebP(data, size);
+        }
+    }
+
     QImage image =
-        QImage::fromData(reinterpret_cast<const uint8_t*>(data.data()), data.size())
+        QImage::fromData(data, size)
         .rgbSwapped()
         .convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
@@ -30,16 +43,10 @@ PremultipliedImage decodeImage(const std::string& data) {
         throw std::runtime_error("Unsupported image type");
     }
 
-    PremultipliedImage pre;
-    pre.width = image.width();
-    pre.height = image.height();
-
     auto img = std::make_unique<uint8_t[]>(image.byteCount());
     memcpy(img.get(), image.constBits(), image.byteCount());
 
-    pre.data = std::move(img);
-
-    return pre;
+    return { size_t(image.width()), size_t(image.height()), std::move(img) };
 }
 
 }
