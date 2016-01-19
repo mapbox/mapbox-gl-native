@@ -37,10 +37,17 @@ TEST(Mapbox, SpriteURL) {
 
 TEST(Mapbox, TileURL) {
     try {
+#if defined(__ANDROID__) || defined(__APPLE__)
         EXPECT_EQ("http://path.png/tile{ratio}.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png"));
         EXPECT_EQ("http://path.png/tile{ratio}.png32", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png32"));
         EXPECT_EQ("http://path.png/tile{ratio}.png70", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png70"));
         EXPECT_EQ("http://path.png/tile{ratio}.png?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png?access_token=foo"));
+#else
+        EXPECT_EQ("http://path.png/tile{ratio}.webp", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png"));
+        EXPECT_EQ("http://path.png/tile{ratio}.webp32", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png32"));
+        EXPECT_EQ("http://path.png/tile{ratio}.webp70", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png70"));
+        EXPECT_EQ("http://path.png/tile{ratio}.webp?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png?access_token=foo"));
+#endif // defined(__ANDROID__) || defined(__APPLE__)
         EXPECT_EQ("http://path.png/tile{ratio}.pbf", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf"));
         EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo"));
         EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png"));
