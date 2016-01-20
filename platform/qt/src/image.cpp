@@ -19,6 +19,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     return std::string(array.constData(), array.size());
 }
 
+PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 PremultipliedImage decodeWebP(const uint8_t*, size_t);
 
 PremultipliedImage decodeImage(const std::string& string) {
@@ -31,6 +32,14 @@ PremultipliedImage decodeImage(const std::string& string) {
         uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
         if (riff_magic == 0x52494646 && webp_magic == 0x57454250) {
             return decodeWebP(data, size);
+        }
+    }
+
+    // Use libjpeg-turbo rather than the built-in version of libjpeg.
+    if (size >= 2) {
+        uint16_t magic = ((data[0] << 8) | data[1]) & 0xffff;
+        if (magic == 0xFFD8) {
+            return decodeJPEG(data, size);
         }
     }
 

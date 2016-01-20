@@ -34,6 +34,7 @@
       'sources': [
         '../default/asset_file_source.cpp',
         '../default/default_file_source.cpp',
+        '../default/jpeg_reader.cpp',
         '../default/log_stderr.cpp',
         '../default/mbgl/storage/offline.cpp',
         '../default/mbgl/storage/offline_database.cpp',
@@ -65,6 +66,7 @@
       'variables': {
         'cflags': [
           '<@(boost_cflags)',
+          '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',
           '<@(opengl_cflags)',
           '<@(qt_cflags)',
@@ -76,6 +78,7 @@
           '-fPIC',
         ],
         'ldflags': [
+          '<@(libjpeg-turbo_ldflags)',
           '<@(nunicode_ldflags)',
           '<@(opengl_ldflags)',
           '<@(qt_ldflags)',
@@ -86,6 +89,7 @@
         'libraries': [
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(webp_static_libs)',
           '<@(zlib_static_libs)',
         ],
