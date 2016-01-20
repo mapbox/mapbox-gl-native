@@ -5,7 +5,6 @@
 #include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/timer.hpp>
 
 #include <memory>

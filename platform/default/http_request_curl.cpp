@@ -3,7 +3,6 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -368,7 +367,7 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const std::string& u
             headers = curl_slist_append(headers, header.c_str());
         } else if (existingResponse->modified) {
             const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(SystemClock::to_time_t(*existingResponse->modified));
+                std::string("If-Modified-Since: ") + util::rfc1123(*existingResponse->modified);
             headers = curl_slist_append(headers, time.c_str());
         }
     }

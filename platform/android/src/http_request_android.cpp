@@ -5,10 +5,8 @@
 #include "jni.hpp"
 
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/parsedate.h>
 
 #include <jni.h>
 
@@ -127,7 +125,7 @@ HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const std::
         if (existingResponse->etag) {
             etagStr = *existingResponse->etag;
         } else if (existingResponse->modified) {
-            modifiedStr = util::rfc1123(SystemClock::to_time_t(*existingResponse->modified));
+            modifiedStr = util::rfc1123(*existingResponse->modified);
         }
     }
 
@@ -197,7 +195,7 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
     }
 
     if (modified != nullptr) {
-        response->modified = SystemClock::from_time_t(parse_date(mbgl::android::std_string_from_jstring(env, modified).c_str()));
+        response->modified = util::parseTimePoint(mbgl::android::std_string_from_jstring(env, modified).c_str());
     }
 
     if (cacheControl != nullptr) {
@@ -205,7 +203,7 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
     }
 
     if (expires != nullptr) {
-        response->expires = SystemClock::from_time_t(parse_date(mbgl::android::std_string_from_jstring(env, expires).c_str()));
+        response->expires = util::parseTimePoint(mbgl::android::std_string_from_jstring(env, expires).c_str());
     }
 
     if (body != nullptr) {

@@ -3,8 +3,6 @@
 #include <mbgl/storage/response.hpp>
 
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/time.hpp>
-#include <mbgl/util/parsedate.h>
 #include <mbgl/util/run_loop.hpp>
 
 #import <Foundation/Foundation.h>
@@ -117,7 +115,7 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
                 [req addValue:@((*existingResponse->etag).c_str())
                      forHTTPHeaderField:@"If-None-Match"];
             } else if (existingResponse->modified) {
-                [req addValue:@(util::rfc1123(SystemClock::to_time_t(*existingResponse->modified)).c_str())
+                [req addValue:@(util::rfc1123(*existingResponse->modified).c_str())
                      forHTTPHeaderField:@"If-Modified-Since"];
             }
         }
@@ -217,12 +215,12 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
 
         NSString *expires = [headers objectForKey:@"Expires"];
         if (expires) {
-            response->expires = SystemClock::from_time_t(parse_date([expires UTF8String]));
+            response->expires = util::parseTimePoint([expires UTF8String]);
         }
 
         NSString *last_modified = [headers objectForKey:@"Last-Modified"];
         if (last_modified) {
-            response->modified = SystemClock::from_time_t(parse_date([last_modified UTF8String]));
+            response->modified = util::parseTimePoint([last_modified UTF8String]);
         }
 
         NSString *etag = [headers objectForKey:@"ETag"];
