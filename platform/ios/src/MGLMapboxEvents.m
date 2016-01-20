@@ -12,8 +12,8 @@
 
 #include <sys/sysctl.h>
 
-static const NSUInteger version = 1;
-static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.1";
+static const NSUInteger version = 2;
+static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/2.0";
 static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
