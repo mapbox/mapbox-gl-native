@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import <mbgl/ios/MGLCalloutView.h>
+#import <Mapbox/Mapbox.h>
 
 /**
  * Basic custom callout view to demonstrate how to

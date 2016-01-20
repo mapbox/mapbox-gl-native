@@ -1,7 +1,5 @@
 #import "MBXCustomCalloutView.h"
 
-#import <mbgl/darwin/MGLAnnotation.h>
-
 static CGFloat const tipHeight = 10.0;
 static CGFloat const tipWidth = 10.0;
 
