@@ -57,6 +57,7 @@
         'miscellaneous/mapbox.cpp',
         'miscellaneous/merge_lines.cpp',
         'miscellaneous/style_parser.cpp',
+        'miscellaneous/run_loop.cpp',
         'miscellaneous/text_conversions.cpp',
         'miscellaneous/thread.cpp',
         'miscellaneous/thread_local.cpp',
