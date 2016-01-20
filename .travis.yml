@@ -39,12 +39,6 @@ matrix:
       compiler: clang
       env: FLAVOR=node NODE_VERSION=4
 
-    # OS X/Node.js 0.10 - Xcode 7
-    - os: osx
-      osx_image: xcode7
-      compiler: clang
-      env: FLAVOR=node NODE_VERSION=0.10
-
 
     # Linux/Node.js 5 - Clang 3.5 - Release
     - os: linux
@@ -56,12 +50,6 @@ matrix:
     - os: linux
       compiler: ": node4-clang35-release"
       env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=4 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
-      addons: *clang35
-
-    # Linux/Node.js 0.10 - Clang 3.5 - Release
-    - os: linux
-      compiler: ": node0.10-clang35-release"
-      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=0.10 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
 
 
