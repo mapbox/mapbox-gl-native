@@ -5,6 +5,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
+#include <mbgl/util/run_loop.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -96,6 +97,11 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
       context(context_),
       existingResponse(existingResponse_),
       async([this] { handleResponse(); }) {
+    // Hold the main loop alive until the request returns. This
+    // is needed because completion handler runs in another
+    // thread and will notify this thread using AsyncTask.
+    util::RunLoop::Get()->ref();
+
     @autoreleasepool {
         NSURL* url = [NSURL URLWithString:@(url_.c_str())];
         if (context->accountType == 0 &&
@@ -129,6 +135,7 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
 }
 
 HTTPNSURLRequest::~HTTPNSURLRequest() {
+    util::RunLoop::Get()->unref();
     assert(!task);
 }
 
