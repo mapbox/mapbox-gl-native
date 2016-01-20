@@ -396,10 +396,14 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
 
         // Calculate the scales at which the text and icon can be placed without collision.
 
-        float glyphScale = hasText && !layout.text.allowOverlap ?
-            collisionTile.placeFeature(symbolInstance.textCollisionFeature) : collisionTile.minScale;
-        float iconScale = hasIcon && !layout.icon.allowOverlap ?
-            collisionTile.placeFeature(symbolInstance.iconCollisionFeature) : collisionTile.minScale;
+        float glyphScale = hasText ?
+            collisionTile.placeFeature(symbolInstance.textCollisionFeature,
+                    layout.text.allowOverlap, layout.avoidEdges) :
+            collisionTile.minScale;
+        float iconScale = hasIcon ?
+            collisionTile.placeFeature(symbolInstance.iconCollisionFeature,
+                    layout.icon.allowOverlap, layout.avoidEdges) :
+            collisionTile.minScale;
 
 
         // Combine the scales for icons and text.
