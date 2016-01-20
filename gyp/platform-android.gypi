@@ -29,7 +29,7 @@
       'variables': {
         'cflags_cc': [
           '<@(libpng_cflags)',
-          '<@(jpeg_cflags)',
+          '<@(libjpeg-turbo_cflags)',
           '<@(libuv_cflags)',
           '<@(nunicode_cflags)',
           '<@(boost_cflags)',
@@ -38,7 +38,7 @@
         ],
         'ldflags': [
           '<@(libpng_ldflags)',
-          '<@(jpeg_ldflags)',
+          '<@(libjpeg-turbo_ldflags)',
           '<@(libuv_ldflags)',
           '<@(nunicode_ldflags)',
           '<@(sqlite_ldflags)',
@@ -46,7 +46,7 @@
         ],
         'libraries': [
           '<@(libpng_static_libs)',
-          '<@(jpeg_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',

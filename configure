@@ -32,7 +32,7 @@ function print_flags {
     if [ "$(type -t print_${NAME}_flags)" = 'function' ]; then
         print_${NAME}_flags
     else
-        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]" "[:upper:]"`
+        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]-" "[:upper:]_"`
         if [ ! -z ${!VERSION:-} ] ; then
             mason install ${NAME} ${!VERSION}
             for FLAGS in "$@" ; do
@@ -94,7 +94,7 @@ print_flags openssl static_libs cflags ldflags
 print_flags libcurl static_libs cflags ldflags
 print_flags glfw static_libs cflags ldflags
 print_flags libpng static_libs cflags ldflags
-print_flags jpeg static_libs cflags ldflags
+print_flags libjpeg-turbo static_libs cflags ldflags
 print_flags sqlite static_libs cflags ldflags
 print_flags libuv static_libs cflags ldflags
 print_flags zlib static_libs cflags ldflags

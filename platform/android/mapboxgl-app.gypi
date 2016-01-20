@@ -30,7 +30,7 @@
       ],
       'libraries': [
           '<@(libpng_static_libs)',
-          '<@(jpeg_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
@@ -45,7 +45,7 @@
           '-lstdc++',
           '-latomic',
           '<@(libpng_ldflags)',
-          '<@(jpeg_ldflags)',
+          '<@(libjpeg-turbo_ldflags)',
           '<@(sqlite_ldflags)',
           '<@(zlib_ldflags)',
           '<@(libzip_ldflags)',
