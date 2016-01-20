@@ -65,10 +65,7 @@ struct AnimationOptions {
     std::function<void(double)> transitionFrameFn;
     
     /** A function that is called once from the Map thread on the last frame of
-        the transition, just before the corresponding screen update. The first
-        parameter indicates how much of the transition was completed, as a
-        percentage of the duration. In the event that the transition is
-        canceled, this parameter will have a value less than 1.0. */
+        the transition, just before the corresponding screen update. */
     std::function<void()> transitionFinishFn;
     
     /** Creates an animation with no options specified. */
