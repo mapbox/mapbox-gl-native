@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PointF;
+import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,32 +17,29 @@ import java.lang.ref.WeakReference;
 
 /**
  * <p>
- * A tooltip view. This is a UI element placed over a map at a specific geographic
- * location.
+ * InfoWindow is a tooltip shown when a {@link Marker} is tapped.
+ * </p>
+ * <p>
+ * This is a UI element placed over a map at a specific geographic location.
  * </p>
  */
 public class InfoWindow {
 
     private WeakReference<Marker> mBoundMarker;
     private WeakReference<MapView> mMapView;
+    protected WeakReference<View> mView;
+
     private float mMarkerHeightOffset;
     private float mViewWidthOffset;
     private PointF mCoordinates;
     private boolean mIsVisible;
-    protected WeakReference<View> mView;
 
-    static int mTitleId = 0;
-    static int mDescriptionId = 0;
-    static int mSubDescriptionId = 0;
-    static int mImageId = 0;
+    @LayoutRes
+    private int mLayoutRes;
 
     InfoWindow(int layoutResId, MapView mapView) {
+        mLayoutRes = layoutResId;
         View view = LayoutInflater.from(mapView.getContext()).inflate(layoutResId, mapView, false);
-
-        if (mTitleId == 0) {
-            setResIds(mapView.getContext());
-        }
-
         initialize(view, mapView);
     }
 
@@ -86,7 +83,7 @@ public class InfoWindow {
      *                    This allows to offset the view from the object position.
      * @return this infowindow
      */
-    InfoWindow open(Marker boundMarker, LatLng position, int offsetX, int offsetY) {
+    InfoWindow open(MapView mapView, Marker boundMarker, LatLng position, int offsetX, int offsetY) {
         setBoundMarker(boundMarker);
 
         MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT);
@@ -99,21 +96,21 @@ public class InfoWindow {
             mMarkerHeightOffset = -view.getMeasuredHeight() + offsetY;
 
             // Calculate default Android x,y coordinate
-            mCoordinates = mMapView.get().toScreenLocation(position);
+            mCoordinates = mapView.toScreenLocation(position);
             float x = mCoordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
             float y = mCoordinates.y - view.getMeasuredHeight() + offsetY;
 
             if (view instanceof InfoWindowView) {
                 // only apply repositioning/margin for InfoWindowView
-                Resources resources = mMapView.get().getContext().getResources();
+                Resources resources = mapView.getContext().getResources();
 
                 // get right/left popup window
                 float rightSideInfowWindow = x + view.getMeasuredWidth();
                 float leftSideInfoWindow = x;
 
                 // get right/left map view
-                final float mapRight = mMapView.get().getRight();
-                final float mapLeft = mMapView.get().getLeft();
+                final float mapRight = mapView.getRight();
+                final float mapLeft = mapView.getLeft();
 
                 float marginHorizontal = resources.getDimension(R.dimen.infowindow_margin);
                 float tipViewOffset = resources.getDimension(R.dimen.infowindow_tipview_width) / 2;
@@ -164,7 +161,7 @@ public class InfoWindow {
             mViewWidthOffset = x - mCoordinates.x - offsetX;
 
             close(); //if it was already opened
-            mMapView.get().addView(view, lp);
+            mapView.addView(view, lp);
             mIsVisible = true;
         }
         return this;
@@ -194,25 +191,17 @@ public class InfoWindow {
      *
      * @param overlayItem the tapped overlay item
      */
-    void adaptDefaultMarker(Marker overlayItem) {
+    void adaptDefaultMarker(Marker overlayItem, MapView mapView) {
         View view = mView.get();
-        if (view != null) {
-            String title = overlayItem.getTitle();
-            ((TextView) view.findViewById(mTitleId /*R.id.title*/)).setText(title);
-            String snippet = overlayItem.getSnippet();
-            ((TextView) view.findViewById(mDescriptionId /*R.id.description*/)).setText(snippet);
+        if (view == null) {
+            view = LayoutInflater.from(mapView.getContext()).inflate(mLayoutRes, mapView, false);
+            initialize(view, mapView);
         }
-/*
-        //handle sub-description, hiding or showing the text view:
-        TextView subDescText = (TextView) mView.findViewById(mSubDescriptionId);
-        String subDesc = overlayItem.getSubDescription();
-        if ("".equals(subDesc)) {
-            subDescText.setVisibility(View.GONE);
-        } else {
-            subDescText.setText(subDesc);
-            subDescText.setVisibility(View.VISIBLE);
-        }
-*/
+        mMapView = new WeakReference<>(mapView);
+        String title = overlayItem.getTitle();
+        ((TextView) view.findViewById(R.id.infowindow_title)).setText(title);
+        String snippet = overlayItem.getSnippet();
+        ((TextView) view.findViewById(R.id.infowindow_description)).setText(snippet);
     }
 
     private void onClose() {
@@ -229,22 +218,6 @@ public class InfoWindow {
             return null;
         }
         return mBoundMarker.get();
-    }
-
-    /**
-     * Given a context, set the resource ids for the layout
-     * of the InfoWindow.
-     *
-     * @param context the apps Context
-     */
-    private static void setResIds(Context context) {
-        String packageName = context.getPackageName(); //get application package name
-        mTitleId = context.getResources().getIdentifier("id/infowindow_title", null, packageName);
-        mDescriptionId =
-                context.getResources().getIdentifier("id/infowindow_description", null, packageName);
-        mSubDescriptionId = context.getResources()
-                .getIdentifier("id/infowindow_subdescription", null, packageName);
-        mImageId = context.getResources().getIdentifier("id/infowindow_image", null, packageName);
     }
 
     public void update() {

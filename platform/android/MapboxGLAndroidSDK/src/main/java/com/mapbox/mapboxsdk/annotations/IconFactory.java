@@ -22,6 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Factory for creating {@link Icon} objects.
+ * @see Icon
+ */
 public final class IconFactory {
 
     private static final String ICON_ID_PREFIX = "com.mapbox.icons.icon_";

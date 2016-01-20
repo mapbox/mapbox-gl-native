@@ -139,6 +139,7 @@ public final class MapView extends FrameLayout {
     private static final String STATE_DEFAULT_TRANSITION_DURATION = "defaultTransitionDuration";
     private static final String STATE_MY_LOCATION_ENABLED = "myLocationEnabled";
     private static final String STATE_MY_LOCATION_TRACKING_MODE = "myLocationTracking";
+    private static final String STATE_MY_BEARING_TRACKING_MODE = "myBearingTracking";
     private static final String STATE_COMPASS_ENABLED = "compassEnabled";
     private static final String STATE_COMPASS_GRAVITY = "compassGravity";
     private static final String STATE_COMPASS_MARGIN_LEFT = "compassMarginLeft";
@@ -804,7 +805,7 @@ public final class MapView extends FrameLayout {
         mZoomButtonsController.setOnZoomListener(new OnZoomListener());
 
         // Check current connection status
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         boolean isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
@@ -973,6 +974,8 @@ public final class MapView extends FrameLayout {
 
             //noinspection ResourceType
             setMyLocationTrackingMode(savedInstanceState.getInt(STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+            //noinspection ResourceType
+            setMyBearingTrackingMode(savedInstanceState.getInt(STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         }
 
         // Force a check for an access token
@@ -1025,6 +1028,7 @@ public final class MapView extends FrameLayout {
         outState.putLong(STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
         outState.putInt(STATE_MY_LOCATION_TRACKING_MODE, mUserLocationView.getMyLocationTrackingMode());
+        outState.putInt(STATE_MY_BEARING_TRACKING_MODE, mUserLocationView.getMyBearingTrackingMode());
 
         // Compass
         LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
@@ -2694,8 +2698,9 @@ public final class MapView extends FrameLayout {
         }
 
         if (!handledDefaultClick) {
-            // default behaviour show InfoWindow
-            mInfoWindows.add(marker.showInfoWindow());
+            if (isInfoWindowValidForMarker(marker)) {
+                mInfoWindows.add(marker.showInfoWindow(this));
+            }
         }
 
         mSelectedMarkers.add(marker);
@@ -2734,6 +2739,10 @@ public final class MapView extends FrameLayout {
         }
 
         mSelectedMarkers.remove(marker);
+    }
+
+    private boolean isInfoWindowValidForMarker(@NonNull Marker marker) {
+        return !TextUtils.isEmpty(marker.getTitle()) || !TextUtils.isEmpty(marker.getSnippet());
     }
 
     //
@@ -2873,10 +2882,8 @@ public final class MapView extends FrameLayout {
 
         for (Marker marker : mSelectedMarkers) {
             if (marker.isInfoWindowShown()) {
-                Marker temp = marker;
-                temp.hideInfoWindow();
-                temp.showInfoWindow();
-                marker = temp;
+                marker.hideInfoWindow();
+                marker.showInfoWindow(this);
             }
         }
     }
@@ -3173,9 +3180,9 @@ public final class MapView extends FrameLayout {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
 
-            final float toleranceSides = 30 * mScreenDensity;
-            final float toleranceTop = 40 * mScreenDensity;
-            final float toleranceBottom = 10 * mScreenDensity;
+            final float toleranceSides = 15 * mScreenDensity;
+            final float toleranceTop = 20 * mScreenDensity;
+            final float toleranceBottom = 5 * mScreenDensity;
 
             RectF tapRect = new RectF(tapPoint.x - toleranceSides, tapPoint.y + toleranceTop,
                     tapPoint.x + toleranceSides, tapPoint.y - toleranceBottom);
@@ -3188,52 +3195,27 @@ public final class MapView extends FrameLayout {
             );
 
             BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
-
             List<Marker> nearbyMarkers = getMarkersInBounds(tapBounds);
+            long newSelectedMarkerId = -1;
 
-            long newSelectedMarkerId;
-
-            if (nearbyMarkers.size() > 0) {
-
-                // there is at least one nearby marker; select one
-                //
-                // first, sort for comparison and iteration
+            if (nearbyMarkers!=null && nearbyMarkers.size() > 0) {
                 Collections.sort(nearbyMarkers);
-
-                if (nearbyMarkers == mMarkersNearLastTap) {
-
-                    // TODO: We still need to adapt this logic to the new mSelectedMarkers list,
-                    // though the basic functionality is there.
-
-                    // the selection candidates haven't changed; cycle through them
-//                    if (mSelectedMarker != null
-//                            && (mSelectedMarker.getId() == mMarkersNearLastTap.get(mMarkersNearLastTap.size() - 1).getId())) {
-//                        // the selected marker is the last in the set; cycle back to the first
-//                        // note: this could be the selected marker if only one in set
-//                        newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-//                    } else if (mSelectedMarker != null) {
-//                        // otherwise increment the selection through the candidates
-//                        long result = mMarkersNearLastTap.indexOf(mSelectedMarker);
-//                        newSelectedMarkerId = mMarkersNearLastTap.get((int) result + 1).getId();
-//                    } else {
-                    // no current selection; select the first one
-                    newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
-//                    }
-                } else {
-                    // start tracking a new set of nearby markers
-                    mMarkersNearLastTap = nearbyMarkers;
-
-                    // select the first one
-                    newSelectedMarkerId = mMarkersNearLastTap.get(0).getId();
+                for (Marker nearbyMarker : nearbyMarkers) {
+                    boolean found = false;
+                    for (Marker selectedMarker : mSelectedMarkers) {
+                        if(selectedMarker.equals(nearbyMarker)){
+                            found = true;
+                        }
+                    }
+                    if(!found){
+                        newSelectedMarkerId = nearbyMarker.getId();
+                        break;
+                    }
                 }
-
-            } else {
-                // there are no nearby markers; deselect if necessary
-                newSelectedMarkerId = -1;
+                mMarkersNearLastTap = nearbyMarkers;
             }
 
             if (newSelectedMarkerId >= 0) {
-
                 int count = mAnnotations.size();
                 for (int i = 0; i < count; i++) {
                     Annotation annotation = mAnnotations.get(i);
@@ -3246,7 +3228,6 @@ public final class MapView extends FrameLayout {
                         }
                     }
                 }
-
             } else {
                 // deselect any selected marker
                 deselectMarkers();

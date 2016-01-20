@@ -155,6 +155,18 @@
                 android:icon="@drawable/ic_directions"
                 android:title="@string/activity_directions" />
 
+            <item
+                android:id="@+id/action_double_mapview"
+                android:checkable="false"
+                android:icon="@drawable/ic_dns_24dp"
+                android:title="@string/action_double_mapview" />
+
+            <item
+                android:id="@+id/action_geocoder"
+                android:checkable="false"
+                android:icon="@drawable/ic_directions"
+                android:title="@string/activity_geocoder" />
+
         </menu>
     </item>
 

@@ -5,6 +5,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Multipoint is an abstract annotation for combining geographical locations.
+ */
 public abstract class MultiPoint extends Annotation {
 
     private List<LatLng> points;

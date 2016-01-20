@@ -10,9 +10,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
  * <p>
- * A builder object for the options configuration {@link com.mapbox.mapboxsdk.annotations.Marker} and
- * {@link com.mapbox.mapboxsdk.annotations.InfoWindow}
- * instances on maps.
+ * Builder for composing {@link com.mapbox.mapboxsdk.annotations.Marker} objects.
  * </p>
  *
  * <h3>Example</h3>
@@ -70,6 +68,8 @@ public final class MarkerOptions implements Parcelable {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @return Marker The build marker
      */
     public Marker getMarker() {
         return marker;

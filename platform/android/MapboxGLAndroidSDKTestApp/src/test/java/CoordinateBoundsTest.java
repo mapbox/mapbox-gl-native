@@ -44,7 +44,7 @@ public class CoordinateBoundsTest {
         CoordinateBounds coordinateBounds = new CoordinateBounds(northEast, southWest);
         assertEquals("string should match",
                 coordinateBounds.toString(),
-                "CoordinateBounds [northEast[" + coordinateBounds.getNorthEast() + "], southWest[]" + coordinateBounds.getSouthWest() + "]");
+                "CoordinateBounds [mNorthEast[" + coordinateBounds.getNorthEast() + "], mSouthWest[]" + coordinateBounds.getSouthWest() + "]");
     }
 
     @Test
