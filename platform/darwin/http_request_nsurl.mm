@@ -231,15 +231,12 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
             if (existingResponse) {
                 response->data = existingResponse->data;
 
-                if (response->expires == Seconds::zero()) {
-                    response->expires = existingResponse->expires;
-                }
-
-                if (response->modified == Seconds::zero()) {
+                // Only copy the existing headers if we didn't get one during this response.
+                if (!last_modified) {
                     response->modified = existingResponse->modified;
                 }
 
-                if (response->etag.empty()) {
+                if (!etag) {
                     response->etag = existingResponse->etag;
                 }
             }

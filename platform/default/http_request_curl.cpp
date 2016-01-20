@@ -98,6 +98,11 @@ private:
     std::shared_ptr<std::string> data;
     std::unique_ptr<Response> response;
 
+    struct {
+        bool lastModified : 1;
+        bool etag : 1;
+    } responseHeaders = { false, false };
+
     // In case of revalidation requests, this will store the old response.
     const std::shared_ptr<const Response> existingResponse;
 
@@ -467,8 +472,10 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
         baton->response->modified = Seconds(curl_getdate(value.c_str(), nullptr));
+        baton->responseHeaders.lastModified = true;
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
+        baton->responseHeaders.etag = true;
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
         baton->response->expires = parseCacheControl(value.c_str());
@@ -534,15 +541,12 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
             if (existingResponse) {
                 response->data = existingResponse->data;
 
-                if (response->expires == Seconds::zero()) {
-                    response->expires = existingResponse->expires;
-                }
-
-                if (response->modified == Seconds::zero()) {
+                // Only copy the existing headers if we didn't get one during this response.
+                if (!responseHeaders.lastModified) {
                     response->modified = existingResponse->modified;
                 }
 
-                if (response->etag.empty()) {
+                if (!responseHeaders.etag) {
                     response->etag = existingResponse->etag;
                 }
             }
