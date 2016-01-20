@@ -43,7 +43,7 @@
 {
     return [[self alloc] initWithCenterCoordinate:centerCoordinate
                                          altitude:distance
-                                            pitch:(CGFloat)pitch
+                                            pitch:pitch
                                           heading:heading];
 }
 

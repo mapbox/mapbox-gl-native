@@ -61,6 +61,11 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
+
+/// Duration of an animation due to a user location update, typically chosen to
+/// match a typical interval between user location updates.
+const NSTimeInterval MGLUserLocationAnimationDuration = 1.0;
+
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
 const NSUInteger MGLTargetFrameInterval = 1;  //Target FPS will be 60 divided by this value
@@ -1630,8 +1635,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)resetPosition
 {
-    _mbglMap->cancelTransitions();
-    _mbglMap->resetPosition();
+    MGLMapCamera *camera = [MGLMapCamera camera];
+    camera.altitude = MGLAltitudeForZoomLevel(0, 0, 0, self.frame.size);
+    self.camera = camera;
 }
 
 - (void)cycleDebugOptions
@@ -1916,6 +1922,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
     _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
@@ -3103,7 +3110,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                                    edgePadding:insets
                                      zoomLevel:self.zoomLevel
                                      direction:course
-                                      duration:animated ? 1 : 0
+                                      duration:animated ? MGLUserLocationAnimationDuration : 0
                        animationTimingFunction:linearFunction
                              completionHandler:NULL];
                 }
