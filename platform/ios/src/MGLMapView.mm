@@ -68,6 +68,13 @@ const NSTimeInterval MGLUserLocationAnimationDuration = 1.0;
 
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
+
+/// Minimum initial zoom level when entering user tracking mode.
+const double MGLMinimumZoomLevelForUserTracking = 10.5;
+
+/// Initial zoom level when entering user tracking mode from a low zoom level.
+const double MGLDefaultZoomLevelForUserTracking = 14.0;
+
 const NSUInteger MGLTargetFrameInterval = 1;  //Target FPS will be 60 divided by this value
 
 /// Tolerance for snapping to true north, measured in degrees in either direction.
@@ -3095,7 +3102,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         if (std::abs(currentPoint.x - correctPoint.x) > 1.0 || std::abs(currentPoint.y - correctPoint.y) > 1.0)
         {
-            if (round(self.zoomLevel) >= 10)
+            if (self.zoomLevel >= MGLMinimumZoomLevelForUserTracking)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
@@ -3140,7 +3147,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
                 MGLMapCamera *camera = self.camera;
                 camera.centerCoordinate = self.userLocation.location.coordinate;
                 camera.heading = course;
-                camera.altitude = newLocation.horizontalAccuracy;
+                camera.altitude = MGLAltitudeForZoomLevel(MGLDefaultZoomLevelForUserTracking, camera.pitch,
+                                                          camera.centerCoordinate.latitude,
+                                                          self.frame.size);
                 
                 __weak MGLMapView *weakSelf = self;
                 [self _flyToCamera:camera withDuration:animated ? -1 : 0 peakAltitude:-1 completionHandler:^{
