@@ -67,7 +67,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 - (instancetype)init {
     if (self = [super init]) {
         _vendorId = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-        
         _model = [self sysInfoByName:"hw.machine"];
         _iOSVersion = [NSString stringWithFormat:@"%@ %@", [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
         if ([UIScreen instancesRespondToSelector:@selector(nativeScale)]) {
@@ -119,11 +118,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 // the main thread, but can be read on any thread.
 //
 @property (atomic) MGLMapboxEventsData *data;
-@property (atomic) NSString *appBundleId;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
-@property (atomic) NSString *instanceID;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
@@ -194,14 +191,13 @@ const NSTimeInterval MGLFlushInterval = 60;
 
     self = [super init];
     if (self) {
-        _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
         _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-        _instanceID = [[NSUUID UUID] UUIDString];
 
+        NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
-        _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
         // Configure Events Infrastructure
         // ===============================
