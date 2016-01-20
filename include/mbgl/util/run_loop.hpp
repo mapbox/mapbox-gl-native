@@ -41,6 +41,9 @@ public:
     void runOnce();
     void stop();
 
+    void ref();
+    void unref();
+
     // So far only needed by the libcurl backend.
     void addWatch(int fd, Event, std::function<void(int, Event)>&& callback);
     void removeWatch(int fd);
