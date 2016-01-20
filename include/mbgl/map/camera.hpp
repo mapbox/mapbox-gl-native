@@ -58,13 +58,17 @@ struct AnimationOptions {
     /** The easing timing curve of the transition. */
     optional<mbgl::util::UnitBezier> easing;
     
-    /** A function that is called on each frame of the transition, just before a
-        screen update, except on the last frame. The first parameter indicates
-        the elapsed time as a percentage of the duration. */
+    /** A function that is called from the Map thread on each frame of the
+        transition, just before a screen update, except on the last frame. The
+        first parameter indicates the elapsed time as a percentage of the
+        duration. */
     std::function<void(double)> transitionFrameFn;
     
-    /** A function that is called once on the last frame of the transition, just
-        before the corresponding screen update. */
+    /** A function that is called once from the Map thread on the last frame of
+        the transition, just before the corresponding screen update. The first
+        parameter indicates how much of the transition was completed, as a
+        percentage of the duration. In the event that the transition is
+        canceled, this parameter will have a value less than 1.0. */
     std::function<void()> transitionFinishFn;
     
     /** Creates an animation with no options specified. */
