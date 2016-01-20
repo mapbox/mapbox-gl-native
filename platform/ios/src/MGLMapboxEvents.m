@@ -121,6 +121,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSString *appName;
 @property (atomic) NSString *appVersion;
 @property (atomic) NSString *appBuildNumber;
+@property (atomic) NSString *instanceID;
 @property (atomic) NSDateFormatter *rfc3339DateFormatter;
 @property (atomic) NSURLSession *session;
 @property (atomic) NSData *digicertCert;
@@ -194,6 +195,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
         _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
         _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+        _instanceID = [[NSUUID UUID] UUIDString];
 
         NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
@@ -494,9 +496,10 @@ const NSTimeInterval MGLFlushInterval = 60;
             [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
         }
 
-        // Only add IDFV to location events
+        // Only additionally add IDFV and app instance UUID to location events
         if ([event isEqualToString:MGLEventTypeLocation] || [event isEqualToString:MGLEventTypeVisit]) {
             [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
+            [evt setObject:strongSelf.instanceID forKey:@"instance"];
         }
 
         // Only send these (relatively static) keys with the map load event
