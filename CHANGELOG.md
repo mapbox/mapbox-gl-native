@@ -4,6 +4,12 @@
 
 * Fixed crash caused by annotation image with non-integer width or height ([#3031](https://github.com/mapbox/mapbox-gl-native/issues/3031))
 
+## 3.1.0
+
+* Camera API Callback Improvements ([#3412](https://github.com/mapbox/mapbox-gl-native/issues/3412))
+* Coordinate Deprecated For LatLng ([#3309](https://github.com/mapbox/mapbox-gl-native/issues/3309))
+* Responsive User Dot Location Tracking ([#2049](https://github.com/mapbox/mapbox-gl-native/issues/2049))
+
 ## 3.0.0
 
 * Added Camera API ([#3244](https://github.com/mapbox/mapbox-gl-native/issues/3244))
