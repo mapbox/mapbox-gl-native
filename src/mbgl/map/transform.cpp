@@ -558,8 +558,6 @@ void Transform::startTransition(const CameraOptions& camera,
         transitionFinishFn();
     }
     
-    view.notifyMapChange(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
-    
     // Associate the anchor, if given, with a coordinate.
     PrecisionPoint anchor = camera.anchor ? *camera.anchor : PrecisionPoint(NAN, NAN);
     LatLng anchorLatLng;
