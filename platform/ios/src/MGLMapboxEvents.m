@@ -1007,8 +1007,9 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 
     if ( ! _debugLogSerialQueue) {
+        NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
-        _debugLogSerialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.debugLog", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        _debugLogSerialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.debugLog", bundleID, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
     dispatch_sync(_debugLogSerialQueue, ^{
