@@ -22,19 +22,9 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
 
 1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
 
-### Access Tokens
+### Install
 
-_The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
-
-Set up the access token by editing the scheme for the application target, then adding an environment variable with the name `MAPBOX_ACCESS_TOKEN`.
-
-![edit scheme](https://cloud.githubusercontent.com/assets/98601/5460702/c4610262-8519-11e4-873a-8597821da468.png)
-
-![setting access token in Xcode scheme](https://cloud.githubusercontent.com/assets/162976/5349358/0a086f00-7f8c-11e4-8433-bdbaccda2b58.png)
-
-### Test
-
-In the context of your own app, you can now either:
+There are two ways to install the Mapbox iOS SDK:
 
 #### CocoaPods
 
@@ -92,6 +82,12 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
    - `libz.dylib`
 
 1. Add `-ObjC` to your target's "Other Linker Flags" build setting (`OTHER_LDFLAGS`).
+
+## Use
+
+1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
+
+1. In a XIB or storyboard, add a View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
 
 ## Troubleshooting
 
