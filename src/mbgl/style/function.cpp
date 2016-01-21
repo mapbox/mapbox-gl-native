@@ -106,7 +106,7 @@ Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& paramete
     Faded<T> result;
 
     float z = parameters.z;
-    float fraction = std::fmod(z, 1.0f);
+    const float fraction = z - std::floor(z);
     std::chrono::duration<float> d = parameters.defaultFadeDuration;
     float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
     float fromScale = 1.0f;
