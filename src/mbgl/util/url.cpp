@@ -50,7 +50,7 @@ std::string percentDecode(const std::string& input) {
     return decoded;
 }
 
-std::string templateTileURL(const std::string& url, const TileID& id, float pixelRatio) {
+std::string templateTileURL(const std::string& url, const TileID& id, float pixelRatio, uint16_t tileSize) {
     return util::replaceTokens(url, [&](const std::string& token) -> std::string {
         if (token == "z") {
             return util::toString(id.sourceZ);
@@ -64,7 +64,7 @@ std::string templateTileURL(const std::string& url, const TileID& id, float pixe
             prefix[1] = "0123456789abcdef"[id.y % 16];
             return prefix;
         } else if (token == "ratio") {
-            return pixelRatio > 1.0 ? "@2x" : "";
+            return pixelRatio > 1.0 || tileSize == 512 ? "@2x" : "";
         } else {
             return "";
         }
