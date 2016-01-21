@@ -179,6 +179,7 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) BOOL shouldReenableLocationServicesOnWake;
 
 @end
 
@@ -977,6 +978,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _mbglMap->pause();
 
         [self.glView deleteDrawable];
+
+        if (self.locationManager)
+        {
+            [self disableLocationServices];
+            self.shouldReenableLocationServicesOnWake = YES;
+        }
     }
 }
 
@@ -1000,6 +1007,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _mbglMap->resume();
         
         _displayLink.paused = NO;
+
+        if (self.shouldReenableLocationServicesOnWake)
+        {
+            [self enableLocationServices];
+            self.shouldReenableLocationServicesOnWake = NO;
+        }
     }
 }
 
@@ -2997,6 +3010,44 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 #pragma mark - User Location -
 
+- (void)enableLocationServices
+{
+    self.locationManager = [[CLLocationManager alloc] init];
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
+    {
+        BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+        if (!hasLocationDescription)
+        {
+            [NSException raise:@"Missing Location Services usage description" format:
+             @"In iOS 8 and above, this app must have a value for NSLocationAlwaysUsageDescription or NSLocationWhenInUseUsageDescription in its Info.plist."];
+        }
+
+        if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+        {
+            [self.locationManager requestAlwaysAuthorization];
+        }
+        else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
+        {
+            [self.locationManager requestWhenInUseAuthorization];
+        }
+    }
+#endif
+
+    self.locationManager.headingFilter = 5.0;
+    self.locationManager.delegate = self;
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)disableLocationServices
+{
+    [self.locationManager stopUpdatingLocation];
+    [self.locationManager stopUpdatingHeading];
+    self.locationManager.delegate = nil;
+    self.locationManager = nil;
+}
+
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
@@ -3014,42 +3065,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
 
-        self.locationManager = [CLLocationManager new];
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        // enable iOS 8+ location authorization API
-        //
-        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
-        {
-            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
-            if (!hasLocationDescription)
-            {
-                [NSException raise:@"Missing Location Services usage description" format:
-                 @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
-            }
-            // request location permissions, if both keys exist ask for less permissive
-            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
-            {
-                [self.locationManager requestWhenInUseAuthorization];
-            }
-            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
-            {
-                [self.locationManager requestAlwaysAuthorization];
-            }
-        }
-#endif
-
-        self.locationManager.headingFilter = 5.0;
-        self.locationManager.delegate = self;
-        [self.locationManager startUpdatingLocation];
+        [self enableLocationServices];
     }
     else
     {
-        [self.locationManager stopUpdatingLocation];
-        [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
-        self.locationManager = nil;
+        [self disableLocationServices];
 
         if ([self.delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)])
         {
