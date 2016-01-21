@@ -33,6 +33,7 @@ private:
 
 uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
+uint64_t crc64(const PremultipliedImage&);
 
 PremultipliedImage render(Map&,
                           std::chrono::milliseconds timeout = std::chrono::milliseconds(1000));

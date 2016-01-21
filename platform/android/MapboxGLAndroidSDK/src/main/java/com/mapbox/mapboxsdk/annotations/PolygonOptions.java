@@ -9,6 +9,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder for composing {@link Polygon} objects.
+ */
 public final class PolygonOptions implements Parcelable {
 
     public static final Parcelable.Creator<PolygonOptions> CREATOR
@@ -96,6 +99,8 @@ public final class PolygonOptions implements Parcelable {
 
     /**
      * Do not use this method. Used internally by the SDK.
+     *
+     * @return Polygon the Polygon to return
      */
     public Polygon getPolygon() {
         return polygon;

@@ -10,9 +10,10 @@ import com.mapbox.mapboxsdk.constants.MathConstants;
 import java.io.Serializable;
 
 /**
+ * A geographical location which contains a single latitude, longitude pair, with
+ * optional altitude.
  * <p>
- * This class is container for a single latitude, longitude pair, with
- * optional altitude. Latitude and longitude are expressed as decimal degrees
+ * Latitude and longitude are expressed as decimal degrees
  * in the WGS84 datum. By default, altitude is 0.0, or sea level.
  * </p>
  * <p>
@@ -20,7 +21,7 @@ import java.io.Serializable;
  * data automatically, so all data enters in the WGS84 datum.
  * </p>
  */
-public class LatLng implements ILatLng, Parcelable, Serializable {
+public class LatLng implements ILatLng, Parcelable {
 
     public static final Parcelable.Creator<LatLng> CREATOR = new Parcelable.Creator<LatLng>() {
         public LatLng createFromParcel(Parcel in) {
@@ -129,7 +130,6 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
         LatLng latLng = (LatLng) o;
 
         return Double.compare(latLng.altitude, altitude) == 0 && Double.compare(latLng.latitude, latitude) == 0 && Double.compare(latLng.longitude, longitude) == 0;
-
     }
 
     @Override
@@ -168,6 +168,10 @@ public class LatLng implements ILatLng, Parcelable, Serializable {
      * @return distance in meters
      */
     public double distanceTo(LatLng other) {
+        if(latitude == other.latitude && longitude == other.longitude){
+            // return 0.0 to avoid a NaN
+            return 0.0;
+        }
 
         final double a1 = MathConstants.DEG2RAD * this.latitude;
         final double a2 = MathConstants.DEG2RAD * this.longitude;

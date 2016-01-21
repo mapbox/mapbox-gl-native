@@ -129,6 +129,12 @@ std::string normalizeRasterTileURL(const std::string& url) {
     }
 
     std::string normalizedURL(url);
+#if !defined(__ANDROID__) && !defined(__APPLE__)
+    // Replace PNG with WebP.
+    if (normalizedURL.compare(extensionIdx + 1, 3, "png") == 0) {
+        normalizedURL.replace(extensionIdx + 1, 3, "webp");
+    }
+#endif // !defined(__ANDROID__) && !defined(__APPLE__)
     normalizedURL.insert(extensionIdx, "{ratio}");
     return normalizedURL;
 }

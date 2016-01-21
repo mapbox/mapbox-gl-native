@@ -43,11 +43,13 @@ namespace mbgl {
 Source::Source(SourceType type_,
                const std::string& id_,
                const std::string& url_,
+               uint16_t tileSize_,
                std::unique_ptr<SourceInfo>&& info_,
                std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
     : type(type_),
       id(id_),
       url(url_),
+      tileSize(tileSize_),
       info(std::move(info_)),
       geojsonvt(std::move(geojsonvt_)) {
 }
@@ -90,14 +92,13 @@ void Source::load() {
     // URL may either be a TileJSON file, or a GeoJSON file.
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Source, url }, [this](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        req = nullptr;
-
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            return;
+        }
+
+        if (res.notModified) {
+            // We got the same data back as last time. Abort early.
             return;
         }
 
@@ -111,6 +112,7 @@ void Source::load() {
             return;
         }
 
+        bool reloadTiles = false;
         if (type == SourceType::Vector || type == SourceType::Raster) {
             // Create a new copy of the SourceInfo object that holds the base values we've parsed
             // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
@@ -124,10 +126,39 @@ void Source::load() {
                 std::transform(newInfo->tiles.begin(), newInfo->tiles.end(), newInfo->tiles.begin(),
                                util::mapbox::normalizeRasterTileURL);
             }
+
+            // Check whether previous information specifies different tile
+            if (info && info->tiles != newInfo->tiles) {
+                reloadTiles = true;
+
+                // Tile size changed: We need to recalculate the tiles we need to load because we
+                // might have to load tiles for a different zoom level
+                // This is done automatically when we trigger the onSourceLoaded observer below.
+
+                // Min/Max zoom changed: We need to recalculate what tiles to load, if we have tiles
+                // loaded that are outside the new zoom range
+                // This is done automatically when we trigger the onSourceLoaded observer below.
+
+                // Attribution changed: We need to notify the embedding application that this
+                // changed. See https://github.com/mapbox/mapbox-gl-native/issues/2723
+                // This is not yet implemented.
+
+                // Center/bounds changed: We're not using these values currently
+            }
+
             info = std::move(newInfo);
         } else if (type == SourceType::GeoJSON) {
             info = std::make_unique<SourceInfo>();
             geojsonvt = StyleParser::parseGeoJSON(d);
+            reloadTiles = true;
+        }
+
+        if (reloadTiles) {
+            // Tile information changed because we got new GeoJSON data, or a new tile URL.
+            tilePtrs.clear();
+            tileDataMap.clear();
+            tiles.clear();
+            cache.clear();
         }
 
         loaded = true;
@@ -196,7 +227,12 @@ bool Source::handlePartialTile(const TileID& tileID, Worker&) {
         return true;
     }
 
-    return tileData->parsePending([this, tileID]() {
+    return tileData->parsePending([this, tileID](std::exception_ptr error) {
+        if (error) {
+            observer->onTileError(*this, tileID, error);
+            return;
+        }
+
         observer->onTileLoaded(*this, tileID, false);
     });
 }
@@ -230,7 +266,9 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
     }
 
     if (!newTile->data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID, parameters.transformState, parameters.debugOptions & MapDebugOptions::Collision);
+        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID,
+                                  std::placeholders::_1, parameters.transformState,
+                                  parameters.debugOptions & MapDebugOptions::Collision);
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
@@ -270,7 +308,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 }
 
 double Source::getZoom(const TransformState& state) const {
-    double offset = std::log(util::tileSize / info->tile_size) / std::log(2);
+    double offset = std::log(util::tileSize / tileSize) / std::log(2);
     return state.getZoom() + offset;
 }
 
@@ -491,7 +529,10 @@ void Source::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformState& transformState, bool collisionDebug) {
+void Source::tileLoadingCompleteCallback(const TileID& tileID,
+                                         std::exception_ptr error,
+                                         const TransformState& transformState,
+                                         bool collisionDebug) {
     auto it = tileDataMap.find(tileID);
     if (it == tileDataMap.end()) {
         return;
@@ -502,8 +543,8 @@ void Source::tileLoadingCompleteCallback(const TileID& tileID, const TransformSt
         return;
     }
 
-    if (tileData->getState() == TileData::State::obsolete && tileData->getError()) {
-        observer->onTileError(*this, tileID, tileData->getError());
+    if (error) {
+        observer->onTileError(*this, tileID, error);
         return;
     }
 

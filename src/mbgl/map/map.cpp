@@ -172,7 +172,11 @@ void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
 }
 
 void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
-    transform->setLatLng(latLng, duration);
+    setLatLng(latLng, EdgeInsets(), duration);
+}
+
+void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLng(latLng, padding, duration);
     update(Update::Repaint);
 }
 
@@ -181,16 +185,19 @@ void Map::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Dur
     update(Update::Repaint);
 }
 
-LatLng Map::getLatLng() const {
-    return transform->getLatLng();
+LatLng Map::getLatLng(const EdgeInsets& padding) const {
+    return transform->getLatLng(padding);
 }
 
-void Map::resetPosition() {
-    CameraOptions options;
-    options.angle = 0;
-    options.center = LatLng(0, 0);
-    options.zoom = 0;
-    transform->jumpTo(options);
+void Map::resetPosition(const EdgeInsets& padding) {
+    CameraOptions camera;
+    camera.angle = 0;
+    camera.center = LatLng(0, 0);
+    if (padding) {
+        camera.padding = padding;
+    }
+    camera.zoom = 0;
+    transform->jumpTo(camera);
     update(Update::Zoom);
 }
 
@@ -212,7 +219,11 @@ double Map::getScale() const {
 }
 
 void Map::setZoom(double zoom, const Duration& duration) {
-    transform->setZoom(zoom, duration);
+    setZoom(zoom, {}, duration);
+}
+
+void Map::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setZoom(zoom, padding, duration);
     update(Update::Zoom);
 }
 
@@ -221,7 +232,11 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
-    transform->setLatLngZoom(latLng, zoom, duration);
+    setLatLngZoom(latLng, zoom, {}, duration);
+}
+
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLngZoom(latLng, zoom, padding, duration);
     update(Update::Zoom);
 }
 
@@ -244,12 +259,13 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     PrecisionPoint nePixel = {-INFINITY, -INFINITY};
     PrecisionPoint swPixel = {INFINITY, INFINITY};
+    double viewportHeight = getHeight();
     for (LatLng latLng : latLngs) {
         PrecisionPoint pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
-        swPixel.y = std::min(swPixel.y, pixel.y);
-        nePixel.y = std::max(nePixel.y, pixel.y);
+        swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
+        nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
     }
     double width = nePixel.x - swPixel.x;
     double height = nePixel.y - swPixel.y;
@@ -259,7 +275,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     double scaleY = (getHeight() - padding.top - padding.bottom) / height;
     double minScale = ::fmin(scaleX, scaleY);
     double zoom = ::log2(getScale() * minScale);
-    zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
+    zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     PrecisionPoint paddedNEPixel = {
@@ -274,6 +290,9 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
+    
+    // CameraOptions origin is at the top-left corner.
+    centerPixel.y = viewportHeight - centerPixel.y;
 
     options.center = latLngForPixel(centerPixel);
     options.zoom = zoom;
@@ -312,12 +331,16 @@ void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, co
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, duration);
+    setBearing(degrees, EdgeInsets(), duration);
+}
+
+void Map::setBearing(double degrees, const PrecisionPoint& center, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, center, duration);
     update(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, const PrecisionPoint& center) {
-    transform->setAngle(-degrees * M_PI / 180, center);
+void Map::setBearing(double degrees, const EdgeInsets& padding, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, padding, duration);
     update(Update::Repaint);
 }
 
@@ -378,11 +401,11 @@ LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) con
 }
 
 PrecisionPoint Map::pixelForLatLng(const LatLng& latLng) const {
-    return transform->getState().latLngToPoint(latLng);
+    return transform->latLngToPoint(latLng);
 }
 
 LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
-    return transform->getState().pointToLatLng(pixel);
+    return transform->pointToLatLng(pixel);
 }
 
 #pragma mark - Annotations
@@ -446,7 +469,7 @@ void Map::addCustomLayer(const std::string& id,
                          const char* before) {
     context->invoke(&MapContext::addLayer,
         std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
-        before ? std::string(before) : mapbox::util::optional<std::string>());
+        before ? std::string(before) : optional<std::string>());
 }
 
 void Map::removeCustomLayer(const std::string& id) {

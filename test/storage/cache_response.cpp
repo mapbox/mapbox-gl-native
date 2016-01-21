@@ -64,9 +64,9 @@ TEST_F(Storage, CacheNotFound) {
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3000/not-found" };
 
     // Insert existing data into the cache that will be marked as stale.
-    auto response = std::make_shared<Response>();
-    response->data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, FileCache::Hint::Full);
+    Response response;
+    response.data = std::make_shared<const std::string>("existing data");
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -122,9 +122,9 @@ TEST_F(Storage, DontCacheConnectionErrors) {
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3001" };
 
     // Insert existing data into the cache that will be marked as stale.
-    auto response = std::make_shared<Response>();
-    response->data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, FileCache::Hint::Full);
+    Response response;
+    response.data = std::make_shared<const std::string>("existing data");
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;
@@ -178,9 +178,9 @@ TEST_F(Storage, DontCacheServerErrors) {
     const Resource resource{ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" };
 
     // Insert existing data into the cache that will be marked as stale.
-    auto response = std::make_shared<Response>();
-    response->data = std::make_shared<const std::string>("existing data");
-    cache.put(resource, response, FileCache::Hint::Full);
+    Response response;
+    response.data = std::make_shared<const std::string>("existing data");
+    cache.put(resource, response);
 
     std::unique_ptr<FileRequest> req1;
     std::unique_ptr<WorkRequest> req2;

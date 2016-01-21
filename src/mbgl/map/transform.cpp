@@ -91,7 +91,11 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     }
     
     // Determine endpoints.
-    const LatLng startLatLng = getLatLng();
+    EdgeInsets padding;
+    if (camera.padding) {
+        padding = *camera.padding;
+    }
+    const LatLng startLatLng = getLatLng(padding);
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -101,6 +105,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
+    PrecisionPoint center = padding.getCenter(state.width, state.height);
+    center.y = state.height - center.y;
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
@@ -141,6 +147,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, t);
         }
+        
+        if (padding) {
+            state.moveLatLng(frameLatLng, center);
+        }
         return update;
     }, duration);
 }
@@ -164,7 +174,11 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
     
     // Determine endpoints.
-    const LatLng startLatLng = getLatLng();
+    EdgeInsets padding;
+    if (camera.padding) {
+        padding = *camera.padding;
+    }
+    const LatLng startLatLng = getLatLng(padding);
     const PrecisionPoint startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
@@ -174,6 +188,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
+    PrecisionPoint center = padding.getCenter(state.width, state.height);
+    center.y = state.height - center.y;
     
     // Constrain camera options.
     zoom = util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
@@ -189,7 +205,8 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = std::max(state.width, state.height);
+    double w0 = std::max(state.width - padding.left - padding.right,
+                         state.height - padding.top - padding.bottom);
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);
@@ -304,6 +321,10 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (pitch != startPitch) {
             state.pitch = util::interpolate(startPitch, pitch, k);
         }
+        
+        if (padding) {
+            state.moveLatLng(frameLatLng, center);
+        }
         return Update::Zoom;
     }, duration);
 }
@@ -340,12 +361,19 @@ void Transform::moveBy(const PrecisionPoint& offset, const Duration& duration) {
 }
 
 void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
+    setLatLng(latLng, EdgeInsets(), duration);
+}
+
+void Transform::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
     if (!latLng) {
         return;
     }
 
     CameraOptions camera;
     camera.center = latLng;
+    if (padding) {
+        camera.padding = padding;
+    }
     easeTo(camera, duration);
 }
 
@@ -353,32 +381,43 @@ void Transform::setLatLng(const LatLng& latLng, const PrecisionPoint& point, con
     if (!latLng || !point) {
         return;
     }
-
-    auto coord = state.latLngToCoordinate(latLng);
-    auto coordAtPoint = state.pointToCoordinate(point);
-    auto coordCenter = state.pointToCoordinate({ state.width / 2.0f, state.height / 2.0f });
-
-    float columnDiff = coordAtPoint.column - coord.column;
-    float rowDiff = coordAtPoint.row - coord.row;
-
-    auto newLatLng = state.coordinateToLatLng({
-        coordCenter.column - columnDiff,
-        coordCenter.row - rowDiff,
-        coordCenter.zoom
-    });
-
-    setLatLng(newLatLng, duration);
+    
+    // Pretend the viewport is 0×0 around the passed-in point.
+    CameraOptions camera;
+    camera.center = latLng;
+    EdgeInsets padding;
+    padding.top = point.y;
+    padding.left = point.x;
+    padding.bottom = state.height - point.y;
+    padding.right = state.width - point.x;
+    camera.padding = padding;
+    easeTo(camera, duration);
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
+    setLatLngZoom(latLng, zoom, {}, duration);
+}
+
+void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
     if (!latLng || std::isnan(zoom)) {
         return;
     }
 
     CameraOptions camera;
     camera.center = latLng;
+    if (padding) {
+        camera.padding = padding;
+    }
     camera.zoom = zoom;
     easeTo(camera, duration);
+}
+
+LatLng Transform::getLatLng(const EdgeInsets& padding) const {
+    if (padding) {
+        return pointToLatLng(padding.getCenter(state.width, state.height));
+    } else {
+        return state.getLatLng();
+    }
 }
 
 
@@ -393,8 +432,13 @@ void Transform::scaleBy(double ds, const PrecisionPoint& center, const Duration&
     setScale(scale, center, duration);
 }
 
-void Transform::setZoom(double zoom, const Duration& duration) {
-    setScale(state.zoomScale(zoom), {NAN, NAN}, duration);
+void Transform::setZoom(double zoom, const PrecisionPoint& anchor, const Duration& duration) {
+    setScale(state.zoomScale(zoom), anchor, duration);
+}
+
+void Transform::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setZoom(zoom, center, duration);
 }
 
 double Transform::getZoom() const {
@@ -414,6 +458,11 @@ void Transform::setScale(double scale, const PrecisionPoint& anchor, const Durat
     camera.zoom = state.scaleZoom(scale);
     camera.anchor = anchor;
     easeTo(camera, duration);
+}
+
+void Transform::setScale(double scale, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setScale(scale, center, duration);
 }
 
 #pragma mark - Angle
@@ -460,6 +509,11 @@ void Transform::setAngle(double angle, const PrecisionPoint& anchor, const Durat
     camera.angle = angle;
     camera.anchor = anchor;
     easeTo(camera, duration);
+}
+
+void Transform::setAngle(double angle, const EdgeInsets& padding, const Duration& duration) {
+    const PrecisionPoint center = padding.getCenter(state.width, state.height);
+    setAngle(angle, center, duration);
 }
 
 double Transform::getAngle() const {
@@ -539,8 +593,11 @@ void Transform::startTransition(const CameraOptions& camera,
             view.notifyMapChange(MapChangeRegionIsChanging);
         } else {
             transitionFinishFn();
-            transitionFrameFn = nullptr;
             transitionFinishFn = nullptr;
+
+            // This callback gets destroyed here,
+            // we can only return after this point.
+            transitionFrameFn = nullptr;
         }
         return result;
     };
@@ -579,4 +636,18 @@ void Transform::cancelTransitions() {
 
 void Transform::setGestureInProgress(bool inProgress) {
     state.gestureInProgress = inProgress;
+}
+
+#pragma mark Conversion and projection
+
+PrecisionPoint Transform::latLngToPoint(const LatLng& latLng) const {
+    PrecisionPoint point = state.latLngToPoint(latLng);
+    point.y = state.height - point.y;
+    return point;
+}
+
+LatLng Transform::pointToLatLng(const PrecisionPoint& point) const {
+    PrecisionPoint flippedPoint = point;
+    flippedPoint.y = state.height - flippedPoint.y;
+    return state.pointToLatLng(flippedPoint);
 }

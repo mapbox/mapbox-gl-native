@@ -24,6 +24,9 @@ public:
     // Stale responses are fetched from cache and are expired.
     bool stale = false;
 
+    // This is set to true for 304 Not Modified responses.
+    bool notModified = false;
+
     // The actual data of the response. This is guaranteed to never be empty.
     std::shared_ptr<const std::string> data;
 

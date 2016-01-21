@@ -13,7 +13,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                                std::string sourceID,
                                Style& style_,
                                const MapMode mode_,
-                               const std::function<void()>& callback)
+                               const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
       style(style_),
       worker(style_.workers),
@@ -32,16 +32,19 @@ VectorTileData::VectorTileData(const TileID& id_,
                                                         Seconds modified_,
                                                         Seconds expires_) {
         if (err) {
-            error = err;
-            state = State::obsolete;
-            callback();
+            callback(err);
             return;
         }
 
+        modified = modified_;
+        expires = expires_;
+
         if (!tile) {
+            // This is a 404 response. We're treating these as empty tiles.
+            workRequest.reset();
             state = State::parsed;
             buckets.clear();
-            callback();
+            callback(err);
             return;
         }
 
@@ -50,9 +53,6 @@ VectorTileData::VectorTileData(const TileID& id_,
         } else if (isReady()) {
             state = State::partial;
         }
-
-        modified = modified_;
-        expires = expires_;
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
         // when tile data changed. Replacing the workdRequest will cancel a pending work
@@ -64,6 +64,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 return;
             }
 
+            std::exception_ptr error;
             if (result.is<TileParseResultBuckets>()) {
                 auto& resultBuckets = result.get<TileParseResultBuckets>();
                 state = resultBuckets.state;
@@ -86,7 +87,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 state = State::obsolete;
             }
 
-            callback();
+            callback(error);
         });
     });
 }
@@ -95,19 +96,20 @@ VectorTileData::~VectorTileData() {
     cancel();
 }
 
-bool VectorTileData::parsePending(std::function<void()> callback) {
+bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
     if (workRequest) {
         // There's already parsing or placement going on.
         return false;
     }
 
     workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, [this, callback] (TileParseResult result) {
+    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
         if (state == State::obsolete) {
             return;
         }
 
+        std::exception_ptr error;
         if (result.is<TileParseResultBuckets>()) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
             state = resultBuckets.state;
@@ -117,6 +119,10 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             for (auto& bucket : resultBuckets.buckets) {
                 buckets[bucket.first] = std::move(bucket.second);
             }
+
+            // Persist the configuration we just placed so that we can later check whether we need to
+            // place again in case the configuration has changed.
+            placedConfig = config;
 
             // The target configuration could have changed since we started placement. In this case,
             // we're starting another placement run.
@@ -128,7 +134,7 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
             state = State::obsolete;
         }
 
-        callback();
+        callback(error);
     });
 
     return true;

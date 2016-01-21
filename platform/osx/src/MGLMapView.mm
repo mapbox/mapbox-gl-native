@@ -284,8 +284,10 @@ public:
     _annotationsNearbyLastClick = {};
     
     // Jump to Null Island initially.
+    self.automaticallyAdjustsContentInsets = YES;
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     options.zoom = _mbglMap->getMinZoom();
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
@@ -442,6 +444,8 @@ public:
 
 - (void)dealloc {
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
+    [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
+    [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
     
     // Close any annotation callout immediately.
     [self.calloutForSelectedAnnotation close];
@@ -468,6 +472,9 @@ public:
         if (![accessToken isKindOfClass:[NSNull class]]) {
             _mbglFileSource->setAccessToken((std::string)accessToken.UTF8String);
         }
+    } else if ([keyPath isEqualToString:@"contentLayoutRect"] ||
+               [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
+        [self adjustContentInsets];
     }
 }
 
@@ -546,6 +553,9 @@ public:
         self.dormant = YES;
         _mbglMap->pause();
     }
+    
+    [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
+    [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
 }
 
 - (void)viewDidMoveToWindow {
@@ -553,6 +563,15 @@ public:
         _mbglMap->resume();
         self.dormant = NO;
     }
+    
+    [self.window addObserver:self
+                  forKeyPath:@"contentLayoutRect"
+                     options:NSKeyValueObservingOptionInitial
+                     context:NULL];
+    [self.window addObserver:self
+                  forKeyPath:@"titlebarAppearsTransparent"
+                     options:NSKeyValueObservingOptionInitial
+                     context:NULL];
 }
 
 - (BOOL)wantsLayer {
@@ -808,7 +827,8 @@ public:
 }
 
 - (CLLocationCoordinate2D)centerCoordinate {
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng(padding));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate {
@@ -818,6 +838,7 @@ public:
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
     [self willChangeValueForKey:@"centerCoordinate"];
     _mbglMap->setLatLng(MGLLatLngFromLocationCoordinate2D(centerCoordinate),
+                        MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
                         MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"centerCoordinate"];
 }
@@ -859,13 +880,15 @@ public:
 }
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated {
-    _mbglMap->setZoom(zoomLevel, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self willChangeValueForKey:@"zoomLevel"];
+    _mbglMap->setZoom(zoomLevel,
+                      MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
+                      MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    [self didChangeValueForKey:@"zoomLevel"];
 }
 
 - (void)zoomBy:(double)zoomDelta animated:(BOOL)animated {
-    [self willChangeValueForKey:@"zoomLevel"];
-    _mbglMap->setZoom(self.zoomLevel + zoomDelta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
-    [self didChangeValueForKey:@"zoomLevel"];
+    [self setZoomLevel:self.zoomLevel + zoomDelta animated:animated];
 }
 
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
@@ -915,15 +938,14 @@ public:
 
 - (void)setDirection:(CLLocationDirection)direction animated:(BOOL)animated {
     [self willChangeValueForKey:@"direction"];
-    _mbglMap->setBearing(direction, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
+    _mbglMap->setBearing(direction,
+                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets),
+                         MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"direction"];
 }
 
 - (void)offsetDirectionBy:(CLLocationDegrees)delta animated:(BOOL)animated {
-    [self willChangeValueForKey:@"direction"];
-    _mbglMap->cancelTransitions();
-    _mbglMap->setBearing(_mbglMap->getBearing() + delta, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
-    [self didChangeValueForKey:@"direction"];
+    [self setDirection:_mbglMap->getBearing() + delta animated:animated];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera {
@@ -1023,6 +1045,7 @@ public:
 - (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera {
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
@@ -1054,8 +1077,9 @@ public:
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
     _mbglMap->cancelTransitions();
     
-    mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), mbglInsets);
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
     mbgl::AnimationOptions animationOptions;
     if (animated) {
         animationOptions.duration = MGLDurationInSeconds(MGLAnimationDuration);
@@ -1066,6 +1090,51 @@ public:
         [self didChangeValueForKey:@"visibleCoordinateBounds"];
     };
     _mbglMap->easeTo(cameraOptions, animationOptions);
+}
+
+- (void)setAutomaticallyAdjustsContentInsets:(BOOL)automaticallyAdjustsContentInsets {
+    _automaticallyAdjustsContentInsets = automaticallyAdjustsContentInsets;
+    [self adjustContentInsets];
+}
+
+/// Updates `contentInsets` to reflect the current window geometry.
+- (void)adjustContentInsets {
+    if (!_automaticallyAdjustsContentInsets) {
+        return;
+    }
+    
+    NSEdgeInsets contentInsets = self.contentInsets;
+    if ((self.window.styleMask & NSFullSizeContentViewWindowMask)
+        && !self.window.titlebarAppearsTransparent) {
+        NSRect contentLayoutRect = [self convertRect:self.window.contentLayoutRect fromView:nil];
+        if (NSMaxX(contentLayoutRect) > 0 && NSMaxY(contentLayoutRect) > 0) {
+            contentInsets = NSEdgeInsetsMake(NSHeight(self.bounds) - NSMaxY(contentLayoutRect),
+                                             NSMinX(contentLayoutRect),
+                                             NSMinY(contentLayoutRect),
+                                             NSWidth(self.bounds) - NSMaxX(contentLayoutRect));
+        }
+    } else {
+        contentInsets = NSEdgeInsetsZero;
+    }
+    
+    self.contentInsets = contentInsets;
+}
+
+- (void)setContentInsets:(NSEdgeInsets)contentInsets {
+    [self setContentInsets:contentInsets animated:NO];
+}
+
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated {
+    if (NSEdgeInsetsEqual(contentInsets, self.contentInsets)) {
+        return;
+    }
+    
+    // After adjusting the content insets, move the center coordinate from the
+    // old frame of reference to the new one represented by the newly set
+    // content insets.
+    CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+    _contentInsets = contentInsets;
+    [self setCenterCoordinate:oldCenter animated:animated];
 }
 
 #pragma mark Mouse events and gestures
@@ -1531,10 +1600,11 @@ public:
     
     // Get the image’s raw pixel data as an RGBA buffer.
     std::string pixelString((const char *)rep.bitmapData, rep.pixelsWide * rep.pixelsHigh * 4 /* RGBA */);
-    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>((uint16_t)rep.size.width,
-                                                            (uint16_t)rep.size.height,
-                                                            (float)(rep.pixelsWide / size.width),
-                                                            std::move(pixelString));
+
+    mbgl::PremultipliedImage cPremultipliedImage(rep.pixelsWide, rep.pixelsHigh);
+    std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
+    auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(std::move(cPremultipliedImage),
+                                                            (float)(rep.pixelsWide / size.width));
     NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
     _mbglMap->addAnnotationIcon(symbolName.UTF8String, cSpriteImage);
     
@@ -1929,7 +1999,7 @@ public:
 
 - (void)popoverDidShow:(__unused NSNotification *)notification {
     id <MGLAnnotation> annotation = self.selectedAnnotation;
-    if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)]) {
+    if (annotation && [self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)]) {
         [self.delegate mapView:self didSelectAnnotation:annotation];
     }
 }
@@ -2074,6 +2144,8 @@ public:
 /// Converts a geographic coordinate to a point in the view’s coordinate system.
 - (NSPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable NSView *)view {
     mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
+    // Cocoa origin is at the lower-left corner.
+    pixel.y = NSHeight(self.bounds) - pixel.y;
     return [self convertPoint:NSMakePoint(pixel.x, pixel.y) toView:view];
 }
 
@@ -2084,7 +2156,11 @@ public:
 /// Converts a point in the view’s coordinate system to a geographic coordinate.
 - (mbgl::LatLng)convertPoint:(NSPoint)point toLatLngFromView:(nullable NSView *)view {
     NSPoint convertedPoint = [self convertPoint:point fromView:view];
-    return _mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y));
+    return _mbglMap->latLngForPixel({
+        convertedPoint.x,
+        // mbgl origin is at the top-left corner.
+        NSHeight(self.bounds) - convertedPoint.y,
+    });
 }
 
 - (NSRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable NSView *)view {

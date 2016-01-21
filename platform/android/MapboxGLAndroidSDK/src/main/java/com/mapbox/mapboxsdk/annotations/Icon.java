@@ -2,6 +2,10 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
 
+/**
+ * Icon is the visual representation of a {@link Marker} on a {@link com.mapbox.mapboxsdk.views.MapView}.
+ * @see Marker
+ */
 public final class Icon {
     private Bitmap mBitmap;
     private String mId;

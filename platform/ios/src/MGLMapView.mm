@@ -48,12 +48,37 @@
 class MBGLView;
 class MGLAnnotationContext;
 
+/// Indicates the manner in which the map view is tracking the user location.
+typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
+    /// The map view is not yet tracking the user location.
+    MGLUserTrackingStatePossible = 0,
+    /// The map view has begun to move to the first reported user location.
+    MGLUserTrackingStateBegan,
+    /// The map view has finished moving to the first reported user location.
+    MGLUserTrackingStateChanged,
+};
+
 NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
+
+/// Duration of an animation due to a user location update, typically chosen to
+/// match a typical interval between user location updates.
+const NSTimeInterval MGLUserLocationAnimationDuration = 1.0;
+
 const CGSize MGLAnnotationUpdateViewportOutset = {150, 150};
 const CGFloat MGLMinimumZoom = 3;
+
+/// Minimum initial zoom level when entering user tracking mode.
+const double MGLMinimumZoomLevelForUserTracking = 10.5;
+
+/// Initial zoom level when entering user tracking mode from a low zoom level.
+const double MGLDefaultZoomLevelForUserTracking = 14.0;
+
 const NSUInteger MGLTargetFrameInterval = 1;  //Target FPS will be 60 divided by this value
+
+/// Tolerance for snapping to true north, measured in degrees in either direction.
+const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
@@ -140,8 +165,9 @@ public:
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
+/// Indicates how thoroughly the map view is tracking the user location.
+@property (nonatomic) MGLUserTrackingState userTrackingState;
 @property (nonatomic) CLLocationManager *locationManager;
-@property (nonatomic) CGPoint centerPoint;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
@@ -411,13 +437,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     //
     mbgl::CameraOptions options;
     options.center = mbgl::LatLng(0, 0);
-    options.zoom = _mbglMap->getMinZoom();
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    options.padding = padding;
+    options.zoom = 0;
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
 
     // metrics: map load event
-    mbgl::LatLng latLng = _mbglMap->getLatLng();
+    mbgl::LatLng latLng = _mbglMap->getLatLng(padding);
     int zoom = round(_mbglMap->getZoom());
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
@@ -748,6 +776,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
+    [self adjustContentInset];
 
     if ( ! _isTargetingInterfaceBuilder)
     {
@@ -763,8 +793,79 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         [self updateHeadingForDeviceOrientation];
         [self updateCompass];
-        [self updateUserLocationAnnotationView];
     }
+    
+    [self updateUserLocationAnnotationView];
+}
+
+/// Updates `contentInset` to reflect the current window geometry.
+- (void)adjustContentInset
+{
+    // We could crawl all the way up the responder chain using
+    // -viewControllerForLayoutGuides, but an intervening view means that any
+    // manual contentInset should not be overridden; something other than the
+    // top and bottom bars may be influencing the manual inset.
+    UIViewController *viewController;
+    if ([self.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is the content view of a view controller.
+        viewController = (UIViewController *)self.nextResponder;
+    }
+    else if ([self.superview.nextResponder isKindOfClass:[UIViewController class]])
+    {
+        // This map view is an immediate child of a view controller’s content view.
+        viewController = (UIViewController *)self.superview.nextResponder;
+    }
+    
+    if ( ! viewController.automaticallyAdjustsScrollViewInsets)
+    {
+        return;
+    }
+    
+    UIEdgeInsets contentInset = UIEdgeInsetsZero;
+    CGPoint topPoint = CGPointMake(0, viewController.topLayoutGuide.length);
+    contentInset.top = [self convertPoint:topPoint fromView:viewController.view].y;
+    CGPoint bottomPoint = CGPointMake(0, CGRectGetMaxY(viewController.view.bounds)
+                                      - viewController.bottomLayoutGuide.length);
+    contentInset.bottom = (CGRectGetMaxY(self.bounds)
+                           - [self convertPoint:bottomPoint fromView:viewController.view].y);
+    self.contentInset = contentInset;
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset
+{
+    [self setContentInset:contentInset animated:NO];
+}
+
+- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated
+{
+    if (UIEdgeInsetsEqualToEdgeInsets(contentInset, self.contentInset))
+    {
+        return;
+    }
+    
+    // After adjusting the content inset, move the center coordinate from the
+    // old frame of reference to the new one represented by the newly set
+    // content inset.
+    CLLocationCoordinate2D oldCenter = self.centerCoordinate;
+    
+    _contentInset = contentInset;
+    
+    // Don’t call -setCenterCoordinate:, which resets the user tracking mode.
+    [self _setCenterCoordinate:oldCenter animated:animated];
+}
+
+/// Returns the frame of inset content within the map view.
+- (CGRect)contentFrame
+{
+    return UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+}
+
+/// Returns the center point of the inset content within the map view.
+- (CGPoint)contentCenter
+{
+    CGRect contentFrame = self.contentFrame;
+    return CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
 }
 
 #pragma mark - Life Cycle -
@@ -961,27 +1062,15 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
 
-        self.centerPoint = CGPointMake(0, 0);
-
         self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
     else if (pan.state == UIGestureRecognizerStateChanged)
     {
-        CGPoint delta = CGPointMake([pan translationInView:pan.view].x - self.centerPoint.x,
-                                    [pan translationInView:pan.view].y - self.centerPoint.y);
-
-        double flippedY = self.bounds.size.height - [pan locationInView:pan.view].y;
-        _mbglMap->setLatLng(
-            _mbglMap->latLngForPixel(mbgl::PrecisionPoint(
-                [pan locationInView:pan.view].x - delta.x,
-                flippedY + delta.y)),
-            mbgl::PrecisionPoint(
-                [pan locationInView:pan.view].x,
-                flippedY));
-
-        self.centerPoint = CGPointMake(self.centerPoint.x + delta.x, self.centerPoint.y + delta.y);
+        CGPoint delta = [pan translationInView:pan.view];
+        _mbglMap->moveBy({ delta.x, delta.y });
+        [pan setTranslation:CGPointZero inView:pan.view];
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1024,14 +1113,18 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if (_mbglMap->getZoom() <= _mbglMap->getMinZoom() && pinch.scale < 1) return;
 
     _mbglMap->cancelTransitions();
+    
+    CGPoint centerPoint = [pinch locationInView:pinch.view];
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
 
         self.scale = _mbglMap->getScale();
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
@@ -1040,10 +1133,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         CGFloat newScale = self.scale * pinch.scale;
 
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
-
-        mbgl::PrecisionPoint center([pinch locationInView:pinch.view].x,
-                                    [pinch locationInView:pinch.view].y);
-        _mbglMap->setScale(newScale, center);
+        
+        _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1079,14 +1170,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
         if (velocity)
         {
-            CGPoint pinchCenter = [pinch locationInView:pinch.view];
-            mbgl::PrecisionPoint center(pinchCenter.x, pinchCenter.y);
-            _mbglMap->setScale(newScale, center, MGLDurationInSeconds(duration));
+            _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
         }
 
         [self notifyGestureDidEndWithDrift:velocity];
 
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 }
 
@@ -1095,14 +1184,18 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     if ( ! self.isRotateEnabled) return;
 
     _mbglMap->cancelTransitions();
+    
+    CGPoint centerPoint = [rotate locationInView:rotate.view];
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
-
-        self.userTrackingMode = MGLUserTrackingModeNone;
         
         [self notifyGestureDidBegin];
     }
@@ -1117,10 +1210,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             newDegrees = fminf(newDegrees,  30);
             newDegrees = fmaxf(newDegrees, -30);
         }
-
-        mbgl::PrecisionPoint center([rotate locationInView:rotate.view].x,
-                                    [rotate locationInView:rotate.view].y);
-        _mbglMap->setBearing(newDegrees, center);
+        
+        _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1135,7 +1226,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, MGLDurationInSeconds(duration));
+            _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
 
             [self notifyGestureDidEndWithDrift:YES];
 
@@ -1143,14 +1234,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
             [self animateWithDelay:duration animations:^
              {
-                 [weakSelf unrotateIfNeededAnimated:YES];
+                 [weakSelf unrotateIfNeededForGesture];
              }];
         }
         else
         {
             [self notifyGestureDidEndWithDrift:NO];
-
-            [self unrotateIfNeededAnimated:YES];
+            [self unrotateIfNeededForGesture];
         }
     }
 }
@@ -1210,31 +1300,20 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint doubleTapPoint = [doubleTap locationInView:doubleTap.view];
-
-        CGPoint zoomInPoint = doubleTapPoint;
-        CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
-            CGRect userLocationRect = CGRectMake(userPoint.x - 40, userPoint.y - 40, 80, 80);
-            if (CGRectContainsPoint(userLocationRect, doubleTapPoint))
-            {
-                zoomInPoint = userPoint;
-            }
-        }
-        if ( ! CGPointEqualToPoint(zoomInPoint, userPoint))
-        {
-            self.userTrackingMode = MGLUserTrackingModeNone;
+            gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(zoomInPoint.x, zoomInPoint.y);
+        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
         [self animateWithDelay:MGLAnimationDuration animations:^
         {
-            [weakSelf unrotateIfNeededAnimated:YES];
+            [weakSelf unrotateIfNeededForGesture];
         }];
     }
 }
@@ -1253,27 +1332,20 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint zoomOutPoint;
-
+        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
-            zoomOutPoint = self.center;
-        }
-        else
-        {
-            self.userTrackingMode = MGLUserTrackingModeNone;
-
-            zoomOutPoint = CGPointMake([twoFingerTap locationInView:twoFingerTap.view].x, [twoFingerTap locationInView:twoFingerTap.view].y);
+            gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(zoomOutPoint.x, zoomOutPoint.y);
+        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(0.5, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
 
         [self animateWithDelay:MGLAnimationDuration animations:^
         {
-            [weakSelf unrotateIfNeededAnimated:YES];
+            [weakSelf unrotateIfNeededForGesture];
         }];
     }
 }
@@ -1301,16 +1373,21 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         CGFloat newZoom = log2f(self.scale) + (distance / 75);
 
         if (newZoom < _mbglMap->getMinZoom()) return;
-
-        mbgl::PrecisionPoint center(self.bounds.size.width / 2, self.bounds.size.height / 2);
-        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(), center);
+        
+        CGPoint centerPoint = self.contentCenter;
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            centerPoint = self.userLocationAnnotationViewCenter;
+        }
+        _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(),
+                          { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
     else if (quickZoom.state == UIGestureRecognizerStateEnded || quickZoom.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 }
 
@@ -1340,7 +1417,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     else if (twoFingerDrag.state == UIGestureRecognizerStateEnded || twoFingerDrag.state == UIGestureRecognizerStateCancelled)
     {
         [self notifyGestureDidEndWithDrift:NO];
-        [self unrotateIfNeededAnimated:YES];
+        [self unrotateIfNeededForGesture];
     }
 
 }
@@ -1565,8 +1642,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)resetPosition
 {
-    _mbglMap->cancelTransitions();
-    _mbglMap->resetPosition();
+    MGLMapCamera *camera = [MGLMapCamera camera];
+    camera.altitude = MGLAltitudeForZoomLevel(0, 0, 0, self.frame.size);
+    self.camera = camera;
 }
 
 - (void)cycleDebugOptions
@@ -1598,7 +1676,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (CLLocationCoordinate2D)centerCoordinate
 {
-    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng());
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
+    return MGLLocationCoordinate2DFromLatLng(_mbglMap->getLatLng(padding));
 }
 
 - (void)setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel animated:(BOOL)animated
@@ -1614,27 +1693,31 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    [self _setCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:direction animated:animated completionHandler:completion];
+    [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
 
-- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction animated:(BOOL)animated completionHandler:(nullable void (^)(void))completion
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate animated:(BOOL)animated {
+    [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:self.zoomLevel direction:self.direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:NULL];
+}
+
+- (void)_setCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate edgePadding:(UIEdgeInsets)insets zoomLevel:(double)zoomLevel direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
     _mbglMap->cancelTransitions();
     
     mbgl::CameraOptions cameraOptions;
     cameraOptions.center = MGLLatLngFromLocationCoordinate2D(centerCoordinate);
-    cameraOptions.zoom = fmaxf(zoomLevel, self.currentMinimumZoom);
+    cameraOptions.padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    cameraOptions.zoom = zoomLevel;
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
     }
     
-    NSTimeInterval duration = animated ? MGLAnimationDuration : 0;
     mbgl::AnimationOptions animationOptions;
-    if (animated)
+    if (duration)
     {
         animationOptions.duration = MGLDurationInSeconds(duration);
-        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(nil);
+        animationOptions.easing = MGLUnitBezierForMediaTimingFunction(function);
     }
     if (completion)
     {
@@ -1648,8 +1731,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         };
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
-
-    [self unrotateIfNeededAnimated:animated];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel
@@ -1736,7 +1817,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     
     // NOTE: does not disrupt tracking mode
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
-    mbgl::EdgeInsets mbglInsets = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     mbgl::AnnotationSegment segment;
     segment.reserve(count);
     for (NSUInteger i = 0; i < count; i++)
@@ -1744,7 +1826,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
     
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, mbglInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, padding);
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
@@ -1766,8 +1848,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
-
-    [self unrotateIfNeededAnimated:duration > 0];
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection
@@ -1800,7 +1880,9 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    _mbglMap->setBearing(direction, MGLDurationInSeconds(duration));
+    _mbglMap->setBearing(direction,
+                         MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
+                         MGLDurationInSeconds(duration));
 }
 
 - (void)setDirection:(CLLocationDirection)direction
@@ -1847,6 +1929,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
     _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
     {
@@ -1885,6 +1968,13 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 }
 
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
+{
+    self.userTrackingMode = MGLUserTrackingModeNone;
+    
+    [self _flyToCamera:camera withDuration:duration peakAltitude:peakAltitude completionHandler:completion];
+}
+
+- (void)_flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion
 {
     _mbglMap->cancelTransitions();
     if ([self.camera isEqual:camera])
@@ -1925,6 +2015,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 {
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
@@ -1948,10 +2039,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (mbgl::LatLng)convertPoint:(CGPoint)point toLatLngFromView:(nullable UIView *)view
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
-    
-    // Flip y coordinate for iOS view origin in the top left corner.
-    convertedPoint.y = self.bounds.size.height - convertedPoint.y;
-    
     return _mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y));
 }
 
@@ -1964,10 +2051,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 - (CGPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable UIView *)view
 {
     mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
-    
-    // Flip y coordinate for iOS view origin in the top left corner.
-    pixel.y = self.bounds.size.height - pixel.y;
-    
     return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
 }
 
@@ -2304,22 +2387,19 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     size_t width = CGImageGetWidth(image);
     size_t height = CGImageGetHeight(image);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    std::string pixels(width * height * 4, '\0');
+    mbgl::PremultipliedImage cPremultipliedImage(width, height);
     size_t bytesPerPixel = 4;
     size_t bytesPerRow = bytesPerPixel * width;
     size_t bitsPerComponent = 8;
-    char *pixelData = const_cast<char *>(pixels.data());
-    CGContextRef context = CGBitmapContextCreate(pixelData, width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGContextRef context = CGBitmapContextCreate(cPremultipliedImage.data.get(), width, height, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
 
     // add sprite
     auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(
-        uint16_t(annotationImage.image.size.width),
-        uint16_t(annotationImage.image.size.height),
-        float(annotationImage.image.scale),
-        std::move(pixels));
+        std::move(cPremultipliedImage), 
+        float(annotationImage.image.scale));
 
     // sprite upload
     NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
@@ -2587,7 +2667,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (annotation == self.selectedAnnotation) return;
 
-    self.userTrackingMode = MGLUserTrackingModeNone;
+    if (annotation != self.userLocation)
+    {
+        self.userTrackingMode = MGLUserTrackingModeNone;
+    }
 
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
     
@@ -2908,6 +2991,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 
     _userTrackingMode = mode;
+    
+    if (_userTrackingMode == MGLUserTrackingModeNone
+        || _userTrackingMode == MGLUserTrackingModeFollowWithCourse)
+    {
+        self.userTrackingState = MGLUserTrackingStatePossible;
+    }
 
     switch (_userTrackingMode)
     {
@@ -2930,7 +3019,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
             if (self.userLocationAnnotationView)
             {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location]];
+                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
             }
 
             break;
@@ -2947,7 +3036,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
             if (self.userLocationAnnotationView)
             {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location]];
+                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
             }
 
             [self updateHeadingForDeviceOrientation];
@@ -2964,7 +3053,21 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     }
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment
+{
+    _userLocationVerticalAlignment = alignment;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:YES];
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    [self locationManager:manager didUpdateLocations:locations animated:YES];
+}
+
+- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
 {
     CLLocation *oldLocation = self.userLocation.location;
     CLLocation *newLocation = locations.lastObject;
@@ -2973,10 +3076,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation])
     {
-        self.userLocation.location = newLocation;
-
-        // deselect user if applicable since we don't do callout tracking yet
-        if ([self.selectedAnnotation isEqual:self.userLocation]) [self deselectAnnotation:self.userLocation animated:NO];
+        if (self.userTrackingState != MGLUserTrackingStateBegan)
+        {
+            self.userLocation.location = newLocation;
+        }
 
         if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
         {
@@ -2994,48 +3097,67 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         // center on user location unless we're already centered there (or very close)
         //
-        CGPoint mapCenterPoint    = [self convertPoint:self.center fromView:self.superview];
-        CGPoint userLocationPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+        CGPoint correctPoint = self.userLocationAnnotationViewCenter;
+        CGPoint currentPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
 
-        if (std::abs(userLocationPoint.x - mapCenterPoint.x) > 1.0 || std::abs(userLocationPoint.y - mapCenterPoint.y) > 1.0)
+        if (std::abs(currentPoint.x - correctPoint.x) > 1.0 || std::abs(currentPoint.y - correctPoint.y) > 1.0)
         {
-            if (round(self.zoomLevel) >= 10)
+            if (self.zoomLevel >= MGLMinimumZoomLevelForUserTracking)
             {
                 // at sufficient detail, just re-center the map; don't zoom
                 //
-                [self _setCenterCoordinate:self.userLocation.location.coordinate zoomLevel:self.zoomLevel direction:course animated:YES completionHandler:NULL];
+                if (self.userTrackingState == MGLUserTrackingStateChanged)
+                {
+                    // Ease incrementally to the new user location.
+                    UIEdgeInsets insets = UIEdgeInsetsMake(correctPoint.y, correctPoint.x,
+                                                           CGRectGetHeight(self.bounds) - correctPoint.y,
+                                                           CGRectGetWidth(self.bounds) - correctPoint.x);
+                    CAMediaTimingFunction *linearFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+                    [self _setCenterCoordinate:self.userLocation.location.coordinate
+                                   edgePadding:insets
+                                     zoomLevel:self.zoomLevel
+                                     direction:course
+                                      duration:animated ? MGLUserLocationAnimationDuration : 0
+                       animationTimingFunction:linearFunction
+                             completionHandler:NULL];
+                }
+                else if (self.userTrackingState == MGLUserTrackingStatePossible)
+                {
+                    // Fly to the first reported location, which may be far away
+                    // from the current viewport.
+                    self.userTrackingState = MGLUserTrackingStateBegan;
+                    
+                    MGLMapCamera *camera = self.camera;
+                    camera.centerCoordinate = self.userLocation.location.coordinate;
+                    camera.heading = course;
+                    
+                    __weak MGLMapView *weakSelf = self;
+                    [self _flyToCamera:camera withDuration:animated ? -1 : 0 peakAltitude:-1 completionHandler:^{
+                        MGLMapView *strongSelf = weakSelf;
+                        strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+                    }];
+                }
             }
-            else
+            else if (self.userTrackingState == MGLUserTrackingStatePossible)
             {
                 // otherwise re-center and zoom in to near accuracy confidence
                 //
-                float delta = (newLocation.horizontalAccuracy / 110000) * 1.2; // approx. meter per degree latitude, plus some margin
-
-                CLLocationCoordinate2D desiredSouthWest = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  - delta,
-                                                                                     newLocation.coordinate.longitude - delta);
-
-                CLLocationCoordinate2D desiredNorthEast = CLLocationCoordinate2DMake(newLocation.coordinate.latitude  + delta,
-                                                                                     newLocation.coordinate.longitude + delta);
-
-                CGFloat pixelRadius = fminf(self.bounds.size.width, self.bounds.size.height) / 2;
-
-                CLLocationCoordinate2D actualSouthWest = [self convertPoint:CGPointMake(userLocationPoint.x - pixelRadius,
-                                                                                        userLocationPoint.y - pixelRadius)
-                                                       toCoordinateFromView:self];
-
-                CLLocationCoordinate2D actualNorthEast = [self convertPoint:CGPointMake(userLocationPoint.x + pixelRadius,
-                                                                                        userLocationPoint.y + pixelRadius)
-                                                       toCoordinateFromView:self];
-
-                if (desiredNorthEast.latitude  != actualNorthEast.latitude  ||
-                    desiredNorthEast.longitude != actualNorthEast.longitude ||
-                    desiredSouthWest.latitude  != actualSouthWest.latitude  ||
-                    desiredSouthWest.longitude != actualSouthWest.longitude)
-                {
-                    // assumes we won't disrupt tracking mode
-                    [self setVisibleCoordinateBounds:MGLCoordinateBoundsMake(desiredSouthWest, desiredNorthEast) edgePadding:UIEdgeInsetsZero direction:course animated:YES];
-                }
+                self.userTrackingState = MGLUserTrackingStateBegan;
+                
+                MGLMapCamera *camera = self.camera;
+                camera.centerCoordinate = self.userLocation.location.coordinate;
+                camera.heading = course;
+                camera.altitude = MGLAltitudeForZoomLevel(MGLDefaultZoomLevelForUserTracking, camera.pitch,
+                                                          camera.centerCoordinate.latitude,
+                                                          self.frame.size);
+                
+                __weak MGLMapView *weakSelf = self;
+                [self _flyToCamera:camera withDuration:animated ? -1 : 0 peakAltitude:-1 completionHandler:^{
+                    MGLMapView *strongSelf = weakSelf;
+                    strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+                }];
             }
+            [self unrotateIfNeededAnimated:YES];
         }
     }
 
@@ -3139,18 +3261,30 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return (self.zoomLevel >= self.currentMinimumZoom);
 }
 
-// correct rotations to north as needed
-//
+- (void)unrotateIfNeededForGesture
+{
+    // Avoid contention with in-progress gestures.
+    UIGestureRecognizerState state = self.pinch.state;
+    if (self.direction != 0
+        && state != UIGestureRecognizerStateBegan
+        && state != UIGestureRecognizerStateChanged)
+    {
+        [self unrotateIfNeededAnimated:YES];
+        
+        // Snap to north.
+        if ((self.direction < MGLToleranceForSnappingToNorth
+             || self.direction > 360 - MGLToleranceForSnappingToNorth)
+            && self.userTrackingMode != MGLUserTrackingModeFollowWithHeading
+            && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+        {
+            [self resetNorthAnimated:YES];
+        }
+    }
+}
+
+/// Rotate back to true north if the map view is zoomed too far out.
 - (void)unrotateIfNeededAnimated:(BOOL)animated
 {
-    double snapTolerance = 7;
-
-    // don't worry about it in the midst of pinch or rotate gestures
-    //
-    if (self.pinch.state  == UIGestureRecognizerStateChanged || self.rotate.state == UIGestureRecognizerStateChanged) return;
-
-    // but otherwise, do
-    //
     if (self.direction != 0 && ! self.isRotationAllowed)
     {
         if (animated)
@@ -3175,10 +3309,6 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             [self resetNorthAnimated:NO];
         }
     }
-    else if (self.direction < snapTolerance || self.direction > 360 - snapTolerance)
-    {
-        [self resetNorthAnimated:animated];
-    }
 }
 
 - (void)notifyMapChange:(mbgl::MapChange)change
@@ -3193,7 +3323,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         case mbgl::MapChangeRegionWillChange:
         case mbgl::MapChangeRegionWillChangeAnimated:
         {
-            [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            if ( ! _userLocationAnnotationIsSelected
+                || self.userTrackingMode == MGLUserTrackingModeNone
+                || self.userTrackingState != MGLUserTrackingStateChanged)
+            {
+                [self deselectAnnotation:self.selectedAnnotation animated:NO];
+            }
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
             {
@@ -3288,28 +3423,78 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)updateUserLocationAnnotationView
 {
+    MGLUserLocationAnnotationView *annotationView = self.userLocationAnnotationView;
     if ( ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate)) {
-        self.userLocationAnnotationView.layer.hidden = YES;
+        annotationView.layer.hidden = YES;
         return;
     }
 
-    if ( ! self.userLocationAnnotationView.superview) [self.glView addSubview:self.userLocationAnnotationView];
+    if ( ! annotationView.superview) [self.glView addSubview:annotationView];
 
-    CGPoint userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    CGPoint userPoint;
+    if (self.userTrackingMode != MGLUserTrackingModeNone
+        && self.userTrackingState == MGLUserTrackingStateChanged)
+    {
+        userPoint = self.userLocationAnnotationViewCenter;
+    }
+    else
+    {
+        userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+    }
 
     if (CGRectContainsPoint(CGRectInset(self.bounds, -MGLAnnotationUpdateViewportOutset.width,
         -MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
-        self.userLocationAnnotationView.center = userPoint;
-
-        self.userLocationAnnotationView.layer.hidden = NO;
-
-        [self.userLocationAnnotationView setupLayers];
+        annotationView.center = userPoint;
+        annotationView.layer.hidden = NO;
+        [annotationView setupLayers];
+        
+        if (_userLocationAnnotationIsSelected)
+        {
+            // Ensure the callout view still points to its annotation.
+            UIView <MGLCalloutView> *calloutView = self.calloutViewForSelectedAnnotation;
+            CGRect calloutFrame = calloutView.frame;
+            calloutFrame.origin.x = annotationView.center.x - CGRectGetWidth(calloutFrame) / 2;
+            calloutFrame.origin.y = CGRectGetMinY(annotationView.frame) - CGRectGetHeight(calloutFrame);
+            if ( ! CGRectEqualToRect(calloutView.frame, calloutFrame))
+            {
+                calloutView.frame = calloutFrame;
+            }
+        }
     }
     else
     {
-        self.userLocationAnnotationView.layer.hidden = YES;
+        // User has moved far enough outside of the viewport that showing it or
+        // its callout would be useless.
+        annotationView.layer.hidden = YES;
+        
+        if (_userLocationAnnotationIsSelected)
+        {
+            [self deselectAnnotation:self.selectedAnnotation animated:YES];
+        }
     }
+}
+
+/// Intended center point of the user location annotation view.
+- (CGPoint)userLocationAnnotationViewCenter
+{
+    CGRect contentFrame = self.contentFrame;
+    CGPoint center = CGPointMake(CGRectGetMidX(contentFrame), CGRectGetMidY(contentFrame));
+    
+    // When tracking course, it’s more important to see the road ahead, so
+    // weight the user dot down towards the bottom.
+    switch (self.userLocationVerticalAlignment) {
+        case MGLAnnotationVerticalAlignmentCenter:
+            break;
+        case MGLAnnotationVerticalAlignmentTop:
+            center.y = CGRectGetHeight(self.userLocationAnnotationView.frame);
+            break;
+        case MGLAnnotationVerticalAlignmentBottom:
+            center.y = CGRectGetHeight(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame);
+            break;
+    }
+    
+    return center;
 }
 
 - (void)updateCompass

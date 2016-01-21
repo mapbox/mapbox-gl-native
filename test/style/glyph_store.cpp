@@ -52,7 +52,6 @@ TEST(GlyphStore, LoadingSuccess) {
             return;
 
         auto fontStack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_FALSE(fontStack->getMetrics().empty());
         ASSERT_FALSE(fontStack->getSDFs().empty());
 
         test.end();
@@ -73,7 +72,6 @@ TEST(GlyphStore, LoadingFail) {
         ASSERT_EQ(glyphRange, GlyphRange(0, 255));
 
         auto stack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_TRUE(stack->getMetrics().empty());
         ASSERT_TRUE(stack->getSDFs().empty());
         ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
 
@@ -95,7 +93,6 @@ TEST(GlyphStore, LoadingCorrupted) {
         ASSERT_EQ(glyphRange, GlyphRange(0, 255));
 
         auto stack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_TRUE(stack->getMetrics().empty());
         ASSERT_TRUE(stack->getSDFs().empty());
         ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
 
@@ -132,7 +129,6 @@ TEST(GlyphStore, InvalidURL) {
         ASSERT_TRUE(error != nullptr);
 
         auto stack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_TRUE(stack->getMetrics().empty());
         ASSERT_TRUE(stack->getSDFs().empty());
 
         test.end();

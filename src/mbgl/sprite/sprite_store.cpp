@@ -40,15 +40,18 @@ void SpriteStore::setURL(const std::string& url) {
     FileSource* fs = util::ThreadContext::getFileSource();
     loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL },
                                       [this, jsonURL](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        loader->jsonRequest = nullptr;
-
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else {
+            return;
+        }
+
+        if (res.notModified) {
+            // We got the same data back as last time. Abort early.
+            return;
+        }
+
+        if (!loader->json || *loader->json != *res.data) {
+            // Only trigger a sprite loaded event we got new data.
             loader->json = res.data;
             emitSpriteLoadedIfComplete();
         }
@@ -57,15 +60,17 @@ void SpriteStore::setURL(const std::string& url) {
     loader->spriteRequest =
         fs->request({ Resource::Kind::SpriteImage, spriteURL },
                     [this, spriteURL](Response res) {
-            if (res.stale) {
-                // Only handle fresh responses.
-                return;
-            }
-            loader->spriteRequest = nullptr;
-
             if (res.error) {
                 observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-            } else {
+                return;
+            }
+
+            if (res.notModified) {
+                // We got the same data back as last time. Abort early.
+                return;
+            }
+
+            if (!loader->image || *loader->image != *res.data) {
                 loader->image = res.data;
                 emitSpriteLoadedIfComplete();
             }
@@ -79,8 +84,7 @@ void SpriteStore::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    auto local = std::move(loader);
-    auto result = parseSprite(*local->image, *local->json);
+    auto result = parseSprite(*loader->image, *loader->json);
     if (result.is<Sprites>()) {
         loaded = true;
         setSprites(result.get<Sprites>());
@@ -109,7 +113,7 @@ void SpriteStore::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end()) {
             // There is already a sprite with that name in our store.
-            if ((it->second->width != sprite->width || it->second->height != sprite->height)) {
+            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
                 Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
                 return;
             }

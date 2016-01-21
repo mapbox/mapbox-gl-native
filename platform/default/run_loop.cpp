@@ -1,3 +1,4 @@
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/thread_local.hpp>
@@ -71,6 +72,8 @@ public:
     uv_handle_t* holderHandle() {
         return reinterpret_cast<uv_handle_t*>(holder);
     }
+
+    int refCount = 1;
 
     uv_loop_t *loop = nullptr;
     uv_async_t* holder = new uv_async_t;
@@ -161,7 +164,28 @@ void RunLoop::runOnce() {
 }
 
 void RunLoop::stop() {
-    invoke([&] { uv_unref(impl->holderHandle()); });
+    invoke([&] {
+        unref();
+
+        if (impl->refCount) {
+            Log::Debug(mbgl::Event::General, "Blocking on pending events.");
+        }
+    });
+}
+
+void RunLoop::ref() {
+    ++impl->refCount;
+}
+
+void RunLoop::unref() {
+    // Main loop already stopped.
+    if (impl->refCount == 0) {
+        return;
+    }
+
+    if (!--impl->refCount) {
+        uv_unref(impl->holderHandle());
+    }
 }
 
 void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& callback) {

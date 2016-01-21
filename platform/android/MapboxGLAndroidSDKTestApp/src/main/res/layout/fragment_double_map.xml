@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <com.mapbox.mapboxsdk.views.MapView
+        android:id="@+id/mapview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:access_token="@string/access_token" />
+
+    <FrameLayout
+        android:id="@+id/map_card"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
+
+        <com.mapbox.mapboxsdk.views.MapView
+            android:id="@+id/mini_map"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            mapbox:access_token="@string/access_token" />
+    </FrameLayout>
+</RelativeLayout>

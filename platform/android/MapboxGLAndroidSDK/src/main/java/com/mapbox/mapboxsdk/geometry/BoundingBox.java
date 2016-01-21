@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * A rectangular geographical area defined in latitude and longitude units.
  */
-public final class BoundingBox implements Parcelable, Serializable {
+public final class BoundingBox implements Parcelable {
 
     private final double mLatNorth;
     private final double mLatSouth;

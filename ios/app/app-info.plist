@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>MBGL</string>
 	<key>CFBundleVersion</key>
-	<string>0.0.3</string>
+	<string>7877</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MGLMetricsTestServerURL</key>

@@ -2,7 +2,6 @@
 #define MBGL_STORAGE_REQUEST_BASE
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/storage/file_cache.hpp>
 
 #include <memory>
 #include <functional>

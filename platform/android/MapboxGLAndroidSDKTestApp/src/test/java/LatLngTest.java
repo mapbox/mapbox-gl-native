@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +42,23 @@ public class LatLngTest {
         double altitude = 5.6;
         LatLng latLng2 = new LatLng(1.2, 3.4, altitude);
         assertEquals("altitude default value", latLng2.getAltitude(), altitude, DELTA);
+    }
+
+    @Test
+    public void testDistanceTo() {
+        LatLng latLng1 = new LatLng(0.0, 0.0);
+        LatLng latLng2 = new LatLng(1.0, 1.0);
+        assertEquals("distances should match",
+                latLng1.distanceTo(latLng2),
+                157425.53710839353, DELTA);
+    }
+
+    @Test
+    public void testDistanceToSamePoint() {
+        LatLng latLng1 = new LatLng(40.71199035644531, -74.0081);
+        LatLng latLng2 = new LatLng(40.71199035644531, -74.0081);
+        double distance = latLng1.distanceTo(latLng2);
+        assertEquals("distance should match", 0.0, distance, DELTA);
     }
 
     /*
@@ -84,15 +102,6 @@ public class LatLngTest {
         assertEquals("string should match",
                 latLng.toString(),
                 "LatLng [longitude=3.4, latitude=1.2, altitude=5.6]");
-    }
-
-    @Test
-    public void testDistanceTo() {
-        LatLng latLng1 = new LatLng(0.0, 0.0);
-        LatLng latLng2 = new LatLng(1.0, 1.0);
-        assertEquals("distances should match",
-                latLng1.distanceTo(latLng2),
-                157425.53710839353, DELTA);
     }
 
 }

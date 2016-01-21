@@ -112,7 +112,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID)
 void AnnotationManager::updateStyle(Style& style) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
-        std::unique_ptr<Source> source = std::make_unique<Source>(SourceType::Annotations, SourceID, "", std::make_unique<SourceInfo>(), nullptr);
+        std::unique_ptr<Source> source = std::make_unique<Source>(SourceType::Annotations, SourceID, "", util::tileSize, std::make_unique<SourceInfo>(), nullptr);
         source->enabled = true;
         style.addSource(std::move(source));
 
@@ -165,7 +165,7 @@ void AnnotationManager::removeIcon(const std::string& name) {
 
 double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
     auto sprite = spriteStore.getSprite(name);
-    return sprite ? -sprite->height / 2 : 0;
+    return sprite ? -(sprite->image.height / sprite->pixelRatio) / 2 : 0;
 }
 
 } // namespace mbgl

@@ -51,7 +51,7 @@ bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const fl
 
         float angleDelta = util::angle_to(prev, current) - util::angle_to(current, next);
         // restrict angle to -pi..pi range
-        angleDelta = std::fmod(angleDelta + 3 * M_PI, M_PI * 2) - M_PI;
+        angleDelta = std::fabs(std::fmod(angleDelta + 3 * M_PI, M_PI * 2) - M_PI);
 
         recentCorners.emplace(anchorDistance, angleDelta);
         recentAngleDelta += angleDelta;
@@ -63,7 +63,7 @@ bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const fl
         }
 
         // the sum of angles within the window area exceeds the maximum allowed value. check fails.
-        if (std::fabs(recentAngleDelta) > maxAngle) return false;
+        if (recentAngleDelta > maxAngle) return false;
 
         index++;
         anchorDistance += util::dist<float>(current, next);

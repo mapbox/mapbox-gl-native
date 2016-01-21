@@ -18,12 +18,12 @@ public:
         , type(type_)
     {}
 
-    mapbox::util::optional<Value> getValue(const std::string &key) const {
+    optional<Value> getValue(const std::string &key) const {
         if (key == "$type")
             return Value(uint64_t(type));
         auto it = properties.find(key);
         if (it == properties.end())
-            return mapbox::util::optional<Value>();
+            return optional<Value>();
         return it->second;
     }
 

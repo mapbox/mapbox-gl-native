@@ -16,7 +16,7 @@ public:
     VectorTileFeature(pbf, const VectorTileLayer&);
 
     FeatureType getType() const override { return type; }
-    mapbox::util::optional<Value> getValue(const std::string&) const override;
+    optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override;
 
 private:
@@ -68,7 +68,6 @@ public:
 private:
     TileID tileID;
     std::string urlTemplate;
-    std::shared_ptr<const std::string> data;
 };
 
 } // namespace mbgl

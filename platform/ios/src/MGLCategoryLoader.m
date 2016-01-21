@@ -18,7 +18,7 @@
 
     // https://github.com/mapbox/mapbox-gl-native/issues/3113
     //
-    NSString *description = [MGLMapView description];
+    [MGLMapView description];
 }
 
 @end

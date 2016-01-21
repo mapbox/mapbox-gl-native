@@ -34,13 +34,6 @@ namespace util {
 template <class T> class Thread;
 } // namespace util
 
-struct EdgeInsets {
-    double top = 0;
-    double left = 0;
-    double bottom = 0;
-    double right = 0;
-};
-
 class Map : private util::noncopyable {
     friend class View;
 
@@ -106,17 +99,20 @@ public:
     // Position
     void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
-    LatLng getLatLng() const;
-    void resetPosition();
+    LatLng getLatLng(const EdgeInsets& = {}) const;
+    void resetPosition(const EdgeInsets& = {});
 
     // Scale
     void scaleBy(double ds, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
     void setScale(double scale, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
+    void setZoom(double zoom, const EdgeInsets&, const Duration& = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
+    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const Duration& = Duration::zero());
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&);
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&);
     void resetZoom();
@@ -126,9 +122,11 @@ public:
     // Rotation
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
-    void setBearing(double degrees, const PrecisionPoint&);
+    void setBearing(double degrees, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setBearing(double degrees, const EdgeInsets&, const Duration& = Duration::zero());
     double getBearing() const;
     void resetNorth(const Duration& = std::chrono::milliseconds(500));
+    void resetNorth(const EdgeInsets&, const Duration& = std::chrono::milliseconds(500));
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());

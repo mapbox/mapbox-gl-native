@@ -5,7 +5,10 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 
-public class LatLngZoom extends LatLng implements Parcelable, Serializable {
+/**
+ * A geographical location which contains a {@link LatLng}, zoom pair.
+ */
+public class LatLngZoom extends LatLng implements Parcelable {
 
     public static final Parcelable.Creator<LatLngZoom> CREATOR = new Parcelable.Creator<LatLngZoom>() {
         public LatLngZoom createFromParcel(Parcel in) {

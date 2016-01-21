@@ -1,17 +1,28 @@
 #include <mbgl/text/font_stack.hpp>
 #include <cassert>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>
 
 namespace mbgl {
 
 void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
-    metrics.emplace(id, glyph.metrics);
-    bitmaps.emplace(id, glyph.bitmap);
-    sdfs.emplace(id, glyph);
-}
-
-const std::map<uint32_t, GlyphMetrics> &FontStack::getMetrics() const {
-    return metrics;
+    auto it = sdfs.find(id);
+    if (it == sdfs.end()) {
+        // Glyph doesn't exist yet.
+        sdfs.emplace(id, glyph);
+    } else if (it->second.metrics == glyph.metrics) {
+        if (it->second.bitmap != glyph.bitmap) {
+            // The actual bitmap was updated; this is unsupported.
+            Log::Warning(Event::Glyph, "Modified glyph changed bitmap represenation");
+        }
+        // At least try to update it in case it's currently unsused.
+        // If it is already used; we won't attempt to update the glyph atlas texture.
+        it->second.bitmap = glyph.bitmap;
+    } else {
+        // The metrics were updated; this is unsupported.
+        Log::Warning(Event::Glyph, "Modified glyph has different metrics");
+        return;
+    }
 }
 
 const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
@@ -32,10 +43,10 @@ const Shaping FontStack::getShaping(const std::u32string &string, const float ma
 
     // Loop through all characters of this label and shape.
     for (uint32_t chr : string) {
-        auto metric = metrics.find(chr);
-        if (metric != metrics.end()) {
+        auto it = sdfs.find(chr);
+        if (it != sdfs.end()) {
             shaping.positionedGlyphs.emplace_back(chr, x, y);
-            x += metric->second.advance + spacing;
+            x += it->second.metrics.advance + spacing;
         }
     }
 
@@ -59,12 +70,12 @@ void align(Shaping &shaping, const float justify, const float horizontalAlign,
     }
 }
 
-void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, GlyphMetrics> &metrics, uint32_t start,
+void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<uint32_t, SDFGlyph> &sdfs, uint32_t start,
                  uint32_t end, float justify) {
     PositionedGlyph &glyph = positionedGlyphs[end];
-    auto metric = metrics.find(glyph.glyph);
-    if (metric != metrics.end()) {
-        const uint32_t lastAdvance = metric->second.advance;
+    auto it = sdfs.find(glyph.glyph);
+    if (it != sdfs.end()) {
+        const uint32_t lastAdvance = it->second.metrics.advance;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
 
         for (uint32_t j = start; j <= end; j++) {
@@ -112,7 +123,7 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
                         lineEnd--;
                     }
 
-                    justifyLine(positionedGlyphs, metrics, lineStartIndex, lineEnd, justify);
+                    justifyLine(positionedGlyphs, sdfs, lineStartIndex, lineEnd, justify);
                 }
 
                 lineStartIndex = lastSafeBreak + 1;
@@ -138,14 +149,14 @@ void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float m
     }
 
     const PositionedGlyph& lastPositionedGlyph = positionedGlyphs.back();
-    const auto lastGlyphMetric = metrics.find(lastPositionedGlyph.glyph);
-    assert(lastGlyphMetric != metrics.end());
-    const uint32_t lastLineLength = lastPositionedGlyph.x + lastGlyphMetric->second.advance;
+    const auto lastGlyphIt = sdfs.find(lastPositionedGlyph.glyph);
+    assert(lastGlyphIt != sdfs.end());
+    const uint32_t lastLineLength = lastPositionedGlyph.x + lastGlyphIt->second.metrics.advance;
     maxLineLength = std::max(maxLineLength, lastLineLength);
 
     const uint32_t height = (line + 1) * lineHeight;
 
-    justifyLine(positionedGlyphs, metrics, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
+    justifyLine(positionedGlyphs, sdfs, lineStartIndex, uint32_t(positionedGlyphs.size()) - 1, justify);
     align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight, line, translate);
 
     // Calculate the bounding box

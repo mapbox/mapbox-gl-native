@@ -42,6 +42,7 @@ public:
     Source(SourceType,
            const std::string& id,
            const std::string& url,
+           uint16_t tileSize,
            std::unique_ptr<SourceInfo>&&,
            std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~Source();
@@ -73,10 +74,14 @@ public:
     const SourceType type;
     const std::string id;
     const std::string url;
+    uint16_t tileSize = util::tileSize;
     bool enabled = false;
 
 private:
-    void tileLoadingCompleteCallback(const TileID&, const TransformState&, bool collisionDebug);
+    void tileLoadingCompleteCallback(const TileID&,
+                                     std::exception_ptr,
+                                     const TransformState&,
+                                     bool collisionDebug);
     bool handlePartialTile(const TileID&, Worker& worker);
     bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::forward_list<TileID>& retain);

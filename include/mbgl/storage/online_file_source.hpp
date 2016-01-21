@@ -2,9 +2,10 @@
 #define MBGL_STORAGE_ONLINE_FILE_SOURCE
 
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/storage/file_cache.hpp>
 
 namespace mbgl {
+
+class SQLiteCache;
 
 namespace util {
 template <typename T> class Thread;
@@ -12,7 +13,7 @@ template <typename T> class Thread;
 
 class OnlineFileSource : public FileSource {
 public:
-    OnlineFileSource(FileCache*);
+    OnlineFileSource(SQLiteCache*);
     ~OnlineFileSource() override;
 
     void setAccessToken(const std::string& t) { accessToken = t; }

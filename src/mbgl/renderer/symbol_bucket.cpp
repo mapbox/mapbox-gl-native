@@ -173,8 +173,7 @@ bool SymbolBucket::needsDependencies(GlyphStore& glyphStore, SpriteStore& sprite
 void SymbolBucket::addFeatures(uintptr_t tileUID,
                                SpriteAtlas& spriteAtlas,
                                GlyphAtlas& glyphAtlas,
-                               GlyphStore& glyphStore,
-                               CollisionTile& collisionTile) {
+                               GlyphStore& glyphStore) {
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
@@ -249,8 +248,8 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
             auto image = spriteAtlas.getImage(feature.sprite, false);
             if (image) {
                 shapedIcon = shapeIcon(*image, layout);
-                assert((*image).texture);
-                if ((*image).texture->sdf) {
+                assert((*image).spriteImage);
+                if ((*image).spriteImage->sdf) {
                     sdfIcons = true;
                 }
                 if ((*image).relativePixelRatio != 1.0f) {
@@ -266,8 +265,6 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
     }
 
     features.clear();
-
-    placeFeatures(collisionTile, true);
 }
 
 
@@ -358,10 +355,6 @@ bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repe
 }
 
 void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
-    placeFeatures(collisionTile, false);
-}
-
-void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediately) {
 
     renderDataInProgress = std::make_unique<SymbolRenderData>();
 
@@ -403,10 +396,14 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
 
         // Calculate the scales at which the text and icon can be placed without collision.
 
-        float glyphScale = hasText && !layout.text.allowOverlap ?
-            collisionTile.placeFeature(symbolInstance.textCollisionFeature) : collisionTile.minScale;
-        float iconScale = hasIcon && !layout.icon.allowOverlap ?
-            collisionTile.placeFeature(symbolInstance.iconCollisionFeature) : collisionTile.minScale;
+        float glyphScale = hasText ?
+            collisionTile.placeFeature(symbolInstance.textCollisionFeature,
+                    layout.text.allowOverlap, layout.avoidEdges) :
+            collisionTile.minScale;
+        float iconScale = hasIcon ?
+            collisionTile.placeFeature(symbolInstance.iconCollisionFeature,
+                    layout.icon.allowOverlap, layout.avoidEdges) :
+            collisionTile.minScale;
 
 
         // Combine the scales for icons and text.
@@ -448,8 +445,6 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile, bool swapImmediat
     if (collisionTile.config.debug) {
         addToDebugBuffers(collisionTile);
     }
-
-    if (swapImmediately) swapRenderData();
 }
 
 template <typename Buffer, typename GroupType>

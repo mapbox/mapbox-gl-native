@@ -19,6 +19,16 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLOverlay;
 @protocol MGLCalloutView;
 
+/** The vertical alignment of an annotation within a map view. */
+typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
+    /** Aligns the annotation vertically in the center of the map view. */
+    MGLAnnotationVerticalAlignmentCenter = 0,
+    /** Aligns the annotation vertically at the top of the map view. */
+    MGLAnnotationVerticalAlignmentTop,
+    /** Aligns the annotation vertically at the bottom of the map view. */
+    MGLAnnotationVerticalAlignmentBottom,
+};
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple's MapKit.
@@ -217,6 +227,24 @@ IB_DESIGNABLE
  The mode used to track the user location.
  */
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
+
+/**
+ Sets the mode used to track the user location, with an optional transition.
+ 
+ @param mode The mode used to track the user location.
+ @param animated If `YES`, there is an animated transition from the current
+    viewport to a viewport that results from the change to `mode`. If `NO`, the
+    map view instantaneously changes to the new viewport. This parameter only
+    affects the initial transition; subsequent changes to the user location or
+    heading are always animated.
+ */
+- (void)setUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
+
+/**
+ The vertical alignment of the user location annotation within the receiver. The
+ default value is `MGLAnnotationVerticalAlignmentCenter`.
+ */
+@property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment;
 
 /**
  Whether the map view should display a heading calibration alert when necessary.
@@ -574,6 +602,47 @@ IB_DESIGNABLE
  */
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
 
+/**
+ The distance from the edges of the map view’s frame to the edges of the map
+ view’s logical viewport.
+ 
+ When the value of this property is equal to `UIEdgeInsetsZero`, viewport
+ properties such as `centerCoordinate` assume a viewport that matches the map
+ view’s frame. Otherwise, those properties are inset, excluding part of the
+ frame from the viewport. For instance, if the only the top edge is inset, the
+ map center is effectively shifted downward.
+ 
+ When the map view’s superview is an instance of `UIViewController` whose
+ `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
+ property may be overridden at any time.
+ 
+ Changing the value of this property updates the map view immediately. If you
+ want to animate the change, use the `-setContentInset:animated:` method
+ instead.
+ */
+@property (nonatomic, assign) UIEdgeInsets contentInset;
+
+/**
+ Sets the distance from the edges of the map view’s frame to the edges of the
+ map view’s logical viewport with an optional transition animation.
+ 
+ When the value of this property is equal to `UIEdgeInsetsZero`, viewport
+ properties such as `centerCoordinate` assume a viewport that matches the map
+ view’s frame. Otherwise, those properties are inset, excluding part of the
+ frame from the viewport. For instance, if the only the top edge is inset, the
+ map center is effectively shifted downward.
+ 
+ When the map view’s superview is an instance of `UIViewController` whose
+ `automaticallyAdjustsScrollViewInsets` property is `YES`, the value of this
+ property may be overridden at any time.
+ 
+ @param contentInset The new values to inset the content by.
+ @param animated Specify `YES` if you want the map view to animate the change to
+    the content inset or `NO` if you want the map to inset the content
+    immediately.
+ */
+- (void)setContentInset:(UIEdgeInsets)contentInset animated:(BOOL)animated;
+
 #pragma mark Converting Geographic Coordinates
 
 /**
@@ -734,7 +803,7 @@ IB_DESIGNABLE
  @param annotation The annotation object to deselect.
  @param animated If `YES`, the callout view is animated offscreen.
  */
-- (void)deselectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
+- (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
 #pragma mark Overlaying the Map
 

@@ -14,12 +14,12 @@ FeatureType GeoJSONTileFeature::getType() const {
     return type;
 }
 
-mapbox::util::optional<Value> GeoJSONTileFeature::getValue(const std::string& key) const {
+optional<Value> GeoJSONTileFeature::getValue(const std::string& key) const {
     auto it = tags.find(key);
     if (it != tags.end()) {
-        return mapbox::util::optional<Value>(it->second);
+        return optional<Value>(it->second);
     }
-    return mapbox::util::optional<Value>();
+    return optional<Value>();
 }
 
 GeometryCollection GeoJSONTileFeature::getGeometries() const {

@@ -10,8 +10,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
-
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 
@@ -58,7 +57,7 @@ public:
     
     // Style API
     void addLayer(std::unique_ptr<StyleLayer>,
-                  const mapbox::util::optional<std::string> before);
+                  const optional<std::string> before);
     void removeLayer(const std::string& id);
 
     void setSourceTileCacheSize(size_t size);

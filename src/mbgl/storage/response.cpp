@@ -10,6 +10,7 @@ Response::Response(const Response& res) {
 Response& Response::operator=(const Response& res) {
     error = res.error ? std::make_unique<Error>(*res.error) : nullptr;
     stale = res.stale;
+    notModified = res.notModified;
     data = res.data;
     modified = res.modified;
     expires = res.expires;

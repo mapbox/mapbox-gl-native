@@ -26,20 +26,26 @@ void RasterTileData::request(const std::string& url,
 
     FileSource* fs = util::ThreadContext::getFileSource();
     req = fs->request({ Resource::Kind::Tile, url }, [url, callback, this](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
+        if (res.error) {
+            std::exception_ptr error;
+            if (res.error->reason == Response::Error::Reason::NotFound) {
+                // This is a 404 response. We're treating these as empty tiles.
+                workRequest.reset();
+                state = State::parsed;
+                bucket.reset();
+            } else {
+                // This is a different error, e.g. a connection or server error.
+                error = std::make_exception_ptr(std::runtime_error(res.error->message));
+            }
+            callback(error);
             return;
         }
-        req = nullptr;
 
-        if (res.error) {
-            if (res.error->reason == Response::Error::Reason::NotFound) {
-                state = State::parsed;
-            } else {
-                error = std::make_exception_ptr(std::runtime_error(res.error->message));
-                state = State::obsolete;
-            }
-            callback();
+        modified = res.modified;
+        expires = res.expires;
+
+        if (res.notModified) {
+            // We got the same data again. Abort early.
             return;
         }
 
@@ -48,24 +54,24 @@ void RasterTileData::request(const std::string& url,
             state = State::loaded;
         }
 
-        modified = res.modified;
-        expires = res.expires;
-
+        workRequest.reset();
         workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
             workRequest.reset();
             if (state != State::loaded) {
                 return;
             }
 
+            std::exception_ptr error;
             if (result.is<std::unique_ptr<Bucket>>()) {
                 state = State::parsed;
                 bucket = std::move(result.get<std::unique_ptr<Bucket>>());
             } else {
                 error = result.get<std::exception_ptr>();
                 state = State::obsolete;
+                bucket.reset();
             }
 
-            callback();
+            callback(error);
         });
     });
 }

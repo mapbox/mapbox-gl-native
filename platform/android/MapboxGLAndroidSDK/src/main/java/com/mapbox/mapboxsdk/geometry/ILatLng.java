@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 /**
- * A Latitude, Longitude point.
+ * Describes a latitude, longitude point.
  */
 public interface ILatLng {
     double getLatitude();

@@ -16,7 +16,7 @@ public:
     RasterTileData(const TileID&, TexturePool&, Worker&);
     ~RasterTileData();
 
-    using Callback = std::function<void()>;
+    using Callback = std::function<void(std::exception_ptr)>;
 
     void request(const std::string& url,
                  const Callback& callback);

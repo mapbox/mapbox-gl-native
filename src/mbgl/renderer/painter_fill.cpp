@@ -60,8 +60,8 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     }
 
     if (pattern) {
-        mapbox::util::optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        mapbox::util::optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
 
         // Image fill.
         if (pass == RenderPass::Translucent && posA && posB) {

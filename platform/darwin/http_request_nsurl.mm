@@ -5,6 +5,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/time.hpp>
 #include <mbgl/util/parsedate.h>
+#include <mbgl/util/run_loop.hpp>
 
 #import <Foundation/Foundation.h>
 
@@ -96,6 +97,11 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
       context(context_),
       existingResponse(existingResponse_),
       async([this] { handleResponse(); }) {
+    // Hold the main loop alive until the request returns. This
+    // is needed because completion handler runs in another
+    // thread and will notify this thread using AsyncTask.
+    util::RunLoop::Get()->ref();
+
     @autoreleasepool {
         NSURL* url = [NSURL URLWithString:@(url_.c_str())];
         if (context->accountType == 0 &&
@@ -129,6 +135,7 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
 }
 
 HTTPNSURLRequest::~HTTPNSURLRequest() {
+    util::RunLoop::Get()->unref();
     assert(!task);
 }
 
@@ -226,18 +233,22 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
         if (responseCode == 200) {
             // Nothing to do; this is what we want.
         } else if (responseCode == 304) {
+            response->notModified = true;
+
             if (existingResponse) {
-                // We're going to copy over the existing response's data.
-                if (existingResponse->error) {
-                    response->error = std::make_unique<Error>(*existingResponse->error);
-                }
                 response->data = existingResponse->data;
-                response->modified = existingResponse->modified;
-                // We're not updating `expired`, it was probably set during the request.
-                response->etag = existingResponse->etag;
-            } else {
-                // This is an unsolicited 304 response and should only happen on malfunctioning
-                // HTTP servers. It likely doesn't include any data, but we don't have much options.
+
+                if (response->expires == Seconds::zero()) {
+                    response->expires = existingResponse->expires;
+                }
+
+                if (response->modified == Seconds::zero()) {
+                    response->modified = existingResponse->modified;
+                }
+
+                if (response->etag.empty()) {
+                    response->etag = existingResponse->etag;
+                }
             }
         } else if (responseCode == 404) {
             response->error =

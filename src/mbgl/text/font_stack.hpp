@@ -9,7 +9,6 @@ namespace mbgl {
 class FontStack {
 public:
     void insert(uint32_t id, const SDFGlyph &glyph);
-    const std::map<uint32_t, GlyphMetrics> &getMetrics() const;
     const std::map<uint32_t, SDFGlyph> &getSDFs() const;
     const Shaping getShaping(const std::u32string &string, float maxWidth, float lineHeight,
                              float horizontalAlign, float verticalAlign, float justify,
@@ -18,8 +17,6 @@ public:
                   float verticalAlign, float justify, const vec2<float> &translate) const;
 
 private:
-    std::map<uint32_t, std::string> bitmaps;
-    std::map<uint32_t, GlyphMetrics> metrics;
     std::map<uint32_t, SDFGlyph> sdfs;
 };
 

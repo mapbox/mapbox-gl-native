@@ -15,7 +15,7 @@ public:
                           std::unordered_map<std::string, std::string> properties = {{}});
 
     FeatureType getType() const override { return type; }
-    mapbox::util::optional<Value> getValue(const std::string&) const override;
+    optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override { return geometries; }
 
     const FeatureType type;
