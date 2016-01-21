@@ -79,7 +79,8 @@ public:
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 
     virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
-    virtual void redoPlacement(PlacementConfig) {}
+    virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}
+    virtual void redoPlacement(const std::function<void()>&) {}
 
     bool isReady() const {
         return isReadyState(state);

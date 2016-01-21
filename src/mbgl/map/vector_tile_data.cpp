@@ -77,11 +77,6 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
 
-                // The target configuration could have changed since we started placement. In this case,
-                // we're starting another placement run.
-                if (placedConfig != targetConfig) {
-                    redoPlacement();
-                }
             } else {
                 error = result.get<std::exception_ptr>();
                 state = State::obsolete;
@@ -124,11 +119,6 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
             // place again in case the configuration has changed.
             placedConfig = config;
 
-            // The target configuration could have changed since we started placement. In this case,
-            // we're starting another placement run.
-            if (placedConfig != targetConfig) {
-                redoPlacement();
-            }
         } else {
             error = result.get<std::exception_ptr>();
             state = State::obsolete;
@@ -150,21 +140,21 @@ Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
     return it->second.get();
 }
 
-void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
+void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& callback) {
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
         if (!workRequest) {
             // Don't start a new placement request when the current one hasn't completed yet, or when
             // we are parsing buckets.
-            redoPlacement();
+            redoPlacement(callback);
         }
     }
 }
 
-void VectorTileData::redoPlacement() {
+void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -178,7 +168,9 @@ void VectorTileData::redoPlacement() {
         // The target configuration could have changed since we started placement. In this case,
         // we're starting another placement run.
         if (placedConfig != targetConfig) {
-            redoPlacement();
+            redoPlacement(callback);
+        } else {
+            callback();
         }
     });
 }

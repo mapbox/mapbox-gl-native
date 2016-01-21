@@ -37,6 +37,7 @@ public:
 
         virtual void onTileLoaded(Source&, const TileID&, bool /* isNewTile */) {};
         virtual void onTileError(Source&, const TileID&, std::exception_ptr) {};
+        virtual void onPlacementRedone() {};
     };
 
     Source(SourceType,
@@ -78,11 +79,10 @@ public:
     bool enabled = false;
 
 private:
-    void tileLoadingCompleteCallback(const TileID&,
-                                     std::exception_ptr,
-                                     const TransformState&,
-                                     bool collisionDebug);
-    bool handlePartialTile(const TileID&, Worker& worker);
+    void tileLoadingCallback(const TileID&,
+                             std::exception_ptr,
+                             bool isNewTile);
+    bool handlePartialTile(const TileID&);
     bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;

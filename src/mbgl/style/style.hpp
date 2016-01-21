@@ -132,6 +132,7 @@ private:
     void onSourceError(Source&, std::exception_ptr) override;
     void onTileLoaded(Source&, const TileID&, bool isNewTile) override;
     void onTileError(Source&, const TileID&, std::exception_ptr) override;
+    void onPlacementRedone() override;
 
     bool shouldReparsePartialTiles = false;
 

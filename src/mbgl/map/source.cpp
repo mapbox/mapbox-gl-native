@@ -216,7 +216,7 @@ TileData::State Source::hasTile(const TileID& tileID) {
     return TileData::State::invalid;
 }
 
-bool Source::handlePartialTile(const TileID& tileID, Worker&) {
+bool Source::handlePartialTile(const TileID& tileID) {
     auto it = tileDataMap.find(tileID.normalized());
     if (it == tileDataMap.end()) {
         return true;
@@ -227,14 +227,10 @@ bool Source::handlePartialTile(const TileID& tileID, Worker&) {
         return true;
     }
 
-    return tileData->parsePending([this, tileID](std::exception_ptr error) {
-        if (error) {
-            observer->onTileError(*this, tileID, error);
-            return;
-        }
+    auto callback = std::bind(&Source::tileLoadingCallback, this, tileID,
+            std::placeholders::_1, false);
 
-        observer->onTileLoaded(*this, tileID, false);
-    });
+    return tileData->parsePending(callback);
 }
 
 TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameters& parameters) {
@@ -266,9 +262,8 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
     }
 
     if (!newTile->data) {
-        auto callback = std::bind(&Source::tileLoadingCompleteCallback, this, normalizedID,
-                                  std::placeholders::_1, parameters.transformState,
-                                  parameters.debugOptions & MapDebugOptions::Collision);
+        auto callback = std::bind(&Source::tileLoadingCallback, this, normalizedID,
+                                  std::placeholders::_1, true);
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
@@ -425,7 +420,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         switch (state) {
         case TileData::State::partial:
             if (parameters.shouldReparsePartialTiles) {
-                if (!handlePartialTile(tileID, parameters.worker)) {
+                if (!handlePartialTile(tileID)) {
                     allTilesUpdated = false;
                 }
             }
@@ -502,7 +497,10 @@ bool Source::update(const StyleUpdateParameters& parameters) {
 
     for (auto& tilePtr : tilePtrs) {
         tilePtr->data->redoPlacement(
-            { parameters.transformState.getAngle(), parameters.transformState.getPitch(), parameters.debugOptions & MapDebugOptions::Collision });
+            { parameters.transformState.getAngle(), parameters.transformState.getPitch(), parameters.debugOptions & MapDebugOptions::Collision },
+            [this]() {
+                observer->onPlacementRedone();
+            });
     }
 
     updated = parameters.animationTime;
@@ -529,10 +527,9 @@ void Source::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-void Source::tileLoadingCompleteCallback(const TileID& tileID,
+void Source::tileLoadingCallback(const TileID& tileID,
                                          std::exception_ptr error,
-                                         const TransformState& transformState,
-                                         bool collisionDebug) {
+                                         bool isNewTile) {
     auto it = tileDataMap.find(tileID);
     if (it == tileDataMap.end()) {
         return;
@@ -548,8 +545,10 @@ void Source::tileLoadingCompleteCallback(const TileID& tileID,
         return;
     }
 
-    tileData->redoPlacement({ transformState.getAngle(), transformState.getPitch(), collisionDebug });
-    observer->onTileLoaded(*this, tileID, true);
+    tileData->redoPlacement([this]() {
+        observer->onPlacementRedone();
+    });
+    observer->onTileLoaded(*this, tileID, isNewTile);
 }
 
 void Source::dumpDebugLogs() const {

@@ -31,8 +31,8 @@ public:
 
     bool parsePending(std::function<void(std::exception_ptr)> callback) override;
 
-    void redoPlacement(PlacementConfig config) override;
-    void redoPlacement();
+    void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
+    void redoPlacement(const std::function<void()>&) override;
 
     void cancel() override;
 

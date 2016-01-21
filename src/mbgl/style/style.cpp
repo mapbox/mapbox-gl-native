@@ -356,6 +356,10 @@ void Style::onTileError(Source& source, const TileID& tileID, std::exception_ptr
     observer->onResourceError(error);
 }
 
+void Style::onPlacementRedone() {
+    observer->onResourceLoaded();
+}
+
 void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
     observer->onSpriteLoaded();
