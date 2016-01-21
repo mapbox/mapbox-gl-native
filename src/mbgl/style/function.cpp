@@ -92,7 +92,7 @@ template class Function<TextTransformType>;
 template class Function<RotationAlignmentType>;
 
 template <typename T>
-size_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
+inline size_t getBiggestStopLessThan(const std::vector<std::pair<float, T>>& stops, float z) {
     for (uint32_t i = 0; i < stops.size(); i++) {
         if (stops[i].first > z) {
             return i == 0 ? i : i - 1;
