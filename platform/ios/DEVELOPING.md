@@ -16,6 +16,20 @@ Which will create and open an Xcode project that can build the entire library fr
 
 If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
 
+`ipackage` is only one of several available `make` build targets. Others include:
+
+* `make ipackage` builds both dynamic and static frameworks in the Release configuration for devices and the iOS Simulator.
+* `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
+* `make ipackage-strip` builds both dynamic and static frameworks in the Release configuration, stripped of debug symbols, for devices and the iOS Simulator.
+* `make iframework` builds a dynamic framework in the Release configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
+
+You can customize the build output by passing the following arguments into the `make` invocation:
+
+* `BITCODE=NO` builds without Bitcode support.
+* `BUILD_DEVICE=false` builds only for the iOS Simulator.
+* `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for compatibility with iOS 7.x.
+* `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries.
+
 ### Access Tokens
 
 _The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
