@@ -191,7 +191,7 @@ if [[ ${BUILD_STATIC} == true ]]; then
 fi
 
 step "Copying library resources…"
-SHORT_VERSION=$( git tag -l ios-v* | sed 's/^ios-v//' | sort -r | sed -n '1p' )
+SHORT_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
 cp -pv LICENSE.md "${OUTPUT}"
 cp -rv ios/app/Settings.bundle "${OUTPUT}"
 if [[ ${BUILD_STATIC} == true ]]; then
@@ -220,14 +220,14 @@ if [ -z `which jazzy` ]; then
     fi
 fi
 DOCS_OUTPUT="${OUTPUT}/documentation"
-DOCS_VERSION=$( git tag -l ios-v* | sed 's/^ios-//' | sort -r | grep -v '\-rc.' | grep -v '\-pre.' | sed -n '1p' | sed 's/^v//' )
+DOCS_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed -e 's/^ios-v//' -e 's/-.*//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
-cat ios/docs/pod-README.md > ${README}
-echo >> ${README}
-echo -n "#" >> ${README}
-cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' >> ${README}
+cp ios/docs/pod-README.md "${README}"
+CHANGES=/tmp/mbgl/CHANGES.md
+cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' | sed "s/^## iOS ${DOCS_VERSION}//g" > "${CHANGES}"
+sed -i '' -e "s/{{VERSION}}/${DOCS_VERSION}/" -e "/{{CHANGES}}/r${CHANGES}" -e 's/{{CHANGES}}//g' "${README}"
 cp ${README} "${OUTPUT}"
 
 jazzy \
