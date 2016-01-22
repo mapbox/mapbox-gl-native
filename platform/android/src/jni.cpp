@@ -655,7 +655,7 @@ jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLatLng");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
+    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng(nativeMapView->getInsets());
 
     jobject ret = env->NewObject(latLngClass, latLngConstructorId, latLng.latitude, latLng.longitude);
     if (ret == nullptr) {

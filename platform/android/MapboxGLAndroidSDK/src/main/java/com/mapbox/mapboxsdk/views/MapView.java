@@ -4351,7 +4351,7 @@ public final class MapView extends FrameLayout {
      * view’s logical viewport.
      *
      * When the value of this property is equal to {0,0,0,0}, viewport
-     * properties such as `centerCoordinate` assume a viewport that matches the map
+     * properties such as `getLatLng` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
      * frame from the viewport. For instance, if the only the top edge is inset, the
      * map center is effectively shifted downward.
