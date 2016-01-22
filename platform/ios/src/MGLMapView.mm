@@ -1196,6 +1196,11 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
+
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            self.userTrackingMode = MGLUserTrackingModeFollow;
+        }
         
         [self notifyGestureDidBegin];
     }
