@@ -220,22 +220,35 @@ if [ -z `which jazzy` ]; then
     fi
 fi
 DOCS_OUTPUT="${OUTPUT}/documentation"
-DOCS_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed -e 's/^ios-v//' -e 's/-.*//' )
+RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^ios-v//' -e 's/-.*//' )
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
 cp ios/docs/pod-README.md "${README}"
 CHANGES=/tmp/mbgl/CHANGES.md
-cat CHANGELOG.md | sed -n "/^## iOS ${DOCS_VERSION}/,/^##/p" | sed '$d' | sed "s/^## iOS ${DOCS_VERSION}//g" > "${CHANGES}"
-sed -i '' -e "s/{{VERSION}}/${DOCS_VERSION}/" -e "/{{CHANGES}}/r${CHANGES}" -e 's/{{CHANGES}}//g' "${README}"
+# http://stackoverflow.com/a/4858011/4585461
+sed -n -e '/^## iOS/{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' CHANGELOG.md > "${CHANGES}"
+if [[ ${BUILD_DYNAMIC} == false ]]; then
+    sed -i '' -e '/{{DYNAMIC}}/,/{{\/DYNAMIC}}/d' "${README}"
+fi
+if [[ ${BUILD_STATIC} == false ]]; then
+    sed -i '' -e '/{{STATIC}}/,/{{\/STATIC}}/d' "${README}"
+fi
+sed -i '' \
+    -e "s/{{VERSION}}/${RELEASE_VERSION}/" \
+    -e "/{{CHANGES}}/r${CHANGES}" \
+    -e 's/{{CHANGES}}//g' \
+    -e '/{{DYNAMIC}}/d' -e '/{{\/DYNAMIC}}/d' \
+    -e '/{{STATIC}}/d' -e '/{{\/STATIC}}/d' \
+    "${README}"
 cp ${README} "${OUTPUT}"
 
 jazzy \
     --sdk iphonesimulator \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${HASH} \
-    --module-version ${DOCS_VERSION} \
+    --module-version ${SHORT_VERSION} \
     --readme ${README} \
-    --root-url https://www.mapbox.com/ios-sdk/api/${DOCS_VERSION}/ \
+    --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
     --output ${DOCS_OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${DOCS_OUTPUT} -name *.html -exec \

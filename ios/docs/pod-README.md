@@ -16,6 +16,8 @@ See the [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/master/
 
 The Mapbox iOS SDK may be installed as either a dynamic framework or a static framework. (To reduce the download size, the static framework is omitted from some distributions; you may need to download the full package from the [release page](https://github.com/mapbox/mapbox-gl-native/releases/).)
 
+{{DYNAMIC}}
+
 ### Dynamic framework
 
 This is the recommended workflow for manually integrating the SDK into an application targeting iOS 8 and above:
@@ -29,6 +31,9 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 ```
 
 (The last step, courtesy of [Realm](https://github.com/realm/realm-cocoa/), is required for working around an [iOS App Store bug](http://www.openradar.me/radar?id=6409498411401216) when archiving universal binaries.)
+
+{{/DYNAMIC}}
+{{STATIC}}
 
 ### Static framework
 
@@ -49,6 +54,8 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
 
 1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
 
+{{/STATIC}}
+
 ## Configuration
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
@@ -65,4 +72,4 @@ In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapVie
 
 Full API documentation is included in this package, within the `documentation` folder. For more details, read “[First steps with the Mapbox iOS SDK](https://www.mapbox.com/guides/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/).
 
-If you have any questions, please contact mobile@mapbox.com. We welcome your [bug reports and feature requests](https://github.com/mapbox/mapbox-gl-native/issues/).
+If you have any questions, please contact <mobile@mapbox.com>. We welcome your [bug reports and feature requests](https://github.com/mapbox/mapbox-gl-native/issues/).
