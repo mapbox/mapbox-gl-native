@@ -113,12 +113,14 @@ void MapContext::setStyleURL(const std::string& url) {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
                 data.loading = false;
             }
-        } else {
-            // We got a new stylesheet; only update when it's different from the previous one.
-            if (styleJSON != *res.data) {
-                loadStyleJSON(*res.data, base);
-            }
+            return;
         }
+
+        if (res.notModified) {
+            return;
+        }
+
+        loadStyleJSON(*res.data, base);
     });
 }
 
