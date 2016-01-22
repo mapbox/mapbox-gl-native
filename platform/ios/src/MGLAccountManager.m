@@ -1,5 +1,6 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
+#import "NSBundle+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
 #import "FABKitProtocol.h"
@@ -70,11 +71,11 @@
 #pragma mark - Fabric
 
 + (NSString *)bundleIdentifier {
-    return @"com.mapbox.sdk.ios";
+    return [NSBundle mgl_frameworkBundle].bundleIdentifier;
 }
 
 + (NSString *)kitDisplayVersion {
-    return @"3.0.1";
+    return [NSBundle mgl_frameworkBundle].infoDictionary[@"CFBundleShortVersionString"];
 }
 
 + (void)initializeIfNeeded {
