@@ -1813,6 +1813,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)setVisibleCoordinates:(CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
+    self.userTrackingMode = MGLUserTrackingModeNone;
     _mbglMap->cancelTransitions();
     
     // NOTE: does not disrupt tracking mode
