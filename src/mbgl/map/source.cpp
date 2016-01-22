@@ -406,6 +406,14 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         return allTilesUpdated;
     }
 
+    // Mapbox+raster specific override: the requested image tiles are always
+    // of size 512x512 on the v4 tile API (see mapbox::normalizeRasterTileURL)
+    // so disregard the source tileSize and instead use a tileSize based on
+    // the device pixelRatio.
+    if (type == SourceType::Raster && util::mapbox::isMapboxURL(url)) {
+        tileSize = parameters.pixelRatio > 1.0 ? 256 : 512;
+    }
+
     double zoom = coveringZoomLevel(parameters.transformState);
     std::forward_list<TileID> required = coveringTiles(parameters.transformState);
 
