@@ -135,10 +135,17 @@ std::string normalizeRasterTileURL(const std::string& url) {
         normalizedURL.replace(extensionIdx + 1, 3, "webp");
     }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__)
+
     // Mapbox raster sources always use the @2x suffix on the v4 tile API
-    // to ensure a maximum 512 image size. Needs to be reevaluated when
-    // normalizeSourceURL() moves to a new API version.
-    normalizedURL.insert(extensionIdx, "@2x");
+    // to ensure a maximum 512 image size.
+    std::string::size_type versionIdx = url.rfind("/v4/");
+    if (versionIdx != std::string::npos &&
+        (normalizedURL.compare(extensionIdx + 1, 3, "png") == 0 ||
+        normalizedURL.compare(extensionIdx + 1, 3, "jpg") == 0 ||
+        normalizedURL.compare(extensionIdx + 1, 4, "webp") == 0)) {
+        normalizedURL.insert(extensionIdx, "@2x");
+    }
+
     return normalizedURL;
 }
 
