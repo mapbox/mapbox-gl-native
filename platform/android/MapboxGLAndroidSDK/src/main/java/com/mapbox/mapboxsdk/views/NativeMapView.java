@@ -336,6 +336,10 @@ final class NativeMapView {
         nativeRotateBy(mNativeMapViewPtr, sx, sy, ex, ey, duration);
     }
 
+    public void setContentPadding(double top, double left, double bottom, double right) {
+        nativeSetContentPadding(mNativeMapViewPtr, top, left, bottom, right);
+    }
+
     public void setBearing(double degrees) {
         setBearing(degrees, 0);
     }
@@ -590,6 +594,8 @@ final class NativeMapView {
 
     private native void nativeRotateBy(long nativeMapViewPtr, double sx,
                                        double sy, double ex, double ey, long duration);
+
+    private native void nativeSetContentPadding(long nativeMapViewPtr, double top, double left, double bottom, double right);
 
     private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
                                          long duration);
