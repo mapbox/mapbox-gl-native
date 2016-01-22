@@ -380,7 +380,7 @@ final class UserLocationView extends View {
                 setLocation(lastLocation);
             }
 
-            if(mUserLocationListener==null){
+            if (mUserLocationListener == null) {
                 mUserLocationListener = new UserLocationListener(this);
             }
 
@@ -505,7 +505,7 @@ final class UserLocationView extends View {
         }
     }
 
-    private static class UserLocationListener implements LocationListener{
+    private static class UserLocationListener implements LocationListener {
 
         private WeakReference<UserLocationView> mUserLocationView;
 
@@ -522,7 +522,7 @@ final class UserLocationView extends View {
         @Override
         public void onLocationChanged(Location location) {
             UserLocationView locationView = mUserLocationView.get();
-            if(locationView!=null && !locationView.isPaused()){
+            if (locationView != null && !locationView.isPaused()) {
                 locationView.setLocation(location);
             }
         }
@@ -590,6 +590,7 @@ final class UserLocationView extends View {
                     previousCoordinate, new LatLng(location)
             ));
             mMarkerCoordinateAnimator.start();
+            mMarkerCoordinate = new LatLng(location);
         } else {
             // moving map under the tracker
             mMarkerCoordinate = new LatLng(location);
@@ -765,7 +766,7 @@ final class UserLocationView extends View {
         }
     }
 
-    public boolean isPaused(){
+    public boolean isPaused() {
         return mPaused;
     }
 
