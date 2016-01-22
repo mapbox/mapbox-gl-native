@@ -21,8 +21,8 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
    ```
 
 1. Run `make ipackage`. The packaging script will produce a `build/ios/pkg/` folder containing:
-  - a `dynamic` folder containing a dynamically-linked fat framework
-  - a `static` folder containing a statically-linked framework
+  - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
+  - a `static` folder containing a statically-linked framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
   - an example `Settings.bundle` for providing the required Mapbox Metrics opt-out setting
 
