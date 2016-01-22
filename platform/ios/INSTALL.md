@@ -24,7 +24,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
   - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
   - a `static` folder containing a statically-linked framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
-  - an example `Settings.bundle` for providing the required Mapbox Metrics opt-out setting
+  - an example `Settings.bundle` containing an optional Mapbox Telemetry opt-out setting
 
 ### Install
 
