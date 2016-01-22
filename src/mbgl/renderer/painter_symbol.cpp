@@ -189,7 +189,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
         SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
         const bool iconScaled = fontScale != 1 || data.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
-        const bool iconTransformed = layout.placement == PlacementType::Line || angleOffset != 0 || state.getPitch() != 0;
+        const bool iconTransformed = layout.icon.rotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed);
 
         if (sdf) {
