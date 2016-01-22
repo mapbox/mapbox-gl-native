@@ -54,7 +54,7 @@ ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BU
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
 iframework: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
 itest: ipackage-sim ; ./platform/ios/scripts/test.sh
-idocument: ; OUTPUT=$(OUTPUT) README=$(README) ./platform/ios/scripts/document.sh
+idocument: ; OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
 .PHONY: xpackage xpackage-strip xctest
 xpackage: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh

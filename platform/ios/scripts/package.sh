@@ -228,4 +228,4 @@ sed -i '' \
 cp ${README} "${OUTPUT}"
 
 step "Generating API documentation…"
-make idocument OUTPUT="${OUTPUT}/documentation" README=${README}
+make idocument OUTPUT="${OUTPUT}/documentation"

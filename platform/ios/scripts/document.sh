@@ -14,11 +14,21 @@ if [ -z `which jazzy` ]; then
 fi
 
 OUTPUT=${OUTPUT:-documentation}
-README=${README:-README.md}
 
 BRANCH=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
 SHORT_VERSION=$( echo ${BRANCH} | sed 's/^ios-v//' )
 RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^ios-v//' -e 's/-.*//' )
+
+rm -rf /tmp/mbgl
+mkdir -p /tmp/mbgl/
+README=/tmp/mbgl/README.md
+cp ios/docs/doc-README.md "${README}"
+# http://stackoverflow.com/a/4858011/4585461
+echo "## Changes in version ${RELEASE_VERSION}" >> "${README}"
+sed -n -e '/^## iOS/{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' CHANGELOG.md >> "${README}"
+
+rm -rf ${OUTPUT}
+mkdir -p ${OUTPUT}
 
 jazzy \
     --sdk iphonesimulator \
