@@ -648,7 +648,7 @@ void JNICALL nativeSetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, j
         return;
     }
 
-    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), mbgl::Duration(duration));
+    nativeMapView->getMap().setLatLng(mbgl::LatLng(latitude, longitude), nativeMapView->getInsets(), mbgl::Duration(duration));
 }
 
 jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1505,6 +1505,7 @@ void JNICALL nativeJumpTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
         options.angle = angle;
     }
     options.center = mbgl::LatLng(latitude, longitude);
+    options.padding = nativeMapView->getInsets();
     if (pitch != -1) {
         options.pitch = pitch;
     }
@@ -1537,6 +1538,7 @@ void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
         cameraOptions.angle = angle;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
+    cameraOptions.padding = nativeMapView->getInsets();
     if (pitch != -1) {
         cameraOptions.pitch = pitch;
     }
@@ -1548,6 +1550,14 @@ void JNICALL nativeEaseTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdou
 
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
 }
+
+void JNICALL nativeSetContentPadding(JNIEnv *env, jobject obj,long nativeMapViewPtr, double top, double left, double bottom, double right) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetContentPadding");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->setInsets({top, left, bottom, right});
+}
+
 
 void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble angle, jobject centerLatLng, jlong duration, jdouble pitch, jdouble zoom) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeFlyTo");
@@ -1571,6 +1581,7 @@ void JNICALL nativeFlyTo(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdoub
         cameraOptions.angle = angle;
     }
     cameraOptions.center = mbgl::LatLng(latitude, longitude);
+    cameraOptions.padding = nativeMapView->getInsets();
     if (pitch != -1) {
         cameraOptions.pitch = pitch;
     }
@@ -2136,6 +2147,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeAddCustomLayer)},
         {"nativeRemoveCustomLayer", "(JLjava/lang/String;)V",
          reinterpret_cast<void *>(&nativeRemoveCustomLayer)},
+        {"nativeSetContentPadding", "(JDDDD)V",
+         reinterpret_cast<void *>(&nativeSetContentPadding)}
     };
 
     if (env->RegisterNatives(nativeMapViewClass, methods.data(), methods.size()) < 0) {
