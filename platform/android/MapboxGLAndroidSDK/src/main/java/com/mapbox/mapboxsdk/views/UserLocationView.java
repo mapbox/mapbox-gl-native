@@ -287,7 +287,7 @@ final class UserLocationView extends View {
             } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 float bearing;
                 if (mShowDirection) {
-                    bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : mGpsMarkerDirection;
+                    bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : mUserLocation.getBearing();
                 } else {
                     bearing = (float) mMapView.getBearing();
                 }
@@ -618,9 +618,6 @@ final class UserLocationView extends View {
             // always show north & rotate map below
             mShowDirection = true;
             mGpsMarkerDirection = 0;
-            if (location.hasBearing()) {
-                mMapView.setBearing(location.getBearing(), BEARING_DURATION);
-            }
         }
 
         mShowAccuracy = location.hasAccuracy();
