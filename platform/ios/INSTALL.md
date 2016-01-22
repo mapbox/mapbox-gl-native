@@ -13,6 +13,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
 ### Build
 
 1. [Install core dependencies](../../INSTALL.md).
+  * For development on OS X, you can install pkg-config using `brew install pkg-config`
 
 1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
 
@@ -20,7 +21,23 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
    [sudo] gem install jazzy
    ```
 
-1. Run `make ipackage`. The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
+1. From the path at the root of the project, e.g. `/path/to/mapbox-gl-native $ `, run
+```
+  make ipackage  #  makes ./build/ios/pkg/static/
+```
+ The packaging script will produce the statically-linked `libMapbox.a`, `Mapbox.bundle` for resources, a `Headers` folder, and a `Docs` folder with HTML API documentation.
+
+ ![makes ./build/ios/pkg/static/](libMapbox.a.png)
+
+1.  In addition to `make ipackage`, other make commands include
+```
+make iproj    # makes ./build/ios-all/gyp/ios.xcodeproj/
+```
+After opening `ios.xcodeproj`, you will see a couple of targets
+
+  ![Open the project ios.xcodeproj](ios.xcodeproj.png)  
+
+  ![Targets within ios.xcodeproj](ios.xcodeproj.targets.png)
 
 ### Install
 
