@@ -225,9 +225,6 @@ rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
 cp ios/docs/pod-README.md "${README}"
-CHANGES=/tmp/mbgl/CHANGES.md
-# http://stackoverflow.com/a/4858011/4585461
-sed -n -e '/^## iOS/{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' CHANGELOG.md > "${CHANGES}"
 if [[ ${BUILD_DYNAMIC} == false ]]; then
     sed -i '' -e '/{{DYNAMIC}}/,/{{\/DYNAMIC}}/d' "${README}"
 fi
@@ -235,13 +232,11 @@ if [[ ${BUILD_STATIC} == false ]]; then
     sed -i '' -e '/{{STATIC}}/,/{{\/STATIC}}/d' "${README}"
 fi
 sed -i '' \
-    -e "s/{{VERSION}}/${RELEASE_VERSION}/" \
-    -e "/{{CHANGES}}/r${CHANGES}" \
-    -e 's/{{CHANGES}}//g' \
     -e '/{{DYNAMIC}}/d' -e '/{{\/DYNAMIC}}/d' \
     -e '/{{STATIC}}/d' -e '/{{\/STATIC}}/d' \
     "${README}"
 cp ${README} "${OUTPUT}"
+sed -n -e '/^## iOS/,$p' CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
 jazzy \
     --sdk iphonesimulator \
