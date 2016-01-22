@@ -31,6 +31,20 @@ if [[ ${PUBLISH_PLATFORM} = 'ios' ]]; then
 
     mapbox_time "deploy_ios_stripped"
     ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}"
+    
+    # dynamic, with debug symbols
+    mapbox_time "package_ios_dynamic" \
+    make iframework
+
+    mapbox_time "deploy_ios_dynamic"
+    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" symbols-dynamic
+
+    # dynamic, without debug symbols
+    mapbox_time "package_ios_dynamic_stripped" \
+    make iframework SYMBOLS=NO
+
+    mapbox_time "deploy_ios_dynamic_stripped"
+    ./platform/ios/scripts/publish.sh "${PUBLISH_VERSION}" dynamic
 else
     # build & test iOS
     mapbox_time "run_ios_tests" \
