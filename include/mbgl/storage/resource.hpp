@@ -31,6 +31,17 @@ public:
     optional<SystemTimePoint> priorModified;
     optional<SystemTimePoint> priorExpires;
     optional<std::string> priorEtag;
+
+    // Includes auxiliary data if this is a tile request.
+
+    struct TileData {
+        int32_t x;
+        int32_t y;
+        int8_t z;
+        float pixelRatio;
+    };
+
+    optional<TileData> tileData;
 };
 
 } // namespace mbgl
