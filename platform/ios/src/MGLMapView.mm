@@ -2842,6 +2842,20 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
 - (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated
 {
+    CGFloat defaultPadding = 100;
+    CGFloat yPadding = (self.frame.size.height / 2 <= defaultPadding) ? (self.frame.size.height / 5) : defaultPadding;
+    CGFloat xPadding = (self.frame.size.width / 2 <= defaultPadding) ? (self.frame.size.width / 5) : defaultPadding;
+
+    UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
+
+    [self showAnnotations:annotations
+           withEdgeInsets:edgeInsets
+                 animated:animated];
+    ]
+}
+
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations withEdgeInsets:(UIEdgeInsets)edgeInsets animated:(BOOL)animated
+{
     if ( ! annotations || ! annotations.count) return;
 
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::getExtendable();
@@ -2858,12 +2872,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         }
     }
 
-    CGFloat defaultPadding = 100;
-    CGFloat yPadding = (self.frame.size.height / 2 <= defaultPadding) ? (self.frame.size.height / 5) : defaultPadding;
-    CGFloat xPadding = (self.frame.size.width / 2 <= defaultPadding) ? (self.frame.size.width / 5) : defaultPadding;
-
     [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
-                         edgePadding:UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding)
+                         edgePadding:edgeInsets
                             animated:animated];
 }
 
