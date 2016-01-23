@@ -37,7 +37,7 @@ namespace mbgl {
                     const float boxScale, const float padding, const bool alongLine)
                 : CollisionFeature(line, anchor,
                         shapedText.top, shapedText.bottom, shapedText.left, shapedText.right,
-                        boxScale, padding, alongLine) {}
+                        boxScale, padding, alongLine, false) {}
 
             // for icons
             inline explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
@@ -45,17 +45,17 @@ namespace mbgl {
                     const float boxScale, const float padding, const bool alongLine)
                 : CollisionFeature(line, anchor,
                         shapedIcon.top, shapedIcon.bottom, shapedIcon.left, shapedIcon.right,
-                        boxScale, padding, alongLine) {}
+                        boxScale, padding, alongLine, true) {}
 
             explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
                     const float top, const float bottom, const float left, const float right,
-                    const float boxScale, const float padding, const bool alongLine);
+                    const float boxScale, const float padding, const bool alongLine, const bool straight);
 
 
             std::vector<CollisionBox> boxes;
 
         private:
-            void bboxifyLabel(const std::vector<Coordinate> &line, const Anchor &anchor, const float length, const float height);
+            void bboxifyLabel(const std::vector<Coordinate> &line, Coordinate &anchorPoint, const int segment, const float length, const float height);
     };
 } // namespace mbgl
 
