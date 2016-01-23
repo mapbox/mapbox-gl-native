@@ -121,8 +121,6 @@ void Source::load() {
 
             // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
             if (type == SourceType::Raster && util::mapbox::isMapboxURL(url)) {
-                // We need to insert {ratio} into raster source URLs that are loaded from mapbox://
-                // TileJSONs.
                 std::transform(newInfo->tiles.begin(), newInfo->tiles.end(), newInfo->tiles.begin(),
                                util::mapbox::normalizeRasterTileURL);
             }

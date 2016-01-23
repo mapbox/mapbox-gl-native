@@ -20,7 +20,7 @@ class StyleParser {
 public:
     ~StyleParser();
 
-    void parse(const JSValue&);
+    void parse(const JSValue&, float pixelRatio = 1.0f);
 
     std::string spriteURL;
     std::string glyphURL;
@@ -32,7 +32,7 @@ public:
     static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);
 
 private:
-    void parseSources(const JSValue&);
+    void parseSources(const JSValue&, float pixelRatio = 1.0f);
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSValue& value);

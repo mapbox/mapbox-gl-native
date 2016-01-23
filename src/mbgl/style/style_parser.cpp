@@ -5,6 +5,7 @@
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -96,7 +97,7 @@ void parseTileJSONMember(const JSValue& value, std::array<float, N>& target, con
 
 StyleParser::~StyleParser() = default;
 
-void StyleParser::parse(const JSValue& document) {
+void StyleParser::parse(const JSValue& document, float pixelRatio) {
     if (document.HasMember("version")) {
         int version = document["version"].GetInt();
         if (version != 8) {
@@ -105,7 +106,7 @@ void StyleParser::parse(const JSValue& document) {
     }
 
     if (document.HasMember("sources")) {
-        parseSources(document["sources"]);
+        parseSources(document["sources"], pixelRatio);
     }
 
     if (document.HasMember("layers")) {
@@ -127,7 +128,7 @@ void StyleParser::parse(const JSValue& document) {
     }
 }
 
-void StyleParser::parseSources(const JSValue& value) {
+void StyleParser::parseSources(const JSValue& value, float pixelRatio) {
     if (!value.IsObject()) {
         Log::Warning(Event::ParseStyle, "sources must be an object");
         return;
@@ -218,6 +219,14 @@ void StyleParser::parseSources(const JSValue& value) {
         default:
             Log::Error(Event::ParseStyle, "source type '%s' is not supported", typeVal.GetString());
             continue;
+        }
+
+        // Mapbox+raster specific override: the requested image tiles are always
+        // of size 512x512 on the v4 tile API (see mapbox::normalizeRasterTileURL)
+        // so disregard the source tileSize and instead use a tileSize based on
+        // the device pixelRatio.
+        if (type == SourceType::Raster && util::mapbox::isMapboxURL(url)) {
+            tileSize = pixelRatio > 1.0 ? 256 : 512;
         }
 
         const std::string id { nameVal.GetString(), nameVal.GetStringLength() };

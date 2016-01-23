@@ -54,7 +54,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
     }
 
     StyleParser parser;
-    parser.parse(doc);
+    parser.parse(doc, data.pixelRatio);
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));
