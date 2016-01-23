@@ -596,15 +596,33 @@ IB_DESIGNABLE
 
 /**
  Sets the visible region so that the map displays the specified annotations.
- 
+
  Calling this method updates the value in the visibleCoordinateBounds property
- and potentially other properties to reflect the new map region.
- 
+ and potentially other properties to reflect the new map region. Defaults to 
+ insetting the annotation bounds by 100,100,100,100, or if map is smaller than 
+ 200x200 in either dimension, sets the insets to 20% of that dimmension on
+ either side.
+
  @param annotations The annotations that you want to be visible in the map.
  @param animated `YES` if you want the map region change to be animated, or `NO`
     if you want the map to display the new region immediately without animations.
  */
 - (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
+
+/**
+ Sets the visible region so that the map displays the specified annotations with
+ custom insets.
+
+ Calling this method updates the value in the visibleCoordinateBounds property
+ and potentially other properties to reflect the new map region. It allows for
+ the customization of the UIEdgeInsets that determine the resultant viewport.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param edgeInsets Custom edge insets to contain the the annotations within.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+    if you want the map to display the new region immediately without animations.
+ */
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations withEdgeInsets:(UIEdgeInsets)edgeInsets animated:(BOOL)animated;
 
 /**
  A camera representing the current viewpoint of the map.
