@@ -3581,9 +3581,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     // Explanation
     UILabel *explanationLabel = [[UILabel alloc] init];
-    explanationLabel.text = (@"To display a Mapbox-hosted map here:\n\n"
-                             @"1. Set MGLMapboxAccessToken to your access token in Info.plist\n"
-                             @"2. Add a Settings bundle that allows the user to turn Mapbox Metrics on and off\n\n"
+    explanationLabel.text = (@"To display a Mapbox-hosted map here, set MGLMapboxAccessToken to your access token in Info.plist\n\n"
                              @"For detailed instructions, see:");
     explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     explanationLabel.numberOfLines = 0;
