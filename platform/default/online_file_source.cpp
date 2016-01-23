@@ -61,7 +61,7 @@ class OnlineFileSource::Impl {
 public:
     using Callback = std::function<void (Response)>;
 
-    Impl();
+    Impl(int);
     ~Impl();
 
     void networkIsReachableAgain();
@@ -79,7 +79,7 @@ private:
 
 OnlineFileSource::OnlineFileSource()
     : thread(std::make_unique<util::Thread<Impl>>(
-          util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low })) {
+          util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low }, 0)) {
 }
 
 OnlineFileSource::~OnlineFileSource() = default;
@@ -124,7 +124,8 @@ void OnlineFileSource::cancel(FileRequest* req) {
 
 // ----- Impl -----
 
-OnlineFileSource::Impl::Impl()
+// Dummy parameter is a workaround for a gcc 4.9 bug.
+OnlineFileSource::Impl::Impl(int)
     : httpContext(HTTPContextBase::createContext()),
       reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
     NetworkStatus::Subscribe(&reachability);
