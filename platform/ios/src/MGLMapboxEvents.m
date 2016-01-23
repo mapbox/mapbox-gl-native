@@ -485,7 +485,8 @@ const NSTimeInterval MGLFlushInterval = 60;
         if ( ! [event isEqualToString:MGLEventTypeLocation] && ! [event isEqualToString:MGLEventTypeVisit]) {
             [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
 
-            [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
+            int batteryLevel = roundf(100 * [UIDevice currentDevice].batteryLevel);
+            [evt setValue:@(batteryLevel) forKey:@"batteryLevel"];
 
             UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
             if (batteryState != UIDeviceBatteryStateUnknown) {
