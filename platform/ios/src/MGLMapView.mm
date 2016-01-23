@@ -1056,7 +1056,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
+        [self trackGestureEvent:MGLEventGesturePanStart];
 
         self.userTrackingMode = MGLUserTrackingModeNone;
         
@@ -1114,7 +1114,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
+        [self trackGestureEvent:MGLEventGesturePinchStart];
 
         self.scale = _mbglMap->getScale();
         
@@ -1185,7 +1185,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
+        [self trackGestureEvent:MGLEventGestureRotateStart];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
 
@@ -1248,7 +1248,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     {
         return;
     }
-    [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
+    [self trackGestureEvent:MGLEventGestureSingleTap];
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -1293,7 +1293,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+        [self trackGestureEvent:MGLEventGestureDoubleTap];
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
@@ -1325,7 +1325,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap];
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -1355,7 +1355,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
+        [self trackGestureEvent:MGLEventGestureQuickZoom];
 
         self.scale = _mbglMap->getScale();
 
@@ -1396,7 +1396,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
+        [self trackGestureEvent:MGLEventGesturePitchStart];
         [self notifyGestureDidBegin];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
@@ -1471,7 +1471,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(__unused UIGestureRecognizer *)recognizer
+- (void)trackGestureEvent:(NSString *)gestureID
 {
     int zoom = round([self zoomLevel]);
 
