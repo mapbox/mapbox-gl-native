@@ -336,13 +336,24 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
-        CLAuthorizationStatus authStatus = [CLLocationManager authorizationStatus];
-        if (authStatus == kCLAuthorizationStatusDenied ||
-            authStatus == kCLAuthorizationStatusRestricted) {
-            [self stopUpdatingLocation];
-        } else if (authStatus == kCLAuthorizationStatusAuthorized ||
-                   authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
-            [self startUpdatingLocation];
+        switch ([CLLocationManager authorizationStatus]) {
+            case kCLAuthorizationStatusNotDetermined:
+            case kCLAuthorizationStatusRestricted:
+            case kCLAuthorizationStatusDenied:
+                [self stopUpdatingLocation];
+                break;
+            case kCLAuthorizationStatusAuthorized:
+                // Also handles kCLAuthorizationStatusAuthorizedAlways
+                [self startUpdatingLocation];
+                break;
+            case kCLAuthorizationStatusAuthorizedWhenInUse:
+                if (UIApplication.sharedApplication.applicationState == UIApplicationStateBackground) {
+                    // Prevent blue status bar when app is not in foreground
+                    [self stopUpdatingLocation];
+                } else {
+                    [self startUpdatingLocation];
+                }
+                break;
         }
     }
 }
