@@ -5,27 +5,35 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
+#include <mbgl/util/url.hpp>
 
 using namespace mbgl;
 
 RasterTileData::RasterTileData(const TileID& id_,
+                               float pixelRatio,
+                               const std::string& urlTemplate,
                                TexturePool &texturePool_,
-                               Worker& worker_)
+                               Worker& worker_,
+                               const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
       texturePool(texturePool_),
       worker(worker_) {
-}
-
-RasterTileData::~RasterTileData() {
-    cancel();
-}
-
-void RasterTileData::request(const std::string& url,
-                             const RasterTileData::Callback& callback) {
     state = State::loading;
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Tile, url }, [url, callback, this](Response res) {
+    Resource resource {
+        Resource::Kind::Tile,
+        util::templateTileURL(urlTemplate, id, pixelRatio)
+    };
+
+    resource.tileData = Resource::TileData {
+        urlTemplate,
+        pixelRatio,
+        id.x,
+        id.y,
+        id.z
+    };
+
+    req = util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
         if (res.error) {
             std::exception_ptr error;
             if (res.error->reason == Response::Error::Reason::NotFound) {
@@ -74,6 +82,10 @@ void RasterTileData::request(const std::string& url,
             callback(error);
         });
     });
+}
+
+RasterTileData::~RasterTileData() {
+    cancel();
 }
 
 Bucket* RasterTileData::getBucket(StyleLayer const&) {

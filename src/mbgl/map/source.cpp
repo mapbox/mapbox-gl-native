@@ -267,16 +267,17 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
-            auto tileData = std::make_shared<RasterTileData>(normalizedID,
+            newTile->data = std::make_shared<RasterTileData>(normalizedID,
+                                                             parameters.pixelRatio,
+                                                             info->tiles.at(0),
                                                              parameters.texturePool,
-                                                             parameters.worker);
-            tileData->request(util::templateTileURL(info->tiles.at(0), normalizedID, parameters.pixelRatio), callback);
-            newTile->data = tileData;
+                                                             parameters.worker,
+                                                             callback);
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
             if (type == SourceType::Vector) {
-                monitor = std::make_unique<VectorTileMonitor>(normalizedID, info->tiles.at(0));
+                monitor = std::make_unique<VectorTileMonitor>(normalizedID, parameters.pixelRatio, info->tiles.at(0));
             } else if (type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.data);
             } else if (type == SourceType::GeoJSON) {

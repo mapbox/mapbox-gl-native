@@ -178,13 +178,27 @@ util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) 
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
 }
 
-VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, const std::string& urlTemplate_)
-    : tileID(tileID_), urlTemplate(urlTemplate_) {
+VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, const std::string& urlTemplate_)
+    : tileID(tileID_),
+      pixelRatio(pixelRatio_),
+      urlTemplate(urlTemplate_) {
 }
 
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
-    const std::string url = util::templateTileURL(urlTemplate, tileID);
-    return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](Response res) {
+    Resource resource {
+        Resource::Kind::Tile,
+        util::templateTileURL(urlTemplate, tileID, pixelRatio)
+    };
+
+    resource.tileData = Resource::TileData {
+        urlTemplate,
+        pixelRatio,
+        tileID.x,
+        tileID.y,
+        tileID.z
+    };
+
+    return util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
         if (res.notModified) {
             // We got the same data again. Abort early.
             return;
