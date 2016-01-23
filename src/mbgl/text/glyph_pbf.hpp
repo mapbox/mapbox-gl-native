@@ -28,13 +28,8 @@ public:
     }
 
 private:
-    void parse(GlyphStore*, const std::string& fontStack, const GlyphRange&);
-
-    std::shared_ptr<const std::string> data;
     std::atomic<bool> parsed;
-
     std::unique_ptr<FileRequest> req;
-
     GlyphStore::Observer* observer = nullptr;
 };
 

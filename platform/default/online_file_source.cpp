@@ -48,19 +48,16 @@ private:
     void scheduleCacheRequest(OnlineFileSource::Impl&);
     void scheduleRealRequest(OnlineFileSource::Impl&, bool forceImmediate = false);
 
-    const Resource resource;
+    Resource resource;
     std::unique_ptr<WorkRequest> cacheRequest;
     HTTPRequestBase* realRequest = nullptr;
     util::Timer realRequestTimer;
     Callback callback;
 
-    // The current response data. Used to create conditional HTTP requests, and to check whether
-    // new responses we got changed any data.
-    std::shared_ptr<const Response> response;
-
     // Counts the number of subsequent failed requests. We're using this value for exponential
     // backoff when retrying requests.
     uint32_t failedRequests = 0;
+    Response::Error::Reason failedRequestReason = Response::Error::Reason::Success;
 };
 
 class OnlineFileSource::Impl {
@@ -169,7 +166,7 @@ OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_, Callback
     if (impl.cache) {
         scheduleCacheRequest(impl);
     } else {
-        scheduleRealRequest(impl);
+        scheduleRealRequest(impl, true);
     }
 }
 
@@ -184,25 +181,28 @@ OnlineFileRequestImpl::~OnlineFileRequestImpl() {
 void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
     // Check the cache for existing data so that we can potentially
     // revalidate the information without having to redownload everything.
-    cacheRequest = impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response_) {
+    cacheRequest = impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response) {
         cacheRequest = nullptr;
 
-        if (response_) {
-            response = response_;
+        if (response) {
+            resource.priorModified = response->modified;
+            resource.priorExpires = response->expires;
+            resource.priorEtag = response->etag;
             callback(*response);
         }
 
-        // Force immediate revalidation if the cached response didn't indicate an expiration. If
-        // it did indicate an expiration, revalidation will happen in the normal scheduling flow.
-        scheduleRealRequest(impl, response && !response->expires);
+        // Force immediate revalidation if we don't have a cached response, or the cached
+        // response does not have an expiration time. Otherwise revalidation will happen in
+        // the normal scheduling flow.
+        scheduleRealRequest(impl, !response || !response->expires);
     });
 }
 
-static Duration errorRetryTimeout(const Response& response, uint32_t failedRequests) {
-    if (response.error && response.error->reason == Response::Error::Reason::Server) {
+static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests) {
+    if (failedRequestReason == Response::Error::Reason::Server) {
         // Retry after one second three times, then start exponential backoff.
         return Seconds(failedRequests <= 3 ? 1 : 1 << std::min(failedRequests - 3, 31u));
-    } else if (response.error && response.error->reason == Response::Error::Reason::Connection) {
+    } else if (failedRequestReason == Response::Error::Reason::Connection) {
         // Immediate exponential backoff.
         assert(failedRequests > 0);
         return Seconds(1 << std::min(failedRequests - 1, 31u));
@@ -212,9 +212,9 @@ static Duration errorRetryTimeout(const Response& response, uint32_t failedReque
     }
 }
 
-static Duration expirationTimeout(const Response& response) {
-    if (response.expires) {
-        return std::max(SystemDuration::zero(), *response.expires - SystemClock::now());
+static Duration expirationTimeout(optional<SystemTimePoint> expires) {
+    if (expires) {
+        return std::max(SystemDuration::zero(), *expires - SystemClock::now());
     } else {
         return Duration::max();
     }
@@ -226,47 +226,65 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         return;
     }
 
-    Duration timeout = Duration::zero();
+    // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
+    // consecutive errors we've encountered, and on the expiration time, if present.
+    Duration timeout = forceImmediate
+        ? Duration::zero()
+        : std::min(errorRetryTimeout(failedRequestReason, failedRequests),
+                   expirationTimeout(resource.priorExpires));
 
-    // If there was a prior response and we're not being asked for a forced refresh, calculate a timeout
-    // that depends on how many consecutive errors we've encountered, and on the expiration time.
-    if (response && !forceImmediate) {
-        timeout = std::min(errorRetryTimeout(*response, failedRequests),
-                           expirationTimeout(*response));
-
-        if (timeout == Duration::max()) {
-            return;
-        }
+    if (timeout == Duration::max()) {
+        return;
     }
 
     realRequestTimer.start(timeout, Duration::zero(), [this, &impl] {
         assert(!realRequest);
-        realRequest = impl.httpContext->createRequest(resource.url, [this, &impl](std::shared_ptr<const Response> response_) {
+        realRequest = impl.httpContext->createRequest(resource, [this, &impl](Response response) {
             realRequest = nullptr;
 
-            if (impl.cache) {
-                impl.cache->put(resource, *response_);
-            }
+            // If we didn't get various caching headers in the response, continue using the
+            // previous values. Otherwise, update the previous values to the new values.
 
-            response = response_;
-
-            if (response->error) {
-                failedRequests++;
+            if (!response.modified) {
+                response.modified = resource.priorModified;
             } else {
-                // Reset the number of subsequent failed requests after we got a successful one.
-                failedRequests = 0;
+                resource.priorModified = response.modified;
             }
 
-            callback(*response);
+            if (!response.expires) {
+                response.expires = resource.priorExpires;
+            } else {
+                resource.priorExpires = response.expires;
+            }
+
+            if (!response.etag) {
+                response.etag = resource.priorEtag;
+            } else {
+                resource.priorEtag = response.etag;
+            }
+
+            if (impl.cache) {
+                impl.cache->put(resource, response);
+            }
+
+            if (response.error) {
+                failedRequests++;
+                failedRequestReason = response.error->reason;
+            } else {
+                failedRequests = 0;
+                failedRequestReason = Response::Error::Reason::Success;
+            }
+
+            callback(response);
             scheduleRealRequest(impl);
-        }, response);
+        });
     });
 }
 
 void OnlineFileRequestImpl::networkIsReachableAgain(OnlineFileSource::Impl& impl) {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
-    if (response && response->error && response->error->reason == Response::Error::Reason::Connection) {
+    if (failedRequestReason == Response::Error::Reason::Connection) {
         scheduleRealRequest(impl, true);
     }
 }

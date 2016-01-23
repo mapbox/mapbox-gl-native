@@ -13,9 +13,7 @@ public:
     static std::unique_ptr<HTTPContextBase> createContext();
 
     virtual ~HTTPContextBase() = default;
-    virtual HTTPRequestBase* createRequest(const std::string& url,
-                                       HTTPRequestBase::Callback,
-                                       std::shared_ptr<const Response>) = 0;
+    virtual HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) = 0;
 };
 
 } // namespace mbgl

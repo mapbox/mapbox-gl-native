@@ -40,8 +40,7 @@ TEST_F(Storage, CacheRevalidateSame) {
 
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_TRUE(res2.notModified);
-                ASSERT_TRUE(res2.data.get());
-                EXPECT_EQ("Response", *res2.data);
+                ASSERT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_FALSE(bool(res2.modified));
                 // We're not sending the ETag in the 304 reply, but it should still be there.
@@ -92,8 +91,7 @@ TEST_F(Storage, CacheRevalidateModified) {
 
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_TRUE(res2.notModified);
-                ASSERT_TRUE(res2.data.get());
-                EXPECT_EQ("Response", *res2.data);
+                ASSERT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_EQ(SystemClock::from_time_t(1420070400), *res2.modified);
                 EXPECT_FALSE(res2.etag);

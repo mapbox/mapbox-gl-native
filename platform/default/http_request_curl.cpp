@@ -1,5 +1,6 @@
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/http_request_base.hpp>
+#include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -45,9 +46,7 @@ public:
     HTTPCURLContext();
     ~HTTPCURLContext();
 
-    HTTPRequestBase* createRequest(const std::string& url,
-                               HTTPRequestBase::Callback,
-                               std::shared_ptr<const Response>) final;
+    HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
@@ -77,10 +76,7 @@ class HTTPCURLRequest : public HTTPRequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPCURLRequest(HTTPCURLContext*,
-                const std::string& url,
-                Callback,
-                std::shared_ptr<const Response>);
+    HTTPCURLRequest(HTTPCURLContext*, const Resource&, Callback);
     ~HTTPCURLRequest();
 
     void cancel() final;
@@ -137,10 +133,8 @@ HTTPCURLContext::~HTTPCURLContext() {
     timeout.stop();
 }
 
-HTTPRequestBase* HTTPCURLContext::createRequest(const std::string& url,
-                                            HTTPRequestBase::Callback callback,
-                                            std::shared_ptr<const Response> response) {
-    return new HTTPCURLRequest(this, url, callback, response);
+HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource, HTTPRequestBase::Callback callback) {
+    return new HTTPCURLRequest(this, resource, callback);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -351,25 +345,22 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const std::string& url_, Callback callback_, std::shared_ptr<const Response> response_)
-    : HTTPRequestBase(url_, callback_),
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_)
+    : HTTPRequestBase(resource_, callback_),
       context(context_),
-      existingResponse(response_),
       handle(context->getHandle()) {
     // Zero out the error buffer.
     memset(error, 0, sizeof(error));
 
     // If there's already a response, set the correct etags/modified headers to make sure we are
     // getting a 304 response if possible. This avoids redownloading unchanged data.
-    if (existingResponse) {
-        if (existingResponse->etag) {
-            const std::string header = std::string("If-None-Match: ") + *existingResponse->etag;
-            headers = curl_slist_append(headers, header.c_str());
-        } else if (existingResponse->modified) {
-            const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(*existingResponse->modified);
-            headers = curl_slist_append(headers, time.c_str());
-        }
+    if (resource.priorEtag) {
+        const std::string header = std::string("If-None-Match: ") + *resource.priorEtag;
+        headers = curl_slist_append(headers, header.c_str());
+    } else if (resource.priorModified) {
+        const std::string time =
+            std::string("If-Modified-Since: ") + util::rfc1123(*resource.priorModified);
+        headers = curl_slist_append(headers, time.c_str());
     }
 
     if (headers) {
@@ -385,7 +376,7 @@ HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const std::string& u
     handleError(curl_easy_setopt(handle, CURLOPT_CAINFO, "ca-bundle.crt"));
 #endif
     handleError(curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1));
-    handleError(curl_easy_setopt(handle, CURLOPT_URL, url.c_str()));
+    handleError(curl_easy_setopt(handle, CURLOPT_URL, resource.url.c_str()));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, writeCallback));
     handleError(curl_easy_setopt(handle, CURLOPT_WRITEDATA, this));
     handleError(curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, headerCallback));
@@ -529,22 +520,7 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
             // Nothing to do; this is what we want.
         } else if (responseCode == 304) {
             response->notModified = true;
-
-            if (existingResponse) {
-                response->data = existingResponse->data;
-
-                if (!response->expires) {
-                    response->expires = existingResponse->expires;
-                }
-
-                if (!response->modified) {
-                    response->modified = existingResponse->modified;
-                }
-
-                if (!response->etag) {
-                    response->etag = existingResponse->etag;
-                }
-            }
+            response->data.reset();
         } else if (responseCode == 404) {
             response->error =
                 std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
@@ -560,7 +536,7 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
     }
 
     // Actually return the response.
-    notify(std::move(response));
+    notify(*response);
     delete this;
 }
 

@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-struct Resource;
+class Resource;
 class Response;
 class WorkRequest;
 
