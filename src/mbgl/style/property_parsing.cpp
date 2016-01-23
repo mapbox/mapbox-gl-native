@@ -214,11 +214,11 @@ optional<PropertyTransition> parseProperty(const char *, const JSValue& value) {
     if (value.IsObject()) {
         bool parsed = false;
         if (value.HasMember("duration") && value["duration"].IsNumber()) {
-            transition.duration = Duration(std::chrono::milliseconds(value["duration"].GetUint()));
+            transition.duration.emplace(Milliseconds(value["duration"].GetUint()));
             parsed = true;
         }
         if (value.HasMember("delay") && value["delay"].IsNumber()) {
-            transition.delay = Duration(std::chrono::milliseconds(value["delay"].GetUint()));
+            transition.delay.emplace(Milliseconds(value["delay"].GetUint()));
             parsed = true;
         }
         if (!parsed) {

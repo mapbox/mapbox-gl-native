@@ -37,14 +37,14 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
 
     // After 50 milliseconds, we're going to trigger a NetworkStatus change.
     util::Timer reachableTimer;
-    reachableTimer.start(std::chrono::milliseconds(50), Duration::zero(), [] () {
+    reachableTimer.start(Milliseconds(50), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 
     // This timer will keep the loop alive to make sure we would be getting a response in caes the
     // network status change triggered another change (which it shouldn't).
     util::Timer delayTimer;
-    delayTimer.start(std::chrono::milliseconds(300), Duration::zero(), [] () {});
+    delayTimer.start(Milliseconds(300), Duration::zero(), [] () {});
 
     loop.run();
 }
@@ -100,7 +100,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
 
     // After 400 milliseconds, we're going to trigger a NetworkStatus change.
     util::Timer reachableTimer;
-    reachableTimer.start(std::chrono::milliseconds(400), Duration::zero(), [] () {
+    reachableTimer.start(Milliseconds(400), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 

@@ -1,6 +1,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <memory>
 
@@ -15,7 +16,7 @@ TEST(Timer, Basic) {
 
     auto callback = [&loop] { loop.stop(); };
 
-    auto interval = std::chrono::milliseconds(300);
+    auto interval = mbgl::Milliseconds(300);
     auto expectedTotalTime = interval;
 
     auto first = mbgl::Clock::now();
@@ -23,8 +24,7 @@ TEST(Timer, Basic) {
 
     loop.run();
 
-    using namespace std::chrono;
-    auto totalTime = duration_cast<milliseconds>(mbgl::Clock::now() - first);
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
 
     // These are not high precision timers. Especially libuv uses
     // cached time from the beginning of of the main loop iteration
@@ -45,7 +45,7 @@ TEST(Timer, Repeat) {
         }
     };
 
-    auto interval = std::chrono::milliseconds(50);
+    auto interval = mbgl::Milliseconds(50);
     auto expectedTotalTime = interval * count;
 
     auto first = mbgl::Clock::now();
@@ -53,8 +53,7 @@ TEST(Timer, Repeat) {
 
     loop.run();
 
-    using namespace std::chrono;
-    auto totalTime = duration_cast<milliseconds>(mbgl::Clock::now() - first);
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
 
     EXPECT_GE(totalTime, expectedTotalTime * 0.8);
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
@@ -66,8 +65,8 @@ TEST(Timer, Stop) {
     Timer timer1;
     Timer timer2;
 
-    auto interval1 = std::chrono::milliseconds(50);
-    auto interval2 = std::chrono::milliseconds(250);
+    auto interval1 = mbgl::Milliseconds(50);
+    auto interval2 = mbgl::Milliseconds(250);
     auto expectedTotalTime = interval2;
 
     int count = 0;
@@ -88,8 +87,7 @@ TEST(Timer, Stop) {
 
     loop.run();
 
-    using namespace std::chrono;
-    auto totalTime = duration_cast<milliseconds>(mbgl::Clock::now() - first);
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
 
     EXPECT_EQ(count, 2);
 
@@ -103,8 +101,8 @@ TEST(Timer, DestroyShouldStop) {
     auto timer1 = std::make_unique<Timer>();
     Timer timer2;
 
-    auto interval1 = std::chrono::milliseconds(50);
-    auto interval2 = std::chrono::milliseconds(250);
+    auto interval1 = mbgl::Milliseconds(50);
+    auto interval2 = mbgl::Milliseconds(250);
     auto expectedTotalTime = interval2;
 
     int count = 0;
@@ -125,8 +123,7 @@ TEST(Timer, DestroyShouldStop) {
 
     loop.run();
 
-    using namespace std::chrono;
-    auto totalTime = duration_cast<milliseconds>(mbgl::Clock::now() - first);
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
 
     EXPECT_EQ(count, 2);
 
@@ -139,8 +136,8 @@ TEST(Timer, StartOverrides) {
 
     Timer timer;
 
-    auto interval1 = std::chrono::milliseconds(50);
-    auto interval2 = std::chrono::milliseconds(250);
+    auto interval1 = mbgl::Milliseconds(50);
+    auto interval2 = mbgl::Milliseconds(250);
     auto expectedTotalTime = interval1  + interval2;
 
     int count = 0;
@@ -160,8 +157,7 @@ TEST(Timer, StartOverrides) {
 
     loop.run();
 
-    using namespace std::chrono;
-    auto totalTime = duration_cast<milliseconds>(mbgl::Clock::now() - first);
+    auto totalTime = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - first);
 
     EXPECT_EQ(count, 2);
 

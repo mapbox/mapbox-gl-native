@@ -1,5 +1,6 @@
 #include "mock_file_source.hpp"
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/chrono.hpp>
 
 namespace mbgl {
 
@@ -18,7 +19,7 @@ public:
 
 MockFileSource::MockFileSource(Type type_, const std::string& match_)
     : type(type_), match(match_) {
-    timer.start(std::chrono::milliseconds(10), std::chrono::milliseconds(10), [this] {
+    timer.start(Milliseconds(10), Milliseconds(10), [this] {
         // Explicit move to avoid iterator invalidation if ~MockFileRequest gets called within the loop.
         auto pending_ = std::move(pending);
         for (auto& pair : pending_) {

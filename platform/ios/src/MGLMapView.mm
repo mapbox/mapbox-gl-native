@@ -24,6 +24,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/default_styles.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #import "Mapbox.h"
 #import "../../darwin/MGLGeometry_Private.h"
@@ -214,10 +215,9 @@ public:
 #pragma mark - Setup & Teardown -
 
 @dynamic debugActive;
-
-std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
+mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
-    return std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<float, std::chrono::seconds::period>(duration));
+    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -1083,7 +1083,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
             velocity = CGPointZero;
         }
 
-        CGFloat duration = UIScrollViewDecelerationRateNormal;
+        NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
         BOOL drift = ! CGPointEqualToPoint(velocity, CGPointZero);
         if (drift)
         {
@@ -1150,7 +1150,8 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         {
             velocity = 0;
         }
-        CGFloat duration = velocity > 0 ? 1 : 0.25;
+
+        NSTimeInterval duration = velocity > 0 ? 1 : 0.25;
 
         CGFloat scale = self.scale * pinch.scale;
         CGFloat newScale = scale;
@@ -1227,7 +1228,7 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         if (fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
-            CGFloat duration = UIScrollViewDecelerationRateNormal;
+            NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 

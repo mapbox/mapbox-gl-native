@@ -1,6 +1,7 @@
 #include <mbgl/style/function.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <cmath>
 

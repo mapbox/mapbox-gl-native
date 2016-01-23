@@ -26,7 +26,7 @@ public:
         , pixelRatio(pixelRatio_)
         , annotationManager(pixelRatio)
         , animationTime(Duration::zero())
-        , defaultFadeDuration(mode_ == MapMode::Continuous ? std::chrono::milliseconds(300) : Duration::zero())
+        , defaultFadeDuration(mode_ == MapMode::Continuous ? Milliseconds(300) : Duration::zero())
         , defaultTransitionDuration(Duration::zero())
         , defaultTransitionDelay(Duration::zero()) {
         assert(pixelRatio > 0);

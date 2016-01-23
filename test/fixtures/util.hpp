@@ -2,6 +2,7 @@
 #define MBGL_TEST_UTIL
 
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -35,8 +36,7 @@ uint64_t crc64(const char*, size_t);
 uint64_t crc64(const std::string&);
 uint64_t crc64(const PremultipliedImage&);
 
-PremultipliedImage render(Map&,
-                          std::chrono::milliseconds timeout = std::chrono::milliseconds(1000));
+PremultipliedImage render(Map&, Milliseconds timeout = Milliseconds(1000));
 
 void checkImage(const std::string& base,
                 const PremultipliedImage& actual,

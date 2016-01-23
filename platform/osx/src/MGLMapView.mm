@@ -25,6 +25,7 @@
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/math.hpp>
 #import <mbgl/util/std.hpp>
+#import <mbgl/util/chrono.hpp>
 
 #import <map>
 #import <unordered_set>
@@ -96,9 +97,8 @@ NSImage *MGLDefaultMarkerImage() {
 }
 
 /// Converts from a duration in seconds to a duration object usable in mbgl.
-std::chrono::steady_clock::duration MGLDurationInSeconds(NSTimeInterval duration) {
-    return std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<NSTimeInterval, std::chrono::seconds::period>(duration));
+mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration) {
+    return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
 }
 
 /// Converts a media timing function into a unit bezier object usable in mbgl.

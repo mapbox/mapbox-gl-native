@@ -8,6 +8,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <curl/curl.h>
 
@@ -239,7 +240,7 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
         timeout_ms = 0;
     }
     context->timeout.stop();
-    context->timeout.start(std::chrono::milliseconds(timeout_ms), Duration::zero(),
+    context->timeout.start(mbgl::Milliseconds(timeout_ms), Duration::zero(),
         std::bind(&HTTPCURLContext::onTimeout, context));
 
     return 0;
