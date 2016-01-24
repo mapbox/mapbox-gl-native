@@ -224,7 +224,12 @@ IB_DESIGNABLE
 @property (nonatomic, readonly, nullable) MGLUserLocation *userLocation;
 
 /** 
- The mode used to track the user location.
+ The mode used to track the user location. The default value is
+ `MGLUserTrackingModeNone`.
+ 
+ Changing the value of this property updates the map view with an animated
+ transition. If you don’t want to animate the change, use the
+ `-setUserTrackingMode:animated:` method instead.
  */
 @property (nonatomic, assign) MGLUserTrackingMode userTrackingMode;
 
@@ -243,8 +248,23 @@ IB_DESIGNABLE
 /**
  The vertical alignment of the user location annotation within the receiver. The
  default value is `MGLAnnotationVerticalAlignmentCenter`.
+ 
+ Changing the value of this property updates the map view with an animated
+ transition. If you don’t want to animate the change, use the
+ `-setUserLocationVerticalAlignment:animated:` method instead.
  */
 @property (nonatomic, assign) MGLAnnotationVerticalAlignment userLocationVerticalAlignment;
+
+/**
+ Sets the vertical alignment of the user location annotation within the
+ receiver, with an optional transition.
+ 
+ @param alignment The vertical alignment of the user location annotation.
+ @param animated If `YES`, the user location annotation animates to its new
+    position within the map view. If `NO`, the user location annotation
+    instantaneously moves to its new position.
+ */
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
 
 /**
  Whether the map view should display a heading calibration alert when necessary.

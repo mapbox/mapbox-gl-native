@@ -1756,7 +1756,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated
 {
-    [self setCenterCoordinate:self.centerCoordinate zoomLevel:zoomLevel animated:animated];
+    if (zoomLevel == self.zoomLevel) return;
+    _mbglMap->cancelTransitions();
+    
+    CGFloat duration = animated ? MGLAnimationDuration : 0;
+    
+    _mbglMap->setZoom(zoomLevel,
+                      MGLEdgeInsetsFromNSEdgeInsets(self.contentInset),
+                      MGLDurationInSeconds(duration));
 }
 
 - (MGLCoordinateBounds)visibleCoordinateBounds
@@ -2021,7 +2028,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera
 {
     mbgl::CameraOptions options;
-    options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    if (CLLocationCoordinate2DIsValid(camera.centerCoordinate))
+    {
+        options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
+    }
     options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
@@ -3010,6 +3020,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         self.userTrackingState = MGLUserTrackingStatePossible;
     }
+    if ( ! animated)
+    {
+        self.userTrackingState = MGLUserTrackingStateChanged;
+    }
 
     switch (_userTrackingMode)
     {
@@ -3068,10 +3082,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment
 {
+    [self setUserLocationVerticalAlignment:alignment animated:YES];
+}
+
+- (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated
+{
     _userLocationVerticalAlignment = alignment;
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
-        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:YES];
+        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
     }
 }
 
