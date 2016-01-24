@@ -6,21 +6,21 @@ FOUNDATION_EXPORT double MapboxVersionNumber;
 /// Project version string for Mapbox.
 FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 
-#import <Mapbox/MGLAccountManager.h>
-#import <Mapbox/MGLAnnotation.h>
-#import <Mapbox/MGLAnnotationImage.h>
-#import <Mapbox/MGLCalloutView.h>
-#import <Mapbox/MGLMapCamera.h>
-#import <Mapbox/MGLGeometry.h>
-#import <Mapbox/MGLMapView.h>
-#import <Mapbox/MGLMapView+IBAdditions.h>
-#import <Mapbox/MGLMapView+MGLCustomStyleLayerAdditions.h>
-#import <Mapbox/MGLMultiPoint.h>
-#import <Mapbox/MGLOverlay.h>
-#import <Mapbox/MGLPointAnnotation.h>
-#import <Mapbox/MGLPolygon.h>
-#import <Mapbox/MGLPolyline.h>
-#import <Mapbox/MGLShape.h>
-#import <Mapbox/MGLStyle.h>
-#import <Mapbox/MGLTypes.h>
-#import <Mapbox/MGLUserLocation.h>
+#import "MGLAccountManager.h"
+#import "MGLAnnotation.h"
+#import "MGLAnnotationImage.h"
+#import "MGLCalloutView.h"
+#import "MGLMapCamera.h"
+#import "MGLGeometry.h"
+#import "MGLMapView.h"
+#import "MGLMapView+IBAdditions.h"
+#import "MGLMapView+MGLCustomStyleLayerAdditions.h"
+#import "MGLMultiPoint.h"
+#import "MGLOverlay.h"
+#import "MGLPointAnnotation.h"
+#import "MGLPolygon.h"
+#import "MGLPolyline.h"
+#import "MGLShape.h"
+#import "MGLStyle.h"
+#import "MGLTypes.h"
+#import "MGLUserLocation.h"
