@@ -14,6 +14,7 @@ public:
 
     virtual void operator()() = 0;
     virtual void cancel() = 0;
+    virtual bool tryCancel() = 0;
 };
 
 } // namespace mbgl
