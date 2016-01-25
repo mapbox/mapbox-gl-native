@@ -74,6 +74,7 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(double longitude READ longitude WRITE setLongitude)
     Q_PROPERTY(double zoom READ zoom WRITE setZoom)
     Q_PROPERTY(double bearing READ bearing WRITE setBearing)
+    Q_PROPERTY(double pitch READ pitch WRITE setPitch)
 
 public:
     typedef QPair<double, double> Coordinate;
