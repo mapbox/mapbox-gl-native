@@ -278,6 +278,7 @@ public final class MapView extends FrameLayout {
     private boolean mTiltEnabled = true;
     private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
+
     private int mContentPaddingLeft;
     private int mContentPaddingTop;
     private int mContentPaddingRight;
@@ -1573,6 +1574,38 @@ public final class MapView extends FrameLayout {
     @Deprecated
     public double getZoomLevel() {
         return mNativeMapView.getZoom();
+    }
+
+    /**
+     * Return The current content padding left of the map view viewport.
+     * @return The current content padding left
+     */
+    public int getContentPaddingLeft() {
+        return mContentPaddingLeft;
+    }
+
+    /**
+     * Return The current content padding left of the map view viewport.
+     * @return The current content padding left
+     */
+    public int getContentPaddingTop() {
+        return mContentPaddingTop;
+    }
+
+    /**
+     * Return The current content padding left of the map view viewport.
+     * @return The current content padding left
+     */
+    public int getContentPaddingRight() {
+        return mContentPaddingRight;
+    }
+
+    /**
+     * Return The current content padding left of the map view viewport.
+     * @return The current content padding left
+     */
+    public int getContentPaddingBottom() {
+        return mContentPaddingBottom;
     }
 
     /**
