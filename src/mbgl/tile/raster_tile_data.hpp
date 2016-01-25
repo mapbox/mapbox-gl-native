@@ -22,7 +22,7 @@ public:
                    const std::function<void(std::exception_ptr)>& callback);
     ~RasterTileData();
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
     Bucket* getBucket(StyleLayer const &layer_desc) override;
     bool hasData() const override;
 

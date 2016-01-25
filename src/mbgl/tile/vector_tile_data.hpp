@@ -35,7 +35,7 @@ public:
 
     bool hasData() const override;
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
 
 private:
     Style& style;

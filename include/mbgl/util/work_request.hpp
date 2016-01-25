@@ -15,6 +15,8 @@ public:
     WorkRequest(Task);
     ~WorkRequest() override;
 
+    bool tryCancel();
+
 private:
     std::shared_ptr<WorkTask> task;
 };
