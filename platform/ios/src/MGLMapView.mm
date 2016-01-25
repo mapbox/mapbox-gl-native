@@ -3141,9 +3141,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if (std::abs(currentPoint.x - correctPoint.x) > 1.0 || std::abs(currentPoint.y - correctPoint.y) > 1.0)
         {
             CLLocationDirection course = self.userLocation.location.course;
-            if (course < 0 || self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
+            if (self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
             {
                 course = -1;
+            }
+            else if (course >= 0 && self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentTop)
+            {
+                course += 180;
             }
             
             // Shift the center point upward or downward to accommodate a
@@ -3525,7 +3529,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
 }
 
-/// Intended center point of the user location annotation view.
+/// Intended center point of the user location annotation view with respect to
+/// the overall map view (but respecting the content inset).
 - (CGPoint)userLocationAnnotationViewCenter
 {
     CGRect contentFrame = self.contentFrame;
@@ -3537,10 +3542,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         case MGLAnnotationVerticalAlignmentCenter:
             break;
         case MGLAnnotationVerticalAlignmentTop:
-            center.y = CGRectGetHeight(self.userLocationAnnotationView.frame) + MGLUserLocationAnnotationViewPadding;
+            center.y = CGRectGetMinY(contentFrame) + CGRectGetHeight(self.userLocationAnnotationView.frame) + MGLUserLocationAnnotationViewPadding;
             break;
         case MGLAnnotationVerticalAlignmentBottom:
-            center.y = CGRectGetHeight(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame) - MGLUserLocationAnnotationViewPadding;
+            center.y = CGRectGetMaxY(contentFrame) - CGRectGetHeight(self.userLocationAnnotationView.frame) - MGLUserLocationAnnotationViewPadding;
             break;
     }
     
