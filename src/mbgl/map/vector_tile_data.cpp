@@ -59,6 +59,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         // request in case there is one.
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+            WorkCompletedNotifier notifier(this);
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -100,6 +101,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 
     workRequest.reset();
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
         if (state == State::obsolete) {
             return;
@@ -156,6 +158,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::f
 void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     workRequest.reset();
     workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to

@@ -21,6 +21,13 @@ class DebugBucket;
 
 class TileData : private util::noncopyable {
 public:
+    class Observer {
+    public:
+        virtual ~Observer() = default;
+
+        virtual void onTileDataWorkCompleted(TileData*) {};
+    };
+
     // initial:
     //   Initial state, only used when the TileData object is created.
     //
@@ -95,6 +102,10 @@ public:
 
     void dumpDebugLogs() const;
 
+    void setObserver(Observer* observer_) {
+        observer = observer_;
+    }
+
     const TileID id;
     optional<SystemTimePoint> modified;
     optional<SystemTimePoint> expires;
@@ -103,7 +114,21 @@ public:
     std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
+    class WorkCompletedNotifier {
+    public:
+        WorkCompletedNotifier(TileData* data_) : data(data_) {}
+        ~WorkCompletedNotifier() {
+            data->observer->onTileDataWorkCompleted(data);
+        }
+
+    private:
+        TileData* data;
+    };
+
     std::atomic<State> state;
+
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 };
 
 } // namespace mbgl
