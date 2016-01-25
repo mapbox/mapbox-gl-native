@@ -45,7 +45,9 @@ RasterTileData::RasterTileData(const TileID& id_,
 
             workRequest.reset();
             workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
+                WorkCompletedNotifier notifier(this);
                 workRequest.reset();
+
                 if (state != State::loaded) {
                     return;
                 }
