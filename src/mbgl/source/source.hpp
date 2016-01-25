@@ -3,6 +3,7 @@
 
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_cache.hpp>
+#include <mbgl/tile/tile_data_deleter.hpp>
 #include <mbgl/source/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
@@ -111,6 +112,8 @@ private:
 
     Observer nullObserver;
     Observer* observer = &nullObserver;
+
+    TileDataDeleter tileDataDeleter;
 };
 
 } // namespace mbgl
