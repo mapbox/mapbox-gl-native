@@ -2,6 +2,7 @@
 #define MBGL_MAP_SOURCE
 
 #include <mbgl/map/tile_cache.hpp>
+#include <mbgl/map/tile_data_deleter.hpp>
 #include <mbgl/map/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
@@ -111,6 +112,8 @@ private:
 
     Observer nullObserver;
     Observer* observer = &nullObserver;
+
+    TileDataDeleter tileDataDeleter;
 };
 
 } // namespace mbgl

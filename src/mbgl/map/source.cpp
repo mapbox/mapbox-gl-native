@@ -267,9 +267,11 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
-            auto tileData = std::make_shared<RasterTileData>(normalizedID,
-                                                             parameters.texturePool,
-                                                             parameters.worker);
+            auto tileData = std::shared_ptr<RasterTileData>(new RasterTileData{
+                normalizedID,
+                parameters.texturePool,
+                parameters.worker
+            }, [this](TileData* data) { tileDataDeleter.add(data); });
             tileData->request(util::templateTileURL(info->tiles.at(0), normalizedID, parameters.pixelRatio), callback);
             newTile->data = tileData;
         } else {
@@ -286,12 +288,14 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
                 return TileData::State::invalid;
             }
 
-            newTile->data = std::make_shared<VectorTileData>(normalizedID,
-                                                             std::move(monitor),
-                                                             id,
-                                                             parameters.style,
-                                                             parameters.mode,
-                                                             callback);
+            newTile->data = std::shared_ptr<VectorTileData>(new VectorTileData{
+                normalizedID,
+                std::move(monitor),
+                id,
+                parameters.style,
+                parameters.mode,
+                callback
+            }, [this](TileData* data) { tileDataDeleter.add(data); });
         }
 
         tileDataMap.emplace(newTile->data->id, newTile->data);
