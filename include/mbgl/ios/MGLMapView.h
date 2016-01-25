@@ -272,6 +272,46 @@ IB_DESIGNABLE
  */
 @property (nonatomic, assign) BOOL displayHeadingCalibration;
 
+/**
+ The geographic coordinate that is the subject of observation as the user
+ location is being tracked.
+ 
+ By default, this property is set to an invalid coordinate, indicating that
+ there is no target. In course tracking mode, the target forms one of two foci
+ in the viewport, the other being the user location annotation. Typically, this
+ property is set to a destination or waypoint in a real-time navigation scene.
+ As the user annotation moves toward the target, the map automatically zooms in
+ to fit both foci optimally within the viewport.
+ 
+ This property has no effect if the `userTrackingMode` property is set to a
+ value other than `MGLUserTrackingModeFollowWithCourse`.
+ 
+ Changing the value of this property updates the map view with an animated
+ transition. If you don’t want to animate the change, use the
+ `-setTargetCoordinate:animated:` method instead.
+ */
+@property (nonatomic, assign) CLLocationCoordinate2D targetCoordinate;
+
+/**
+ Sets the geographic coordinate that is the subject of observation as the user
+ location is being tracked, with an optional transition animation.
+ 
+ By default, the target coordinate is set to an invalid coordinate, indicating
+ that there is no target. In course tracking mode, the target forms one of two
+ foci in the viewport, the other being the user location annotation. Typically,
+ the target is set to a destination or waypoint in a real-time navigation scene.
+ As the user annotation moves toward the target, the map automatically zooms in
+ to fit both foci optimally within the viewport.
+ 
+ This method has no effect if the `userTrackingMode` property is set to a value
+ other than `MGLUserTrackingModeFollowWithCourse`.
+ 
+ @param targetCoordinate The target coordinate to fit within the viewport.
+ @param animated If `YES`, the map animates to fit the target within the map
+    view. If `NO`, the map fits the target instantaneously.
+ */
+- (void)setTargetCoordinate:(CLLocationCoordinate2D)targetCoordinate animated:(BOOL)animated;
+
 #pragma mark Configuring How the User Interacts with the Map
 
 /**

@@ -179,6 +179,10 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_puckArrow];
     }
+    if (self.annotation.location.course >= 0)
+    {
+        _puckArrow.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.annotation.location.course));
+    }
 
     if ( ! _puckModeActivated)
     {
