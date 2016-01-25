@@ -485,7 +485,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         bool obsolete = retain_data.find(tile->id) == retain_data.end();
         if (obsolete) {
             if (!tileCache.has(tile->id.normalized().to_uint64())) {
-                tile->cancel();
+                tile->tryCancel();
             }
             return true;
         } else {

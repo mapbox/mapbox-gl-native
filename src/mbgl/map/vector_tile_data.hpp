@@ -34,7 +34,7 @@ public:
     void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
     void redoPlacement(const std::function<void()>&) override;
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
 
 private:
     Style& style;

@@ -73,8 +73,11 @@ public:
     TileData(const TileID&);
     virtual ~TileData();
 
-    // Mark this tile as no longer needed and cancel any pending work.
-    virtual void cancel() = 0;
+    // Mark this tile as no longer needed and cancel any pending work. Returns
+    // true if the work was canceled, false otherwise. Canceling is not always
+    // possible because in some circumstances it might block. Force will force
+    // the cancellation and always return true, but it can potentially block.
+    virtual bool tryCancel(bool force = false) = 0;
 
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 

@@ -21,7 +21,7 @@ public:
     void request(const std::string& url,
                  const Callback& callback);
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
 
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 

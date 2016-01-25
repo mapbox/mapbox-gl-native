@@ -88,7 +88,8 @@ VectorTileData::VectorTileData(const TileID& id_,
 }
 
 VectorTileData::~VectorTileData() {
-    cancel();
+    assert(tryCancel());
+    workRequest.reset();
 }
 
 bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
@@ -175,10 +176,19 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     });
 }
 
-void VectorTileData::cancel() {
+bool VectorTileData::tryCancel(bool force) {
     state = State::obsolete;
     tileRequest.reset();
-    workRequest.reset();
+
+    if (force) {
+        workRequest.reset();
+    }
+
+    if (workRequest) {
+        return workRequest->tryCancel();
+    }
+
+    return true;
 }
 
 } // namespace mbgl

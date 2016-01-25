@@ -17,7 +17,8 @@ RasterTileData::RasterTileData(const TileID& id_,
 }
 
 RasterTileData::~RasterTileData() {
-    cancel();
+    assert(tryCancel());
+    workRequest.reset();
 }
 
 void RasterTileData::request(const std::string& url,
@@ -80,10 +81,20 @@ Bucket* RasterTileData::getBucket(StyleLayer const&) {
     return bucket.get();
 }
 
-void RasterTileData::cancel() {
+bool RasterTileData::tryCancel(bool force) {
     if (state != State::obsolete) {
         state = State::obsolete;
     }
+
     req = nullptr;
-    workRequest.reset();
+
+    if (force) {
+        workRequest.reset();
+    }
+
+    if (workRequest) {
+        return workRequest->tryCancel();
+    }
+
+    return true;
 }
