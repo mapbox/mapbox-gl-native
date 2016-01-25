@@ -2443,7 +2443,10 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"annotation should conform to MGLAnnotation");
 
         MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"No ID for annotation %@", annotation);
+        if (annotationTag == MGLAnnotationTagNotFound)
+        {
+            continue;
+        }
         annotationTagsToRemove.push_back(annotationTag);
 
         if (annotationTag == _selectedAnnotationTag)
@@ -2454,9 +2457,12 @@ std::chrono::steady_clock::duration MGLDurationInSeconds(float duration)
         _annotationContextsByAnnotationTag.erase(annotationTag);
     }
 
-    [self willChangeValueForKey:@"annotations"];
-    _mbglMap->removeAnnotations(annotationTagsToRemove);
-    [self didChangeValueForKey:@"annotations"];
+    if ( ! annotationTagsToRemove.empty())
+    {
+        [self willChangeValueForKey:@"annotations"];
+        _mbglMap->removeAnnotations(annotationTagsToRemove);
+        [self didChangeValueForKey:@"annotations"];
+    }
 }
 
 - (void)addOverlay:(id <MGLOverlay>)overlay
