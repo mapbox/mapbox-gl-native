@@ -24,7 +24,8 @@ VectorTileData::VectorTileData(const TileID& id_,
                  *style_.glyphStore,
                  state,
                  mode_),
-      monitor(std::move(monitor_))
+      monitor(std::move(monitor_)),
+      delayedRedoPlacement([this]{ delayedRedoPlacementFunction(); })
 {
     state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
@@ -99,7 +100,6 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
         return false;
     }
 
-    workRequest.reset();
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         WorkCompletedNotifier notifier(this);
         workRequest.reset();
@@ -156,8 +156,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::f
 }
 
 void VectorTileData::redoPlacement(const std::function<void()>& callback) {
-    workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
+    auto redoPlacementCallback = [this, callback, config = targetConfig] {
         WorkCompletedNotifier notifier(this);
         workRequest.reset();
 
@@ -176,7 +175,21 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
         } else {
             callback();
         }
-    });
+    };
+
+    // We overwrite any existing function as
+    // we only care about the last placement.
+    delayedRedoPlacementFunction = [this, redoPlacementCallback] {
+        if (workRequest) {
+            delayedRedoPlacement.send();
+        } else {
+            workRequest = worker.redoPlacement(
+                tileWorker, buckets, targetConfig, redoPlacementCallback);
+            delayedRedoPlacementFunction = nullptr;
+        }
+    };
+
+    delayedRedoPlacementFunction();
 }
 
 bool VectorTileData::tryCancel(bool force) {
