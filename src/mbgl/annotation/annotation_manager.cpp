@@ -12,7 +12,7 @@ const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.poin
 
 AnnotationManager::AnnotationManager(float pixelRatio)
     : spriteStore(pixelRatio),
-      spriteAtlas(512, 512, pixelRatio, spriteStore) {
+      spriteAtlas(1024, 1024, pixelRatio, spriteStore) {
 }
 
 AnnotationManager::~AnnotationManager() = default;
