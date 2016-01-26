@@ -1,7 +1,6 @@
 #include "storage.hpp"
 
 #include <mbgl/storage/asset_file_source.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>

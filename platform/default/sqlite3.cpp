@@ -115,14 +115,44 @@ template <> void Statement::bind(int offset, std::nullptr_t) {
     check(sqlite3_bind_null(stmt, offset));
 }
 
-template <> void Statement::bind(int offset, int value) {
+template <> void Statement::bind(int offset, int8_t value) {
     assert(stmt);
-    check(sqlite3_bind_int(stmt, offset, value));
+    check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, int16_t value) {
+    assert(stmt);
+    check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, int32_t value) {
+    assert(stmt);
+    check(sqlite3_bind_int64(stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, int64_t value) {
     assert(stmt);
     check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, uint8_t value) {
+    assert(stmt);
+    check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, uint16_t value) {
+    assert(stmt);
+    check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, uint32_t value) {
+    assert(stmt);
+    check(sqlite3_bind_int64(stmt, offset, value));
+}
+
+template <> void Statement::bind(int offset, float value) {
+    assert(stmt);
+    check(sqlite3_bind_double(stmt, offset, value));
 }
 
 template <> void Statement::bind(int offset, double value) {

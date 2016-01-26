@@ -10,5 +10,5 @@
   "name": "Streets",
   "scheme": "xyz",
   "tilejson": "2.0.0",
-  "tiles": [ "asset://test/fixtures/stale/{z}-{x}-{y}.vector.pbf" ]
+  "tiles": [ "http://127.0.0.1:3000/offline/{z}-{x}-{y}.vector.pbf" ]
 }

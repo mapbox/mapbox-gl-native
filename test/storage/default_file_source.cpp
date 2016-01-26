@@ -1,10 +1,54 @@
 #include "storage.hpp"
 
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-TEST_F(Storage, CacheRevalidateSame) {
+class DefaultFileSourceTest : public Storage {};
+
+TEST_F(DefaultFileSourceTest, CacheResponse) {
+    SCOPED_TEST(CacheResponse);
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
+    Response response;
+
+    std::unique_ptr<FileRequest> req1;
+    std::unique_ptr<FileRequest> req2;
+
+    req1 = fs.request(resource, [&](Response res) {
+        req1.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response 1", *res.data);
+        EXPECT_TRUE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        response = res;
+
+        // Now test that we get the same values as in the previous request. If we'd go to the server
+        // again, we'd get different values.
+        req2 = fs.request(resource, [&](Response res2) {
+            req2.reset();
+            EXPECT_EQ(response.error, res2.error);
+            ASSERT_TRUE(res2.data.get());
+            EXPECT_EQ(*response.data, *res2.data);
+            EXPECT_EQ(response.expires, res2.expires);
+            EXPECT_EQ(response.modified, res2.modified);
+            EXPECT_EQ(response.etag, res2.etag);
+
+            loop.stop();
+            CacheResponse.finish();
+        });
+    });
+
+    loop.run();
+}
+
+TEST_F(DefaultFileSourceTest, CacheRevalidateSame) {
     SCOPED_TEST(CacheRevalidateSame)
 
     using namespace mbgl;
@@ -53,7 +97,7 @@ TEST_F(Storage, CacheRevalidateSame) {
     loop.run();
 }
 
-TEST_F(Storage, CacheRevalidateModified) {
+TEST_F(DefaultFileSourceTest, CacheRevalidateModified) {
     SCOPED_TEST(CacheRevalidateModified)
 
     using namespace mbgl;
@@ -102,7 +146,7 @@ TEST_F(Storage, CacheRevalidateModified) {
     loop.run();
 }
 
-TEST_F(Storage, CacheRevalidateEtag) {
+TEST_F(DefaultFileSourceTest, CacheRevalidateEtag) {
     SCOPED_TEST(CacheRevalidateEtag)
 
     using namespace mbgl;

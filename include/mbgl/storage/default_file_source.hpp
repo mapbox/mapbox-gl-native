@@ -5,7 +5,9 @@
 
 namespace mbgl {
 
-class SQLiteCache;
+namespace util {
+template <typename T> class Thread;
+} // namespace util
 
 class DefaultFileSource : public FileSource {
 public:
@@ -20,14 +22,15 @@ public:
 
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
-    // For testing purposes only.
-    SQLiteCache& getCache();
+    // For testing only.
+    void put(const Resource&, const Response&);
+    void goOffline();
+
+    class Impl;
 
 private:
-    class Impl;
-    friend class DefaultFileRequest;
-
-    const std::unique_ptr<Impl> impl;
+    const std::unique_ptr<util::Thread<Impl>> thread;
+    const std::unique_ptr<FileSource> assetFileSource;
 };
 
 } // namespace mbgl
