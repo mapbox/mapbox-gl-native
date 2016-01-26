@@ -221,7 +221,10 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
 }
 
 void HTTPAndroidRequest::onFailure(JNIEnv* env, int type, jstring message) {
-    std::string messageStr = mbgl::android::std_string_from_jstring(env, message);
+    std::string messageStr = "Error processing the request";
+    if(message) {
+        messageStr = mbgl::android::std_string_from_jstring(env, message);
+    }
 
     response = std::make_unique<Response>();
     using Error = Response::Error;
