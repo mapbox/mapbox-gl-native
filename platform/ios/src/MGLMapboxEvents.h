@@ -20,8 +20,6 @@ extern NSString *const MGLEventKeyCourse;
 extern NSString *const MGLEventKeyAltitude;
 extern NSString *const MGLEventKeyHorizontalAccuracy;
 extern NSString *const MGLEventKeyVerticalAccuracy;
-extern NSString *const MGLEventKeyPushEnabled;
-extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
 extern NSString *const MGLEventKeyArrivalDate;
 extern NSString *const MGLEventKeyDepartureDate;
@@ -62,10 +60,6 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 + (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
 
 + (BOOL) debugLoggingEnabled;
-
-// You can call these methods from any thread.
-//
-+ (BOOL) checkPushEnabled;
 
 // You can call this method from any thread.
 //

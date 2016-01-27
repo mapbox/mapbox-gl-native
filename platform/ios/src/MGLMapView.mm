@@ -450,15 +450,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _pendingLongitude = NAN;
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
 
-    // metrics: map load event
-    mbgl::LatLng latLng = _mbglMap->getLatLng(padding);
+    // telemetry: map load event
     int zoom = round(_mbglMap->getZoom());
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
-        MGLEventKeyLatitude: @(latLng.latitude),
-        MGLEventKeyLongitude: @(latLng.longitude),
-        MGLEventKeyZoomLevel: @(zoom),
-        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
+        MGLEventKeyZoomLevel: @(zoom)
     }];
 }
 
@@ -1073,7 +1069,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
+        [self trackGestureEvent:MGLEventGesturePanStart];
 
         self.userTrackingMode = MGLUserTrackingModeNone;
         
@@ -1106,14 +1102,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         [self notifyGestureDidEndWithDrift:drift];
 
-        // metrics: pan end
-        CGPoint pointInView = CGPointMake([pan locationInView:pan.view].x, [pan locationInView:pan.view].y);
-        CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
+        // telemetry: pan/drag end
         int zoom = round([self zoomLevel]);
 
         [MGLMapboxEvents pushEvent:MGLEventTypeMapDragEnd withAttributes:@{
-            MGLEventKeyLatitude: @(panCoordinate.latitude),
-            MGLEventKeyLongitude: @(panCoordinate.longitude),
             MGLEventKeyZoomLevel: @(zoom)
         }];
     }
@@ -1135,7 +1127,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
+        [self trackGestureEvent:MGLEventGesturePinchStart];
 
         self.scale = _mbglMap->getScale();
         
@@ -1207,7 +1199,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
+        [self trackGestureEvent:MGLEventGestureRotateStart];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
 
@@ -1270,7 +1262,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         return;
     }
-    [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
+    [self trackGestureEvent:MGLEventGestureSingleTap];
 
     CGPoint tapPoint = [singleTap locationInView:self];
 
@@ -1315,7 +1307,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (doubleTap.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+        [self trackGestureEvent:MGLEventGestureDoubleTap];
     }
     else if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
@@ -1347,7 +1339,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap];
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -1377,7 +1369,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
+        [self trackGestureEvent:MGLEventGestureQuickZoom];
 
         self.scale = _mbglMap->getScale();
 
@@ -1418,7 +1410,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
+        [self trackGestureEvent:MGLEventGesturePitchStart];
         [self notifyGestureDidBegin];
     }
     else if (twoFingerDrag.state == UIGestureRecognizerStateBegan || twoFingerDrag.state == UIGestureRecognizerStateChanged)
@@ -1498,15 +1490,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
 
-- (void)trackGestureEvent:(NSString *)gestureID forRecognizer:(UIGestureRecognizer *)recognizer
+- (void)trackGestureEvent:(NSString *)gestureID
 {
-    CGPoint pointInView = CGPointMake([recognizer locationInView:recognizer.view].x, [recognizer locationInView:recognizer.view].y);
-    CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
     int zoom = round([self zoomLevel]);
 
     [MGLMapboxEvents pushEvent:MGLEventTypeMapTap withAttributes:@{
-        MGLEventKeyLatitude: @(gestureCoordinate.latitude),
-        MGLEventKeyLongitude: @(gestureCoordinate.longitude),
         MGLEventKeyZoomLevel: @(zoom),
         MGLEventKeyGestureID: gestureID
     }];
