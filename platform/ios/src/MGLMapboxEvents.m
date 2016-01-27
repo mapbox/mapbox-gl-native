@@ -439,25 +439,23 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         if ( ! strongSelf) return;
 
-            // Build only IDFV event
-            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-
-            if (!vid) return;
-
-            NSDictionary *vevt = @{
-                @"event" : MGLEventTypeAppUserTurnstile,
-                @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                @"appBundleId" : strongSelf.appBundleId,
-                @"vendorId": vid,
-                @"version": @(version),
-                @"instance": strongSelf.instanceID
-            };
-
-            // Add to Queue
-            [_eventQueue addObject:vevt];
-
-            // Flush
-            [strongSelf flush];
+        // Build only IDFV event
+        NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        
+        if (!vid) return;
+        
+        NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                               @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                               @"appBundleId" : strongSelf.appBundleId,
+                               @"vendorId": vid,
+                               @"version": @(version),
+                               @"instance": strongSelf.instanceID};
+        
+        // Add to Queue
+        [_eventQueue addObject:vevt];
+        
+        // Flush
+        [strongSelf flush];
 
         if ([strongSelf debugLoggingEnabled]) {
             [strongSelf writeEventToLocalDebugLog:vevt];
