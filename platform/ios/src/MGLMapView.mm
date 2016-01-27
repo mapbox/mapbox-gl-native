@@ -2993,6 +2993,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ( ! [newAnnotationView isEqual:_userLocationAnnotationView])
     {
         _userLocationAnnotationView = newAnnotationView;
+        [self updateUserLocationAnnotationView];
     }
 }
 
@@ -3040,15 +3041,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     _userTrackingMode = mode;
     
-    if (_userTrackingMode == MGLUserTrackingModeNone
-        || _userTrackingMode == MGLUserTrackingModeFollowWithCourse)
-    {
-        self.userTrackingState = MGLUserTrackingStatePossible;
-    }
-    if ( ! animated)
-    {
-        self.userTrackingState = MGLUserTrackingStateChanged;
-    }
+    self.userTrackingState = animated ? MGLUserTrackingStatePossible : MGLUserTrackingStateChanged;
 
     switch (_userTrackingMode)
     {
@@ -3150,9 +3143,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if ( ! _showsUserLocation || ! newLocation || ! CLLocationCoordinate2DIsValid(newLocation.coordinate)) return;
 
-    if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation])
+    if (! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || [newLocation distanceFromLocation:oldLocation]
+        || oldLocation.course != newLocation.course)
     {
-        if (self.userTrackingState != MGLUserTrackingStateBegan)
+        if ( ! oldLocation || ! CLLocationCoordinate2DIsValid(oldLocation.coordinate) || self.userTrackingState != MGLUserTrackingStateBegan)
         {
             self.userLocation.location = newLocation;
         }
@@ -3163,10 +3157,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
     }
 
-    if (self.userTrackingMode != MGLUserTrackingModeNone)
-    {
-        [self didUpdateLocationWithUserTrackingAnimated:animated];
-    }
+    [self didUpdateLocationWithUserTrackingAnimated:animated];
 
     self.userLocationAnnotationView.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate) ||
         newLocation.horizontalAccuracy > 10;
@@ -3176,11 +3167,20 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)didUpdateLocationWithUserTrackingAnimated:(BOOL)animated
 {
+    CLLocation *location = self.userLocation.location;
+    if ( ! _showsUserLocation || ! location
+        || ! CLLocationCoordinate2DIsValid(location.coordinate)
+        || self.userTrackingMode == MGLUserTrackingModeNone)
+    {
+        return;
+    }
+    
     // If the user location annotation is already where it’s supposed to be,
     // don’t change the viewport.
     CGPoint correctPoint = self.userLocationAnnotationViewCenter;
     CGPoint currentPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
-    if (std::abs(currentPoint.x - correctPoint.x) <= 1.0 && std::abs(currentPoint.y - correctPoint.y) <= 1.0)
+    if (std::abs(currentPoint.x - correctPoint.x) <= 1.0 && std::abs(currentPoint.y - correctPoint.y) <= 1.0
+        && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse)
     {
         return;
     }
@@ -3242,7 +3242,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
           peakAltitude:-1
      completionHandler:^{
         MGLMapView *strongSelf = weakSelf;
-        strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+        if (strongSelf.userTrackingState == MGLUserTrackingStateBegan)
+        {
+            strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+        }
     }];
 }
 
@@ -3258,7 +3261,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         __weak MGLMapView *weakSelf = self;
         completion = ^{
             MGLMapView *strongSelf = weakSelf;
-            strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+            if (strongSelf.userTrackingState == MGLUserTrackingStateBegan)
+            {
+                strongSelf.userTrackingState = MGLUserTrackingStateChanged;
+            }
         };
     }
     
@@ -3361,7 +3367,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     CLLocationDirection headingDirection = (newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading);
 
-    if (headingDirection >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+    if (headingDirection >= 0 && self.userTrackingMode == MGLUserTrackingModeFollowWithHeading
+        && self.userTrackingState != MGLUserTrackingStateBegan)
     {
         [self _setDirection:headingDirection animated:YES];
     }
@@ -3455,7 +3462,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 /// Rotate back to true north if the map view is zoomed too far out.
 - (void)unrotateIfNeededAnimated:(BOOL)animated
 {
-    if (self.direction != 0 && ! self.isRotationAllowed)
+    if (self.direction != 0 && ! self.isRotationAllowed
+        && self.userTrackingState != MGLUserTrackingStateBegan)
     {
         if (animated)
         {
@@ -3595,7 +3603,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     MGLUserLocationAnnotationView *annotationView = self.userLocationAnnotationView;
     if ( ! CLLocationCoordinate2DIsValid(self.userLocation.coordinate)) {
-        annotationView.layer.hidden = YES;
+        annotationView.hidden = YES;
         return;
     }
 
@@ -3616,7 +3624,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         -MGLAnnotationUpdateViewportOutset.height), userPoint))
     {
         annotationView.center = userPoint;
-        annotationView.layer.hidden = NO;
+        annotationView.hidden = NO;
         [annotationView setupLayers];
         
         if (_userLocationAnnotationIsSelected)
@@ -3636,7 +3644,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         // User has moved far enough outside of the viewport that showing it or
         // its callout would be useless.
-        annotationView.layer.hidden = YES;
+        annotationView.hidden = YES;
         
         if (_userLocationAnnotationIsSelected)
         {
