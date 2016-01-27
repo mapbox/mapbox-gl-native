@@ -79,6 +79,9 @@ public:
     /** Returns the scale factor. */
     double getScale() const;
 
+    void setMinZoom(const double minZoom);
+    void setMaxZoom(const double maxZoom);
+
     // Angle
 
     void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());

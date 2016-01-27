@@ -52,7 +52,9 @@ public:
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
     double getScale() const;
+    void setMinZoom(const double minZoom);
     double getMinZoom() const;
+    void setMaxZoom(const double maxZoom);
     double getMaxZoom() const;
 
     // Rotation
@@ -83,7 +85,7 @@ private:
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
-    double max_scale = std::pow(2, 18);
+    double max_scale = std::pow(2, 20);
 
     NorthOrientation orientation = NorthOrientation::Upwards;
 

@@ -465,6 +465,14 @@ void Transform::setScale(double scale, const EdgeInsets& padding, const Duration
     setScale(scale, center, duration);
 }
 
+void Transform::setMinZoom(const double minZoom) {
+    state.setMinZoom(minZoom);
+}
+
+void Transform::setMaxZoom(const double maxZoom) {
+    state.setMaxZoom(maxZoom);
+}
+
 #pragma mark - Angle
 
 void Transform::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& duration) {

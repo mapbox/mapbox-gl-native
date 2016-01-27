@@ -303,8 +303,22 @@ void Map::resetZoom() {
     setZoom(0);
 }
 
+void Map::setMinZoom(const double minZoom) {
+    transform->setMinZoom(minZoom);
+    if (getZoom() < minZoom) {
+        setZoom(minZoom);
+    }
+}
+
 double Map::getMinZoom() const {
     return transform->getState().getMinZoom();
+}
+
+void Map::setMaxZoom(const double maxZoom) {
+    transform->setMaxZoom(maxZoom);
+    if (getZoom() > maxZoom) {
+        setZoom(maxZoom);
+    }
 }
 
 double Map::getMaxZoom() const {
