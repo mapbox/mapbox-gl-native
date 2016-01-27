@@ -464,6 +464,30 @@ IB_DESIGNABLE
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
 /**
+ * The minimum zoom level at which the map can be shown.
+ *
+ * Depending on the map view’s aspect ratio, the map view may be prevented
+ * from reaching the minimum zoom level, in order to keep the map from
+ * repeating within the current viewport.
+ *
+ * If the value of this property is greater than that of the
+ * maximumZoomLevel property, the behavior is undefined.
+ *
+ * The default minimumZoomLevel is 0.
+ */
+@property (nonatomic) double minimumZoomLevel;
+
+/**
+ * The maximum zoom level the map can be shown at.
+ *
+ * If the value of this property is smaller than that of the
+ * minimumZoomLevel property, the behavior is undefined.
+ *
+ * The default maximumZoomLevel is 20.
+ */
+@property (nonatomic) double maximumZoomLevel;
+
+/**
  The heading of the map, measured in degrees clockwise from true north.
  
  The value `0` means that the top edge of the map view corresponds to true

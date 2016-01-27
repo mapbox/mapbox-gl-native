@@ -1784,6 +1784,26 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                       MGLDurationInSeconds(duration));
 }
 
+- (void)setMinimumZoomLevel:(double)minimumZoomLevel
+{
+    _mbglMap->setMinZoom(minimumZoomLevel);
+}
+
+- (double)minimumZoomLevel
+{
+    return _mbglMap->getMinZoom();
+}
+
+- (void)setMaximumZoomLevel:(double)maximumZoomLevel
+{
+    _mbglMap->setMaxZoom(maximumZoomLevel);
+}
+
+- (double)maximumZoomLevel
+{
+    return _mbglMap->getMaxZoom();
+}
+
 - (MGLCoordinateBounds)visibleCoordinateBounds
 {
     return [self convertRect:self.bounds toCoordinateBoundsFromView:self];
