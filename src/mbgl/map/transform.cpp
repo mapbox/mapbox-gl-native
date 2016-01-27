@@ -523,12 +523,17 @@ double Transform::getAngle() const {
 #pragma mark - Pitch
 
 void Transform::setPitch(double pitch, const Duration& duration) {
+    setPitch(pitch, {NAN, NAN}, duration);
+}
+
+void Transform::setPitch(double pitch, const PrecisionPoint& anchor, const Duration& duration) {
     if (std::isnan(pitch)) {
         return;
     }
 
     CameraOptions camera;
     camera.pitch = pitch;
+    camera.anchor = anchor;
     easeTo(camera, duration);
 }
 

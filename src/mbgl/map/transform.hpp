@@ -102,7 +102,15 @@ public:
     double getAngle() const;
 
     // Pitch
+    /** Sets the pitch angle.
+        @param angle The new pitch angle, measured in radians toward the
+            horizon. */
     void setPitch(double pitch, const Duration& = Duration::zero());
+    /** Sets the pitch angle, keeping the given point fixed within the view.
+        @param angle The new pitch angle, measured in radians toward the
+            horizon.
+        @param anchor A point relative to the top-left corner of the view. */
+    void setPitch(double pitch, const PrecisionPoint& anchor, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation

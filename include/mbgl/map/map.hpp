@@ -130,6 +130,7 @@ public:
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());
+    void setPitch(double pitch, const PrecisionPoint&, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation

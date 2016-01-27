@@ -1428,8 +1428,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         CGFloat slowdown = 20.0;
 
         CGFloat pitchNew = currentPitch - (gestureDistance / slowdown);
-
-        _mbglMap->setPitch(pitchNew);
+        
+        CGPoint centerPoint = self.contentCenter;
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            centerPoint = self.userLocationAnnotationViewCenter;
+        }
+        _mbglMap->setPitch(pitchNew, centerPoint);
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }

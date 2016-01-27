@@ -1207,7 +1207,7 @@ public:
                 [self didChangeValueForKey:@"direction"];
             }
             if (self.pitchEnabled) {
-                _mbglMap->setPitch(_pitchAtBeginningOfGesture + delta.y / 5);
+                _mbglMap->setPitch(_pitchAtBeginningOfGesture + delta.y / 5, center);
             }
         }
     } else if (self.scrollEnabled) {

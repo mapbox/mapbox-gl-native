@@ -357,7 +357,11 @@ void Map::resetNorth(const Duration& duration) {
 #pragma mark - Pitch
 
 void Map::setPitch(double pitch, const Duration& duration) {
-    transform->setPitch(pitch * M_PI / 180, duration);
+    setPitch(pitch, {NAN, NAN}, duration);
+}
+
+void Map::setPitch(double pitch, const PrecisionPoint& anchor, const Duration& duration) {
+    transform->setPitch(pitch * M_PI / 180, anchor, duration);
     update(Update::Repaint);
 }
 
