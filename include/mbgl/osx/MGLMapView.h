@@ -182,13 +182,29 @@ IB_DESIGNABLE
  */
 @property (nonatomic) double zoomLevel;
 
-/** The minimum zoom level that can be displayed by the receiver using the
-    current style. */
-@property (nonatomic, readonly) double maximumZoomLevel;
+/**
+ * The minimum zoom level at which the map can be shown.
+ *
+ * Depending on the map view’s aspect ratio, the map view may be prevented
+ * from reaching the minimum zoom level, in order to keep the map from
+ * repeating within the current viewport.
+ *
+ * If the value of this property is greater than that of the
+ * maximumZoomLevel property, the behavior is undefined.
+ *
+ * The default minimumZoomLevel is 0.
+ */
+@property (nonatomic) double minimumZoomLevel;
 
-/** The maximum zoom level that can be displayed by the receiver using the
-    current style. */
-@property (nonatomic, readonly) double minimumZoomLevel;
+/**
+ * The maximum zoom level the map can be shown at.
+ *
+ * If the value of this property is smaller than that of the
+ * minimumZoomLevel property, the behavior is undefined.
+ *
+ * The default maximumZoomLevel is 20.
+ */
+@property (nonatomic) double maximumZoomLevel;
 
 /** Changes the zoom level of the map and optionally animates the change.
     

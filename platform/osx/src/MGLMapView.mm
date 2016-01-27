@@ -900,6 +900,16 @@ public:
     [self didChangeValueForKey:@"centerCoordinate"];
 }
 
+- (void)setMinimumZoomLevel:(double)minimumZoomLevel
+{
+    _mbglMap->setMinZoom(minimumZoomLevel);
+}
+
+- (void)setMaximumZoomLevel:(double)maximumZoomLevel
+{
+    _mbglMap->setMaxZoom(maximumZoomLevel);
+}
+
 - (double)maximumZoomLevel {
     return _mbglMap->getMaxZoom();
 }
