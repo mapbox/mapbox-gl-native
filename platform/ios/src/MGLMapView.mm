@@ -3127,11 +3127,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         || targetCoordinate.longitude != self.targetCoordinate.longitude)
     {
         _targetCoordinate = targetCoordinate;
-        if (CLLocationCoordinate2DIsValid(targetCoordinate)
-            && self.userTrackingMode == MGLUserTrackingModeFollowWithCourse
-            && self.userLocation.location)
+        if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
         {
-            [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+            self.userTrackingState = MGLUserTrackingStatePossible;
+            if (self.userLocation.location)
+            {
+                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+            }
         }
     }
 }
@@ -3191,11 +3193,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse
-        && self.userTrackingState != MGLUserTrackingStateBegan
         && CLLocationCoordinate2DIsValid(self.targetCoordinate))
     {
-        // Keep both the user and the destination in view.
-        [self didUpdateLocationWithTargetAnimated:animated];
+        if (self.userTrackingState != MGLUserTrackingStateBegan)
+        {
+            // Keep both the user and the destination in view.
+            [self didUpdateLocationWithTargetAnimated:animated];
+        }
     }
     else if (self.userTrackingState == MGLUserTrackingStatePossible)
     {
@@ -3260,7 +3264,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     BOOL firstUpdate = self.userTrackingState == MGLUserTrackingStatePossible;
     void (^completion)(void);
-    if (firstUpdate)
+    if (animated && firstUpdate)
     {
         self.userTrackingState = MGLUserTrackingStateBegan;
         __weak MGLMapView *weakSelf = self;
