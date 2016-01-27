@@ -1671,6 +1671,60 @@ public final class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
+     * Sets the minimum zoom level the map can be displayed at.
+     * </p>
+     *
+     * @param minZoom The new minimum zoom level.
+     */
+    @UiThread
+    public void setMinZoom(@FloatRange(from = 0.0, to = 25.0) double minZoom) {
+        if ((minZoom < 0.0) || (minZoom > 25.0)) {
+            throw new IllegalArgumentException("zoomLevel is < 0 or > 25");
+        }
+        mNativeMapView.setMinZoom(minZoom);
+    }
+
+    /**
+     * <p>
+     * Gets the maximum zoom level the map can be displayed at.
+     * </p>
+     *
+     * @return The minimum zoom level.
+     */
+    @UiThread
+    public double getMinZoom() {
+        return mNativeMapView.getMinZoom();
+    }
+
+    /**
+     * <p>
+     * Sets the maximum zoom level the map can be displayed at.
+     * </p>
+     *
+     * @param maxZoom The new maximum zoom level.
+     */
+    @UiThread
+    public void setMaxZoom(@FloatRange(from = 0.0, to = 25.0) double maxZoom) {
+        if ((maxZoom < 0.0) || (maxZoom > 25.0)) {
+            throw new IllegalArgumentException("zoomLevel is < 0 or > 25");
+        }
+        mNativeMapView.setMaxZoom(maxZoom);
+    }
+
+    /**
+     * <p>
+     * Gets the maximum zoom level the map can be displayed at.
+     * </p>
+     *
+     * @return The maximum zoom level.
+     */
+    @UiThread
+    public double getMaxZoom() {
+        return mNativeMapView.getMaxZoom();
+    }
+
+    /**
      * Returns whether the user may zoom the map.
      *
      * @return If true, zooming is enabled.

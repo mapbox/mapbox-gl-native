@@ -777,11 +777,25 @@ void JNICALL nativeResetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->getMap().resetZoom();
 }
 
+void JNICALL nativeSetMinZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetMinZoom");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setMinZoom(zoom);
+}
+
 jdouble JNICALL nativeGetMinZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetMinZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     return nativeMapView->getMap().getMinZoom();
+}
+
+void JNICALL nativeSetMaxZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetMaxZoom");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setMaxZoom(zoom);
 }
 
 jdouble JNICALL nativeGetMaxZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -2087,7 +2101,9 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
          reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeGetMinZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMinZoom)},
+        {"nativeSetMinZoom", "(JD)V", reinterpret_cast<void *>(&nativeSetMinZoom)},
         {"nativeGetMaxZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMaxZoom)},
+        {"nativeSetMaxZoom", "(JD)V", reinterpret_cast<void *>(&nativeSetMaxZoom)},
         {"nativeRotateBy", "(JDDDDJ)V", reinterpret_cast<void *>(&nativeRotateBy)},
         {"nativeSetBearing", "(JDJ)V",
          reinterpret_cast<void *>(

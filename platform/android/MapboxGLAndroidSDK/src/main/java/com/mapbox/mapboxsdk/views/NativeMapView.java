@@ -319,8 +319,16 @@ final class NativeMapView {
         nativeResetZoom(mNativeMapViewPtr);
     }
 
+    public void setMinZoom(double zoom) {
+        nativeSetMinZoom(mNativeMapViewPtr, zoom);
+    }
+
     public double getMinZoom() {
         return nativeGetMinZoom(mNativeMapViewPtr);
+    }
+
+    public void setMaxZoom(double zoom) {
+        nativeSetMaxZoom(mNativeMapViewPtr, zoom);
     }
 
     public double getMaxZoom() {
@@ -588,7 +596,11 @@ final class NativeMapView {
 
     private native void nativeResetZoom(long nativeMapViewPtr);
 
+    private native void nativeSetMinZoom(long nativeMapViewPtr, double zoom);
+
     private native double nativeGetMinZoom(long nativeMapViewPtr);
+
+    private native void nativeSetMaxZoom(long nativeMapViewPtr, double zoom);
 
     private native double nativeGetMaxZoom(long nativeMapViewPtr);
 
