@@ -18,7 +18,7 @@ TEST(API, RenderWithoutCallback) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
     map->renderStill(nullptr);
@@ -40,7 +40,7 @@ TEST(API, RenderWithoutStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    OnlineFileSource fileSource(nullptr);
+    OnlineFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
 

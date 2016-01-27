@@ -1,7 +1,6 @@
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/http_context_base.hpp>
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
@@ -45,13 +44,11 @@ public:
     void networkIsReachableAgain(OnlineFileSource::Impl&);
 
 private:
-    void scheduleCacheRequest(OnlineFileSource::Impl&);
-    void scheduleRealRequest(OnlineFileSource::Impl&, bool forceImmediate = false);
+    void schedule(OnlineFileSource::Impl&, bool forceImmediate = false);
 
     Resource resource;
-    std::unique_ptr<WorkRequest> cacheRequest;
-    HTTPRequestBase* realRequest = nullptr;
-    util::Timer realRequestTimer;
+    HTTPRequestBase* request = nullptr;
+    util::Timer timer;
     Callback callback;
 
     // Counts the number of subsequent failed requests. We're using this value for exponential
@@ -64,7 +61,7 @@ class OnlineFileSource::Impl {
 public:
     using Callback = std::function<void (Response)>;
 
-    Impl(SQLiteCache*);
+    Impl(int);
     ~Impl();
 
     void networkIsReachableAgain();
@@ -76,15 +73,13 @@ private:
     friend OnlineFileRequestImpl;
 
     std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> pending;
-    SQLiteCache* const cache;
     const std::unique_ptr<HTTPContextBase> httpContext;
     util::AsyncTask reachability;
 };
 
-OnlineFileSource::OnlineFileSource(SQLiteCache* cache)
+OnlineFileSource::OnlineFileSource()
     : thread(std::make_unique<util::Thread<Impl>>(
-          util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low },
-          cache)) {
+          util::ThreadContext{ "OnlineFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low }, 0)) {
 }
 
 OnlineFileSource::~OnlineFileSource() = default;
@@ -94,31 +89,30 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
         throw util::MisuseException("FileSource callback can't be empty");
     }
 
-    std::string url;
+    Resource res = resource;
 
     switch (resource.kind) {
     case Resource::Kind::Style:
-        url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
+        res.url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
         break;
 
     case Resource::Kind::Source:
-        url = util::mapbox::normalizeSourceURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeSourceURL(resource.url, accessToken);
         break;
 
     case Resource::Kind::Glyphs:
-        url = util::mapbox::normalizeGlyphsURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeGlyphsURL(resource.url, accessToken);
         break;
 
     case Resource::Kind::SpriteImage:
     case Resource::Kind::SpriteJSON:
-        url = util::mapbox::normalizeSpriteURL(resource.url, accessToken);
+        res.url = util::mapbox::normalizeSpriteURL(resource.url, accessToken);
         break;
 
     default:
-        url = resource.url;
+        break;
     }
 
-    Resource res { resource.kind, url };
     auto req = std::make_unique<OnlineFileRequest>(*this);
     req->workRequest = thread->invokeWithCallback(&Impl::add, callback, res, req.get());
     return std::move(req);
@@ -130,13 +124,10 @@ void OnlineFileSource::cancel(FileRequest* req) {
 
 // ----- Impl -----
 
-OnlineFileSource::Impl::Impl(SQLiteCache* cache_)
-    : cache(cache_),
-      httpContext(HTTPContextBase::createContext()),
+// Dummy parameter is a workaround for a gcc 4.9 bug.
+OnlineFileSource::Impl::Impl(int)
+    : httpContext(HTTPContextBase::createContext()),
       reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
-    // Subscribe to network status changes, but make sure that this async handle doesn't keep the
-    // loop alive; otherwise our app wouldn't terminate. After all, we only need status change
-    // notifications when our app is still running.
     NetworkStatus::Subscribe(&reachability);
 }
 
@@ -163,39 +154,16 @@ void OnlineFileSource::Impl::cancel(FileRequest* req) {
 OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
     : resource(resource_),
       callback(callback_) {
-    if (impl.cache) {
-        scheduleCacheRequest(impl);
-    } else {
-        scheduleRealRequest(impl, true);
-    }
+    // Force an immediate first request if we don't have an expiration time.
+    schedule(impl, !resource.priorExpires);
 }
 
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {
-    if (realRequest) {
-        realRequest->cancel();
-        realRequest = nullptr;
+    if (request) {
+        request->cancel();
+        request = nullptr;
     }
-    // realRequestTimer and cacheRequest are automatically canceled upon destruction.
-}
-
-void OnlineFileRequestImpl::scheduleCacheRequest(OnlineFileSource::Impl& impl) {
-    // Check the cache for existing data so that we can potentially
-    // revalidate the information without having to redownload everything.
-    cacheRequest = impl.cache->get(resource, [this, &impl](std::shared_ptr<Response> response) {
-        cacheRequest = nullptr;
-
-        if (response) {
-            resource.priorModified = response->modified;
-            resource.priorExpires = response->expires;
-            resource.priorEtag = response->etag;
-            callback(*response);
-        }
-
-        // Force immediate revalidation if we don't have a cached response, or the cached
-        // response does not have an expiration time. Otherwise revalidation will happen in
-        // the normal scheduling flow.
-        scheduleRealRequest(impl, !response || !response->expires);
-    });
+    // timer is automatically canceled upon destruction.
 }
 
 static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests) {
@@ -220,8 +188,8 @@ static Duration expirationTimeout(optional<SystemTimePoint> expires) {
     }
 }
 
-void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bool forceImmediate) {
-    if (realRequest) {
+void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, bool forceImmediate) {
+    if (request) {
         // There's already a request in progress; don't start another one.
         return;
     }
@@ -237,10 +205,10 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
         return;
     }
 
-    realRequestTimer.start(timeout, Duration::zero(), [this, &impl] {
-        assert(!realRequest);
-        realRequest = impl.httpContext->createRequest(resource, [this, &impl](Response response) {
-            realRequest = nullptr;
+    timer.start(timeout, Duration::zero(), [this, &impl] {
+        assert(!request);
+        request = impl.httpContext->createRequest(resource, [this, &impl](Response response) {
+            request = nullptr;
 
             // If we didn't get various caching headers in the response, continue using the
             // previous values. Otherwise, update the previous values to the new values.
@@ -263,10 +231,6 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
                 resource.priorEtag = response.etag;
             }
 
-            if (impl.cache) {
-                impl.cache->put(resource, response);
-            }
-
             if (response.error) {
                 failedRequests++;
                 failedRequestReason = response.error->reason;
@@ -276,7 +240,7 @@ void OnlineFileRequestImpl::scheduleRealRequest(OnlineFileSource::Impl& impl, bo
             }
 
             callback(response);
-            scheduleRealRequest(impl);
+            schedule(impl);
         });
     });
 }
@@ -285,7 +249,7 @@ void OnlineFileRequestImpl::networkIsReachableAgain(OnlineFileSource::Impl& impl
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
     if (failedRequestReason == Response::Error::Reason::Connection) {
-        scheduleRealRequest(impl, true);
+        schedule(impl, true);
     }
 }
 

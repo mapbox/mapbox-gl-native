@@ -1,8 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/sqlite_cache.hpp>
-#include <mbgl/util/chrono.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issue/1369
@@ -22,8 +20,7 @@ TEST_F(Storage, HTTPIssue1369) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    SQLiteCache cache;
-    OnlineFileSource fs(&cache);
+    DefaultFileSource fs(":memory:", ".");
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 

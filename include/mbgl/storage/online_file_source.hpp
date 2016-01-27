@@ -5,15 +5,13 @@
 
 namespace mbgl {
 
-class SQLiteCache;
-
 namespace util {
 template <typename T> class Thread;
 } // namespace util
 
 class OnlineFileSource : public FileSource {
 public:
-    OnlineFileSource(SQLiteCache*);
+    OnlineFileSource();
     ~OnlineFileSource() override;
 
     void setAccessToken(const std::string& t) { accessToken = t; }

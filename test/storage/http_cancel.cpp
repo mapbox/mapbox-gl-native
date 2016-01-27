@@ -13,7 +13,7 @@ TEST_F(Storage, HTTPCancel) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     auto req =
         fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
@@ -31,7 +31,7 @@ TEST_F(Storage, HTTPCancelMultiple) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
 

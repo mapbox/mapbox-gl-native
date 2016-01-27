@@ -11,7 +11,7 @@ TEST_F(Storage, HTTPTimeout) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    OnlineFileSource fs(nullptr);
+    OnlineFileSource fs;
 
     int counter = 0;
 
