@@ -275,11 +275,6 @@ const NSTimeInterval MGLFlushInterval = 60;
              MGLMapboxEvents *strongSelf = weakSelf;
              [strongSelf validate];
          }];
-
-        // Turn the Mapbox Turnstile to Count App Users
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self pushTurnstileEvent];
-        });
     }
     return self;
 }
@@ -429,38 +424,42 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+
 - (void) pushTurnstileEvent {
 
     __weak MGLMapboxEvents *weakSelf = self;
-
-    dispatch_async(_serialQueue, ^{
-
-        MGLMapboxEvents *strongSelf = weakSelf;
-
-        if ( ! strongSelf) return;
-
-        // Build only IDFV event
-        NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-        
-        if (!vid) return;
-        
-        NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
-                               @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                               @"appBundleId" : strongSelf.appBundleId,
-                               @"vendorId": vid,
-                               @"version": @(version),
-                               @"instance": strongSelf.instanceID};
-        
-        // Add to Queue
-        [_eventQueue addObject:vevt];
-        
-        // Flush
-        [strongSelf flush];
-
-        if ([strongSelf debugLoggingEnabled]) {
-            [strongSelf writeEventToLocalDebugLog:vevt];
-        }
-
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dispatch_async(_serialQueue, ^{
+            
+            MGLMapboxEvents *strongSelf = weakSelf;
+            
+            if ( ! strongSelf) return;
+            
+            // Build only IDFV event
+            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+            
+            if (!vid) return;
+            
+            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                   @"appBundleId" : strongSelf.appBundleId,
+                                   @"vendorId": vid,
+                                   @"version": @(version),
+                                   @"instance": strongSelf.instanceID};
+            
+            // Add to Queue
+            [_eventQueue addObject:vevt];
+            
+            // Flush
+            [strongSelf flush];
+            
+            if ([strongSelf debugLoggingEnabled]) {
+                [strongSelf writeEventToLocalDebugLog:vevt];
+            }
+            
+        });
     });
 }
 
@@ -484,13 +483,18 @@ const NSTimeInterval MGLFlushInterval = 60;
         MGLMapboxEvents *strongSelf = weakSelf;
 
         if ( ! strongSelf) return;
+        
+        if (!event) return;
 
+        // If it's a map load event then turn the Mapbox Turnstile to count app users
+        if ([event isEqualToString:MGLEventTypeMapLoad]) {
+            [self pushTurnstileEvent];
+        }
+        
         // Metrics Collection Has Been Paused
         if (_paused) {
             return;
         }
-        
-        if (!event) return;
 
         MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
         // mapbox-events stock attributes
@@ -520,6 +524,7 @@ const NSTimeInterval MGLFlushInterval = 60;
         
         // Put On The Queue
         [_eventQueue addObject:finalEvent];
+       
         
         // Has Flush Limit Been Reached?
         if (_eventQueue.count >= MGLMaximumEventsPerFlush) {
