@@ -1,5 +1,5 @@
 #UI Tests
-## Running Espresso tests locally on a device
+## Running Espresso tests locally
 
 This test project comes with all the required Android Testing Support Library dependencies
 in the Gradle file. Tests are under the `app/src/androidTest` folder.
@@ -19,7 +19,7 @@ To create a new run configuration:
 
 You can now run this configuration from the main toolbar dropdown menu.
 
-## Running Espresso tests manually on AWS Device Farm
+## Running Espresso tests on AWS Device Farm
 
 On a terminal, within `mapbox-gl-native/android/java`,
 run the tests (`cC` stands for `connectedCheck`):
@@ -41,6 +41,22 @@ On Step 2, you can also separate by commas different classes: `com.mapbox.mapbox
 
 If you have no tests for your app, or want to test some random user behaviour,
 you can just choose "Built-in: Fuzz" in step 2.
+
+### Code coverage
+You can generate JaCoCo reports from espresso tests by
+
+- adding this to build.gradle:
+
+ ```java
+ buildTypes {
+        debug {
+           // Run code coverage reports by default on debug builds.
+          testCoverageEnabled = true
+        }
+}
+```
+
+- running the gradle task `createMockDebugCoverageReport` when executing tests.
 
 ## Running Espresso test automatically on AWS Device Farm
 To automatically execute Espresso tests as part of our CI build, we have created a Python [script](https://github.com/mapbox/mapbox-gl-native/blob/aws-devicelab/android/scripts/devicefarm.py).
@@ -129,3 +145,6 @@ This script is responsible for:
     --test-apk-path TEST_APK_PATH
                           Path to the tests APK (default: None)
   ```
+
+
+

@@ -20,6 +20,14 @@ You can also run the tests from the command line with:
 $ ./gradlew test --continue -p MapboxGLAndroidSDKTestApp
 ```
 
+### Code Coverage
+Showing code coverage directly in the IDE.
+- Switch your Build Variant to the Unit Tests artifact
+- Right click a unit test and select `Run test with coverage`
+- Select `Add to active suites` //this will create a run configuration
+- Edit the run configuration to include/exclude packages in the `Code coverage`-tab.
+
+
 ## Running Unit tests on CI
 The Unit tests are executed as part of the build process on our CI and are 
 automatically run for each new commit pushed to this repo. If a Unit tests 
