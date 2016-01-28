@@ -119,8 +119,10 @@ class HTTPContext {
                 type = CANCELED_ERROR;
             }
 
-            nativeOnFailure(mNativePtr, type, e.getMessage());
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
+            nativeOnFailure(mNativePtr, type, errorMessage);
         }
+
     }
 
     /*
