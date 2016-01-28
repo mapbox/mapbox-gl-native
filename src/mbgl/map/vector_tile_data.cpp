@@ -144,16 +144,15 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::f
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
-        if (!workRequest) {
-            // Don't start a new placement request when the current one hasn't completed yet, or when
-            // we are parsing buckets.
-            redoPlacement(callback);
-        }
+        redoPlacement(callback);
     }
 }
 
 void VectorTileData::redoPlacement(const std::function<void()>& callback) {
-    workRequest.reset();
+    // Don't start a new placement request when the current one hasn't completed yet, or when
+    // we are parsing buckets.
+    if (workRequest) return;
+
     workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
         workRequest.reset();
 
