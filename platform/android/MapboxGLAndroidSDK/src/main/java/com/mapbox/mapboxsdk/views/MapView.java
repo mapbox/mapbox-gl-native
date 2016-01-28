@@ -279,10 +279,12 @@ public final class MapView extends FrameLayout {
     private boolean mAllowConcurrentMultipleOpenInfoWindows = false;
     private String mStyleUrl;
 
+/*
     private int mContentPaddingLeft;
     private int mContentPaddingTop;
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
+*/
 
     //
     // Inner classes
@@ -1580,33 +1582,41 @@ public final class MapView extends FrameLayout {
      * Return The current content padding left of the map view viewport.
      * @return The current content padding left
      */
+/*
     public int getContentPaddingLeft() {
         return mContentPaddingLeft;
     }
+*/
 
     /**
      * Return The current content padding left of the map view viewport.
      * @return The current content padding left
      */
+/*
     public int getContentPaddingTop() {
         return mContentPaddingTop;
     }
+*/
 
     /**
      * Return The current content padding left of the map view viewport.
      * @return The current content padding left
      */
+/*
     public int getContentPaddingRight() {
         return mContentPaddingRight;
     }
+*/
 
     /**
      * Return The current content padding left of the map view viewport.
      * @return The current content padding left
      */
+/*
     public int getContentPaddingBottom() {
         return mContentPaddingBottom;
     }
+*/
 
     /**
      * <p>
@@ -4394,6 +4404,7 @@ public final class MapView extends FrameLayout {
      * @param right    The right margin in pixels.
      * @param bottom   The bottom margin in pixels.
      */
+/*
     @UiThread
     public void setContentPadding(int left, int top, int right, int bottom) {
 
@@ -4408,7 +4419,7 @@ public final class MapView extends FrameLayout {
 
         mNativeMapView.setContentPadding(top / mScreenDensity, left / mScreenDensity, bottom / mScreenDensity, right / mScreenDensity);
     }
-
+*/
 
     /**
      * <p>
