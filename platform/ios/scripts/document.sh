@@ -5,7 +5,7 @@ set -o pipefail
 set -u
 
 if [ -z `which jazzy` ]; then
-    step "Installing jazzy…"
+    echo "Installing jazzy…"
     gem install jazzy
     if [ -z `which jazzy` ]; then
         echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/INSTALL.md"
