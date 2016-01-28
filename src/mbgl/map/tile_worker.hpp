@@ -50,7 +50,7 @@ public:
     ~TileWorker();
 
     TileParseResult parseAllLayers(std::vector<std::unique_ptr<StyleLayer>>,
-                                   const GeometryTile&,
+                                   std::unique_ptr<const GeometryTile> geometryTile,
                                    PlacementConfig);
 
     TileParseResult parsePendingLayers(PlacementConfig);

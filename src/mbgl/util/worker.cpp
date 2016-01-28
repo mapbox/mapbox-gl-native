@@ -16,10 +16,12 @@ public:
     Impl() = default;
 
     void parseRasterTile(std::unique_ptr<RasterBucket> bucket,
-                         const std::shared_ptr<const std::string> data,
+                         std::shared_ptr<const std::string> data,
                          std::function<void(RasterTileParseResult)> callback) {
         try {
             bucket->setImage(decodeImage(*data));
+            // Destruct the shared pointer before calling the callback.
+            data.reset();
             callback(RasterTileParseResult(std::move(bucket)));
         } catch (...) {
             callback(std::current_exception());
@@ -32,7 +34,7 @@ public:
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
         try {
-            callback(worker->parseAllLayers(std::move(layers), *tile, config));
+            callback(worker->parseAllLayers(std::move(layers), std::move(tile), config));
         } catch (...) {
             callback(std::current_exception());
         }

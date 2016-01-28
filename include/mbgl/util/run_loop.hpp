@@ -146,7 +146,7 @@ private:
     private:
         template <std::size_t... I>
         void invoke(std::index_sequence<I...>) {
-            func(std::get<I>(std::forward<P>(params))...);
+            func(std::move(std::get<I>(std::forward<P>(params)))...);
         }
 
         std::recursive_mutex mutex;
