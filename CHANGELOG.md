@@ -1,8 +1,12 @@
 # Changelog
 
-## Android master
+## Android
+
+## 3.2.0
 
 * Fixed crash caused by annotation image with non-integer width or height ([#3031](https://github.com/mapbox/mapbox-gl-native/issues/3031))
+* Tracking Mode Reverses Bearing Fix ([#3664](https://github.com/mapbox/mapbox-gl-native/issues/3664))
+* GPS Extra Rotation Fix ([#3661](https://github.com/mapbox/mapbox-gl-native/issues/3661))
 
 ## 3.1.0
 
