@@ -11,6 +11,9 @@
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
 
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+
 #include <algorithm>
 
 namespace mbgl {
@@ -96,7 +99,15 @@ void parseTileJSONMember(const JSValue& value, std::array<float, N>& target, con
 
 StyleParser::~StyleParser() = default;
 
-void StyleParser::parse(const JSValue& document) {
+void StyleParser::parse(const std::string& json) {
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
+    document.Parse<0>((const char *const)json.c_str());
+
+    if (document.HasParseError()) {
+        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
+        return;
+    }
+
     if (document.HasMember("version")) {
         int version = document["version"].GetInt();
         if (version != 8) {

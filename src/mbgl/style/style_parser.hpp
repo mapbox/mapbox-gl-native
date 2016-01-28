@@ -20,7 +20,7 @@ class StyleParser {
 public:
     ~StyleParser();
 
-    void parse(const JSValue&);
+    void parse(const std::string&);
 
     std::string spriteURL;
     std::string glyphURL;

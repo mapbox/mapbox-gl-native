@@ -27,16 +27,11 @@ TEST_P(StyleParserTest, ParseStyle) {
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> styleDoc;
-    styleDoc.Parse<0>(util::read_file(base + ".style.json").c_str());
-    ASSERT_FALSE(styleDoc.HasParseError());
-    ASSERT_TRUE(styleDoc.IsObject());
-
     FixtureLogObserver* observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     StyleParser parser;
-    parser.parse(styleDoc);
+    parser.parse(util::read_file(base + ".style.json"));
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
         const std::string name { it->name.GetString(), it->name.GetStringLength() };
