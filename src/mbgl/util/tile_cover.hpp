@@ -2,13 +2,19 @@
 #define MBGL_UTIL_TILE_COVER
 
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/util/box.hpp>
+#include <mbgl/style/types.hpp>
 
-#include <forward_list>
+#include <vector>
 
 namespace mbgl {
 
-std::forward_list<TileID> tileCover(int8_t z, const box& bounds, int8_t actualZ);
+class TransformState;
+class LatLngBounds;
+
+int32_t coveringZoomLevel(double z, SourceType type, uint16_t tileSize);
+
+std::vector<TileID> tileCover(const TransformState&, int32_t z, int32_t actualZ);
+std::vector<TileID> tileCover(const LatLngBounds&,   int32_t z, int32_t actualZ);
 
 } // namespace mbgl
 

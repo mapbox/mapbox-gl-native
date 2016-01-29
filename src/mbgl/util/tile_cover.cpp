@@ -1,7 +1,9 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/vec.hpp>
-#include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/map/source_info.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
@@ -66,7 +68,27 @@ static void scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b,
     if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t actualZ) {
+int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t tileSize) {
+    zoom += std::log(util::tileSize / tileSize) / std::log(2);
+    if (type == SourceType::Raster || type == SourceType::Video) {
+        return ::round(zoom);
+    } else {
+        return std::floor(zoom);
+    }
+}
+
+static mbgl::vec2<double> zoomTo(const TileCoordinate& c, double z) {
+    double scale = std::pow(2, z - c.zoom);
+    return { c.column * scale, c.row * scale };
+}
+
+std::vector<TileID> tileCover(const TileCoordinate& tl_,
+                              const TileCoordinate& tr_,
+                              const TileCoordinate& br_,
+                              const TileCoordinate& bl_,
+                              const TileCoordinate& center,
+                              int32_t z,
+                              int32_t actualZ) {
     int32_t tiles = 1 << z;
     std::forward_list<mbgl::TileID> t;
 
@@ -79,10 +101,11 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
         }
     };
 
-    mbgl::vec2<double> tl = { bounds.tl.column, bounds.tl.row };
-    mbgl::vec2<double> tr = { bounds.tr.column, bounds.tr.row };
-    mbgl::vec2<double> br = { bounds.br.column, bounds.br.row };
-    mbgl::vec2<double> bl = { bounds.bl.column, bounds.bl.row };
+    mbgl::vec2<double> tl = zoomTo(tl_, z);
+    mbgl::vec2<double> tr = zoomTo(tr_, z);
+    mbgl::vec2<double> br = zoomTo(br_, z);
+    mbgl::vec2<double> bl = zoomTo(bl_, z);
+    mbgl::vec2<double> c  = zoomTo(center, z);
 
     // Divide the screen up in two triangles and scan each of them:
     // \---+
@@ -94,7 +117,46 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
     t.sort();
     t.unique();
 
-    return t;
+    t.sort([&](const TileID& a, const TileID& b) {
+        // Sorts by distance from the box center
+        return std::fabs(a.x - c.x) + std::fabs(a.y - c.y) <
+               std::fabs(b.x - c.x) + std::fabs(b.y - c.y);
+    });
+
+    return std::vector<TileID>(t.begin(), t.end());
+}
+
+std::vector<TileID> tileCover(const LatLngBounds& bounds_, int32_t z, int32_t actualZ) {
+    if (bounds_.isEmpty() ||
+        bounds_.south() >  util::LATITUDE_MAX ||
+        bounds_.north() < -util::LATITUDE_MAX) {
+        return {};
+    }
+
+    LatLngBounds bounds = LatLngBounds::hull(
+        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+
+    const TransformState state;
+    return tileCover(
+        state.latLngToCoordinate(bounds.northwest()),
+        state.latLngToCoordinate(bounds.northeast()),
+        state.latLngToCoordinate(bounds.southeast()),
+        state.latLngToCoordinate(bounds.southwest()),
+        state.latLngToCoordinate(bounds.center()),
+        z, actualZ);
+}
+
+std::vector<TileID> tileCover(const TransformState& state, int32_t z, int32_t actualZ) {
+    const double w = state.getWidth();
+    const double h = state.getHeight();
+    return tileCover(
+        state.pointToCoordinate({ 0,   0   }),
+        state.pointToCoordinate({ w,   0   }),
+        state.pointToCoordinate({ w,   h   }),
+        state.pointToCoordinate({ 0,   h   }),
+        state.pointToCoordinate({ w/2, h/2 }),
+        z, actualZ);
 }
 
 } // namespace mbgl
