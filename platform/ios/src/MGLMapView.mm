@@ -3064,14 +3064,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         mode = MGLUserTrackingModeNone;
     }
 
+    MGLUserTrackingMode oldMode = _userTrackingMode;
     _userTrackingMode = mode;
-    
-    self.userTrackingState = animated ? MGLUserTrackingStatePossible : MGLUserTrackingStateChanged;
 
     switch (_userTrackingMode)
     {
         case MGLUserTrackingModeNone:
         {
+            self.userTrackingState = MGLUserTrackingStatePossible;
+            
             [self.locationManager stopUpdatingHeading];
 
             // Immediately update the annotation view; other cases update inside
@@ -3083,6 +3084,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         case MGLUserTrackingModeFollow:
         case MGLUserTrackingModeFollowWithCourse:
         {
+            self.userTrackingState = animated ? MGLUserTrackingStatePossible : MGLUserTrackingStateChanged;
             self.showsUserLocation = YES;
 
             [self.locationManager stopUpdatingHeading];
@@ -3096,6 +3098,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         case MGLUserTrackingModeFollowWithHeading:
         {
+            if (oldMode == MGLUserTrackingModeNone)
+            {
+                self.userTrackingState = animated ? MGLUserTrackingStatePossible : MGLUserTrackingStateChanged;
+            }
+            
             self.showsUserLocation = YES;
 
             if (self.zoomLevel < self.currentMinimumZoom)
