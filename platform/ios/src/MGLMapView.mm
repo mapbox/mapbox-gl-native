@@ -1697,6 +1697,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return self.debugMask;
 }
 
+- (void)toggleDebug
+{
+    self.debugActive = !self.debugActive;
+}
+
 - (void)resetNorth
 {
     [self resetNorthAnimated:YES];
@@ -1712,11 +1717,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     MGLMapCamera *camera = [MGLMapCamera camera];
     camera.altitude = MGLAltitudeForZoomLevel(0, 0, 0, self.frame.size);
     self.camera = camera;
-}
-
-- (void)cycleDebugOptions
-{
-    _mbglMap->cycleDebugOptions();
 }
 
 - (void)emptyMemoryCache

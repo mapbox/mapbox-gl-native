@@ -956,7 +956,7 @@ IB_DESIGNABLE
 
 @property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
 
-- (void)cycleDebugOptions __attribute__((deprecated("Use -setDebugMask:.")));
+- (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
 
 /**
     Empties the in-memory tile cache.
