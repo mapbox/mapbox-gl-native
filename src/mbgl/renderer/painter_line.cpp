@@ -83,10 +83,12 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == CapType::Round);
         lineAtlas->bind();
 
+        const float widthA = posA.width * properties.dasharray.value.fromScale;
+        const float widthB = posB.width * properties.dasharray.value.toScale;
         float patternratio = std::pow(2.0, std::floor(::log2(state.getScale())) - id.z) / (util::EXTENT / util::tileSize) * id.overscaling;
-        float scaleXA = patternratio / posA.width / properties.dashLineWidth / properties.dasharray.value.fromScale;
+        float scaleXA = patternratio / widthA / properties.dashLineWidth;
         float scaleYA = -posA.height / 2.0;
-        float scaleXB = patternratio / posB.width / properties.dashLineWidth / properties.dasharray.value.toScale;
+        float scaleXB = patternratio / widthB / properties.dashLineWidth;
         float scaleYB = -posB.height / 2.0;
 
         linesdfShader->u_patternscale_a = {{ scaleXA, scaleYA }};
@@ -94,7 +96,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
         linesdfShader->u_image = 0;
-        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dashLineWidth * std::min(posA.width, posB.width) * 256.0 * data.pixelRatio) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas->width / (properties.dashLineWidth * std::min(widthA, widthB) * 256.0 * data.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dasharray.value.t;
         linesdfShader->u_extra = extra;
         linesdfShader->u_offset = -properties.offset;
