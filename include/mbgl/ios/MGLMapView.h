@@ -29,6 +29,20 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
+/** Options for enabling debugging features in an MGLMapView instance. */
+typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
+    /** Edges of tile boundaries are shown as thick, red lines to help diagnose
+        tile clipping issues. */
+    MGLMapDebugTileBoundariesMask = 1 << 1,
+    /** Each tile shows its tile coordinate (x/y/z) in the upper-left corner. */
+    MGLMapDebugTileInfoMask = 1 << 2,
+    /** Each tile shows a timestamp indicating when it was loaded. */
+    MGLMapDebugTimestampsMask = 1 << 3,
+    /** Edges of glyphs and symbols are shown as faint, green lines to help
+        diagnose collision and label placement issues. */
+    MGLMapDebugCollisionBoxesMask = 1 << 4,
+};
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple's MapKit.
@@ -930,23 +944,19 @@ IB_DESIGNABLE
  */
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
-#pragma mark Debugging
+#pragma mark Debugging the Map
 
 /**
- A Boolean value that determines whether map debugging information is shown.
- 
- The default value of this property is `NO`.
- */
-@property (nonatomic, getter=isDebugActive) BOOL debugActive;
-
-/**
- Cycle through the options that determine which debugging aids are shown on the
- map.
+ The options that determine which debugging aids are shown on the map.
  
  These options are all disabled by default and should remain disabled in
- released software.
+ released software for performance and aesthetic reasons.
  */
-- (void)cycleDebugOptions;
+@property (nonatomic) MGLMapDebugMaskOptions debugMask;
+
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
+
+- (void)cycleDebugOptions __attribute__((deprecated("Use -setDebugMask:.")));
 
 /**
     Empties the in-memory tile cache.

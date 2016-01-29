@@ -219,7 +219,6 @@ public:
 
 #pragma mark - Setup & Teardown -
 
-@dynamic debugActive;
 mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     return std::chrono::duration_cast<mbgl::Duration>(std::chrono::duration<NSTimeInterval>(duration));
@@ -967,7 +966,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.glSnapshotView.image = self.glView.snapshot;
         self.glSnapshotView.hidden = NO;
 
-        if (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug && [self.glSnapshotView.subviews count] == 0)
+        if (self.debugMask && [self.glSnapshotView.subviews count] == 0)
         {
             UIView *snapshotTint = [[UIView alloc] initWithFrame:self.glSnapshotView.bounds];
             snapshotTint.autoresizingMask = self.glSnapshotView.autoresizingMask;
@@ -1641,17 +1640,61 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return [NSSet setWithObject:@"allowsTilting"];
 }
 
+- (MGLMapDebugMaskOptions)debugMask
+{
+    mbgl::MapDebugOptions options = _mbglMap->getDebug();
+    MGLMapDebugMaskOptions mask = 0;
+    if (options & mbgl::MapDebugOptions::TileBorders)
+    {
+        mask |= MGLMapDebugTileBoundariesMask;
+    }
+    if (options & mbgl::MapDebugOptions::ParseStatus)
+    {
+        mask |= MGLMapDebugTileInfoMask;
+    }
+    if (options & mbgl::MapDebugOptions::Timestamps)
+    {
+        mask |= MGLMapDebugTimestampsMask;
+    }
+    if (options & mbgl::MapDebugOptions::Collision)
+    {
+        mask |= MGLMapDebugCollisionBoxesMask;
+    }
+    return mask;
+}
+
+- (void)setDebugMask:(MGLMapDebugMaskOptions)debugMask
+{
+    mbgl::MapDebugOptions options = mbgl::MapDebugOptions::NoDebug;
+    if (debugMask & MGLMapDebugTileBoundariesMask)
+    {
+        options |= mbgl::MapDebugOptions::TileBorders;
+    }
+    if (debugMask & MGLMapDebugTileInfoMask)
+    {
+        options |= mbgl::MapDebugOptions::ParseStatus;
+    }
+    if (debugMask & MGLMapDebugTimestampsMask)
+    {
+        options |= mbgl::MapDebugOptions::Timestamps;
+    }
+    if (debugMask & MGLMapDebugCollisionBoxesMask)
+    {
+        options |= mbgl::MapDebugOptions::Collision;
+    }
+    _mbglMap->setDebug(options);
+}
+
 - (void)setDebugActive:(BOOL)debugActive
 {
-    _mbglMap->setDebug(debugActive ? mbgl::MapDebugOptions::TileBorders
-                                   | mbgl::MapDebugOptions::ParseStatus
-                                   | mbgl::MapDebugOptions::Collision
-                                   : mbgl::MapDebugOptions::NoDebug);
+    self.debugMask = debugActive ? (MGLMapDebugTileBoundariesMask |
+                                    MGLMapDebugTileInfoMask |
+                                    MGLMapDebugCollisionBoxesMask) : 0;
 }
 
 - (BOOL)isDebugActive
 {
-    return (_mbglMap->getDebug() != mbgl::MapDebugOptions::NoDebug);
+    return self.debugMask;
 }
 
 - (void)resetNorth
