@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -73,6 +75,7 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
+import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
@@ -365,6 +368,9 @@ public class MapView extends FrameLayout {
 
         // Force a check for an access token
         validateAccessToken(getAccessToken());
+
+        // Force a check for Telemetry
+        validateTelemetryServiceConfigured();
 
         // Initialize EGL
         mNativeMapView.initializeDisplay();
@@ -864,6 +870,28 @@ public class MapView extends FrameLayout {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
             throw new InvalidAccessTokenException();
         }
+    }
+
+    // Checks that TelemetryService has been configured by developer
+    private void validateTelemetryServiceConfigured() {
+
+        try {
+            // Check Implementing app's AndroidManifest.xml
+            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), PackageManager.GET_SERVICES);
+
+            if (packageInfo.services != null) {
+
+                for (ServiceInfo service : packageInfo.services) {
+                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
+                        return;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            Log.w(TAG, "Error checking for Telemetry Service Config: " + e);
+        }
+        throw new TelemetryServiceNotConfiguredException();
     }
 
     /**

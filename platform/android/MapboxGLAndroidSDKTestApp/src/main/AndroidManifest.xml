@@ -88,6 +88,8 @@
         <meta-data
             android:name="com.mapbox.AccessToken"
             android:value="" />
+
+        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
     </application>
 
 </manifest>
