@@ -32,6 +32,7 @@ public:
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
+    virtual uint32_t getExtent() const = 0;
 };
 
 class GeometryTileLayer : private util::noncopyable {

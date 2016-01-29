@@ -10,6 +10,7 @@ namespace mbgl {
 namespace util {
 
 extern const float tileSize;
+extern const int32_t EXTENT;
 
 extern const double DEG2RAD;
 extern const double RAD2DEG;

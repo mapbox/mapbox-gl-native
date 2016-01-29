@@ -34,7 +34,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     if (skewed) {
         matrix::identity(exMatrix);
-        s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+        s = util::EXTENT / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
         gammaScale = 1.0f / std::cos(state.getPitch());
     } else {
         exMatrix = extrudeMatrix;
@@ -211,7 +211,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
             if (skewed) {
                 matrix::identity(exMatrix);
-                s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+                s = util::EXTENT / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
             } else {
                 exMatrix = extrudeMatrix;
                 matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());

@@ -117,7 +117,6 @@ private:
     const float overscaling;
     const float zoom;
     const float tileSize;
-    const float tileExtent = 4096.0f;
     const float tilePixelRatio;
     const MapMode mode;
 

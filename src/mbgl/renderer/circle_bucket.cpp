@@ -3,6 +3,7 @@
 
 #include <mbgl/shader/circle_shader.hpp>
 #include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/util/constants.hpp>
 
 using namespace mbgl;
 
@@ -31,14 +32,13 @@ bool CircleBucket::hasData() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
-    const int extent = 4096;
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
             auto y = geometry.y;
 
             // Do not include points that are outside the tile boundaries.
-            if (x < 0 || x >= extent || y < 0 || y >= extent) continue;
+            if (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT) continue;
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.

@@ -21,7 +21,7 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
 
     matrix::identity(matrix);
     matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
-    matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
+    matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {

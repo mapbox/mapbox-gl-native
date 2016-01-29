@@ -130,6 +130,10 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return lines;
 }
 
+uint32_t VectorTileFeature::getExtent() const {
+    return layer.extent;
+}
+
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }

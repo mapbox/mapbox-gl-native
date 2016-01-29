@@ -18,6 +18,7 @@ public:
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override;
+    uint32_t getExtent() const override;
 
 private:
     const VectorTileLayer& layer;

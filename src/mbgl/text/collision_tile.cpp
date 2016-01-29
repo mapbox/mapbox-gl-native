@@ -1,4 +1,5 @@
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/util/constants.hpp>
 #include <cmath>
 
 namespace mbgl {
@@ -10,11 +11,11 @@ CollisionTile::CollisionTile(PlacementConfig config_) : config(config_),
         // left
         CollisionBox(vec2<float>(0, 0), 0, -infinity, 0, infinity, infinity),
         // right
-        CollisionBox(vec2<float>(extent, 0), 0, -infinity, 0, infinity, infinity),
+        CollisionBox(vec2<float>(util::EXTENT, 0), 0, -infinity, 0, infinity, infinity),
         // top
         CollisionBox(vec2<float>(0, 0), -infinity, 0, infinity, 0, infinity),
         // bottom
-        CollisionBox(vec2<float>(0, extent), -infinity, 0, infinity, 0, infinity),
+        CollisionBox(vec2<float>(0, util::EXTENT), -infinity, 0, infinity, 0, infinity),
     }}) {
     tree.clear();
 
