@@ -11,8 +11,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/math.hpp>
-#include <mbgl/util/box.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
@@ -294,47 +292,6 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
     return newState;
 }
 
-double Source::getZoom(const TransformState& state) const {
-    double offset = std::log(util::tileSize / tileSize) / std::log(2);
-    return state.getZoom() + offset;
-}
-
-int32_t Source::coveringZoomLevel(const TransformState& state) const {
-    double zoom = getZoom(state);
-    if (type == SourceType::Raster || type == SourceType::Video) {
-        zoom = ::round(zoom);
-    } else {
-        zoom = std::floor(zoom);
-    }
-    return util::clamp(zoom, state.getMinZoom(), state.getMaxZoom());
-}
-
-std::forward_list<TileID> Source::coveringTiles(const TransformState& state) const {
-    int32_t z = coveringZoomLevel(state);
-
-    auto actualZ = z;
-    const bool reparseOverscaled =
-        type == SourceType::Vector ||
-        type == SourceType::Annotations;
-
-    if (z < info->minZoom) return {{}};
-    if (z > info->maxZoom) z = info->maxZoom;
-
-    // Map four viewport corners to pixel coordinates
-    box points = state.cornersToBox(z);
-    const TileCoordinate center = state.pointToCoordinate({ state.getWidth() / 2.0f, state.getHeight()/ 2.0f }).zoomTo(z);
-
-    std::forward_list<TileID> covering_tiles = tileCover(z, points, reparseOverscaled ? actualZ : z);
-
-    covering_tiles.sort([&center](const TileID& a, const TileID& b) {
-        // Sorts by distance from the box center
-        return std::fabs(a.x - center.column) + std::fabs(a.y - center.row) <
-               std::fabs(b.x - center.column) + std::fabs(b.y - center.row);
-    });
-
-    return covering_tiles;
-}
-
 /**
  * Recursively find children of the given tile that are already loaded.
  *
@@ -344,14 +301,14 @@ std::forward_list<TileID> Source::coveringTiles(const TransformState& state) con
  *
  * @return boolean Whether the children found completely cover the tile.
  */
-bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, std::forward_list<TileID>& retain) {
+bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, std::vector<TileID>& retain) {
     bool complete = true;
     int32_t z = tileID.z;
     auto ids = tileID.children(info->maxZoom);
     for (const auto& child_id : ids) {
         const TileData::State state = hasTile(child_id);
         if (TileData::isReadyState(state)) {
-            retain.emplace_front(child_id);
+            retain.emplace_back(child_id);
         }
         if (state != TileData::State::parsed) {
             complete = false;
@@ -373,12 +330,12 @@ bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, s
  *
  * @return boolean Whether a parent was found.
  */
-void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::forward_list<TileID>& retain) {
+void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::vector<TileID>& retain) {
     for (int32_t z = tileID.z - 1; z >= minCoveringZoom; --z) {
         const TileID parent_id = tileID.parent(z, info->maxZoom);
         const TileData::State state = hasTile(parent_id);
         if (TileData::isReadyState(state)) {
-            retain.emplace_front(parent_id);
+            retain.emplace_back(parent_id);
             if (state == TileData::State::parsed) {
                 return;
             }
@@ -393,17 +350,29 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         return allTilesUpdated;
     }
 
-    double zoom = coveringZoomLevel(parameters.transformState);
-    std::forward_list<TileID> required = coveringTiles(parameters.transformState);
-
-    // Determine the overzooming/underzooming amounts.
+    // Determine the overzooming/underzooming amounts and required tiles.
+    std::vector<TileID> required;
+    int32_t zoom = coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t minCoveringZoom = util::clamp<int32_t>(zoom - 10, info->minZoom, info->maxZoom);
     int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->minZoom, info->maxZoom);
+
+    if (zoom >= info->minZoom) {
+        const bool reparseOverscaled =
+            type == SourceType::Vector ||
+            type == SourceType::Annotations;
+
+        const auto actualZ = zoom;
+        if (zoom > info->maxZoom) {
+            zoom = info->maxZoom;
+        }
+
+        required = tileCover(parameters.transformState, zoom, reparseOverscaled ? actualZ : zoom);
+    }
 
     // Retain is a list of tiles that we shouldn't delete, even if they are not
     // the most ideal tile for the current viewport. This may include tiles like
     // parent or child tiles that are *already* loaded.
-    std::forward_list<TileID> retain(required);
+    std::vector<TileID> retain(required);
 
     // Add existing child/parent tiles if the actual tile is not yet loaded
     for (const auto& tileID : required) {

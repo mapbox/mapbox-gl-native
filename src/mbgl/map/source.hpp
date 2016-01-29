@@ -7,7 +7,7 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
-#include <forward_list>
+#include <vector>
 #include <map>
 
 namespace mapbox {
@@ -82,16 +82,12 @@ private:
                              std::exception_ptr,
                              bool isNewTile);
     bool handlePartialTile(const TileID&);
-    bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
-    void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
-    int32_t coveringZoomLevel(const TransformState&) const;
-    std::forward_list<TileID> coveringTiles(const TransformState&) const;
+    bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::vector<TileID>& retain);
+    void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::vector<TileID>& retain);
 
     TileData::State addTile(const TileID&, const StyleUpdateParameters&);
     TileData::State hasTile(const TileID&);
     void updateTilePtrs();
-
-    double getZoom(const TransformState &state) const;
 
 private:
     std::unique_ptr<const SourceInfo> info;

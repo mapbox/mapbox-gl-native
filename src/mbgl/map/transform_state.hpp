@@ -15,8 +15,7 @@
 namespace mbgl {
 
 class TileID;
-struct box;
-struct TileCoordinate;
+class TileCoordinate;
 
 class TransformState {
     friend class Transform;
@@ -27,7 +26,6 @@ public:
     // Matrix
     void matrixFor(mat4& matrix, const TileID& id, const int8_t z) const;
     void getProjMatrix(mat4& matrix) const;
-    box cornersToBox(uint32_t z) const;
 
     // Dimensions
     uint16_t getWidth() const;

@@ -47,6 +47,7 @@
         'util/text_conversions.cpp',
         'util/thread.cpp',
         'util/thread_local.cpp',
+        'util/tile_cover.cpp',
         'util/timer.cpp',
         'util/token.cpp',
         'util/work_queue.cpp',

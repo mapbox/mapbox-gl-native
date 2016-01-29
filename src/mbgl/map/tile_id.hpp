@@ -26,12 +26,6 @@ public:
         return ((std::pow(2, z) * y + x) * 32) + z;
     }
 
-    struct Hash {
-        std::size_t operator()(const TileID& id) const {
-            return std::hash<uint64_t>()(id.to_uint64());
-        }
-    };
-
     inline bool operator==(const TileID& rhs) const {
         return w == rhs.w && z == rhs.z && x == rhs.x && y == rhs.y;
     }
@@ -53,9 +47,20 @@ public:
     children(int8_t sourceMaxZoom = std::numeric_limits<int8_t>::max()) const;
     bool isChildOf(const TileID&) const;
     operator std::string() const;
-
 };
 
 } // namespace mbgl
+
+namespace std {
+template <>
+struct hash<mbgl::TileID> {
+    typedef mbgl::TileID argument_type;
+    typedef std::size_t result_type;
+
+    result_type operator()(const mbgl::TileID& id) const {
+            return std::hash<uint64_t>()(id.to_uint64());
+    }
+};
+} // namespace std
 
 #endif

@@ -1,7 +1,6 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/math.hpp>
@@ -53,18 +52,6 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
     matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
             pixel_y() - getHeight() / 2.0f, 0);
 }
-
-box TransformState::cornersToBox(uint32_t z) const {
-    double w = width;
-    double h = height;
-    box b(
-    pointToCoordinate({ 0, 0 }).zoomTo(z),
-    pointToCoordinate({ w, 0 }).zoomTo(z),
-    pointToCoordinate({ w, h }).zoomTo(z),
-    pointToCoordinate({ 0, h }).zoomTo(z));
-    return b;
-}
-
 
 #pragma mark - Dimensions
 
