@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.utils.MaterialUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -132,7 +134,7 @@ final class UserLocationView extends View {
 
         // Setup the custom paint
         Resources resources = context.getResources();
-        int accuracyColor = resources.getColor(R.color.my_location_ring);
+        int accuracyColor = MaterialUtils.getAccentColor(context);
 
         mDensity = resources.getDisplayMetrics().density;
         mMarkerCoordinate = new LatLng(0.0, 0.0);
@@ -156,6 +158,7 @@ final class UserLocationView extends View {
         mAccuracyBounds = new RectF();
 
         mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location);
+        MaterialUtils.setTint(context, mUserLocationDrawable);
         mUserLocationDrawableBounds = new Rect(
                 -mUserLocationDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationDrawable.getIntrinsicHeight() / 2,
@@ -169,6 +172,7 @@ final class UserLocationView extends View {
         mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
 
         mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_bearing);
+        MaterialUtils.setTint(context, mUserLocationBearingDrawable);
         mUserLocationBearingDrawableBounds = new Rect(
                 -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
                 -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
