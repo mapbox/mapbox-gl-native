@@ -17,7 +17,8 @@ RasterTileData::RasterTileData(const TileID& id_,
 }
 
 RasterTileData::~RasterTileData() {
-    cancel();
+    assert(tryCancel());
+    workRequest.reset();
 }
 
 void RasterTileData::request(const std::string& url,
@@ -56,7 +57,9 @@ void RasterTileData::request(const std::string& url,
 
         workRequest.reset();
         workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
+            WorkCompletedNotifier notifier(this);
             workRequest.reset();
+
             if (state != State::loaded) {
                 return;
             }
@@ -80,10 +83,20 @@ Bucket* RasterTileData::getBucket(StyleLayer const&) {
     return bucket.get();
 }
 
-void RasterTileData::cancel() {
+bool RasterTileData::tryCancel(bool force) {
     if (state != State::obsolete) {
         state = State::obsolete;
     }
+
     req = nullptr;
-    workRequest.reset();
+
+    if (force) {
+        workRequest.reset();
+    }
+
+    if (workRequest) {
+        return workRequest->tryCancel();
+    }
+
+    return true;
 }

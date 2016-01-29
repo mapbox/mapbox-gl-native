@@ -24,7 +24,8 @@ VectorTileData::VectorTileData(const TileID& id_,
                  *style_.glyphStore,
                  state,
                  mode_),
-      monitor(std::move(monitor_))
+      monitor(std::move(monitor_)),
+      delayedRedoPlacement([this]{ delayedRedoPlacementFunction(); })
 {
     state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
@@ -59,6 +60,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         // request in case there is one.
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+            WorkCompletedNotifier notifier(this);
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -88,7 +90,8 @@ VectorTileData::VectorTileData(const TileID& id_,
 }
 
 VectorTileData::~VectorTileData() {
-    cancel();
+    assert(tryCancel());
+    workRequest.reset();
 }
 
 bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
@@ -97,8 +100,8 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
         return false;
     }
 
-    workRequest.reset();
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
         if (state == State::obsolete) {
             return;
@@ -153,8 +156,8 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::f
 }
 
 void VectorTileData::redoPlacement(const std::function<void()>& callback) {
-    workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
+    auto redoPlacementCallback = [this, callback, config = targetConfig] {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -172,13 +175,36 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
         } else {
             callback();
         }
-    });
+    };
+
+    // We overwrite any existing function as
+    // we only care about the last placement.
+    delayedRedoPlacementFunction = [this, redoPlacementCallback] {
+        if (workRequest) {
+            delayedRedoPlacement.send();
+        } else {
+            workRequest = worker.redoPlacement(
+                tileWorker, buckets, targetConfig, redoPlacementCallback);
+            delayedRedoPlacementFunction = nullptr;
+        }
+    };
+
+    delayedRedoPlacementFunction();
 }
 
-void VectorTileData::cancel() {
+bool VectorTileData::tryCancel(bool force) {
     state = State::obsolete;
     tileRequest.reset();
-    workRequest.reset();
+
+    if (force) {
+        workRequest.reset();
+    }
+
+    if (workRequest) {
+        return workRequest->tryCancel();
+    }
+
+    return true;
 }
 
 } // namespace mbgl

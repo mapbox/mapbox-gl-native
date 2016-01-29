@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/util/async_task.hpp>
 
 #include <atomic>
 #include <memory>
@@ -34,7 +35,7 @@ public:
     void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
     void redoPlacement(const std::function<void()>&) override;
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
 
 private:
     Style& style;
@@ -44,6 +45,9 @@ private:
     std::unique_ptr<GeometryTileMonitor> monitor;
     std::unique_ptr<FileRequest> tileRequest;
     std::unique_ptr<WorkRequest> workRequest;
+
+    util::AsyncTask delayedRedoPlacement;
+    std::function<void(void)> delayedRedoPlacementFunction;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
