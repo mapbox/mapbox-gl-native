@@ -2,6 +2,9 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
+#include <mbgl/util/constants.hpp>
+#include <mbgl/map/source_info.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
@@ -66,7 +69,36 @@ static void scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b,
     if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
-std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t actualZ) {
+int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t tileSize) {
+    zoom += std::log(util::tileSize / tileSize) / std::log(2);
+    if (type == SourceType::Raster || type == SourceType::Video) {
+        return ::round(zoom);
+    } else {
+        return std::floor(zoom);
+    }
+}
+
+std::forward_list<TileID> tileCover(const TransformState& state,
+                                    SourceType type,
+                                    uint16_t tileSize,
+                                    const SourceInfo& info) {
+    int32_t z = coveringZoomLevel(state.getZoom(), type, tileSize);
+    if (z < info.minZoom) {
+        return {{}};
+    }
+
+    const bool reparseOverscaled =
+        type == SourceType::Vector ||
+        type == SourceType::Annotations;
+
+    const auto actualZ = z;
+    if (z > info.maxZoom) {
+        z = info.maxZoom;
+    }
+
+    // Map four viewport corners to pixel coordinates
+    box bounds = state.cornersToBox(z);
+
     int32_t tiles = 1 << z;
     std::forward_list<mbgl::TileID> t;
 
@@ -74,7 +106,7 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
         int32_t x;
         if (y >= 0 && y <= tiles) {
             for (x = x0; x < x1; x++) {
-                t.emplace_front(actualZ, x, y, z);
+                t.emplace_front(reparseOverscaled ? actualZ : z, x, y, z);
             }
         }
     };
@@ -93,6 +125,15 @@ std::forward_list<TileID> tileCover(int8_t z, const mbgl::box &bounds, int8_t ac
 
     t.sort();
     t.unique();
+
+    const TileCoordinate center = state.pointToCoordinate({ state.getWidth()  / 2.0f,
+                                                            state.getHeight() / 2.0f }).zoomTo(z);
+
+    t.sort([&](const TileID& a, const TileID& b) {
+        // Sorts by distance from the box center
+        return std::fabs(a.x - center.column) + std::fabs(a.y - center.row) <
+               std::fabs(b.x - center.column) + std::fabs(b.y - center.row);
+    });
 
     return t;
 }
