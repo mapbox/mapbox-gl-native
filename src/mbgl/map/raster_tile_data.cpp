@@ -5,7 +5,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
-#include <mbgl/util/url.hpp>
 
 using namespace mbgl;
 
@@ -20,19 +19,7 @@ RasterTileData::RasterTileData(const TileID& id_,
       worker(worker_) {
     state = State::loading;
 
-    Resource resource {
-        Resource::Kind::Tile,
-        util::templateTileURL(urlTemplate, id, pixelRatio)
-    };
-
-    resource.tileData = Resource::TileData {
-        urlTemplate,
-        pixelRatio,
-        id.x,
-        id.y,
-        id.z
-    };
-
+    const Resource resource = Resource::tile(urlTemplate, pixelRatio, id.x, id.y, id.sourceZ);
     req = util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
         if (res.error) {
             std::exception_ptr error;

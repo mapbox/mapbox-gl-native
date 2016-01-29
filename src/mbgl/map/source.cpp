@@ -91,7 +91,7 @@ void Source::load() {
 
     // URL may either be a TileJSON file, or a GeoJSON file.
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Source, url }, [this](Response res) {
+    req = fs->request(Resource::source(url), [this](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;

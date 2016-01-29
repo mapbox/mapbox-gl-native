@@ -1,7 +1,4 @@
 #include <mbgl/util/url.hpp>
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/string.hpp>
-#include <mbgl/map/tile_id.hpp>
 
 #include <cctype>
 #include <iomanip>
@@ -48,27 +45,6 @@ std::string percentDecode(const std::string& input) {
     }
 
     return decoded;
-}
-
-std::string templateTileURL(const std::string& url, const TileID& id, float pixelRatio) {
-    return util::replaceTokens(url, [&](const std::string& token) -> std::string {
-        if (token == "z") {
-            return util::toString(id.sourceZ);
-        } else if (token == "x") {
-            return util::toString(id.x);
-        } else if (token == "y") {
-            return util::toString(id.y);
-        } else if (token == "prefix") {
-            std::string prefix{ 2 };
-            prefix[0] = "0123456789abcdef"[id.x % 16];
-            prefix[1] = "0123456789abcdef"[id.y % 16];
-            return prefix;
-        } else if (token == "ratio") {
-            return pixelRatio > 1.0 ? "@2x" : "";
-        } else {
-            return "";
-        }
-    });
 }
 
 } // namespace util

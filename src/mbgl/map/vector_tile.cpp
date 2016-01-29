@@ -185,19 +185,7 @@ VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, c
 }
 
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
-    Resource resource {
-        Resource::Kind::Tile,
-        util::templateTileURL(urlTemplate, tileID, pixelRatio)
-    };
-
-    resource.tileData = Resource::TileData {
-        urlTemplate,
-        pixelRatio,
-        tileID.x,
-        tileID.y,
-        tileID.z
-    };
-
+    const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.x, tileID.y, tileID.sourceZ);
     return util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
         if (res.notModified) {
             // We got the same data again. Abort early.

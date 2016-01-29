@@ -104,7 +104,7 @@ void MapContext::setStyleURL(const std::string& url) {
     }
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    styleRequest = fs->request({ Resource::Kind::Style, styleURL }, [this, base](Response res) {
+    styleRequest = fs->request(Resource::style(styleURL), [this, base](Response res) {
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(styleURL)) {

@@ -67,15 +67,8 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
                    GlyphStore::Observer* observer_)
     : parsed(false),
       observer(observer_) {
-    // Load the glyph set URL
-    std::string url = util::replaceTokens(store->getURL(), [&](const std::string &name) -> std::string {
-        if (name == "fontstack") return util::percentEncode(fontStack);
-        if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
-        return "";
-    });
-
     FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Glyphs, url }, [this, store, fontStack, glyphRange](Response res) {
+    req = fs->request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
         if (res.error) {
             observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;
