@@ -11,10 +11,13 @@
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
 
+#include <mbgl/util/mapbox.hpp>
+
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
 #include <algorithm>
+#include <sstream>
 
 namespace mbgl {
 
@@ -101,7 +104,7 @@ StyleParser::~StyleParser() = default;
 
 void StyleParser::parse(const std::string& json) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
-    document.Parse<0>((const char *const)json.c_str());
+    document.Parse<0>(json.c_str());
 
     if (document.HasParseError()) {
         Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
@@ -250,6 +253,29 @@ std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> StyleParser::parseGeoJSON(const JS
         // tiles to load.
         return std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
     }
+}
+
+std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const std::string& json, const std::string& sourceURL) {
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
+    document.Parse<0>(json.c_str());
+
+    if (document.HasParseError()) {
+        std::stringstream message;
+        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
+        throw std::runtime_error(message.str());
+    }
+
+    std::unique_ptr<SourceInfo> result = StyleParser::parseTileJSON(document);
+
+    // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
+    if (util::mapbox::isMapboxURL(sourceURL)) {
+        std::transform(result->tiles.begin(),
+                       result->tiles.end(),
+                       result->tiles.begin(),
+                       util::mapbox::normalizeRasterTileURL);
+    }
+
+    return result;
 }
 
 std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {

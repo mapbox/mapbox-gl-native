@@ -28,8 +28,10 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
 
-    static std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);
+    static std::unique_ptr<SourceInfo> parseTileJSON(const std::string& json, const std::string& sourceURL);
     static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);
+
+    static std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);
 
 private:
     void parseSources(const JSValue&);

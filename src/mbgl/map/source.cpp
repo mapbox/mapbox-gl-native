@@ -13,7 +13,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
@@ -22,7 +21,6 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/util/url.hpp>
 
 #include <mbgl/map/vector_tile_data.hpp>
 #include <mbgl/map/raster_tile_data.hpp>
@@ -102,29 +100,19 @@ void Source::load() {
             return;
         }
 
-        rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
-        d.Parse<0>(res.data->c_str());
-
-        if (d.HasParseError()) {
-            std::stringstream message;
-            message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
-            return;
-        }
-
         bool reloadTiles = false;
+
         if (type == SourceType::Vector || type == SourceType::Raster) {
+            std::unique_ptr<SourceInfo> newInfo;
+
             // Create a new copy of the SourceInfo object that holds the base values we've parsed
             // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
             // via the URL.
-            auto newInfo = StyleParser::parseTileJSON(d);
-
-            // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-            if (type == SourceType::Raster && util::mapbox::isMapboxURL(url)) {
-                // We need to insert {ratio} into raster source URLs that are loaded from mapbox://
-                // TileJSONs.
-                std::transform(newInfo->tiles.begin(), newInfo->tiles.end(), newInfo->tiles.begin(),
-                               util::mapbox::normalizeRasterTileURL);
+            try {
+                newInfo = StyleParser::parseTileJSON(*res.data, url);
+            } catch (...) {
+                observer->onSourceError(*this, std::current_exception());
+                return;
             }
 
             // Check whether previous information specifies different tile
@@ -149,6 +137,17 @@ void Source::load() {
             info = std::move(newInfo);
         } else if (type == SourceType::GeoJSON) {
             info = std::make_unique<SourceInfo>();
+
+            rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
+            d.Parse<0>(res.data->c_str());
+
+            if (d.HasParseError()) {
+                std::stringstream message;
+                message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
+                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
+                return;
+            }
+
             geojsonvt = StyleParser::parseGeoJSON(d);
             reloadTiles = true;
         }
