@@ -22,7 +22,7 @@ public:
 
     struct TileData {
         std::string urlTemplate;
-        float pixelRatio;
+        uint8_t pixelRatio;
         int32_t x;
         int32_t y;
         int8_t z;

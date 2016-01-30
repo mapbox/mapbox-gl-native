@@ -71,7 +71,7 @@ Resource Resource::tile(const std::string& urlTemplate, float pixelRatio, int32_
         }),
         Resource::TileData {
             urlTemplate,
-            pixelRatio,
+            uint8_t(pixelRatio > 1.0 ? 2 : 1),
             x,
             y,
             z
