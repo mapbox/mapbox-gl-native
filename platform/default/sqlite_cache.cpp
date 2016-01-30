@@ -322,8 +322,7 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             getStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
-        getStmt->bind(1, canonicalURL.c_str());
+        getStmt->bind(1, resource.url);
         if (getStmt->run()) {
             // There is data.
             auto response = std::make_unique<Response>();
@@ -358,7 +357,7 @@ void SQLiteCache::Impl::get(const Resource &resource, Callback callback) {
             }
 
             accessedStmt->bind(1, SystemClock::now());
-            accessedStmt->bind(2, canonicalURL.c_str());
+            accessedStmt->bind(2, resource.url);
             accessedStmt->run();
         }
     } catch (mapbox::sqlite::Exception& ex) {
@@ -411,8 +410,7 @@ void SQLiteCache::Impl::put(const Resource& resource, const Response& response) 
             putStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
-        putStmt->bind(1 /* url */, canonicalURL.c_str());
+        putStmt->bind(1 /* url */, resource.url);
         if (response.error) {
             putStmt->bind(2 /* status */, int(response.error->reason));
         } else {
@@ -465,10 +463,9 @@ void SQLiteCache::Impl::refresh(const Resource& resource, optional<SystemTimePoi
             refreshStmt->reset();
         }
 
-        const auto canonicalURL = util::mapbox::canonicalURL(resource.url);
         refreshStmt->bind(1, SystemClock::now());
         refreshStmt->bind(2, expires);
-        refreshStmt->bind(3, canonicalURL.c_str());
+        refreshStmt->bind(3, resource.url);
         refreshStmt->run();
     } catch (mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, ex.code, ex.what());

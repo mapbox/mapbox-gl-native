@@ -96,9 +96,9 @@ TEST(StyleParser, ParseTileJSONRaster) {
     EXPECT_EQ(15, result->maxZoom);
     EXPECT_EQ("attribution", result->attribution);
 #if !defined(__ANDROID__) && !defined(__APPLE__)
-    EXPECT_EQ("http://a.tiles.mapbox.com/mapbox.satellite/{z}-{x}-{y}{ratio}.webp?access_token=key", result->tiles[0]);
+    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp", result->tiles[0]);
 #else
-    EXPECT_EQ("http://a.tiles.mapbox.com/mapbox.satellite/{z}-{x}-{y}{ratio}.png?access_token=key", result->tiles[0]);
+    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", result->tiles[0]);
 #endif
 }
 
@@ -111,7 +111,7 @@ TEST(StyleParser, ParseTileJSONVector) {
     EXPECT_EQ(0, result->minZoom);
     EXPECT_EQ(15, result->maxZoom);
     EXPECT_EQ("attribution", result->attribution);
-    EXPECT_EQ("http://a.tiles.mapbox.com/mapbox.streets/{z}-{x}-{y}.vector.pbf?access_token=key", result->tiles[0]);
+    EXPECT_EQ("mapbox://tiles/mapbox.streets/{z}/{x}/{y}.vector.pbf", result->tiles[0]);
 }
 
 TEST(StyleParser, FontStacks) {

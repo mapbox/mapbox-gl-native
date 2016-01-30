@@ -92,6 +92,9 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
     Resource res = resource;
 
     switch (resource.kind) {
+    case Resource::Kind::Unknown:
+        break;
+
     case Resource::Kind::Style:
         res.url = mbgl::util::mapbox::normalizeStyleURL(resource.url, accessToken);
         break;
@@ -109,7 +112,8 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
         res.url = util::mapbox::normalizeSpriteURL(resource.url, accessToken);
         break;
 
-    default:
+    case Resource::Kind::Tile:
+        res.url = util::mapbox::normalizeTileURL(resource.url, accessToken);
         break;
     }
 

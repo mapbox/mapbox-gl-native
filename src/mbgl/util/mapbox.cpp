@@ -111,83 +111,56 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
     return baseURL + "fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
 }
 
-std::string normalizeRasterTileURL(const std::string& url) {
-    std::string::size_type queryIdx = url.rfind("?");
-    // Trim off the right end but never touch anything before the extension dot.
-    std::string urlSansParams((queryIdx == std::string::npos) ? url : url.substr(0, queryIdx));
-
-    while (!urlSansParams.empty() && isdigit(urlSansParams.back())) {
-        urlSansParams.pop_back();
-    }
-
-    std::string::size_type basenameIdx = url.rfind("/", queryIdx);
-    std::string::size_type extensionIdx = url.rfind(".", queryIdx);
-    if (basenameIdx == std::string::npos || extensionIdx == std::string::npos ||
-        basenameIdx > extensionIdx) {
-        // No file extension: probably not a file name we can tack a ratio onto.
+std::string normalizeTileURL(const std::string& url, const std::string& accessToken) {
+    if (!isMapboxURL(url)) {
         return url;
     }
 
-    std::string normalizedURL(url);
+    return baseURL + "v4/" + url.substr(sizeof("mapbox://tiles/") - 1) + "?access_token=" + accessToken;
+}
+
+std::string canonicalizeTileURL(const std::string& url, SourceType type) {
+    auto tilesetStartIdx = url.find("/v4/");
+    if (tilesetStartIdx == std::string::npos) {
+        return url;
+    }
+
+    tilesetStartIdx += sizeof("/v4/") - 1;
+
+    auto tilesetEndIdx = url.find("/", tilesetStartIdx);
+    if (tilesetEndIdx == std::string::npos) {
+        return url;
+    }
+
+    auto queryIdx = url.rfind("?");
+    if (queryIdx == std::string::npos) {
+        queryIdx = url.length();
+    }
+
+    auto basenameIdx = url.rfind("/", queryIdx);
+    if (basenameIdx == std::string::npos || basenameIdx == queryIdx - 1) {
+        basenameIdx = url.length();
+    } else {
+        basenameIdx += 1;
+    }
+
+    auto extensionIdx = url.find(".", basenameIdx);
+    if (extensionIdx == std::string::npos || extensionIdx == queryIdx - 1) {
+        return url;
+    }
+
+    auto tileset = url.substr(tilesetStartIdx, tilesetEndIdx - tilesetStartIdx);
+    auto extension = url.substr(extensionIdx + 1, queryIdx - extensionIdx - 1);
+
 #if !defined(__ANDROID__) && !defined(__APPLE__)
     // Replace PNG with WebP.
-    if (normalizedURL.compare(extensionIdx + 1, 3, "png") == 0) {
-        normalizedURL.replace(extensionIdx + 1, 3, "webp");
+    if (extension == "png") {
+        extension = "webp";
     }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__)
-    normalizedURL.insert(extensionIdx, "{ratio}");
-    return normalizedURL;
-}
 
-
-std::string removeAccessTokenFromURL(const std::string &url) {
-    const size_t token_start = url.find("access_token=");
-    // Ensure that token exists, isn't at the front and is preceded by either & or ?.
-    if (token_start == std::string::npos || token_start == 0 || !(url[token_start - 1] == '&' || url[token_start - 1] == '?')) {
-        return url;
-    }
-
-    const size_t token_end = url.find_first_of('&', token_start);
-    if (token_end == std::string::npos) {
-        // The token is the last query argument. We slice away the "&access_token=..." part
-        return url.substr(0, token_start - 1);
-    } else {
-        // We slice away the "access_token=...&" part.
-        return url.substr(0, token_start) + url.substr(token_end + 1);
-    }
-}
-
-namespace {
-
-std::string convertMapboxDomainsToProtocol(const std::string &url) {
-    const size_t protocol_separator = url.find("://");
-    if (protocol_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string protocol = url.substr(0, protocol_separator);
-    if (!(protocol == "http" || protocol == "https")) {
-        return url;
-    }
-
-    const size_t domain_begin = protocol_separator + 3;
-    const size_t path_separator = url.find("/", domain_begin);
-    if (path_separator == std::string::npos) {
-        return url;
-    }
-
-    const std::string domain = url.substr(domain_begin, path_separator - domain_begin);
-    if (domain == "api.mapbox.com" || domain.find(".tiles.mapbox.com") != std::string::npos) {
-        return std::string{ "mapbox://" } + url.substr(path_separator + 1);
-    } else {
-        return url;
-    }
-}
-
-} // end namespace
-
-std::string canonicalURL(const std::string &url) {
-    return removeAccessTokenFromURL(convertMapboxDomainsToProtocol(url));
+    return "mapbox://tiles/" + tileset + "/{z}/{x}/{y}" +
+        (type == SourceType::Raster ? "{ratio}" : "") + "." + extension;
 }
 
 } // end namespace mapbox

@@ -269,11 +269,11 @@ std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const std::string& json, 
     std::unique_ptr<SourceInfo> result = StyleParser::parseTileJSON(document);
 
     // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-    if (type == SourceType::Raster && util::mapbox::isMapboxURL(sourceURL)) {
+    if (util::mapbox::isMapboxURL(sourceURL)) {
         std::transform(result->tiles.begin(),
                        result->tiles.end(),
                        result->tiles.begin(),
-                       util::mapbox::normalizeRasterTileURL);
+                       std::bind(util::mapbox::canonicalizeTileURL, std::placeholders::_1, type));
     }
 
     return result;

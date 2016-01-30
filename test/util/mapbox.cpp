@@ -7,6 +7,8 @@
 
 using namespace mbgl;
 
+// TODO: correct all EXPECT_EQ(actual, expected) to EXPECT_EQ(expected, actual)
+
 TEST(Mapbox, SourceURL) {
     EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"), "https://api.mapbox.com/v4/user.map.json?access_token=key&secure");
     EXPECT_EQ(mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "token"), "https://api.mapbox.com/v4/user.map.json?access_token=token&secure");
@@ -36,110 +38,76 @@ TEST(Mapbox, SpriteURL) {
 }
 
 TEST(Mapbox, TileURL) {
-    try {
-#if defined(__ANDROID__) || defined(__APPLE__)
-        EXPECT_EQ("http://path.png/tile{ratio}.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png"));
-        EXPECT_EQ("http://path.png/tile{ratio}.png32", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png32"));
-        EXPECT_EQ("http://path.png/tile{ratio}.png70", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png70"));
-        EXPECT_EQ("http://path.png/tile{ratio}.png?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png?access_token=foo"));
-#else
-        EXPECT_EQ("http://path.png/tile{ratio}.webp", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png"));
-        EXPECT_EQ("http://path.png/tile{ratio}.webp32", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png32"));
-        EXPECT_EQ("http://path.png/tile{ratio}.webp70", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png70"));
-        EXPECT_EQ("http://path.png/tile{ratio}.webp?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.png?access_token=foo"));
-#endif // defined(__ANDROID__) || defined(__APPLE__)
-        EXPECT_EQ("http://path.png/tile{ratio}.pbf", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf"));
-        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo"));
-        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png"));
-        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png/bar", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png/bar"));
-        EXPECT_EQ("http://path.png/tile{ratio}.pbf?access_token=foo.png/bar.png", mbgl::util::mapbox::normalizeRasterTileURL("http://path.png/tile.pbf?access_token=foo.png/bar.png"));
-    } catch (const std::regex_error& e) {
-        const char *error = "unknown";
-        switch (e.code()) {
-            case std::regex_constants::error_collate:
-                error = "error_collate"; break;
-            case std::regex_constants::error_ctype:
-                error = "error_ctype"; break;
-            case std::regex_constants::error_escape:
-                error = "error_escape"; break;
-            case std::regex_constants::error_backref:
-                error = "error_backref"; break;
-            case std::regex_constants::error_paren:
-                error = "error_paren"; break;
-            case std::regex_constants::error_brace:
-                error = "error_brace"; break;
-            case std::regex_constants::error_badbrace:
-                error = "error_badbrace"; break;
-            case std::regex_constants::error_range:
-                error = "error_range"; break;
-            case std::regex_constants::error_space:
-                error = "error_space"; break;
-            case std::regex_constants::error_badrepeat:
-                error = "error_badrepeat"; break;
-            case std::regex_constants::error_complexity:
-                error = "error_complexity"; break;
-            case std::regex_constants::error_stack:
-                error = "error_stack"; break;
-            default:
-                break;
-        }
-        mbgl::Log::Error(mbgl::Event::General, "regex_error caught: %s - %s (%d)", e.what(), error, e.code());
-        throw e;
-    }
+    EXPECT_EQ(
+        "https://api.mapbox.com/v4/a.b/0/0/0.pbf?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0.pbf", "key"));
+    EXPECT_EQ(
+        "https://api.mapbox.com/v4/a.b/0/0/0.png?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0.png", "key"));
+    EXPECT_EQ(
+        "https://api.mapbox.com/v4/a.b/0/0/0@2x.webp?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b/0/0/0@2x.webp", "key"));
+    EXPECT_EQ(
+        "https://api.mapbox.com/v4/a.b,c.d/0/0/0.pbf?access_token=key",
+        mbgl::util::mapbox::normalizeTileURL("mapbox://tiles/a.b,c.d/0/0/0.pbf", "key"));
+    EXPECT_EQ(
+        "http://path",
+        mbgl::util::mapbox::normalizeSpriteURL("http://path", "key"));
 }
 
 TEST(Mapbox, CanonicalURL) {
-    using mbgl::util::mapbox::canonicalURL;
     EXPECT_EQ(
-        canonicalURL("https://a.tiles.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
-
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
+        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
     EXPECT_EQ(
-        canonicalURL("http://a.tiles.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
-
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
+        mbgl::util::mapbox::canonicalizeTileURL("http://b.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
     EXPECT_EQ(
-        canonicalURL("https://b.tiles.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
-
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
     EXPECT_EQ(
-        canonicalURL("http://c.tiles.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
-
+        "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector));
     EXPECT_EQ(
-        canonicalURL("https://api.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                     "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
-
+        "mapbox://tiles/a.b,c.d/{z}/{x}/{y}.vector.pbf",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b,c.d/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector));
     EXPECT_EQ(
-        canonicalURL("http://api.mapbox.com/v4/"
-                     "mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/"
-                     "10744.vector.pbf"),
-        "mapbox://v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6/15/17599/10744.vector.pbf");
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.jpg",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg?access_token=key", SourceType::Raster));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.jpg70",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg70?access_token=key", SourceType::Raster));
 
-    EXPECT_EQ(canonicalURL("https://api.mapbox.com/fonts/v1/mapbox/"
-                           "DIN%20Offc%20Pro%20Italic%2cArial%20Unicode%20MS%20Regular/"
-                           "0-255.pbf?access_token=pk.kAeslEm93Sjf3mXk."
-                           "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-              "mapbox://fonts/v1/mapbox/DIN%20Offc%20Pro%20Italic%2cArial%20Unicode%20MS%20Regular/"
-              "0-255.pbf");
+#if defined(__ANDROID__) || defined(__APPLE__)
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.png",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.png",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster));
+#else
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster));
+#endif // defined(__ANDROID__) || defined(__APPLE__)
 
-    EXPECT_EQ(canonicalURL("https://api.mapbox.com/styles/v1/mapbox/streets-v8/"
-                           "sprite.json?access_token=pk.kAeslEm93Sjf3mXk."
-                           "vbiF02XnvkPkzlFhGSn2iIm6De3Cxsk5tmips2tvkG8sF"),
-              "mapbox://styles/v1/mapbox/streets-v8/sprite.json");
+    // We don't ever expect to see these inputs, but be safe anyway.
+    EXPECT_EQ(
+        "",
+        mbgl::util::mapbox::canonicalizeTileURL("", SourceType::Raster));
+    EXPECT_EQ(
+        "http://path",
+        mbgl::util::mapbox::canonicalizeTileURL("http://path", SourceType::Raster));
+    EXPECT_EQ(
+        "http://api.mapbox.com/v4/",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/", SourceType::Raster));
+    EXPECT_EQ(
+        "http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.", SourceType::Raster));
+    EXPECT_EQ(
+        "http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.", SourceType::Raster));
 }
