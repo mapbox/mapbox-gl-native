@@ -63,7 +63,7 @@ public class MapboxMap {
 
     MapboxMap(@NonNull MapView mapView) {
         mMapView = mapView;
-        mUiSettings = new UiSettings(this);
+        mUiSettings = new UiSettings(mapView);
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
     }
@@ -1102,63 +1102,6 @@ public class MapboxMap {
     // used by MapView
     OnMyBearingTrackingModeChangeListener getOnMyBearingTrackingModeChangeListener() {
         return mOnMyBearingTrackingModeChangeListener;
-    }
-
-    //
-    // Compass
-    //
-
-    // used by UiSettings
-    void setCompassEnabled(boolean compassEnabled) {
-        mMapView.setCompassEnabled(compassEnabled);
-    }
-
-    // used by UiSettings
-    void setCompassGravity(int gravity) {
-        mMapView.setCompassGravity(gravity);
-    }
-
-    // used by UiSettings
-    void setCompassMargins(int left, int top, int right, int bottom) {
-        mMapView.setCompassMargins(left, top, right, bottom);
-    }
-
-    //
-    // Logo
-    //
-
-    // used by UiSettings
-    void setLogoGravity(int gravity) {
-        mMapView.setLogoGravity(gravity);
-    }
-
-    // used by UiSettings
-    void setLogoMargins(int left, int top, int right, int bottom) {
-        mMapView.setLogoMargins(left, top, right, bottom);
-    }
-
-    // used by UiSettings
-    void setLogoVisibility(int visibility) {
-        mMapView.setLogoVisibility(visibility);
-    }
-
-    //
-    // Attribution
-    //
-
-    // used by UiSettings
-    void setAttributionGravity(int gravity) {
-        mMapView.setAttributionGravity(gravity);
-    }
-
-    // used by UiSettings
-    void setAttributionMargins(int left, int top, int right, int bottom) {
-        mMapView.setAttributionMargins(left, top, right, bottom);
-    }
-
-    // used by UiSettings
-    void setAttributionVisibility(int visibility) {
-        mMapView.setAttributionVisibility(visibility);
     }
 
     //

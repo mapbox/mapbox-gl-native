@@ -226,7 +226,6 @@ public class MapView extends FrameLayout {
         // Load the attributes
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
         try {
-
             // Debug mode
             mMapboxMap.setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
 
@@ -250,32 +249,31 @@ public class MapView extends FrameLayout {
             uiSettings.setScrollGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
             uiSettings.setRotateGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
             uiSettings.setTiltGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
-            uiSettings.setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, false
-            ));
+            uiSettings.setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, false));
 
             // Compass
-            mMapboxMap.setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
-            mMapboxMap.setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
-            setWidgetMargins(mCompassView, typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP));
+            uiSettings.setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
+            uiSettings.setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
+            uiSettings.setCompassMargins((int) (typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP) * mScreenDensity)
+                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP * mScreenDensity))
+                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * mScreenDensity))
+                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * mScreenDensity)));
 
             // Logo
-            mMapboxMap.setLogoVisibility(typedArray.getInt(R.styleable.MapView_logo_visibility, View.VISIBLE));
-            mMapboxMap.setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
-            setWidgetMargins(mLogoView, typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP));
+            uiSettings.setLogoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
+            uiSettings.setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
+            uiSettings.setLogoMargins((int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * mScreenDensity));
 
             // Attribution
-            mMapboxMap.setAttributionVisibility(typedArray.getInt(R.styleable.MapView_attribution_visibility, View.VISIBLE));
-            mMapboxMap.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
-            setWidgetMargins(mAttributionsView, typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTYSIX_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP)
-                    , typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP));
+            uiSettings.setAttributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
+            uiSettings.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
+            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTYSIX_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * mScreenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
 
             // User location
             try {
@@ -322,6 +320,31 @@ public class MapView extends FrameLayout {
             uiSettings.setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
             uiSettings.setZoomControlsEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED));
 
+            // Compass
+            uiSettings.setCompassEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_ENABLED));
+            uiSettings.setCompassGravity(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_GRAVITY));
+            uiSettings.setCompassMargins(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
+
+            // Logo
+            uiSettings.setLogoEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_LOGO_ENABLED));
+            uiSettings.setLogoGravity(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_GRAVITY));
+            uiSettings.setLogoMargins(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_TOP)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM));
+
+            // Attribution
+            uiSettings.setAttributionEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ATTRIBUTION_ENABLED));
+            uiSettings.setAttributionGravity(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY));
+            uiSettings.setAttributionMargins(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT)
+                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
+
+
             mMapboxMap.setDebugActive(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
             mMapboxMap.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(MapboxConstants.STATE_ACCESS_TOKEN));
@@ -335,30 +358,6 @@ public class MapView extends FrameLayout {
             } catch (SecurityException ignore) {
                 // User did not accept location permissions
             }
-
-            // Compass
-            mMapboxMap.setCompassEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_ENABLED));
-            mMapboxMap.setCompassGravity(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_GRAVITY));
-            mMapboxMap.setCompassMargins(savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
-
-            // Logo
-            mMapboxMap.setLogoVisibility(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_VISIBILITY));
-            mMapboxMap.setLogoGravity(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_GRAVITY));
-            mMapboxMap.setLogoMargins(savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_TOP)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM));
-
-            // Attribution
-            mMapboxMap.setAttributionVisibility(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_VISIBILITY));
-            mMapboxMap.setAttributionGravity(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY));
-            mMapboxMap.setAttributionMargins(savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT)
-                    , savedInstanceState.getInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM));
 
             //noinspection ResourceType
             mMapboxMap.setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
@@ -395,14 +394,7 @@ public class MapView extends FrameLayout {
 
     @UiThread
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        UiSettings uiSettings = mMapboxMap.getUiSettings();
-
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
-        outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, uiSettings.isZoomGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, uiSettings.isScrollGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, uiSettings.isRotateGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, uiSettings.isTiltGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, uiSettings.isZoomControlsEnabled());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
         outState.putString(MapboxConstants.STATE_STYLE_URL, mMapboxMap.getStyleUrl());
         outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
@@ -411,32 +403,37 @@ public class MapView extends FrameLayout {
         outState.putInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, mMapboxMap.getMyLocationTrackingMode());
         outState.putInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, mMapboxMap.getMyBearingTrackingMode());
 
-        // Compass
-        LayoutParams compassParams = (LayoutParams) mCompassView.getLayoutParams();
+        // UiSettings
+        UiSettings uiSettings = mMapboxMap.getUiSettings();
+        outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, uiSettings.isZoomGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, uiSettings.isScrollGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, uiSettings.isRotateGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, uiSettings.isTiltGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, uiSettings.isZoomControlsEnabled());
+
+        // UiSettings - Compass
         outState.putBoolean(MapboxConstants.STATE_COMPASS_ENABLED, uiSettings.isCompassEnabled());
-        outState.putInt(MapboxConstants.STATE_COMPASS_GRAVITY, compassParams.gravity);
-        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT, compassParams.leftMargin);
-        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP, compassParams.topMargin);
-        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM, compassParams.bottomMargin);
-        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, compassParams.rightMargin);
+        outState.putInt(MapboxConstants.STATE_COMPASS_GRAVITY, uiSettings.getCompassGravity());
+        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_LEFT, uiSettings.getCompassMarginLeft());
+        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_TOP, uiSettings.getCompassMarginTop());
+        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM, uiSettings.getCompassMarginBottom());
+        outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, uiSettings.getCompassMarginRight());
 
-        // Logo
-        LayoutParams logoParams = (LayoutParams) mLogoView.getLayoutParams();
-        outState.putInt(MapboxConstants.STATE_LOGO_GRAVITY, logoParams.gravity);
-        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT, logoParams.leftMargin);
-        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_TOP, logoParams.topMargin);
-        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT, logoParams.rightMargin);
-        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM, logoParams.bottomMargin);
-        outState.putInt(MapboxConstants.STATE_LOGO_VISIBILITY, mLogoView.getVisibility());
+        // UiSettings - Logo
+        outState.putInt(MapboxConstants.STATE_LOGO_GRAVITY, uiSettings.getLogoGravity());
+        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_LEFT, uiSettings.getLogoMarginLeft());
+        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_TOP, uiSettings.getCompassMarginTop());
+        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_RIGHT, uiSettings.getLogoMarginRight());
+        outState.putInt(MapboxConstants.STATE_LOGO_MARGIN_BOTTOM, uiSettings.getLogoMarginBottom());
+        outState.putBoolean(MapboxConstants.STATE_LOGO_ENABLED, uiSettings.isLogoEnabled());
 
-        // Attribution
-        LayoutParams attrParams = (LayoutParams) mAttributionsView.getLayoutParams();
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY, attrParams.gravity);
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT, attrParams.leftMargin);
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP, attrParams.topMargin);
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT, attrParams.rightMargin);
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM, attrParams.bottomMargin);
-        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_VISIBILITY, mAttributionsView.getVisibility());
+        // UiSettings - Attribution
+        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_GRAVITY, uiSettings.getAttributionGravity());
+        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_LEFT, uiSettings.getAttributionMarginLeft());
+        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_TOP, uiSettings.getAttributionMarginTop());
+        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_RIGHT, uiSettings.getAttributionMarginRight());
+        outState.putInt(MapboxConstants.STATE_ATTRIBUTION_MARGIN_BOTTOM, uiSettings.getAttributionMarginBottom());
+        outState.putBoolean(MapboxConstants.STATE_ATTRIBUTION_ENABLED, uiSettings.isAttributionEnabled());
     }
 
     /**
@@ -2714,11 +2711,11 @@ public class MapView extends FrameLayout {
      * </p>
      * By default, the compass is enabled.
      *
-     * @param visibility True to enable the logo; false to disable the logo.
+     * @param visible True to enable the logo; false to disable the logo.
      */
     @UiThread
-    void setLogoVisibility(int visibility) {
-        mLogoView.setVisibility(visibility);
+    void setLogoVisibility(boolean visible) {
+        mLogoView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     //
@@ -2854,12 +2851,6 @@ public class MapView extends FrameLayout {
     private void setWidgetMargins(@NonNull final View view, int left, int top, int right, int bottom) {
         LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
         layoutParams.setMargins(left, top, right, bottom);
-        view.setLayoutParams(layoutParams);
-    }
-
-    private void setWidgetMargins(@NonNull final View view, float leftDp, float topDp, float rightDp, float bottomDp) {
-        LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
-        layoutParams.setMargins((int) (leftDp * mScreenDensity), (int) (topDp * mScreenDensity), (int) (rightDp * mScreenDensity), (int) (bottomDp * mScreenDensity));
         view.setLayoutParams(layoutParams);
     }
 

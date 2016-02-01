@@ -37,7 +37,7 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     public MapboxMapOptions compassEnabled(boolean enabled) {
-        mMapboxMap.setCompassEnabled(enabled);
+        mUiSettings.setCompassEnabled(enabled);
         return this;
     }
 

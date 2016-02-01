@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.view.Gravity;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.view.View;
  */
 public class UiSettings {
 
-    private MapboxMap mapboxMap;
+    private MapView mapView;
 
     private boolean compassEnabled;
     private int compassGravity;
@@ -29,8 +30,8 @@ public class UiSettings {
     private boolean zoomControlsEnabled;
     private boolean scrollGesturesEnabled;
 
-    UiSettings(MapboxMap mapboxMap) {
-        this.mapboxMap = mapboxMap;
+    UiSettings(@NonNull MapView mapView) {
+        this.mapView = mapView;
         this.compassMargins = new int[4];
         this.attributionMargins = new int[4];
         this.logoMargins = new int[4];
@@ -49,7 +50,7 @@ public class UiSettings {
      */
     public void setCompassEnabled(boolean compassEnabled) {
         this.compassEnabled = compassEnabled;
-        this.mapboxMap.setCompassEnabled(compassEnabled);
+        this.mapView.setCompassEnabled(compassEnabled);
     }
 
     /**
@@ -74,7 +75,7 @@ public class UiSettings {
     @UiThread
     public void setCompassGravity(int gravity) {
         this.compassGravity = gravity;
-        this.mapboxMap.setCompassGravity(gravity);
+        this.mapView.setCompassGravity(gravity);
     }
 
     /**
@@ -98,7 +99,7 @@ public class UiSettings {
     @UiThread
     public void setCompassMargins(int left, int top, int right, int bottom) {
         this.compassMargins = new int[]{left, top, right, bottom};
-        this.mapboxMap.setCompassMargins(left, top, right, bottom);
+        this.mapView.setCompassMargins(left, top, right, bottom);
     }
 
     /**
@@ -147,7 +148,7 @@ public class UiSettings {
      */
     public void setLogoEnabled(boolean enabled) {
         this.logoEnabled = enabled;
-        this.mapboxMap.setLogoVisibility(enabled ? View.VISIBLE : View.GONE);
+        this.mapView.setLogoVisibility(enabled );
     }
 
     /**
@@ -171,7 +172,7 @@ public class UiSettings {
      */
     public void setLogoGravity(int gravity) {
         this.logoGravity = gravity;
-        this.mapboxMap.setLogoGravity(gravity);
+        this.mapView.setLogoGravity(gravity);
     }
 
     /**
@@ -194,7 +195,7 @@ public class UiSettings {
      */
     public void setLogoMargins(int left, int top, int right, int bottom) {
         this.logoMargins = new int[]{left, top, right, bottom};
-        this.mapboxMap.setLogoMargins(left, top, right, bottom);
+        this.mapView.setLogoMargins(left, top, right, bottom);
     }
 
     /**
@@ -243,7 +244,7 @@ public class UiSettings {
      */
     public void setAttributionEnabled(boolean enabled) {
         this.attributionEnabled = enabled;
-        this.mapboxMap.setAttributionVisibility(enabled ? View.VISIBLE : View.GONE);
+        this.mapView.setAttributionVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -267,7 +268,7 @@ public class UiSettings {
      */
     public void setAttributionGravity(int gravity) {
         this.attributionGravity = gravity;
-        this.mapboxMap.setAttributionGravity(gravity);
+        this.mapView.setAttributionGravity(gravity);
     }
 
     /**
@@ -290,7 +291,7 @@ public class UiSettings {
      */
     public void setAttributionMargins(int left, int top, int right, int bottom) {
         this.attributionMargins = new int[]{left, top, right, bottom};
-        this.mapboxMap.setAttributionMargins(left, top, right, bottom);
+        this.mapView.setAttributionMargins(left, top, right, bottom);
     }
 
     /**
