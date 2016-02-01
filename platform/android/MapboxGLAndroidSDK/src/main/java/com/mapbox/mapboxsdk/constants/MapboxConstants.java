@@ -18,6 +18,16 @@ public class MapboxConstants {
     public static final String KEY_META_DATA_MANIFEST = "com.mapbox.AccessToken";
 
     /**
+     * Key used to store staging data server url in AndroidManifest.xml
+     */
+    public static final String KEY_META_DATA_STAGING_SERVER = "com.mapbox.TestEventsServer";
+
+    /**
+     * Key used to store staging data server access token in AndroidManifest.xml
+     */
+    public static final String KEY_META_DATA_STAGING_ACCESS_TOKEN = "com.mapbox.TestEventsAccessToken";
+
+    /**
      * Default animation time
      */
     public static final int ANIMATION_DURATION = 300;

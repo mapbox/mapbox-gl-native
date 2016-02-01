@@ -90,6 +90,12 @@
             android:name="com.mapbox.AccessToken"
             android:value="" />
 
+        <meta-data android:name="com.mapbox.TestEventsServer"
+                   android:value="https://cloudfront-staging.tilestream.net"/>
+
+        <meta-data android:name="com.mapbox.TestEventsAccessToken"
+                   android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg"/>
+
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
     </application>
 
