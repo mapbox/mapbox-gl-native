@@ -38,6 +38,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
@@ -225,10 +226,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Dispatch onStart() to all fragments.  Ensure any created loaders are
-     * now started.
-     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -371,6 +368,10 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_map_fragment:
                                 startActivity(new Intent(getApplicationContext(), MapFragmentActivity.class));
+                                return true;
+
+                            case R.id.action_support_map_fragment:
+                                startActivity(new Intent(getApplicationContext(), SupportMapFragmentActivity.class));
                                 return true;
 
                             case R.id.action_press_for_marker:

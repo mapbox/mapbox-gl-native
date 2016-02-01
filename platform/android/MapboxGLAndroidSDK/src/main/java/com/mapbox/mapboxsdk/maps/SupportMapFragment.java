@@ -1,8 +1,8 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +25,17 @@ import com.mapbox.mapboxsdk.utils.ApiAccess;
  *
  * @see #getMapAsync(OnMapReadyCallback)
  */
-public class MapFragment extends Fragment {
+public class SupportMapFragment extends Fragment {
 
     private MapView mMap;
     private OnMapReadyCallback mMapReadyCallback;
 
-    public static MapFragment newInstance(){
-        return new MapFragment();
+    public static SupportMapFragment newInstance(){
+        return new SupportMapFragment();
     }
 
-    public static MapFragment newInstance(MapboxMapOptions mapboxMapOptions) {
-        final MapFragment mapFragment = new MapFragment();
+    public static SupportMapFragment newInstance(MapboxMapOptions mapboxMapOptions) {
+        final SupportMapFragment mapFragment = new SupportMapFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
         mapFragment.setArguments(bundle);

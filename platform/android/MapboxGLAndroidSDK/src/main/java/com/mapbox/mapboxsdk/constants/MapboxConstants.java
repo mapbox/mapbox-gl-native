@@ -52,6 +52,11 @@ public class MapboxConstants {
      */
     public static final double MINIMUM_DIRECTION = 0;
 
+    /**
+     * Fragment Argument Key for MapboxMapOptions
+     */
+    public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
+
     // Save instance state keys
     public static final String STATE_CAMERA_POSITION = "cameraPosition";
     public static final String STATE_ZOOM_ENABLED = "zoomEnabled";

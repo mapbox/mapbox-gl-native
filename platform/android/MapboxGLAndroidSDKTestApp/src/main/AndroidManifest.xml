@@ -51,6 +51,9 @@
             android:name=".MapFragmentActivity"
             android:label="@string/activity_map_fragment" />
         <activity
+            android:name=".SupportMapFragmentActivity"
+            android:label="@string/activity_map_fragment_suport" />
+        <activity
             android:name=".PressForMarkerActivity"
             android:label="@string/activity_press_for_marker" />
         <activity

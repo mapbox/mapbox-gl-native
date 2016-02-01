@@ -7,6 +7,7 @@
     <string name="activity_mapboxmap">MapboxMap</string>
     <string name="activity_tilt">Map Tilt</string>
     <string name="activity_infowindow_adapter">InfoWindow Adapter</string>
+    <string name="activity_map_fragment_suport">Support Map Fragment Activity</string>
     <string name="activity_map_fragment">Map Fragment Activity</string>
     <string name="activity_press_for_marker">Press For Marker Activity</string>
     <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
@@ -37,6 +38,7 @@
     <string name="action_info_window_adapter">InfoWindow Adapter</string>
     <string name="action_tilt">Tilt</string>
     <string name="action_map_fragment">MapFragment</string>
+    <string name="action_map_fragment_support">SupportMapFragment</string>
     <string name="action_press_for_marker">Press For Marker</string>
     <string name="action_manual_zoom">Manual Zoom</string>
     <string name="action_minmax_zoom">Min/Max Zoom</string>
