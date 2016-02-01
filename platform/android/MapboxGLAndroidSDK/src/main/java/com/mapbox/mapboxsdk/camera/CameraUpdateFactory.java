@@ -93,7 +93,7 @@ public class CameraUpdateFactory {
      * @return
      */
     public static CameraUpdate zoomBy(float amount, Point focus) {
-        return new ZoomUpdate(ZoomUpdate.ZOOM_TO_POINT, focus.x, focus.y);
+        return new ZoomUpdate(amount, focus.x, focus.y);
     }
 
     /**

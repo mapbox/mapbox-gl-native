@@ -82,7 +82,8 @@ public class ManualZoomActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_zoom_to_point:
-                mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(12, new Point(100, 100)));
+                View view = getWindow().getDecorView();
+                mMapboxMap.animateCamera(CameraUpdateFactory.zoomBy(1, new Point(view.getMeasuredWidth() / 4, view.getMeasuredHeight() / 4)));
                 return true;
 
             default:

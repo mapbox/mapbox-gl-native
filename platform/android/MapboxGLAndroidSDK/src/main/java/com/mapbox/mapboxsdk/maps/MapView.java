@@ -611,7 +611,7 @@ public class MapView extends FrameLayout {
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
         long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
-        // Out of range direactions are normallised in setBearing
+        // Out of range directions are normalised in setBearing
         mNativeMapView.setBearing(-direction, duration);
     }
 
@@ -638,105 +638,6 @@ public class MapView extends FrameLayout {
     double getZoom() {
         return mNativeMapView.getZoom();
     }
-
-    /**
-     * <p>
-     * Zooms the map to a new zoom level immediately without changing the center coordinate.
-     * </p>
-     * <p>
-     * At zoom level 0, tiles cover the entire world map;
-     * at zoom level 1, tiles cover 1/14 of the world;
-     * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * </p>
-     * <p>
-     * The initial zoom level is 0. The maximum zoom level is {@link MapboxConstants#MAXIMUM_ZOOM}.
-     * </p>
-     * If you want to animate the change, use {@link MapView#setZoom(double, boolean)}.
-     *
-     * @param zoomLevel The new zoom.
-     * @see MapView#setZoom(double, boolean)
-     * @see MapboxConstants#MAXIMUM_ZOOM
-     */
-    @UiThread
-    void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoomLevel) {
-        setZoom(zoomLevel, false);
-    }
-
-    /**
-     * <p>
-     * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
-     * </p>
-     * <p>
-     * At zoom level 0, tiles cover the entire world map;
-     * at zoom level 1, tiles cover 1/14 of the world;
-     * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * </p>
-     * The initial zoom level is 0. The maximum zoom level is {@link MapboxConstants#MAXIMUM_ZOOM}.
-     *
-     * @param zoomLevel The new zoom level.
-     * @param animated  If true, animates the change. If false, immediately changes the map.
-     * @see MapboxConstants#MAXIMUM_ZOOM
-     */
-    @UiThread
-    void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoomLevel, boolean animated) {
-        long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
-        setZoom(zoomLevel, duration);
-    }
-
-    /**
-     * <p>
-     * Zooms the map to a new zoom level and optionally animates the change without changing the center coordinate.
-     * </p>
-     * <p>
-     * At zoom level 0, tiles cover the entire world map;
-     * at zoom level 1, tiles cover 1/14 of the world;
-     * at zoom level 2, tiles cover 1/16 of the world, and so on.
-     * </p>
-     * The initial zoom level is 0. The maximum zoom level is {@link MapboxConstants#MAXIMUM_ZOOM}.
-     *
-     * @param zoomLevel The new zoom level.
-     * @param duration  The length of the animation.
-     * @see MapboxConstants#MAXIMUM_ZOOM
-     */
-    @UiThread
-    void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoomLevel, long duration) {
-        if ((zoomLevel < MapboxConstants.MINIMUM_ZOOM) || (zoomLevel > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.w(TAG, "Not setting zoom, value is in a unsupported range: " + zoomLevel);
-            return;
-        }
-        mNativeMapView.cancelTransitions();
-        mNativeMapView.setZoom(zoomLevel, duration);
-    }
-
-    void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoomLevel, float x, float y) {
-        if ((zoomLevel < MapboxConstants.MINIMUM_ZOOM) || (zoomLevel > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.w(TAG, "Not setting zoom, value is in a unsupported range: " + zoomLevel);
-            return;
-        }
-        LatLng target = fromScreenLocation(new PointF(x, y));
-        flyTo(-1, target, MapboxConstants.ANIMATION_DURATION, -1, zoomLevel, null);
-    }
-
-    void setZoom(CameraUpdateFactory.ZoomUpdate update, long duration) {
-        switch (update.getType()) {
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_IN:
-                setZoom(getZoom() + 1, duration);
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_OUT:
-                setZoom(getZoom() - 1, duration);
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_TO:
-                setZoom(update.getZoom(), duration);
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_BY:
-                setZoom(getZoom() + update.getZoom(), duration);
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_TO_POINT:
-                setZoom(update.getZoom(), update.getX(), update.getY());
-                break;
-        }
-    }
-
 
 //    /**
 //     * Return The current content padding left of the map view viewport.
