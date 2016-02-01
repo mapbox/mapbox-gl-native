@@ -126,7 +126,7 @@ public class MapboxEventManager {
                     jsonObject.put("instance", "FFFFFFFF-GGGG-HHHH-IIII-JJJJJJJJJJJJ");
                     jsonObject.put("created", evt.get("created"));
                     jsonObject.put("anonid", "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE");
-                    jsonObject.put("appBundleId", "com.mapbox.hermes.android");
+                    jsonObject.put("appBundleId", context.getPackageName());
 
                     jsonArray.put(jsonObject);
                 }
@@ -135,7 +135,7 @@ public class MapboxEventManager {
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
                 String url = eventsURL + "/events/v1?access_token=" + accessToken;
-                Log.i(TAG, "url = " + url);
+                Log.d(TAG, "url = " + url);
 
                 Request request = new Request.Builder()
                         .url(url)
