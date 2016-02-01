@@ -55,7 +55,7 @@ public class TelemetryService extends Service {
         super.onCreate();
 
         // Enable Location Listening for lifecycle of app
-        IntentFilter filter = new IntentFilter("com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver");
+        IntentFilter filter = new IntentFilter(TelemetryLocationReceiver.INTENT_STRING);
         telemetryLocationReceiver = new TelemetryLocationReceiver();
         registerReceiver(telemetryLocationReceiver, filter);
     }
@@ -137,8 +137,10 @@ public class TelemetryService extends Service {
         // Start Ambient Location Listening
         // TODO
 
-        Intent locIntent = new Intent("com.mapbox.hermes.LocationReceiver");
+/*
+        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
         locationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 14872, locIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+*/
         try {
             // Request Location Updates to be delivered to PendingIntent
             // Currently Not supported in LOST

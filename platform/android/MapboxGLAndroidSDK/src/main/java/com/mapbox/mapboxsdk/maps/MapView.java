@@ -79,6 +79,7 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.telemetry.TelemetryService;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.lang.annotation.Retention;
@@ -364,13 +365,16 @@ public class MapView extends FrameLayout {
             mMapboxMap.setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
             //noinspection ResourceType
             mMapboxMap.setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+        } else {
+            // Force a check for Telemetry
+            validateTelemetryServiceConfigured();
+
+            Intent telemetryService = new Intent(getContext(), TelemetryService.class);
+            getContext().startService(telemetryService);
         }
 
         // Force a check for an access token
         validateAccessToken(getAccessToken());
-
-        // Force a check for Telemetry
-        validateTelemetryServiceConfigured();
 
         // Initialize EGL
         mNativeMapView.initializeDisplay();

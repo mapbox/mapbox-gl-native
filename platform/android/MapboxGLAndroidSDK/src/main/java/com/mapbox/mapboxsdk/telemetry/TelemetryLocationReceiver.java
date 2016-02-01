@@ -14,6 +14,8 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
 
     private static final String TAG = "TelemLocationReceiver";
 
+    public static final String INTENT_STRING = "com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver";
+
     /**
      * Default Constructor
      */
