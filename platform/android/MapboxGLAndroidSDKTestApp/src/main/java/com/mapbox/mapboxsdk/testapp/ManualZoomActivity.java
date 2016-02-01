@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -44,7 +45,9 @@ public class ManualZoomActivity extends AppCompatActivity {
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
                 mMapboxMap.setStyle(Style.SATELLITE_STREETS);
-                mMapboxMap.setAllGesturesEnabled(false);
+
+                UiSettings uiSettings = mMapboxMap.getUiSettings();
+                uiSettings.setAllGesturesEnabled(false);
             }
         });
     }

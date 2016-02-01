@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.util.Log;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -9,16 +7,12 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.lang.reflect.Constructor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,78 +43,6 @@ public class MapboxMapTest {
     @Test
     public void testSanity() {
         assertNotNull("mMapboxMap should not be null", mMapboxMap);
-    }
-
-    @Test
-    public void testCompassEnabled() {
-        mMapboxMap.setCompassEnabled(true);
-        assertTrue("CompassEnabled should be true", mMapboxMap.isCompassEnabled());
-    }
-
-    @Test
-    public void testCompassDisabled() {
-        mMapboxMap.setCompassEnabled(false);
-        assertFalse("CompassbEnabled should be false", mMapboxMap.isCompassEnabled());
-    }
-
-    @Test
-    public void testScrollEnabled() {
-        mMapboxMap.setScrollEnabled(true);
-        assertTrue("ScrollEnabled should be true", mMapboxMap.isScrollEnabled());
-    }
-
-    @Test
-    public void testScrollDisabled() {
-        mMapboxMap.setScrollEnabled(false);
-        assertFalse("ScrollEnabled should be false", mMapboxMap.isScrollEnabled());
-    }
-
-    @Test
-    public void testRotateEnabled() {
-        mMapboxMap.setRotateEnabled(true);
-        assertTrue("RotateEnabled should be true", mMapboxMap.isRotateEnabled());
-    }
-
-    @Test
-    public void testRotateDisabled() {
-        mMapboxMap.setRotateEnabled(false);
-        assertFalse("RotateDisabled should be false", mMapboxMap.isRotateEnabled());
-    }
-
-    @Test
-    public void testZoomEnabled() {
-        mMapboxMap.setZoomEnabled(true);
-        assertTrue("ZoomEnabled should be true", mMapboxMap.isZoomEnabled());
-    }
-
-    @Test
-    public void testZoomDisabled() {
-        mMapboxMap.setZoomEnabled(false);
-        assertFalse("ZoomEnabled should be false", mMapboxMap.isZoomEnabled());
-    }
-
-    @Test
-    public void testZoomControlsEnabled() {
-        mMapboxMap.setZoomControlsEnabled(true);
-        assertTrue("ZoomControlsEnabled should be true", mMapboxMap.isZoomControlsEnabled());
-    }
-
-    @Test
-    public void testZoomControlsDisabled() {
-        mMapboxMap.setZoomControlsEnabled(false);
-        assertFalse("ZoomControlsEnabled should be false", mMapboxMap.isZoomControlsEnabled());
-    }
-
-    @Test
-    public void testTiltEnabled() {
-        mMapboxMap.setTiltEnabled(true);
-        assertTrue("TiltEnabled should be true", mMapboxMap.isTiltEnabled());
-    }
-
-    @Test
-    public void testTiltDisabled() {
-        mMapboxMap.setTiltEnabled(false);
-        assertFalse("TiltEnabled should be false", mMapboxMap.isTiltEnabled());
     }
 
     @Test
@@ -185,7 +107,7 @@ public class MapboxMapTest {
     public void testAnimateCamera() {
         CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
         mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
-        assertEquals("CameraPosition should be same", position , mMapboxMap.getCameraPosition());
+        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
     }
 
     @Test
@@ -199,7 +121,7 @@ public class MapboxMapTest {
     public void testAnimateCameraWithDurationParameter() {
         CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
         mMapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 0);
-        assertEquals("CameraPosition should be same",position, mMapboxMap.getCameraPosition());
+        assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
     }
 
     @Test

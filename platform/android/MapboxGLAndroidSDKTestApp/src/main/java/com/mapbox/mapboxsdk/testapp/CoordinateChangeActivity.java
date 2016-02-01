@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -47,8 +48,10 @@ public class CoordinateChangeActivity extends AppCompatActivity {
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
                 mapboxMap.setStyle(Style.MAPBOX_STREETS);
-                mapboxMap.setCompassEnabled(false);
                 mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getNextLatLng(), 16));
+
+                UiSettings uiSettings = mapboxMap.getUiSettings();
+                uiSettings.setCompassEnabled(false);
             }
         });
 

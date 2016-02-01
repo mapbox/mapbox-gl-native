@@ -15,10 +15,12 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
  */
 public class MapboxMapOptions implements Parcelable {
 
-    public MapboxMap mMapboxMap;
+    private MapboxMap mMapboxMap;
+    private UiSettings mUiSettings;
 
     public MapboxMapOptions(MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
+        mUiSettings = mapboxMap.getUiSettings();
     }
 
     public MapboxMapOptions(Parcel in) {
@@ -40,52 +42,52 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     public boolean getCompassEnabled() {
-        return mMapboxMap.isCompassEnabled();
+        return mUiSettings.isCompassEnabled();
     }
 
     public MapboxMapOptions rotateEnabled(boolean rotateEnabled) {
-        mMapboxMap.setRotateEnabled(rotateEnabled);
+        mUiSettings.setRotateGesturesEnabled(rotateEnabled);
         return this;
     }
 
     public MapboxMapOptions rotateGesturesEnabled(boolean enabled) {
-        mMapboxMap.setRotateEnabled(enabled);
+        mUiSettings.setRotateGesturesEnabled(enabled);
         return this;
     }
 
     public boolean getRotateGesturesEnabled() {
-        return mMapboxMap.isRotateEnabled();
+        return mUiSettings.isRotateGesturesEnabled();
     }
 
     public MapboxMapOptions scrollGesturesEnabled(boolean enabled) {
-        mMapboxMap.setScrollEnabled(enabled);
+        mUiSettings.setScrollGesturesEnabled(enabled);
         return this;
     }
 
     public boolean getScrollGesturesEnabled() {
-        return mMapboxMap.isScrollEnabled();
+        return mUiSettings.isScrollGesturesEnabled();
     }
 
     public MapboxMapOptions tiltGesturesEnabled(boolean enabled) {
-        mMapboxMap.setTiltEnabled(enabled);
+        mUiSettings.setTiltGesturesEnabled(enabled);
         return this;
     }
 
     public boolean getTiltGesturesEnabled() {
-        return mMapboxMap.isTiltEnabled();
+        return mUiSettings.isTiltGesturesEnabled();
     }
 
     public MapboxMapOptions zoomControlsEnabled(boolean enabled) {
-        mMapboxMap.setZoomControlsEnabled(enabled);
+        mUiSettings.setZoomControlsEnabled(enabled);
         return this;
     }
 
     public boolean getZoomControlsEnabled() {
-        return mMapboxMap.isZoomControlsEnabled();
+        return mUiSettings.isZoomControlsEnabled();
     }
 
     public boolean getZoomGesturesEnabled() {
-        return mMapboxMap.isZoomEnabled();
+        return mUiSettings.isZoomGesturesEnabled();
     }
 
     public MapboxMapOptions createFromAttributes(Context context, AttributeSet attrs) {

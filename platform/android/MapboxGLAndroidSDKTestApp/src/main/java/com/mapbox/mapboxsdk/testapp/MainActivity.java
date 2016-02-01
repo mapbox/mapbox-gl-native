@@ -38,6 +38,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -164,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 // Set default UI state
-                mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mapboxMap.isCompassEnabled());
+                mNavigationView.getMenu().findItem(R.id.action_compass).setChecked(mapboxMap.getUiSettings().isCompassEnabled());
                 mNavigationView.getMenu().findItem(R.id.action_debug).setChecked(mapboxMap.isDebugActive());
                 mNavigationView.getMenu().findItem(R.id.action_markers).setChecked(mIsAnnotationsOn);
                 toggleGps(mapboxMap.isMyLocationEnabled());
@@ -348,7 +349,8 @@ public class MainActivity extends AppCompatActivity {
 
                             case R.id.action_compass:
                                 // Toggle compass
-                                mMapboxMap.setCompassEnabled(!mMapboxMap.isCompassEnabled());
+                                UiSettings uiSettings = mMapboxMap.getUiSettings();
+                                uiSettings.setCompassEnabled(!uiSettings.isCompassEnabled());
                                 return true;
 
                             case R.id.action_mapboxmap:

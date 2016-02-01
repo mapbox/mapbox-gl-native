@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 
 public class DoubleMapActivity extends AppCompatActivity {
 
@@ -86,11 +87,13 @@ public class DoubleMapActivity extends AppCompatActivity {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
                     mapboxMap.setStyle(Style.LIGHT);
-                    mapboxMap.setAllGesturesEnabled(false);
-                    mapboxMap.setCompassEnabled(false);
-                    mapboxMap.setAttributionVisibility(View.GONE);
-                    mapboxMap.setLogoVisibility(View.GONE);
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
+
+                    UiSettings uiSettings = mapboxMap.getUiSettings();
+                    uiSettings.setAllGesturesEnabled(false);
+                    uiSettings.setCompassEnabled(false);
+                    uiSettings.setAttributionEnabled(false);
+                    uiSettings.setLogoEnabled(false);
 
                     try {
                         mapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
@@ -162,6 +165,4 @@ public class DoubleMapActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
 }
