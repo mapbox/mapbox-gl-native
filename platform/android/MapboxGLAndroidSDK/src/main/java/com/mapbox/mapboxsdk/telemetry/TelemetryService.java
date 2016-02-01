@@ -1,6 +1,4 @@
 package com.mapbox.mapboxsdk.telemetry;
-
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +8,12 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 public class TelemetryService extends Service {
 
     private static final String TAG = "TelemetryService";
 
     private TelemetryLocationReceiver telemetryLocationReceiver = null;
-    private PendingIntent locationPendingIntent = null;
     private PowerManager.WakeLock telemetryWakeLock;
 
     /**
@@ -134,30 +130,10 @@ public class TelemetryService extends Service {
         telemetryWakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TelemetryWakeLock");
         telemetryWakeLock.acquire();
 
-        // Start Ambient Location Listening
-        // TODO
-
-/*
-        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
-        locationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 14872, locIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-*/
-        try {
-            // Request Location Updates to be delivered to PendingIntent
-            // Currently Not supported in LOST
-            // TODO
-//            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 3.0f, mLocationPendingIntent);
-        } catch (SecurityException e) {
-            Log.e(TAG, "Permissions Not Authorized For Location Updates: " + e);
-        }
-
-
         return START_NOT_STICKY;
     }
 
     private void shutdownTelemetry() {
-        // TODO
-//        locationManager.removeUpdates(mLocationPendingIntent);
-        locationPendingIntent.cancel();
         unregisterReceiver(telemetryLocationReceiver);
         telemetryWakeLock.release();
     }
