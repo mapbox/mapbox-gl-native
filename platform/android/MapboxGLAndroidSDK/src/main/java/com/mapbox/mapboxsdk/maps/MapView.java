@@ -53,7 +53,6 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
-
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -79,9 +78,9 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.telemetry.TelemetryService;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -369,8 +368,12 @@ public class MapView extends FrameLayout {
             // Force a check for Telemetry
             validateTelemetryServiceConfigured();
 
+            // Start Telemetry Service
             Intent telemetryService = new Intent(getContext(), TelemetryService.class);
             getContext().startService(telemetryService);
+
+            // Start PASSIVE Telemetry
+            LocationServices.getLocationServices(getContext()).toggleGPS(false);
         }
 
         // Force a check for an access token
