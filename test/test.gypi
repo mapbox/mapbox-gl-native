@@ -28,8 +28,8 @@
       ],
       'sources': [
         'fixtures/main.cpp',
-        'fixtures/mock_file_source.cpp',
-        'fixtures/mock_file_source.hpp',
+        'fixtures/stub_file_source.cpp',
+        'fixtures/stub_file_source.hpp',
         'fixtures/mock_view.hpp',
         'fixtures/util.hpp',
         'fixtures/util.cpp',
@@ -90,8 +90,8 @@
         'storage/resource.cpp',
 
         'style/glyph_store.cpp',
-        'style/pending_resources.cpp',
-        'style/resource_loading.cpp',
+        'style/source.cpp',
+        'style/style.cpp',
         'style/style_layer.cpp',
 
         'sprite/sprite_atlas.cpp',
