@@ -1,8 +1,12 @@
 package com.mapbox.mapboxsdk.location;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LostApiClient;
 import java.util.ArrayList;
@@ -10,8 +14,11 @@ import java.util.List;
 
 public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
 
+    private static final String TAG = "LocationServices";
+
     private static LocationServices instance = null;
 
+    private Context context;
     private LostApiClient mLocationClient;
     private LocationRequest mLocationRequest;
 
@@ -26,6 +33,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     private LocationServices(Context context) {
         super();
+        this.context = context;
         // Setup location services
         mLocationClient = new LostApiClient.Builder(context).build();
         locationListeners = new ArrayList<>();
@@ -53,20 +61,21 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     public void toggleGPS(boolean enableGPS) {
 
+        // Disconnect
+        if (mLocationClient.isConnected()) {
+            // Disconnect first to ensure that the new requests are GPS
+            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
+            mLocationClient.disconnect();
+        }
+
+        // Setup Fresh
+        mLocationClient.connect();
+        Location lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation();
+        if (lastLocation != null) {
+            this.lastLocation = lastLocation;
+        }
+
         if (enableGPS) {
-
-            if (mLocationClient.isConnected()) {
-                // Disconnect first to ensure that the new requests are GPS
-                com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
-                mLocationClient.disconnect();
-            }
-
-            // Setup Fresh
-            mLocationClient.connect();
-            Location lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation();
-            if (lastLocation != null) {
-                this.lastLocation = lastLocation;
-            }
 
             // LocationRequest Tuned for GPS
             mLocationRequest = LocationRequest.create()
@@ -78,12 +87,13 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
         } else {
 
-            // Disconnect
-            if (mLocationClient.isConnected()) {
-                // Disconnect first to ensure that the new requests are GPS
-                com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
-                mLocationClient.disconnect();
-            }
+            // LocationRequest Tuned for PASSIVE
+            mLocationRequest = LocationRequest.create()
+                    .setFastestInterval(1000)
+                    .setSmallestDisplacement(3.0f)
+                    .setPriority(LocationRequest.PRIORITY_NO_POWER);
+
+            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
 
         }
 
@@ -96,12 +106,18 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.i(TAG, "onLocationChanged()..." + location);
         this.lastLocation = location;
 
         // Update Listeners
         for (LocationListener listener : this.locationListeners) {
             listener.onLocationChanged(location);
         }
+
+        // Update the Telemetry Receiver
+        Intent locIntent = new Intent(TelemetryLocationReceiver.INTENT_STRING);
+        locIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, location);
+        context.sendBroadcast(locIntent);
     }
 
     /**
