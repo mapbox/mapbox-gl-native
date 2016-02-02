@@ -261,12 +261,10 @@ LatLng TransformState::pointToLatLng(const PrecisionPoint& point) const {
 }
 
 TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
-    const double tileZoom = getZoom();
-    const double k = zoomScale(tileZoom) / worldSize();
     return {
-        lngX(latLng.longitude) * k,
-        latY(latLng.latitude) * k,
-        tileZoom
+        lngX(latLng.longitude) / util::tileSize,
+        latY(latLng.latitude) / util::tileSize,
+        getZoom()
     };
 }
 
