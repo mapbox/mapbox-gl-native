@@ -85,14 +85,10 @@ private:
     bool handlePartialTile(const TileID&);
     bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
     void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
-    int32_t coveringZoomLevel(const TransformState&) const;
-    std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
     TileData::State addTile(const TileID&, const StyleUpdateParameters&);
     TileData::State hasTile(const TileID&);
     void updateTilePtrs();
-
-    double getZoom(const TransformState &state) const;
 
 private:
     std::unique_ptr<const SourceInfo> info;
