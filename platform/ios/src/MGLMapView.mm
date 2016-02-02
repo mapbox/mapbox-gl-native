@@ -2958,12 +2958,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
 
-    [self showAnnotations:annotations
-           withEdgeInsets:edgeInsets
-                 animated:animated];
+    [self showAnnotations:annotations edgePadding:edgeInsets animated:animated];
 }
 
-- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations withEdgeInsets:(UIEdgeInsets)edgeInsets animated:(BOOL)animated
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated
 {
     if ( ! annotations || ! annotations.count) return;
 
@@ -2982,7 +2980,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
 
     [self setVisibleCoordinateBounds:MGLCoordinateBoundsFromLatLngBounds(bounds)
-                         edgePadding:edgeInsets
+                         edgePadding:insets
                             animated:animated];
 }
 
