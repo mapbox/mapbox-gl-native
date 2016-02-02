@@ -242,10 +242,10 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& pad
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) {
     AnnotationSegment segment = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
+        bounds.northwest(),
+        bounds.southwest(),
+        bounds.southeast(),
+        bounds.northeast(),
     };
     return cameraForLatLngs(segment, padding);
 }

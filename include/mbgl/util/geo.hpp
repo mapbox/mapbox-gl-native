@@ -44,21 +44,47 @@ public:
 
 class LatLngBounds {
 public:
-    LatLng sw = {-90, -180};
-    LatLng ne = {90, 180};
+    // Return a bounds covering the entire (unwrapped) world.
+    static LatLngBounds world() {
+        return LatLngBounds({-90, -180}, {90, 180});
+    }
 
-    LatLngBounds() {}
+    // Return the bounds consisting of the single point.
+    static LatLngBounds singleton(const LatLng& a) {
+        return LatLngBounds(a, a);
+    }
 
-    LatLngBounds(const LatLng& sw_, const LatLng& ne_)
-        : sw(sw_), ne(ne_) {}
+    // Return the convex hull of two points; the smallest bounds that contains both.
+    static LatLngBounds hull(const LatLng& a, const LatLng& b) {
+        LatLngBounds bounds(a, a);
+        bounds.extend(b);
+        return bounds;
+    }
 
-    static LatLngBounds getExtendable() {
-        LatLngBounds bounds;
-        return { bounds.ne, bounds.sw };
+    // Return a bounds that may serve as the identity element for the extend operation.
+    static LatLngBounds empty() {
+        LatLngBounds bounds = world();
+        std::swap(bounds.sw, bounds.ne);
+        return bounds;
     }
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
-    LatLngBounds(const TileID& id);
+    LatLngBounds(const TileID&);
+
+    double south() const { return sw.latitude; }
+    double west()  const { return sw.longitude; }
+    double north() const { return ne.latitude; }
+    double east()  const { return ne.longitude; }
+
+    LatLng southwest() const { return sw; }
+    LatLng northeast() const { return ne; }
+    LatLng southeast() const { return LatLng(south(), east()); }
+    LatLng northwest() const { return LatLng(north(), west()); }
+
+    LatLng center() const {
+        return LatLng((sw.latitude + ne.latitude) / 2,
+                      (sw.longitude + ne.longitude) / 2);
+    }
 
     void extend(const LatLng& point) {
         if (point.latitude < sw.latitude) sw.latitude = point.latitude;
@@ -70,6 +96,11 @@ public:
     void extend(const LatLngBounds& bounds) {
         extend(bounds.sw);
         extend(bounds.ne);
+    }
+
+    bool isEmpty() const {
+        return sw.latitude > ne.latitude ||
+               sw.longitude > ne.longitude;
     }
 
     bool contains(const LatLng& point) const {
@@ -85,6 +116,13 @@ public:
                 area.ne.longitude > sw.longitude &&
                 area.sw.longitude < ne.longitude);
     }
+
+private:
+    LatLng sw;
+    LatLng ne;
+
+    LatLngBounds(const LatLng& sw_, const LatLng& ne_)
+        : sw(sw_), ne(ne_) {}
 };
 
 class MetersBounds {

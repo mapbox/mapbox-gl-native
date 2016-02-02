@@ -30,7 +30,7 @@
 
 // Make Boost Geometry aware of our LatLng type
 BOOST_GEOMETRY_REGISTER_POINT_2D(mbgl::LatLng, double, boost::geometry::cs::cartesian, longitude, latitude)
-BOOST_GEOMETRY_REGISTER_BOX(mbgl::LatLngBounds, mbgl::LatLng, sw, ne)
+BOOST_GEOMETRY_REGISTER_BOX(mbgl::LatLngBounds, mbgl::LatLng, southwest(), northeast())
 
 namespace mbgl {
 

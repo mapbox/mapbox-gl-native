@@ -1182,10 +1182,9 @@ jlongArray JNICALL nativeGetAnnotationsInBounds(JNIEnv *env, jobject obj, jlong 
         return nullptr;
     }
 
-    mbgl::LatLngBounds bounds({ swLat, swLon }, { neLat, neLon });
-
     // assume only points for now
-    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(bounds);
+    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(
+        mbgl::LatLngBounds::hull({ swLat, swLon }, { neLat, neLon }));
 
     return std_vector_uint_to_jobject(env, annotations);
 }
