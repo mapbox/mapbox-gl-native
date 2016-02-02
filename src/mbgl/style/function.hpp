@@ -27,6 +27,9 @@ public:
 
     T evaluate(const StyleCalculationParameters&) const;
 
+    float getBase() const { return base; }
+    const std::vector<std::pair<float, T>>& getStops() const { return stops; }
+
 private:
     float base = 1;
     std::vector<std::pair<float, T>> stops;

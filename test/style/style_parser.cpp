@@ -113,3 +113,13 @@ TEST(StyleParser, ParseTileJSONVector) {
     EXPECT_EQ("attribution", result->attribution);
     EXPECT_EQ("http://a.tiles.mapbox.com/mapbox.streets/{z}-{x}-{y}.vector.pbf?access_token=key", result->tiles[0]);
 }
+
+TEST(StyleParser, FontStacks) {
+    StyleParser parser;
+    parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
+    auto result = parser.fontStacks();
+    ASSERT_EQ(3, result.size());
+    ASSERT_EQ("a", result[0]);
+    ASSERT_EQ("a,b", result[1]);
+    ASSERT_EQ("a,b,c", result[2]);
+}

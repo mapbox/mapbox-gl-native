@@ -28,6 +28,9 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
 
+    // Statically evaluate layer properties to determine what font stacks are used.
+    std::vector<std::string> fontStacks() const;
+
     static std::unique_ptr<SourceInfo> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType);
     static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);
 

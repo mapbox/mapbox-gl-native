@@ -1,0 +1,38 @@
+{
+  "version": 8,
+  "sources": {
+    "source": {
+      "type": "vector",
+      "tiles": []
+    }
+  },
+  "layers": [{
+    "id": "a",
+    "type": "symbol",
+    "source": "source",
+    "source-layer": "source-layer",
+    "layout": {
+      "text-font": ["a"]
+    }
+  }, {
+    "id": "a,b",
+    "type": "symbol",
+    "source": "source",
+    "source-layer": "source-layer",
+    "layout": {
+      "text-font": {
+        "stops": [[0, ["a", "b"]]]
+      }
+    }
+  }, {
+    "id": "a,b;a,b,c",
+    "type": "symbol",
+    "source": "source",
+    "source-layer": "source-layer",
+    "layout": {
+      "text-font": {
+        "stops": [[0, ["a", "b"]], [1, ["a", "b", "c"]]]
+      }
+    }
+  }]
+}

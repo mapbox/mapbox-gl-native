@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <set>
 
 namespace mbgl {
 
@@ -482,6 +483,25 @@ void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
         return;
     }
     layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
+}
+
+std::vector<std::string> StyleParser::fontStacks() const {
+    std::set<std::string> result;
+
+    for (const auto& layer : layers) {
+        if (layer->is<SymbolLayer>()) {
+            LayoutProperty<std::string> property = layer->as<SymbolLayer>()->layout.text.font;
+            if (property.parsedValue) {
+                for (const auto& stop : property.parsedValue->getStops()) {
+                    result.insert(stop.second);
+                }
+            } else {
+                result.insert(property.value);
+            }
+        }
+    }
+
+    return std::vector<std::string>(result.begin(), result.end());
 }
 
 } // namespace mbgl
