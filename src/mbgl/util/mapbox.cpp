@@ -119,7 +119,7 @@ std::string normalizeTileURL(const std::string& url, const std::string& accessTo
     return baseURL + "v4/" + url.substr(sizeof("mapbox://tiles/") - 1) + "?access_token=" + accessToken;
 }
 
-std::string canonicalizeTileURL(const std::string& url, SourceType type) {
+std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_t tileSize) {
     auto tilesetStartIdx = url.find("/v4/");
     if (tilesetStartIdx == std::string::npos) {
         return url;
@@ -159,8 +159,14 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type) {
     }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__)
 
-    return "mapbox://tiles/" + tileset + "/{z}/{x}/{y}" +
-        (type == SourceType::Raster ? "{ratio}" : "") + "." + extension;
+    std::string result = "mapbox://tiles/" + tileset + "/{z}/{x}/{y}";
+
+    if (type == SourceType::Raster) {
+        result += tileSize == 512 ? "@2x" : "{ratio}";
+    }
+
+    result += "." + extension;
+    return result;
 }
 
 } // end namespace mapbox

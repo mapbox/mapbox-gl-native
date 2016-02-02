@@ -107,7 +107,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(source->url));
                 if (sourceResponse) {
                     result.requiredResourceCount += tileResources(source->type, source->tileSize,
-                        *StyleParser::parseTileJSON(*sourceResponse->data, source->url, source->type)).size();
+                        *StyleParser::parseTileJSON(*sourceResponse->data, source->url, source->type, source->tileSize)).size();
                 } else {
                     result.requiredResourceCountIsIndeterminate = true;
                 }
@@ -157,7 +157,7 @@ void OfflineDownload::activateDownload() {
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=] (Response sourceResponse) {
-                        ensureTiles(type, tileSize, *StyleParser::parseTileJSON(*sourceResponse.data, url, type));
+                        ensureTiles(type, tileSize, *StyleParser::parseTileJSON(*sourceResponse.data, url, type, tileSize));
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {

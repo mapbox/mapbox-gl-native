@@ -31,7 +31,7 @@ public:
     // Statically evaluate layer properties to determine what font stacks are used.
     std::vector<std::string> fontStacks() const;
 
-    static std::unique_ptr<SourceInfo> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType);
+    static std::unique_ptr<SourceInfo> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
     static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);
 
     static std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);

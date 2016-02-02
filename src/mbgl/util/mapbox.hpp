@@ -17,7 +17,7 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
 std::string normalizeTileURL(const std::string& url, const std::string& accessToken);
 
 // Return a "mapbox://tiles/..." URL (suitable for normalizeTileURL) for the given Mapbox tile URL.
-std::string canonicalizeTileURL(const std::string& url, SourceType);
+std::string canonicalizeTileURL(const std::string& url, SourceType, uint16_t tileSize);
 
 } // namespace mapbox
 } // namespace util

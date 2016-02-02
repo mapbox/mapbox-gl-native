@@ -90,7 +90,8 @@ TEST(StyleParser, ParseTileJSONRaster) {
     auto result = StyleParser::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.raster.json"),
         "mapbox://mapbox.satellite",
-        SourceType::Raster);
+        SourceType::Raster,
+        256);
 
     EXPECT_EQ(0, result->minZoom);
     EXPECT_EQ(15, result->maxZoom);
@@ -106,7 +107,8 @@ TEST(StyleParser, ParseTileJSONVector) {
     auto result = StyleParser::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.vector.json"),
         "mapbox://mapbox.streets",
-        SourceType::Vector);
+        SourceType::Vector,
+        256);
 
     EXPECT_EQ(0, result->minZoom);
     EXPECT_EQ(15, result->maxZoom);

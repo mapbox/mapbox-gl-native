@@ -58,56 +58,74 @@ TEST(Mapbox, TileURL) {
 TEST(Mapbox, CanonicalURL) {
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
-        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
+        mbgl::util::mapbox::canonicalizeTileURL("http://a.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector, 512));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
-        mbgl::util::mapbox::canonicalizeTileURL("http://b.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
+        mbgl::util::mapbox::canonicalizeTileURL("http://b.tiles.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector, 512));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf", SourceType::Vector, 512));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}.vector.pbf",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector, 512));
     EXPECT_EQ(
         "mapbox://tiles/a.b,c.d/{z}/{x}/{y}.vector.pbf",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b,c.d/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b,c.d/{z}/{x}/{y}.vector.pbf?access_token=key", SourceType::Vector, 512));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.jpg",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg?access_token=key", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg?access_token=key", SourceType::Raster, 256));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.jpg70",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg70?access_token=key", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg70?access_token=key", SourceType::Raster, 256));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.jpg",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg?access_token=key", SourceType::Raster, 512));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.jpg70",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.jpg70?access_token=key", SourceType::Raster, 512));
 
 #if defined(__ANDROID__) || defined(__APPLE__)
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.png",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 256));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.png",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 256));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.png",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 512));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.png",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 512));
 #else
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 256));
     EXPECT_EQ(
         "mapbox://tiles/a.b/{z}/{x}/{y}{ratio}.webp",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 256));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.webp",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png", SourceType::Raster, 512));
+    EXPECT_EQ(
+        "mapbox://tiles/a.b/{z}/{x}/{y}@2x.webp",
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.png?access_token=key", SourceType::Raster, 512));
 #endif // defined(__ANDROID__) || defined(__APPLE__)
 
     // We don't ever expect to see these inputs, but be safe anyway.
     EXPECT_EQ(
         "",
-        mbgl::util::mapbox::canonicalizeTileURL("", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("", SourceType::Raster, 256));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::canonicalizeTileURL("http://path", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://path", SourceType::Raster, 256));
     EXPECT_EQ(
         "http://api.mapbox.com/v4/",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/", SourceType::Raster, 256));
     EXPECT_EQ(
         "http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}.", SourceType::Raster, 256));
     EXPECT_EQ(
         "http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.",
-        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.", SourceType::Raster));
+        mbgl::util::mapbox::canonicalizeTileURL("http://api.mapbox.com/v4/a.b/{z}/{x}/{y}/.", SourceType::Raster, 256));
 }
