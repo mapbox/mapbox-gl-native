@@ -14,7 +14,6 @@
 namespace mbgl {
 
 class Tile;
-class TileID;
 
 struct ClipID {
     inline ClipID() {}
@@ -26,28 +25,33 @@ struct ClipID {
     inline bool operator==(const ClipID &other) const {
         return mask == other.mask && reference == other.reference;
     }
+
+    inline ClipID& operator|=(const ClipID &other) {
+        mask |= other.mask;
+        reference |= other.reference;
+        return *this;
+    }
 };
 
 class ClipIDGenerator {
 private:
     struct Leaf {
-        Leaf(Tile &tile);
+        Leaf(TileID, ClipID&);
         void add(const TileID &p);
         bool operator==(const Leaf &other) const;
 
-        Tile &tile;
+        const TileID id;
         std::forward_list<TileID> children;
+        ClipID& clip;
     };
 
-    typedef std::vector<Leaf> Pool;
-    std::forward_list<Pool> pools;
     uint8_t bit_offset = 0;
-
-private:
-    bool reuseExisting(Leaf &leaf);
+    std::vector<Leaf> pool;
 
 public:
     void update(std::forward_list<Tile *> tiles);
+
+    std::map<TileID, ClipID> getStencils() const;
 };
 
 

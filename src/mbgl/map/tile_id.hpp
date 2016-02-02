@@ -6,6 +6,7 @@
 #include <string>
 #include <functional>
 #include <forward_list>
+#include <limits>
 
 namespace mbgl {
 
@@ -48,7 +49,8 @@ public:
 
     TileID parent(int8_t z, int8_t sourceMaxZoom) const;
     TileID normalized() const;
-    std::forward_list<TileID> children(int8_t sourceMaxZoom) const;
+    std::forward_list<TileID>
+    children(int8_t sourceMaxZoom = std::numeric_limits<int8_t>::max()) const;
     bool isChildOf(const TileID&) const;
     operator std::string() const;
 
