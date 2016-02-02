@@ -1,8 +1,8 @@
 #ifndef QMAPBOXGL_H
 #define QMAPBOXGL_H
 
+#include <QMapbox>
 #include <QObject>
-#include <QPair>
 #include <QPointF>
 
 class QImage;
@@ -77,20 +77,6 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(double pitch READ pitch WRITE setPitch)
 
 public:
-    typedef QPair<double, double> Coordinate;
-    typedef QList<Coordinate> Coordinates;
-    typedef QList<Coordinates> CoordinateSegments;
-
-    typedef quint32 AnnotationID;
-    typedef QList<AnnotationID> AnnotationIDs;
-
-    typedef QPair<Coordinate, QString> PointAnnotation;
-    typedef QList<PointAnnotation> PointAnnotations;
-
-    // FIXME: We need to add support for custom style properties
-    typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
-    typedef QList<ShapeAnnotation> ShapeAnnotations;
-
     // Determines the orientation of the map.
     enum NorthOrientation {
         NorthUpwards, // Default
@@ -135,9 +121,9 @@ public:
     NorthOrientation northOrientation() const;
     void setNorthOrientation(NorthOrientation);
 
-    Coordinate coordinate() const;
-    void setCoordinate(const Coordinate &);
-    void setCoordinateZoom(const Coordinate &, double zoom);
+    QMapbox::Coordinate coordinate() const;
+    void setCoordinate(const QMapbox::Coordinate &);
+    void setCoordinateZoom(const QMapbox::Coordinate &, double zoom);
 
     void setGestureInProgress(bool inProgress);
 
@@ -147,14 +133,14 @@ public:
     void setClasses(const QStringList &);
     QStringList getClasses() const;
 
-    AnnotationID addPointAnnotation(const PointAnnotation &);
-    AnnotationIDs addPointAnnotations(const PointAnnotations &);
+    QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
+    QMapbox::AnnotationIDs addPointAnnotations(const QMapbox::PointAnnotations &);
 
-    AnnotationID addShapeAnnotation(const ShapeAnnotation &);
-    AnnotationIDs addShapeAnnotations(const ShapeAnnotations &);
+    QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
+    QMapbox::AnnotationIDs addShapeAnnotations(const QMapbox::ShapeAnnotations &);
 
-    void removeAnnotation(AnnotationID);
-    void removeAnnotations(const AnnotationIDs &);
+    void removeAnnotation(QMapbox::AnnotationID);
+    void removeAnnotations(const QMapbox::AnnotationIDs &);
 
     bool isRotating() const;
     bool isScaling() const;
@@ -169,8 +155,8 @@ public:
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
 
-    QPointF pixelForCoordinate(const Coordinate &) const;
-    Coordinate coordinateForPixel(const QPointF &) const;
+    QPointF pixelForCoordinate(const QMapbox::Coordinate &) const;
+    QMapbox::Coordinate coordinateForPixel(const QPointF &) const;
 
     void setMargins(const QMargins &margins);
     QMargins margins() const;

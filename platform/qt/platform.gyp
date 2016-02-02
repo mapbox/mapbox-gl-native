@@ -42,6 +42,7 @@
         '../default/sqlite3.cpp',
         '../default/string_stdlib.cpp',
         '../default/thread.cpp',
+        'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
         'qmapbox.qrc',
         'src/async_task.cpp',

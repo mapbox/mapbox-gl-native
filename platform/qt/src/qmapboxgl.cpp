@@ -18,6 +18,8 @@
 
 #include <memory>
 
+using namespace QMapbox;
+
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
     , m_contextMode(QMapboxGLSettings::UniqueGLContext)
@@ -189,7 +191,7 @@ double QMapboxGL::maximumZoom() const
     return d_ptr->mapObj->getMaxZoom();
 }
 
-QMapboxGL::Coordinate QMapboxGL::coordinate() const
+Coordinate QMapboxGL::coordinate() const
 {
     const mbgl::LatLng& latLng = d_ptr->mapObj->getLatLng(d_ptr->margins);
     return Coordinate(latLng.latitude, latLng.longitude);
@@ -294,24 +296,24 @@ QStringList QMapboxGL::getClasses() const
     return classNames;
 }
 
-mbgl::PointAnnotation fromQMapboxGLPointAnnotation(const QMapboxGL::PointAnnotation &pointAnnotation) {
-    const QMapboxGL::Coordinate &coordinate = pointAnnotation.first;
+mbgl::PointAnnotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
+    const Coordinate &coordinate = pointAnnotation.first;
     const QString &icon = pointAnnotation.second;
     return { { coordinate.first, coordinate.second }, icon.toStdString() };
 }
 
-QMapboxGL::AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
+AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
 {
-    return d_ptr->mapObj->addPointAnnotation(fromQMapboxGLPointAnnotation(pointAnnotation));
+    return d_ptr->mapObj->addPointAnnotation(fromPointAnnotation(pointAnnotation));
 }
 
-QMapboxGL::AnnotationIDs QMapboxGL::addPointAnnotations(const PointAnnotations &pointAnnotations)
+AnnotationIDs QMapboxGL::addPointAnnotations(const PointAnnotations &pointAnnotations)
 {
     std::vector<mbgl::PointAnnotation> mbglPointAnnotations;
     mbglPointAnnotations.reserve(pointAnnotations.size());
 
     for (const PointAnnotation &pointAnnotation : pointAnnotations) {
-        mbglPointAnnotations.emplace_back(fromQMapboxGLPointAnnotation(pointAnnotation));
+        mbglPointAnnotations.emplace_back(fromPointAnnotation(pointAnnotation));
     }
 
     AnnotationIDs ids;
@@ -322,18 +324,18 @@ QMapboxGL::AnnotationIDs QMapboxGL::addPointAnnotations(const PointAnnotations &
     return ids;
 }
 
-mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const QMapboxGL::ShapeAnnotation &shapeAnnotation) {
-    const QMapboxGL::CoordinateSegments &segments = shapeAnnotation.first;
+mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
+    const CoordinateSegments &segments = shapeAnnotation.first;
     const QString &styleLayer = shapeAnnotation.second;
 
     mbgl::AnnotationSegments mbglAnnotationSegments;
     mbglAnnotationSegments.reserve(segments.size());
 
-    for (const QMapboxGL::Coordinates &coordinates : segments) {
+    for (const Coordinates &coordinates : segments) {
         mbgl::AnnotationSegment mbglAnnotationSegment;
         mbglAnnotationSegment.reserve(coordinates.size());
 
-        for (const QMapboxGL::Coordinate &coordinate : coordinates) {
+        for (const Coordinate &coordinate : coordinates) {
             mbgl::LatLng mbglCoordinate(coordinate.first, coordinate.second);
             mbglAnnotationSegment.emplace_back(mbglCoordinate);
         }
@@ -344,12 +346,12 @@ mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const QMapboxGL::ShapeAnnotat
     return { mbglAnnotationSegments, styleLayer.toStdString() };
 }
 
-QMapboxGL::AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
+AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
 {
     return d_ptr->mapObj->addShapeAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
 }
 
-QMapboxGL::AnnotationIDs QMapboxGL::addShapeAnnotations(const ShapeAnnotations &shapeAnnotations)
+AnnotationIDs QMapboxGL::addShapeAnnotations(const ShapeAnnotations &shapeAnnotations)
 {
     std::vector<mbgl::ShapeAnnotation> mbglShapeAnnotations;
     mbglShapeAnnotations.reserve(shapeAnnotations.size());
@@ -450,7 +452,7 @@ QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
     return QPointF(pixel.x, pixel.y);
 }
 
-QMapboxGL::Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
+Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
 {
     const mbgl::LatLng latLng =
         d_ptr->mapObj->latLngForPixel(mbgl::ScreenCoordinate { pixel.x(), pixel.y() });
