@@ -628,7 +628,7 @@ public class MapboxMap {
         }
 
         if (!handledDefaultClick) {
-            if (isInfoWindowValidForMarker(marker)) {
+            if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
                 mInfoWindows.add(marker.showInfoWindow(this, mMapView));
             }
         }
