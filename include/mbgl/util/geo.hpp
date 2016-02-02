@@ -11,7 +11,8 @@ class TileID;
 
 using PrecisionPoint = vec2<double>;
 
-struct LatLng {
+class LatLng {
+public:
     double latitude = 0;
     double longitude = 0;
 
@@ -28,7 +29,8 @@ struct LatLng {
     PrecisionPoint project() const;
 };
 
-struct ProjectedMeters {
+class ProjectedMeters {
+public:
     double northing = 0;
     double easting = 0;
 
@@ -40,7 +42,8 @@ struct ProjectedMeters {
     }
 };
 
-struct LatLngBounds {
+class LatLngBounds {
+public:
     LatLng sw = {-90, -180};
     LatLng ne = {90, 180};
 
@@ -88,7 +91,8 @@ struct LatLngBounds {
     }
 };
 
-struct MetersBounds {
+class MetersBounds {
+public:
     ProjectedMeters sw;
     ProjectedMeters ne;
 
@@ -109,7 +113,8 @@ enum class NorthOrientation : uint8_t {
 };
 
 /// The distance on each side between a rectangle and a rectangle within.
-struct EdgeInsets {
+class EdgeInsets {
+public:
     double top = 0;     ///< Number of pixels inset from the top edge.
     double left = 0;    ///< Number of pixels inset from the left edge.
     double bottom = 0;  ///< Number of pixels inset from the bottom edge.
