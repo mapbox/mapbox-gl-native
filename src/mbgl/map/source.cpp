@@ -109,7 +109,7 @@ void Source::load() {
             // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
             // via the URL.
             try {
-                newInfo = StyleParser::parseTileJSON(*res.data, url);
+                newInfo = StyleParser::parseTileJSON(*res.data, url, type);
             } catch (...) {
                 observer->onSourceError(*this, std::current_exception());
                 return;
