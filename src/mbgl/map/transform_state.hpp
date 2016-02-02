@@ -38,9 +38,6 @@ public:
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
 
-    std::array<float, 2> locationCoordinate(float lon, float lat) const;
-    void getLonLat(double &lon, double &lat) const;
-
     // Position
     LatLng getLatLng() const;
     double pixel_x() const;
