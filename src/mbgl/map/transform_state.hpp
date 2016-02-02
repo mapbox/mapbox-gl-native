@@ -44,11 +44,10 @@ public:
     double pixel_y() const;
 
     // Zoom
-    float getNormalizedZoom() const;
+    double getScale() const;
     double getZoom() const;
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
-    double getScale() const;
     void setMinZoom(const double minZoom);
     double getMinZoom() const;
     void setMaxZoom(const double maxZoom);

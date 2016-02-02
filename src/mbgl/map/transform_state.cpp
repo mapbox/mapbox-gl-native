@@ -148,10 +148,6 @@ double TransformState::pixel_y() const {
 
 #pragma mark - Zoom
 
-float TransformState::getNormalizedZoom() const {
-    return std::log(scale * util::tileSize / 512.0f) / M_LN2;
-}
-
 double TransformState::getZoom() const {
     return std::log(scale) / M_LN2;
 }

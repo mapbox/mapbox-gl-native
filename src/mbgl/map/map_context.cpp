@@ -178,7 +178,7 @@ void MapContext::update() {
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::Zoom) {
-        style->recalculate(transformState.getNormalizedZoom());
+        style->recalculate(transformState.getZoom());
     }
 
     style->update(transformState, *texturePool);

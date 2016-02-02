@@ -59,19 +59,19 @@ void Painter::renderSDF(SymbolBucket &bucket,
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
 
-    sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
+    sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
     if (data.mode == MapMode::Continuous) {
         FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
         sdfShader.u_fadedist = f.fadedist * 10;
         sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
         sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
-        sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+        sdfShader.u_fadezoom = (state.getZoom() + f.bump) * 10;
     } else { // MapMode::Still
         sdfShader.u_fadedist = 0;
-        sdfShader.u_minfadezoom = state.getNormalizedZoom() * 10;
-        sdfShader.u_maxfadezoom = state.getNormalizedZoom() * 10;
-        sdfShader.u_fadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_minfadezoom = state.getZoom() * 10;
+        sdfShader.u_maxfadezoom = state.getZoom() * 10;
+        sdfShader.u_fadezoom = state.getZoom() * 10;
     }
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
@@ -143,8 +143,8 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
         config.program = collisionBoxShader->program;
         collisionBoxShader->u_matrix = matrix;
-        collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
-        collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
+        collisionBoxShader->u_scale = std::pow(2, state.getZoom() - id.z);
+        collisionBoxShader->u_zoom = state.getZoom() * 10;
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
         config.lineWidth = 1.0f;
 
@@ -238,11 +238,11 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.icon.size) / std::log(2);
 
-            iconShader->u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
+            iconShader->u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
             iconShader->u_fadedist = 0 * 10;
-            iconShader->u_minfadezoom = state.getNormalizedZoom() * 10;
-            iconShader->u_maxfadezoom = state.getNormalizedZoom() * 10;
-            iconShader->u_fadezoom = state.getNormalizedZoom() * 10;
+            iconShader->u_minfadezoom = state.getZoom() * 10;
+            iconShader->u_maxfadezoom = state.getZoom() * 10;
+            iconShader->u_fadezoom = state.getZoom() * 10;
             iconShader->u_opacity = properties.icon.opacity;
 
             setDepthSublayer(0);

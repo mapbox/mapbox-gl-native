@@ -154,7 +154,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         drawClippingMasks(sources);
     }
 
-    frameHistory.record(data.getAnimationTime(), state.getNormalizedZoom());
+    frameHistory.record(data.getAnimationTime(), state.getZoom());
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
