@@ -9,8 +9,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 public final class CameraPosition implements Parcelable {
@@ -161,11 +160,11 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
-         * Create Builder from an existing PositionCameraUpdate update.
+         * Create Builder from an existing CameraPositionUpdate update.
          *
          * @param update Update containing camera options
          */
-        public Builder(CameraUpdateFactory.PositionCameraUpdate update) {
+        public Builder(CameraUpdateFactory.CameraPositionUpdate update) {
             super();
             if (update != null) {
                 this.bearing = update.getBearing();
@@ -177,7 +176,7 @@ public final class CameraPosition implements Parcelable {
 
 
         /**
-         * Create Builder from an existing PositionCameraUpdate update.
+         * Create Builder from an existing CameraPositionUpdate update.
          *
          * @param update Update containing camera options
          */

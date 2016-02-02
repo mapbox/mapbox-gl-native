@@ -12,7 +12,6 @@ import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -24,8 +23,6 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
@@ -42,7 +39,7 @@ public class MapboxMap {
 
     private MapView mMapView;
     private UiSettings mUiSettings;
-    private CameraPosition mCurrentCameraPosition;
+    private CameraPosition mCameraPosition;
     private String mStyleUrl;
     private List<Marker> mSelectedMarkers;
     private List<InfoWindow> mInfoWindows;
@@ -92,7 +89,7 @@ public class MapboxMap {
      * @return The current position of the Camera.
      */
     public final CameraPosition getCameraPosition() {
-        return mCurrentCameraPosition;
+        return mCameraPosition;
     }
 
     /**
@@ -115,52 +112,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update) {
-        CameraPosition cameraPosition;
-        if (update instanceof CameraUpdateFactory.PositionCameraUpdate) {
-            CameraUpdateFactory.PositionCameraUpdate positionCameraUpdate = (CameraUpdateFactory.PositionCameraUpdate) update;
-            cameraPosition = new CameraPosition.Builder(positionCameraUpdate).build();
-        } else if (update instanceof CameraUpdateFactory.ZoomUpdate) {
-            CameraUpdateFactory.ZoomUpdate zoomUpdate = (CameraUpdateFactory.ZoomUpdate) update;
-            if(zoomUpdate.getType()!= CameraUpdateFactory.ZoomUpdate.ZOOM_TO_POINT){
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .build();
-            }else{
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .target(fromScreenLocation(new PointF(zoomUpdate.getX(),zoomUpdate.getY())))
-                        .build();
-            }
-        } else {
-            Log.e(MapboxConstants.TAG, "Unsupported CameraUpdate");
-            return;
-        }
-        mCurrentCameraPosition = cameraPosition;
-        mMapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
-    }
-
-    private float getZoom(CameraUpdateFactory.ZoomUpdate update, float currentZoom) {
-        switch (update.getType()) {
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_IN:
-                currentZoom++;
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_OUT:
-                currentZoom--;
-                if (currentZoom < 0) {
-                    currentZoom = 0;
-                }
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_TO:
-                currentZoom = update.getZoom();
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_BY:
-                currentZoom = currentZoom + update.getZoom();
-                break;
-            case CameraUpdateFactory.ZoomUpdate.ZOOM_TO_POINT:
-                currentZoom = currentZoom + update.getZoom();
-                break;
-        }
-        return currentZoom;
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.jumpTo(mCameraPosition.bearing, mCameraPosition.target, mCameraPosition.tilt, mCameraPosition.zoom);
     }
 
     /**
@@ -185,28 +138,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        CameraPosition cameraPosition;
-        if (update instanceof CameraUpdateFactory.PositionCameraUpdate) {
-            CameraUpdateFactory.PositionCameraUpdate positionCameraUpdate = (CameraUpdateFactory.PositionCameraUpdate) update;
-            cameraPosition = new CameraPosition.Builder(positionCameraUpdate).build();
-        } else if (update instanceof CameraUpdateFactory.ZoomUpdate) {
-            CameraUpdateFactory.ZoomUpdate zoomUpdate = (CameraUpdateFactory.ZoomUpdate) update;
-            if(zoomUpdate.getType()!= CameraUpdateFactory.ZoomUpdate.ZOOM_TO_POINT){
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .build();
-            }else{
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .target(fromScreenLocation(new PointF(zoomUpdate.getX(),zoomUpdate.getY())))
-                        .build();
-            }
-        } else {
-            Log.e(MapboxConstants.TAG, "Unsupported CameraUpdate");
-            return;
-        }
-        mCurrentCameraPosition = cameraPosition;
-        mMapView.easeTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt, cameraPosition.zoom, callback);
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.easeTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, callback);
     }
 
     /**
@@ -257,28 +190,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        CameraPosition cameraPosition;
-        if (update instanceof CameraUpdateFactory.PositionCameraUpdate) {
-            CameraUpdateFactory.PositionCameraUpdate positionCameraUpdate = (CameraUpdateFactory.PositionCameraUpdate) update;
-            cameraPosition = new CameraPosition.Builder(positionCameraUpdate).build();
-        } else if (update instanceof CameraUpdateFactory.ZoomUpdate) {
-            CameraUpdateFactory.ZoomUpdate zoomUpdate = (CameraUpdateFactory.ZoomUpdate) update;
-            if(zoomUpdate.getType()!= CameraUpdateFactory.ZoomUpdate.ZOOM_TO_POINT){
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .build();
-            }else {
-                cameraPosition = new CameraPosition.Builder(mCurrentCameraPosition)
-                        .zoom(getZoom(zoomUpdate, mCurrentCameraPosition.zoom))
-                        .target(fromScreenLocation(new PointF(zoomUpdate.getX(), zoomUpdate.getY())))
-                        .build();
-            }
-        } else {
-            Log.e(MapboxConstants.TAG, "Unsupported CameraUpdate");
-            return;
-        }
-        mCurrentCameraPosition = cameraPosition;
-        mMapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt, cameraPosition.zoom, callback);
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.flyTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, callback);
     }
 
     // internal time layer conversion
@@ -1123,9 +1036,13 @@ public class MapboxMap {
         mMapView.invalidateCustomLayers();
     }
 
-    //
-    // Interfaces
-    //
+    MapView getMapView(){
+        return mMapView;
+    }
+
+//
+// Interfaces
+//
 
     /**
      * Interface definition for a callback to be invoked when the map is flinged.

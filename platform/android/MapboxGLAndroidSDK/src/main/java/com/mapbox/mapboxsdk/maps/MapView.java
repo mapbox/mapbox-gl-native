@@ -67,7 +67,6 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
@@ -75,7 +74,6 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.geometry.BoundingBox;
-import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -1305,7 +1303,7 @@ public class MapView extends FrameLayout {
      * not included in `options`.
      *
      * @param bearing Bearing in Radians
-     * @param center  Center Coordinate
+     * @param center  Center LatLng
      * @param pitch   Pitch in Radians
      * @param zoom    Zoom Level
      */
@@ -1324,7 +1322,7 @@ public class MapView extends FrameLayout {
      * not included in `options`.
      *
      * @param bearing  Bearing in Radians
-     * @param center   Center Coordinate
+     * @param center   Center LatLng
      * @param duration Animation time in Nanoseconds
      * @param pitch    Pitch in Radians
      * @param zoom     Zoom Level
@@ -1358,7 +1356,7 @@ public class MapView extends FrameLayout {
      * Flying animation to a specified location/zoom/bearing with automatic curve.
      *
      * @param bearing  Bearing in Radians
-     * @param center   Center Coordinate
+     * @param center   Center LatLng
      * @param duration Animation time in Nanoseconds
      * @param pitch    Pitch in Radians
      * @param zoom     Zoom Level
@@ -1386,70 +1384,6 @@ public class MapView extends FrameLayout {
         }
 
         mNativeMapView.flyTo(bearing, center, duration, pitch, zoom);
-    }
-
-    /**
-     * Changes the map's viewport to fit the given coordinate bounds.
-     *
-     * @param bounds The bounds that the viewport will show in its entirety.
-     */
-    @UiThread
-    void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds) {
-        setVisibleCoordinateBounds(bounds, false);
-    }
-
-    /**
-     * Changes the map's viewing area to fit the given coordinate bounds, optionally animating the change.
-     *
-     * @param bounds   The bounds that the viewport will show in its entirety.
-     * @param animated If true, animates the change. If false, immediately changes the map.
-     */
-    @UiThread
-    void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, boolean animated) {
-        setVisibleCoordinateBounds(bounds, new RectF(), animated);
-    }
-
-    /**
-     * Changes the map’s viewport to fit the given coordinate bounds with additional padding at the
-     * edge of the map,  optionally animating the change.
-     *
-     * @param bounds   The bounds that the viewport will show in its entirety.
-     * @param padding  The minimum padding (in pixels) that will be visible around the given coordinate bounds.
-     * @param animated If true, animates the change. If false, immediately changes the map.
-     */
-    @UiThread
-    void setVisibleCoordinateBounds(@NonNull CoordinateBounds bounds, @NonNull RectF padding, boolean animated) {
-        LatLng[] coordinates = {
-                new LatLng(bounds.getNorthEast().getLatitude(), bounds.getSouthWest().getLongitude()),
-                bounds.getSouthWest(),
-                new LatLng(bounds.getSouthWest().getLatitude(), bounds.getNorthEast().getLongitude()),
-                bounds.getNorthEast()
-
-        };
-        setVisibleCoordinateBounds(coordinates, padding, animated);
-    }
-
-    /**
-     * Changes the map’s viewport to fit the given coordinates, optionally some additional padding on each side
-     * and animating the change.
-     *
-     * @param coordinates The coordinates that the viewport will show.
-     * @param padding     The minimum padding (in pixels) that will be visible around the given coordinate bounds.
-     * @param animated    If true, animates the change. If false, immediately changes the map.
-     */
-    @UiThread
-    void setVisibleCoordinateBounds(@NonNull LatLng[] coordinates, @NonNull RectF padding, boolean animated) {
-        setVisibleCoordinateBounds(coordinates, padding, getDirection(), animated);
-    }
-
-    private void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, boolean animated) {
-        setVisibleCoordinateBounds(coordinates, padding, direction, animated ? MapboxConstants.ANIMATION_DURATION : 0l);
-    }
-
-    void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
-        mNativeMapView.setVisibleCoordinateBounds(coordinates, new RectF(padding.left / mScreenDensity,
-                        padding.top / mScreenDensity, padding.right / mScreenDensity, padding.bottom / mScreenDensity),
-                direction, duration);
     }
 
     private void adjustTopOffsetPixels() {
@@ -1511,6 +1445,10 @@ public class MapView extends FrameLayout {
         if (!isInEditMode()) {
             mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
         }
+    }
+
+    double getScale() {
+        return mNativeMapView.getScale();
     }
 
     // This class handles TextureView callbacks
@@ -2826,8 +2764,15 @@ public class MapView extends FrameLayout {
      * @param callback The callback object that will be triggered when the map is ready to be used.
      */
     @UiThread
-    public void getMapAsync(@NonNull OnMapReadyCallback callback) {
-        callback.onMapReady(mMapboxMap);
+    public void getMapAsync(@NonNull final OnMapReadyCallback callback) {
+
+        // We need to put our callback on the message queue
+        post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onMapReady(mMapboxMap);
+            }
+        });
     }
 
     MapboxMap getMapboxMap() {

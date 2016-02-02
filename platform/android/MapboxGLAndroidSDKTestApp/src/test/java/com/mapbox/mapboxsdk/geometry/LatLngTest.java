@@ -1,6 +1,7 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.geometry;
 
 import android.location.Location;
+import android.os.Parcel;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -47,6 +48,34 @@ public class LatLngTest {
     }
 
     @Test
+    public void testLatitudeSetter() {
+        LatLng latLng = new LatLng(1.2, 3.4);
+        latLng.setLatitude(3);
+        assertEquals("latitude should match", 3, latLng.getLatitude(), DELTA);
+    }
+
+    @Test
+    public void testLongitudeSetter() {
+        LatLng latLng = new LatLng(1.2, 3.4);
+        latLng.setLongitude(3);
+        assertEquals("longitude should match", 3, latLng.getLongitude(), DELTA);
+    }
+
+    @Test
+    public void testAltitudeSetter() {
+        LatLng latLng = new LatLng(1.2, 3.4);
+        latLng.setAltitude(3);
+        assertEquals("altitude should match", 3, latLng.getAltitude(), DELTA);
+    }
+
+    @Test
+    public void testLatLngConstructor() {
+        LatLng latLng1 = new LatLng(1.2, 3.4);
+        LatLng latLng2 = new LatLng(latLng1);
+        assertEquals("latLng should match", latLng1, latLng2);
+    }
+
+    @Test
     public void testDistanceTo() {
         LatLng latLng1 = new LatLng(0.0, 0.0);
         LatLng latLng2 = new LatLng(1.0, 1.0);
@@ -62,10 +91,6 @@ public class LatLngTest {
         double distance = latLng1.distanceTo(latLng2);
         assertEquals("distance should match", 0.0, distance, DELTA);
     }
-
-    /*
-     * A sample test where Mockito is necessary
-     */
 
     @Test
     public void testLocationProvider() {

@@ -1,19 +1,15 @@
 package com.mapbox.mapboxsdk.testapp;
 
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.maps.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.CoordinateBounds;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -63,16 +59,17 @@ public class VisibleCoordinateBoundsActivity extends AppCompatActivity {
                         .snippet("City Hall")
                         .position(NEW_YORK));
 
-                Snackbar.make(findViewById(android.R.id.content), R.string.action_visible_bounds_explanation, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(android.R.string.ok, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // Reposition coordinate bounds
-                                LatLngBounds bounds = new LatLngBounds(NEW_YORK, LOS_ANGELES);
-                                int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
-                                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
-                            }
-                        }).show();
+                // Create Bounds
+                final LatLngBounds bounds = new LatLngBounds.Builder()
+                        .include(NEW_YORK)
+                        .include(LOS_ANGELES)
+                        .build();
+
+                // And padding
+                int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+
+                // Animate camera
+                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
             }
         });
 

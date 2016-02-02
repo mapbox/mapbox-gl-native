@@ -28,7 +28,6 @@ import com.mapbox.mapboxsdk.utils.ApiAccess;
 public class MapFragment extends Fragment {
 
     private MapView mMap;
-    private OnMapReadyCallback mMapReadyCallback;
 
     public static MapFragment newInstance(){
         return new MapFragment();
@@ -61,9 +60,6 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mMap.onResume();
-        if(mMapReadyCallback!=null){
-            mMapReadyCallback.onMapReady(mMap.getMapboxMap());
-        }
     }
 
     @Override
@@ -99,6 +95,6 @@ public class MapFragment extends Fragment {
 
     @NonNull
     public void getMapAsync(@NonNull OnMapReadyCallback onMapReadyCallback){
-        mMapReadyCallback = onMapReadyCallback;
+        mMap.getMapAsync(onMapReadyCallback);
     }
 }

@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 // Class that wraps the native methods for convenience

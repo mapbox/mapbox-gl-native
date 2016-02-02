@@ -6,7 +6,6 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -358,7 +357,6 @@ public class MapboxMapTest {
         mMapboxMap.easeCamera(CameraUpdateFactory.zoomTo(12), 1000);
         assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
     }
-
 
     //
     // OnMarkerClick interface
