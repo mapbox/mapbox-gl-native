@@ -165,7 +165,6 @@ public:
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
-    LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
     void addCustomLayer(const std::string& id,
                         CustomLayerInitializeFunction,

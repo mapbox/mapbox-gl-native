@@ -71,20 +71,6 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
     return result;
 }
 
-LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids) const {
-    LatLngBounds result = LatLngBounds::getExtendable();
-
-    for (const auto& id : ids) {
-        if (pointAnnotations.find(id) != pointAnnotations.end()) {
-            result.extend(pointAnnotations.at(id)->bounds());
-        } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-            result.extend(shapeAnnotations.at(id)->bounds());
-        }
-    }
-
-    return result;
-}
-
 std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID) {
     if (pointAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;

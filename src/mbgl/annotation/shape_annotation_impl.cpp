@@ -147,16 +147,4 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
     }
 }
 
-LatLngBounds ShapeAnnotationImpl::bounds() const {
-    LatLngBounds result;
-
-    for (const auto& segment : shape.segments) {
-        for (const auto& point : segment) {
-            result.extend(point);
-        }
-    }
-
-    return result;
-}
-
 } // namespace mbgl

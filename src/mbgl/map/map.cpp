@@ -465,10 +465,6 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return data->getAnnotationManager()->getPointAnnotationsInBounds(bounds);
 }
 
-LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
-    return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
-}
-    
 #pragma mark - Style API
 
 void Map::addCustomLayer(const std::string& id,

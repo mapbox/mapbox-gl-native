@@ -31,7 +31,6 @@ public:
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
-    LatLngBounds getBoundsForAnnotations(const AnnotationIDs&) const;
 
     void addIcon(const std::string& name, std::shared_ptr<const SpriteImage>);
     void removeIcon(const std::string& name);

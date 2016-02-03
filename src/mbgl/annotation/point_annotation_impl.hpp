@@ -43,7 +43,6 @@ public:
 
     PointAnnotationImpl(const AnnotationID, const PointAnnotation&);
 
-    LatLngBounds bounds() const;
     void updateLayer(const TileID&, AnnotationTileLayer&) const;
 
     const AnnotationID id;
