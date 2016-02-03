@@ -2999,7 +2999,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
-    if (showsUserLocation == _showsUserLocation) return;
+    if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
 
     _showsUserLocation = showsUserLocation;
 
