@@ -57,10 +57,6 @@ public:
         return { bounds.ne, bounds.sw };
     }
 
-    inline operator bool() const {
-        return sw && ne;
-    }
-
     // Constructs a LatLngBounds object with the tile's exact boundaries.
     LatLngBounds(const TileID& id);
 
