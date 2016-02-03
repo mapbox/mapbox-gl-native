@@ -198,7 +198,6 @@ TEST(Transform, Anchor) {
 
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
     ASSERT_NE(anchorLatLng, transform.getLatLng());
-    ASSERT_DOUBLE_EQ(anchorLatLng, transform.getState().pointToLatLng(anchorPoint));
 }
 
 TEST(Transform, Padding) {
@@ -224,7 +223,7 @@ TEST(Transform, Padding) {
     EdgeInsets padding;
     padding.top = 1000.0 / 2.0;
     ASSERT_GT(padding.top, 0);
-    ASSERT_TRUE(padding);
+    ASSERT_TRUE(bool(padding));
     
     const LatLng shiftedCenter = transform.getLatLng(padding);
     ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);

@@ -19,7 +19,7 @@ public:
     LatLng(double lat = 0, double lon = 0)
         : latitude(lat), longitude(lon) {}
 
-    operator bool() const {
+    explicit operator bool() const {
         return !(std::isnan(latitude) || std::isnan(longitude));
     }
 
@@ -29,6 +29,14 @@ public:
     PrecisionPoint project() const;
 };
 
+inline bool operator==(const LatLng& a, const LatLng& b) {
+    return a.latitude == b.latitude && a.longitude == b.longitude;
+}
+
+inline bool operator!=(const LatLng& a, const LatLng& b) {
+    return !(a == b);
+}
+
 class ProjectedMeters {
 public:
     double northing = 0;
@@ -37,7 +45,7 @@ public:
     ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
 
-    operator bool() const {
+    explicit operator bool() const {
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
@@ -133,7 +141,7 @@ public:
     MetersBounds(const ProjectedMeters& sw_, const ProjectedMeters& ne_)
         : sw(sw_), ne(ne_) {}
 
-    operator bool() const {
+    explicit operator bool() const {
         return sw && ne;
     }
 };
@@ -159,7 +167,7 @@ public:
     EdgeInsets(const double t, const double l, const double b, const double r)
         : top(t), left(l), bottom(b), right(r) {}
     
-    operator bool() const {
+    explicit operator bool() const {
         return top || left || bottom || right;
     }
     
