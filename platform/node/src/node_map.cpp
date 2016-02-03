@@ -462,7 +462,7 @@ std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resour
         Nan::HandleScope scope;
 
         auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();
-        auto callbackHandle = Nan::GetFunction(Nan::New<v8::FunctionTemplate>(NodeRequest::Respond, requestHandle)).ToLocalChecked();
+        auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
 
         v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
         Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
