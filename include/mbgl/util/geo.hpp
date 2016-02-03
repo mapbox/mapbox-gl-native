@@ -131,7 +131,18 @@ private:
 
     LatLngBounds(const LatLng& sw_, const LatLng& ne_)
         : sw(sw_), ne(ne_) {}
+
+    friend bool operator==(const LatLngBounds&, const LatLngBounds&);
+    friend bool operator!=(const LatLngBounds&, const LatLngBounds&);
 };
+
+inline bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
+    return a.sw == b.sw && a.ne == b.ne;
+}
+
+inline bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
+    return !(a == b);
+}
 
 class MetersBounds {
 public:
