@@ -31,12 +31,13 @@ namespace mbgl {
 
 SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
         const Shaping& shapedText, const PositionedIcon& shapedIcon,
-        const SymbolLayoutProperties& layout, const bool addToBuffers,
+        const SymbolLayoutProperties& layout, const bool addToBuffers, const uint32_t index_,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
         const GlyphPositions& face) :
     x(anchor.x),
     y(anchor.y),
+    index(index_),
     hasText(shapedText),
     hasIcon(shapedIcon),
 
@@ -333,7 +334,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
             // TODO remove the `&& false` when is #1673 implemented
             const bool addToBuffers = (mode == MapMode::Still) || inside || (mayOverlap && false);
 
-            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers,
+            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                     textBoxScale, textPadding, textAlongLine,
                     iconBoxScale, iconPadding, iconAlongLine,
                     face);
@@ -382,9 +383,11 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         const float cos = std::cos(collisionTile.config.angle);
 
         std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
-            const float aRotated = sin * a.x + cos * a.y;
-            const float bRotated = sin * b.x + cos * b.y;
-            return aRotated < bRotated;
+            const int32_t aRotated = sin * a.x + cos * a.y;
+            const int32_t bRotated = sin * b.x + cos * b.y;
+            return aRotated != bRotated ?
+                aRotated < bRotated :
+                a.index > b.index;
         });
     }
 

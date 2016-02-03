@@ -46,12 +46,13 @@ class SymbolInstance {
     public:
         explicit SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
                 const Shaping& shapedText, const PositionedIcon& shapedIcon,
-                const SymbolLayoutProperties& layout, const bool inside,
+                const SymbolLayoutProperties& layout, const bool inside, const uint32_t index,
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
                 const GlyphPositions& face);
         float x;
         float y;
+        uint32_t index;
         bool hasText;
         bool hasIcon;
         SymbolQuads glyphQuads;
