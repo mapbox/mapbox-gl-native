@@ -158,6 +158,9 @@ public:
     QPointF pixelForCoordinate(const QMapbox::Coordinate &) const;
     QMapbox::Coordinate coordinateForPixel(const QPointF &) const;
 
+    QMapbox::CoordinateZoom coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne) const;
+    QMapbox::CoordinateZoom coordinateZoomForBounds(const QMapbox::Coordinate &sw, QMapbox::Coordinate &ne, double bearing, double pitch);
+
     void setMargins(const QMargins &margins);
     QMargins margins() const;
 

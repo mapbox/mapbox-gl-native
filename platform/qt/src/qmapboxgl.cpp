@@ -3,6 +3,7 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
@@ -458,6 +459,35 @@ Coordinate QMapboxGL::coordinateForPixel(const QPointF &pixel) const
         d_ptr->mapObj->latLngForPixel(mbgl::ScreenCoordinate { pixel.x(), pixel.y() });
 
     return Coordinate(latLng.latitude, latLng.longitude);
+}
+
+CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordinate &ne) const
+{
+    auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
+    mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
+
+    return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
+}
+
+CoordinateZoom QMapboxGL::coordinateZoomForBounds(const Coordinate &sw, Coordinate &ne,
+    double newBearing, double newPitch)
+{
+    // FIXME: mbgl::Map::cameraForLatLngBounds should
+    // take bearing and pitch as input too, so this
+    // hack won't be needed.
+    double currentBearing = bearing();
+    double currentPitch = pitch();
+
+    setBearing(newBearing);
+    setPitch(newPitch);
+
+    auto bounds = mbgl::LatLngBounds::hull(mbgl::LatLng { sw.first, sw.second }, mbgl::LatLng { ne.first, ne.second });
+    mbgl::CameraOptions camera = d_ptr->mapObj->cameraForLatLngBounds(bounds, d_ptr->margins);
+
+    setBearing(currentBearing);
+    setPitch(currentPitch);
+
+    return {{ (*camera.center).latitude, (*camera.center).longitude }, *camera.zoom };
 }
 
 void QMapboxGL::setMargins(const QMargins &margins_)

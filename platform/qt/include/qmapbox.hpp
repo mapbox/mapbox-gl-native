@@ -13,6 +13,8 @@ typedef QPair<double, double> Coordinate;
 typedef QList<Coordinate> Coordinates;
 typedef QList<Coordinates> CoordinateSegments;
 
+typedef QPair<Coordinate, double> CoordinateZoom;
+
 typedef quint32 AnnotationID;
 typedef QList<AnnotationID> AnnotationIDs;
 
