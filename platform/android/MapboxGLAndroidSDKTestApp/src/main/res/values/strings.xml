@@ -24,6 +24,7 @@
     <string name="activity_directions">Directions Activity</string>
     <string name="activity_geocoder">Geocoder Activity</string>
     <string name="activity_double_map">Double Map Activity</string>
+    <string name="activity_scroll_by">Scroll By Activity</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
@@ -90,5 +91,8 @@
     </string-array>
 
     <string name="zoom_botton">Zoom</string>
+
+    <string name="scrollby_x_value">X: %1$d</string>
+    <string name="scrollby_y_value">Y: %1$d</string>
 
 </resources>

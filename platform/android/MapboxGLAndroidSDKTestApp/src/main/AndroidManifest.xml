@@ -23,7 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapboxMapActivity"
+        <activity
+            android:name=".MapboxMapActivity"
             android:label="@string/action_mapboxmap" />
         <activity
             android:name=".VisibleCoordinateBoundsActivity"
@@ -80,6 +81,9 @@
         <activity
             android:name=".DoubleMapActivity"
             android:label="@string/activity_double_map" />
+        <activity
+            android:name=".ScrollByActivity"
+            android:label="@string/activity_scroll_by" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"

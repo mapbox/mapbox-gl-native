@@ -40,6 +40,7 @@ public class MapboxMap {
     private MapView mMapView;
     private UiSettings mUiSettings;
     private CameraPosition mCameraPosition;
+    private boolean mInvalidCameraPosition;
     private String mStyleUrl;
     private List<Marker> mSelectedMarkers;
     private List<InfoWindow> mInfoWindows;
@@ -60,6 +61,7 @@ public class MapboxMap {
 
     MapboxMap(@NonNull MapView mapView) {
         mMapView = mapView;
+        mMapView.addOnMapChangedListener(new MapChangeCameraPositionListener());
         mUiSettings = new UiSettings(mapView);
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
@@ -89,6 +91,16 @@ public class MapboxMap {
      * @return The current position of the Camera.
      */
     public final CameraPosition getCameraPosition() {
+        if (mInvalidCameraPosition) {
+            // Camera position has changed, need to regenerate position
+            mCameraPosition = new CameraPosition.Builder(true)
+                    .bearing((float) mMapView.getBearing())
+                    .target(mMapView.getLatLng())
+                    .tilt((float) mMapView.getTilt())
+                    .zoom((float) mMapView.getZoom())
+                    .build();
+            mInvalidCameraPosition = false;
+        }
         return mCameraPosition;
     }
 
@@ -114,6 +126,17 @@ public class MapboxMap {
     public final void moveCamera(CameraUpdate update) {
         mCameraPosition = update.getCameraPosition(this);
         mMapView.jumpTo(mCameraPosition.bearing, mCameraPosition.target, mCameraPosition.tilt, mCameraPosition.zoom);
+    }
+
+    /**
+     * Ease the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
+     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     *
+     * @param update The change that should be applied to the camera.
+     */
+    @UiThread
+    public final void easeCamera(CameraUpdate update) {
+        easeCamera(update, MapboxConstants.ANIMATION_DURATION);
     }
 
     /**
@@ -1036,7 +1059,7 @@ public class MapboxMap {
         mMapView.invalidateCustomLayers();
     }
 
-    MapView getMapView(){
+    MapView getMapView() {
         return mMapView;
     }
 
@@ -1218,4 +1241,15 @@ public class MapboxMap {
         void onFinish();
     }
 
+    private class MapChangeCameraPositionListener implements MapView.OnMapChangedListener {
+        @Override
+        public void onMapChanged(@MapView.MapChange int change) {
+            if (!mInvalidCameraPosition && (change == MapView.REGION_DID_CHANGE
+                    || change == MapView.REGION_DID_CHANGE_ANIMATED
+                    || change == MapView.REGION_WILL_CHANGE
+                    || change == MapView.REGION_WILL_CHANGE_ANIMATED)) {
+                mInvalidCameraPosition = true;
+            }
+        }
+    }
 }

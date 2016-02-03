@@ -81,6 +81,11 @@ public final class CameraPosition implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "Target: " + target + ", Zoom:" + zoom + ", Bearing:" + bearing + ", Tilt:" + tilt;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -119,12 +124,22 @@ public final class CameraPosition implements Parcelable {
         private LatLng target = null;
         private float tilt = -1;
         private float zoom = -1;
+        private boolean isRadiant;
 
         /**
          * Creates an empty builder.
          */
         public Builder() {
             super();
+        }
+
+        /**
+         * Creates a builder for building CameraPosition objects using radiants.
+         *
+         * @param isRadiant
+         */
+        public Builder(boolean isRadiant) {
+            this.isRadiant = isRadiant;
         }
 
         /**
@@ -147,13 +162,13 @@ public final class CameraPosition implements Parcelable {
          *
          * @param typedArray TypedArray containgin attribute values
          */
-        public Builder(TypedArray typedArray){
+        public Builder(TypedArray typedArray) {
             super();
-            if(typedArray!=null) {
+            if (typedArray != null) {
                 this.bearing = typedArray.getFloat(R.styleable.MapView_direction, 0.0f);
                 double lat = typedArray.getFloat(R.styleable.MapView_center_latitude, 0.0f);
                 double lng = typedArray.getFloat(R.styleable.MapView_center_longitude, 0.0f);
-                this.target= new LatLng(lat, lng);
+                this.target = new LatLng(lat, lng);
                 this.tilt = typedArray.getFloat(R.styleable.MapView_tilt, 0.0f);
                 this.zoom = typedArray.getFloat(R.styleable.MapView_zoom, 0.0f);
             }
@@ -174,15 +189,14 @@ public final class CameraPosition implements Parcelable {
             }
         }
 
-
         /**
          * Create Builder from an existing CameraPositionUpdate update.
          *
          * @param update Update containing camera options
          */
-        public Builder(CameraUpdateFactory.ZoomUpdate update){
+        public Builder(CameraUpdateFactory.ZoomUpdate update) {
             super();
-            if(update!=null){
+            if (update != null) {
                 this.zoom = update.getZoom();
             }
         }
@@ -194,7 +208,12 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         public Builder bearing(float bearing) {
-            this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
+            if(isRadiant){
+                this.bearing = bearing;
+            }else{
+                // converting degrees to radiant
+                this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
+            }
             return this;
         }
 
@@ -226,7 +245,12 @@ public final class CameraPosition implements Parcelable {
          */
         @FloatRange(from = 0.0, to = 60.0)
         public Builder tilt(float tilt) {
-            this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
+            if(isRadiant){
+                this.tilt = tilt;
+            }else {
+                // converting degrees to radiant
+                this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
+            }
             return this;
         }
 

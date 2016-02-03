@@ -160,10 +160,10 @@ public class MapView extends FrameLayout {
     }
 
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
+        mOnMapChangedListener = new ArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mAnnotations = new ArrayList<>();
         mIcons = new ArrayList<>();
-        mOnMapChangedListener = new ArrayList<>();
 
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
@@ -510,6 +510,19 @@ public class MapView extends FrameLayout {
                 }
             }
         });
+    }
+
+    //
+    // LatLng / CenterCoordinate
+    //
+
+    /**
+     * Gets the current LatLng in the center of the MapView
+     *
+     * @return The center in LatLng
+     */
+    LatLng getLatLng() {
+        return mNativeMapView.getLatLng();
     }
 
     //

@@ -452,6 +452,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), GeocoderActivity.class));
                                 return true;
 
+                            case R.id.action_scroll_by:
+                                startActivity(new Intent(getApplicationContext(), ScrollByActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }

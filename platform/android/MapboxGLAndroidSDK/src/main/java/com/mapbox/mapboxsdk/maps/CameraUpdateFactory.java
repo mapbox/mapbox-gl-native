@@ -69,22 +69,6 @@ public class CameraUpdateFactory {
         return new CameraBoundsUpdate(bounds, paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 
-//    /**
-//     * Returns a CameraUpdate that transforms the camera such that the specified latitude/longitude
-//     * bounds are centered on screen within a bounding box of specified dimensions at the greatest
-//     * possible zoom level. You can specify additional padding, to further restrict the size of
-//     * the bounding box. The returned CameraUpdate has a bearing of 0 and a tilt of 0.
-//     *
-//     * @param bounds
-//     * @param width
-//     * @param height
-//     * @param padding
-//     * @return
-//     */
-//    public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, int width, int height, int padding) {
-//        throw new UnsupportedOperationException("Not implemented yet");
-//    }
-
     /**
      * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude specified by a LatLng object, and moves to the given zoom level.
      *
@@ -96,16 +80,16 @@ public class CameraUpdateFactory {
         return new CameraPositionUpdate(-1, latLng, -1, zoom);
     }
 
-//    /**
-//     * Returns a CameraUpdate that scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y directions.
-//     *
-//     * @param xPixel
-//     * @param yPixel
-//     * @return
-//     */
-//    public static CameraUpdate scrollBy(float xPixel, float yPixel) {
-//        throw new UnsupportedOperationException("Not implemented yet");
-//    }
+    /**
+     * Returns a CameraUpdate that scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y directions.
+     *
+     * @param xPixel
+     * @param yPixel
+     * @return
+     */
+    public static CameraUpdate scrollBy(float xPixel, float yPixel) {
+        return new CameraMoveUpdate(xPixel, yPixel);
+    }
 
     /**
      * Returns a CameraUpdate that shifts the zoom level of the current camera viewpoint.
@@ -263,6 +247,38 @@ public class CameraUpdateFactory {
                     .zoom((float) zoom)
                     .tilt(0)
                     .bearing(0)
+                    .build();
+        }
+    }
+
+    public static class CameraMoveUpdate implements CameraUpdate {
+
+        private float x;
+        private float y;
+
+        public CameraMoveUpdate(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
+            MapView mapView = mapboxMap.getMapView();
+
+            // Calculate the new center point
+            float viewPortWidth = mapView.getWidth();
+            float viewPortHeight = mapView.getHeight();
+            PointF targetPoint = new PointF(viewPortWidth / 2 + x, viewPortHeight / 2 + y);
+
+            // Convert point to LatLng
+            LatLng latLng = mapView.fromScreenLocation(targetPoint);
+
+            CameraPosition cameraPosition = mapboxMap.getCameraPosition();
+            return new CameraPosition.Builder()
+                    .target(latLng)
+                    .zoom(cameraPosition.zoom)
+                    .tilt(cameraPosition.tilt)
+                    .bearing(cameraPosition.bearing)
                     .build();
         }
     }

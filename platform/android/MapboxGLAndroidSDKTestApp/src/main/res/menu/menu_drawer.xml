@@ -76,7 +76,7 @@
                 android:id="@+id/action_mapboxmap"
                 android:checkable="false"
                 android:icon="@drawable/ic_mapboxmap"
-                android:title="@string/action_mapboxmap"/>
+                android:title="@string/action_mapboxmap" />
 
             <item
                 android:id="@+id/action_tilt"
@@ -84,10 +84,11 @@
                 android:icon="@drawable/ic_tilt"
                 android:title="@string/action_tilt" />
 
-            <item android:id="@+id/action_camera"
-                  android:checkable="false"
-                  android:icon="@drawable/ic_transform_24dp"
-                  android:title="@string/action_camera"/>
+            <item
+                android:id="@+id/action_camera"
+                android:checkable="false"
+                android:icon="@drawable/ic_transform_24dp"
+                android:title="@string/action_camera" />
 
             <item
                 android:id="@+id/action_map_fragment"
@@ -184,6 +185,12 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_directions"
                 android:title="@string/activity_geocoder" />
+
+            <item
+                android:id="@+id/action_scroll_by"
+                android:checkable="false"
+                android:icon="@drawable/ic_input_24dp"
+                android:title="@string/activity_scroll_by" />
 
         </menu>
     </item>
