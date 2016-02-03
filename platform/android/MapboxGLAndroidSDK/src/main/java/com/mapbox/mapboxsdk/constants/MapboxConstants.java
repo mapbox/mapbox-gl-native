@@ -25,12 +25,12 @@ public class MapboxConstants {
     /**
      * The currently supported minimum zoom level.
      */
-    public static final double MINIMUM_ZOOM = 0f;
+    public static final double MINIMUM_ZOOM = 0.0;
 
     /**
      * The currently supported maximum zoom level.
      */
-    public static final double MAXIMUM_ZOOM = 25.0;
+    public static final double MAXIMUM_ZOOM = 25.5;
 
     /**
      * The currently supported maximum tilt value.
