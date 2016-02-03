@@ -11,16 +11,6 @@ namespace mbgl {
 class Projection {
 
 public:
-    static inline MetersBounds getWorldBoundsMeters() {
-        const double d = util::EARTH_RADIUS_M * M_PI;
-        return { { -d, -d }, { d, d } };
-    }
-
-    static inline LatLngBounds getWorldBoundsLatLng() {
-        MetersBounds bounds = getWorldBoundsMeters();
-        return { latLngForProjectedMeters(bounds.sw), latLngForProjectedMeters(bounds.ne) };
-    }
-
     static inline double getMetersPerPixelAtLatitude(double lat, double zoom) {
         const double mapPixelWidthAtZoom = std::pow(2.0, zoom) * util::tileSize;
         const double constrainedLatitude = ::fmin(::fmax(lat, -util::LATITUDE_MAX), util::LATITUDE_MAX);
