@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.geometry;
 
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 
 import org.junit.Before;
@@ -58,8 +56,8 @@ public class LatLngBoundsTest {
 
     @Test
     public void testCoordinateSpan() {
-        CoordinateSpan coordinateSpan = mLatLngBounds.getSpan();
-        assertEquals("CoordinateSpan should be the same", new CoordinateSpan(2, 2), coordinateSpan);
+        LatLngSpan latLngSpan = mLatLngBounds.getSpan();
+        assertEquals("LatLngSpan should be the same", new LatLngSpan(2, 2), latLngSpan);
     }
 
     @Test

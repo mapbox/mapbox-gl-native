@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.geometry;
 
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 

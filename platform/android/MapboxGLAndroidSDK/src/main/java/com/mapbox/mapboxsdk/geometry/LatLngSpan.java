@@ -7,17 +7,17 @@ import android.support.annotation.NonNull;
 /**
  * A geographical span defined by its latitude and longitude span.
  */
-public class CoordinateSpan implements Parcelable {
+public class LatLngSpan implements Parcelable {
 
     private double mLatitudeSpan;
     private double mLongitudeSpan;
 
-    public CoordinateSpan(@NonNull Parcel in){
+    public LatLngSpan(@NonNull Parcel in){
         mLatitudeSpan = in.readDouble();
         mLongitudeSpan = in.readDouble();
     }
 
-    public CoordinateSpan(double latitudeSpan, double longitudeSpan) {
+    public LatLngSpan(double latitudeSpan, double longitudeSpan) {
         mLatitudeSpan = latitudeSpan;
         mLongitudeSpan = longitudeSpan;
     }
@@ -41,24 +41,24 @@ public class CoordinateSpan implements Parcelable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o instanceof CoordinateSpan) {
-            CoordinateSpan other = (CoordinateSpan) o;
+        if (o instanceof LatLngSpan) {
+            LatLngSpan other = (LatLngSpan) o;
             return mLongitudeSpan == other.getLongitudeSpan()
                     && mLatitudeSpan == other.getLatitudeSpan();
         }
         return false;
     }
 
-    public static final Parcelable.Creator<CoordinateSpan> CREATOR =
-            new Parcelable.Creator<CoordinateSpan>() {
+    public static final Parcelable.Creator<LatLngSpan> CREATOR =
+            new Parcelable.Creator<LatLngSpan>() {
                 @Override
-                public CoordinateSpan createFromParcel(Parcel in) {
-                    return new CoordinateSpan(in);
+                public LatLngSpan createFromParcel(Parcel in) {
+                    return new LatLngSpan(in);
                 }
 
                 @Override
-                public CoordinateSpan[] newArray(int size) {
-                    return new CoordinateSpan[size];
+                public LatLngSpan[] newArray(int size) {
+                    return new LatLngSpan[size];
                 }
             };
 

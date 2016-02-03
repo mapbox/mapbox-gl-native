@@ -99,7 +99,7 @@ public class InfoWindow {
 
             // Calculate default Android x,y coordinate
 
-            mCoordinates = mapboxMap.toScreenLocation(position);
+            mCoordinates = mapboxMap.getProjection().toScreenLocation(position);
             float x = mCoordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
             float y = mCoordinates.y - view.getMeasuredHeight() + offsetY;
 
@@ -231,7 +231,7 @@ public class InfoWindow {
         Marker marker = mBoundMarker.get();
         View view = mView.get();
         if (mapboxMap != null && marker != null && view != null) {
-            mCoordinates = mapboxMap.toScreenLocation(marker.getPosition());
+            mCoordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
             view.setX(mCoordinates.x + mViewWidthOffset);
             view.setY(mCoordinates.y + mMarkerHeightOffset);
         }

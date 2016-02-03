@@ -73,8 +73,8 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
-import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
@@ -1254,7 +1254,7 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(mAnnotations);
     }
 
-    private List<Marker> getMarkersInBounds(@NonNull BoundingBox bbox) {
+    private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
         if (bbox == null) {
             Log.w(TAG, "bbox was null, so just returning null");
             return null;
@@ -1699,15 +1699,13 @@ public class MapView extends FrameLayout {
             RectF tapRect = new RectF(tapPoint.x - toleranceSides, tapPoint.y + toleranceTop,
                     tapPoint.x + toleranceSides, tapPoint.y - toleranceBottom);
 
-            List<LatLng> corners = Arrays.asList(
-                    fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)),
-                    fromScreenLocation(new PointF(tapRect.left, tapRect.top)),
-                    fromScreenLocation(new PointF(tapRect.right, tapRect.top)),
-                    fromScreenLocation(new PointF(tapRect.right, tapRect.bottom))
-            );
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)));
+            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.top)));
+            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
+            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
 
-            BoundingBox tapBounds = BoundingBox.fromLatLngs(corners);
-            List<Marker> nearbyMarkers = getMarkersInBounds(tapBounds);
+            List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
             long newSelectedMarkerId = -1;
 
             if (nearbyMarkers != null && nearbyMarkers.size() > 0) {

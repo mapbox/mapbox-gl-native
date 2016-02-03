@@ -10,8 +10,8 @@ import android.view.Surface;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
-import com.mapbox.mapboxsdk.geometry.BoundingBox;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 
@@ -403,7 +403,7 @@ final class NativeMapView {
         nativeRemoveAnnotations(mNativeMapViewPtr, ids);
     }
 
-    public long[] getAnnotationsInBounds(BoundingBox bbox) {
+    public long[] getAnnotationsInBounds(LatLngBounds bbox) {
         return nativeGetAnnotationsInBounds(mNativeMapViewPtr, bbox);
     }
 
@@ -633,7 +633,7 @@ final class NativeMapView {
 
     private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
-    private native long[] nativeGetAnnotationsInBounds(long mNativeMapViewPtr, BoundingBox bbox);
+    private native long[] nativeGetAnnotationsInBounds(long mNativeMapViewPtr, LatLngBounds bbox);
 
     private native void nativeAddAnnotationIcon(long nativeMapViewPtr, String symbol,
                                                 int width, int height, float scale, byte[] pixels);

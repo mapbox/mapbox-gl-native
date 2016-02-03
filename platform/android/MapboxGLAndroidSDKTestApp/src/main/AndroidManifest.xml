@@ -27,7 +27,7 @@
             android:name=".MapboxMapActivity"
             android:label="@string/action_mapboxmap" />
         <activity
-            android:name=".VisibleCoordinateBoundsActivity"
+            android:name=".LatLngBoundsActivity"
             android:label="@string/activity_visible_coordinate_bounds" />
         <activity
             android:name=".InfoWindowAdapterActivity"

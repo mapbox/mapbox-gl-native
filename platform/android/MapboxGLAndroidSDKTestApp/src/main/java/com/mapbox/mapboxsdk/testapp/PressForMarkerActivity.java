@@ -83,7 +83,7 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapboxM
 
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
-        PointF pixel = mMapboxMap.toScreenLocation(point);
+        PointF pixel = mMapboxMap.getProjection().toScreenLocation(point);
         String title = LAT_LON_FORMATTER.format(point.getLatitude()) + ", " + LAT_LON_FORMATTER.format(point.getLongitude());
         String snippet = "X = " + (int) pixel.x + ", Y = " + (int) pixel.y;
 

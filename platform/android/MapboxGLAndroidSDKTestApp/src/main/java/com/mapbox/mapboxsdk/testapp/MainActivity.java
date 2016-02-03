@@ -38,7 +38,6 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
@@ -403,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
 
                             case R.id.action_visible_bounds:
-                                startActivity(new Intent(getApplicationContext(), VisibleCoordinateBoundsActivity.class));
+                                startActivity(new Intent(getApplicationContext(), LatLngBoundsActivity.class));
                                 return true;
 
                             case R.id.action_user_tracking_mode:

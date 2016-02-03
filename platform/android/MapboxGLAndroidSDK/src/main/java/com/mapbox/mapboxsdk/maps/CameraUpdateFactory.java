@@ -240,7 +240,7 @@ public class CameraUpdateFactory {
 
             centerPixel.y = viewportHeight - centerPixel.y;
 
-            LatLng center = mapboxMap.fromScreenLocation(centerPixel);
+            LatLng center = mapboxMap.getProjection().fromScreenLocation(centerPixel);
 
             return new CameraPosition.Builder()
                     .target(center)
@@ -370,7 +370,7 @@ public class CameraUpdateFactory {
             } else {
                 return new CameraPosition.Builder(cameraPosition)
                         .zoom(transformZoom(cameraPosition.zoom))
-                        .target(mapboxMap.fromScreenLocation(new PointF(getX(), getY())))
+                        .target(mapboxMap.getProjection().fromScreenLocation(new PointF(getX(), getY())))
                         .build();
             }
         }

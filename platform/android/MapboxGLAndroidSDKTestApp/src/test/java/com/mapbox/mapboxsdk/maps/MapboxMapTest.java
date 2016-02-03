@@ -47,13 +47,23 @@ public class MapboxMapTest {
     }
 
     //
-    // Test UiSettings
+    // UiSettings
     //
 
     @Test
     public void testUiSettings() {
         assertNotNull("UiSettings should not be null", mMapboxMap.getUiSettings());
     }
+
+    //
+    // Projection
+    //
+
+    @Test
+    public void testProjection(){
+        assertNotNull("Projection should not be null",mMapboxMap.getProjection());
+    }
+
 
 
     //

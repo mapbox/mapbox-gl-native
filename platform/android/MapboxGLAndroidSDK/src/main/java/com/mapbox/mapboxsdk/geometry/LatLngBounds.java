@@ -3,10 +3,7 @@ package com.mapbox.mapboxsdk.geometry;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 
 import java.util.ArrayList;
@@ -68,10 +65,10 @@ public class LatLngBounds implements Parcelable {
     /**
      * Get the area spanned by this LatLngBounds
      *
-     * @return CoordinateSpan area
+     * @return LatLngSpan area
      */
-    public CoordinateSpan getSpan() {
-        return new CoordinateSpan(getLatitudeSpan(), getLongitudeSpan());
+    public LatLngSpan getSpan() {
+        return new LatLngSpan(getLatitudeSpan(), getLongitudeSpan());
     }
 
     /**
