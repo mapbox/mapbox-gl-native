@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.telemetry;
 import java.io.Serializable;
 
 public class MapboxEvent implements Serializable {
-    public static final int VERSION = 1;
     public static final String MGLMapboxEventsUserAgent = "Sirius/1.0/ANDROID MapboxEventsiOS/1.1";
     public static final String MGLMapboxEventsAPIBase = "https://api.tiles.mapbox.com";
 
@@ -15,7 +14,7 @@ public class MapboxEvent implements Serializable {
     public static final String MAPBOXEVENT_LOCATION = "location";
     public static final String MAPBOXEVENT_VISIT = "visit";
 
-    // Attributes
+    // Event Keys
     public static final String MGLEventKeyLatitude = "lat";
     public static final String MGLEventKeyLongitude = "lng";
     public static final String MGLEventKeySpeed = "speed";
@@ -38,4 +37,20 @@ public class MapboxEvent implements Serializable {
     public static final String MGLEventGestureRotateStart = "Rotation";
     public static final String MGLEventGesturePitchStart = "Pitch";
 
+    // Event Attributes
+    public static final int VERSION = 1;
+    public static final String CREATED = "created";
+    public static final String INSTANCE = "instance";
+    public static final String VENDORID = "vendorId";
+    public static final String APPBUNDLEID = "appBundleId";
+    public static final String MODEL = "model";
+    public static final String OPERATINGSYSTEM= "operatingSystem";
+    public static final String ORIENTATION = "orientation";
+    public static final String BATTERYLEVEL = "batteryLevel";
+    public static final String APPLICATIONSTATE = "applicationState";
+    public static final String RESOLUTION = "resolution";
+    public static final String ACCESSIBILITYFONTSCALE = "accessibilityFontScale";
+    public static final String CARRIER = "carrier";
+    public static final String CELLULARNETWORKTYPE = "cellularNetworkType";
+    public static final String WIFI = "wifi";
 }
