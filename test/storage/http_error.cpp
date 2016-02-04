@@ -26,8 +26,7 @@ TEST_F(Storage, HTTPTemporaryError) {
             ASSERT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
             EXPECT_EQ("HTTP status code 500", res.error->message);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("", *res.data);
+            ASSERT_FALSE(bool(res.data));
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(bool(res.modified));
             EXPECT_FALSE(bool(res.etag));

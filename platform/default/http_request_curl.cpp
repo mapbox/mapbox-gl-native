@@ -509,19 +509,14 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         long responseCode = 0;
         curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &responseCode);
 
-        // Move over any data we got. We're storing this in a separate object because the Response
-        // object defines it as const.
-        if (data) {
-            response->data = std::move(data);
-        } else {
-            response->data = std::make_shared<std::string>();
-        }
-
         if (responseCode == 200) {
-            // Nothing to do; this is what we want.
+            if (data) {
+                response->data = std::move(data);
+            } else {
+                response->data = std::make_shared<std::string>();
+            }
         } else if (responseCode == 304) {
             response->notModified = true;
-            response->data.reset();
         } else if (responseCode == 404) {
             response->error =
                 std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");

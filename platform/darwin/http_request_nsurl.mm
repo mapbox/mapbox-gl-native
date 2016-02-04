@@ -194,8 +194,6 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
     } else if ([res isKindOfClass:[NSHTTPURLResponse class]]) {
         const long responseCode = [(NSHTTPURLResponse *)res statusCode];
 
-        response->data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
-
         NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
         NSString *cache_control = [headers objectForKey:@"Cache-Control"];
         if (cache_control) {
@@ -218,10 +216,9 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
         }
 
         if (responseCode == 200) {
-            // Nothing to do; this is what we want.
+            response->data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
         } else if (responseCode == 304) {
             response->notModified = true;
-            response->data.reset();
         } else if (responseCode == 404) {
             response->error =
                 std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");

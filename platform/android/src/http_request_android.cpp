@@ -199,17 +199,14 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
         response->expires = util::parseTimePoint(mbgl::android::std_string_from_jstring(env, expires).c_str());
     }
 
-    if (body != nullptr) {
-        jbyte* bodyData = env->GetByteArrayElements(body, nullptr);
-        response->data = std::make_shared<std::string>(reinterpret_cast<char*>(bodyData), env->GetArrayLength(body));
-        env->ReleaseByteArrayElements(body, bodyData, JNI_ABORT);
-    }
-
     if (code == 200) {
-        // Nothing to do; this is what we want
+        if (body != nullptr) {
+            jbyte* bodyData = env->GetByteArrayElements(body, nullptr);
+            response->data = std::make_shared<std::string>(reinterpret_cast<char*>(bodyData), env->GetArrayLength(body));
+            env->ReleaseByteArrayElements(body, bodyData, JNI_ABORT);
+        }
     } else if (code == 304) {
         response->notModified = true;
-        response->data.reset();
     } else if (code == 404) {
         response->error = std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
     } else if (code >= 500 && code < 600) {

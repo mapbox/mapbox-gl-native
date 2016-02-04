@@ -23,7 +23,7 @@ public:
     // This is set to true for 304 Not Modified responses.
     bool notModified = false;
 
-    // The actual data of the response. This is null if notModified is true.
+    // The actual data of the response. Present only for non-error, non-notModified responses.
     std::shared_ptr<const std::string> data;
 
     optional<SystemTimePoint> modified;
