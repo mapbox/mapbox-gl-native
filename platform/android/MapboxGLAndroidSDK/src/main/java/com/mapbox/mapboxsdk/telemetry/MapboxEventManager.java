@@ -127,7 +127,6 @@ public class MapboxEventManager {
                     jsonObject.put("version", MapboxEvent.VERSION);
                     jsonObject.put("instance", SESSION_UUID);
                     jsonObject.put("created", evt.get("created"));
-                    jsonObject.put("anonid", "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE");
                     jsonObject.put("appBundleId", context.getPackageName());
 
                     jsonArray.put(jsonObject);
