@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class MapboxEvent implements Serializable {
     public static final int VERSION_NUMBER = 1;
-    public static final String MGLMapboxEventsUserAgent = "Sirius/1.0/ANDROID MapboxEventsiOS/1.1";
+    public static final String MGLMapboxEventsUserAgent = "MapboxEventsAndroid/1.1";
     public static final String MGLMapboxEventsAPIBase = "https://api.tiles.mapbox.com";
 
     // Event Types
