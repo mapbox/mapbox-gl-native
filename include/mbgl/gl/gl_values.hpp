@@ -1,5 +1,5 @@
-#ifndef MBGL_RENDERER_GL_CONFIG
-#define MBGL_RENDERER_GL_CONFIG
+#ifndef MBGL_GL_GL_VALUES
+#define MBGL_GL_GL_VALUES
 
 #include <cstdint>
 #include <tuple>
@@ -9,32 +9,6 @@
 
 namespace mbgl {
 namespace gl {
-
-template <typename T>
-class Value {
-public:
-    inline void operator=(const typename T::Type& value) {
-        if (dirty || current != value) {
-            dirty = false;
-            current = value;
-            T::Set(current);
-        }
-    }
-
-    inline void reset() {
-        dirty = true;
-        current = T::Default;
-        T::Set(current);
-    }
-
-    inline void setDirty() {
-        dirty = true;
-    }
-
-private:
-    typename T::Type current = T::Default;
-    bool dirty = false;
-};
 
 struct ClearDepth {
     using Type = GLfloat;
@@ -266,63 +240,36 @@ struct LineWidth {
     }
 };
 
-class Config {
-public:
-    void reset() {
-        stencilFunc.reset();
-        stencilMask.reset();
-        stencilTest.reset();
-        stencilOp.reset();
-        depthRange.reset();
-        depthMask.reset();
-        depthTest.reset();
-        depthFunc.reset();
-        blend.reset();
-        blendFunc.reset();
-        colorMask.reset();
-        clearDepth.reset();
-        clearColor.reset();
-        clearStencil.reset();
-        program.reset();
-        lineWidth.reset();
-    }
+#ifndef GL_ES_VERSION_2_0
 
-    void setDirty() {
-        stencilFunc.setDirty();
-        stencilMask.setDirty();
-        stencilTest.setDirty();
-        stencilOp.setDirty();
-        depthRange.setDirty();
-        depthMask.setDirty();
-        depthTest.setDirty();
-        depthFunc.setDirty();
-        blend.setDirty();
-        blendFunc.setDirty();
-        colorMask.setDirty();
-        clearDepth.setDirty();
-        clearColor.setDirty();
-        clearStencil.setDirty();
-        program.setDirty();
-        lineWidth.setDirty();
+struct PixelZoom {
+    struct Type { GLfloat xfactor; GLfloat yfactor; };
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glPixelZoom(value.xfactor, value.yfactor));
     }
-
-    Value<StencilFunc> stencilFunc;
-    Value<StencilMask> stencilMask;
-    Value<StencilTest> stencilTest;
-    Value<StencilOp> stencilOp;
-    Value<DepthRange> depthRange;
-    Value<DepthMask> depthMask;
-    Value<DepthTest> depthTest;
-    Value<DepthFunc> depthFunc;
-    Value<Blend> blend;
-    Value<BlendFunc> blendFunc;
-    Value<ColorMask> colorMask;
-    Value<ClearDepth> clearDepth;
-    Value<ClearColor> clearColor;
-    Value<ClearStencil> clearStencil;
-    Value<Program> program;
-    Value<LineWidth> lineWidth;
+    inline static Type Get() {
+        Type value;
+        MBGL_CHECK_ERROR(glGetFloatv(GL_ZOOM_X, &value.xfactor));
+        MBGL_CHECK_ERROR(glGetFloatv(GL_ZOOM_Y, &value.yfactor));
+        return value;
+    }
 };
+
+struct RasterPos {
+    using Type = std::array<GLdouble, 4>;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glRasterPos4d(value[0], value[1], value[2], value[3]));
+    }
+    inline static Type Get() {
+        Type pos;
+        MBGL_CHECK_ERROR(glGetDoublev(GL_CURRENT_RASTER_POSITION, pos.data()));
+        return pos;
+    }
+};
+
+#endif
 
 } // namespace gl
 } // namespace mbgl

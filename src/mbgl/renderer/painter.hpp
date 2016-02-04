@@ -10,7 +10,7 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
 
-#include <mbgl/renderer/gl_config.hpp>
+#include <mbgl/gl/gl_config.hpp>
 
 #include <mbgl/style/types.hpp>
 
