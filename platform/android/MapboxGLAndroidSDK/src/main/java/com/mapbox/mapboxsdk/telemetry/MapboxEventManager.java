@@ -41,7 +41,7 @@ public class MapboxEventManager {
     private static final String MAPBOX_EVENTS_BASE_URL = "https://api.tiles.mapbox.com";
     private String eventsURL = MAPBOX_EVENTS_BASE_URL;
 
-    private static final String SESSION_UUID = java.util.UUID.randomUUID().toString();
+    private static final String SESSION_UUID = UUID.randomUUID().toString();
 
     private MapboxEventManager(@NonNull Context context) {
         super();
