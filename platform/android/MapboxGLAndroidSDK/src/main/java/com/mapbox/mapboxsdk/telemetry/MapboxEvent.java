@@ -16,5 +16,4 @@ public class MapboxEvent implements Serializable {
     public static final String MGLEventKeyCourse = "course";
     public static final String MGLEventKeyAltitude = "altitude";
     public static final String MGLEventKeyHorizontalAccuracy = "horizontalAccuracy";
-    public static final String MGLEventKeyVerticalAccuracy = "verticalAccuracy";
 }
