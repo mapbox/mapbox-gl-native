@@ -69,7 +69,6 @@
         'cflags_cc': [
           '<@(libuv_cflags)',
           '<@(boost_cflags)',
-          '<@(variant_cflags)',
           '<@(sqlite_cflags)',
           '<@(zlib_cflags)',
         ],
