@@ -862,6 +862,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void)boostLocationManagerAccuracy {
+    if ([self debugLoggingEnabled]) {
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.boost_accuracy"}];
+    }
     self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     self.locationManager.distanceFilter = 10;
 }
@@ -874,7 +877,12 @@ const NSTimeInterval MGLFlushInterval = 60;
         if (self.isDormant) {
             // if device is moving, start capturing data again
             if (loc.speed > 0.0) {
+                
                 self.dormant = NO;
+                if ([self debugLoggingEnabled]) {
+                    [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.ended"}];
+                }
+                
                 [self.dormancyTimer invalidate];
                 [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
                                                                                  MGLEventKeyLongitude: @(loc.coordinate.longitude),
@@ -884,6 +892,10 @@ const NSTimeInterval MGLFlushInterval = 60;
                                                                                  MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
                                                                                  MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
             } else { // otherwise ignore
+                
+                if ([self debugLoggingEnabled]) {
+                    [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.reduce_accuracy"}];
+                }
                 
                 // power down as much as possible
                 manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
@@ -904,7 +916,16 @@ const NSTimeInterval MGLFlushInterval = 60;
                 // if the device has been stationary for 20 readings then go dormant
                 if (self.stationaryLocationReadingsCount > 20) {
                     self.stationaryLocationReadingsCount = 0;
+                    
+                    
                     self.dormant = YES;
+                    if ([self debugLoggingEnabled]) {
+                        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.started"}];
+                    }
+                    
+                    if ([self debugLoggingEnabled]) {
+                        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.reduce_accuracy"}];
+                    }
                     
                     // power down as much as possible
                     manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
