@@ -8,8 +8,14 @@ public class MapboxEvent implements Serializable {
     public static final String MGLMapboxEventsAPIBase = "https://api.tiles.mapbox.com";
 
     // Event Types
+    public static final String MAPBOXEVENT_TURNSTILE = "appUserTurnstile";
+    public static final String MAPBOXEVENT_MAP_LOAD = "map.load";
+    public static final String MAPBOXEVENT_MAP_CLICK = "map.click";
+    public static final String MAPBOXEVENT_MAP_DRAGEND = "map.dragend";
     public static final String MAPBOXEVENT_LOCATION = "location";
+    public static final String MAPBOXEVENT_VISIT = "visit";
 
+    // Attributes
     public static final String MGLEventKeyLatitude = "lat";
     public static final String MGLEventKeyLongitude = "lng";
     public static final String MGLEventKeySpeed = "speed";
