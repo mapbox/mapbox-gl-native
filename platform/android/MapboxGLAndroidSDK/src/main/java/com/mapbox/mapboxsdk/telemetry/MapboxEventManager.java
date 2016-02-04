@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.Vector;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -39,6 +40,8 @@ public class MapboxEventManager {
     private String accessToken = null;
     private static final String MAPBOX_EVENTS_BASE_URL = "https://api.tiles.mapbox.com";
     private String eventsURL = MAPBOX_EVENTS_BASE_URL;
+
+    private static final String SESSION_UUID = java.util.UUID.randomUUID().toString();
 
     private MapboxEventManager(@NonNull Context context) {
         super();
@@ -122,7 +125,7 @@ public class MapboxEventManager {
                     // Basic Event Meta Data
                     jsonObject.put("event", evt.get("event"));
                     jsonObject.put("version", MapboxEvent.VERSION);
-                    jsonObject.put("instance", "FFFFFFFF-GGGG-HHHH-IIII-JJJJJJJJJJJJ");
+                    jsonObject.put("instance", SESSION_UUID);
                     jsonObject.put("created", evt.get("created"));
                     jsonObject.put("anonid", "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE");
                     jsonObject.put("appBundleId", context.getPackageName());
