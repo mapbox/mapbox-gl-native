@@ -76,11 +76,11 @@ public class MapboxEventManager {
         Hashtable<String, Object> event = new Hashtable<>();
         event.put(MapboxEvent.MGLEventKeyLatitude, location.getLatitude());
         event.put(MapboxEvent.MGLEventKeyLongitude, location.getLongitude());
-        event.put(MapboxEvent.MGLEventKeySpeed, location.hasSpeed() ? location.getSpeed() : -1);
-        event.put(MapboxEvent.MGLEventKeyCourse, location.hasBearing() ? location.getBearing() : -1);
-        event.put(MapboxEvent.MGLEventKeyAltitude, location.hasAltitude() ? location.getAltitude() : 0);
-        event.put(MapboxEvent.MGLEventKeyHorizontalAccuracy, location.hasAccuracy() ? location.getAccuracy() : 0);
-        event.put(MapboxEvent.MGLEventKeyVerticalAccuracy, location.hasAccuracy() ? location.getAccuracy() : 0);
+        event.put(MapboxEvent.MGLEventKeySpeed, location.getSpeed());
+        event.put(MapboxEvent.MGLEventKeyCourse, location.getBearing());
+        event.put(MapboxEvent.MGLEventKeyAltitude, location.getAltitude());
+        event.put(MapboxEvent.MGLEventKeyHorizontalAccuracy, location.getAccuracy());
+        event.put(MapboxEvent.MGLEventKeyVerticalAccuracy, -99);
         event.put("created", dateFormat.format(new Date()));
 
         events.add(event);
