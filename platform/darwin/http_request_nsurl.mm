@@ -133,7 +133,7 @@ void HTTPNSURLRequest::handleResponse() {
     }
 
     if (!cancelled) {
-        // Actually return the response.
+        assert(response);
         notify(*response);
     }
 
@@ -158,8 +158,8 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
 
     if (error) {
         if ([error code] == NSURLErrorCancelled) {
-            response->error =
-                std::make_unique<Error>(Error::Reason::Canceled, "Request was cancelled");
+            response.reset();
+
         } else {
             if (data) {
                 response->data =
