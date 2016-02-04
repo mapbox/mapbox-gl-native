@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.telemetry;
 import java.io.Serializable;
 
 public class MapboxEvent implements Serializable {
+    public static final int VERSION_NUMBER = 1;
     public static final String MGLMapboxEventsUserAgent = "Sirius/1.0/ANDROID MapboxEventsiOS/1.1";
     public static final String MGLMapboxEventsAPIBase = "https://api.tiles.mapbox.com";
 
@@ -38,7 +39,8 @@ public class MapboxEvent implements Serializable {
     public static final String GESTURE_PITCH_START = "Pitch";
 
     // Event Attributes
-    public static final int ATTRIBUTE_VERSION = 1;
+    public static final String ATTRIBUTE_EVENT = "event";
+    public static final String ATTRIBUTE_VERSION = "version";
     public static final String ATTRIBUTE_CREATED = "created";
     public static final String ATTRIBUTE_INSTANCE = "instance";
     public static final String ATTRIBUTE_VENDOR_ID = "vendorId";

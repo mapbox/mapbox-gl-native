@@ -83,8 +83,8 @@ public class MapboxEventManager {
         event.put(MapboxEvent.KEY_COURSE, location.getBearing());
         event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
         event.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, location.getAccuracy());
-        event.put("created", dateFormat.format(new Date()));
-        event.put("event", MapboxEvent.TYPE_LOCATION);
+        event.put(MapboxEvent.ATTRIBUTE_CREATED, dateFormat.format(new Date()));
+        event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_LOCATION);
 
         events.add(event);
 
@@ -123,11 +123,22 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, evt.get(MapboxEvent.KEY_HORIZONTAL_ACCURACY));
 
                     // Basic Event Meta Data
-                    jsonObject.put("event", evt.get("event"));
-                    jsonObject.put("version", MapboxEvent.ATTRIBUTE_VERSION);
-                    jsonObject.put("instance", SESSION_UUID);
-                    jsonObject.put("created", evt.get("created"));
-                    jsonObject.put("appBundleId", context.getPackageName());
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get("event"));
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_INSTANCE, SESSION_UUID);
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, "");
 
                     jsonArray.put(jsonObject);
                 }
