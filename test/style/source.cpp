@@ -240,7 +240,7 @@ TEST(Source, RasterTileCancel) {
 
     test.fileSource.tileResponse = [&] (const Resource&) {
         test.end();
-        return Response();
+        return optional<Response>();
     };
 
     test.observer.tileLoaded = [&] (Source&, const TileID&, bool) {
@@ -267,7 +267,7 @@ TEST(Source, VectorTileCancel) {
 
     test.fileSource.tileResponse = [&] (const Resource&) {
         test.end();
-        return Response();
+        return optional<Response>();
     };
 
     test.observer.tileLoaded = [&] (Source&, const TileID&, bool) {

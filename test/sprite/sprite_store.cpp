@@ -299,7 +299,7 @@ TEST(SpriteStore, LoadingCancel) {
     test.fileSource.spriteImageResponse =
     test.fileSource.spriteJSONResponse = [&] (const Resource&) {
         test.end();
-        return Response();
+        return optional<Response>();
     };
 
     test.observer.spriteLoaded = [&] () {

@@ -134,7 +134,7 @@ TEST(GlyphStore, LoadingCancel) {
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         test.end();
-        return Response();
+        return optional<Response>();
     };
 
     test.observer.glyphsLoaded = [&] (const std::string&, const GlyphRange&) {

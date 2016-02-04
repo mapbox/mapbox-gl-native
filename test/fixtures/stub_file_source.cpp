@@ -22,7 +22,9 @@ StubFileSource::StubFileSource() {
         // Explicit move to avoid iterator invalidation if ~StubFileRequest gets called within the loop.
         auto pending_ = std::move(pending);
         for (auto& pair : pending_) {
-            pair.second.second(pair.second.first);
+            if (pair.second.first) {
+                pair.second.second(*pair.second.first);
+            }
         }
     });
 }
@@ -35,7 +37,7 @@ std::unique_ptr<FileRequest> StubFileSource::request(const Resource& resource, C
     return std::move(req);
 }
 
-Response StubFileSource::defaultResponse(const Resource& resource) {
+optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
     switch (resource.kind) {
     case Resource::Kind::Style:
         if (!styleResponse) throw std::runtime_error("unexpected style request");
