@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -107,6 +109,17 @@ public class MapboxEventManager {
 
     }
 
+    private String getOrientation() {
+        switch (context.getResources().getConfiguration().orientation) {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                return "Landscape";
+            case Configuration.ORIENTATION_PORTRAIT:
+                return "Portrait";
+            default:
+                return "Undefined";
+        }
+    }
+
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -141,9 +154,9 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_INSTANCE, SESSION_UUID);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, "");
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, "");
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, Build.VERSION.RELEASE);
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, "");
