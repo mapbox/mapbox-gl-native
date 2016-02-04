@@ -82,6 +82,7 @@ public class MapboxEventManager {
         event.put(MapboxEvent.MGLEventKeyHorizontalAccuracy, location.getAccuracy());
         event.put(MapboxEvent.MGLEventKeyVerticalAccuracy, -99);
         event.put("created", dateFormat.format(new Date()));
+        event.put("event", MapboxEvent.MAPBOXEVENT_LOCATION);
 
         events.add(event);
 
@@ -121,8 +122,8 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.MGLEventKeyVerticalAccuracy, evt.get(MapboxEvent.MGLEventKeyVerticalAccuracy));
 
                     // Basic Event Meta Data
-                    jsonObject.put("event", "location");
-                    jsonObject.put("version", 1);
+                    jsonObject.put("event", evt.get("event"));
+                    jsonObject.put("version", MapboxEvent.VERSION);
                     jsonObject.put("instance", "FFFFFFFF-GGGG-HHHH-IIII-JJJJJJJJJJJJ");
                     jsonObject.put("created", evt.get("created"));
                     jsonObject.put("anonid", "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE");
