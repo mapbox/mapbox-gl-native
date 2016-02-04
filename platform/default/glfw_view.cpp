@@ -3,8 +3,8 @@
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/gl_helper.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 

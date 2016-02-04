@@ -1,5 +1,5 @@
-#ifndef MBGL_UTIL_GL_HELPER
-#define MBGL_UTIL_GL_HELPER
+#ifndef MBGL_GL_GL_HELPER
+#define MBGL_GL_GL_HELPER
 
 #include <mbgl/gl/gl.hpp>
 
