@@ -77,14 +77,14 @@ public class MapboxEventManager {
     public void addLocationEvent(Location location) {
         // Add Location even to queue
         Hashtable<String, Object> event = new Hashtable<>();
-        event.put(MapboxEvent.MGLEventKeyLatitude, location.getLatitude());
-        event.put(MapboxEvent.MGLEventKeyLongitude, location.getLongitude());
-        event.put(MapboxEvent.MGLEventKeySpeed, location.getSpeed());
-        event.put(MapboxEvent.MGLEventKeyCourse, location.getBearing());
-        event.put(MapboxEvent.MGLEventKeyAltitude, location.getAltitude());
-        event.put(MapboxEvent.MGLEventKeyHorizontalAccuracy, location.getAccuracy());
+        event.put(MapboxEvent.KEY_LATITUDE, location.getLatitude());
+        event.put(MapboxEvent.KEY_LONGITUDE, location.getLongitude());
+        event.put(MapboxEvent.KEY_SPEED, location.getSpeed());
+        event.put(MapboxEvent.KEY_COURSE, location.getBearing());
+        event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
+        event.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, location.getAccuracy());
         event.put("created", dateFormat.format(new Date()));
-        event.put("event", MapboxEvent.MAPBOXEVENT_LOCATION);
+        event.put("event", MapboxEvent.TYPE_LOCATION);
 
         events.add(event);
 
@@ -115,16 +115,16 @@ public class MapboxEventManager {
 
                 for (Hashtable<String, Object> evt : events) {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(MapboxEvent.MGLEventKeyLatitude, evt.get(MapboxEvent.MGLEventKeyLatitude));
-                    jsonObject.put(MapboxEvent.MGLEventKeyLongitude, evt.get(MapboxEvent.MGLEventKeyLongitude));
-                    jsonObject.put(MapboxEvent.MGLEventKeySpeed, evt.get(MapboxEvent.MGLEventKeySpeed));
-                    jsonObject.put(MapboxEvent.MGLEventKeyCourse, evt.get(MapboxEvent.MGLEventKeyCourse));
-                    jsonObject.put(MapboxEvent.MGLEventKeyAltitude, evt.get(MapboxEvent.MGLEventKeyAltitude));
-                    jsonObject.put(MapboxEvent.MGLEventKeyHorizontalAccuracy, evt.get(MapboxEvent.MGLEventKeyHorizontalAccuracy));
+                    jsonObject.put(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
+                    jsonObject.put(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
+                    jsonObject.put(MapboxEvent.KEY_SPEED, evt.get(MapboxEvent.KEY_SPEED));
+                    jsonObject.put(MapboxEvent.KEY_COURSE, evt.get(MapboxEvent.KEY_COURSE));
+                    jsonObject.put(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
+                    jsonObject.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, evt.get(MapboxEvent.KEY_HORIZONTAL_ACCURACY));
 
                     // Basic Event Meta Data
                     jsonObject.put("event", evt.get("event"));
-                    jsonObject.put("version", MapboxEvent.VERSION);
+                    jsonObject.put("version", MapboxEvent.ATTRIBUTE_VERSION);
                     jsonObject.put("instance", SESSION_UUID);
                     jsonObject.put("created", evt.get("created"));
                     jsonObject.put("appBundleId", context.getPackageName());
