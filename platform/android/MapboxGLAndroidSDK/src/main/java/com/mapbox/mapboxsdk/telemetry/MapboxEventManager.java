@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.telemetry;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -43,6 +44,8 @@ public class MapboxEventManager {
 
     private static final String SESSION_UUID = UUID.randomUUID().toString();
 
+    private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
+
     private MapboxEventManager(@NonNull Context context) {
         super();
         this.accessToken = ApiAccess.getToken(context);
@@ -53,6 +56,10 @@ public class MapboxEventManager {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             String stagingURL = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_SERVER);
             String stagingAccessToken = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_STAGING_ACCESS_TOKEN);
+            String appName = context.getPackageManager().getApplicationLabel(appInfo).toString();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            int versionCode = packageInfo.versionCode;
 
             if (!TextUtils.isEmpty(stagingURL)) {
                 eventsURL = stagingURL;
@@ -60,6 +67,11 @@ public class MapboxEventManager {
 
             if (!TextUtils.isEmpty(stagingAccessToken)) {
                 this.accessToken = stagingAccessToken;
+            }
+
+            // Build User Agent
+            if (!TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
+                userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
             }
 
         } catch (Exception e) {
@@ -151,7 +163,7 @@ public class MapboxEventManager {
 
                 Request request = new Request.Builder()
                         .url(url)
-                        .header("User-Agent", MapboxEvent.MGLMapboxEventsUserAgent)
+                        .header("User-Agent", userAgent)
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
