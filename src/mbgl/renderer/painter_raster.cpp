@@ -1,5 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>

@@ -3,7 +3,7 @@
 #import "MGLMapView+MGLCustomStyleLayerAdditions.h"
 
 #import <mbgl/platform/log.hpp>
-#import <mbgl/platform/gl.hpp>
+#import <mbgl/gl/gl.hpp>
 
 #import <GLKit/GLKit.h>
 #import <OpenGLES/EAGL.h>

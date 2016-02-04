@@ -2,7 +2,7 @@
 #define MBGL_UTIL_TEXTUREPOOL
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <set>
 #include <mutex>

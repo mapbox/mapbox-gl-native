@@ -1,5 +1,5 @@
 #include <mbgl/geometry/collision_box_buffer.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>

@@ -1,4 +1,4 @@
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 

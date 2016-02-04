@@ -5,7 +5,7 @@
 #include <tuple>
 #include <array>
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 namespace gl {

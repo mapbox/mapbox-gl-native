@@ -1,7 +1,7 @@
 #ifndef MBGL_GEOMETRY_BUFFER
 #define MBGL_GEOMETRY_BUFFER
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>

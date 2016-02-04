@@ -2,7 +2,7 @@
 
 #include <mbgl/util/thread.hpp>
 #include <mbgl/geometry/vao.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 

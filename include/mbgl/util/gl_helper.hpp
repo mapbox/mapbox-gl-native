@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_GL_HELPER
 #define MBGL_UTIL_GL_HELPER
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <array>
 

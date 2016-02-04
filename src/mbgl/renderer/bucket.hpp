@@ -1,7 +1,7 @@
 #ifndef MBGL_RENDERER_BUCKET
 #define MBGL_RENDERER_BUCKET
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>

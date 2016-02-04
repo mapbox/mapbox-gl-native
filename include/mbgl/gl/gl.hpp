@@ -1,5 +1,5 @@
-#ifndef MBGL_RENDERER_GL
-#define MBGL_RENDERER_GL
+#ifndef MBGL_GL_GL
+#define MBGL_GL_GL
 
 //#define GL_TRACK
 

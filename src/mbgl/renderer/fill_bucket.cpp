@@ -6,7 +6,7 @@
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <cassert>

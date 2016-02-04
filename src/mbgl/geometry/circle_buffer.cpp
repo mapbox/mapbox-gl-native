@@ -1,6 +1,6 @@
 #include <mbgl/geometry/circle_buffer.hpp>
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <climits>
 

@@ -2,7 +2,7 @@
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/platform/default/glfw_view.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/gl_helper.hpp>
 #include <mbgl/util/string.hpp>
