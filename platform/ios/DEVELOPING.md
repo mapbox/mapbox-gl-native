@@ -50,6 +50,12 @@ To run the included integration tests on the command line.
 
 If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `test/ios/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target.
 
+### Testing Pre-Releases with CocoaPods
+
+To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+
+    pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
+
 ### Usage
 
 - Pan to move
