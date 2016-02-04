@@ -133,6 +133,12 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (atomic) NSData *testServerCert;
 @property (atomic) BOOL usesTestServer;
 
+
+@property (atomic, getter=isDormant) BOOL dormant;
+@property (atomic) NSUInteger stationaryLocationReadingsCount;
+@property (atomic) NSTimer *dormancyTimer;
+
+
 // Main thread only
 @property (nonatomic) CLLocationManager *locationManager;
 
@@ -420,6 +426,11 @@ const NSTimeInterval MGLFlushInterval = 60;
     _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     _locationManager.distanceFilter = 10;
     _locationManager.delegate = self;
+    
+    // -[CLLocationManager allowsBackgroundLocationUpdates] is only available in iOS 9+.
+    if ([_locationManager respondsToSelector:@selector(allowsBackgroundLocationUpdates)]) {
+        _locationManager.allowsBackgroundLocationUpdates = YES;
+    }
 
     [_locationManager startUpdatingLocation];
 
@@ -850,19 +861,78 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+- (void)boostLocationManagerAccuracy {
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    self.locationManager.distanceFilter = 10;
+}
+
 #pragma mark CLLocationManagerDelegate
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
-        [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{
-            MGLEventKeyLatitude: @(loc.coordinate.latitude),
-            MGLEventKeyLongitude: @(loc.coordinate.longitude),
-            MGLEventKeySpeed: @(loc.speed),
-            MGLEventKeyCourse: @(loc.course),
-            MGLEventKeyAltitude: @(round(loc.altitude)),
-            MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
-            MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))
-        }];
+
+        if (self.isDormant) {
+            // if device is moving, start capturing data again
+            if (loc.speed > 0.0) {
+                self.dormant = NO;
+                [self.dormancyTimer invalidate];
+                [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
+                                                                                 MGLEventKeyLongitude: @(loc.coordinate.longitude),
+                                                                                 MGLEventKeySpeed: @(loc.speed),
+                                                                                 MGLEventKeyCourse: @(loc.course),
+                                                                                 MGLEventKeyAltitude: @(round(loc.altitude)),
+                                                                                 MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+                                                                                 MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
+            } else { // otherwise ignore
+                
+                // power down as much as possible
+                manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
+                manager.distanceFilter = CLLocationDistanceMax;
+                
+                [self.dormancyTimer invalidate];
+                self.dormancyTimer = [NSTimer scheduledTimerWithTimeInterval:300
+                                                                      target:self
+                                                                    selector:@selector(boostLocationManagerAccuracy)
+                                                                    userInfo:nil
+                                                                     repeats:YES];
+            }
+        } else {
+            // if the device seems to be stationary then start monitoring that
+            if (loc.speed <= 0.0) {
+                self.stationaryLocationReadingsCount++;
+                
+                // if the device has been stationary for 20 readings then go dormant
+                if (self.stationaryLocationReadingsCount > 20) {
+                    self.stationaryLocationReadingsCount = 0;
+                    self.dormant = YES;
+                    
+                    // power down as much as possible
+                    manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
+                    manager.distanceFilter = CLLocationDistanceMax;
+                    
+                    [self.dormancyTimer invalidate];
+                    self.dormancyTimer = [NSTimer scheduledTimerWithTimeInterval:300
+                                                                          target:self
+                                                                        selector:@selector(boostLocationManagerAccuracy)
+                                                                        userInfo:nil
+                                                                         repeats:YES];
+                }
+            } else {
+                // any movement resets our movement counter
+                self.stationaryLocationReadingsCount = 0;
+            }
+            
+            // as long as we don't consider ourselves dormant
+            [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
+                                                                             MGLEventKeyLongitude: @(loc.coordinate.longitude),
+                                                                             MGLEventKeySpeed: @(loc.speed),
+                                                                             MGLEventKeyCourse: @(loc.course),
+                                                                             MGLEventKeyAltitude: @(round(loc.altitude)),
+                                                                             MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+                                                                             MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
+        }
+        
+        
     }
 }
 
