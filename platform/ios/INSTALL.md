@@ -28,7 +28,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
 
 ### Install
 
-There are two ways to install the Mapbox iOS SDK:
+There are a few ways to install the Mapbox iOS SDK:
 
 #### CocoaPods
 
@@ -63,6 +63,15 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
     ```
 
 1. Run `pod update` to grab the newly-built library.
+
+
+
+##### Testing Pre-Releases with CocoaPods
+
+To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+
+    pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
+
 
 #### Dynamic framework
 
