@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.telemetry;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,6 +11,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -48,6 +51,8 @@ public class MapboxEventManager {
 
     private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
 
+    private Intent batteryStatus = null;
+
     private MapboxEventManager(@NonNull Context context) {
         super();
         this.accessToken = ApiAccess.getToken(context);
@@ -79,6 +84,10 @@ public class MapboxEventManager {
         } catch (Exception e) {
             Log.e(TAG, "Error Trying to load Staging Credentials: " + e.toString());
         }
+
+        // Register for battery updates
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = context.registerReceiver(null, ifilter);
     }
 
     public static MapboxEventManager getMapboxEventManager(@NonNull Context context) {
@@ -120,6 +129,13 @@ public class MapboxEventManager {
         }
     }
 
+    private int getBatteryLevel() {
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        return Math.round((level / (float)scale) * 100);
+    }
+
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -157,7 +173,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, Build.VERSION.RELEASE);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
