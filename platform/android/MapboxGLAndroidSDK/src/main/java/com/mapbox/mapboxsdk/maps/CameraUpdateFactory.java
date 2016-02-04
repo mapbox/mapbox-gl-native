@@ -176,6 +176,15 @@ public class CameraUpdateFactory {
 
         @Override
         public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
+            CameraPosition previousPosition = mapboxMap.getCameraPosition();
+            if (target == null) {
+                return new CameraPosition.Builder(true)
+                        .tilt(tilt)
+                        .zoom(zoom)
+                        .bearing(bearing)
+                        .target(previousPosition.target)
+                        .build();
+            }
             return new CameraPosition.Builder(this).build();
         }
     }
