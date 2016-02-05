@@ -16,7 +16,9 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import org.json.JSONArray;
@@ -55,10 +57,16 @@ public class MapboxEventManager {
 
     private Intent batteryStatus = null;
 
+    private DisplayMetrics displayMetrics = null;
+
     private MapboxEventManager(@NonNull Context context) {
         super();
         this.accessToken = ApiAccess.getToken(context);
         this.context = context;
+
+        // Get DisplayMetrics Setup
+        displayMetrics = new DisplayMetrics();
+        ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
 
         // Check for Staging Server Information
         try {
@@ -193,7 +201,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, displayMetrics.density);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, "");
