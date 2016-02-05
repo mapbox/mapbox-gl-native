@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.telemetry;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -23,6 +24,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.Vector;
@@ -136,6 +138,22 @@ public class MapboxEventManager {
         return Math.round((level / (float)scale) * 100);
     }
 
+    private String getApplicationState() {
+
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return "Unknown";
+        }
+        final String packageName = context.getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals(packageName)) {
+                return "Foreground";
+            }
+        }
+        return "Background";
+    }
+
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -174,7 +192,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, Build.VERSION.RELEASE);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, "");
