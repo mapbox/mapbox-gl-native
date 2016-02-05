@@ -11,6 +11,8 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -210,7 +212,21 @@ public class MapboxEventManager {
             default:
                 return "Default Unknown";
         }
+    }
 
+
+    public String getConnectedToWifi() {
+
+        String status = "No";
+        WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (wifiMgr.isWifiEnabled()) {
+            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+            if( wifiInfo.getNetworkId() != -1 ){
+                status = "Yes";
+            }
+        }
+
+        return status;
     }
 
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
@@ -256,7 +272,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
 
                     jsonArray.put(jsonObject);
                 }
