@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -162,6 +163,56 @@ public class MapboxEventManager {
         return "Background";
     }
 
+    private String getCellularCarrier() {
+        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        String carrierName = manager.getNetworkOperatorName();
+        if (TextUtils.isEmpty(carrierName)) {
+            carrierName = "None";
+        }
+        return carrierName;
+    }
+
+    private String getCellularNetworkType () {
+        TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        switch (manager.getNetworkType()) {
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+                return "1xRTT";
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+                return "CDMA";
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+                return "EDGE";
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+                return "EHRPD";
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                return "EVDO_0";
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                return "EVDO_A";
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                return "EVDO_B";
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+                return "GPRS";
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+                return "HSDPA";
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+                return "HSPA";
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+                return "HSPAP";
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+                return "HSUPA";
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+                return "IDEN";
+            case TelephonyManager.NETWORK_TYPE_LTE:
+                return "LTE";
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+                return "UMTS";
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                return "Unknown";
+            default:
+                return "Default Unknown";
+        }
+
+    }
+
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -203,8 +254,8 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, displayMetrics.density);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, "");
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, "");
 
                     jsonArray.put(jsonObject);
