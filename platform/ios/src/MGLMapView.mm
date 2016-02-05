@@ -977,6 +977,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _mbglMap->pause();
 
         [self.glView deleteDrawable];
+        
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager stopUpdatingHeading];
     }
 }
 
@@ -1000,6 +1003,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _mbglMap->resume();
         
         _displayLink.paused = NO;
+      
+        if (self.showsUserLocation) {
+            [self.locationManager startUpdatingLocation];
+            if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading) {
+                [self.locationManager startUpdatingHeading];
+            }
+        }
+        
     }
 }
 

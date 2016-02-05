@@ -875,8 +875,34 @@ const NSTimeInterval MGLFlushInterval = 60;
    
     CLLocation *loc = locations.lastObject;
     NSTimeInterval ageInSeconds = -[loc.timestamp timeIntervalSinceNow];
-    if (ageInSeconds > 5.0) return;   // data is too old ago, don't use it
+    if (ageInSeconds > 5.0) { return; }   // data is too old ago, don't use it
+    if (loc.speed <= 0.0) {
+        CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:loc.coordinate radius:30 identifier:@"fence.center"];
+        [manager startMonitoringForRegion:region];
+        if ([self debugLoggingEnabled]) {
+            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.establish_region"}];
+        }
+        if ([self debugLoggingEnabled]) {
+            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.soft_pause"}];
+        }
+        self.dormant = YES;
+        [manager stopUpdatingLocation];
+        [manager stopMonitoringVisits];
+    }
+    [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
+                                                                     MGLEventKeyLongitude: @(loc.coordinate.longitude),
+                                                                     MGLEventKeySpeed: @(loc.speed),
+                                                                     MGLEventKeyCourse: @(loc.course),
+                                                                     MGLEventKeyAltitude: @(round(loc.altitude)),
+                                                                     MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+                                                                     MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
+    return;
+  
    
+    
+    
+    
+    
    
     if (self.isDormant) {
         // if device is moving, start capturing data again
@@ -953,18 +979,28 @@ const NSTimeInterval MGLFlushInterval = 60;
                                                                          MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
                                                                          MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
     }
-    
-    
-    
 
     return;
-    
     
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
         
         NSTimeInterval ageInSeconds = -[loc.timestamp timeIntervalSinceNow];
         if (ageInSeconds > 5.0) continue;   // data is too old ago, don't use it
+        [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
+                                                                         MGLEventKeyLongitude: @(loc.coordinate.longitude),
+                                                                         MGLEventKeySpeed: @(loc.speed),
+                                                                         MGLEventKeyCourse: @(loc.course),
+                                                                         MGLEventKeyAltitude: @(round(loc.altitude)),
+                                                                         MGLEventKeyHorizontalAccuracy: @(round(loc.horizontalAccuracy)),
+                                                                         MGLEventKeyVerticalAccuracy: @(round(loc.verticalAccuracy))}];
+        if (loc.speed <= 0.0) {
+            self.stationaryLocationReadingsCount++;
+            if (self.stationaryLocationReadingsCount > 2) {
+                [manager stopUpdatingLocation];
+            }
+        }
+        return;
 
         if (self.isDormant) {
             // if device is moving, start capturing data again
@@ -1046,6 +1082,20 @@ const NSTimeInterval MGLFlushInterval = 60;
     }
 }
 
+- (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
+    if ([self debugLoggingEnabled]) {
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.exit_region"}];
+    }
+    if (self.isDormant) {
+        if ([self debugLoggingEnabled]) {
+            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.soft_resume"}];
+        }
+        self.dormant = NO;
+        [manager startUpdatingLocation];
+        [manager startMonitoringVisits];
+    }
+}
+
 - (void)locationManager:(CLLocationManager *)manager didVisit:(CLVisit *)visit {
     [MGLMapboxEvents pushEvent:MGLEventTypeVisit withAttributes:@{
         MGLEventKeyLatitude: @(visit.coordinate.latitude),
@@ -1054,6 +1104,25 @@ const NSTimeInterval MGLFlushInterval = 60;
         MGLEventKeyArrivalDate: [[NSDate distantPast] isEqualToDate:visit.arrivalDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.arrivalDate],
         MGLEventKeyDepartureDate: [[NSDate distantFuture] isEqualToDate:visit.departureDate] ? [NSNull null] : [_rfc3339DateFormatter stringFromDate:visit.departureDate]
     }];
+    
+//    if ([visit.departureDate isEqualToDate:[NSDate distantFuture]]) {
+//        // user has arrived
+//        if ([self debugLoggingEnabled]) {
+//            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.soft_pause"}];
+//        }
+//        self.dormant = YES;
+//        [manager stopUpdatingLocation];
+//    } else {
+//        // the visit is complete
+//        if (self.isDormant) {
+//            if ([self debugLoggingEnabled]) {
+//                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"dormancy.soft_resume"}];
+//            }
+//            self.dormant = NO;
+//            [manager startUpdatingLocation];
+//        }
+//    }
+    
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
