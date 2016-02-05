@@ -22,7 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  *   .position(new LatLng(38.9002073, -77.03364419)));
  * </pre>
  */
-public final class MarkerOptions implements Parcelable {
+public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions> implements Parcelable {
 
     public static final Parcelable.Creator<MarkerOptions> CREATOR
             = new Parcelable.Creator<MarkerOptions>() {
@@ -44,6 +44,11 @@ public final class MarkerOptions implements Parcelable {
         Icon icon = new Icon(iconId, iconBitmap);
         icon(icon);
         title(in.readString());
+    }
+
+    @Override
+    public MarkerOptions getThis() {
+        return this;
     }
 
     @Override

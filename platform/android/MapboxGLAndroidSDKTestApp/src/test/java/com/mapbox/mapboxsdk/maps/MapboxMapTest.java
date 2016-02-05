@@ -1,9 +1,14 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.Color;
 import android.graphics.Point;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Polygon;
+import com.mapbox.mapboxsdk.annotations.PolygonOptions;
+import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 
 import com.mapbox.mapboxsdk.constants.Style;
@@ -15,9 +20,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.mock;
 
 import static org.junit.Assert.assertNotNull;
@@ -46,6 +55,16 @@ public class MapboxMapTest {
         assertNotNull("mMapboxMap should not be null", mMapboxMap);
     }
 
+    @Test
+    public void testMock() {
+        assertNotNull("mMapView should be mocked", mMapView);
+    }
+
+    @Test
+    public void testGetMapView(){
+        assertNotNull("MapView should be non null", mMapboxMap.getMapView());
+    }
+
     //
     // UiSettings
     //
@@ -60,10 +79,9 @@ public class MapboxMapTest {
     //
 
     @Test
-    public void testProjection(){
-        assertNotNull("Projection should not be null",mMapboxMap.getProjection());
+    public void testProjection() {
+        assertNotNull("Projection should not be null", mMapboxMap.getProjection());
     }
-
 
 
     //
@@ -367,6 +385,206 @@ public class MapboxMapTest {
         mMapboxMap.easeCamera(CameraUpdateFactory.zoomTo(12), 1000);
         assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
     }
+
+    //
+    // Annotations
+    //
+
+    @Test
+    public void testAddMarker() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker = mMapboxMap.addMarker(markerOptions);
+        assertTrue("Marker should be contained", mMapboxMap.getMarkers().contains(marker));
+    }
+
+    @Test
+    public void testAddMarkers() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions1 = new MarkerOptions().title("a");
+        MarkerOptions markerOptions2 = new MarkerOptions().title("b");
+        markerList.add(markerOptions1);
+        markerList.add(markerOptions2);
+        mMapboxMap.addMarkers(markerList);
+        assertEquals("Markers size should be 2", 2, mMapboxMap.getMarkers().size());
+        assertTrue(mMapboxMap.getMarkers().contains(markerOptions1.getMarker()));
+        assertTrue(mMapboxMap.getMarkers().contains(markerOptions2.getMarker()));
+    }
+
+    @Test
+    public void testAddPolygon() {
+        PolygonOptions polygonOptions = new PolygonOptions();
+        Polygon polygon = mMapboxMap.addPolygon(polygonOptions);
+        assertTrue("Polygon should be contained", mMapboxMap.getPolygons().contains(polygon));
+    }
+
+    @Test
+    public void testAddPolygons() {
+        List<PolygonOptions> polygonList = new ArrayList<>();
+        PolygonOptions polygonOptions1 = new PolygonOptions().fillColor(Color.BLACK);
+        PolygonOptions polygonOptions2 = new PolygonOptions().fillColor(Color.WHITE);
+        polygonList.add(polygonOptions1);
+        polygonList.add(polygonOptions2);
+        mMapboxMap.addPolygons(polygonList);
+        assertEquals("Polygons size should be 2", 2, mMapboxMap.getPolygons().size());
+        assertTrue(mMapboxMap.getPolygons().contains(polygonOptions1.getPolygon()));
+        assertTrue(mMapboxMap.getPolygons().contains(polygonOptions2.getPolygon()));
+    }
+
+    @Test
+    public void testAddPolyline() {
+        PolylineOptions polylineOptions = new PolylineOptions();
+        Polyline polyline = mMapboxMap.addPolyline(polylineOptions);
+        assertTrue("Polyline should be contained", mMapboxMap.getPolylines().contains(polyline));
+    }
+
+    @Test
+    public void testAddPolylines() {
+        List<PolylineOptions> polylineList = new ArrayList<>();
+        PolylineOptions polygonOptions1 = new PolylineOptions().color(Color.BLACK);
+        PolylineOptions polygonOptions2 = new PolylineOptions().color(Color.WHITE);
+        polylineList.add(polygonOptions1);
+        polylineList.add(polygonOptions2);
+        mMapboxMap.addPolylines(polylineList);
+        assertEquals("Polygons size should be 2", 2, mMapboxMap.getPolylines().size());
+        assertTrue(mMapboxMap.getPolylines().contains(polygonOptions1.getPolyline()));
+        assertTrue(mMapboxMap.getPolylines().contains(polygonOptions2.getPolyline()));
+    }
+
+    @Test
+    public void testRemoveMarker() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker = mMapboxMap.addMarker(markerOptions);
+        mMapboxMap.removeMarker(marker);
+        assertTrue("Markers should be empty", mMapboxMap.getMarkers().isEmpty());
+    }
+
+    @Test
+    public void testRemovePolygon() {
+        PolygonOptions polygonOptions = new PolygonOptions();
+        Polygon polygon = mMapboxMap.addPolygon(polygonOptions);
+        mMapboxMap.removePolygon(polygon);
+        assertTrue("Polygons should be empty", mMapboxMap.getPolylines().isEmpty());
+    }
+
+    @Test
+    public void testRemovePolyline() {
+        PolylineOptions polylineOptions = new PolylineOptions();
+        Polyline polyline = mMapboxMap.addPolyline(polylineOptions);
+        mMapboxMap.removePolyline(polyline);
+        assertTrue("Polylines should be empty", mMapboxMap.getPolylines().isEmpty());
+    }
+
+    @Test
+    public void testRemoveAnnotation() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker = mMapboxMap.addMarker(markerOptions);
+        mMapboxMap.removeAnnotation(marker);
+        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
+    }
+
+    @Test
+    public void testRemoveAnnotationById() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        mMapboxMap.addMarker(markerOptions);
+        // id will always be 0 in unit tests
+        mMapboxMap.removeAnnotation(0);
+        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
+    }
+
+    @Test
+    public void testRemoveAnnotations() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions1 = new MarkerOptions().title("a");
+        MarkerOptions markerOptions2 = new MarkerOptions().title("b");
+        markerList.add(markerOptions1);
+        markerList.add(markerOptions2);
+        mMapboxMap.addMarkers(markerList);
+        mMapboxMap.removeAnnotations();
+        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
+    }
+
+    @Test
+    public void testRemoveAnnotationsByList() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions1 = new MarkerOptions().title("a");
+        MarkerOptions markerOptions2 = new MarkerOptions().title("b");
+        markerList.add(markerOptions1);
+        markerList.add(markerOptions2);
+        List<Marker> markers = mMapboxMap.addMarkers(markerList);
+        Marker marker = mMapboxMap.addMarker(new MarkerOptions().title("c"));
+        mMapboxMap.removeAnnotations(markers);
+        assertTrue("Annotations should not be empty", mMapboxMap.getAnnotations().size() == 1);
+        assertTrue("Marker should be contained", mMapboxMap.getAnnotations().contains(marker));
+    }
+
+    @Test
+    public void testGetAnnotationById() {
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker initialMarker = mMapboxMap.addMarker(markerOptions);
+        Marker retrievedMarker = (Marker) mMapboxMap.getAnnotation(0);
+        assertEquals("Markers should match", initialMarker, retrievedMarker);
+    }
+
+    @Test
+    public void testGetAnnotations() {
+        assertNotNull("Annotations should be non null", mMapboxMap.getAnnotations());
+    }
+
+    @Test
+    public void testGetMarkers() {
+        assertNotNull("Markers should be non null", mMapboxMap.getMarkers());
+    }
+
+    @Test
+    public void testGetPolygons() {
+        assertNotNull("Polygons should be non null", mMapboxMap.getPolygons());
+    }
+
+    @Test
+    public void testGetPolylines() {
+        assertNotNull("Polylines should be non null", mMapboxMap.getPolylines());
+    }
+
+    @Test
+    public void testGetSelectedMarkers() {
+        assertNotNull("Selected markers should be non null", mMapboxMap.getSelectedMarkers());
+    }
+
+    @Test
+    public void testSelectMarker() {
+        mMapboxMap.setOnMarkerClickListener(mOnMarkerClickListener);
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker = mMapboxMap.addMarker(markerOptions);
+        when(mOnMarkerClickListener.onMarkerClick(marker)).thenReturn(true);
+        mMapboxMap.selectMarker(marker);
+        assertTrue("Marker should be contained", mMapboxMap.getSelectedMarkers().contains(marker));
+    }
+
+    @Test
+    public void testDeselectMarker() {
+        mMapboxMap.setOnMarkerClickListener(mOnMarkerClickListener);
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker = mMapboxMap.addMarker(markerOptions);
+        when(mOnMarkerClickListener.onMarkerClick(marker)).thenReturn(true);
+        mMapboxMap.selectMarker(marker);
+        mMapboxMap.deselectMarker(marker);
+        assertTrue("Selected markers should be empty", mMapboxMap.getSelectedMarkers().isEmpty());
+    }
+
+    @Test
+    public void testDeselectMarkers() {
+        mMapboxMap.setOnMarkerClickListener(mOnMarkerClickListener);
+        MarkerOptions markerOptions = new MarkerOptions();
+        Marker marker1 = mMapboxMap.addMarker(markerOptions);
+        Marker marker2 = mMapboxMap.addMarker(markerOptions);
+        when(mOnMarkerClickListener.onMarkerClick(marker1)).thenReturn(true);
+        when(mOnMarkerClickListener.onMarkerClick(marker2)).thenReturn(true);
+        mMapboxMap.selectMarker(marker1);
+        mMapboxMap.selectMarker(marker2);
+        mMapboxMap.deselectMarkers();
+        assertTrue("Selected markers should be empty", mMapboxMap.getSelectedMarkers().isEmpty());
+    }
+
 
     //
     // OnMarkerClick interface

@@ -16,10 +16,11 @@ import android.widget.TextView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.testapp.annotations.CityStateMarker;
+import com.mapbox.mapboxsdk.testapp.annotations.CityStateMarkerOptions;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -54,12 +55,12 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 // add markers
-                mapboxMap.addMarker(generateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
-                mapboxMap.addMarker(generateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
-                mapboxMap.addMarker(generateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
-                mapboxMap.addMarker(generateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
-                mapboxMap.addMarker(generateMarker("San Marino", 43.942360, 12.457777, "#795548"));
-                mapboxMap.addMarker(generateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
+                mapboxMap.addMarker(generateCityStateMarker("Andorra", 42.505777, 1.52529, "#F44336"));
+                mapboxMap.addMarker(generateCityStateMarker("Luxembourg", 49.815273, 6.129583, "#3F51B5"));
+                mapboxMap.addMarker(generateCityStateMarker("Monaco", 43.738418, 7.424616, "#673AB7"));
+                mapboxMap.addMarker(generateCityStateMarker("Vatican City", 41.902916, 12.453389, "#009688"));
+                mapboxMap.addMarker(generateCityStateMarker("San Marino", 43.942360, 12.457777, "#795548"));
+                mapboxMap.addMarker(generateCityStateMarker("Liechtenstein", 47.166000, 9.555373, "#FF5722"));
 
                 // add custom window adapter
                 mapboxMap.setInfoWindowAdapter(new MapboxMap.InfoWindowAdapter() {
@@ -71,7 +72,12 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
                         TextView textView = new TextView(InfoWindowAdapterActivity.this);
                         textView.setText(marker.getTitle());
                         textView.setTextColor(Color.WHITE);
-                        textView.setBackgroundColor(Color.parseColor(marker.getSnippet()));
+
+                        if(marker instanceof CityStateMarker){
+                            CityStateMarker cityStateMarker = (CityStateMarker)marker;
+                            textView.setBackgroundColor(Color.parseColor(cityStateMarker.getInfoWindowBackgroundColor()));
+                        }
+
                         textView.setPadding(tenDp, tenDp, tenDp, tenDp);
                         return textView;
                     }
@@ -80,13 +86,13 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
         });
     }
 
-    private MarkerOptions generateMarker(String title, double lat, double lng, String color) {
-        MarkerOptions marker = new MarkerOptions();
+    private CityStateMarkerOptions generateCityStateMarker(String title, double lat, double lng, String color) {
+        CityStateMarkerOptions marker = new CityStateMarkerOptions();
         marker.title(title);
-        marker.snippet(color);
         marker.position(new LatLng(lat, lng));
+        marker.infoWindowBackground(color);
 
-        mIconDrawable.setColorFilter(Color.parseColor(marker.getSnippet()), PorterDuff.Mode.SRC_IN);
+        mIconDrawable.setColorFilter(Color.parseColor(color), PorterDuff.Mode.SRC_IN);
         Icon icon = mIconFactory.fromDrawable(mIconDrawable);
         marker.icon(icon);
         return marker;
@@ -144,4 +150,5 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

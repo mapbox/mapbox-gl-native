@@ -78,7 +78,7 @@ public class GeocoderActivity extends AppCompatActivity {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
                         setMessage("Geocoding...");
-                        mapboxMap.removeAllAnnotations();
+                        mapboxMap.removeAnnotations();
                         mapboxMap.addMarker(new MarkerOptions()
                                 .position(point)
                                 .title("Your finger is here"));

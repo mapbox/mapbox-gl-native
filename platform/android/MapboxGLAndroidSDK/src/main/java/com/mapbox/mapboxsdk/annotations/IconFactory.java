@@ -150,4 +150,8 @@ public final class IconFactory {
         }
         return fromInputStream(is);
     }
+
+    public static Icon recreate(@NonNull String iconId, @NonNull Bitmap bitmap) {
+        return new Icon(iconId, bitmap);
+    }
 }

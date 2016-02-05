@@ -150,7 +150,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
         public LoadBulkMarkerTask(Context context, MapboxMap mapboxMap, int amount) {
             mMapboxMap = mapboxMap;
-            mapboxMap.removeAllAnnotations();
+            mapboxMap.removeAnnotations();
             mProgressDialog = ProgressDialog.show(context, "Loading", "Fetching markers", false);
             mAppContext = context.getApplicationContext();
             mAmount = amount;

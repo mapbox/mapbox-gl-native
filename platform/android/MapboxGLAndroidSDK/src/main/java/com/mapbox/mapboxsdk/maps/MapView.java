@@ -64,14 +64,12 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
-import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
-import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -124,7 +122,6 @@ public class MapView extends FrameLayout {
     private static final float DIMENSION_SEVENTYSIX_DP = 76f;
 
     private MapboxMap mMapboxMap;
-    private LongSparseArray<Annotation> mAnnotations;
     private List<Icon> mIcons;
 
     private NativeMapView mNativeMapView;
@@ -173,9 +170,7 @@ public class MapView extends FrameLayout {
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
-        mAnnotations = new LongSparseArray<>();
         mIcons = new ArrayList<>();
-
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
         if (!isInEditMode()) {
@@ -974,7 +969,25 @@ public class MapView extends FrameLayout {
     // Annotations
     //
 
-    private void loadIcon(Icon icon) {
+    Icon loadIconForMarker(Marker marker) {
+        Icon icon = marker.getIcon();
+        if (icon == null) {
+            icon = IconFactory.getInstance(getContext()).defaultMarker();
+            marker.setIcon(icon);
+        }
+        if (!mIcons.contains(icon)) {
+            mIcons.add(icon);
+            loadIcon(icon);
+        } else {
+            Icon oldIcon = mIcons.get(mIcons.indexOf(icon));
+            if (!oldIcon.getBitmap().sameAs(icon.getBitmap())) {
+                throw new IconBitmapChangedException();
+            }
+        }
+        return icon;
+    }
+
+    void loadIcon(Icon icon) {
         Bitmap bitmap = icon.getBitmap();
         String id = icon.getId();
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
@@ -996,12 +1009,34 @@ public class MapView extends FrameLayout {
                 scale, buffer.array());
     }
 
-    private void reloadIcons() {
+    void reloadIcons() {
         int count = mIcons.size();
         for (int i = 0; i < count; i++) {
             Icon icon = mIcons.get(i);
             loadIcon(icon);
         }
+    }
+
+    /**
+     * <p>
+     * Updates a marker on this map. Does nothing if the marker is already added.
+     * </p>
+     *
+     * @param updatedMarker An updated marker object.
+     */
+    @UiThread
+    void updateMarker(@NonNull Marker updatedMarker) {
+        if (updatedMarker == null) {
+            Log.w(TAG, "marker was null, doing nothing");
+            return;
+        }
+
+        if (updatedMarker.getId() == -1) {
+            Log.w(TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
+        }
+
+        ensureIconLoaded(updatedMarker);
+        mNativeMapView.updateMarker(updatedMarker);
     }
 
     private Marker prepareMarker(MarkerOptions markerOptions) {
@@ -1027,306 +1062,46 @@ public class MapView extends FrameLayout {
         }
 
         // this seems to be a costly operation according to the profiler so I'm trying to save some calls
-        Marker previousMarker = marker.getId() != -1 ? (Marker) mAnnotations.get(marker.getId()) : null;
+        Marker previousMarker = marker.getId() != -1 ? (Marker) mMapboxMap.getAnnotation(marker.getId()) : null;
         if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
             marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
         }
     }
 
-    /**
-     * <p>
-     * Adds a marker to this map.
-     * </p>
-     * The marker's icon is rendered on the map at the location {@code Marker.position}.
-     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-     *
-     * @param markerOptions A marker options object that defines how to render the marker.
-     * @return The {@code Marker} that was added to the map.
-     */
-    @UiThread
-    @NonNull
-    Marker addMarker(@NonNull MarkerOptions markerOptions) {
-        if (markerOptions == null) {
-            Log.w(TAG, "markerOptions was null, so just returning null");
-            return null;
-        }
 
-        Marker marker = prepareMarker(markerOptions);
-        long id = mNativeMapView.addMarker(marker);
-        marker.setId(id);        // the annotation needs to know its id
-        marker.setMapboxMap(mMapboxMap); // the annotation needs to know which map view it is in
-        mAnnotations.put(id, marker);
-        return marker;
+    long addMarker(@NonNull Marker marker) {
+        if (mNativeMapView == null) {
+            return 0l;
+        }
+        return mNativeMapView.addMarker(marker);
     }
 
-    /**
-     * <p>
-     * Updates a marker on this map. Does nothing if the marker is already added.
-     * </p>
-     *
-     * @param updatedMarker An updated marker object.
-     */
-    @UiThread
-    void updateMarker(@NonNull Marker updatedMarker) {
-        if (updatedMarker == null) {
-            Log.w(TAG, "marker was null, doing nothing");
-            return;
-        }
-
-        if (updatedMarker.getId() == -1) {
-            Log.w(TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
-        }
-
-        ensureIconLoaded(updatedMarker);
-        mNativeMapView.updateMarker(updatedMarker);
-
-
-        int index = mAnnotations.indexOfKey(updatedMarker.getId());
-        if (index > -1) {
-            mAnnotations.setValueAt(index, updatedMarker);
-        }
+    long[] addMarkers(@NonNull List<Marker> markerList) {
+        return mNativeMapView.addMarkers(markerList);
     }
 
-    /**
-     * <p>
-     * Adds multiple markers to this map.
-     * </p>
-     * The marker's icon is rendered on the map at the location {@code Marker.position}.
-     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-     *
-     * @param markerOptionsList A list of marker options objects that defines how to render the markers.
-     * @return A list of the {@code Marker}s that were added to the map.
-     */
-    @UiThread
-    @NonNull
-    List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
-        if (markerOptionsList == null) {
-            Log.w(TAG, "markerOptionsList was null, so just returning null");
-            return null;
-        }
-
-        int count = markerOptionsList.size();
-        List<Marker> markers = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            MarkerOptions markerOptions = markerOptionsList.get(i);
-            Marker marker = prepareMarker(markerOptions);
-            markers.add(marker);
-        }
-
-        long[] ids = mNativeMapView.addMarkers(markers);
-
-        Marker m;
-        for (int i = 0; i < count; i++) {
-            m = markers.get(i);
-            m.setId(ids[i]);
-            m.setMapboxMap(mMapboxMap);
-            mAnnotations.put(ids[i], m);
-        }
-
-        return new ArrayList<>(markers);
+    long addPolyline(@NonNull Polyline polyline) {
+        return mNativeMapView.addPolyline(polyline);
     }
 
-    /**
-     * Adds a polyline to this map.
-     *
-     * @param polylineOptions A polyline options object that defines how to render the polyline.
-     * @return The {@code Polyine} that was added to the map.
-     */
-    @UiThread
-    @NonNull
-    Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
-        if (polylineOptions == null) {
-            Log.w(TAG, "polylineOptions was null, so just returning null");
-            return null;
-        }
-
-        Polyline polyline = polylineOptions.getPolyline();
-        long id = mNativeMapView.addPolyline(polyline);
-        polyline.setId(id);
-        polyline.setMapboxMap(mMapboxMap);
-        mAnnotations.put(id, polyline);
-        return polyline;
+    long[] addPolylines(@NonNull List<Polyline> polylines) {
+        return mNativeMapView.addPolylines(polylines);
     }
 
-    /**
-     * Adds multiple polylines to this map.
-     *
-     * @param polylineOptionsList A list of polyline options objects that defines how to render the polylines.
-     * @return A list of the {@code Polyline}s that were added to the map.
-     */
-    @UiThread
-    @NonNull
-    List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
-        if (polylineOptionsList == null) {
-            Log.w(TAG, "polylineOptionsList was null, so just returning null");
-            return null;
-        }
-
-        int count = polylineOptionsList.size();
-        List<Polyline> polylines = new ArrayList<>(count);
-        for (PolylineOptions options : polylineOptionsList) {
-            polylines.add(options.getPolyline());
-        }
-
-        long[] ids = mNativeMapView.addPolylines(polylines);
-
-        Polyline p;
-        for (int i = 0; i < count; i++) {
-            p = polylines.get(i);
-            p.setId(ids[i]);
-            p.setMapboxMap(mMapboxMap);
-            mAnnotations.put(ids[i], p);
-        }
-
-        return new ArrayList<>(polylines);
+    long addPolygon(@NonNull Polygon polygon) {
+        return mNativeMapView.addPolygon(polygon);
     }
 
-    /**
-     * Adds a polygon to this map.
-     *
-     * @param polygonOptions A polygon options object that defines how to render the polygon.
-     * @return The {@code Polygon} that was added to the map.
-     */
-    @UiThread
-    @NonNull
-    Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
-        if (polygonOptions == null) {
-            Log.w(TAG, "polygonOptions was null, so just returning null");
-            return null;
-        }
-
-        Polygon polygon = polygonOptions.getPolygon();
-        long id = mNativeMapView.addPolygon(polygon);
-        polygon.setId(id);
-        polygon.setMapboxMap(mMapboxMap);
-        mAnnotations.put(id, polygon);
-        return polygon;
+    long[] addPolygons(@NonNull List<Polygon> polygons) {
+        return mNativeMapView.addPolygons(polygons);
     }
 
-
-    /**
-     * Adds multiple polygons to this map.
-     *
-     * @param polygonOptionsList A list of polygon options objects that defines how to render the polygons.
-     * @return A list of the {@code Polygon}s that were added to the map.
-     */
-    @UiThread
-    @NonNull
-    List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
-        if (polygonOptionsList == null) {
-            Log.w(TAG, "polygonOptionsList was null, so just returning null");
-            return null;
-        }
-
-        int count = polygonOptionsList.size();
-        List<Polygon> polygons = new ArrayList<>(count);
-        for (PolygonOptions polygonOptions : polygonOptionsList) {
-            polygons.add(polygonOptions.getPolygon());
-        }
-
-        long[] ids = mNativeMapView.addPolygons(polygons);
-
-        Polygon p;
-        for (int i = 0; i < count; i++) {
-            p = polygons.get(i);
-            p.setId(ids[i]);
-            p.setMapboxMap(mMapboxMap);
-            mAnnotations.put(ids[i], p);
-        }
-
-        return new ArrayList<>(polygons);
-    }
-
-
-    /**
-     * <p>
-     * Convenience method for removing a Marker from the map.
-     * </p>
-     * Calls removeAnnotation() internally
-     *
-     * @param marker Marker to remove
-     */
-    @UiThread
-    void removeMarker(@NonNull Marker marker) {
-        removeAnnotation(marker);
-    }
-
-    /**
-     * Removes an annotation from the map.
-     *
-     * @param annotation The annotation object to remove.
-     */
-    @UiThread
-    void removeAnnotation(@NonNull Annotation annotation) {
-        if (annotation == null) {
-            Log.w(TAG, "annotation was null, so just returning");
-            return;
-        }
-
-        if (annotation instanceof Marker) {
-            ((Marker) annotation).hideInfoWindow();
-        }
-        long id = annotation.getId();
+    void removeAnnotation(long id) {
         mNativeMapView.removeAnnotation(id);
-        mAnnotations.delete(id);
     }
 
-    /**
-     * Removes multiple annotations from the map.
-     *
-     * @param annotationList A list of annotation objects to remove.
-     */
-    @UiThread
-    void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
-        if (annotationList == null) {
-            Log.w(TAG, "annotationList was null, so just returning");
-            return;
-        }
-
-        int count = annotationList.size();
-        long[] ids = new long[count];
-        for (int i = 0; i < count; i++) {
-            ids[i] = annotationList.get(i).getId();
-        }
+    void removeAnnotations(@NonNull long[] ids) {
         mNativeMapView.removeAnnotations(ids);
-    }
-
-    /**
-     * Removes all annotations from the map.
-     */
-    @UiThread
-    void removeAllAnnotations() {
-        int count = mAnnotations.size();
-        long[] ids = new long[count];
-
-        for (int i = 0; i < count; i++) {
-            Annotation annotation = mAnnotations.valueAt(i);
-            long id = annotation.getId();
-            ids[i] = id;
-            if (annotation instanceof Marker) {
-                ((Marker) annotation).hideInfoWindow();
-            }
-        }
-
-        mNativeMapView.removeAnnotations(ids);
-        mAnnotations.clear();
-    }
-
-    /**
-     * Returns a list of all the annotations on the map.
-     *
-     * @return A list of all the annotation objects. The returned object is a copy so modifying this
-     * list will not update the map.
-     */
-    @NonNull
-    public List<Annotation> getAllAnnotations() {
-        List<Annotation> copyOfAnnotations = new ArrayList<>(mAnnotations.size());
-
-        for (int i = 0; i < mAnnotations.size(); i++) {
-            copyOfAnnotations.add(mAnnotations.valueAt(i));
-        }
-
-        return copyOfAnnotations;
     }
 
     private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
@@ -1344,9 +1119,10 @@ public class MapView extends FrameLayout {
         }
 
         List<Marker> annotations = new ArrayList<>(ids.length);
-        int count = mAnnotations.size();
+        List<Annotation> annotationList = mMapboxMap.getAnnotations();
+        int count = annotationList.size();
         for (int i = 0; i < count; i++) {
-            Annotation annotation = mAnnotations.valueAt(i);
+            Annotation annotation = annotationList.get(i);
             if (annotation instanceof Marker && idsList.contains(annotation.getId())) {
                 annotations.add((Marker) annotation);
             }
@@ -1355,7 +1131,7 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    private int getTopOffsetPixelsForIcon(Icon icon) {
+    int getTopOffsetPixelsForIcon(Icon icon) {
         // This method will dead lock if map paused. Causes a freeze if you add a marker in an
         // activity's onCreate()
         if (mNativeMapView.isPaused()) {
@@ -1504,9 +1280,10 @@ public class MapView extends FrameLayout {
     }
 
     private void adjustTopOffsetPixels() {
-        int count = mAnnotations.size();
+        List<Annotation> annotations = mMapboxMap.getAnnotations();
+        int count = annotations.size();
         for (int i = 0; i < count; i++) {
-            Annotation annotation = mAnnotations.valueAt(i);
+            Annotation annotation = annotations.get(i);
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 marker.setTopOffsetPixels(
@@ -1523,9 +1300,10 @@ public class MapView extends FrameLayout {
     }
 
     private void reloadMarkers() {
-        int count = mAnnotations.size();
+        List<Annotation> annotations = mMapboxMap.getAnnotations();
+        int count = annotations.size();
         for (int i = 0; i < count; i++) {
-            Annotation annotation = mAnnotations.valueAt(i);
+            Annotation annotation = annotations.get(i);
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 mNativeMapView.removeAnnotation(annotation.getId());
@@ -1830,9 +1608,10 @@ public class MapView extends FrameLayout {
             }
 
             if (newSelectedMarkerId >= 0) {
-                int count = mAnnotations.size();
+                List<Annotation> annotations = mMapboxMap.getAnnotations();
+                int count = annotations.size();
                 for (int i = 0; i < count; i++) {
-                    Annotation annotation = mAnnotations.valueAt(i);
+                    Annotation annotation = annotations.get(i);
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {

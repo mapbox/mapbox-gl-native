@@ -169,7 +169,7 @@ public class PolylineActivity extends AppCompatActivity {
             case R.id.action_id_remove:
                 // test to remove all annotations
                 mPolylineOptions.clear();
-                mMapboxMap.removeAllAnnotations();
+                mMapboxMap.removeAnnotations();
                 return true;
 
             case android.R.id.home:

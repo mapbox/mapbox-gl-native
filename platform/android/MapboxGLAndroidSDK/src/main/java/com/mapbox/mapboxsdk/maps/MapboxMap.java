@@ -11,11 +11,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
+import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -28,11 +32,13 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +51,7 @@ public class MapboxMap {
     private CameraPosition mCameraPosition;
     private boolean mInvalidCameraPosition;
     private String mStyleUrl;
+    private LongSparseArray<Annotation> mAnnotations;
     private List<Marker> mSelectedMarkers;
     private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
@@ -71,6 +78,7 @@ public class MapboxMap {
         mUiSettings = new UiSettings(mapView);
         mTrackingSettings = new TrackingSettings(mMapView, mUiSettings);
         mProjection = new Projection(mapView);
+        mAnnotations = new LongSparseArray<>();
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
     }
@@ -97,7 +105,7 @@ public class MapboxMap {
      *
      * @return
      */
-    public TrackingSettings getTrackingSettings(){
+    public TrackingSettings getTrackingSettings() {
         return mTrackingSettings;
     }
 
@@ -532,7 +540,17 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull MarkerOptions markerOptions) {
-        return mMapView.addMarker(markerOptions);
+        return addMarker((BaseMarkerOptions)markerOptions);
+    }
+
+    @UiThread
+    @NonNull
+    public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
+        Marker marker = prepareMarker(markerOptions);
+        long id = mMapView.addMarker(marker);
+        marker.setId(id);
+        mAnnotations.put(id, marker);
+        return marker;
     }
 
     /**
@@ -548,7 +566,33 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
-        return mMapView.addMarkers(markerOptionsList);
+        int count = markerOptionsList.size();
+        List<Marker> markers = new ArrayList<>(count);
+        MarkerOptions markerOptions;
+        Marker marker;
+        for (int i = 0; i < count; i++) {
+            markerOptions = markerOptionsList.get(i);
+            marker = prepareMarker(markerOptions);
+            markers.add(marker);
+        }
+
+        long[] ids = mMapView.addMarkers(markers);
+        long id = 0;
+        Marker m;
+
+        for (int i = 0; i < markers.size(); i++) {
+            m = markers.get(i);
+            m.setMapboxMap(this);
+            if (ids != null) {
+                id = ids[i];
+            } else {
+                //unit test
+                id++;
+            }
+            m.setId(id);
+            mAnnotations.put(id, m);
+        }
+        return markers;
     }
 
     /**
@@ -561,6 +605,11 @@ public class MapboxMap {
     @UiThread
     public void updateMarker(@NonNull Marker updatedMarker) {
         mMapView.updateMarker(updatedMarker);
+
+        int index = mAnnotations.indexOfKey(updatedMarker.getId());
+        if (index > -1) {
+            mAnnotations.setValueAt(index, updatedMarker);
+        }
     }
 
     /**
@@ -572,7 +621,12 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
-        return mMapView.addPolyline(polylineOptions);
+        Polyline polyline = polylineOptions.getPolyline();
+        long id = mMapView.addPolyline(polyline);
+        polyline.setMapboxMap(this);
+        polyline.setId(id);
+        mAnnotations.put(id, polyline);
+        return polyline;
     }
 
     /**
@@ -584,7 +638,29 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
-        return mMapView.addPolylines(polylineOptionsList);
+        int count = polylineOptionsList.size();
+        List<Polyline> polylines = new ArrayList<>(count);
+        for (PolylineOptions options : polylineOptionsList) {
+            polylines.add(options.getPolyline());
+        }
+
+        long[] ids = mMapView.addPolylines(polylines);
+        long id = 0;
+        Polyline p;
+
+        for (int i = 0; i < polylines.size(); i++) {
+            p = polylines.get(i);
+            p.setMapboxMap(this);
+            if (ids != null) {
+                id = ids[i];
+            } else {
+                // unit test
+                id++;
+            }
+            p.setId(id);
+            mAnnotations.put(id, p);
+        }
+        return polylines;
     }
 
     /**
@@ -596,7 +672,12 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
-        return mMapView.addPolygon(polygonOptions);
+        Polygon polygon = polygonOptions.getPolygon();
+        long id = mMapView.addPolygon(polygon);
+        polygon.setId(id);
+        polygon.setMapboxMap(this);
+        mAnnotations.put(id, polygon);
+        return polygon;
     }
 
     /**
@@ -608,7 +689,29 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
-        return mMapView.addPolygons(polygonOptionsList);
+        int count = polygonOptionsList.size();
+        List<Polygon> polygons = new ArrayList<>(count);
+        for (PolygonOptions polygonOptions : polygonOptionsList) {
+            polygons.add(polygonOptions.getPolygon());
+        }
+
+        long[] ids = mMapView.addPolygons(polygons);
+        long id = 0;
+        Polygon polygon;
+
+        for (int i = 0; i < polygons.size(); i++) {
+            polygon = polygons.get(i);
+            polygon.setMapboxMap(this);
+            if(ids!=null){
+                id = ids[i];
+            }else{
+                // unit test
+                id++;
+            }
+            polygon.setId(id);
+            mAnnotations.put(id, polygon);
+        }
+        return polygons;
     }
 
     /**
@@ -625,13 +728,55 @@ public class MapboxMap {
     }
 
     /**
+     * <p>
+     * Convenience method for removing a Polyline from the map.
+     * </p>
+     * Calls removeAnnotation() internally
+     *
+     * @param polyline Polyline to remove
+     */
+    @UiThread
+    public void removePolyline(@NonNull Polyline polyline) {
+        removeAnnotation(polyline);
+    }
+
+    /**
+     * <p>
+     * Convenience method for removing a Polygon from the map.
+     * </p>
+     * Calls removeAnnotation() internally
+     *
+     * @param polygon Polygon to remove
+     */
+    @UiThread
+    public void removePolygon(@NonNull Polygon polygon) {
+        removeAnnotation(polygon);
+    }
+
+    /**
      * Removes an annotation from the map.
      *
      * @param annotation The annotation object to remove.
      */
     @UiThread
     public void removeAnnotation(@NonNull Annotation annotation) {
-        mMapView.removeAnnotation(annotation);
+        if (annotation instanceof Marker) {
+            ((Marker) annotation).hideInfoWindow();
+        }
+        long id = annotation.getId();
+        mMapView.removeAnnotation(id);
+        mAnnotations.remove(id);
+    }
+
+    /**
+     * Removes an annotation from the map
+     *
+     * @param id The identifier associated to the annotation to be removed
+     */
+    @UiThread
+    public void removeAnnotation(long id) {
+        mMapView.removeAnnotation(id);
+        mAnnotations.remove(id);
     }
 
     /**
@@ -641,15 +786,38 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
-        mMapView.removeAnnotations(annotationList);
+        int count = annotationList.size();
+        long[] ids = new long[count];
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
+            if (annotation instanceof Marker) {
+                ((Marker) annotation).hideInfoWindow();
+            }
+            ids[i] = annotationList.get(i).getId();
+        }
+        mMapView.removeAnnotations(ids);
+        for (long id : ids) {
+            mAnnotations.remove(id);
+        }
     }
 
     /**
      * Removes all annotations from the map.
      */
     @UiThread
-    public void removeAllAnnotations() {
-        mMapView.removeAllAnnotations();
+    public void removeAnnotations() {
+        mAnnotations.clear();
+    }
+
+    /**
+     * Return a annotation based on its id.
+     *
+     * @return An annotation with a matched id, null is returned if no match was found.
+     */
+    @UiThread
+    @Nullable
+    public Annotation getAnnotation(long id) {
+        return mAnnotations.get(id);
     }
 
     /**
@@ -659,8 +827,69 @@ public class MapboxMap {
      * list will not update the map.
      */
     @NonNull
-    public List<Annotation> getAllAnnotations() {
-        return mMapView.getAllAnnotations();
+    public List<Annotation> getAnnotations() {
+        List<Annotation> annotations = new ArrayList<>();
+        for (int i = 0; i < mAnnotations.size(); i++) {
+            annotations.add(mAnnotations.get(mAnnotations.keyAt(i)));
+        }
+        return annotations;
+    }
+
+    /**
+     * Returns a list of all the markers on the map.
+     *
+     * @return A list of all the markers objects. The returned object is a copy so modifying this
+     * list will not update the map.
+     */
+    @NonNull
+    public List<Marker> getMarkers() {
+        List<Marker> markers = new ArrayList<>();
+        Annotation annotation;
+        for (int i = 0; i < mAnnotations.size(); i++) {
+            annotation = mAnnotations.get(mAnnotations.keyAt(i));
+            if (annotation instanceof Marker) {
+                markers.add((Marker) annotation);
+            }
+        }
+        return markers;
+    }
+
+    /**
+     * Returns a list of all the polygons on the map.
+     *
+     * @return A list of all the polygon objects. The returned object is a copy so modifying this
+     * list will not update the map.
+     */
+    @NonNull
+    public List<Polygon> getPolygons() {
+        List<Polygon> polygons = new ArrayList<>();
+        Annotation annotation;
+        for (int i = 0; i < mAnnotations.size(); i++) {
+            annotation = mAnnotations.get(mAnnotations.keyAt(i));
+            if (annotation instanceof Polygon) {
+                polygons.add((Polygon) annotation);
+            }
+        }
+        return polygons;
+    }
+
+    /**
+     * Returns a list of all the polylines on the map.
+     *
+     * @return A list of all the polylines objects. The returned object is a copy so modifying this
+     * list will not update the map.
+     */
+    @NonNull
+    public List<Polyline> getPolylines() {
+        List<Polyline> polylines = new ArrayList<>();
+        Annotation annotation;
+        for (int i = 0; i < mAnnotations.size(); i++) {
+            annotation = mAnnotations.get(mAnnotations.keyAt(i));
+            if (annotation instanceof Polyline) {
+                polylines.add((Polyline) annotation);
+            }
+        }
+        return polylines;
     }
 
     /**
@@ -746,9 +975,15 @@ public class MapboxMap {
      * @return The currently selected marker.
      */
     @UiThread
-    @Nullable
     public List<Marker> getSelectedMarkers() {
         return mSelectedMarkers;
+    }
+
+    private Marker prepareMarker(BaseMarkerOptions markerOptions) {
+        Marker marker = markerOptions.getMarker();
+        Icon icon = mMapView.loadIconForMarker(marker);
+        marker.setTopOffsetPixels(mMapView.getTopOffsetPixelsForIcon(icon));
+        return marker;
     }
 
     //
@@ -1107,9 +1342,9 @@ public class MapboxMap {
         return mMapView;
     }
 
-//
-// Interfaces
-//
+    //
+    // Interfaces
+    //
 
     /**
      * Interface definition for a callback to be invoked when the map is flinged.
@@ -1287,7 +1522,7 @@ public class MapboxMap {
     /**
      * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
      *
-     * @see MapboxMap#setMyLocationTrackingMode(int)
+     * @see MapView#setMyLocationTrackingMode(int)
      */
     public interface OnMyLocationTrackingModeChangeListener {
 
@@ -1302,7 +1537,7 @@ public class MapboxMap {
     /**
      * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
      *
-     * @see MapboxMap#setMyLocationTrackingMode(int)
+     * @see MapView#setMyLocationTrackingMode(int)
      */
     public interface OnMyBearingTrackingModeChangeListener {
 
