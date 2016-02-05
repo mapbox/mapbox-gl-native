@@ -151,7 +151,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
             source->updateMatrices(projMatrix, state);
         }
 
-        drawClippingMasks(sources);
+        drawClippingMasks(generator.getStencils());
     }
 
     frameHistory.record(data.getAnimationTime(), state.getZoom());

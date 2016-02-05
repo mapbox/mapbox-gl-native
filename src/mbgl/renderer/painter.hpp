@@ -93,8 +93,7 @@ public:
     float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
-    void drawClippingMasks(const std::set<Source*>&);
-    void drawClippingMask(const mat4& matrix, const ClipID& clip);
+    void drawClippingMasks(const std::map<TileID, ClipID>&);
 
     bool needsAnimation() const;
 

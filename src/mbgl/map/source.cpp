@@ -173,14 +173,6 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
     }
 }
 
-void Source::drawClippingMasks(Painter &painter) {
-    for (const auto& pair : tiles) {
-        Tile &tile = *pair.second;
-        MBGL_DEBUG_GROUP(std::string { "mask: " } + std::string(tile.id));
-        painter.drawClippingMask(tile.matrix, tile.clip);
-    }
-}
-
 void Source::finishRender(Painter &painter) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;

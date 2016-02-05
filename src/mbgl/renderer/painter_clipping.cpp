@@ -6,31 +6,34 @@
 
 using namespace mbgl;
 
-void Painter::drawClippingMasks(const std::set<Source*>& sources) {
+
+void Painter::drawClippingMasks(const std::map<TileID, ClipID>& stencils) {
     MBGL_DEBUG_GROUP("clipping masks");
+
+    mat4 matrix;
+    const GLuint mask = 0b11111111;
 
     config.program = plainShader->program;
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
+    config.depthTest = GL_FALSE;
     config.depthMask = GL_FALSE;
     config.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
-    config.depthRange = { 1.0f, 1.0f };
+    config.stencilMask = mask;
 
     coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET_0);
 
-    for (const auto& source : sources) {
-        source->drawClippingMasks(*this);
+    for (const auto& stencil : stencils) {
+        const auto& id = stencil.first;
+        const auto& clip = stencil.second;
+
+        MBGL_DEBUG_GROUP(std::string{ "mask: " } + std::string(id));
+        state.matrixFor(matrix, id, id.z);
+        matrix::multiply(matrix, projMatrix, matrix);
+        plainShader->u_matrix = matrix;
+
+        const GLint ref = (GLint)(clip.reference.to_ulong());
+        config.stencilFunc = { GL_ALWAYS, ref, mask };
+        MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
     }
-}
-
-void Painter::drawClippingMask(const mat4& matrix, const ClipID &clip) {
-    plainShader->u_matrix = matrix;
-
-    const GLint ref = (GLint)(clip.reference.to_ulong());
-    const GLuint mask = (GLuint)(clip.mask.to_ulong());
-    config.stencilFunc = { GL_ALWAYS, ref, mask };
-    config.stencilMask = mask;
-    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
 }

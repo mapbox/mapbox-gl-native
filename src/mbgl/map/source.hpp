@@ -60,7 +60,6 @@ public:
     bool update(const StyleUpdateParameters&);
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
-    void drawClippingMasks(Painter &painter);
     void finishRender(Painter &painter);
 
     std::forward_list<Tile *> getLoadedTiles() const;
