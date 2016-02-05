@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Getting and Setting Attributes
 
 /** The image to be displayed for the annotation. */
-@property (nonatomic, strong) UIImage *image;
+@property (nonatomic, strong, nullable) UIImage *image;
 
 /**
  The string that identifies that this annotation image is reusable. (read-only)

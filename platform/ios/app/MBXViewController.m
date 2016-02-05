@@ -594,50 +594,68 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (!title.length) return nil;
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
-    UIColor *color;
+    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
 
-    // make every tenth annotation blue
-    if ([lastTwoCharacters hasSuffix:@"0"]) {
-        color = [UIColor blueColor];
-    } else {
-        color = [UIColor redColor];
-    }
-
-    MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
-
-    if ( ! image)
+    if ( ! annotationImage)
     {
-        CGRect rect = CGRectMake(0, 0, 20, 15);
-
-        UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
-
-        CGContextRef ctx = UIGraphicsGetCurrentContext();
-
-        CGContextSetFillColorWithColor(ctx, [[color colorWithAlphaComponent:0.75] CGColor]);
-        CGContextFillRect(ctx, rect);
-
-        CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
-        CGContextStrokeRectWithWidth(ctx, rect, 2);
-
-        NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:lastTwoCharacters attributes:@{
-            NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
-            NSForegroundColorAttributeName: [UIColor whiteColor] }];
-        CGSize stringSize = drawString.size;
-        CGRect stringRect = CGRectMake((rect.size.width - stringSize.width) / 2,
-                                       (rect.size.height - stringSize.height) / 2,
-                                       stringSize.width,
-                                       stringSize.height);
-        [drawString drawInRect:stringRect];
-
-        image = [MGLAnnotationImage annotationImageWithImage:UIGraphicsGetImageFromCurrentImageContext() reuseIdentifier:lastTwoCharacters];
+        UIColor *color;
+        
+        // make every tenth annotation blue
+        if ([lastTwoCharacters hasSuffix:@"0"]) {
+            color = [UIColor blueColor];
+        } else {
+            color = [UIColor redColor];
+        }
+        
+        UIImage *image = [self imageWithText:lastTwoCharacters backgroundColor:color];
+        annotationImage = [MGLAnnotationImage annotationImageWithImage:image reuseIdentifier:lastTwoCharacters];
 
         // don't allow touches on blue annotations
-        if ([color isEqual:[UIColor blueColor]]) image.enabled = NO;
-
-        UIGraphicsEndImageContext();
+        if ([color isEqual:[UIColor blueColor]]) annotationImage.enabled = NO;
     }
 
+    return annotationImage;
+}
+
+- (UIImage *)imageWithText:(NSString *)text backgroundColor:(UIColor *)color
+{
+    CGRect rect = CGRectMake(0, 0, 20, 15);
+    
+    UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
+    
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    
+    CGContextSetFillColorWithColor(ctx, [[color colorWithAlphaComponent:0.75] CGColor]);
+    CGContextFillRect(ctx, rect);
+    
+    CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
+    CGContextStrokeRectWithWidth(ctx, rect, 2);
+    
+    NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:text attributes:@{
+        NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
+        NSForegroundColorAttributeName: [UIColor whiteColor],
+    }];
+    CGSize stringSize = drawString.size;
+    CGRect stringRect = CGRectMake((rect.size.width - stringSize.width) / 2,
+                                   (rect.size.height - stringSize.height) / 2,
+                                   stringSize.width,
+                                   stringSize.height);
+    [drawString drawInRect:stringRect];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
     return image;
+}
+
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id<MGLAnnotation>)annotation {
+    NSString *title = [(MGLPointAnnotation *)annotation title];
+    if ( ! title.length)
+    {
+        return;
+    }
+    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
+    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
+    annotationImage.image = annotationImage.image ? nil : [self imageWithText:lastTwoCharacters backgroundColor:[UIColor grayColor]];
 }
 
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation

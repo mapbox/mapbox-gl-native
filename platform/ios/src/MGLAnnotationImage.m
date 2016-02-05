@@ -3,6 +3,8 @@
 @interface MGLAnnotationImage ()
 
 @property (nonatomic, strong) NSString *reuseIdentifier;
+@property (nonatomic, strong, nullable) NSString *styleIconIdentifier;
+
 @property (nonatomic, weak) id<MGLAnnotationImageDelegate> delegate;
 
 @end
