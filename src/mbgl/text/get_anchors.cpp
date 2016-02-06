@@ -10,14 +10,19 @@ namespace mbgl {
 Anchors resample(const std::vector<Coordinate> &line, const float offset, const float spacing,
         const float angleWindowSize, const float maxAngle, const float labelLength, const bool continuedLine, const bool placeAtMiddle) {
 
+    const float halfLabelLength = labelLength / 2.0f;
+    float lineLength = 0;
+    for (auto it = line.begin(), end = line.end() - 1; it != end; it++) {
+        lineLength += util::dist<float>(*(it), *(it + 1));
+    }
+
     float distance = 0;
     float markedDistance = offset - spacing;
 
     Anchors anchors;
 
-    auto end = line.end() - 1;
     int i = 0;
-    for (auto it = line.begin(); it != end; it++, i++) {
+    for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
         const Coordinate &a = *(it);
         const Coordinate &b = *(it + 1);
 
@@ -31,7 +36,12 @@ Anchors resample(const std::vector<Coordinate> &line, const float offset, const 
                   x = util::interpolate(float(a.x), float(b.x), t),
                   y = util::interpolate(float(a.y), float(b.y), t);
 
-            if (x >= 0 && x < util::EXTENT && y >= 0 && y < util::EXTENT) {
+            // Check that the point is within the tile boundaries and that
+            // the label would fit before the beginning and end of the line
+            // if placed at this point.
+            if (x >= 0 && x < util::EXTENT && y >= 0 && y < util::EXTENT &&
+                    markedDistance - halfLabelLength >= 0.0f &&
+                    markedDistance + halfLabelLength <= lineLength) {
                 Anchor anchor(::round(x), ::round(y), angle, 0.5f, i);
 
                 if (!angleWindowSize || checkMaxAngle(line, anchor, labelLength, angleWindowSize, maxAngle)) {
