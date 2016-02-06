@@ -1,0 +1,17 @@
+{
+  "version": 8,
+  "sources": {
+    "inline": {
+      "type": "vector",
+      "maxzoom": 15,
+      "minzoom": 0,
+      "tiles": [ "http://127.0.0.1:3000/offline/{z}-{x}-{y}.vector.pbf" ]
+    }
+  },
+  "layers": [{
+    "id": "fill",
+    "type": "fill",
+    "source": "inline",
+    "source-layer": "water"
+  }]
+}

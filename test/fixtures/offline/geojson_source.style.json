@@ -1,0 +1,10 @@
+{
+  "version": 8,
+  "sources": {
+    "geojson": {
+      "type": "geojson",
+      "data": "http://127.0.0.1:3000/offline/geojson.json"
+    }
+  },
+  "layers": []
+}

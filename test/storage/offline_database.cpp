@@ -372,3 +372,79 @@ TEST(OfflineDatabase, PutTileNotFound) {
     EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
 }
+
+TEST(OfflineDatabase, CreateRegion) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
+    OfflineRegion region = db.createRegion(definition, metadata);
+
+    EXPECT_EQ(definition.styleURL, region.getDefinition().styleURL);
+    EXPECT_EQ(definition.bounds, region.getDefinition().bounds);
+    EXPECT_EQ(definition.minZoom, region.getDefinition().minZoom);
+    EXPECT_EQ(definition.maxZoom, region.getDefinition().maxZoom);
+    EXPECT_EQ(definition.pixelRatio, region.getDefinition().pixelRatio);
+    EXPECT_EQ(metadata, region.getMetadata());
+}
+
+TEST(OfflineDatabase, ListRegions) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
+
+    OfflineRegion region = db.createRegion(definition, metadata);
+    std::vector<OfflineRegion> regions = db.listRegions();
+
+    ASSERT_EQ(1, regions.size());
+    EXPECT_EQ(region.getID(), regions.at(0).getID());
+    EXPECT_EQ(definition.styleURL, regions.at(0).getDefinition().styleURL);
+    EXPECT_EQ(definition.bounds, regions.at(0).getDefinition().bounds);
+    EXPECT_EQ(definition.minZoom, regions.at(0).getDefinition().minZoom);
+    EXPECT_EQ(definition.maxZoom, regions.at(0).getDefinition().maxZoom);
+    EXPECT_EQ(definition.pixelRatio, regions.at(0).getDefinition().pixelRatio);
+    EXPECT_EQ(metadata, regions.at(0).getMetadata());
+}
+
+TEST(OfflineDatabase, GetRegionDefinition) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
+
+    OfflineRegion region = db.createRegion(definition, metadata);
+    OfflineRegionDefinition result = db.getRegionDefinition(region.getID());
+
+    EXPECT_EQ(definition.styleURL, result.styleURL);
+    EXPECT_EQ(definition.bounds, result.bounds);
+    EXPECT_EQ(definition.minZoom, result.minZoom);
+    EXPECT_EQ(definition.maxZoom, result.maxZoom);
+    EXPECT_EQ(definition.pixelRatio, result.pixelRatio);
+}
+
+TEST(OfflineDatabase, DeleteRegion) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata {{ 1, 2, 3 }};
+    db.deleteRegion(db.createRegion(definition, metadata));
+
+    ASSERT_EQ(0, db.listRegions().size());
+}
+
+TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegionMetadata metadata;
+    OfflineRegion region = db.createRegion(definition, metadata);
+
+    EXPECT_EQ(0, region.getDefinition().minZoom);
+    EXPECT_EQ(INFINITY, region.getDefinition().maxZoom);
+}

@@ -77,6 +77,11 @@ Statement Database::prepare(const char *query) {
     return Statement(db, query);
 }
 
+int64_t Database::lastInsertRowid() const {
+    assert(db);
+    return sqlite3_last_insert_rowid(db);
+}
+
 Statement::Statement(sqlite3 *db, const char *sql) {
     const int err = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (err != SQLITE_OK) {
@@ -170,10 +175,37 @@ template <> void Statement::bind(int offset, const char *value) {
     check(sqlite3_bind_text(stmt, offset, value, -1, SQLITE_STATIC));
 }
 
-void Statement::bind(int offset, const std::string& value, bool retain) {
+// We currently cannot use sqlite3_bind_blob64 / sqlite3_bind_text64 because they
+// was introduced in SQLite 3.8.7, and we need to support earlier versions:
+//    iOS 7.0: 3.7.13
+//    iOS 8.2: 3.8.5
+// According to http://stackoverflow.com/questions/14288128/what-version-of-sqlite-does-ios-provide,
+// the first iOS version with 3.8.7+ was 9.0, with 3.8.10.2.
+
+void Statement::bind(int offset, const char * value, std::size_t length, bool retain) {
     assert(stmt);
-    check(sqlite3_bind_blob(stmt, offset, value.data(), int(value.size()),
+    if (length > std::numeric_limits<int>::max()) {
+        throw std::range_error("value too long for sqlite3_bind_text");
+    }
+    check(sqlite3_bind_text(stmt, offset, value, int(length),
                             retain ? SQLITE_TRANSIENT : SQLITE_STATIC));
+}
+
+void Statement::bind(int offset, const std::string& value, bool retain) {
+    bind(offset, value.data(), value.size(), retain);
+}
+
+void Statement::bindBlob(int offset, const void * value, std::size_t length, bool retain) {
+    assert(stmt);
+    if (length > std::numeric_limits<int>::max()) {
+        throw std::range_error("value too long for sqlite3_bind_text");
+    }
+    check(sqlite3_bind_blob(stmt, offset, value, int(length),
+                            retain ? SQLITE_TRANSIENT : SQLITE_STATIC));
+}
+
+void Statement::bindBlob(int offset, const std::vector<uint8_t>& value, bool retain) {
+    bindBlob(offset, value.data(), value.size(), retain);
 }
 
 template <> void Statement::bind(int offset, std::chrono::system_clock::time_point value) {
@@ -232,6 +264,13 @@ template <> std::string Statement::get(int offset) {
         reinterpret_cast<const char *>(sqlite3_column_blob(stmt, offset)),
         size_t(sqlite3_column_bytes(stmt, offset))
     };
+}
+
+template <> std::vector<uint8_t> Statement::get(int offset) {
+    assert(stmt);
+    const uint8_t* begin = reinterpret_cast<const uint8_t*>(sqlite3_column_blob(stmt, offset));
+    const uint8_t* end   = begin + sqlite3_column_bytes(stmt, offset);
+    return { begin, end };
 }
 
 template <> std::chrono::system_clock::time_point Statement::get(int offset) {

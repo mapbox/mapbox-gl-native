@@ -100,17 +100,17 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
     }
 }
 
-void OfflineDatabase::put(const Resource& resource, const Response& response) {
+uint64_t OfflineDatabase::put(const Resource& resource, const Response& response) {
     // Don't store errors in the cache.
     if (response.error) {
-        return;
+        return 0;
     }
 
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        putTile(*resource.tileData, response);
+        return putTile(*resource.tileData, response);
     } else {
-        putResource(resource, response);
+        return putResource(resource, response);
     }
 }
 
@@ -145,7 +145,7 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
     return response;
 }
 
-void OfflineDatabase::putResource(const Resource& resource, const Response& response) {
+uint64_t OfflineDatabase::putResource(const Resource& resource, const Response& response) {
     if (response.notModified) {
         mapbox::sqlite::Statement& stmt = getStatement(
             //                               1            2             3
@@ -155,6 +155,7 @@ void OfflineDatabase::putResource(const Resource& resource, const Response& resp
         stmt.bind(2, response.expires);
         stmt.bind(3, resource.url);
         stmt.run();
+        return 0;
     } else {
         mapbox::sqlite::Statement& stmt = getStatement(
             //                        1     2    3      4        5         6        7       8
@@ -169,6 +170,7 @@ void OfflineDatabase::putResource(const Resource& resource, const Response& resp
         stmt.bind(6 /* accessed */, SystemClock::now());
 
         std::string data;
+        uint64_t size = 0;
 
         if (response.noContent) {
             stmt.bind(7 /* data */, nullptr);
@@ -176,15 +178,18 @@ void OfflineDatabase::putResource(const Resource& resource, const Response& resp
         } else {
             data = util::compress(*response.data);
             if (data.size() < response.data->size()) {
-                stmt.bind(7 /* data */, data, false); // do not retain the string internally.
+                size = data.size();
+                stmt.bindBlob(7 /* data */, data.data(), size, false);
                 stmt.bind(8 /* compressed */, true);
             } else {
-                stmt.bind(7 /* data */, *response.data, false); // do not retain the string internally.
+                size = response.data->size();
+                stmt.bindBlob(7 /* data */, response.data->data(), size, false);
                 stmt.bind(8 /* compressed */, false);
             }
         }
 
         stmt.run();
+        return size;
     }
 }
 
@@ -228,7 +233,7 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     return response;
 }
 
-void OfflineDatabase::putTile(const Resource::TileData& tile, const Response& response) {
+uint64_t OfflineDatabase::putTile(const Resource::TileData& tile, const Response& response) {
     if (response.notModified) {
         mapbox::sqlite::Statement& stmt = getStatement(
             "UPDATE tiles SET accessed = ?1, expires = ?2 "
@@ -248,6 +253,7 @@ void OfflineDatabase::putTile(const Resource::TileData& tile, const Response& re
         stmt.bind(6, tile.y);
         stmt.bind(7, tile.z);
         stmt.run();
+        return 0;
     } else {
         mapbox::sqlite::Statement& stmt1 = getStatement(
             "REPLACE INTO tilesets (url_template, pixel_ratio) "
@@ -275,6 +281,7 @@ void OfflineDatabase::putTile(const Resource::TileData& tile, const Response& re
         stmt2.bind(9 /* accessed */, SystemClock::now());
 
         std::string data;
+        uint64_t size = 0;
 
         if (response.noContent) {
             stmt2.bind(10 /* data */, nullptr);
@@ -282,16 +289,160 @@ void OfflineDatabase::putTile(const Resource::TileData& tile, const Response& re
         } else {
             data = util::compress(*response.data);
             if (data.size() < response.data->size()) {
-                stmt2.bind(10 /* data */, data, false); // do not retain the string internally.
+                size = data.size();
+                stmt2.bindBlob(10 /* data */, data.data(), size, false);
                 stmt2.bind(11 /* compressed */, true);
             } else {
-                stmt2.bind(10 /* data */, *response.data, false); // do not retain the string internally.
+                size = response.data->size();
+                stmt2.bindBlob(10 /* data */, response.data->data(), size, false);
                 stmt2.bind(11 /* compressed */, false);
             }
         }
 
         stmt2.run();
+        return size;
     }
+}
+
+std::vector<OfflineRegion> OfflineDatabase::listRegions() {
+    mapbox::sqlite::Statement& stmt = getStatement(
+        "SELECT id, definition, description FROM regions");
+
+    std::vector<OfflineRegion> result;
+
+    while (stmt.run()) {
+        result.push_back(OfflineRegion(
+            stmt.get<int64_t>(0),
+            decodeOfflineRegionDefinition(stmt.get<std::string>(1)),
+            stmt.get<std::vector<uint8_t>>(2)));
+    }
+
+    return std::move(result);
+}
+
+OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
+                                            const OfflineRegionMetadata& metadata) {
+    mapbox::sqlite::Statement& stmt = getStatement(
+        "INSERT INTO regions (definition, description) "
+        "VALUES              (?1,         ?2) ");
+
+    stmt.bind(1, encodeOfflineRegionDefinition(definition));
+    stmt.bindBlob(2, metadata);
+    stmt.run();
+
+    return OfflineRegion(db->lastInsertRowid(), definition, metadata);
+}
+
+void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
+    mapbox::sqlite::Statement& stmt = getStatement(
+        "DELETE FROM regions WHERE id = ?");
+
+    stmt.bind(1, region.getID());
+    stmt.run();
+}
+
+optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
+    auto response = get(resource);
+
+    if (response) {
+        markUsed(regionID, resource);
+    }
+
+    return response;
+}
+
+uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+    uint64_t result = put(resource, response);
+    markUsed(regionID, resource);
+    return result;
+}
+
+void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
+    if (resource.kind == Resource::Kind::Tile) {
+        mapbox::sqlite::Statement& stmt1 = getStatement(
+            "REPLACE INTO region_tiles (region_id, tileset_id,  x,  y,  z) "
+            "SELECT                     ?1,        tilesets.id, ?4, ?5, ?6 "
+            "FROM tilesets "
+            "WHERE url_template = ?2 "
+            "AND pixel_ratio    = ?3 ");
+
+        stmt1.bind(1, regionID);
+        stmt1.bind(2, (*resource.tileData).urlTemplate);
+        stmt1.bind(3, (*resource.tileData).pixelRatio);
+        stmt1.bind(4, (*resource.tileData).x);
+        stmt1.bind(5, (*resource.tileData).y);
+        stmt1.bind(6, (*resource.tileData).z);
+        stmt1.run();
+    } else {
+        mapbox::sqlite::Statement& stmt1 = getStatement(
+            "REPLACE INTO region_resources (region_id, resource_url) "
+            "VALUES                        (?1,        ?2) ");
+
+        stmt1.bind(1, regionID);
+        stmt1.bind(2, resource.url);
+        stmt1.run();
+    }
+}
+
+OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
+    mapbox::sqlite::Statement& stmt = getStatement(
+        "SELECT definition FROM regions WHERE id = ?1");
+
+    stmt.bind(1, regionID);
+    stmt.run();
+
+    return decodeOfflineRegionDefinition(stmt.get<std::string>(0));
+}
+
+OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
+    OfflineRegionStatus result;
+
+    mapbox::sqlite::Statement& stmt = getStatement(
+        "SELECT COUNT(*), SUM(size) FROM ( "
+        "  SELECT LENGTH(data) as size "
+        "  FROM region_resources, resources "
+        "  WHERE region_id = ?1 "
+        "  AND resources.url = region_resources.resource_url "
+        "  UNION ALL "
+        "  SELECT LENGTH(data) as size "
+        "  FROM region_tiles, tiles "
+        "  WHERE region_id = ?1 "
+        "  AND tiles.tileset_id = region_tiles.tileset_id "
+        "  AND tiles.z = region_tiles.z "
+        "  AND tiles.x = region_tiles.x "
+        "  AND tiles.y = region_tiles.y "
+        ") ");
+
+    stmt.bind(1, regionID);
+    stmt.run();
+
+    result.completedResourceCount = stmt.get<int64_t>(0);
+    result.completedResourceSize  = stmt.get<int64_t>(1);
+
+    return result;
+}
+
+void OfflineDatabase::removeUnusedResources() {
+    mapbox::sqlite::Statement& stmt1 = getStatement(
+        "DELETE FROM resources "
+        "WHERE ROWID NOT IN ( "
+        "  SELECT resources.ROWID "
+        "  FROM resources, region_resources "
+        "  WHERE resources.url = region_resources.resource_url "
+        ") ");
+    stmt1.run();
+
+    mapbox::sqlite::Statement& stmt2 = getStatement(
+        "DELETE FROM tiles "
+        "WHERE ROWID NOT IN ( "
+        "  SELECT tiles.ROWID "
+        "  FROM tiles, region_tiles "
+        "  AND tiles.tileset_id = region_tiles.tileset_id "
+        "  AND tiles.z = region_tiles.z "
+        "  AND tiles.x = region_tiles.x "
+        "  AND tiles.y = region_tiles.y "
+        ") ");
+    stmt2.run();
 }
 
 } // namespace mbgl
