@@ -59,6 +59,56 @@ TEST_F(Storage, HTTP404) {
     loop.run();
 }
 
+TEST_F(Storage, HTTPTile404) {
+    SCOPED_TEST(HTTPTile404)
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Tile, "http://127.0.0.1:3000/doesnotexist" },
+               [&](Response res) {
+        req2.reset();
+        EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
+        EXPECT_TRUE(res.noContent);
+        EXPECT_FALSE(bool(res.error));
+        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+        HTTPTile404.finish();
+    });
+
+    loop.run();
+}
+
+TEST_F(Storage, HTTP204) {
+    SCOPED_TEST(HTTP204)
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/no-content" },
+               [&](Response res) {
+        req2.reset();
+        EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
+        EXPECT_TRUE(res.noContent);
+        EXPECT_FALSE(bool(res.error));
+        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+        HTTP204.finish();
+    });
+
+    loop.run();
+}
+
 TEST_F(Storage, HTTP500) {
     SCOPED_TEST(HTTP500)
 

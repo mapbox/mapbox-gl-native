@@ -9,6 +9,7 @@ Response::Response(const Response& res) {
 
 Response& Response::operator=(const Response& res) {
     error = res.error ? std::make_unique<Error>(*res.error) : nullptr;
+    noContent = res.noContent;
     notModified = res.notModified;
     data = res.data;
     modified = res.modified;

@@ -20,6 +20,10 @@ public:
     // When this object is empty, the response was successful.
     std::unique_ptr<const Error> error;
 
+    // This is set to true for 204 Not Modified responses, and, for backward compatibility,
+    // for 404 Not Found responses for tiles.
+    bool noContent = false;
+
     // This is set to true for 304 Not Modified responses.
     bool notModified = false;
 

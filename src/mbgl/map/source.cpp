@@ -90,76 +90,74 @@ void Source::load() {
     req = fs->request(Resource::source(url), [this](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
             return;
-        }
+        } else if (res.noContent) {
+            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty source")));
+        } else {
+            bool reloadTiles = false;
 
-        if (res.notModified) {
-            // We got the same data back as last time. Abort early.
-            return;
-        }
+            if (type == SourceType::Vector || type == SourceType::Raster) {
+                std::unique_ptr<SourceInfo> newInfo;
 
-        bool reloadTiles = false;
+                // Create a new copy of the SourceInfo object that holds the base values we've parsed
+                // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
+                // via the URL.
+                try {
+                    newInfo = StyleParser::parseTileJSON(*res.data, url, type);
+                } catch (...) {
+                    observer->onSourceError(*this, std::current_exception());
+                    return;
+                }
 
-        if (type == SourceType::Vector || type == SourceType::Raster) {
-            std::unique_ptr<SourceInfo> newInfo;
+                // Check whether previous information specifies different tile
+                if (info && info->tiles != newInfo->tiles) {
+                    reloadTiles = true;
 
-            // Create a new copy of the SourceInfo object that holds the base values we've parsed
-            // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
-            // via the URL.
-            try {
-                newInfo = StyleParser::parseTileJSON(*res.data, url, type);
-            } catch (...) {
-                observer->onSourceError(*this, std::current_exception());
-                return;
-            }
+                    // Tile size changed: We need to recalculate the tiles we need to load because we
+                    // might have to load tiles for a different zoom level
+                    // This is done automatically when we trigger the onSourceLoaded observer below.
 
-            // Check whether previous information specifies different tile
-            if (info && info->tiles != newInfo->tiles) {
+                    // Min/Max zoom changed: We need to recalculate what tiles to load, if we have tiles
+                    // loaded that are outside the new zoom range
+                    // This is done automatically when we trigger the onSourceLoaded observer below.
+
+                    // Attribution changed: We need to notify the embedding application that this
+                    // changed. See https://github.com/mapbox/mapbox-gl-native/issues/2723
+                    // This is not yet implemented.
+
+                    // Center/bounds changed: We're not using these values currently
+                }
+
+                info = std::move(newInfo);
+            } else if (type == SourceType::GeoJSON) {
+                info = std::make_unique<SourceInfo>();
+
+                rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
+                d.Parse<0>(res.data->c_str());
+
+                if (d.HasParseError()) {
+                    std::stringstream message;
+                    message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
+                    observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
+                    return;
+                }
+
+                geojsonvt = StyleParser::parseGeoJSON(d);
                 reloadTiles = true;
-
-                // Tile size changed: We need to recalculate the tiles we need to load because we
-                // might have to load tiles for a different zoom level
-                // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                // Min/Max zoom changed: We need to recalculate what tiles to load, if we have tiles
-                // loaded that are outside the new zoom range
-                // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                // Attribution changed: We need to notify the embedding application that this
-                // changed. See https://github.com/mapbox/mapbox-gl-native/issues/2723
-                // This is not yet implemented.
-
-                // Center/bounds changed: We're not using these values currently
             }
 
-            info = std::move(newInfo);
-        } else if (type == SourceType::GeoJSON) {
-            info = std::make_unique<SourceInfo>();
-
-            rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
-            d.Parse<0>(res.data->c_str());
-
-            if (d.HasParseError()) {
-                std::stringstream message;
-                message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
-                return;
+            if (reloadTiles) {
+                // Tile information changed because we got new GeoJSON data, or a new tile URL.
+                tilePtrs.clear();
+                tileDataMap.clear();
+                tiles.clear();
+                cache.clear();
             }
 
-            geojsonvt = StyleParser::parseGeoJSON(d);
-            reloadTiles = true;
+            loaded = true;
+            observer->onSourceLoaded(*this);
         }
-
-        if (reloadTiles) {
-            // Tile information changed because we got new GeoJSON data, or a new tile URL.
-            tilePtrs.clear();
-            tileDataMap.clear();
-            tiles.clear();
-            cache.clear();
-        }
-
-        loaded = true;
-        observer->onSourceLoaded(*this);
     });
 }
 

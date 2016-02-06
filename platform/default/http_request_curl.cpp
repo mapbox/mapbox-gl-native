@@ -515,6 +515,8 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
             } else {
                 response->data = std::make_shared<std::string>();
             }
+        } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+            response->noContent = true;
         } else if (responseCode == 304) {
             response->notModified = true;
         } else if (responseCode == 404) {

@@ -101,8 +101,8 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
 }
 
 void OfflineDatabase::put(const Resource& resource, const Response& response) {
-    // Except for 404s, don't store errors in the cache.
-    if (response.error && response.error->reason != Response::Error::Reason::NotFound) {
+    // Don't store errors in the cache.
+    if (response.error) {
         return;
     }
 
@@ -135,7 +135,7 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
 
     optional<std::string> data = stmt.get<optional<std::string>>(3);
     if (!data) {
-        response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+        response.noContent = true;
     } else if (stmt.get<int>(4)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
     } else {
@@ -170,7 +170,7 @@ void OfflineDatabase::putResource(const Resource& resource, const Response& resp
 
         std::string data;
 
-        if (response.error) { // Can only be NotFound
+        if (response.noContent) {
             stmt.bind(7 /* data */, nullptr);
             stmt.bind(8 /* compressed */, false);
         } else {
@@ -218,7 +218,7 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
 
     optional<std::string> data = stmt.get<optional<std::string>>(3);
     if (!data) {
-        response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+        response.noContent = true;
     } else if (stmt.get<int>(4)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
     } else {
@@ -276,7 +276,7 @@ void OfflineDatabase::putTile(const Resource::TileData& tile, const Response& re
 
         std::string data;
 
-        if (response.error) { // Can only be NotFound
+        if (response.noContent) {
             stmt2.bind(10 /* data */, nullptr);
             stmt2.bind(11 /* compressed */, false);
         } else {

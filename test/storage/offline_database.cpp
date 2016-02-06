@@ -334,19 +334,19 @@ TEST(OfflineDatabase, PutTile) {
     EXPECT_EQ("data", *res->data);
 }
 
-TEST(OfflineDatabase, PutResourceNotFound) {
+TEST(OfflineDatabase, PutResourceNoContent) {
     using namespace mbgl;
 
     OfflineDatabase db(":memory:");
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
-    response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+    response.noContent = true;
 
     db.put(resource, response);
     auto res = db.get(resource);
-    EXPECT_NE(nullptr, res->error);
-    EXPECT_EQ(Response::Error::Reason::NotFound, res->error->reason);
+    EXPECT_EQ(nullptr, res->error);
+    EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
 }
 
@@ -364,11 +364,11 @@ TEST(OfflineDatabase, PutTileNotFound) {
         0
     };
     Response response;
-    response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound);
+    response.noContent = true;
 
     db.put(resource, response);
     auto res = db.get(resource);
-    EXPECT_NE(nullptr, res->error);
-    EXPECT_EQ(Response::Error::Reason::NotFound, res->error->reason);
+    EXPECT_EQ(nullptr, res->error);
+    EXPECT_TRUE(res->noContent);
     EXPECT_FALSE(res->data.get());
 }

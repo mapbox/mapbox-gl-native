@@ -71,22 +71,22 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
     req = fs->request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
         if (res.error) {
             observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
             return;
-        }
+        } else if (res.noContent) {
+            parsed = true;
+            observer->onGlyphsLoaded(fontStack, glyphRange);
+        } else {
+            try {
+                parseGlyphPBF(**store->getFontStack(fontStack), *res.data);
+            } catch (...) {
+                observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
+                return;
+            }
 
-        if (res.notModified) {
-            return;
+            parsed = true;
+            observer->onGlyphsLoaded(fontStack, glyphRange);
         }
-
-        try {
-            parseGlyphPBF(**store->getFontStack(fontStack), *res.data);
-        } catch (...) {
-            observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
-            return;
-        }
-
-        parsed = true;
-        observer->onGlyphsLoaded(fontStack, glyphRange);
     });
 }
 

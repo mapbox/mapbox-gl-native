@@ -217,6 +217,8 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
 
         if (responseCode == 200) {
             response->data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
+        } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
+            response->noContent = true;
         } else if (responseCode == 304) {
             response->notModified = true;
         } else if (responseCode == 404) {

@@ -191,22 +191,15 @@ VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, c
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
     const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.x, tileID.y, tileID.sourceZ);
     return util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
-        if (res.notModified) {
-            // We got the same data again. Abort early.
-            return;
-        }
-
         if (res.error) {
-            if (res.error->reason == Response::Error::Reason::NotFound) {
-                callback(nullptr, nullptr, res.modified, res.expires);
-                return;
-            } else {
-                callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
-                return;
-            }
+            callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
+        } else if (res.notModified) {
+            return;
+        } else if (res.noContent) {
+            callback(nullptr, nullptr, res.modified, res.expires);
+        } else {
+            callback(nullptr, std::make_unique<VectorTile>(res.data), res.modified, res.expires);
         }
-
-        callback(nullptr, std::make_unique<VectorTile>(res.data), res.modified, res.expires);
     });
 }
 

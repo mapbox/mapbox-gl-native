@@ -116,6 +116,64 @@ TEST(Source, LoadingCorrupt) {
     test.run();
 }
 
+TEST(Source, RasterTileEmpty) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
+        EXPECT_EQ("source", source.id);
+        test.end();
+    };
+
+    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto info = std::make_unique<SourceInfo>();
+    info->tiles = { "tiles" };
+
+    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    source.setObserver(&test.observer);
+    source.load();
+    source.update(test.updateParameters);
+
+    test.run();
+}
+
+TEST(Source, VectorTileEmpty) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
+        EXPECT_EQ("source", source.id);
+        test.end();
+    };
+
+    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto info = std::make_unique<SourceInfo>();
+    info->tiles = { "tiles" };
+
+    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    source.setObserver(&test.observer);
+    source.load();
+    source.update(test.updateParameters);
+
+    test.run();
+}
+
 TEST(Source, RasterTileFail) {
     SourceTest test;
 

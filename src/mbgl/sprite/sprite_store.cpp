@@ -38,15 +38,12 @@ void SpriteStore::setURL(const std::string& url) {
     loader->jsonRequest = fs->request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
             return;
-        }
-
-        if (res.notModified) {
-            // We got the same data back as last time. Abort early.
-            return;
-        }
-
-        if (!loader->json || *loader->json != *res.data) {
+        } else if (res.noContent) {
+            loader->json = std::make_shared<const std::string>();
+            emitSpriteLoadedIfComplete();
+        } else {
             // Only trigger a sprite loaded event we got new data.
             loader->json = res.data;
             emitSpriteLoadedIfComplete();
@@ -56,15 +53,12 @@ void SpriteStore::setURL(const std::string& url) {
     loader->spriteRequest = fs->request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        } else if (res.notModified) {
             return;
-        }
-
-        if (res.notModified) {
-            // We got the same data back as last time. Abort early.
-            return;
-        }
-
-        if (!loader->image || *loader->image != *res.data) {
+        } else if (res.noContent) {
+            loader->image = std::make_shared<const std::string>();
+            emitSpriteLoadedIfComplete();
+        } else {
             loader->image = res.data;
             emitSpriteLoadedIfComplete();
         }
