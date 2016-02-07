@@ -165,6 +165,10 @@ public class MapboxEventManager {
         return "Background";
     }
 
+    private String getAccesibilityFontScaleSize() {
+        return "Uknown";
+    }
+
     private String getCellularCarrier() {
         TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         String carrierName = manager.getNetworkOperatorName();
@@ -274,7 +278,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, displayMetrics.density);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, getAccesibilityFontScaleSize());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
