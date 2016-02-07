@@ -220,9 +220,14 @@ public class MapboxEventManager {
         String status = "No";
         WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr.isWifiEnabled()) {
-            WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-            if( wifiInfo.getNetworkId() != -1 ){
-                status = "Yes";
+            try {
+                WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+                if( wifiInfo.getNetworkId() != -1 ){
+                    status = "Yes";
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Error getting Wifi Connection Status: " + e);
+                status = "Unknown";
             }
         }
 
