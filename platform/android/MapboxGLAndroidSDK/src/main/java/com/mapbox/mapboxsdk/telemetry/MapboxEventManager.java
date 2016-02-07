@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -62,10 +63,26 @@ public class MapboxEventManager {
 
     private DisplayMetrics displayMetrics = null;
 
+    private String mapboxVendorId = null;
+
     private MapboxEventManager(@NonNull Context context) {
         super();
         this.accessToken = ApiAccess.getToken(context);
         this.context = context;
+
+        // Load / Create Vendor Id
+        SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        if (prefs.contains(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
+            mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "Default Value");
+            Log.i(TAG, "Found Vendor Id = " + mapboxVendorId);
+        } else {
+            String vendorId = "Mapbox-" + UUID.randomUUID().toString();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, vendorId);
+            editor.apply();
+            editor.commit();
+            Log.i(TAG, "Set New Vendor Id = " + vendorId);
+        }
 
         // Get DisplayMetrics Setup
         displayMetrics = new DisplayMetrics();
@@ -276,7 +293,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_INSTANCE, SESSION_UUID);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, "");
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, Build.VERSION.RELEASE);

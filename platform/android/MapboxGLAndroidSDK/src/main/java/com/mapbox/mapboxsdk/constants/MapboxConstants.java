@@ -101,4 +101,7 @@ public class MapboxConstants {
     public static final String STATE_ATTRIBUTION_ENABLED = "atrrEnabled";
 
     public static final String TAG = "MapboxMap";
+
+    public static final String MAPBOX_SHARED_PREFERENCES_FILE = "MapboxSharedPreferences";
+    public static final String MAPBOX_SHARED_PREFERENCE_KEY_VENDORID = "mapboxVendorId";
 }
