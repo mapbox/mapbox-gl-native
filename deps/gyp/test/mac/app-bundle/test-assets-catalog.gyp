@@ -36,7 +36,7 @@
       },
       'xcode_settings': {
         'INFOPLIST_FILE': 'TestApp/TestApp-Info.plist',
-        'MACOSX_DEPLOYMENT_TARGET': '10.9',
+        'MACOSX_DEPLOYMENT_TARGET': '10.10',
       },
     },
   ],

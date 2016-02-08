@@ -8,13 +8,109 @@
 
 #include <mbgl/platform/log.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+#include <mapbox/geojsonvt/convert.hpp>
+
+#include <mbgl/util/mapbox.hpp>
+
+#include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
+
 #include <algorithm>
+#include <sstream>
 
 namespace mbgl {
 
+
+namespace {
+
+void parseTileJSONMember(const JSValue& value, std::vector<std::string>& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsArray()) {
+        return;
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        if (!property[i].IsString()) {
+            return;
+        }
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        target.emplace_back(std::string(property[i].GetString(), property[i].GetStringLength()));
+    }
+}
+
+void parseTileJSONMember(const JSValue& value, std::string& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsString()) {
+        return;
+    }
+
+    target = { property.GetString(), property.GetStringLength() };
+}
+
+void parseTileJSONMember(const JSValue& value, uint16_t& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsUint()) {
+        return;
+    }
+
+    unsigned int uint = property.GetUint();
+    if (uint > std::numeric_limits<uint16_t>::max()) {
+        return;
+    }
+
+    target = uint;
+}
+
+template <size_t N>
+void parseTileJSONMember(const JSValue& value, std::array<float, N>& target, const char* name) {
+    if (!value.HasMember(name)) {
+        return;
+    }
+
+    const JSValue& property = value[name];
+    if (!property.IsArray() || property.Size() != N) {
+        return;
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        if (!property[i].IsNumber()) {
+            return;
+        }
+    }
+
+    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
+        target[i] = property[i].GetDouble();
+    }
+}
+
+} // end namespace
+
 StyleParser::~StyleParser() = default;
 
-void StyleParser::parse(const JSVal& document) {
+void StyleParser::parse(const std::string& json) {
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
+    document.Parse<0>(json.c_str());
+
+    if (document.HasParseError()) {
+        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", document.GetErrorOffset(), rapidjson::GetParseError_En(document.GetParseError()));
+        return;
+    }
+
     if (document.HasMember("version")) {
         int version = document["version"].GetInt();
         if (version != 8) {
@@ -31,152 +127,169 @@ void StyleParser::parse(const JSVal& document) {
     }
 
     if (document.HasMember("sprite")) {
-        const JSVal& sprite = document["sprite"];
+        const JSValue& sprite = document["sprite"];
         if (sprite.IsString()) {
             spriteURL = { sprite.GetString(), sprite.GetStringLength() };
         }
     }
 
     if (document.HasMember("glyphs")) {
-        const JSVal& glyphs = document["glyphs"];
+        const JSValue& glyphs = document["glyphs"];
         if (glyphs.IsString()) {
             glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
         }
     }
 }
 
-void StyleParser::parseSources(const JSVal& value) {
+void StyleParser::parseSources(const JSValue& value) {
     if (!value.IsObject()) {
         Log::Warning(Event::ParseStyle, "sources must be an object");
         return;
     }
 
-    rapidjson::Value::ConstMemberIterator itr = value.MemberBegin();
+    JSValue::ConstMemberIterator itr = value.MemberBegin();
     for (; itr != value.MemberEnd(); ++itr) {
-        const JSVal& nameVal = itr->name;
-        const JSVal& sourceVal = itr->value;
-
-        std::unique_ptr<Source> source = std::make_unique<Source>();
-
-        source->info.source_id = { nameVal.GetString(), nameVal.GetStringLength() };
+        const JSValue& nameVal = itr->name;
+        const JSValue& sourceVal = itr->value;
 
         if (!sourceVal.HasMember("type")) {
             Log::Warning(Event::ParseStyle, "source must have a type");
             continue;
         }
 
-        const JSVal& typeVal = sourceVal["type"];
+        const JSValue& typeVal = sourceVal["type"];
         if (!typeVal.IsString()) {
             Log::Warning(Event::ParseStyle, "source type must have one of the enum values");
             continue;
         }
 
-        source->info.type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
+        const auto type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
 
-        switch (source->info.type) {
-        case SourceType::Vector:
-            if (!parseVectorSource(*source, sourceVal)) {
-                continue;
-            }
-            break;
+        // Sources can have URLs, either because they reference an external TileJSON file, or
+        // because reference a GeoJSON file. They don't have to have one though when all source
+        // parameters are specified inline.
+        std::string url;
+
+        uint16_t tileSize = util::tileSize;
+
+        std::unique_ptr<SourceInfo> info;
+        std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
+
+        switch (type) {
         case SourceType::Raster:
-            if (!parseRasterSource(*source, sourceVal)) {
-                continue;
+            if (sourceVal.HasMember("tileSize")) {
+                const JSValue& tileSizeVal = sourceVal["tileSize"];
+                if (tileSizeVal.IsNumber() && tileSizeVal.GetUint64() <= std::numeric_limits<uint16_t>::max()) {
+                    tileSize = tileSizeVal.GetUint64();
+                } else {
+                    Log::Error(Event::ParseStyle, "invalid tileSize");
+                    continue;
+                }
+            }
+            // Fall through. Vector sources are forbidden from having a tileSize.
+
+        case SourceType::Vector:
+            if (sourceVal.HasMember("url")) {
+                const JSValue& urlVal = sourceVal["url"];
+                if (urlVal.IsString()) {
+                    url = { urlVal.GetString(), urlVal.GetStringLength() };
+                } else {
+                    Log::Error(Event::ParseStyle, "source url must be a string");
+                    continue;
+                }
+            } else {
+                info = parseTileJSON(sourceVal);
             }
             break;
+
         case SourceType::GeoJSON:
-            if (!parseGeoJSONSource(*source, sourceVal)) {
+            // We should probably split this up to have URLs in the url property, and actual data
+            // in the data property. Until then, we're going to detect the content based on the
+            // object type.
+            if (sourceVal.HasMember("data")) {
+                const JSValue& dataVal = sourceVal["data"];
+                if (dataVal.IsString()) {
+                    // We need to load an external GeoJSON file
+                    url = { dataVal.GetString(), dataVal.GetStringLength() };
+                } else if (dataVal.IsObject()) {
+                    // We need to parse dataVal as a GeoJSON object
+                    // TODO: parse GeoJSON data
+                    geojsonvt = parseGeoJSON(dataVal);
+                } else {
+                    Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
+                    continue;
+                }
+            } else {
+                Log::Error(Event::ParseStyle, "GeoJSON source must have a data value");
                 continue;
             }
+
+            // We always assume the default configuration for GeoJSON sources.
+            info = std::make_unique<SourceInfo>();
+
             break;
+
         default:
-            Log::Warning(Event::ParseStyle, "source type %s is not supported", SourceTypeClass(source->info.type).c_str());
+            Log::Error(Event::ParseStyle, "source type '%s' is not supported", typeVal.GetString());
+            continue;
         }
 
-        sourcesMap.emplace(source->info.source_id, source.get());
+        const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
+        std::unique_ptr<Source> source = std::make_unique<Source>(type, id, url, tileSize, std::move(info), std::move(geojsonvt));
+
+        sourcesMap.emplace(id, source.get());
         sources.emplace_back(std::move(source));
     }
 }
 
-bool StyleParser::parseVectorSource(Source& source, const JSVal& sourceVal) {
-    // A vector tile source either specifies the URL of a TileJSON file...
-    if (sourceVal.HasMember("url")) {
-        const JSVal& urlVal = sourceVal["url"];
+std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> StyleParser::parseGeoJSON(const JSValue& value) {
+    using namespace mapbox::geojsonvt;
 
-        if (!urlVal.IsString()) {
-            Log::Warning(Event::ParseStyle, "source url must be a string");
-            return false;
-        }
-
-        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
-
-    } else {
-        // ...or the TileJSON directly.
-        source.info.parseTileJSONProperties(sourceVal);
+    try {
+        return std::make_unique<GeoJSONVT>(Convert::convert(value, 0));
+    } catch (const std::exception& ex) {
+        Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
+        // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
+        // tiles to load.
+        return std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
     }
-
-    return true;
 }
 
-bool StyleParser::parseRasterSource(Source& source, const JSVal& sourceVal) {
-    if (sourceVal.HasMember("tileSize")) {
-        const JSVal& tileSizeVal = sourceVal["tileSize"];
+std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type) {
+    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
+    document.Parse<0>(json.c_str());
 
-        if (!tileSizeVal.IsUint()) {
-            Log::Warning(Event::ParseStyle, "source tileSize must be an unsigned integer");
-            return false;
-        }
-
-        unsigned int intValue = tileSizeVal.GetUint();
-        if (intValue > std::numeric_limits<uint16_t>::max()) {
-            Log::Warning(Event::ParseStyle, "values for tileSize that are larger than %d are not supported", std::numeric_limits<uint16_t>::max());
-            return false;
-        }
-
-        source.info.tile_size = intValue;
+    if (document.HasParseError()) {
+        std::stringstream message;
+        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
+        throw std::runtime_error(message.str());
     }
 
-    // A raster tile source either specifies the URL of a TileJSON file...
-    if (sourceVal.HasMember("url")) {
-        const JSVal& urlVal = sourceVal["url"];
+    std::unique_ptr<SourceInfo> result = StyleParser::parseTileJSON(document);
 
-        if (!urlVal.IsString()) {
-            Log::Warning(Event::ParseStyle, "source url must be a string");
-            return false;
-        }
-
-        source.info.url = { urlVal.GetString(), urlVal.GetStringLength() };
-
-    } else {
-        // ...or the TileJSON directly.
-        source.info.parseTileJSONProperties(sourceVal);
+    // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
+    if (type == SourceType::Raster && util::mapbox::isMapboxURL(sourceURL)) {
+        std::transform(result->tiles.begin(),
+                       result->tiles.end(),
+                       result->tiles.begin(),
+                       util::mapbox::normalizeRasterTileURL);
     }
 
-    return true;
+    return result;
 }
 
-bool StyleParser::parseGeoJSONSource(Source& source, const JSVal& sourceVal) {
-    if (!sourceVal.HasMember("data")) {
-        Log::Warning(Event::ParseStyle, "GeoJSON source must have a data value");
-        return false;
-    }
-
-    const JSVal& dataVal = sourceVal["data"];
-    if (dataVal.IsString()) {
-        // We need to load an external GeoJSON file
-        source.info.url = { dataVal.GetString(), dataVal.GetStringLength() };
-    } else if (dataVal.IsObject()) {
-        // We need to parse dataVal as a GeoJSON object
-        source.info.parseGeoJSON(dataVal);
-    } else {
-        Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
-        return false;
-    }
-
-    return true;
+std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {
+    auto info = std::make_unique<SourceInfo>();
+    parseTileJSONMember(value, info->tiles, "tiles");
+    parseTileJSONMember(value, info->minZoom, "minzoom");
+    parseTileJSONMember(value, info->maxZoom, "maxzoom");
+    parseTileJSONMember(value, info->attribution, "attribution");
+    parseTileJSONMember(value, info->center, "center");
+    parseTileJSONMember(value, info->bounds, "bounds");
+    return info;
 }
 
-void StyleParser::parseLayers(const JSVal& value) {
+void StyleParser::parseLayers(const JSValue& value) {
     std::vector<std::string> ids;
 
     if (!value.IsArray()) {
@@ -185,7 +298,7 @@ void StyleParser::parseLayers(const JSVal& value) {
     }
 
     for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-        const JSVal& layerValue = value[i];
+        const JSValue& layerValue = value[i];
 
         if (!layerValue.IsObject()) {
             Log::Warning(Event::ParseStyle, "layer must be an object");
@@ -197,7 +310,7 @@ void StyleParser::parseLayers(const JSVal& value) {
             continue;
         }
 
-        const JSVal& id = layerValue["id"];
+        const JSValue& id = layerValue["id"];
         if (!id.IsString()) {
             Log::Warning(Event::ParseStyle, "layer id must be a string");
             continue;
@@ -209,7 +322,7 @@ void StyleParser::parseLayers(const JSVal& value) {
             continue;
         }
 
-        layersMap.emplace(layerID, std::pair<const JSVal&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
+        layersMap.emplace(layerID, std::pair<const JSValue&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
         ids.push_back(layerID);
     }
 
@@ -230,7 +343,7 @@ void StyleParser::parseLayers(const JSVal& value) {
     }
 }
 
-void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::unique_ptr<StyleLayer>& layer) {
+void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<StyleLayer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
@@ -244,7 +357,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
 
     if (value.HasMember("ref")) {
         // This layer is referencing another layer. Recursively parse that layer.
-        const JSVal& refVal = value["ref"];
+        const JSValue& refVal = value["ref"];
         if (!refVal.IsString()) {
             Log::Warning(Event::ParseStyle, "layer ref of '%s' must be a string", id.c_str());
             return;
@@ -280,7 +393,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
             return;
         }
 
-        const JSVal& typeVal = value["type"];
+        const JSValue& typeVal = value["type"];
         if (!typeVal.IsString()) {
             Log::Warning(Event::ParseStyle, "layer '%s' has an invalid type", id.c_str());
             return;
@@ -308,7 +421,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         layer->id = id;
 
         if (value.HasMember("source")) {
-            const JSVal& value_source = value["source"];
+            const JSValue& value_source = value["source"];
             if (value_source.IsString()) {
                 layer->source = { value_source.GetString(), value_source.GetStringLength() };
                 auto source_it = sourcesMap.find(layer->source);
@@ -321,7 +434,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("source-layer")) {
-            const JSVal& value_source_layer = value["source-layer"];
+            const JSValue& value_source_layer = value["source-layer"];
             if (value_source_layer.IsString()) {
                 layer->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
             } else {
@@ -334,7 +447,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("minzoom")) {
-            const JSVal& min_zoom = value["minzoom"];
+            const JSValue& min_zoom = value["minzoom"];
             if (min_zoom.IsNumber()) {
                 layer->minZoom = min_zoom.GetDouble();
             } else {
@@ -343,7 +456,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("maxzoom")) {
-            const JSVal& max_zoom = value["maxzoom"];
+            const JSValue& max_zoom = value["maxzoom"];
             if (max_zoom.IsNumber()) {
                 layer->maxZoom = max_zoom.GetDouble();
             } else {
@@ -352,7 +465,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
         }
 
         if (value.HasMember("interactive")) {
-            const JSVal& interactive = value["interactive"];
+            const JSValue& interactive = value["interactive"];
             if (interactive.IsBool()) {
                 layer->isInteractive = interactive.GetBool();
             } else {
@@ -369,7 +482,7 @@ void StyleParser::parseLayer(const std::string& id, const JSVal& value, std::uni
     layer->parsePaints(value);
 }
 
-void StyleParser::parseVisibility(StyleLayer& layer, const JSVal& value) {
+void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
     if (!value.HasMember("visibility")) {
         return;
     } else if (!value["visibility"].IsString()) {

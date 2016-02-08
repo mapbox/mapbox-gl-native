@@ -12,6 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** Indicates an error occurred in the Mapbox SDK. */
 extern NSString * const MGLErrorDomain;
 
 /** The mode used to track the user location on the map. */

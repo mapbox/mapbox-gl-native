@@ -22,6 +22,7 @@ public:
         }
 
         handle()->data = this;
+        uv_unref(handle());
     }
 
     ~Impl() {
@@ -42,10 +43,6 @@ public:
         if (uv_timer_stop(timer) != 0) {
             throw std::runtime_error("Failed to stop timer.");
         }
-    }
-
-    void unref() {
-        uv_unref(handle());
     }
 
 private:
@@ -69,17 +66,13 @@ Timer::Timer()
 Timer::~Timer() = default;
 
 void Timer::start(Duration timeout, Duration repeat, std::function<void()>&& cb) {
-    impl->start(std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count(),
-                std::chrono::duration_cast<std::chrono::milliseconds>(repeat).count(),
+    impl->start(std::chrono::duration_cast<Milliseconds>(timeout).count(),
+                std::chrono::duration_cast<Milliseconds>(repeat).count(),
                 std::move(cb));
 }
 
 void Timer::stop() {
     impl->stop();
-}
-
-void Timer::unref() {
-    impl->unref();
 }
 
 } // namespace util

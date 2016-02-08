@@ -12,7 +12,7 @@ const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.poin
 
 AnnotationManager::AnnotationManager(float pixelRatio)
     : spriteStore(pixelRatio),
-      spriteAtlas(512, 512, pixelRatio, spriteStore) {
+      spriteAtlas(1024, 1024, pixelRatio, spriteStore) {
 }
 
 AnnotationManager::~AnnotationManager() = default;
@@ -71,20 +71,6 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
     return result;
 }
 
-LatLngBounds AnnotationManager::getBoundsForAnnotations(const AnnotationIDs& ids) const {
-    LatLngBounds result = LatLngBounds::getExtendable();
-
-    for (const auto& id : ids) {
-        if (pointAnnotations.find(id) != pointAnnotations.end()) {
-            result.extend(pointAnnotations.at(id)->bounds());
-        } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-            result.extend(shapeAnnotations.at(id)->bounds());
-        }
-    }
-
-    return result;
-}
-
 std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID) {
     if (pointAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
@@ -112,9 +98,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID)
 void AnnotationManager::updateStyle(Style& style) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
-        std::unique_ptr<Source> source = std::make_unique<Source>();
-        source->info.type = SourceType::Annotations;
-        source->info.source_id = SourceID;
+        std::unique_ptr<Source> source = std::make_unique<Source>(SourceType::Annotations, SourceID, "", util::tileSize, std::make_unique<SourceInfo>(), nullptr);
         source->enabled = true;
         style.addSource(std::move(source));
 
@@ -159,10 +143,15 @@ void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const S
     spriteStore.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
+    
+void AnnotationManager::removeIcon(const std::string& name) {
+    spriteStore.removeSprite(name);
+    spriteAtlas.updateDirty();
+}
 
 double AnnotationManager::getTopOffsetPixelsForIcon(const std::string& name) {
     auto sprite = spriteStore.getSprite(name);
-    return sprite ? -sprite->height / 2 : 0;
+    return sprite ? -(sprite->image.height / sprite->pixelRatio) / 2 : 0;
 }
 
 } // namespace mbgl

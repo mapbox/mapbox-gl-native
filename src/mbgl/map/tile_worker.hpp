@@ -3,6 +3,7 @@
 
 #include <mapbox/variant.hpp>
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/map/geometry_tile.hpp>
 #include <mbgl/util/geo.hpp>
@@ -36,8 +37,9 @@ public:
     FeatureTree featureTree;
 };
 
-using TileParseResult = mapbox::util::variant<TileParseResultBuckets, // success
-                                              std::string>;           // error
+using TileParseResult = mapbox::util::variant<
+    TileParseResultBuckets, // success
+    std::exception_ptr>;    // error
 
 class TileWorker : public util::noncopyable {
 public:
@@ -46,14 +48,15 @@ public:
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const std::atomic<TileData::State>&);
+               const std::atomic<TileData::State>&,
+               const MapMode);
     ~TileWorker();
 
     TileParseResult parseAllLayers(std::vector<std::unique_ptr<StyleLayer>>,
-                                   const GeometryTile&,
+                                   std::unique_ptr<const GeometryTile> geometryTile,
                                    PlacementConfig);
 
-    TileParseResult parsePendingLayers();
+    TileParseResult parsePendingLayers(PlacementConfig);
 
     void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
                        PlacementConfig);
@@ -61,6 +64,7 @@ public:
 private:
     void parseLayer(const StyleLayer*, const GeometryTile&);
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
+    void placeLayers(PlacementConfig);
 
     const TileID id;
     const std::string sourceID;
@@ -69,15 +73,19 @@ private:
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
     const std::atomic<TileData::State>& state;
+    const MapMode mode;
 
     bool partialParse = false;
 
     std::vector<std::unique_ptr<StyleLayer>> layers;
-    std::unique_ptr<CollisionTile> collisionTile;
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.
     std::list<std::pair<const SymbolLayer*, std::unique_ptr<Bucket>>> pending;
+
+    // Contains buckets that have been parsed, but still need placement.
+    // They will be placed when all buckets have been parsed.
+    std::unordered_map<std::string, std::unique_ptr<Bucket>> placementPending;
 
     // Temporary holder
     TileParseResultBuckets result;

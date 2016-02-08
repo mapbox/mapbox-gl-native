@@ -17,13 +17,11 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/layer/background_layer.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
-
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
 
 #include <algorithm>
 
@@ -34,7 +32,7 @@ Style::Style(MapData& data_)
       glyphStore(std::make_unique<GlyphStore>()),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(512, 512, data.pixelRatio, *spriteStore)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, data.pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(512, 512)),
       workers(4) {
     glyphStore->setObserver(this);
@@ -42,15 +40,11 @@ Style::Style(MapData& data_)
 }
 
 void Style::setJSON(const std::string& json, const std::string&) {
-    rapidjson::Document doc;
-    doc.Parse<0>((const char *const)json.c_str());
-    if (doc.HasParseError()) {
-        Log::Error(Event::ParseStyle, "Error parsing style JSON at %i: %s", doc.GetErrorOffset(), rapidjson::GetParseError_En(doc.GetParseError()));
-        return;
-    }
+    sources.clear();
+    layers.clear();
 
     StyleParser parser;
-    parser.parse(doc);
+    parser.parse(json);
 
     for (auto& source : parser.sources) {
         addSource(std::move(source));
@@ -77,7 +71,6 @@ Style::~Style() {
 
 void Style::addSource(std::unique_ptr<Source> source) {
     source->setObserver(this);
-    source->load();
     sources.emplace_back(std::move(source));
 }
 
@@ -101,7 +94,7 @@ StyleLayer* Style::getLayer(const std::string& id) const {
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> before) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> before) {
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();
@@ -132,6 +125,7 @@ void Style::update(const TransformState& transform,
                                      workers,
                                      texturePool,
                                      shouldReparsePartialTiles,
+                                     data.mode,
                                      data,
                                      *this);
 
@@ -184,17 +178,16 @@ void Style::recalculate(float z) {
         hasPendingTransitions |= layer->recalculate(parameters);
 
         Source* source = getSource(layer->source);
-        if (!source) {
-            continue;
+        if (source && layer->needsRendering()) {
+            source->enabled = true;
+            if (!source->loaded && !source->isLoading()) source->load();
         }
-
-        source->enabled = true;
     }
 }
 
 Source* Style::getSource(const std::string& id) const {
     const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
-        return source->info.source_id == id;
+        return source->id == id;
     });
 
     return it != sources.end() ? it->get() : nullptr;
@@ -209,10 +202,8 @@ bool Style::isLoaded() const {
         return false;
     }
 
-    for (const auto& source : sources) {
-        if (!source->isLoaded()) {
-            return false;
-        }
+    for (const auto& source: sources) {
+        if (source->enabled && !source->isLoaded()) return false;
     }
 
     if (!spriteStore->isLoaded()) {
@@ -236,7 +227,7 @@ RenderData Style::getRenderData() const {
             continue;
 
         if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
-            if (background->paint.pattern.value.from.empty()) {
+            if (layer.get() == layers[0].get() && background->paint.pattern.value.from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = background->paint.color;
                 result.backgroundColor[0] *= background->paint.opacity;
@@ -244,7 +235,7 @@ RenderData Style::getRenderData() const {
                 result.backgroundColor[2] *= background->paint.opacity;
                 result.backgroundColor[3] *= background->paint.opacity;
             } else {
-                // This is a textured background. We need to render it with a quad.
+                // This is a textured background, or not the bottommost layer. We need to render it with a quad.
                 result.order.emplace_back(*layer);
             }
             continue;
@@ -308,73 +299,68 @@ void Style::onLowMemory() {
 
 void Style::setObserver(Observer* observer_) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    assert(!observer);
-
     observer = observer_;
 }
 
-void Style::onGlyphRangeLoaded() {
+void Style::onGlyphsLoaded(const std::string& fontStack, const GlyphRange& glyphRange) {
     shouldReparsePartialTiles = true;
-
-    emitTileDataChanged();
+    observer->onGlyphsLoaded(fontStack, glyphRange);
+    observer->onResourceLoaded();
 }
 
-void Style::onGlyphRangeLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onGlyphsError(const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
+               glyphRange.first, glyphRange.second, fontStack.c_str(), util::toString(error).c_str());
+    observer->onGlyphsError(fontStack, glyphRange, error);
+    observer->onResourceError(error);
 }
 
-void Style::onSourceLoaded() {
-    emitTileDataChanged();
+void Style::onSourceLoaded(Source& source) {
+    observer->onSourceLoaded(source);
+    observer->onResourceLoaded();
 }
 
-void Style::onSourceLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onSourceError(Source& source, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load source %s: %s",
+               source.id.c_str(), util::toString(error).c_str());
+    observer->onSourceError(source, error);
+    observer->onResourceError(error);
 }
 
-void Style::onTileLoaded(bool isNewTile) {
+void Style::onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) {
     if (isNewTile) {
         shouldReparsePartialTiles = true;
     }
 
-    emitTileDataChanged();
+    observer->onTileLoaded(source, tileID, isNewTile);
+    observer->onResourceLoaded();
 }
 
-void Style::onTileLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
+void Style::onTileError(Source& source, const TileID& tileID, std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
+               std::string(tileID).c_str(), source.id.c_str(), util::toString(error).c_str());
+    observer->onTileError(source, tileID, error);
+    observer->onResourceError(error);
+}
+
+void Style::onPlacementRedone() {
+    observer->onResourceLoaded();
 }
 
 void Style::onSpriteLoaded() {
     shouldReparsePartialTiles = true;
-    emitTileDataChanged();
+    observer->onSpriteLoaded();
+    observer->onResourceLoaded();
 }
 
-void Style::onSpriteLoadingFailed(std::exception_ptr error) {
-    emitResourceLoadingFailed(error);
-}
-
-void Style::emitTileDataChanged() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (observer) {
-        observer->onTileDataChanged();
-    }
-}
-
-void Style::emitResourceLoadingFailed(std::exception_ptr error) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    try {
-        if (error) {
-            lastError = error;
-            std::rethrow_exception(error);
-        }
-    } catch(const std::exception& e) {
-        Log::Error(Event::Style, "%s", e.what());
-    }
-
-    if (observer) {
-        observer->onResourceLoadingFailed(error);
-    }
+void Style::onSpriteError(std::exception_ptr error) {
+    lastError = error;
+    Log::Error(Event::Style, "Failed to load sprite: %s", util::toString(error).c_str());
+    observer->onSpriteError(error);
+    observer->onResourceError(error);
 }
 
 std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius, const TransformState& transform) const {
@@ -383,7 +369,7 @@ std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoin
     std::vector<FeatureDescription> results;
 
     for (const auto& source : sources) {
-        if (source->info.type == SourceType::Vector && source->isLoaded()) {
+        if (source->type == SourceType::Vector && source->isLoaded()) {
             const auto sourceResults = source->featureDescriptionsAt(point, radius, transform);
             results.insert(results.end(), sourceResults.begin(), sourceResults.end());
         }

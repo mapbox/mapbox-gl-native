@@ -9,15 +9,12 @@
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/std.hpp>
-
-#include <rapidjson/document.h>
+#include <mbgl/util/rapidjson.hpp>
 
 #include <map>
 #include <utility>
 
 namespace mbgl {
-
-using JSVal = rapidjson::Value;
 
 template <typename T, typename Result = T>
 class PaintProperty {
@@ -34,7 +31,7 @@ public:
           transitions(other.transitions) {
     }
 
-    void parse(const char* name, const JSVal& layer) {
+    void parse(const char* name, const JSValue& layer) {
         mbgl::util::erase_if(values, [] (const auto& p) { return p.first != ClassID::Fallback; });
 
         std::string transitionName = { name };

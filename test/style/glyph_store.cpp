@@ -1,233 +1,148 @@
-#include "../fixtures/fixture_log_observer.hpp"
-#include "../fixtures/mock_file_source.hpp"
 #include "../fixtures/util.hpp"
+#include "../fixtures/stub_file_source.hpp"
+#include "../fixtures/stub_style_observer.hpp"
 
 #include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/util/async_task.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread.hpp>
-#include <utility>
+#include <mbgl/util/string.hpp>
+#include <mbgl/util/io.hpp>
+#include <mbgl/platform/log.hpp>
 
 using namespace mbgl;
 
-using GlyphStoreTestCallback = std::function<void(GlyphStore*, std::exception_ptr)>;
-
-struct GlyphStoreParams {
-    const std::string url;
-    const std::string stack;
-    const std::set<GlyphRange> ranges;
-};
-
-class GlyphStoreThread : public GlyphStore::Observer {
+class GlyphStoreTest {
 public:
-    GlyphStoreThread(FileSource* fileSource, GlyphStoreTestCallback callback) : callback_(std::move(callback)) {
-        util::ThreadContext::setFileSource(fileSource);
-    }
+    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
+    util::RunLoop loop;
+    StubFileSource fileSource;
+    StubStyleObserver observer;
+    GlyphStore glyphStore;
 
-    void loadGlyphStore(const GlyphStoreParams& params) {
-        glyphStore_.reset(new GlyphStore());
+    void run(const std::string& url, const std::string& fontStack, const std::set<GlyphRange>& glyphRanges) {
+        // Squelch logging.
+        Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        glyphStore_->setObserver(this);
-        glyphStore_->setURL(params.url);
+        util::ThreadContext::Set(&context);
+        util::ThreadContext::setFileSource(&fileSource);
 
-        ASSERT_FALSE(glyphStore_->hasGlyphRanges(params.stack, params.ranges));
-    }
-
-    void unloadGlyphStore() {
-        glyphStore_->setObserver(nullptr);
-        glyphStore_.reset();
-    }
-
-    void onGlyphRangeLoaded() override {
-        callback_(glyphStore_.get(), nullptr);
-    }
-
-    void onGlyphRangeLoadingFailed(std::exception_ptr error) override {
-        callback_(glyphStore_.get(), error);
-    }
-
-private:
-    std::unique_ptr<GlyphStore> glyphStore_;
-    GlyphStoreTestCallback callback_;
-};
-
-class GlyphStoreTest : public testing::Test {
-protected:
-    void runTest(const GlyphStoreParams& params, FileSource* fileSource, GlyphStoreTestCallback callback) {
-        util::RunLoop loop;
-
-        async_ = std::make_unique<util::AsyncTask>([&]{ loop.stop(); });
-        async_->unref();
-
-        const util::ThreadContext context = {"Map", util::ThreadType::Map, util::ThreadPriority::Regular};
-
-        util::Thread<GlyphStoreThread> tester(context, fileSource, callback);
-        tester.invoke(&GlyphStoreThread::loadGlyphStore, params);
+        glyphStore.setObserver(&observer);
+        glyphStore.setURL(url);
+        glyphStore.hasGlyphRanges(fontStack, glyphRanges);
 
         loop.run();
-
-        tester.invoke(&GlyphStoreThread::unloadGlyphStore);
     }
 
-    void stopTest() {
-        testDone = true;
-        async_->send();
+    void end() {
+        loop.stop();
     }
-
-    bool isDone() const {
-        return testDone;
-    }
-
-private:
-    bool testDone = false;
-
-    std::unique_ptr<util::AsyncTask> async_;
 };
 
-TEST_F(GlyphStoreTest, LoadingSuccess) {
-    GlyphStoreParams params = {
-        "test/fixtures/resources/glyphs.pbf",
-        "Test Stack",
-        {{0, 255}, {256, 511}}
+TEST(GlyphStore, LoadingSuccess) {
+    GlyphStoreTest test;
+
+    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
+        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
     };
 
-    auto callback = [this, &params](GlyphStore* store, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    test.observer.glyphsError = [&] (const std::string&, const GlyphRange&, std::exception_ptr) {
+        FAIL();
+        test.end();
+    };
 
-        // We need to check if the test is over because checking
-        // if the GlyphStore has glyphs below will cause more requests
-        // to happen and we don't want this endless loop.
-        if (isDone()) {
+    test.observer.glyphsLoaded = [&] (const std::string&, const GlyphRange&) {
+        if (!test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}, {256, 511}}))
             return;
-        }
 
-        ASSERT_EQ(error, nullptr);
-
-        if (!store->hasGlyphRanges(params.stack, params.ranges)) {
-            return;
-        }
-
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", params.ranges));
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", {{512, 767}}));
-        ASSERT_FALSE(store->hasGlyphRanges("Test Stack",  {{512, 767}}));
-
-        auto fontStack = store->getFontStack(params.stack);
-        ASSERT_FALSE(fontStack->getMetrics().empty());
+        auto fontStack = test.glyphStore.getFontStack("Test Stack");
         ASSERT_FALSE(fontStack->getSDFs().empty());
 
-        stopTest();
+        test.end();
     };
 
-    MockFileSource fileSource(MockFileSource::Success, "");
-    runTest(params, &fileSource, callback);
-}
-
-TEST_F(GlyphStoreTest, LoadingFail) {
-    GlyphStoreParams params = {
+    test.run(
         "test/fixtures/resources/glyphs.pbf",
         "Test Stack",
-        {{0, 255}, {256, 511}}
-    };
-
-    auto callback = [this, &params](GlyphStore* store, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-        if (isDone()) {
-            return;
-        }
-
-        ASSERT_TRUE(error != nullptr);
-
-        auto fontStack = store->getFontStack(params.stack);
-        ASSERT_TRUE(fontStack->getMetrics().empty());
-        ASSERT_TRUE(fontStack->getSDFs().empty());
-
-        for (const auto& range : params.ranges) {
-            ASSERT_FALSE(store->hasGlyphRanges(params.stack, {range}));
-        }
-
-        ASSERT_FALSE(store->hasGlyphRanges(params.stack, params.ranges));
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", params.ranges));
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", {{512, 767}}));
-
-        stopTest();
-    };
-
-    MockFileSource fileSource(MockFileSource::RequestFail, "glyphs.pbf");
-    runTest(params, &fileSource, callback);
+        {{0, 255}, {256, 511}});
 }
 
-TEST_F(GlyphStoreTest, LoadingCorrupted) {
-    GlyphStoreParams params = {
+TEST(GlyphStore, LoadingFail) {
+    GlyphStoreTest test;
+
+    test.fileSource.glyphsResponse = [&] (const Resource&) {
+        Response response;
+        response.error = std::make_unique<Response::Error>(
+            Response::Error::Reason::Other,
+            "Failed by the test case");
+        return response;
+    };
+
+    test.observer.glyphsError = [&] (const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+        EXPECT_EQ(fontStack, "Test Stack");
+        EXPECT_EQ(glyphRange, GlyphRange(0, 255));
+
+        EXPECT_TRUE(error != nullptr);
+        EXPECT_EQ(util::toString(error), "Failed by the test case");
+
+        auto stack = test.glyphStore.getFontStack("Test Stack");
+        ASSERT_TRUE(stack->getSDFs().empty());
+        ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
+
+        test.end();
+    };
+
+    test.run(
         "test/fixtures/resources/glyphs.pbf",
         "Test Stack",
-        {{0, 255}, {256, 511}}
-    };
-
-    auto callback = [this, &params](GlyphStore* store, std::exception_ptr error) {
-        ASSERT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-        if (isDone()) {
-            return;
-        }
-
-        ASSERT_TRUE(error != nullptr);
-
-        auto fontStack = store->getFontStack(params.stack);
-        ASSERT_TRUE(fontStack->getMetrics().empty());
-        ASSERT_TRUE(fontStack->getSDFs().empty());
-
-        for (const auto& range : params.ranges) {
-            ASSERT_FALSE(store->hasGlyphRanges(params.stack, {range}));
-        }
-
-        ASSERT_FALSE(store->hasGlyphRanges(params.stack, params.ranges));
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", params.ranges));
-        ASSERT_FALSE(store->hasGlyphRanges("Foobar", {{512, 767}}));
-
-        stopTest();
-    };
-
-    MockFileSource fileSource(MockFileSource::RequestWithCorruptedData, "glyphs.pbf");
-    runTest(params, &fileSource, callback);
+        {{0, 255}});
 }
 
-TEST_F(GlyphStoreTest, LoadingCancel) {
-    GlyphStoreParams params = {
-        "test/fixtures/resources/glyphs.pbf",
-        "Test Stack",
-        {{0, 255}, {256, 511}}
+TEST(GlyphStore, LoadingCorrupted) {
+    GlyphStoreTest test;
+
+    test.fileSource.glyphsResponse = [&] (const Resource&) {
+        Response response;
+        response.data = std::make_unique<std::string>("CORRUPTED");
+        return response;
     };
 
-    auto callback = [this](GlyphStore*, std::exception_ptr) {
+    test.observer.glyphsError = [&] (const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+        EXPECT_EQ(fontStack, "Test Stack");
+        EXPECT_EQ(glyphRange, GlyphRange(0, 255));
+
+        EXPECT_TRUE(error != nullptr);
+        EXPECT_EQ(util::toString(error), "pbf unknown field type exception");
+
+        auto stack = test.glyphStore.getFontStack("Test Stack");
+        ASSERT_TRUE(stack->getSDFs().empty());
+        ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
+
+        test.end();
+    };
+
+    test.run(
+        "test/fixtures/resources/glyphs.pbf",
+        "Test Stack",
+        {{0, 255}});
+}
+
+TEST(GlyphStore, LoadingCancel) {
+    GlyphStoreTest test;
+
+    test.fileSource.glyphsResponse = [&] (const Resource&) {
+        test.end();
+        return optional<Response>();
+    };
+
+    test.observer.glyphsLoaded = [&] (const std::string&, const GlyphRange&) {
         FAIL() << "Should never be called";
     };
 
-    MockFileSource fileSource(MockFileSource::SuccessWithDelay, "glyphs.pbf");
-    fileSource.setOnRequestDelayedCallback([this]{
-        stopTest();
-    });
-    runTest(params, &fileSource, callback);
-}
-
-TEST_F(GlyphStoreTest, InvalidURL) {
-    GlyphStoreParams params = {
-        "foo bar",
+    test.run(
+        "test/fixtures/resources/glyphs.pbf",
         "Test Stack",
-        {{0, 255}, {256, 511}}
-    };
-
-    auto callback = [this, &params](GlyphStore* store, std::exception_ptr error) {
-        ASSERT_TRUE(error != nullptr);
-
-        auto fontStack = store->getFontStack(params.stack);
-        ASSERT_TRUE(fontStack->getMetrics().empty());
-        ASSERT_TRUE(fontStack->getSDFs().empty());
-
-        stopTest();
-    };
-
-    MockFileSource fileSource(MockFileSource::Success, "");
-    runTest(params, &fileSource, callback);
+        {{0, 255}});
 }

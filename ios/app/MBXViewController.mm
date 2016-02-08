@@ -1,11 +1,21 @@
 #import "MBXViewController.h"
+#import "MBXCustomCalloutView.h"
 
-#import <mbgl/ios/Mapbox.h>
-#import <mbgl/util/default_styles.hpp>
+#import <Mapbox/Mapbox.h>
+#import "../../include/mbgl/util/default_styles.hpp"
 
 #import <CoreLocation/CoreLocation.h>
+#import <OpenGLES/ES2/gl.h>
 
 static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
+static NSString * const kCustomCalloutTitle = @"Custom Callout";
+
+static const CLLocationCoordinate2D WorldTourDestinations[] = {
+    { 38.9131982, -77.0325453144239 },
+    { 37.7757368, -122.4135302 },
+    { 12.9810816, 77.6368034 },
+    { -13.15589555, -74.2178961777998 },
+};
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -17,6 +27,10 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 @end
 
 @implementation MBXViewController
+{
+    BOOL _isTouringWorld;
+    BOOL _isShowingCustomStyleLayer;
+}
 
 #pragma mark - Setup
 
@@ -92,7 +106,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
         [defaults setObject:archivedCamera forKey:@"MBXCamera"];
         [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
         [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
-        [defaults setBool:self.mapView.debugActive forKey:@"MBXDebug"];
+        [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
         [defaults synchronize];
     }
 }
@@ -115,7 +129,11 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             self.mapView.userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
         }
         self.mapView.showsUserLocation = [defaults boolForKey:@"MBXShowsUserLocation"];
-        self.mapView.debugActive = [defaults boolForKey:@"MBXDebug"];
+        NSInteger uncheckedDebugMask = [defaults integerForKey:@"MBXDebugMask"];
+        if (uncheckedDebugMask >= 0)
+        {
+            self.mapView.debugMask = (MGLMapDebugMaskOptions)uncheckedDebugMask;
+        }
     }
 }
 
@@ -128,19 +146,37 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
 - (void)showSettings
 {
+    MGLMapDebugMaskOptions debugMask = self.mapView.debugMask;
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Map Settings"
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:nil
-                                              otherButtonTitles:@"Reset North",
-                                                                @"Reset Position",
-                                                                @"Cycle debug options",
+                                              otherButtonTitles:@"Reset Position",
+                                                                ((debugMask & MGLMapDebugTileBoundariesMask)
+                                                                 ? @"Hide Tile Boundaries"
+                                                                 : @"Show Tile Boundaries"),
+                                                                ((debugMask & MGLMapDebugTileInfoMask)
+                                                                 ? @"Hide Tile Info"
+                                                                 : @"Show Tile Info"),
+                                                                ((debugMask & MGLMapDebugTimestampsMask)
+                                                                 ? @"Hide Tile Timestamps"
+                                                                 : @"Show Tile Timestamps"),
+                                                                ((debugMask & MGLMapDebugCollisionBoxesMask)
+                                                                 ? @"Hide Collision Boxes"
+                                                                 : @"Show Collision Boxes"),
                                                                 @"Empty Memory",
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
                                                                 @"Add 10,000 Points",
                                                                 @"Add Test Shapes",
+                                                                @"Start World Tour",
+                                                                @"Add Custom Callout Point",
                                                                 @"Remove Annotations",
+                                                                (_isShowingCustomStyleLayer
+                                                                 ? @"Hide Custom Style Layer"
+                                                                 : @"Show Custom Style Layer"),
+                                                                @"Print Telemetry Logfile",
+                                                                @"Delete Telemetry Logfile",
                                                                 @"Enable Interactivity",
                                                                 nil];
 
@@ -151,33 +187,41 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 {
     if (buttonIndex == actionSheet.firstOtherButtonIndex)
     {
-        [self.mapView resetNorth];
+        [self.mapView resetPosition];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
     {
-        [self.mapView resetPosition];
+        self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
-        [self.mapView cycleDebugOptions];
+        self.mapView.debugMask ^= MGLMapDebugTileInfoMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
     {
-        [self.mapView emptyMemoryCache];
+        self.mapView.debugMask ^= MGLMapDebugTimestampsMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
     {
-        [self parseFeaturesAddingCount:100];
+        self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        [self parseFeaturesAddingCount:1000];
+        [self.mapView emptyMemoryCache];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
     {
-        [self parseFeaturesAddingCount:10000];
+        [self parseFeaturesAddingCount:100];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
+    {
+        [self parseFeaturesAddingCount:1000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    {
+        [self parseFeaturesAddingCount:10000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
     {
         // PNW triangle
         //
@@ -244,11 +288,48 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             free(polygonCoordinates);
         }
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
+    {
+        [self startWorldTour:actionSheet];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
+    {
+        [self presentAnnotationWithCustomCallout];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    {
+        if (_isShowingCustomStyleLayer)
+        {
+            [self removeCustomStyleLayer];
+        }
+        else
+        {
+            [self insertCustomStyleLayer];
+        }
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
+    {
+        NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogfilePath] encoding:NSUTF8StringEncoding error:nil];
+        NSLog(@"%@", fileContents);
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
+    {
+        NSString *filePath = [self telemetryDebugLogfilePath];
+        if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath]) {
+            NSError *error;
+            BOOL success = [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+            if (success) {
+                NSLog(@"Deleted telemetry log.");
+            } else {
+                NSLog(@"Error deleting telemetry log: %@", error.localizedDescription);
+            }
+        }
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
     {
         if ([self.mapView.styleURL.scheme isEqualToString:@"mapbox"])
         {
@@ -263,7 +344,7 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             [self.interactiveShield addGestureRecognizer:pan];
 
             self.featuresView = [[UITextView alloc] initWithFrame:CGRectMake(20, self.topLayoutGuide.length + 20,
-                self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height / 4)];
+                                                                             self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height / 4)];
             self.featuresView.selectable = NO;
             self.featuresView.font = [UIFont systemFontOfSize:16];
             self.featuresView.backgroundColor = [UIColor whiteColor];
@@ -276,7 +357,6 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
             [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
         }
-
     }
 }
 
@@ -318,6 +398,79 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
             });
         }
     });
+}
+
+- (void)insertCustomStyleLayer
+{
+    _isShowingCustomStyleLayer = YES;
+
+    static const GLchar *vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
+    static const GLchar *fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
+    
+    __block GLuint program = 0;
+    __block GLuint vertexShader = 0;
+    __block GLuint fragmentShader = 0;
+    __block GLuint buffer = 0;
+    __block GLuint a_pos = 0;
+    [self.mapView insertCustomStyleLayerWithIdentifier:@"mbx-custom" preparationHandler:^{
+        program = glCreateProgram();
+        vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        
+        glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+        glCompileShader(vertexShader);
+        glAttachShader(program, vertexShader);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+        glCompileShader(fragmentShader);
+        glAttachShader(program, fragmentShader);
+        glLinkProgram(program);
+        a_pos = glGetAttribLocation(program, "a_pos");
+        
+        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
+        glGenBuffers(1, &buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW);
+    } drawingHandler:^(__unused CGSize size,
+                       __unused CLLocationCoordinate2D centerCoordinate,
+                       __unused double zoomLevel,
+                       __unused CLLocationDirection direction,
+                       __unused CGFloat pitch,
+                       __unused CGFloat perspectiveSkew) {
+        glUseProgram(program);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glEnableVertexAttribArray(a_pos);
+        glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    } completionHandler:^{
+        if (program) {
+            glDeleteBuffers(1, &buffer);
+            glDetachShader(program, vertexShader);
+            glDetachShader(program, fragmentShader);
+            glDeleteShader(vertexShader);
+            glDeleteShader(fragmentShader);
+            glDeleteProgram(program);
+        }
+    } belowStyleLayerWithIdentifier:@"housenum-label"];
+}
+
+- (void)removeCustomStyleLayer
+{
+    _isShowingCustomStyleLayer = NO;
+    [self.mapView removeCustomStyleLayerWithIdentifier:@"mbx-custom"];
+}
+
+- (void)presentAnnotationWithCustomCallout
+{
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    
+    MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+    annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
+    annotation.title = kCustomCalloutTitle;
+    
+    [self.mapView addAnnotation:annotation];
+    [self.mapView showAnnotations:@[annotation] animated:YES];
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longPress
@@ -441,6 +594,56 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     self.mapView.userTrackingMode = nextMode;
 }
 
+- (IBAction)startWorldTour:(__unused id)sender
+{
+    _isTouringWorld = YES;
+    
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
+    NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
+    for (NSUInteger i = 0; i < numberOfAnnotations; i++)
+    {
+        MGLPointAnnotation *annotation = [[MGLPointAnnotation alloc] init];
+        annotation.coordinate = WorldTourDestinations[i];
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+    [self continueWorldTourWithRemainingAnnotations:annotations];
+}
+
+- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+{
+    MGLPointAnnotation *nextAnnotation = annotations.firstObject;
+    if (!nextAnnotation || !_isTouringWorld)
+    {
+        _isTouringWorld = NO;
+        return;
+    }
+    
+    [annotations removeObjectAtIndex:0];
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
+                                                            fromDistance:10
+                                                                   pitch:arc4random_uniform(60)
+                                                                 heading:arc4random_uniform(360)];
+    __weak MBXViewController *weakSelf = self;
+    [self.mapView flyToCamera:camera completionHandler:^{
+        MBXViewController *strongSelf = weakSelf;
+        [strongSelf performSelector:@selector(continueWorldTourWithRemainingAnnotations:)
+                         withObject:annotations
+                         afterDelay:2];
+    }];
+}
+
+- (NSString *)telemetryDebugLogfilePath
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
+    [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
+    NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", [dateFormatter stringFromDate:[NSDate date]]]];
+
+    return filePath;
+}
+
 #pragma mark - Destruction
 
 - (void)dealloc
@@ -454,9 +657,14 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-    if ([annotation.title isEqualToString:@"Dropped Marker"]) return nil; // use default marker
+    if ([annotation.title isEqualToString:@"Dropped Marker"]
+        || [annotation.title isEqualToString:kCustomCalloutTitle])
+    {
+        return nil; // use default marker
+    }
 
     NSString *title = [(MGLPointAnnotation *)annotation title];
+    if (!title.length) return nil;
     NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
 
     UIColor *color;
@@ -552,6 +760,18 @@ static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:
     [UIView animateWithDuration:0.25 animations:^{
         self.navigationItem.rightBarButtonItem.image = newButtonImage;
     }];
+}
+
+- (UIView<MGLCalloutView> *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
+{
+    if ([annotation respondsToSelector:@selector(title)]
+        && [annotation.title isEqualToString:kCustomCalloutTitle])
+    {
+        MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
+        calloutView.representedObject = annotation;
+        return calloutView;
+    }
+    return nil;
 }
 
 @end

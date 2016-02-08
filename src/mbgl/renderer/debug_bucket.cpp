@@ -1,7 +1,6 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/util/time.hpp>
 
 #include <mbgl/platform/gl.hpp>
 
@@ -10,7 +9,7 @@
 
 using namespace mbgl;
 
-DebugBucket::DebugBucket(const TileID id, const TileData::State state_, Seconds modified_, Seconds expires_, MapDebugOptions debugMode_)
+DebugBucket::DebugBucket(const TileID id, const TileData::State state_, optional<SystemTimePoint> modified_, optional<SystemTimePoint> expires_, MapDebugOptions debugMode_)
     : state(state_),
       modified(modified_),
       expires(expires_),
@@ -22,11 +21,11 @@ DebugBucket::DebugBucket(const TileID id, const TileData::State state_, Seconds 
         baseline += 200;
     }
 
-    if (debugMode & MapDebugOptions::Timestamps && modified > Seconds::zero() && expires > Seconds::zero()) {
-        const std::string modifiedText = "modified: " + util::iso8601(modified.count());
+    if (debugMode & MapDebugOptions::Timestamps && modified && expires) {
+        const std::string modifiedText = "modified: " + util::iso8601(*modified);
         fontBuffer.addText(modifiedText.c_str(), 50, baseline, 5);
 
-        const std::string expiresText = "expires: " + util::iso8601(expires.count());
+        const std::string expiresText = "expires: " + util::iso8601(*expires);
         fontBuffer.addText(expiresText.c_str(), 50, baseline + 200, 5);
     }
 }

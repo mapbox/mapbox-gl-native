@@ -28,7 +28,7 @@ public:
     static NAN_METHOD(Release);
     static NAN_METHOD(DumpDebugLogs);
 
-    void startRender(std::unique_ptr<NodeMap::RenderOptions> options);
+    void startRender(RenderOptions options);
     void renderFinished();
 
     void release();
@@ -36,7 +36,7 @@ public:
     inline bool isLoaded() { return loaded; }
     inline bool isValid() { return valid; }
 
-    static std::unique_ptr<NodeMap::RenderOptions> ParseOptions(v8::Local<v8::Object>);
+    static RenderOptions ParseOptions(v8::Local<v8::Object>);
     static Nan::Persistent<v8::Function> constructor;
 
     NodeMap(v8::Local<v8::Object>);

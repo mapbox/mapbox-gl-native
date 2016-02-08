@@ -18,7 +18,7 @@
 			<key>Key</key>
 			<string>MGLMapboxMetricsEnabled</string>
 			<key>Title</key>
-			<string>Mapbox Metrics</string>
+			<string>Mapbox Telemetry</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>TrueValue</key>

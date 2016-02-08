@@ -21,6 +21,12 @@ public:
         virtual bool onRecord(EventSeverity severity, Event event, int64_t code, const std::string &msg) = 0;
     };
 
+    class NullObserver : public Observer {
+        bool onRecord(EventSeverity, Event, int64_t, const std::string&) override {
+            return true;
+        }
+    };
+
     static void setObserver(std::unique_ptr<Observer> Observer);
     static std::unique_ptr<Observer> removeObserver();
 

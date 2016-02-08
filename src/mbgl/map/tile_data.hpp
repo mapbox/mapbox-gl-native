@@ -3,6 +3,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
@@ -77,8 +78,9 @@ public:
 
     virtual Bucket* getBucket(const StyleLayer&) = 0;
 
-    virtual bool parsePending(std::function<void ()>) { return true; }
-    virtual void redoPlacement(PlacementConfig) {}
+    virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
+    virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}
+    virtual void redoPlacement(const std::function<void()>&) {}
 
     bool isReady() const {
         return isReadyState(state);
@@ -88,15 +90,11 @@ public:
         return state;
     }
 
-    std::string getError() const {
-        return error;
-    }
-
     void dumpDebugLogs() const;
 
     const TileID id;
-    Seconds modified = Seconds::zero();
-    Seconds expires = Seconds::zero();
+    optional<SystemTimePoint> modified;
+    optional<SystemTimePoint> expires;
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
@@ -105,7 +103,6 @@ public:
 
 protected:
     std::atomic<State> state;
-    std::string error;
 };
 
 } // namespace mbgl

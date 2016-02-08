@@ -60,12 +60,12 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     }
 
     if (pattern) {
-        mapbox::util::optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        mapbox::util::optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
 
         // Image fill.
         if (pass == RenderPass::Translucent && posA && posB) {
-            float factor = 8.0 / std::pow(2, state.getIntegerZoom() - id.z) / id.overscaling;
+            float factor = (util::EXTENT / util::tileSize / std::pow(2, state.getIntegerZoom() - id.z)) / id.overscaling;
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);
@@ -89,6 +89,26 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             patternShader->u_mix = properties.pattern.value.t;
             patternShader->u_patternmatrix_a = patternMatrixA;
             patternShader->u_patternmatrix_b = patternMatrixB;
+
+            std::array<int, 2> imageSizeScaledA = {{
+                (int)((*posA).size[0] * properties.pattern.value.fromScale),
+                (int)((*posA).size[1] * properties.pattern.value.fromScale)
+            }};
+            std::array<int, 2> imageSizeScaledB = {{
+                (int)((*posB).size[0] * properties.pattern.value.toScale),
+                (int)((*posB).size[1] * properties.pattern.value.toScale)
+            }};
+
+            int tileSize = 512;
+
+            float offsetAx = ((tileSize % imageSizeScaledA[0]) * id.x) / (float)imageSizeScaledA[0];
+            float offsetAy = ((tileSize % imageSizeScaledA[1]) * id.y) / (float)imageSizeScaledA[1];
+
+            float offsetBx = ((tileSize % imageSizeScaledB[0]) * id.x) / (float)imageSizeScaledB[0];
+            float offsetBy = ((tileSize % imageSizeScaledB[1]) * id.y) / (float)imageSizeScaledB[1];
+
+            patternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
+            patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
             MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
             spriteAtlas->bind(true);

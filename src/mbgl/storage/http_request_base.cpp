@@ -5,15 +5,19 @@
 
 namespace mbgl {
 
-Seconds HTTPRequestBase::parseCacheControl(const char *value) {
-    if (value) {
-        const auto cacheControl = http::CacheControl::parse(value);
-        if (cacheControl.maxAge) {
-            return toSeconds(SystemClock::now()) + Seconds(*cacheControl.maxAge);
-        }
+optional<SystemTimePoint> HTTPRequestBase::parseCacheControl(const char *value) {
+    if (!value) {
+        return {};
     }
 
-    return Seconds::zero();
+    const auto cacheControl = http::CacheControl::parse(value);
+    if (!cacheControl.maxAge) {
+        return {};
+    }
+
+    // Round trip through time_t to truncate fractional seconds.
+    return SystemClock::from_time_t(SystemClock::to_time_t(
+        SystemClock::now() + std::chrono::seconds(*cacheControl.maxAge)));
 }
 
 } // namespace mbgl

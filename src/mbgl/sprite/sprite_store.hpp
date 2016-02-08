@@ -18,8 +18,8 @@ public:
     public:
         virtual ~Observer() = default;
 
-        virtual void onSpriteLoaded() = 0;
-        virtual void onSpriteLoadingFailed(std::exception_ptr) = 0;
+        virtual void onSpriteLoaded() {};
+        virtual void onSpriteError(std::exception_ptr) {};
     };
 
     SpriteStore(float pixelRatio);
@@ -54,16 +54,15 @@ public:
 
 private:
     void _setSprite(const std::string&, const std::shared_ptr<const SpriteImage>& = nullptr);
-
     void emitSpriteLoadedIfComplete();
-    void emitSpriteLoadingFailed(const std::string& message);
 
     struct Loader;
     std::unique_ptr<Loader> loader;
 
     bool loaded = false;
 
-    Observer* observer = nullptr;
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 
     // Lock for sprites and dirty maps.
     std::mutex mutex;

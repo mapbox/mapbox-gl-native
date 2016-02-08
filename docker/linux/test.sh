@@ -20,7 +20,7 @@ cd build
 source ./scripts/travis_helper.sh
 
 # install
-./scripts/${FLAVOR}/install.sh
+./platform/${FLAVOR}/scripts/install.sh
 
 # script
-./scripts/${FLAVOR}/run.sh
+./platform/${FLAVOR}/scripts/run.sh

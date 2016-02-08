@@ -12,7 +12,6 @@
         'mbgl.gyp:platform-<(platform_lib)',
         'mbgl.gyp:http-<(http_lib)',
         'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:cache-<(cache_lib)',
         'mbgl.gyp:copy_certificate_bundle',
       ],
 
@@ -29,7 +28,6 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(glfw_cflags)',
-          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',
@@ -48,7 +46,7 @@
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
             'SDKROOT': 'macosx',
-            'MACOSX_DEPLOYMENT_TARGET': '10.9',
+            'MACOSX_DEPLOYMENT_TARGET': '10.10',
           }
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],

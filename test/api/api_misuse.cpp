@@ -4,7 +4,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/exception.hpp>
 
 #include <future>
@@ -18,7 +18,7 @@ TEST(API, RenderWithoutCallback) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    DefaultFileSource fileSource(nullptr);
+    OnlineFileSource fileSource(nullptr);
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
     map->renderStill(nullptr);
@@ -40,7 +40,7 @@ TEST(API, RenderWithoutStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    DefaultFileSource fileSource(nullptr);
+    OnlineFileSource fileSource(nullptr);
 
     Map map(view, fileSource, MapMode::Still);
 

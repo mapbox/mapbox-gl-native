@@ -224,8 +224,6 @@ test('Map', function(t) {
                 map.release();
 
                 t.ok(err, 'returns error');
-                t.ok(err.message.match(/Failed to load/), 'error text matches');
-
                 t.end();
             });
         });

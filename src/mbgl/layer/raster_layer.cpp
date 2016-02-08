@@ -7,7 +7,7 @@ std::unique_ptr<StyleLayer> RasterLayer::clone() const {
     return std::make_unique<RasterLayer>(*this);
 }
 
-void RasterLayer::parsePaints(const JSVal& layer) {
+void RasterLayer::parsePaints(const JSValue& layer) {
     paint.opacity.parse("raster-opacity", layer);
     paint.hueRotate.parse("raster-hue-rotate", layer);
     paint.brightnessMin.parse("raster-brightness-min", layer);

@@ -7,7 +7,7 @@
       'hard_dependency': 1,
 
       'sources': [
-        '../platform/android/http_request_android.cpp',
+        '../platform/android/src/http_request_android.cpp',
       ],
 
       'include_dirs': [

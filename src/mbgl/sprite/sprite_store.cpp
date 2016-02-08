@@ -9,7 +9,6 @@
 
 #include <cassert>
 #include <string>
-#include <sstream>
 
 namespace mbgl {
 
@@ -33,50 +32,43 @@ void SpriteStore::setURL(const std::string& url) {
         return;
     }
 
-    std::string spriteURL(url + (pixelRatio > 1 ? "@2x" : "") + ".png");
-    std::string jsonURL(url + (pixelRatio > 1 ? "@2x" : "") + ".json");
-
     loader = std::make_unique<Loader>();
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL },
-                                      [this, jsonURL](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        loader->jsonRequest = nullptr;
-
+    loader->jsonRequest = fs->request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
-            std::stringstream message;
-            message << "Failed to load [" << jsonURL << "]: " << res.error->message;
-            emitSpriteLoadingFailed(message.str());
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;
-        } else {
-            loader->json = res.data;
         }
-        emitSpriteLoadedIfComplete();
+
+        if (res.notModified) {
+            // We got the same data back as last time. Abort early.
+            return;
+        }
+
+        if (!loader->json || *loader->json != *res.data) {
+            // Only trigger a sprite loaded event we got new data.
+            loader->json = res.data;
+            emitSpriteLoadedIfComplete();
+        }
     });
 
-    loader->spriteRequest =
-        fs->request({ Resource::Kind::SpriteImage, spriteURL },
-                    [this, spriteURL](Response res) {
-            if (res.stale) {
-                // Only handle fresh responses.
-                return;
-            }
-            loader->spriteRequest = nullptr;
+    loader->spriteRequest = fs->request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+        if (res.error) {
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            return;
+        }
 
-            if (res.error) {
-                std::stringstream message;
-                message << "Failed to load [" << spriteURL << "]: " << res.error->message;
-                emitSpriteLoadingFailed(message.str());
-                return;
-            } else {
-                loader->image = res.data;
-            }
+        if (res.notModified) {
+            // We got the same data back as last time. Abort early.
+            return;
+        }
+
+        if (!loader->image || *loader->image != *res.data) {
+            loader->image = res.data;
             emitSpriteLoadedIfComplete();
-        });
+        }
+    });
 }
 
 void SpriteStore::emitSpriteLoadedIfComplete() {
@@ -86,26 +78,14 @@ void SpriteStore::emitSpriteLoadedIfComplete() {
         return;
     }
 
-    auto local = std::move(loader);
-    auto result = parseSprite(*local->image, *local->json);
+    auto result = parseSprite(*loader->image, *loader->json);
     if (result.is<Sprites>()) {
         loaded = true;
         setSprites(result.get<Sprites>());
-        if (observer) {
-            observer->onSpriteLoaded();
-        }
+        observer->onSpriteLoaded();
     } else {
-        emitSpriteLoadingFailed(result.get<std::string>());
+        observer->onSpriteError(result.get<std::exception_ptr>());
     }
-}
-
-void SpriteStore::emitSpriteLoadingFailed(const std::string& message) {
-    if (!observer) {
-        return;
-    }
-
-    auto error = std::make_exception_ptr(util::SpriteLoadingException(message));
-    observer->onSpriteLoadingFailed(error);
 }
 
 void SpriteStore::setObserver(Observer* observer_) {
@@ -127,7 +107,7 @@ void SpriteStore::_setSprite(const std::string& name,
         auto it = sprites.find(name);
         if (it != sprites.end()) {
             // There is already a sprite with that name in our store.
-            if ((it->second->width != sprite->width || it->second->height != sprite->height)) {
+            if ((it->second->image.width != sprite->image.width || it->second->image.height != sprite->image.height)) {
                 Log::Warning(Event::Sprite, "Can't change sprite dimensions for '%s'", name.c_str());
                 return;
             }

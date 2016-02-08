@@ -2,6 +2,7 @@
 #define MBGL_MAP_VECTOR_TILE
 
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/pbf.hpp>
 
 #include <map>
@@ -16,9 +17,10 @@ public:
     VectorTileFeature(pbf, const VectorTileLayer&);
 
     FeatureType getType() const override { return type; }
-    mapbox::util::optional<Value> getValue(const std::string&) const override;
+    optional<Value> getValue(const std::string&) const override;
     std::unordered_map<std::string, std::string> getValues() const override;
     GeometryCollection getGeometries() const override;
+    uint32_t getExtent() const override;
 
 private:
     const VectorTileLayer& layer;
@@ -58,18 +60,18 @@ private:
     mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
-class SourceInfo;
 class TileID;
 
 class VectorTileMonitor : public GeometryTileMonitor {
 public:
-    VectorTileMonitor(const SourceInfo&, const TileID&, float pixelRatio);
+    VectorTileMonitor(const TileID&, float pixelRatio, const std::string& urlTemplate);
 
     std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
 private:
-    std::string url;
-    std::shared_ptr<const std::string> data;
+    TileID tileID;
+    float pixelRatio;
+    std::string urlTemplate;
 };
 
 } // namespace mbgl

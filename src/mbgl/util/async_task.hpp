@@ -15,7 +15,6 @@ public:
     ~AsyncTask();
 
     void send();
-    void unref();
 
 private:
     class Impl;

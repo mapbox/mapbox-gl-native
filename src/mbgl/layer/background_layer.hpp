@@ -17,8 +17,8 @@ class BackgroundLayer : public StyleLayer {
 public:
     std::unique_ptr<StyleLayer> clone() const override;
 
-    void parseLayout(const JSVal&) override {};
-    void parsePaints(const JSVal&) override;
+    void parseLayout(const JSValue&) override {};
+    void parsePaints(const JSValue&) override;
 
     void cascade(const StyleCascadeParameters&) override;
     bool recalculate(const StyleCalculationParameters&) override;

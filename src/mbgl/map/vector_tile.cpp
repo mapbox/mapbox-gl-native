@@ -4,8 +4,8 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/thread_context.hpp>
+#include <mbgl/util/url.hpp>
 
-#include <sstream>
 #include <utility>
 
 namespace mbgl {
@@ -54,10 +54,10 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
     }
 }
 
-mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key) const {
+optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     auto keyIter = layer.keys.find(key);
     if (keyIter == layer.keys.end()) {
-        return mapbox::util::optional<Value>();
+        return optional<Value>();
     }
 
     pbf tags = tags_pbf;
@@ -82,7 +82,7 @@ mapbox::util::optional<Value> VectorTileFeature::getValue(const std::string& key
         }
     }
 
-    return mapbox::util::optional<Value>();
+    return optional<Value>();
 }
 
 std::unordered_map<std::string, std::string> VectorTileFeature::getValues() const {
@@ -92,7 +92,7 @@ std::unordered_map<std::string, std::string> VectorTileFeature::getValues() cons
         const auto& key = keyIter.first;
         const auto maybeVal = getValue(key);
         if (maybeVal) {
-            const auto& val = mbgl::toString(maybeVal.get());
+            const auto& val = mbgl::toString(*maybeVal);
             values.emplace(key, val);
         }
     }
@@ -145,6 +145,10 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return lines;
 }
 
+uint32_t VectorTileFeature::getExtent() const {
+    return layer.extent;
+}
+
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }
@@ -193,13 +197,16 @@ util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) 
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
 }
 
-VectorTileMonitor::VectorTileMonitor(const SourceInfo& source, const TileID& id, float pixelRatio)
-    : url(source.tileURL(id, pixelRatio)) {
+VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, const std::string& urlTemplate_)
+    : tileID(tileID_),
+      pixelRatio(pixelRatio_),
+      urlTemplate(urlTemplate_) {
 }
 
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
-    return util::ThreadContext::getFileSource()->request({ Resource::Kind::Tile, url }, [callback, this](Response res) {
-        if (res.data && data == res.data) {
+    const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.x, tileID.y, tileID.sourceZ);
+    return util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
+        if (res.notModified) {
             // We got the same data again. Abort early.
             return;
         }
@@ -209,15 +216,12 @@ std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMo
                 callback(nullptr, nullptr, res.modified, res.expires);
                 return;
             } else {
-                std::stringstream message;
-                message << "Failed to load [" << url << "]: " << res.error->message;
-                callback(std::make_exception_ptr(std::runtime_error(message.str())), nullptr, res.modified, res.expires);
+                callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
                 return;
             }
         }
 
-        data = res.data;
-        callback(nullptr, std::make_unique<VectorTile>(data), res.modified, res.expires);
+        callback(nullptr, std::make_unique<VectorTile>(res.data), res.modified, res.expires);
     });
 }
 

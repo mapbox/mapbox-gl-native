@@ -2,6 +2,7 @@
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/util/get_geometries.hpp>
 
 namespace mbgl {
 
@@ -9,14 +10,14 @@ std::unique_ptr<StyleLayer> LineLayer::clone() const {
     return std::make_unique<LineLayer>(*this);
 }
 
-void LineLayer::parseLayout(const JSVal& value) {
+void LineLayer::parseLayout(const JSValue& value) {
     layout.cap.parse("line-cap", value);
     layout.join.parse("line-join", value);
     layout.miterLimit.parse("line-miter-limit", value);
     layout.roundLimit.parse("line-round-limit", value);
 }
 
-void LineLayer::parsePaints(const JSVal& layer) {
+void LineLayer::parsePaints(const JSValue& layer) {
     paint.opacity.parse("line-opacity", layer);
     paint.color.parse("line-color", layer);
     paint.translate.parse("line-translate", layer);
@@ -79,7 +80,7 @@ std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameter
     bucket->layout.roundLimit.calculate(p);
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
-        bucket->addGeometry(feature.getGeometries());
+        bucket->addGeometry(getGeometries(feature));
     });
 
     return std::move(bucket);

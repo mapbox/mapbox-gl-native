@@ -1,6 +1,7 @@
 #include <mbgl/layer/fill_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/util/get_geometries.hpp>
 
 namespace mbgl {
 
@@ -8,7 +9,7 @@ std::unique_ptr<StyleLayer> FillLayer::clone() const {
     return std::make_unique<FillLayer>(*this);
 }
 
-void FillLayer::parsePaints(const JSVal& layer) {
+void FillLayer::parsePaints(const JSValue& layer) {
     paint.antialias.parse("fill-antialias", layer);
     paint.opacity.parse("fill-opacity", layer);
     paint.color.parse("fill-color", layer);
@@ -58,7 +59,7 @@ std::unique_ptr<Bucket> FillLayer::createBucket(StyleBucketParameters& parameter
     auto bucket = std::make_unique<FillBucket>();
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
-        bucket->addGeometry(feature.getGeometries());
+        bucket->addGeometry(getGeometries(feature));
     });
 
     return std::move(bucket);

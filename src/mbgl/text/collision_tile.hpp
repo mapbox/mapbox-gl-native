@@ -37,7 +37,7 @@ class CollisionTile {
 public:
     explicit CollisionTile(PlacementConfig);
 
-    float placeFeature(const CollisionFeature& feature);
+    float placeFeature(const CollisionFeature& feature, const bool allowOverlap, const bool avoidEdges);
     void insertFeature(CollisionFeature& feature, const float minPlacementScale);
 
     const PlacementConfig config;
@@ -47,10 +47,15 @@ public:
     float yStretch;
 
 private:
+    float findPlacementScale(float minPlacementScale,
+            const vec2<float>& anchor, const CollisionBox& box,
+            const vec2<float>& blockingAnchor, const CollisionBox& blocking);
     Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box);
 
     CollisionTree tree;
     std::array<float, 4> rotationMatrix;
+    std::array<float, 4> reverseRotationMatrix;
+    std::array<CollisionBox, 4> edges;
 };
 
 } // namespace mbgl

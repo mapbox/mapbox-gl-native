@@ -25,8 +25,4 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
                                                       featureProperties));
 }
 
-LatLngBounds PointAnnotationImpl::bounds() const {
-    return LatLngBounds(point.position, point.position);
-}
-
 } // namespace mbgl

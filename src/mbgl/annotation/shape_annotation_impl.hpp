@@ -22,7 +22,6 @@ public:
 
     ShapeAnnotationImpl(const AnnotationID, const ShapeAnnotation&, const uint8_t maxZoom);
 
-    LatLngBounds bounds() const;
     void updateStyle(Style&);
     void updateTile(const TileID&, AnnotationTile&);
 

@@ -13,14 +13,17 @@ class PlainShader;
 
 class DebugBucket : private util::noncopyable {
 public:
-    DebugBucket(TileID id, TileData::State, Seconds modified, Seconds expires, MapDebugOptions);
+    DebugBucket(TileID id, TileData::State,
+                optional<SystemTimePoint> modified,
+                optional<SystemTimePoint> expires,
+                MapDebugOptions);
 
     void drawLines(PlainShader& shader);
     void drawPoints(PlainShader& shader);
 
     const TileData::State state;
-    const Seconds modified;
-    const Seconds expires;
+    const optional<SystemTimePoint> modified;
+    const optional<SystemTimePoint> expires;
     const MapDebugOptions debugMode;
 
 private:

@@ -12,8 +12,6 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
 
-#include <sstream>
-
 namespace {
 
 void parseGlyphPBF(mbgl::FontStack& stack, const std::string& data) {
@@ -65,77 +63,33 @@ namespace mbgl {
 
 GlyphPBF::GlyphPBF(GlyphStore* store,
                    const std::string& fontStack,
-                   const GlyphRange& glyphRange)
-    : parsed(false) {
-    // Load the glyph set URL
-    std::string url = util::replaceTokens(store->getURL(), [&](const std::string &name) -> std::string {
-        if (name == "fontstack") return util::percentEncode(fontStack);
-        if (name == "range") return util::toString(glyphRange.first) + "-" + util::toString(glyphRange.second);
-        return "";
-    });
-
-    auto requestCallback = [this, store, fontStack, url](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
+                   const GlyphRange& glyphRange,
+                   GlyphStore::Observer* observer_)
+    : parsed(false),
+      observer(observer_) {
+    FileSource* fs = util::ThreadContext::getFileSource();
+    req = fs->request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
+        if (res.error) {
+            observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;
         }
-        req = nullptr;
 
-        if (res.error) {
-            std::stringstream message;
-            message <<  "Failed to load [" << url << "]: " << res.error->message;
-            emitGlyphPBFLoadingFailed(message.str());
-        } else {
-            data = res.data;
-            parse(store, fontStack, url);
+        if (res.notModified) {
+            return;
         }
-    };
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request({ Resource::Kind::Glyphs, url }, requestCallback);
+        try {
+            parseGlyphPBF(**store->getFontStack(fontStack), *res.data);
+        } catch (...) {
+            observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
+            return;
+        }
+
+        parsed = true;
+        observer->onGlyphsLoaded(fontStack, glyphRange);
+    });
 }
 
 GlyphPBF::~GlyphPBF() = default;
-
-void GlyphPBF::parse(GlyphStore* store, const std::string& fontStack, const std::string& url) {
-    assert(data);
-    if (data->empty()) {
-        // If there is no data, this means we either haven't
-        // received any data.
-        return;
-    }
-
-    try {
-        parseGlyphPBF(**store->getFontStack(fontStack), *data);
-    } catch (const std::exception& ex) {
-        std::stringstream message;
-        message <<  "Failed to parse [" << url << "]: " << ex.what();
-        emitGlyphPBFLoadingFailed(message.str());
-        return;
-    }
-
-    parsed = true;
-
-    emitGlyphPBFLoaded();
-}
-
-void GlyphPBF::setObserver(Observer* observer_) {
-    observer = observer_;
-}
-
-void GlyphPBF::emitGlyphPBFLoaded() {
-    if (observer) {
-        observer->onGlyphPBFLoaded();
-    }
-}
-
-void GlyphPBF::emitGlyphPBFLoadingFailed(const std::string& message) {
-    if (!observer) {
-        return;
-    }
-
-    auto error = std::make_exception_ptr(util::GlyphRangeLoadingException(message));
-    observer->onGlyphPBFLoadingFailed(error);
-}
 
 } // namespace mbgl

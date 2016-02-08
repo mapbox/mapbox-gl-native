@@ -15,7 +15,7 @@ function abort { >&2 echo -e "\033[1m\033[31m$1\033[0m"; exit 1; }
 function info { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 function warn { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 
-if [ -d "`pwd`/.git" ]; then
+if [ -e "`pwd`/.git" ]; then
     info "This build is within a git repository"
     export MASON_DIR="`pwd`/.mason"
     export PATH="${MASON_DIR}:${PATH}"
@@ -32,7 +32,7 @@ function print_flags {
     if [ "$(type -t print_${NAME}_flags)" = 'function' ]; then
         print_${NAME}_flags
     else
-        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]" "[:upper:]"`
+        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]-" "[:upper:]_"`
         if [ ! -z ${!VERSION:-} ] ; then
             mason install ${NAME} ${!VERSION}
             for FLAGS in "$@" ; do
@@ -54,9 +54,9 @@ function print_opengl_flags {
 }
 
 # Load dependencies
-source scripts/${MASON_PLATFORM}/configure.sh
-if [ -e scripts/${MASON_PLATFORM}/${MASON_PLATFORM_VERSION}/configure.sh ]; then
-    source scripts/${MASON_PLATFORM}/${MASON_PLATFORM_VERSION}/configure.sh
+source platform/${MASON_PLATFORM}/scripts/configure.sh
+if [ -e platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh ]; then
+    source platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh
 fi
 
 PYTHON=`which python || abort 'Cannot find python'`
@@ -94,7 +94,7 @@ print_flags openssl static_libs cflags ldflags
 print_flags libcurl static_libs cflags ldflags
 print_flags glfw static_libs cflags ldflags
 print_flags libpng static_libs cflags ldflags
-print_flags jpeg static_libs cflags ldflags
+print_flags libjpeg-turbo static_libs cflags ldflags
 print_flags sqlite static_libs cflags ldflags
 print_flags libuv static_libs cflags ldflags
 print_flags zlib static_libs cflags ldflags
@@ -105,6 +105,7 @@ print_flags variant static_libs cflags ldflags
 print_flags rapidjson static_libs cflags ldflags
 print_flags gtest static_libs cflags ldflags
 print_flags pixelmatch static_libs cflags ldflags
+print_flags webp static_libs cflags ldflags
 
 CONFIG+="  }
 }

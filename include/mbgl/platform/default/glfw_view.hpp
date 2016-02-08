@@ -50,6 +50,8 @@ private:
     static std::shared_ptr<const mbgl::SpriteImage>
     makeSpriteImage(int width, int height, float pixelRatio);
 
+    void nextOrientation();
+
     void addRandomPointAnnotations(int count);
     void addRandomShapeAnnotations(int count);
     void addRandomCustomPointAnnotations(int count);

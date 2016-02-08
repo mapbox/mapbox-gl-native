@@ -3,7 +3,7 @@
 
 #import "KIFTestActor+MapboxGL.h"
 
-#import "Mapbox.h"
+#import <Mapbox/Mapbox.h>
 #import "MGLTViewController.h"
 
 #import <CoreLocation/CoreLocation.h>
@@ -74,32 +74,6 @@
     XCTAssertEqualObjects([NSValue valueWithCGAffineTransform:tester.compass.transform],
                           [NSValue valueWithCGAffineTransform:CGAffineTransformMakeRotation(M_PI * 0.5)],
                           @"compass rotation should indicate map rotation");
-}
-
-- (void)testCompassTap {
-    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
-        [tester.mapView setDirection:180 animated:YES];
-    }];
-
-    XCTAssertEqual(tester.mapView.direction,
-                   180,
-                   @"setting direction should take effect");
-
-    [self waitForNotificationThatRegionDidChangeAnimatedWhileExecutingBlock:^{
-        [tester.compass tap];
-    }];
-
-    XCTAssertEqual(tester.mapView.direction,
-                   0,
-                   @"tapping compass should reset map direction");
-    
-    [tester waitForAnimationsToFinish];
-    XCTAssertEqual(tester.compass.alpha,
-                   0,
-                   @"compass should not be visible when map is unrotated");
-
-    XCTAssert(CGAffineTransformEqualToTransform(tester.compass.transform, CGAffineTransformIdentity),
-              @"compass rotation should indicate map rotation");
 }
 
 - (void)testDirectionReset {
@@ -317,30 +291,6 @@
                                @"disabling rotation show disallow rotation gestures");
 }
 
-- (void)testCenterSet {
-    CLLocationCoordinate2D newCenterCoordinate = CLLocationCoordinate2DMake(45.23237263, -122.23287129);
-
-    XCTAssertNotEqual(tester.mapView.centerCoordinate.latitude,
-                      newCenterCoordinate.latitude,
-                      @"initial setup should have differing center latitude");
-
-    XCTAssertNotEqual(tester.mapView.centerCoordinate.longitude,
-                      newCenterCoordinate.longitude,
-                      @"initial setup should have differing center longitude");
-
-    tester.mapView.centerCoordinate = newCenterCoordinate;
-
-    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.latitude,
-                   newCenterCoordinate.latitude,
-                   0.001,
-                   @"setting center should change latitude");
-
-    XCTAssertEqualWithAccuracy(tester.mapView.centerCoordinate.longitude,
-                   newCenterCoordinate.longitude,
-                   0.001,
-                   @"setting center should change longitude");
-}
-
 - (void)testZoomSet {
     double newZoom = 11.65;
 
@@ -532,60 +482,6 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"regionWillChangeAnimated"
                                                         object:mapView
                                                       userInfo:@{ @"animated" : @(animated) }];
-}
-
-- (void)testDelegateRegionDidChange {
-    __block NSUInteger unanimatedCount;
-    __block NSUInteger animatedCount;
-    [[NSNotificationCenter defaultCenter] addObserverForName:@"regionDidChangeAnimated"
-                                                      object:tester.mapView
-                                                       queue:nil
-                                                  usingBlock:^(NSNotification *note) {
-                                                      if ([note.userInfo[@"animated"] boolValue]) {
-                                                          animatedCount++;
-                                                      } else {
-                                                          unanimatedCount++;
-                                                      }
-                                                  }];
-
-    [tester waitForTimeInterval:1];
-
-    unanimatedCount = 0;
-    animatedCount = 0;
-
-    NSNotification *notification = [system waitForNotificationName:@"regionDidChangeAnimated"
-                                                            object:tester.mapView
-                                               whileExecutingBlock:^{
-                                                   tester.mapView.centerCoordinate = CLLocationCoordinate2DMake(0, 0);
-                                               }];
-
-    [tester waitForTimeInterval:1];
-
-    XCTAssertEqual([notification.userInfo[@"animated"] boolValue],
-                   NO,
-                   @"regionDidChange delegate should not indicate animated change");
-    XCTAssertEqual(unanimatedCount,
-                   1,
-                   @"regionDidChange delegate should indicate one unanimated change");
-
-    notification = [system waitForNotificationName:@"regionDidChangeAnimated"
-                                            object:tester.mapView
-                               whileExecutingBlock:^{
-                                   [tester.mapView setCenterCoordinate:CLLocationCoordinate2DMake(45, 100) animated:YES];
-                               }];
-
-    [tester waitForTimeInterval:1];
-
-    XCTAssertEqual([notification.userInfo[@"animated"] boolValue],
-                   YES,
-                   @"regionDidChange delegate should indicate animated change");
-    XCTAssertEqual(animatedCount,
-                   1,
-                   @"regionDidChange delegate should indicate one animated change");
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"regionDidChangeAnimated"
-                                                  object:tester.mapView];
 }
 
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {

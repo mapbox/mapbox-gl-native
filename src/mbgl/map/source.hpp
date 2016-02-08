@@ -5,11 +5,18 @@
 #include <mbgl/map/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/interactive_features_impl.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <forward_list>
 #include <map>
+
+namespace mapbox {
+namespace geojsonvt {
+class GeoJSONVT;
+} // namespace geojsonvt
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -27,17 +34,25 @@ public:
     public:
         virtual ~Observer() = default;
 
-        virtual void onSourceLoaded() = 0;
-        virtual void onSourceLoadingFailed(std::exception_ptr error) = 0;
+        virtual void onSourceLoaded(Source&) {};
+        virtual void onSourceError(Source&, std::exception_ptr) {};
 
-        virtual void onTileLoaded(bool isNewTile) = 0;
-        virtual void onTileLoadingFailed(std::exception_ptr error) = 0;
+        virtual void onTileLoaded(Source&, const TileID&, bool /* isNewTile */) {};
+        virtual void onTileError(Source&, const TileID&, std::exception_ptr) {};
+        virtual void onPlacementRedone() {};
     };
 
-    Source();
+    Source(SourceType,
+           const std::string& id,
+           const std::string& url,
+           uint16_t tileSize,
+           std::unique_ptr<SourceInfo>&&,
+           std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~Source();
 
+    bool loaded = false;
     void load();
+    bool isLoading() const;
     bool isLoaded() const;
 
     // Request or parse all the tiles relevant for the "TransformState". This method
@@ -61,20 +76,19 @@ public:
 
     std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius, const TransformState&) const;
 
-    SourceInfo info;
-    bool enabled;
+    const SourceType type;
+    const std::string id;
+    const std::string url;
+    uint16_t tileSize = util::tileSize;
+    bool enabled = false;
 
 private:
-    void tileLoadingCompleteCallback(const TileID&, const TransformState&, bool collisionDebug);
-
-    void emitSourceLoaded();
-    void emitSourceLoadingFailed(const std::string& message);
-    void emitTileLoaded(bool isNewTile);
-    void emitTileLoadingFailed(const std::string& message);
-
-    bool handlePartialTile(const TileID &id, Worker &worker);
-    bool findLoadedChildren(const TileID& id, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
-    void findLoadedParent(const TileID& id, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
+    void tileLoadingCallback(const TileID&,
+                             std::exception_ptr,
+                             bool isNewTile);
+    bool handlePartialTile(const TileID&);
+    bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::forward_list<TileID>& retain);
+    void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::forward_list<TileID>& retain);
     int32_t coveringZoomLevel(const TransformState&) const;
     std::forward_list<TileID> coveringTiles(const TransformState&) const;
 
@@ -84,7 +98,10 @@ private:
 
     double getZoom(const TransformState &state) const;
 
-    bool loaded = false;
+private:
+    std::unique_ptr<const SourceInfo> info;
+
+    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
@@ -95,7 +112,9 @@ private:
     TileCache cache;
 
     std::unique_ptr<FileRequest> req;
-    Observer* observer_ = nullptr;
+
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 };
 
 } // namespace mbgl

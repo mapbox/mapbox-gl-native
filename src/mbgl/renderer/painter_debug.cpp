@@ -25,8 +25,8 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     config.depthTest = GL_FALSE;
 
     if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()
-                              || tileData.debugBucket->modified != tileData.modified
-                              || tileData.debugBucket->expires != tileData.expires
+                              || !(tileData.debugBucket->modified == tileData.modified)
+                              || !(tileData.debugBucket->expires == tileData.expires)
                               || tileData.debugBucket->debugMode != data.getDebug()) {
         tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, data.getDebug());
     }

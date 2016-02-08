@@ -7,6 +7,9 @@
 
 namespace mbgl {
 
+GlyphStore::GlyphStore() = default;
+GlyphStore::~GlyphStore() = default;
+
 void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
@@ -18,10 +21,8 @@ void GlyphStore::requestGlyphRange(const std::string& fontStackName, const Glyph
         return;
     }
 
-    auto glyphPBF = std::make_unique<GlyphPBF>(this, fontStackName, range);
-    glyphPBF->setObserver(this);
-
-    rangeSets.emplace(range, std::move(glyphPBF));
+    rangeSets.emplace(range,
+        std::make_unique<GlyphPBF>(this, fontStackName, range, observer));
 }
 
 
@@ -64,18 +65,6 @@ util::exclusive<FontStack> GlyphStore::getFontStack(const std::string& fontStack
     // FIXME: We lock all FontStacks, but what we should
     // really do is lock only the one we are returning.
     return { it->second.get(), std::move(lock) };
-}
-
-void GlyphStore::onGlyphPBFLoaded() {
-    if (observer) {
-        observer->onGlyphRangeLoaded();
-    }
-}
-
-void GlyphStore::onGlyphPBFLoadingFailed(std::exception_ptr error) {
-    if (observer) {
-        observer->onGlyphRangeLoadingFailed(error);
-    }
 }
 
 void GlyphStore::setObserver(Observer* observer_) {

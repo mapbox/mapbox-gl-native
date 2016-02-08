@@ -6,24 +6,24 @@ endif
 export HOST ?= $(BUILD)
 
 # Defines host defaults
-include scripts/$(HOST)/defaults.mk
+include platform/$(HOST)/scripts/defaults.mk
 
 export HOST_VERSION ?= $(BUILD_VERSION)
 
 # Optionally include version-specific host defaults
 -include scripts/$(HOST)/$(HOST_VERSION)/defaults.mk
+-include platform/$(HOST)/scripts/$(HOST_VERSION)/defaults.mk
 
 export MASON_PLATFORM=$(HOST)
 export MASON_PLATFORM_VERSION=$(HOST_VERSION)
 
+export HOST_SLUG = $(HOST)-$(HOST_VERSION)
+CONFIGURE_FILES = platform/$(HOST)/scripts/configure.sh
 ifneq (,$(wildcard scripts/$(HOST)/$(HOST_VERSION)/configure.sh))
 	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
 endif
-
-export HOST_SLUG = $(HOST)-$(HOST_VERSION)
-CONFIGURE_FILES = scripts/$(HOST)/configure.sh
-ifneq (,$(wildcard scripts/$(HOST)/$(HOST_VERSION)/configure.sh))
-	CONFIGURE_FILES += scripts/$(HOST)/$(HOST_VERSION)/configure.sh
+ifneq (,$(wildcard platform/$(HOST)/scripts/$(HOST_VERSION)/configure.sh))
+	CONFIGURE_FILES += platform/$(HOST)/scripts/$(HOST_VERSION)/configure.sh
 endif
 
 ifneq (,$(findstring clang,$(CXX)))
@@ -75,7 +75,6 @@ GYP_FLAGS += -Iconfig/$(HOST_SLUG).gypi
 GYP_FLAGS += -Dplatform_lib=$(PLATFORM)
 GYP_FLAGS += -Dhttp_lib=$(HTTP)
 GYP_FLAGS += -Dasset_lib=$(ASSET)
-GYP_FLAGS += -Dcache_lib=$(CACHE)
 GYP_FLAGS += -Dheadless_lib=$(HEADLESS)
 GYP_FLAGS += -Dtest=$(BUILD_TEST)
 GYP_FLAGS += -Drender=$(BUILD_RENDER)
@@ -112,8 +111,8 @@ node/configure:
 node/xproj: Xcode/__project__ node/configure
 	$(QUIET)$(ENV) $(NODE_PRE_GYP) configure --clang -- \
 	$(GYP_FLAGS) -f xcode -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
-	$(QUIET)$(ENV) ./scripts/node/create_node_scheme.sh "node test" "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
-	$(QUIET)$(ENV) ./scripts/node/create_node_scheme.sh "npm run test-suite" "platform/node/test/render.test.js"
+	$(QUIET)$(ENV) ./platform/node/scripts/create_node_scheme.sh "node test" "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
+	$(QUIET)$(ENV) ./platform/node/scripts/create_node_scheme.sh "npm run test-suite" "platform/node/test/render.test.js"
 
 Makefile/node: Makefile/__project__ node/configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
@@ -131,8 +130,7 @@ Xcode/node: Xcode/__project__ node/xproj
 		-project ./build/binding.xcodeproj \
 		-configuration $(BUILDTYPE) \
 		-target mapbox-gl-native \
-		-jobs $(JOBS) \
-		$(XCPRETTY)
+		-jobs $(JOBS)
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
@@ -141,8 +139,7 @@ Xcode/%: Xcode/__project__
 		-project ./build/$(HOST_SLUG)/gyp/$(HOST).xcodeproj \
 		-configuration $(BUILDTYPE) \
 		-target $* \
-		-jobs $(JOBS) \
-		$(XCPRETTY)
+		-jobs $(JOBS)
 
 Ninja/%: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
@@ -179,7 +176,7 @@ print-env: $(SUBMODULES)
 		@printf "platform=$(COLOR_CYAN)%s$(FORMAT_END)  " $(PLATFORM)
 		@printf "asset=$(COLOR_CYAN)%s$(FORMAT_END)  " $(ASSET)
 		@printf "http=$(COLOR_CYAN)%s$(FORMAT_END)  " $(HTTP)
-		@printf "cache=$(COLOR_CYAN)%s$(FORMAT_END)\n" $(CACHE)
+		@printf "\n"
 
 # Never remove intermediate files
 .SECONDARY:

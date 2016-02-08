@@ -20,7 +20,6 @@
     ['http_lib == "android" and host == "android"', { 'includes': [ 'http-android.gypi' ] } ],
     ['asset_lib == "fs"', { 'includes': [ 'asset-fs.gypi' ] } ],
     ['asset_lib == "zip"', { 'includes': [ 'asset-zip.gypi' ] } ],
-    ['cache_lib == "sqlite"', { 'includes': [ 'cache-sqlite.gypi' ] } ],
 
     ['install_prefix != ""', { 'includes': ['install.gypi' ] } ],
   ],

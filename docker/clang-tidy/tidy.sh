@@ -13,7 +13,7 @@ cd build
 source ./scripts/travis_helper.sh
 
 # install
-./scripts/${FLAVOR}/install.sh
+./platform/${FLAVOR}/scripts/install.sh
 
 export CLANG_TIDY=clang-tidy-3.8
 make tidy
