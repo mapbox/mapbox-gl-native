@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Vector;
 import okhttp3.MediaType;
@@ -67,6 +69,9 @@ public class MapboxEventManager {
 
     private String mapboxSessionId = null;
     private static long hourInMillis = 1000 * 60 * 60;
+    private static long flushDelayInMillis = 1000 * 60 * 2;
+
+    private Timer timer = null;
 
     private MapboxEventManager(@NonNull Context context) {
         super();
@@ -124,6 +129,10 @@ public class MapboxEventManager {
         // Register for battery updates
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryStatus = context.registerReceiver(null, ifilter);
+
+        // Manage Timer Flush
+        timer = new Timer();
+        timer.schedule(new FlushEventsTimerTask(), 1, flushDelayInMillis);
     }
 
     public static MapboxEventManager getMapboxEventManager(@NonNull Context context) {
@@ -148,12 +157,6 @@ public class MapboxEventManager {
         events.add(event);
 
         rotateSessionId();
-
-        // If size > 1 then flush
-        if (events.size() >= 1) {
-            new FlushTheEventsTask().execute();
-        }
-
     }
 
     private void rotateSessionId() {
@@ -365,4 +368,15 @@ public class MapboxEventManager {
 
     }
 
+
+    private class FlushEventsTimerTask extends TimerTask {
+        /**
+         * The task to run should be specified in the implementation of the {@code run()}
+         * method.
+         */
+        @Override
+        public void run() {
+            new FlushTheEventsTask().execute();
+        }
+    }
 }
