@@ -39,7 +39,7 @@ public:
     ~Database();
     Database &operator=(Database &&);
 
-    operator bool() const;
+    explicit operator bool() const;
 
     void exec(const std::string &sql);
     Statement prepare(const char *query);
@@ -63,7 +63,7 @@ public:
     ~Statement();
     Statement &operator=(Statement &&);
 
-    operator bool() const;
+    explicit operator bool() const;
 
     template <typename T> void bind(int offset, T value);
 
