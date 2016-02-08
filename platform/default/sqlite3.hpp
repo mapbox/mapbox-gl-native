@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <chrono>
 
 typedef struct sqlite3 sqlite3;
 typedef struct sqlite3_stmt sqlite3_stmt;
@@ -41,6 +42,7 @@ public:
 
     explicit operator bool() const;
 
+    void setBusyTimeout(std::chrono::milliseconds);
     void exec(const std::string &sql);
     Statement prepare(const char *query);
 

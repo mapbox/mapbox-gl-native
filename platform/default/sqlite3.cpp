@@ -59,6 +59,15 @@ Database::operator bool() const {
     return db != nullptr;
 }
 
+void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
+    assert(db);
+    const int err = sqlite3_busy_timeout(db,
+        int(std::min<std::chrono::milliseconds::rep>(timeout.count(), std::numeric_limits<int>::max())));
+    if (err != SQLITE_OK) {
+        throw Exception { err, sqlite3_errmsg(db) };
+    }
+}
+
 void Database::exec(const std::string &sql) {
     assert(db);
     char *msg = nullptr;
