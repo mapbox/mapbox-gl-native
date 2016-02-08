@@ -40,6 +40,7 @@ public class MapboxEvent implements Serializable {
 
     // Event Attributes
     public static final String ATTRIBUTE_EVENT = "event";
+    public static final String ATTRIBUTE_SESSION_ID = "sessionId";
     public static final String ATTRIBUTE_VERSION = "version";
     public static final String ATTRIBUTE_CREATED = "created";
     public static final String ATTRIBUTE_INSTANCE = "instance";

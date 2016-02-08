@@ -65,6 +65,9 @@ public class MapboxEventManager {
 
     private String mapboxVendorId = null;
 
+    private String mapboxSessionId = null;
+    private static long hourInMillis = 1000 * 60 * 60;
+
     private MapboxEventManager(@NonNull Context context) {
         super();
         this.accessToken = ApiAccess.getToken(context);
@@ -83,6 +86,9 @@ public class MapboxEventManager {
             editor.commit();
             Log.i(TAG, "Set New Vendor Id = " + vendorId);
         }
+
+        // Create Initial Session Id
+        rotateSessionId();
 
         // Get DisplayMetrics Setup
         displayMetrics = new DisplayMetrics();
@@ -141,11 +147,34 @@ public class MapboxEventManager {
 
         events.add(event);
 
+        rotateSessionId();
+
         // If size > 1 then flush
         if (events.size() >= 1) {
             new FlushTheEventsTask().execute();
         }
 
+    }
+
+    private void rotateSessionId() {
+        if (mapboxSessionId == null) {
+            mapboxSessionId = generateNewSessionId();
+            return;
+        }
+
+        // Rotate if it's been 12 hours and last event was over an hour ago
+        int start = mapboxSessionId.indexOf("-") + 1;
+        int end = mapboxSessionId.indexOf("-", start);
+        long time = Long.valueOf(mapboxSessionId.substring(start, end));
+
+        long now = System.currentTimeMillis();
+        if (now - time > (12 * hourInMillis)) {
+            mapboxSessionId = generateNewSessionId();
+        }
+    }
+
+    private String generateNewSessionId() {
+        return context.getPackageName() + "-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString();
     }
 
     private String getOrientation() {
@@ -290,6 +319,7 @@ public class MapboxEventManager {
 
                     // Basic Event Meta Data
                     jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get("event"));
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, mapboxSessionId);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_INSTANCE, SESSION_UUID);
