@@ -12,12 +12,12 @@ AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollecti
       properties(std::move(properties_)),
       geometries(geometries_) {}
 
-mapbox::util::optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
+optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     auto it = properties.find(key);
     if (it != properties.end()) {
-        return mapbox::util::optional<Value>(it->second);
+        return optional<Value>(it->second);
     }
-    return mapbox::util::optional<Value>();
+    return optional<Value>();
 }
 
 std::unordered_map<std::string, std::string> AnnotationTileFeature::getValues() const {
@@ -48,7 +48,7 @@ std::unique_ptr<FileRequest> AnnotationTileMonitor::monitorTile(const GeometryTi
 }
 
 void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
-    callback(nullptr, std::move(tile), Seconds::zero(), Seconds::zero());
+    callback(nullptr, std::move(tile), {}, {});
 }
 
 } // namespace mbgl

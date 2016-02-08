@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -10,7 +10,7 @@ TEST_F(Storage, HTTPLoad) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const int concurrency = 50;
     const int max = 10000;
@@ -25,12 +25,11 @@ TEST_F(Storage, HTTPLoad) {
                    [&, i, current](Response res) {
             reqs[i].reset();
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
 
             if (number <= max) {
                 req(i);

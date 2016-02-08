@@ -1,6 +1,6 @@
 #import "KIFTestActor+MapboxGL.h"
 
-#import "Mapbox.h"
+#import <Mapbox/Mapbox.h>
 
 #import <KIF/UIApplication-KIFAdditions.h>
 

@@ -21,13 +21,13 @@ NS_INLINE CLLocationCoordinate2D MGLLocationCoordinate2DFromLatLng(mbgl::LatLng 
 }
 
 NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsFromLatLngBounds(mbgl::LatLngBounds latLngBounds) {
-    return MGLCoordinateBoundsMake(MGLLocationCoordinate2DFromLatLng(latLngBounds.sw),
-                                   MGLLocationCoordinate2DFromLatLng(latLngBounds.ne));
+    return MGLCoordinateBoundsMake(MGLLocationCoordinate2DFromLatLng(latLngBounds.southwest()),
+                                   MGLLocationCoordinate2DFromLatLng(latLngBounds.northeast()));
 }
 
 NS_INLINE mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBounds coordinateBounds) {
-    return mbgl::LatLngBounds(MGLLatLngFromLocationCoordinate2D(coordinateBounds.sw),
-                              MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
+    return mbgl::LatLngBounds::hull(MGLLatLngFromLocationCoordinate2D(coordinateBounds.sw),
+                                    MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
 }
 
 NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds coordinateBounds) {
@@ -44,3 +44,21 @@ NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(NSEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
 }
 #endif
+
+/** Converts a map zoom level to a camera altitude.
+    
+    @param zoomLevel The zoom level to convert.
+    @param pitch The camera pitch, measured in degrees.
+    @param latitude The latitude of the point at the center of the viewport.
+    @param size The size of the viewport.
+    @return An altitude measured in meters. */
+CLLocationDistance MGLAltitudeForZoomLevel(double zoomLevel, CGFloat pitch, CLLocationDegrees latitude, CGSize size);
+
+/** Converts a camera altitude to a map zoom level.
+    
+    @param altitude The altitude to convert, measured in meters.
+    @param pitch The camera pitch, measured in degrees.
+    @param latitude The latitude of the point at the center of the viewport.
+    @param size The size of the viewport.
+    @return A zero-based zoom level. */
+double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLocationDegrees latitude, CGSize size);

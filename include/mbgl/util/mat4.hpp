@@ -38,6 +38,7 @@ void perspective(mat4& out, double fovy, double aspect, double near, double far)
 void copy(mat4& out, const mat4& a);
 void translate(mat4& out, const mat4& a, double x, double y, double z);
 void rotate_x(mat4& out, const mat4& a, double rad);
+void rotate_y(mat4& out, const mat4& a, double rad);
 void rotate_z(mat4& out, const mat4& a, double rad);
 void scale(mat4& out, const mat4& a, double x, double y, double z);
 void multiply(mat4& out, const mat4& a, const mat4& b);

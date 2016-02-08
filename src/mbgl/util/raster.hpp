@@ -18,7 +18,7 @@ public:
     ~Raster();
 
     // load image data
-    bool load(PremultipliedImage);
+    void load(PremultipliedImage);
 
     // bind current texture
     void bind(bool linear = false);

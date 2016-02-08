@@ -4,6 +4,7 @@
 #include <mbgl/util/box.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/math.hpp>
 
 using namespace mbgl;
 
@@ -20,7 +21,7 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
 
     matrix::identity(matrix);
     matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
-    matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
+    matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {
@@ -37,10 +38,17 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
-    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / getHeight());
+    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
 
-    matrix::rotate_x(projMatrix, projMatrix, getPitch());
-    matrix::rotate_z(projMatrix, projMatrix, getAngle());
+    using NO = NorthOrientation;
+    switch (getNorthOrientation()) {
+        case NO::Rightwards: matrix::rotate_y(projMatrix, projMatrix, getPitch()); break;
+        case NO::Downwards: matrix::rotate_x(projMatrix, projMatrix, -getPitch()); break;
+        case NO::Leftwards: matrix::rotate_y(projMatrix, projMatrix, -getPitch()); break;
+        default: matrix::rotate_x(projMatrix, projMatrix, getPitch()); break;
+    }
+
+    matrix::rotate_z(projMatrix, projMatrix, getAngle() + getNorthOrientationAngle());
 
     matrix::translate(projMatrix, projMatrix, pixel_x() - getWidth() / 2.0f,
             pixel_y() - getHeight() / 2.0f, 0);
@@ -60,16 +68,30 @@ box TransformState::cornersToBox(uint32_t z) const {
 
 #pragma mark - Dimensions
 
-bool TransformState::hasSize() const {
-    return width && height;
-}
-
 uint16_t TransformState::getWidth() const {
     return width;
 }
 
 uint16_t TransformState::getHeight() const {
     return height;
+}
+
+#pragma mark - North Orientation
+
+NorthOrientation TransformState::getNorthOrientation() const {
+    return orientation;
+}
+
+double TransformState::getNorthOrientationAngle() const {
+    double angleOrientation = 0;
+    if (orientation == NorthOrientation::Rightwards) {
+        angleOrientation += M_PI / 2.0f;
+    } else if (orientation == NorthOrientation::Downwards) {
+        angleOrientation += M_PI;
+    } else if (orientation == NorthOrientation::Leftwards) {
+        angleOrientation -= M_PI / 2.0f;
+    }
+    return angleOrientation;
 }
 
 #pragma mark - Position
@@ -122,10 +144,6 @@ double TransformState::pixel_y() const {
 
 #pragma mark - Zoom
 
-float TransformState::getNormalizedZoom() const {
-    return std::log(scale * util::tileSize / 512.0f) / M_LN2;
-}
-
 double TransformState::getZoom() const {
     return std::log(scale) / M_LN2;
 }
@@ -142,17 +160,29 @@ double TransformState::getScale() const {
     return scale;
 }
 
+void TransformState::setMinZoom(const double minZoom) {
+    if (minZoom <= getMaxZoom()) {
+        min_scale = zoomScale(util::clamp(minZoom, util::MIN_ZOOM, util::MAX_ZOOM));
+    }
+}
+
 double TransformState::getMinZoom() const {
-    double test_scale = scale;
+    double test_scale = min_scale;
     double unused_x = x;
     double unused_y = y;
     constrain(test_scale, unused_x, unused_y);
 
-    return ::log2(::fmin(min_scale, test_scale));
+    return scaleZoom(test_scale);
+}
+
+void TransformState::setMaxZoom(const double maxZoom) {
+    if (maxZoom >= getMinZoom()) {
+        max_scale = zoomScale(util::clamp(maxZoom, util::MIN_ZOOM, util::MAX_ZOOM));
+    }
 }
 
 double TransformState::getMaxZoom() const {
-    return ::log2(max_scale);
+    return scaleZoom(max_scale);
 }
 
 
@@ -218,8 +248,12 @@ double TransformState::zoomScale(double zoom) const {
     return std::pow(2.0f, zoom);
 }
 
-float TransformState::worldSize() const {
-    return util::tileSize * scale;
+double TransformState::scaleZoom(double s) const {
+    return ::log2(s);
+}
+
+double TransformState::worldSize() const {
+    return scale * util::tileSize;
 }
 
 PrecisionPoint TransformState::latLngToPoint(const LatLng& latLng) const {
@@ -231,12 +265,10 @@ LatLng TransformState::pointToLatLng(const PrecisionPoint& point) const {
 }
 
 TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
-    const double tileZoom = getZoom();
-    const double k = zoomScale(tileZoom) / worldSize();
     return {
-        lngX(latLng.longitude) * k,
-        latY(latLng.latitude) * k,
-        tileZoom
+        lngX(latLng.longitude) / util::tileSize,
+        latY(latLng.latitude) / util::tileSize,
+        getZoom()
     };
 }
 
@@ -318,22 +350,71 @@ mat4 TransformState::getPixelMatrix() const {
 
 #pragma mark - (private helper functions)
 
+bool TransformState::rotatedNorth() const {
+    using NO = NorthOrientation;
+    return (orientation == NO::Leftwards || orientation == NO::Rightwards);
+}
+
 void TransformState::constrain(double& scale_, double& x_, double& y_) const {
     // Constrain minimum scale to avoid zooming out far enough to show off-world areas.
-    if (constrainMode == ConstrainMode::WidthAndHeight) {
-        scale_ = std::max(scale_, static_cast<double>(width / util::tileSize));
-    }
-
-    scale_ = std::max(scale_, static_cast<double>(height / util::tileSize));
+    scale_ = util::max(scale_,
+                       static_cast<double>((rotatedNorth() ? height : width) / util::tileSize),
+                       static_cast<double>((rotatedNorth() ? width : height) / util::tileSize));
 
     // Constrain min/max pan to avoid showing off-world areas.
     if (constrainMode == ConstrainMode::WidthAndHeight) {
-        double max_x = (scale_ * util::tileSize - width) / 2;
+        double max_x = (scale_ * util::tileSize - (rotatedNorth() ? height : width)) / 2;
         x_ = std::max(-max_x, std::min(x_, max_x));
     }
 
-    double max_y = (scale_ * util::tileSize - height) / 2;
+    double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
     y_ = std::max(-max_y, std::min(y_, max_y));
 }
 
+void TransformState::moveLatLng(const LatLng& latLng, const PrecisionPoint& anchor) {
+    if (!latLng || !anchor) {
+        return;
+    }
+    
+    auto coord = latLngToCoordinate(latLng);
+    auto coordAtPoint = pointToCoordinate(anchor);
+    auto coordCenter = pointToCoordinate({ width / 2.0f, height / 2.0f });
+    
+    float columnDiff = coordAtPoint.column - coord.column;
+    float rowDiff = coordAtPoint.row - coord.row;
+    
+    auto newLatLng = coordinateToLatLng({
+        coordCenter.column - columnDiff,
+        coordCenter.row - rowDiff,
+        coordCenter.zoom
+    });
+    setLatLngZoom(newLatLng, coordCenter.zoom);
+}
 
+void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
+    double newScale = zoomScale(zoom);
+    const double newWorldSize = newScale * util::tileSize;
+    Bc = newWorldSize / 360;
+    Cc = newWorldSize / util::M2PI;
+    
+    const double m = 1 - 1e-15;
+    const double f = util::clamp(std::sin(util::DEG2RAD * latLng.latitude), -m, m);
+    
+    PrecisionPoint point = {
+        -latLng.longitude * Bc,
+        0.5 * Cc * std::log((1 + f) / (1 - f)),
+    };
+    setScalePoint(newScale, point);
+}
+
+void TransformState::setScalePoint(const double newScale, const PrecisionPoint &point) {
+    double constrainedScale = newScale;
+    PrecisionPoint constrainedPoint = point;
+    constrain(constrainedScale, constrainedPoint.x, constrainedPoint.y);
+    
+    scale = constrainedScale;
+    x = constrainedPoint.x;
+    y = constrainedPoint.y;
+    Bc = worldSize() / 360;
+    Cc = worldSize() / util::M2PI;
+}

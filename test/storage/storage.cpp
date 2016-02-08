@@ -2,13 +2,13 @@
 
 #include <mbgl/platform/platform.hpp>
 
-pid_t Storage::pid = 0;
+std::unique_ptr<mbgl::test::Server> Storage::server;
 
 void Storage::SetUpTestCase() {
-    const auto server = mbgl::platform::applicationRoot() + "/TEST_DATA/storage/server.js";
-    pid = mbgl::test::startServer(server.c_str());
+    const auto program = mbgl::platform::applicationRoot() + "/TEST_DATA/storage/server.js";
+    server = std::make_unique<mbgl::test::Server>(program.c_str());
 }
 
 void Storage::TearDownTestCase() {
-    mbgl::test::stopServer(pid);
+    server.reset();
 }

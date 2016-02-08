@@ -34,12 +34,13 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     if (skewed) {
         matrix::identity(exMatrix);
-        s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+        s = util::EXTENT / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
         gammaScale = 1.0f / std::cos(state.getPitch());
     } else {
         exMatrix = extrudeMatrix;
         s = state.getAltitude();
         gammaScale = 1.0f;
+        matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
     }
     matrix::scale(exMatrix, exMatrix, s, s, 1);
 
@@ -48,35 +49,29 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
-    // calculate how much longer the real world distance is at the top of the screen
-    // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4.0f * (1.0f + std::pow(state.getAltitude(), 2)));
-    float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
-    float extra = (topedgelength + x) / topedgelength - 1;
-
     config.program = sdfShader.program;
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
     sdfShader.u_skewed = skewed;
-    sdfShader.u_extra = extra;
+    sdfShader.u_texture = 0;
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / bucketProperties.size) / std::log(2);
 
-    sdfShader.u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
+    sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
     if (data.mode == MapMode::Continuous) {
         FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
         sdfShader.u_fadedist = f.fadedist * 10;
         sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
         sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);
-        sdfShader.u_fadezoom = (state.getNormalizedZoom() + f.bump) * 10;
+        sdfShader.u_fadezoom = (state.getZoom() + f.bump) * 10;
     } else { // MapMode::Still
         sdfShader.u_fadedist = 0;
-        sdfShader.u_minfadezoom = state.getNormalizedZoom() * 10;
-        sdfShader.u_maxfadezoom = state.getNormalizedZoom() * 10;
-        sdfShader.u_fadezoom = state.getNormalizedZoom() * 10;
+        sdfShader.u_minfadezoom = state.getZoom() * 10;
+        sdfShader.u_maxfadezoom = state.getZoom() * 10;
+        sdfShader.u_fadezoom = state.getZoom() * 10;
     }
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
@@ -148,8 +143,8 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
         config.program = collisionBoxShader->program;
         collisionBoxShader->u_matrix = matrix;
-        collisionBoxShader->u_scale = std::pow(2, state.getNormalizedZoom() - id.z);
-        collisionBoxShader->u_zoom = state.getNormalizedZoom() * 10;
+        collisionBoxShader->u_scale = std::pow(2, state.getZoom() - id.z);
+        collisionBoxShader->u_zoom = state.getZoom() * 10;
         collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
         config.lineWidth = 1.0f;
 
@@ -159,8 +154,8 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
     }
 
     // TODO remove the `true ||` when #1673 is implemented
-    const bool drawAcrossEdges = true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
-          layout.text.ignorePlacement || layout.icon.ignorePlacement);
+    const bool drawAcrossEdges = (data.mode == MapMode::Continuous) && (true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
+          layout.text.ignorePlacement || layout.icon.ignorePlacement));
 
     // Disable the stencil test so that labels aren't clipped to tile boundaries.
     //
@@ -193,8 +188,9 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         const float fontScale = fontSize / 1.0f;
 
         SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
-        activeSpriteAtlas->bind(state.isChanging() || layout.placement == PlacementType::Line
-                || angleOffset != 0 || fontScale != 1 || sdf || state.getPitch() != 0);
+        const bool iconScaled = fontScale != 1 || data.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
+        const bool iconTransformed = layout.icon.rotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
+        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed);
 
         if (sdf) {
             renderSDF(bucket,
@@ -215,9 +211,10 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
             if (skewed) {
                 matrix::identity(exMatrix);
-                s = 4096.0f / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
+                s = util::EXTENT / util::tileSize / id.overscaling / std::pow(2, state.getZoom() - id.z);
             } else {
                 exMatrix = extrudeMatrix;
+                matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
                 s = state.getAltitude();
             }
             matrix::scale(exMatrix, exMatrix, s, s, 1);
@@ -233,18 +230,19 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             config.program = iconShader->program;
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
-            iconShader->u_texsize = {{ float(spriteAtlas->getWidth()) / 4.0f, float(spriteAtlas->getHeight()) / 4.0f }};
+            iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
             iconShader->u_skewed = skewed;
             iconShader->u_extra = extra;
+            iconShader->u_texture = 0;
 
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.icon.size) / std::log(2);
 
-            iconShader->u_zoom = (state.getNormalizedZoom() - zoomAdjust) * 10; // current zoom level
+            iconShader->u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
             iconShader->u_fadedist = 0 * 10;
-            iconShader->u_minfadezoom = state.getNormalizedZoom() * 10;
-            iconShader->u_maxfadezoom = state.getNormalizedZoom() * 10;
-            iconShader->u_fadezoom = state.getNormalizedZoom() * 10;
+            iconShader->u_minfadezoom = state.getZoom() * 10;
+            iconShader->u_maxfadezoom = state.getZoom() * 10;
+            iconShader->u_fadezoom = state.getZoom() * 10;
             iconShader->u_opacity = properties.icon.opacity;
 
             setDepthSublayer(0);

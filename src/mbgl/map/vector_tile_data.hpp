@@ -22,16 +22,17 @@ public:
                    std::unique_ptr<GeometryTileMonitor> monitor,
                    std::string sourceID,
                    Style&,
-                   const std::function<void()>& callback);
+                   const MapMode,
+                   const std::function<void(std::exception_ptr)>& callback);
 
     ~VectorTileData();
 
     Bucket* getBucket(const StyleLayer&) override;
 
-    bool parsePending(std::function<void()> callback) override;
+    bool parsePending(std::function<void(std::exception_ptr)> callback) override;
 
-    void redoPlacement(PlacementConfig config) override;
-    void redoPlacement();
+    void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
+    void redoPlacement(const std::function<void()>&) override;
 
     void cancel() override;
 

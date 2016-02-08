@@ -1,6 +1,6 @@
 #import "MGLTAppDelegate.h"
 #import "MGLTViewController.h"
-#import "Mapbox.h"
+#import <Mapbox/Mapbox.h>
 
 @implementation MGLTAppDelegate
 

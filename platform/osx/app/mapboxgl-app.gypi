@@ -13,6 +13,7 @@
         'Credits.rtf',
         'Icon.icns',
         'MainMenu.xib',
+        'MapDocument.xib',
       ],
 
       'dependencies': [
@@ -26,6 +27,8 @@
         './DroppedPinAnnotation.m',
         './LocationCoordinate2DTransformer.h',
         './LocationCoordinate2DTransformer.m',
+        './MapDocument.h',
+        './MapDocument.m',
         './TimeIntervalTransformer.h',
         './TimeIntervalTransformer.m',
         './NSValue+Additions.h',
@@ -37,7 +40,7 @@
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'INFOPLIST_FILE': '../platform/osx/app/Info.plist',
         'LD_RUNPATH_SEARCH_PATHS': [
-          '$(inherited)',
+          '\${inherited}',
           '@executable_path/../Frameworks',
         ],
         'PRODUCT_BUNDLE_IDENTIFIER': 'com.mapbox.MapboxGL',
@@ -60,7 +63,7 @@
       
       'copies': [
         {
-          'destination': '<(PRODUCT_DIR)/$(FRAMEWORKS_FOLDER_PATH)',
+          'destination': '<(PRODUCT_DIR)/${FRAMEWORKS_FOLDER_PATH}',
           'files': [
             '<(PRODUCT_DIR)/Mapbox.framework',
           ],

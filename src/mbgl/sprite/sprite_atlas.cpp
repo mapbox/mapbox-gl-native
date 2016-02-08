@@ -7,7 +7,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/scaling.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
@@ -27,7 +26,11 @@ SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_,
       dirty(true) {
 }
 
-Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width, const size_t pixel_height) {
+Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const SpriteImage& spriteImage) {
+
+    const uint16_t pixel_width = std::ceil(spriteImage.image.width / pixelRatio);
+    const uint16_t pixel_height = std::ceil(spriteImage.image.height / pixelRatio);
+
     // Increase to next number divisible by 4, but at least 1.
     // This is so we can scale down the texture coordinates and pack them
     // into 2 bytes rather than 4 bytes.
@@ -41,18 +44,15 @@ Rect<SpriteAtlas::dimension> SpriteAtlas::allocateImage(const size_t pixel_width
         return rect;
     }
 
-    rect.originalW = pixel_width;
-    rect.originalH = pixel_height;
-
     return rect;
 }
 
-mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
+optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::string& name, const bool wrap) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto rect_it = images.find({ name, wrap });
     if (rect_it != images.end()) {
-        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.texture };
+        return SpriteAtlasElement { rect_it->second.pos, rect_it->second.spriteImage, rect_it->second.spriteImage->pixelRatio / pixelRatio };
     }
 
     auto sprite = store.getSprite(name);
@@ -60,7 +60,7 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
         return {};
     }
 
-    Rect<dimension> rect = allocateImage(sprite->width, sprite->height);
+    Rect<dimension> rect = allocateImage(*sprite);
     if (rect.w == 0) {
         if (debug::spriteWarnings) {
             Log::Warning(Event::Sprite, "sprite atlas bitmap overflow");
@@ -71,10 +71,10 @@ mapbox::util::optional<SpriteAtlasElement> SpriteAtlas::getImage(const std::stri
     const Holder& holder = images.emplace(Key{ name, wrap }, Holder{ sprite, rect }).first->second;
     copy(holder, wrap);
 
-    return SpriteAtlasElement { rect, sprite };
+    return SpriteAtlasElement { rect, sprite, sprite->pixelRatio / pixelRatio };
 }
 
-mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
+optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::string& name, bool repeating) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
     auto img = getImage(name, repeating);
@@ -83,26 +83,46 @@ mapbox::util::optional<SpriteAtlasPosition> SpriteAtlas::getPosition(const std::
     }
 
     auto rect = (*img).pos;
-    if (repeating) {
-        // When the image is repeating, get the correct position of the image, rather than the
-        // one rounded up to 4 pixels.
-        // TODO: Can't we just use originalW/originalH?
-        auto sprite = store.getSprite(name);
-        if (!sprite) {
-            return SpriteAtlasPosition {};
-        }
-
-        rect.w = sprite->width;
-        rect.h = sprite->height;
-    }
 
     const float padding = 1;
+    auto spriteImage = (*img).spriteImage;
+
+    const float w = spriteImage->getWidth() * (*img).relativePixelRatio;
+    const float h = spriteImage->getHeight() * (*img).relativePixelRatio;
 
     return SpriteAtlasPosition {
-        {{ float(rect.w), float(rect.h) }},
-        {{ float(rect.x + padding)          / width, float(rect.y + padding)          / height }},
-        {{ float(rect.x + padding + rect.w) / width, float(rect.y + padding + rect.h) / height }}
+        {{ float(spriteImage->getWidth()), spriteImage->getHeight() }},
+        {{ float(rect.x + padding)     / width, float(rect.y + padding)     / height }},
+        {{ float(rect.x + padding + w) / width, float(rect.y + padding + h) / height }}
     };
+}
+
+void copyBitmap(const uint32_t *src, const uint32_t srcStride, const uint32_t srcX, const uint32_t srcY,
+        uint32_t *const dst, const uint32_t dstStride, const uint32_t dstX, const uint32_t dstY, int dstSize,
+        const int width, const int height, const bool wrap) {
+
+    int srcI = srcY * srcStride + srcX;
+    int dstI = dstY * dstStride + dstX;
+    int x, y;
+
+    if (wrap) {
+        // add 1 pixel wrapped padding on each side of the image
+        dstI -= dstStride;
+        for (y = -1; y <= height; y++, srcI = ((y + height) % height + srcY) * srcStride + srcX, dstI += dstStride) {
+            for (x = -1; x <= width; x++) {
+                const int dstIndex = (dstI + x + dstSize) % dstSize;
+                dst[dstIndex] = src[srcI + ((x + width) % width)];
+            }
+        }
+
+    } else {
+        for (y = 0; y < height; y++, srcI += srcStride, dstI += dstStride) {
+            for (x = 0; x < width; x++) {
+                const int dstIndex = (dstI + x + dstSize) % dstSize;
+                dst[dstIndex] = src[srcI + x];
+            }
+        }
+    }
 }
 
 void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
@@ -111,53 +131,15 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
         std::fill(data.get(), data.get() + pixelWidth * pixelHeight, 0);
     }
 
-    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.texture->data.data());
+    const uint32_t *srcData = reinterpret_cast<const uint32_t *>(holder.spriteImage->image.data.get());
     if (!srcData) return;
-    const vec2<uint32_t> srcSize { holder.texture->pixelWidth, holder.texture->pixelHeight };
-    const Rect<uint32_t> srcPos { 0, 0, srcSize.x, srcSize.y };
-    const auto& dst = holder.pos;
-
-    const int offset = 1;
-
     uint32_t *const dstData = data.get();
-    const vec2<uint32_t> dstSize{ pixelWidth, pixelHeight };
-    const Rect<uint32_t> dstPos{ static_cast<uint32_t>((offset + dst.x) * pixelRatio),
-                                 static_cast<uint32_t>((offset + dst.y) * pixelRatio),
-                                 static_cast<uint32_t>(dst.originalW * pixelRatio),
-                                 static_cast<uint32_t>(dst.originalH * pixelRatio) };
 
-    util::bilinearScale(srcData, srcSize, srcPos, dstData, dstSize, dstPos, wrap);
+    const int padding = 1;
 
-    // Add borders around the copied image if required.
-    if (wrap) {
-        // We're copying from the same image so we don't have to scale again.
-        const uint32_t border = 1;
-        const uint32_t borderX = dstPos.x != 0 ? border : 0;
-        const uint32_t borderY = dstPos.y != 0 ? border : 0;
-
-        // Left border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x + dstPos.w - borderX, dstPos.y, borderX, dstPos.h },
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y, borderX, dstPos.h });
-
-        // Right border
-        util::nearestNeighborScale(dstData, dstSize, { dstPos.x, dstPos.y, border, dstPos.h },
-                                   dstData, dstSize,
-                                   { dstPos.x + dstPos.w, dstPos.y, border, dstPos.h });
-
-        // Top border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y + dstPos.h - borderY,
-                                dstPos.w + border + borderX, borderY },
-            dstData, dstSize,
-            { dstPos.x - borderX, dstPos.y - borderY, dstPos.w + 2 * borderX, borderY });
-
-        // Bottom border
-        util::nearestNeighborScale(
-            dstData, dstSize, { dstPos.x - borderX, dstPos.y, dstPos.w + 2 * borderX, border },
-            dstData, dstSize,
-            { dstPos.x - borderX, dstPos.y + dstPos.h, dstPos.w + border + borderX, border });
-    }
+    copyBitmap(srcData, uint32_t(holder.spriteImage->image.width), 0, 0,
+            dstData, pixelWidth, (holder.pos.x + padding) * pixelRatio, (holder.pos.y + padding) * pixelRatio, pixelWidth * pixelHeight,
+            uint32_t(holder.spriteImage->image.width), uint32_t(holder.spriteImage->image.height), wrap);
 
     dirty = true;
 }
@@ -186,10 +168,13 @@ void SpriteAtlas::updateDirty() {
         } else {
             // The two names match;
             Holder& holder = imageIterator->second;
-            holder.texture = spriteIterator->second;
-            copy(holder, imageIterator->first.second);
-
-            ++imageIterator;
+            holder.spriteImage = spriteIterator->second;
+            if (holder.spriteImage != nullptr) {
+                copy(holder, imageIterator->first.second);
+                ++imageIterator;
+            } else {
+                images.erase(imageIterator++);
+            }
             // Don't advance the spriteIterator because there might be another sprite with the same
             // name, but a different wrap value.
         }
@@ -270,10 +255,10 @@ SpriteAtlas::~SpriteAtlas() {
     }
 }
 
-SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& texture_,
+SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& spriteImage_,
                             const Rect<dimension>& pos_)
-    : texture(texture_), pos(pos_) {
+    : spriteImage(spriteImage_), pos(pos_) {
 }
 
-SpriteAtlas::Holder::Holder(Holder&& h) : texture(std::move(h.texture)), pos(h.pos) {
+SpriteAtlas::Holder::Holder(Holder&& h) : spriteImage(std::move(h.spriteImage)), pos(h.pos) {
 }

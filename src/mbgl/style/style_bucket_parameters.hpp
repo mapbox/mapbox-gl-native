@@ -1,6 +1,7 @@
 #ifndef STYLE_BUCKET_PARAMETERS
 #define STYLE_BUCKET_PARAMETERS
 
+#include <mbgl/map/mode.hpp>
 #include <mbgl/style/filter_expression.hpp>
 #include <mbgl/map/tile_data.hpp>
 
@@ -26,7 +27,7 @@ public:
                           SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
-                          CollisionTile& collisionTile_)
+                          const MapMode mode_)
         : tileID(tileID_),
           layer(layer_),
           state(state_),
@@ -35,7 +36,7 @@ public:
           spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
-          collisionTile(collisionTile_) {}
+          mode(mode_) {}
 
     bool cancelled() const {
         return state == TileData::State::obsolete;
@@ -51,7 +52,7 @@ public:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    CollisionTile& collisionTile;
+    const MapMode mode;
 };
 
 } // namespace mbgl

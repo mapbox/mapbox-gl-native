@@ -1,5 +1,6 @@
 #include <mbgl/map/tile_data.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
@@ -26,7 +27,6 @@ const char* TileData::StateToString(const State state) {
 void TileData::dumpDebugLogs() const {
     Log::Info(Event::General, "TileData::id: %s", std::string(id).c_str());
     Log::Info(Event::General, "TileData::state: %s", TileData::StateToString(state));
-    Log::Info(Event::General, "TileData::error: %s", error.c_str());
 }
 
 } // namespace mbgl

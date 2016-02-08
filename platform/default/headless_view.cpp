@@ -1,4 +1,3 @@
-
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/log.hpp>
@@ -108,7 +107,7 @@ void HeadlessView::createContext() {
 #endif
 }
 
-bool HeadlessView::isActive() {
+bool HeadlessView::isActive() const {
     return std::this_thread::get_id() == thread;
 }
 

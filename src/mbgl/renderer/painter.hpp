@@ -18,6 +18,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <array>
 #include <vector>
@@ -129,8 +130,8 @@ private:
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
         mat4 flip;
-        matrix::ortho(flip, 0, 4096, -4096, 0, 0, 1);
-        matrix::translate(flip, flip, 0, -4096, 0);
+        matrix::ortho(flip, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
+        matrix::translate(flip, flip, 0, -util::EXTENT, 0);
         return flip;
     }();
 
@@ -186,13 +187,13 @@ private:
     StaticVertexBuffer tileStencilBuffer = {
         // top left triangle
         { 0, 0 },
-        { 4096, 0 },
-        { 0, 4096 },
+        { util::EXTENT, 0 },
+        { 0, util::EXTENT },
 
         // bottom right triangle
-        { 4096, 0 },
-        { 0, 4096 },
-        { 4096, 4096 },
+        { util::EXTENT, 0 },
+        { 0, util::EXTENT },
+        { util::EXTENT, util::EXTENT },
     };
 
     VertexArrayObject coveringPlainArray;
@@ -201,9 +202,9 @@ private:
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer = {
         { 0, 0 },
-        { 4096, 0 },
-        { 4096, 4096 },
-        { 0, 4096 },
+        { util::EXTENT, 0 },
+        { util::EXTENT, util::EXTENT },
+        { 0, util::EXTENT },
         { 0, 0 },
     };
 

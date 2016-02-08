@@ -11,8 +11,7 @@
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/geo.hpp>
-
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 
@@ -53,12 +52,14 @@ public:
 
     // Annotations
     void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
+    void removeAnnotationIcon(const std::string&);
     double getTopOffsetPixelsForAnnotationIcon(const std::string&);
     void updateAnnotations();
     
     // Style API
     void addLayer(std::unique_ptr<StyleLayer>,
-                  const mapbox::util::optional<std::string> before);
+                  const optional<std::string> before);
+    void removeLayer(const std::string& id);
 
     std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius) const;
 
@@ -66,14 +67,12 @@ public:
     void onLowMemory();
 
     void cleanup();
-
-    // Style::Observer implementation.
-    void onTileDataChanged() override;
-    void onResourceLoadingFailed(std::exception_ptr error) override;
-
     void dumpDebugLogs() const;
 
 private:
+    void onResourceLoaded() override;
+    void onResourceError(std::exception_ptr) override;
+
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
 

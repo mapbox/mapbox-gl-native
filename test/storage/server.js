@@ -2,25 +2,19 @@
 /* jshint node: true */
 'use strict';
 
+// This needs to be here to make sure the pipe stays open.
+// We're waiting until the stdin pipe gets closed (e.g. because the parent
+// process dies)
+process.stdin.on('readable', function() {});
+process.stdin.on('end', function() { process.exit(0); });
+
+
 var fs = require('fs');
 var express = require('express');
 var app = express();
 
 // We're manually setting Etag headers.
 app.disable('etag');
-
-// Terminate after a certain time of inactivity.
-function terminate() {
-    console.warn('Server terminated due to inactivity');
-    process.exit(0);
-};
-var inactivity = 5000; // milliseconds
-var timeout = setTimeout(terminate, inactivity);
-app.use(function(req, res, next) {
-    clearTimeout(timeout);
-    timeout = setTimeout(terminate, inactivity);
-    next();
-});
 
 app.get('/test', function (req, res) {
     if (req.query.modified) {
@@ -38,6 +32,9 @@ app.get('/test', function (req, res) {
     res.send('Hello World!');
 });
 
+app.get('/stale/*', function() {
+    // Never respond.
+});
 
 var cacheCounter = 0;
 app.get('/cache', function(req, res) {
@@ -87,6 +84,10 @@ app.get('/revalidate-etag', function(req, res) {
     revalidateEtagCounter++;
 });
 
+app.get('/not-found', function(req, res) {
+    res.status(404).send('Not Found!');
+});
+
 app.get('/permanent-error', function(req, res) {
     res.status(500).send('Server Error!');
 });
@@ -114,13 +115,6 @@ app.get('/load/:number(\\d+)', function(req, res) {
 });
 
 var server = app.listen(3000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
-    console.warn('Storage test server listening at http://%s:%s', host, port);
-
-    if (process.argv[2]) {
-        // Allow the test to continue running.
-        fs.write(+process.argv[2], 'OK');
-        fs.close(+process.argv[2]);
-    }
+    // Tell parent that we're now listening.
+    process.stdout.write("OK");
 });

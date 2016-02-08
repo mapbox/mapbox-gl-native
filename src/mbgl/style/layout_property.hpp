@@ -3,20 +3,18 @@
 
 #include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/function.hpp>
+#include <mbgl/util/rapidjson.hpp>
+
 #include <utility>
 
-#include <rapidjson/document.h>
-
 namespace mbgl {
-
-using JSVal = rapidjson::Value;
 
 template <typename T>
 class LayoutProperty {
 public:
     explicit LayoutProperty(T v) : value(std::move(v)) {}
 
-    void parse(const char * name, const JSVal& layout) {
+    void parse(const char * name, const JSValue& layout) {
         if (layout.HasMember(name)) {
             parsedValue = parseProperty<Function<T>>(name, layout[name]);
         }
@@ -31,7 +29,7 @@ public:
     void operator=(const T& v) { value = v; }
     operator T() const { return value; }
 
-    mapbox::util::optional<Function<T>> parsedValue;
+    optional<Function<T>> parsedValue;
     T value;
 };
 

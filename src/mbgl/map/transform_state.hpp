@@ -30,12 +30,12 @@ public:
     box cornersToBox(uint32_t z) const;
 
     // Dimensions
-    bool hasSize() const;
     uint16_t getWidth() const;
     uint16_t getHeight() const;
 
-    std::array<float, 2> locationCoordinate(float lon, float lat) const;
-    void getLonLat(double &lon, double &lat) const;
+    // North Orientation
+    NorthOrientation getNorthOrientation() const;
+    double getNorthOrientationAngle() const;
 
     // Position
     LatLng getLatLng() const;
@@ -43,12 +43,13 @@ public:
     double pixel_y() const;
 
     // Zoom
-    float getNormalizedZoom() const;
+    double getScale() const;
     double getZoom() const;
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
-    double getScale() const;
+    void setMinZoom(const double minZoom);
     double getMinZoom() const;
+    void setMaxZoom(const double maxZoom);
     double getMaxZoom() const;
 
     // Rotation
@@ -74,11 +75,14 @@ public:
     TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
 
 private:
+    bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
-    double max_scale = std::pow(2, 18);
+    double max_scale = std::pow(2, 20);
+
+    NorthOrientation orientation = NorthOrientation::Upwards;
 
     // logical dimensions
     uint16_t width = 0, height = 0;
@@ -88,10 +92,17 @@ private:
     double lngX(double lon) const;
     double latY(double lat) const;
     double zoomScale(double zoom) const;
-    float worldSize() const;
+    double scaleZoom(double scale) const;
+    double worldSize() const;
 
     mat4 coordinatePointMatrix(double z) const;
     mat4 getPixelMatrix() const;
+    
+    /** Recenter the map so that the given coordinate is located at the given
+        point on screen. */
+    void moveLatLng(const LatLng&, const PrecisionPoint&);
+    void setLatLngZoom(const LatLng &latLng, double zoom);
+    void setScalePoint(const double scale, const PrecisionPoint& point);
 
 private:
     ConstrainMode constrainMode;

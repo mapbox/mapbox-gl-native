@@ -13,7 +13,7 @@ const std::string protocol = "mapbox://";
 const std::string baseURL = "https://api.mapbox.com/";
 
 bool isMapboxURL(const std::string& url) {
-    return url.compare(0, protocol.length(), protocol) == 0;
+    return std::equal(protocol.begin(), protocol.end(), url.begin());
 }
 
 std::vector<std::string> getMapboxURLPathname(const std::string& url) {
@@ -111,11 +111,7 @@ std::string normalizeGlyphsURL(const std::string& url, const std::string& access
     return baseURL + "fonts/v1/" + user + "/" + fontstack + "/" + range + "?access_token=" + accessToken;
 }
 
-std::string normalizeTileURL(const std::string& url, const std::string& sourceURL, SourceType sourceType) {
-    if (sourceURL.empty() || !isMapboxURL(sourceURL) || sourceType != SourceType::Raster) {
-        return url;
-    }
-
+std::string normalizeRasterTileURL(const std::string& url) {
     std::string::size_type queryIdx = url.rfind("?");
     // Trim off the right end but never touch anything before the extension dot.
     std::string urlSansParams((queryIdx == std::string::npos) ? url : url.substr(0, queryIdx));
@@ -133,6 +129,12 @@ std::string normalizeTileURL(const std::string& url, const std::string& sourceUR
     }
 
     std::string normalizedURL(url);
+#if !defined(__ANDROID__) && !defined(__APPLE__)
+    // Replace PNG with WebP.
+    if (normalizedURL.compare(extensionIdx + 1, 3, "png") == 0) {
+        normalizedURL.replace(extensionIdx + 1, 3, "webp");
+    }
+#endif // !defined(__ANDROID__) && !defined(__APPLE__)
     normalizedURL.insert(extensionIdx, "{ratio}");
     return normalizedURL;
 }

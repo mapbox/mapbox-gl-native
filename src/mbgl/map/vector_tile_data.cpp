@@ -6,15 +6,14 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
 
-#include <sstream>
-
 namespace mbgl {
 
 VectorTileData::VectorTileData(const TileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
                                std::string sourceID,
                                Style& style_,
-                               const std::function<void()>& callback)
+                               const MapMode mode_,
+                               const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
       style(style_),
       worker(style_.workers),
@@ -23,29 +22,29 @@ VectorTileData::VectorTileData(const TileID& id_,
                  *style_.spriteStore,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
-                 state),
+                 state,
+                 mode_),
       monitor(std::move(monitor_))
 {
     state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
                                                         std::unique_ptr<GeometryTile> tile,
-                                                        Seconds modified_,
-                                                        Seconds expires_) {
+                                                        optional<SystemTimePoint> modified_,
+                                                        optional<SystemTimePoint> expires_) {
         if (err) {
-            try {
-                std::rethrow_exception(err);
-            } catch (const std::exception& e) {
-                error = e.what();
-                state = State::obsolete;
-                callback();
-                return;
-            }
+            callback(err);
+            return;
         }
 
+        modified = modified_;
+        expires = expires_;
+
         if (!tile) {
+            // This is a 404 response. We're treating these as empty tiles.
+            workRequest.reset();
             state = State::parsed;
             buckets.clear();
-            callback();
+            callback(err);
             return;
         }
 
@@ -54,9 +53,6 @@ VectorTileData::VectorTileData(const TileID& id_,
         } else if (isReady()) {
             state = State::partial;
         }
-
-        modified = modified_;
-        expires = expires_;
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
         // when tile data changed. Replacing the workRequest will cancel a pending work
@@ -68,6 +64,7 @@ VectorTileData::VectorTileData(const TileID& id_,
                 return;
             }
 
+            std::exception_ptr error;
             if (result.is<TileParseResultBuckets>()) {
                 auto& resultBuckets = result.get<TileParseResultBuckets>();
                 state = resultBuckets.state;
@@ -83,19 +80,12 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // Move over interactivity feature tree in case we got a refresh parse.
                 featureTree = std::move(resultBuckets.featureTree);
 
-                // The target configuration could have changed since we started placement. In this case,
-                // we're starting another placement run.
-                if (placedConfig != targetConfig) {
-                    redoPlacement();
-                }
             } else {
-                std::stringstream message;
-                message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
-                error = message.str();
+                error = result.get<std::exception_ptr>();
                 state = State::obsolete;
             }
 
-            callback();
+            callback(error);
         });
     });
 }
@@ -104,19 +94,20 @@ VectorTileData::~VectorTileData() {
     cancel();
 }
 
-bool VectorTileData::parsePending(std::function<void()> callback) {
+bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
     if (workRequest) {
         // There's already parsing or placement going on.
         return false;
     }
 
     workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, [this, callback] (TileParseResult result) {
+    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
         if (state == State::obsolete) {
             return;
         }
 
+        std::exception_ptr error;
         if (result.is<TileParseResultBuckets>()) {
             auto& resultBuckets = result.get<TileParseResultBuckets>();
             state = resultBuckets.state;
@@ -127,19 +118,16 @@ bool VectorTileData::parsePending(std::function<void()> callback) {
                 buckets[bucket.first] = std::move(bucket.second);
             }
 
-            // The target configuration could have changed since we started placement. In this case,
-            // we're starting another placement run.
-            if (placedConfig != targetConfig) {
-                redoPlacement();
-            }
+            // Persist the configuration we just placed so that we can later check whether we need to
+            // place again in case the configuration has changed.
+            placedConfig = config;
+
         } else {
-            std::stringstream message;
-            message << "Failed to parse [" << std::string(id) << "]: " << result.get<std::string>();
-            error = message.str();
+            error = result.get<std::exception_ptr>();
             state = State::obsolete;
         }
 
-        callback();
+        callback(error);
     });
 
     return true;
@@ -155,21 +143,20 @@ Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
     return it->second.get();
 }
 
-void VectorTileData::redoPlacement(const PlacementConfig newConfig) {
+void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& callback) {
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
-        if (!workRequest) {
-            // Don't start a new placement request when the current one hasn't completed yet, or when
-            // we are parsing buckets.
-            redoPlacement();
-        }
+        redoPlacement(callback);
     }
 }
 
-void VectorTileData::redoPlacement() {
-    workRequest.reset();
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig] {
+void VectorTileData::redoPlacement(const std::function<void()>& callback) {
+    // Don't start a new placement request when the current one hasn't completed yet, or when
+    // we are parsing buckets.
+    if (workRequest) return;
+
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -183,7 +170,9 @@ void VectorTileData::redoPlacement() {
         // The target configuration could have changed since we started placement. In this case,
         // we're starting another placement run.
         if (placedConfig != targetConfig) {
-            redoPlacement();
+            redoPlacement(callback);
+        } else {
+            callback();
         }
     });
 }

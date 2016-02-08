@@ -5,7 +5,7 @@ namespace mbgl {
 
 CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
         const float top, const float bottom, const float left, const float right,
-        const float boxScale, const float padding, const bool alongLine) {
+        const float boxScale, const float padding, const bool alongLine, const bool straight) {
 
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
@@ -22,14 +22,24 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
 
         height = std::max(10.0f * boxScale, height);
 
-        bboxifyLabel(line, anchor, length, height);
+        Coordinate anchorPoint(int16_t(anchor.x), int16_t(anchor.y));
+
+        if (straight) {
+            // used for icon labels that are aligned with the line, but don't curve along it
+            const vec2<double> vector = util::unit(vec2<double>(line[anchor.segment + 1] - line[anchor.segment])) * length;
+            const std::vector<Coordinate> newLine({ anchorPoint - vector, anchorPoint + vector });
+            bboxifyLabel(newLine, anchorPoint, 0, length, height);
+        } else {
+            // used for text labels that curve along a line
+            bboxifyLabel(line, anchorPoint, anchor.segment, length, height);
+        }
     } else {
         boxes.emplace_back(anchor, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
     }
 }
 
 void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
-        const Anchor &anchor, const float labelLength, const float boxSize) {
+        Coordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
 
     const float step = boxSize / 2;
     const unsigned int nBoxes = std::floor(labelLength / step);
@@ -38,10 +48,8 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
     // box is at the edge of the label.
     const float firstBoxOffset = -boxSize / 2;
 
-    Coordinate anchorPoint = Coordinate{ (int16_t)anchor.x, (int16_t)anchor.y };
-
     Coordinate &p = anchorPoint;
-    int index = anchor.segment + 1;
+    int index = segment + 1;
     float anchorDistance = firstBoxOffset;
 
     // move backwards along the line to the first segment the label appears on

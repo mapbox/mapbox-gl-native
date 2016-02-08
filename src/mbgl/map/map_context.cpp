@@ -21,6 +21,7 @@
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <algorithm>
 
@@ -37,9 +38,6 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLCon
 
     util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
-
-    asyncUpdate.unref();
-    asyncInvalidate.unref();
 
     view.activate();
 }
@@ -106,24 +104,23 @@ void MapContext::setStyleURL(const std::string& url) {
     }
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    styleRequest = fs->request({ Resource::Kind::Style, styleURL }, [this, base](Response res) {
-        if (res.stale) {
-            // Only handle fresh responses.
-            return;
-        }
-        styleRequest = nullptr;
-
+    styleRequest = fs->request(Resource::style(styleURL), [this, base](Response res) {
         if (res.error) {
-            if (res.error->reason == Response::Error::Reason::NotFound && styleURL.find("mapbox://") == 0) {
+            if (res.error->reason == Response::Error::Reason::NotFound &&
+                util::mapbox::isMapboxURL(styleURL)) {
                 Log::Error(Event::Setup, "style %s could not be found or is an incompatible legacy map or style", styleURL.c_str());
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
                 data.loading = false;
             }
-        } else {
-            loadStyleJSON(*res.data, base);
+            return;
         }
 
+        if (res.notModified) {
+            return;
+        }
+
+        loadStyleJSON(*res.data, base);
     });
 }
 
@@ -133,7 +130,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     }
 
     styleURL.clear();
-    styleJSON = json;
+    styleJSON.clear();
 
     style = std::make_unique<Style>(data);
 
@@ -145,6 +142,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     style->setJSON(json, base);
     style->setObserver(this);
+    styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
@@ -180,7 +178,7 @@ void MapContext::update() {
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::Zoom) {
-        style->recalculate(transformState.getNormalizedZoom());
+        style->recalculate(transformState.getZoom());
     }
 
     style->update(transformState, *texturePool);
@@ -272,14 +270,27 @@ void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<cons
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     data.getAnnotationManager()->addIcon(name, sprite);
 }
+    
+void MapContext::removeAnnotationIcon(const std::string& name) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    data.getAnnotationManager()->removeIcon(name);
+}
 
 double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
 }
 
-void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, mapbox::util::optional<std::string> after) {
+void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> after) {
     style->addLayer(std::move(layer), after);
+    updateFlags |= Update::Classes;
+    asyncUpdate.send();
+}
+
+void MapContext::removeLayer(const std::string& id) {
+    style->removeLayer(id);
+    updateFlags |= Update::Classes;
+    asyncUpdate.send();
 }
 
 std::vector<FeatureDescription> MapContext::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
@@ -305,15 +316,12 @@ void MapContext::onLowMemory() {
     asyncInvalidate.send();
 }
 
-void MapContext::onTileDataChanged() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+void MapContext::onResourceLoaded() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }
 
-void MapContext::onResourceLoadingFailed(std::exception_ptr error) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
+void MapContext::onResourceError(std::exception_ptr error) {
     if (data.mode == MapMode::Still && callback) {
         callback(error, {});
         callback = nullptr;

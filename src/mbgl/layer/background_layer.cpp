@@ -7,7 +7,7 @@ std::unique_ptr<StyleLayer> BackgroundLayer::clone() const {
     return std::make_unique<BackgroundLayer>(*this);
 }
 
-void BackgroundLayer::parsePaints(const JSVal& layer) {
+void BackgroundLayer::parsePaints(const JSValue& layer) {
     paint.opacity.parse("background-opacity", layer);
     paint.color.parse("background-color", layer);
     paint.pattern.parse("background-pattern", layer);

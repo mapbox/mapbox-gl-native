@@ -34,6 +34,7 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -131,6 +132,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.stencilMask = 0xFF;
         config.depthTest = GL_FALSE;
         config.depthMask = GL_TRUE;
+        config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
         config.clearColor = { background[0], background[1], background[2], background[3] };
         config.clearStencil = 0;
         config.clearDepth = 1;
@@ -152,7 +154,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         drawClippingMasks(sources);
     }
 
-    frameHistory.record(data.getAnimationTime(), state.getNormalizedZoom());
+    frameHistory.record(data.getAnimationTime(), state.getZoom());
 
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
@@ -239,6 +241,7 @@ void Painter::renderPass(RenderPass pass_,
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.id + " - custom");
+            VertexArrayObject::Unbind();
             layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
@@ -254,13 +257,13 @@ void Painter::renderPass(RenderPass pass_,
 }
 
 void Painter::renderBackground(const BackgroundLayer& layer) {
-    // Note: This function is only called for textured background. Otherwise, the background color
-    // is created with glClear.
+    // Note that for bottommost layers without a pattern, the background color is drawn with
+    // glClear rather than this method.
     const BackgroundPaintProperties& properties = layer.paint;
 
     if (!properties.pattern.value.to.empty()) {
-        mapbox::util::optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        mapbox::util::optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
+        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
 
         if (!imagePosA || !imagePosB)
             return;
@@ -277,7 +280,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = state.getLatLng();
-        PrecisionPoint center = state.latLngToPoint(latLng);
+        TileCoordinate center = state.latLngToCoordinate(latLng);
         float scale = 1 / std::pow(2, zoomFraction);
 
         std::array<float, 2> sizeA = (*imagePosA).size;
@@ -287,8 +290,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                       1.0f / (sizeA[0] * properties.pattern.value.fromScale),
                       1.0f / (sizeA[1] * properties.pattern.value.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(center.x * 512, sizeA[0] * properties.pattern.value.fromScale),
-                          std::fmod(center.y * 512, sizeA[1] * properties.pattern.value.fromScale));
+                          std::fmod(center.column * util::tileSize, sizeA[0] * properties.pattern.value.fromScale),
+                          std::fmod(center.row    * util::tileSize, sizeA[1] * properties.pattern.value.fromScale));
         matrix::rotate(matrixA, matrixA, -state.getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
@@ -301,8 +304,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                       1.0f / (sizeB[0] * properties.pattern.value.toScale),
                       1.0f / (sizeB[1] * properties.pattern.value.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(center.x * 512, sizeB[0] * properties.pattern.value.toScale),
-                          std::fmod(center.y * 512, sizeB[1] * properties.pattern.value.toScale));
+                          std::fmod(center.column * util::tileSize, sizeB[0] * properties.pattern.value.toScale),
+                          std::fmod(center.row    * util::tileSize, sizeB[1] * properties.pattern.value.toScale));
         matrix::rotate(matrixB, matrixB, -state.getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * state.getWidth()  / 2,
@@ -315,13 +318,24 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         backgroundBuffer.bind();
         patternShader->bind(0);
         spriteAtlas->bind(true);
+    } else {
+        Color color = properties.color;
+        color[0] *= properties.opacity;
+        color[1] *= properties.opacity;
+        color[2] *= properties.opacity;
+        color[3] *= properties.opacity;
+
+        config.program = plainShader->program;
+        plainShader->u_matrix = identityMatrix;
+        plainShader->u_color = color;
+        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
     }
 
     config.stencilTest = GL_FALSE;
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
-    config.depthRange = { 1.0f, 1.0f };
+    setDepthSublayer(0);
 
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 }
@@ -330,8 +344,7 @@ mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &t
     if (translation[0] == 0 && translation[1] == 0) {
         return matrix;
     } else {
-        // TODO: Get rid of the 8 (scaling from 4096 to tile size)
-        const double factor = ((double)(1 << id.z)) / state.getScale() * (4096.0 / util::tileSize / id.overscaling);
+        const double factor = ((double)(1 << id.z)) / state.getScale() * (util::EXTENT / util::tileSize / id.overscaling);
 
         mat4 vtxMatrix;
         if (anchor == TranslateAnchorType::Viewport) {

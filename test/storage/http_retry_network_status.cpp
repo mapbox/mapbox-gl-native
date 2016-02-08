@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -18,7 +18,7 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/delayed" };
 
@@ -26,26 +26,25 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
     std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
          req.reset();
          EXPECT_EQ(nullptr, res.error);
-         EXPECT_EQ(false, res.stale);
          ASSERT_TRUE(res.data.get());
          EXPECT_EQ("Response", *res.data);
-         EXPECT_EQ(Seconds::zero(), res.expires);
-         EXPECT_EQ(Seconds::zero(), res.modified);
-         EXPECT_EQ("", res.etag);
+         EXPECT_FALSE(bool(res.expires));
+         EXPECT_FALSE(bool(res.modified));
+         EXPECT_FALSE(bool(res.etag));
          loop.stop();
          HTTPNetworkStatusChange.finish();
     });
 
     // After 50 milliseconds, we're going to trigger a NetworkStatus change.
     util::Timer reachableTimer;
-    reachableTimer.start(std::chrono::milliseconds(50), Duration::zero(), [] () {
+    reachableTimer.start(Milliseconds(50), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 
     // This timer will keep the loop alive to make sure we would be getting a response in caes the
     // network status change triggered another change (which it shouldn't).
     util::Timer delayTimer;
-    delayTimer.start(std::chrono::milliseconds(300), Duration::zero(), [] () {});
+    delayTimer.start(Milliseconds(300), Duration::zero(), [] () {});
 
     loop.run();
 }
@@ -58,7 +57,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const auto start = Clock::now();
 
@@ -87,11 +86,10 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
 #else
         FAIL();
 #endif
-        EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
 
         if (counter++ == 1) {
             req.reset();
@@ -102,7 +100,7 @@ TEST_F(Storage, HTTPNetworkStatusChangePreempt) {
 
     // After 400 milliseconds, we're going to trigger a NetworkStatus change.
     util::Timer reachableTimer;
-    reachableTimer.start(std::chrono::milliseconds(400), Duration::zero(), [] () {
+    reachableTimer.start(Milliseconds(400), Duration::zero(), [] () {
         mbgl::NetworkStatus::Reachable();
     });
 

@@ -1,6 +1,7 @@
 #include <mbgl/layer/circle_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/circle_bucket.hpp>
+#include <mbgl/util/get_geometries.hpp>
 
 namespace mbgl {
 
@@ -8,7 +9,7 @@ std::unique_ptr<StyleLayer> CircleLayer::clone() const {
     return std::make_unique<CircleLayer>(*this);
 }
 
-void CircleLayer::parsePaints(const JSVal& layer) {
+void CircleLayer::parsePaints(const JSValue& layer) {
     paint.radius.parse("circle-radius", layer);
     paint.color.parse("circle-color", layer);
     paint.opacity.parse("circle-opacity", layer);
@@ -45,7 +46,7 @@ std::unique_ptr<Bucket> CircleLayer::createBucket(StyleBucketParameters& paramet
     auto bucket = std::make_unique<CircleBucket>();
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
-        bucket->addGeometry(feature.getGeometries());
+        bucket->addGeometry(getGeometries(feature));
     });
 
     return std::move(bucket);

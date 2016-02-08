@@ -148,20 +148,20 @@ bool Map::isPanning() const {
 
 #pragma mark -
 
-void Map::jumpTo(const CameraOptions& options) {
-    transform->jumpTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::jumpTo(const CameraOptions& camera) {
+    transform->jumpTo(camera);
+    update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
 
-void Map::easeTo(const CameraOptions& options) {
-    transform->easeTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    transform->easeTo(camera, animation);
+    update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
     
     
-void Map::flyTo(const CameraOptions& options) {
-    transform->flyTo(options);
-    update(options.zoom ? Update::Zoom : Update::Repaint);
+void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
+    transform->flyTo(camera, animation);
+    update(Update::Zoom);
 }
 
 #pragma mark - Position
@@ -172,7 +172,11 @@ void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
 }
 
 void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
-    transform->setLatLng(latLng, duration);
+    setLatLng(latLng, EdgeInsets(), duration);
+}
+
+void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLng(latLng, padding, duration);
     update(Update::Repaint);
 }
 
@@ -181,16 +185,19 @@ void Map::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Dur
     update(Update::Repaint);
 }
 
-LatLng Map::getLatLng() const {
-    return transform->getLatLng();
+LatLng Map::getLatLng(const EdgeInsets& padding) const {
+    return transform->getLatLng(padding);
 }
 
-void Map::resetPosition() {
-    CameraOptions options;
-    options.angle = 0;
-    options.center = LatLng(0, 0);
-    options.zoom = 0;
-    transform->jumpTo(options);
+void Map::resetPosition(const EdgeInsets& padding) {
+    CameraOptions camera;
+    camera.angle = 0;
+    camera.center = LatLng(0, 0);
+    if (padding) {
+        camera.padding = padding;
+    }
+    camera.zoom = 0;
+    transform->jumpTo(camera);
     update(Update::Zoom);
 }
 
@@ -212,7 +219,11 @@ double Map::getScale() const {
 }
 
 void Map::setZoom(double zoom, const Duration& duration) {
-    transform->setZoom(zoom, duration);
+    setZoom(zoom, {}, duration);
+}
+
+void Map::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setZoom(zoom, padding, duration);
     update(Update::Zoom);
 }
 
@@ -221,16 +232,20 @@ double Map::getZoom() const {
 }
 
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& duration) {
-    transform->setLatLngZoom(latLng, zoom, duration);
+    setLatLngZoom(latLng, zoom, {}, duration);
+}
+
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
+    transform->setLatLngZoom(latLng, zoom, padding, duration);
     update(Update::Zoom);
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) {
     AnnotationSegment segment = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
+        bounds.northwest(),
+        bounds.southwest(),
+        bounds.southeast(),
+        bounds.northeast(),
     };
     return cameraForLatLngs(segment, padding);
 }
@@ -244,12 +259,13 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     PrecisionPoint nePixel = {-INFINITY, -INFINITY};
     PrecisionPoint swPixel = {INFINITY, INFINITY};
+    double viewportHeight = getHeight();
     for (LatLng latLng : latLngs) {
         PrecisionPoint pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
-        swPixel.y = std::min(swPixel.y, pixel.y);
-        nePixel.y = std::max(nePixel.y, pixel.y);
+        swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
+        nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
     }
     double width = nePixel.x - swPixel.x;
     double height = nePixel.y - swPixel.y;
@@ -259,7 +275,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     double scaleY = (getHeight() - padding.top - padding.bottom) / height;
     double minScale = ::fmin(scaleX, scaleY);
     double zoom = ::log2(getScale() * minScale);
-    zoom = ::fmax(::fmin(zoom, getMaxZoom()), getMinZoom());
+    zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     PrecisionPoint paddedNEPixel = {
@@ -274,6 +290,9 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
+    
+    // CameraOptions origin is at the top-left corner.
+    centerPixel.y = viewportHeight - centerPixel.y;
 
     options.center = latLngForPixel(centerPixel);
     options.zoom = zoom;
@@ -284,8 +303,22 @@ void Map::resetZoom() {
     setZoom(0);
 }
 
+void Map::setMinZoom(const double minZoom) {
+    transform->setMinZoom(minZoom);
+    if (getZoom() < minZoom) {
+        setZoom(minZoom);
+    }
+}
+
 double Map::getMinZoom() const {
     return transform->getState().getMinZoom();
+}
+
+void Map::setMaxZoom(const double maxZoom) {
+    transform->setMaxZoom(maxZoom);
+    if (getZoom() > maxZoom) {
+        setZoom(maxZoom);
+    }
 }
 
 double Map::getMaxZoom() const {
@@ -312,12 +345,16 @@ void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, co
 }
 
 void Map::setBearing(double degrees, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, duration);
+    setBearing(degrees, EdgeInsets(), duration);
+}
+
+void Map::setBearing(double degrees, const PrecisionPoint& center, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, center, duration);
     update(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, const PrecisionPoint& center) {
-    transform->setAngle(-degrees * M_PI / 180, center);
+void Map::setBearing(double degrees, const EdgeInsets& padding, const Duration& duration) {
+    transform->setAngle(-degrees * M_PI / 180, padding, duration);
     update(Update::Repaint);
 }
 
@@ -334,7 +371,11 @@ void Map::resetNorth(const Duration& duration) {
 #pragma mark - Pitch
 
 void Map::setPitch(double pitch, const Duration& duration) {
-    transform->setPitch(util::clamp(pitch, 0., 60.) * M_PI / 180, duration);
+    setPitch(pitch, {NAN, NAN}, duration);
+}
+
+void Map::setPitch(double pitch, const PrecisionPoint& anchor, const Duration& duration) {
+    transform->setPitch(pitch * M_PI / 180, anchor, duration);
     update(Update::Repaint);
 }
 
@@ -343,15 +384,19 @@ double Map::getPitch() const {
 }
 
 
+#pragma mark - North Orientation
+
+void Map::setNorthOrientation(NorthOrientation orientation) {
+    transform->setNorthOrientation(orientation);
+    update(Update::Repaint);
+}
+
+NorthOrientation Map::getNorthOrientation() const {
+    return transform->getNorthOrientation();
+}
+
+
 #pragma mark - Projection
-
-MetersBounds Map::getWorldBoundsMeters() const {
-    return Projection::getWorldBoundsMeters();
-}
-
-LatLngBounds Map::getWorldBoundsLatLng() const {
-    return Projection::getWorldBoundsLatLng();
-}
 
 double Map::getMetersPerPixelAtLatitude(double lat, double zoom) const {
     return Projection::getMetersPerPixelAtLatitude(lat, zoom);
@@ -366,11 +411,11 @@ LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) con
 }
 
 PrecisionPoint Map::pixelForLatLng(const LatLng& latLng) const {
-    return transform->getState().latLngToPoint(latLng);
+    return transform->latLngToPoint(latLng);
 }
 
 LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
-    return transform->getState().pointToLatLng(pixel);
+    return transform->pointToLatLng(pixel);
 }
 
 #pragma mark - Annotations
@@ -380,7 +425,7 @@ void Map::addAnnotationIcon(const std::string& name, std::shared_ptr<const Sprit
 }
 
 void Map::removeAnnotationIcon(const std::string& name) {
-    addAnnotationIcon(name, nullptr);
+    context->invoke(&MapContext::removeAnnotationIcon, name);
 }
 
 double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& symbol) {
@@ -420,10 +465,6 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return data->getAnnotationManager()->getPointAnnotationsInBounds(bounds);
 }
 
-LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
-    return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
-}
-
 
 #pragma mark - Style API
 
@@ -435,7 +476,11 @@ void Map::addCustomLayer(const std::string& id,
                          const char* before) {
     context->invoke(&MapContext::addLayer,
         std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
-        before ? std::string(before) : mapbox::util::optional<std::string>());
+        before ? std::string(before) : optional<std::string>());
+}
+
+void Map::removeCustomLayer(const std::string& id) {
+    context->invoke(&MapContext::removeLayer, id);
 }
 
 

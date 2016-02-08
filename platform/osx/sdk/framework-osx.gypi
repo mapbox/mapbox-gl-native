@@ -14,7 +14,6 @@
         'mbgl.gyp:platform-<(platform_lib)',
         'mbgl.gyp:http-<(http_lib)',
         'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:cache-<(cache_lib)',
       ],
 
       'xcode_settings': {
@@ -24,7 +23,7 @@
         'DYLIB_INSTALL_NAME_BASE': '@rpath',
         'INFOPLIST_FILE': '../platform/osx/sdk/Info.plist',
         'LD_RUNPATH_SEARCH_PATHS': [
-          '$(inherited)',
+          '${inherited}',
           '@executable_path/../Frameworks',
           '@loader_path/Frameworks',
         ],

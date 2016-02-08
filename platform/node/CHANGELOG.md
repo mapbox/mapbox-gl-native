@@ -1,3 +1,33 @@
+# 3.0.2
+
+- Fixes a memory leak in `NodeMap::request` ([#3829](https://github.com/mapbox/mapbox-gl-native/pull/3829))
+- Increases default max zoom level from 18 to 20 ([#3712](https://github.com/mapbox/mapbox-gl-native/pull/3712))
+- Support tiles with non-4096 extents ([#3766](https://github.com/mapbox/mapbox-gl-native/pull/3766))
+
+# 3.0.1
+
+- Fixes missing icon collision boxes ([#3672](https://github.com/mapbox/mapbox-gl-native/pull/3672))
+- Fixes texture filtering to draw sharper icons ([#3669](https://github.com/mapbox/mapbox-gl-native/pull/3669))
+
+
+# 3.0.0
+
+- Drops support for Node.js v0.10.x ([#3635](https://github.com/mapbox/mapbox-gl-native/pull/3635))
+- Fixes label clipping issues with `symbol-avoid-edges` ([#3623](https://github.com/mapbox/mapbox-gl-native/pull/3623))
+- Avoids label placement around sharp zig-zags ([#3640](https://github.com/mapbox/mapbox-gl-native/pull/3640))
+
+# 2.2.2
+
+- Fixes a bug with non-deterministic label placement [#3543](https://github.com/mapbox/mapbox-gl-native/pull/3543)
+
+# 2.2.1
+
+- Fixes a bug which clipped labels at tile boundaries [#2829](https://github.com/mapbox/mapbox-gl-native/pull/2829)
+
+# 2.2.0
+
+- Adds support for GeoJSON sources [#2161](https://github.com/mapbox/mapbox-gl-native/pull/2161)
+
 # 2.1.0
 
 - Adds [`line-offset`](https://github.com/mapbox/mapbox-gl/issues/3) style property support

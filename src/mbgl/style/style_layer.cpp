@@ -10,4 +10,8 @@ bool StyleLayer::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
 }
 
+bool StyleLayer::needsRendering() const {
+    return passes != RenderPass::None && visibility != VisibilityType::None;
+}
+
 } // namespace mbgl

@@ -41,6 +41,9 @@ public:
     void runOnce();
     void stop();
 
+    void ref();
+    void unref();
+
     // So far only needed by the libcurl backend.
     void addWatch(int fd, Event, std::function<void(int, Event)>&& callback);
     void removeWatch(int fd);
@@ -143,7 +146,7 @@ private:
     private:
         template <std::size_t... I>
         void invoke(std::index_sequence<I...>) {
-            func(std::get<I>(std::forward<P>(params))...);
+            func(std::move(std::get<I>(std::forward<P>(params)))...);
         }
 
         std::recursive_mutex mutex;

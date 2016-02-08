@@ -1,6 +1,6 @@
 #include "storage.hpp"
 
-#include <mbgl/storage/default_file_source.hpp>
+#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -13,7 +13,7 @@ TEST_F(Storage, HTTPTemporaryError) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const auto start = Clock::now();
 
@@ -26,12 +26,11 @@ TEST_F(Storage, HTTPTemporaryError) {
             ASSERT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
             EXPECT_EQ("HTTP status code 500", res.error->message);
-            EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
         } break;
         case 1: {
             req1.reset();
@@ -39,12 +38,11 @@ TEST_F(Storage, HTTPTemporaryError) {
             EXPECT_LT(0.99, duration) << "Backoff timer didn't wait 1 second";
             EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_EQ(false, res.stale);
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ("Hello World!", *res.data);
-            EXPECT_EQ(Seconds::zero(), res.expires);
-            EXPECT_EQ(Seconds::zero(), res.modified);
-            EXPECT_EQ("", res.etag);
+            EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(bool(res.modified));
+            EXPECT_FALSE(bool(res.etag));
             loop.stop();
             HTTPTemporaryError.finish();
         } break;
@@ -60,7 +58,7 @@ TEST_F(Storage, HTTPConnectionError) {
     using namespace mbgl;
 
     util::RunLoop loop;
-    DefaultFileSource fs(nullptr);
+    OnlineFileSource fs(nullptr);
 
     const auto start = Clock::now();
 
@@ -83,11 +81,10 @@ TEST_F(Storage, HTTPConnectionError) {
 #else
         FAIL();
 #endif
-        EXPECT_EQ(false, res.stale);
         ASSERT_FALSE(res.data.get());
-        EXPECT_EQ(Seconds::zero(), res.expires);
-        EXPECT_EQ(Seconds::zero(), res.modified);
-        EXPECT_EQ("", res.etag);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
 
         if (counter == 2) {
             req2.reset();

@@ -1,6 +1,7 @@
 #include <mbgl/style/function.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <cmath>
 
@@ -92,7 +93,7 @@ template class Function<TextTransformType>;
 template class Function<RotationAlignmentType>;
 
 template <typename T>
-size_t getBiggestStopLessThan(std::vector<std::pair<float, T>> stops, float z) {
+inline size_t getBiggestStopLessThan(const std::vector<std::pair<float, T>>& stops, float z) {
     for (uint32_t i = 0; i < stops.size(); i++) {
         if (stops[i].first > z) {
             return i == 0 ? i : i - 1;
@@ -106,7 +107,7 @@ Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& paramete
     Faded<T> result;
 
     float z = parameters.z;
-    float fraction = std::fmod(z, 1.0f);
+    const float fraction = z - std::floor(z);
     std::chrono::duration<float> d = parameters.defaultFadeDuration;
     float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
     float fromScale = 1.0f;

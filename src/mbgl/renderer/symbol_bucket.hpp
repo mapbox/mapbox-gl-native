@@ -3,6 +3,7 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/text_buffer.hpp>
@@ -45,12 +46,13 @@ class SymbolInstance {
     public:
         explicit SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
                 const Shaping& shapedText, const PositionedIcon& shapedIcon,
-                const SymbolLayoutProperties& layout, const bool inside,
+                const SymbolLayoutProperties& layout, const bool inside, const uint32_t index,
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
                 const GlyphPositions& face);
         float x;
         float y;
+        uint32_t index;
         bool hasText;
         bool hasIcon;
         SymbolQuads glyphQuads;
@@ -65,7 +67,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(float overscaling, float zoom);
+    SymbolBucket(float overscaling, float zoom, const MapMode);
     ~SymbolBucket() override;
 
     void upload() override;
@@ -78,8 +80,7 @@ public:
     void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,
                      GlyphAtlas&,
-                     GlyphStore&,
-                     CollisionTile&);
+                     GlyphStore&);
 
     void drawGlyphs(SDFShader& shader);
     void drawIcons(SDFShader& shader);
@@ -100,7 +101,6 @@ private:
     
     void addToDebugBuffers(CollisionTile &collisionTile);
 
-    void placeFeatures(CollisionTile& collisionTile, bool swapImmediately);
     void swapRenderData() override;
 
     // Adds placed items to the buffer.
@@ -111,14 +111,15 @@ private:
 public:
     SymbolLayoutProperties layout;
     bool sdfIcons = false;
+    bool iconsNeedLinear = false;
 
 private:
 
     const float overscaling;
     const float zoom;
     const float tileSize;
-    const float tileExtent = 4096.0f;
     const float tilePixelRatio;
+    const MapMode mode;
 
     std::set<GlyphRange> ranges;
     std::vector<SymbolInstance> symbolInstances;

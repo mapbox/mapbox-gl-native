@@ -10,7 +10,7 @@ std::string mbgl::toString(const mbgl::Value& value) {
     else return "null";
 }
 
-mbgl::Value mbgl::parseValue(const rapidjson::Value& value) {
+mbgl::Value mbgl::parseValue(const JSValue& value) {
     switch (value.GetType()) {
         case rapidjson::kNullType:
         case rapidjson::kFalseType:

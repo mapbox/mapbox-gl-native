@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_zoom_in"
+        android:title="Zoom in"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_zoom_out"
+        android:title="Zoom out"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_zoom_by"
+        android:title="Zoom by 2"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_zoom_to_point"
+        android:title="Zoom to point"
+        mapbox:showAsAction="never" />
+    <item
+        android:id="@+id/action_zoom_to"
+        android:title="Zoom to 4"
+        mapbox:showAsAction="never" />
+
+</menu>

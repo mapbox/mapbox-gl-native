@@ -13,21 +13,23 @@
         'mbgl.gyp:platform-<(platform_lib)',
         'mbgl.gyp:http-<(http_lib)',
         'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:cache-<(cache_lib)',
+      ],
+
+      'include_dirs': [
+        '../src',
       ],
 
       'sources': [
-        './native_map_view.cpp',
-        './jni.cpp',
+        './src/native_map_view.cpp',
+        './src/jni.cpp',
       ],
 
       'cflags_cc': [
         '<@(boost_cflags)',
-        '<@(variant_cflags)',
       ],
       'libraries': [
           '<@(libpng_static_libs)',
-          '<@(jpeg_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
@@ -42,7 +44,7 @@
           '-lstdc++',
           '-latomic',
           '<@(libpng_ldflags)',
-          '<@(jpeg_ldflags)',
+          '<@(libjpeg-turbo_ldflags)',
           '<@(sqlite_ldflags)',
           '<@(zlib_ldflags)',
           '<@(libzip_ldflags)',
@@ -59,10 +61,49 @@
       ],
     },
 
+    { 'target_name': 'example-custom-layer-lib',
+      'product_name': 'example-custom-layer',
+      'type': 'shared_library',
+      'hard_dependency': 1,
+
+      'sources': [
+        './src/example_custom_layer.cpp',
+      ],
+
+      'include_dirs': [
+        '../../include',
+      ],
+
+      'variables': {
+        'ldflags': [
+          '-llog',
+          '-landroid',
+          '-lEGL',
+          '-lGLESv2',
+          '-lstdc++',
+          '-latomic',
+        ],
+      },
+
+      'conditions': [
+        ['OS == "mac"', {
+          'xcode_settings': {
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
+          }
+        }, {
+          'libraries': [ '<@(ldflags)' ],
+        }]
+      ],
+    },
 
     { 'target_name': 'androidapp',
       'type': 'none',
       'hard_dependency': 1,
+
+      'dependencies': [
+        'android-lib',
+        'example-custom-layer-lib',
+      ],
 
       'variables': {
         'pwd': '<!(pwd)',
@@ -73,23 +114,29 @@
           'files': [
             '../../common/ca-bundle.crt',
           ],
-          'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main/assets'
+          'destination': '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main/assets'
         },
         {
         'files': [
           '<(PRODUCT_DIR)/obj.target'
         ],
-        'destination': '<(pwd)/../android/MapboxGLAndroidSDK/src/main'
+        'destination': '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main'
         },
       ],
 
       'actions': [
         {
-          'action_name': 'Strip dynamic library',
+          'action_name': 'Strip mapbox library',
           'inputs': [ '<(PRODUCT_DIR)/lib.target/libmapbox-gl.so' ],
-          'outputs': [ '<(pwd)/../android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
+          'outputs': [ '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main/jniLibs/$(JNIDIR)/libmapbox-gl.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         },
+        {
+          'action_name': 'Strip example custom layer library',
+          'inputs': [ '<(PRODUCT_DIR)/lib.target/libexample-custom-layer.so' ],
+          'outputs': [ '<(pwd)/../platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs/$(JNIDIR)/libexample-custom-layer.so' ],
+          'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
+        }
       ],
     },
   ],

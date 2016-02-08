@@ -1,4 +1,4 @@
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <mbgl/style/value_comparison.hpp>
 
@@ -23,43 +23,43 @@ bool evaluate(const FilterExpression& expression, const Extractor& extractor) {
 
 template <class Extractor>
 bool EqualsExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return actual && util::relaxed_equal(*actual, value);
 }
 
 template <class Extractor>
 bool NotEqualsExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return !actual || util::relaxed_not_equal(*actual, value);
 }
 
 template <class Extractor>
 bool LessThanExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return actual && util::relaxed_less(*actual, value);
 }
 
 template <class Extractor>
 bool LessThanEqualsExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return actual && util::relaxed_less_equal(*actual, value);
 }
 
 template <class Extractor>
 bool GreaterThanExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return actual && util::relaxed_greater(*actual, value);
 }
 
 template <class Extractor>
 bool GreaterThanEqualsExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     return actual && util::relaxed_greater_equal(*actual, value);
 }
 
 template <class Extractor>
 bool InExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     if (!actual)
         return false;
     for (const auto& v: values) {
@@ -72,7 +72,7 @@ bool InExpression::evaluate(const Extractor& extractor) const {
 
 template <class Extractor>
 bool NotInExpression::evaluate(const Extractor& extractor) const {
-    mapbox::util::optional<Value> actual = extractor.getValue(key);
+    optional<Value> actual = extractor.getValue(key);
     if (!actual)
         return true;
     for (const auto& v: values) {

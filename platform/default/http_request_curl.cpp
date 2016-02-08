@@ -4,11 +4,11 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/util/time.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <curl/curl.h>
 
@@ -47,9 +47,7 @@ public:
     HTTPCURLContext();
     ~HTTPCURLContext();
 
-    HTTPRequestBase* createRequest(const Resource&,
-                               RequestBase::Callback,
-                               std::shared_ptr<const Response>) final;
+    HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) final;
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
@@ -79,10 +77,7 @@ class HTTPCURLRequest : public HTTPRequestBase {
     MBGL_STORE_THREAD(tid)
 
 public:
-    HTTPCURLRequest(HTTPCURLContext*,
-                const Resource&,
-                Callback,
-                std::shared_ptr<const Response>);
+    HTTPCURLRequest(HTTPCURLContext*, const Resource&, Callback);
     ~HTTPCURLRequest();
 
     void cancel() final;
@@ -139,10 +134,8 @@ HTTPCURLContext::~HTTPCURLContext() {
     timeout.stop();
 }
 
-HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource,
-                                            RequestBase::Callback callback,
-                                            std::shared_ptr<const Response> response) {
-    return new HTTPCURLRequest(this, resource, callback, response);
+HTTPRequestBase* HTTPCURLContext::createRequest(const Resource& resource, HTTPRequestBase::Callback callback) {
+    return new HTTPCURLRequest(this, resource, callback);
 }
 
 CURL *HTTPCURLContext::getHandle() {
@@ -247,7 +240,7 @@ int HTTPCURLContext::startTimeout(CURLM * /* multi */, long timeout_ms, void *us
         timeout_ms = 0;
     }
     context->timeout.stop();
-    context->timeout.start(std::chrono::milliseconds(timeout_ms), Duration::zero(),
+    context->timeout.start(mbgl::Milliseconds(timeout_ms), Duration::zero(),
         std::bind(&HTTPCURLContext::onTimeout, context));
 
     return 0;
@@ -353,25 +346,22 @@ static CURLcode sslctx_function(CURL * /* curl */, void *sslctx, void * /* parm 
 }
 #endif
 
-HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_, std::shared_ptr<const Response> response_)
+HTTPCURLRequest::HTTPCURLRequest(HTTPCURLContext* context_, const Resource& resource_, Callback callback_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
-      existingResponse(response_),
       handle(context->getHandle()) {
     // Zero out the error buffer.
     memset(error, 0, sizeof(error));
 
     // If there's already a response, set the correct etags/modified headers to make sure we are
     // getting a 304 response if possible. This avoids redownloading unchanged data.
-    if (existingResponse) {
-        if (!existingResponse->etag.empty()) {
-            const std::string header = std::string("If-None-Match: ") + existingResponse->etag;
-            headers = curl_slist_append(headers, header.c_str());
-        } else if (existingResponse->modified != Seconds::zero()) {
-            const std::string time =
-                std::string("If-Modified-Since: ") + util::rfc1123(existingResponse->modified.count());
-            headers = curl_slist_append(headers, time.c_str());
-        }
+    if (resource.priorEtag) {
+        const std::string header = std::string("If-None-Match: ") + *resource.priorEtag;
+        headers = curl_slist_append(headers, header.c_str());
+    } else if (resource.priorModified) {
+        const std::string time =
+            std::string("If-Modified-Since: ") + util::rfc1123(*resource.priorModified);
+        headers = curl_slist_append(headers, time.c_str());
     }
 
     if (headers) {
@@ -467,15 +457,15 @@ size_t HTTPCURLRequest::headerCallback(char *const buffer, const size_t size, co
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = Seconds(curl_getdate(value.c_str(), nullptr));
+        baton->response->modified = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
-        baton->response->etag = { buffer + begin, length - begin - 2 }; // remove \r\n
+        baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
         baton->response->expires = parseCacheControl(value.c_str());
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = Seconds(curl_getdate(value.c_str(), nullptr));
+        baton->response->expires = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
     }
 
     return length;
@@ -530,19 +520,8 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         if (responseCode == 200) {
             // Nothing to do; this is what we want.
         } else if (responseCode == 304) {
-            if (existingResponse) {
-                // We're going to copy over the existing response's data.
-                if (existingResponse->error) {
-                    response->error = std::make_unique<Error>(*existingResponse->error);
-                }
-                response->data = existingResponse->data;
-                response->modified = existingResponse->modified;
-                // We're not updating `expired`, it was probably set during the request.
-                response->etag = existingResponse->etag;
-            } else {
-                // This is an unsolicited 304 response and should only happen on malfunctioning
-                // HTTP servers. It likely doesn't include any data, but we don't have much options.
-            }
+            response->notModified = true;
+            response->data.reset();
         } else if (responseCode == 404) {
             response->error =
                 std::make_unique<Error>(Error::Reason::NotFound, "HTTP status code 404");
@@ -558,7 +537,7 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
     }
 
     // Actually return the response.
-    notify(std::move(response));
+    notify(*response);
     delete this;
 }
 

@@ -3,7 +3,7 @@
   "sources": {
     "fake": {
       "type": "vector",
-      "url": "asset://TEST_DATA/fixtures/tiles/streets.json"
+      "url": "fake"
     }
   },
   "layers": [{
@@ -17,6 +17,5 @@
     "paint": {
       "fill-color": "rgba(255,0,0,1)"
     }
-  }],
-  "sprite": "asset://TEST_DATA/fixtures/resources/sprite"
+  }]
 }

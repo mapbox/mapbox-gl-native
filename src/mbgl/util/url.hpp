@@ -4,6 +4,7 @@
 #include <string>
 
 namespace mbgl {
+
 namespace util {
 
 std::string percentEncode(const std::string&);

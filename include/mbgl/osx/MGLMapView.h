@@ -69,7 +69,7 @@ IB_DESIGNABLE
     
     @param frame The frame for the view, measured in points.
     @return An initialized map view. */
-- (instancetype)initWithFrame:(CGRect)frame;
+- (instancetype)initWithFrame:(NSRect)frame;
 
 /** Initializes and returns a newly allocated map view with the specified frame
     and style URL.
@@ -80,7 +80,7 @@ IB_DESIGNABLE
         (`mapbox://styles/<user>/<style>`), or a path to a local file relative
         to the application’s resource path. Specify `nil` for the default style.
     @return An initialized map view. */
-- (instancetype)initWithFrame:(CGRect)frame styleURL:(nullable NSURL *)styleURL;
+- (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL;
 
 #pragma mark Accessing the delegate
 /** @name Accessing the Delegate */
@@ -182,13 +182,29 @@ IB_DESIGNABLE
  */
 @property (nonatomic) double zoomLevel;
 
-/** The minimum zoom level that can be displayed by the receiver using the
-    current style. */
-@property (nonatomic, readonly) double maximumZoomLevel;
+/**
+ * The minimum zoom level at which the map can be shown.
+ *
+ * Depending on the map view’s aspect ratio, the map view may be prevented
+ * from reaching the minimum zoom level, in order to keep the map from
+ * repeating within the current viewport.
+ *
+ * If the value of this property is greater than that of the
+ * maximumZoomLevel property, the behavior is undefined.
+ *
+ * The default minimumZoomLevel is 0.
+ */
+@property (nonatomic) double minimumZoomLevel;
 
-/** The maximum zoom level that can be displayed by the receiver using the
-    current style. */
-@property (nonatomic, readonly) double minimumZoomLevel;
+/**
+ * The maximum zoom level the map can be shown at.
+ *
+ * If the value of this property is smaller than that of the
+ * minimumZoomLevel property, the behavior is undefined.
+ *
+ * The default maximumZoomLevel is 20.
+ */
+@property (nonatomic) double maximumZoomLevel;
 
 /** Changes the zoom level of the map and optionally animates the change.
     
@@ -249,6 +265,50 @@ IB_DESIGNABLE
     @param completion The block to execute after the animation finishes. */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
+/** Moves the viewpoint to a different location using a transition animation
+    that evokes powered flight and a default duration based on the length of the
+    flight path.
+    
+    The transition animation seamlessly incorporates zooming and panning to help
+    the user find his or her bearings even after traversing a great distance.
+    
+    @param camera The new viewpoint.
+    @param completion The block to execute after the animation finishes. */
+- (void)flyToCamera:(MGLMapCamera *)camera completionHandler:(nullable void (^)(void))completion;
+
+/** Moves the viewpoint to a different location using a transition animation
+    that evokes powered flight and an optional transition duration.
+    
+    The transition animation seamlessly incorporates zooming and panning to help
+    the user find his or her bearings even after traversing a great distance.
+    
+    @param camera The new viewpoint.
+    @param duration The amount of time, measured in seconds, that the transition
+        animation should take. Specify `0` to jump to the new viewpoint
+        instantaneously. Specify a negative value to use the default duration,
+        which is based on the length of the flight path.
+    @param completion The block to execute after the animation finishes. */
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration completionHandler:(nullable void (^)(void))completion;
+
+/** Moves the viewpoint to a different location using a transition animation
+    that evokes powered flight and an optional transition duration and peak
+    altitude.
+    
+    The transition animation seamlessly incorporates zooming and panning to help
+    the user find his or her bearings even after traversing a great distance.
+    
+    @param camera The new viewpoint.
+    @param duration The amount of time, measured in seconds, that the transition
+        animation should take. Specify `0` to jump to the new viewpoint
+        instantaneously. Specify a negative value to use the default duration,
+        which is based on the length of the flight path.
+    @param peakAltitude The altitude, measured in meters, at the midpoint of the
+        animation. The value of this parameter is ignored if it is negative or
+        if the animation transition resulting from a similar call to
+        `-setCamera:animated:` would have a midpoint at a higher altitude.
+    @param completion The block to execute after the animation finishes. */
+- (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
+
 /** The geographic coordinate bounds visible in the receiver’s viewport.
     
     Changing the value of this property updates the receiver immediately. If you
@@ -263,6 +323,53 @@ IB_DESIGNABLE
     @param animated Specify `YES` to animate the change by smoothly scrolling
         and zooming or `NO` to immediately display the given bounds. */
 - (void)setVisibleCoordinateBounds:(MGLCoordinateBounds)bounds animated:(BOOL)animated;
+
+/** A Boolean value indicating whether the receiver automatically adjusts its
+    content insets.
+    
+    When the value of this property is `YES`, the map view automatically updates
+    its `contentInsets` property to account for any overlapping title bar or
+    toolbar. To overlap with the title bar or toolbar, the containing window’s
+    style mask must have `NSFullSizeContentViewWindowMask` set, and the title
+    bar must not be transparent.
+    
+    The default value of this property is `YES`. */
+@property (nonatomic, assign) BOOL automaticallyAdjustsContentInsets;
+
+/** The distance from the edges of the map view’s frame to the edges of the map
+    view’s logical viewport.
+    
+    When the value of this property is equal to `NSEdgeInsetsZero`, viewport
+    properties such as `centerCoordinate` assume a viewport that matches the map
+    view’s frame. Otherwise, those properties are inset, excluding part of the
+    frame from the viewport. For instance, if the only the top edge is inset,
+    the map center is effectively shifted downward.
+    
+    When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
+    the value of this property may be overridden at any time.
+    
+    Changing the value of this property updates the map view immediately. If you
+    want to animate the change, use the `-setContentInsets:animated:` method
+    instead. */
+@property (nonatomic, assign) NSEdgeInsets contentInsets;
+
+/** Sets the distance from the edges of the map view’s frame to the edges of the
+    map view’s logical viewport, with an optional transition animation.
+    
+    When the value of this property is equal to `NSEdgeInsetsZero`, viewport
+    properties such as `centerCoordinate` assume a viewport that matches the map
+    view’s frame. Otherwise, those properties are inset, excluding part of the
+    frame from the viewport. For instance, if the only the top edge is inset,
+    the map center is effectively shifted downward.
+    
+    When the value of the `automaticallyAdjustsContentInsets` property is `YES`,
+    the value of this property may be overridden at any time.
+    
+    @param contentInsets The new values to inset the content by.
+    @param animated Specify `YES` if you want the map view to animate the change
+        to the content insets or `NO` if you want the map to inset the content
+        immediately. */
+- (void)setContentInsets:(NSEdgeInsets)contentInsets animated:(BOOL)animated;
 
 #pragma mark Configuring gesture recognition
 /** @name Configuring How the User Interacts with the Map */
@@ -398,7 +505,7 @@ IB_DESIGNABLE
 /** Deselects an annotation and hides its callout popover.
     
     @param annotation The annotation object to deselect. */
-- (void)deselectAnnotation:(id <MGLAnnotation>)annotation;
+- (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation;
 
 /** A common view controller for managing a callout popover’s content view.
     

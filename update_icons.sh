@@ -10,7 +10,7 @@ branch=`git rev-parse --abbrev-ref HEAD`
 repo=`git remote show origin | grep 'Fetch URL' | sed -e 's/.*github\.com:mapbox\///' -e 's/\.git$//' -e 's/^mapbox-//'`
 
 pwd=`pwd`
-cd android/java/app/src/main/res
+cd platform/android/java/app/src/main/res
 for folder in `find . -maxdepth 1 -type d -name drawable-\*`
 do
     cd ${folder}

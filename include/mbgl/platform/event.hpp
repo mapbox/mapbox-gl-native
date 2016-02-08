@@ -37,7 +37,8 @@ enum class Event : uint8_t {
     OpenGL,
     JNI,
     Android,
-    Crash
+    Crash,
+    Glyph,
 };
 
 MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
@@ -56,6 +57,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::JNI, "JNI" },
     { Event::Android, "Android" },
     { Event::Crash, "Crash" },
+    { Event::Glyph, "Glyph" },
     { Event(-1), "Unknown" },
 });
 

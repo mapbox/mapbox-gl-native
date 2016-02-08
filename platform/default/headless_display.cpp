@@ -24,11 +24,9 @@ HeadlessDisplay::HeadlessDisplay() {
     CGLError error = CGLChoosePixelFormat(attributes, &pixelFormat, &num);
     if (error != kCGLNoError) {
         throw std::runtime_error(std::string("Error choosing pixel format:") + CGLErrorString(error) + "\n");
-        return;
     }
     if (num <= 0) {
         throw std::runtime_error("No pixel formats found.");
-        return;
     }
 #endif
 

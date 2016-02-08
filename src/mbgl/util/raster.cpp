@@ -24,16 +24,15 @@ bool Raster::isLoaded() const {
     return loaded;
 }
 
-bool Raster::load(PremultipliedImage image) {
+void Raster::load(PremultipliedImage image) {
+    assert(image.data.get());
+
     img = std::move(image);
     width = GLsizei(img.width);
     height = GLsizei(img.height);
 
     std::lock_guard<std::mutex> lock(mtx);
-    if (img.data.get()) {
-        loaded = true;
-    }
-    return loaded;
+    loaded = true;
 }
 
 

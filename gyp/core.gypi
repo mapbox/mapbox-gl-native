@@ -31,12 +31,10 @@
           '<@(opengl_cflags)',
           '<@(boost_cflags)',
           '<@(geojsonvt_cflags)',
-          '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
         ],
         'cflags': [
           '<@(opengl_cflags)',
-          '<@(variant_cflags)',
           '<@(rapidjson_cflags)',
           '-fPIC'
         ],

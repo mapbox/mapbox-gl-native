@@ -16,7 +16,7 @@ class GeometryTileLoader;
 
 using RasterTileParseResult = mapbox::util::variant<
     std::unique_ptr<Bucket>, // success
-    std::string>;            // error
+    std::exception_ptr>;     // error
 
 class Worker : public mbgl::util::noncopyable {
 public:
@@ -46,6 +46,7 @@ public:
                               std::function<void(TileParseResult)> callback);
 
     Request parsePendingGeometryTileLayers(TileWorker&,
+                                           PlacementConfig config,
                                            std::function<void(TileParseResult)> callback);
 
     Request redoPlacement(TileWorker&,

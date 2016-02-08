@@ -1,0 +1,125 @@
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
+
+task accessToken {
+    def tokenFile = new File("MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml")
+    if (!tokenFile.exists()) {
+        String tokenFileContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<resources>\n" +
+                "    <string name=\"access_token\">" + "$System.env.MAPBOX_ACCESS_TOKEN" + "</string>\n" +
+                "</resources>"
+
+        if (tokenFileContents == null) {
+            throw new InvalidUserDataException("You must set the MAPBOX_ACCESS_TOKEN environment variable.")
+        }
+        tokenFile.write(tokenFileContents)
+    }
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn('accessToken')
+}
+
+ext {
+    supportLibVersion = '23.1.1'
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.mapbox.mapboxsdk.testapp"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 7
+        versionName "3.1.0"
+
+        // Specify AndroidJUnitRunner as the default test instrumentation runner
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+    lintOptions {
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'IconDensities'
+        disable 'InvalidPackage'
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    buildTypes {
+        debug{
+            // run code coverage reports
+            testCoverageEnabled = true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile(project(':MapboxGLAndroidSDK')) {
+        transitive = true
+    }
+
+    // Support libraries
+    compile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+
+    // Leak Canary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta1'
+
+    // Directions SDK
+    compile ('com.mapbox.mapboxsdk:mapbox-android-directions:1.0.0@aar'){
+        transitive=true
+    }
+
+    // Geocoder SDK
+    compile ('com.mapbox.mapboxsdk:mapbox-android-geocoder:1.0.0@aar'){
+        transitive=true
+    }
+
+    // Testing dependencies
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+}
+
+checkstyle {
+    configFile project.file('../checks.xml')
+    showViolations true
+}
+
+android.applicationVariants.all { variant ->
+    def name = variant.buildType.name
+    def checkstyle = project.tasks.create "checkstyle${name.capitalize()}", Checkstyle
+    checkstyle.dependsOn variant.javaCompile
+    checkstyle.source variant.javaCompile.source
+    checkstyle.classpath = project.fileTree(variant.javaCompile.destinationDir)
+    checkstyle.exclude('**/BuildConfig.java')
+    checkstyle.exclude('**/R.java')
+    project.tasks.getByName("check").dependsOn checkstyle
+}

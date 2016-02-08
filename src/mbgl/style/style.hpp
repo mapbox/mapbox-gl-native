@@ -10,9 +10,8 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/interactive_features_impl.hpp>
-
-#include <mapbox/optional.hpp>
 
 #include <cstdint>
 #include <string>
@@ -59,12 +58,18 @@ public:
     Style(MapData&);
     ~Style();
 
-    class Observer {
+    class Observer : public GlyphStore::Observer,
+                     public SpriteStore::Observer,
+                     public Source::Observer {
     public:
-        virtual ~Observer() = default;
-
-        virtual void onTileDataChanged() = 0;
-        virtual void onResourceLoadingFailed(std::exception_ptr error) = 0;
+        /**
+         * In addition to the individual glyph, sprite, and source events, the
+         * following "rollup" events are provided for convenience. They are
+         * strictly additive; e.g. when a source is loaded, both `onSourceLoaded`
+         * and `onResourceLoaded` will be called.
+         */
+         virtual void onResourceLoaded() {};
+         virtual void onResourceError(std::exception_ptr) {};
     };
 
     void setJSON(const std::string& data, const std::string& base);
@@ -92,7 +97,7 @@ public:
     std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
     StyleLayer* getLayer(const std::string& id) const;
     void addLayer(std::unique_ptr<StyleLayer>,
-                  mapbox::util::optional<std::string> beforeLayerID = {});
+                  optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
     std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius, const TransformState& transform) const;
@@ -118,25 +123,24 @@ private:
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStore::Observer implementation.
-    void onGlyphRangeLoaded() override;
-    void onGlyphRangeLoadingFailed(std::exception_ptr error) override;
+    void onGlyphsLoaded(const std::string& fontStack, const GlyphRange&) override;
+    void onGlyphsError(const std::string& fontStack, const GlyphRange&, std::exception_ptr) override;
 
     // SpriteStore::Observer implementation.
     void onSpriteLoaded() override;
-    void onSpriteLoadingFailed(std::exception_ptr error) override;
+    void onSpriteError(std::exception_ptr) override;
 
     // Source::Observer implementation.
-    void onSourceLoaded() override;
-    void onSourceLoadingFailed(std::exception_ptr error) override;
-    void onTileLoaded(bool isNewTile) override;
-    void onTileLoadingFailed(std::exception_ptr error) override;
-
-    void emitTileDataChanged();
-    void emitResourceLoadingFailed(std::exception_ptr error);
+    void onSourceLoaded(Source&) override;
+    void onSourceError(Source&, std::exception_ptr) override;
+    void onTileLoaded(Source&, const TileID&, bool isNewTile) override;
+    void onTileError(Source&, const TileID&, std::exception_ptr) override;
+    void onPlacementRedone() override;
 
     bool shouldReparsePartialTiles = false;
 
-    Observer* observer = nullptr;
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 
     std::exception_ptr lastError;
 

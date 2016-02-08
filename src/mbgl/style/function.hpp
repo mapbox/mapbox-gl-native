@@ -3,8 +3,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/chrono.hpp>
-
-#include <mapbox/optional.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <utility>

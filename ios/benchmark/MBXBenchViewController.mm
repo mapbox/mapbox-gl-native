@@ -4,14 +4,14 @@
 
 #include "locations.hpp"
 
-#include <chrono>
+#include <mbgl/util/chrono.hpp>
 
 @interface MGLMapView (MBXBenchmarkAdditions)
 
 #pragma mark - Debugging
 
 /** Triggers another render pass even when it is not necessary. */
-- (void)invalidate;
+- (void)setNeedsGLDisplay;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;
@@ -52,7 +52,6 @@
     self.mapView.scrollEnabled = NO;
     self.mapView.rotateEnabled = NO;
     self.mapView.userInteractionEnabled = YES;
-    [self.mapView setDebugActive:NO];
 
     [self startBenchmarkIteration];
 
@@ -60,17 +59,10 @@
 
 }
 
-using Clock = std::chrono::steady_clock;
-using TimePoint = Clock::time_point;
-template <typename Duration>
-inline int64_t Microseconds(Duration d) {
-    return std::chrono::duration_cast<std::chrono::microseconds>(d).count();
-}
-
 size_t idx = 0;
 enum class State { None, WaitingForAssets, WarmingUp, Benchmarking } state = State::None;
 int frames = 0;
-TimePoint started;
+mbgl::TimePoint started;
 std::vector<std::pair<std::string, double>> result;
 
 static const int warmupDuration = 20; // frames
@@ -110,8 +102,8 @@ static const int benchmarkDuration = 200; // frames
             state = State::None;
 
             // Report FPS
-            const auto duration = Microseconds(Clock::now() - started);
-            const auto fps = double(frames * 1e6) / duration;
+            const auto duration = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - started).count();
+            const auto fps = double(frames * 1e3) / duration;
             result.emplace_back(mbgl::bench::locations[idx].name, fps);
             NSLog(@"- FPS: %.1f", fps);
 
@@ -119,7 +111,7 @@ static const int benchmarkDuration = 200; // frames
             idx++;
             [self startBenchmarkIteration];
         } else {
-            [mapView invalidate];
+            [mapView setNeedsGLDisplay];
         }
         return;
     }
@@ -131,10 +123,10 @@ static const int benchmarkDuration = 200; // frames
         {
             frames = 0;
             state = State::Benchmarking;
-            started = Clock::now();
+            started = mbgl::Clock::now();
             NSLog(@"- Benchmarking for %d frames...", benchmarkDuration);
         }
-        [mapView invalidate];
+        [mapView setNeedsGLDisplay];
         return;
     }
 
@@ -146,7 +138,7 @@ static const int benchmarkDuration = 200; // frames
             state = State::WarmingUp;
             [self.mapView emptyMemoryCache];
             NSLog(@"- Warming up for %d frames...", warmupDuration);
-            [mapView invalidate];
+            [mapView setNeedsGLDisplay];
         }
         return;
     }

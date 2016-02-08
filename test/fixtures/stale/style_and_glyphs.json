@@ -1,0 +1,39 @@
+{
+  "version": 8,
+  "name": "Water",
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "asset://test/fixtures/stale/streets.json"
+    }
+  },
+  "glyphs": "http://127.0.0.1:3000/stale/{fontstack}/{range}.pbf",
+  "layers": [{
+    "id": "background",
+    "type": "background",
+    "paint": {
+      "background-color": "red"
+    }
+  }, {
+    "id": "water",
+    "type": "fill",
+    "source": "mapbox",
+    "source-layer": "water",
+    "paint": {
+      "fill-color": "blue"
+    }
+  }, {
+    "id": "admin",
+    "type": "symbol",
+    "source": "mapbox",
+    "source-layer": "admin",
+    "layout": {
+        "text-field": "Text"
+    },
+    "paint": {
+      "text-color": "black",
+      "text-halo-color": "white",
+      "text-halo-width": 2
+    }
+  }]
+}
