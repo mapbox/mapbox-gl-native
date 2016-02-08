@@ -4,6 +4,7 @@
 *.actual.png
 *.diff.png
 *.pyc
+offline.db
 /platform/android/debug
 /platform/android/sdk
 /platform/android/**/.classpath

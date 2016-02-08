@@ -53,6 +53,8 @@ public:
     Error(Reason, const std::string& = "");
 };
 
+std::ostream& operator<<(std::ostream&, Response::Error::Reason);
+
 } // namespace mbgl
 
 #endif

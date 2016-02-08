@@ -116,11 +116,11 @@ ifeq ($(BUILD),osx)
 xtest: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/test
 endif
 
-.PHONY: render xrender
+.PHONY: render
 render: ; $(RUN) Makefile/mbgl-render
-ifeq ($(BUILD),osx)
-xrender: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/mbgl-render
-endif
+
+.PHONY: offline
+offline: ; $(RUN) Makefile/mbgl-offline
 
 
 ##### Maintenace operations ####################################################
