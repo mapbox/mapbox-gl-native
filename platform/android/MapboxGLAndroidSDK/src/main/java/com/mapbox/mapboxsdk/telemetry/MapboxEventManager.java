@@ -68,6 +68,7 @@ public class MapboxEventManager {
     private String mapboxSessionId = null;
     private static long hourInMillis = 1000 * 60 * 60;
     private static long flushDelayInMillis = 1000 * 60 * 2;
+    private static final int SESSION_ID_ROTATION_HOURS = 24;
 
     private Timer timer = null;
 
@@ -163,13 +164,13 @@ public class MapboxEventManager {
             return;
         }
 
-        // Rotate if it's been 12 hours and last event was over an hour ago
+        // Rotate if it's been SESSION_ID_ROTATION_HOURS hours
         int start = mapboxSessionId.indexOf("-") + 1;
         int end = mapboxSessionId.indexOf("-", start);
         long time = Long.valueOf(mapboxSessionId.substring(start, end));
 
         long now = System.currentTimeMillis();
-        if (now - time > (12 * hourInMillis)) {
+        if (now - time > (SESSION_ID_ROTATION_HOURS * hourInMillis)) {
             mapboxSessionId = generateNewSessionId();
         }
     }
