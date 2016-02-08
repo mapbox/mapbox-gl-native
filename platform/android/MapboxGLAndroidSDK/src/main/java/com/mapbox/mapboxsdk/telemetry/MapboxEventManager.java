@@ -182,14 +182,14 @@ public class MapboxEventManager {
         return "Background";
     }
 
-    private String getAccesibilityFontScaleSize() {
+    private float getAccesibilityFontScaleSize() {
         // Values
         // Small = 0.85
         // Normal = 1.0
         // Large = 1.15
         // Huge = 1.3
 
-        return String.valueOf(context.getResources().getConfiguration().fontScale);
+        return context.getResources().getConfiguration().fontScale;
     }
 
     private String getCellularCarrier() {
