@@ -49,9 +49,13 @@ Known issues:
 - Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
   - Resolved in 2.2.0
 
+## iOS 3.1.1
+
+- Fixed Fabric compatibility. ([#3847](https://github.com/mapbox/mapbox-gl-native/pull/3847))
+
 ## iOS 3.1.0
 
-- The SDK is now distributed as a dynamic framework instead of a static library, resulting in a simpler installation workflow and significantly reduced download size. The framework contains both simulator and device content; due to [an Xcode bug](http://www.openradar.me/radar?id=6409498411401216), you’ll need to strip out the simulator content before submitting your application to the App Store. ([#3183](https://github.com/mapbox/mapbox-gl-native/pull/3183))
+- The SDK is now distributed as a dynamic framework instead of a static library, resulting in a simpler installation workflow and significantly reduced download size. The framework contains both simulator and device content. If you install the dynamic framework manually, you’ll need to strip out the simulator content before submitting your application to the App Store due to [an Xcode bug](http://www.openradar.me/radar?id=6409498411401216); see the installation instructions included with the framework for details. ([#3183](https://github.com/mapbox/mapbox-gl-native/pull/3183))
 - Fixed an issue causing the entire MGLMapView to leak. ([#3447](https://github.com/mapbox/mapbox-gl-native/pull/3447))
 - `MGLMapView` methods that alter the viewport now accept optional completion handlers. ([#3090](https://github.com/mapbox/mapbox-gl-native/pull/3090))
 - You can now modify an annotation’s image after adding the annotation to the map. ([#3146](https://github.com/mapbox/mapbox-gl-native/pull/3146))
