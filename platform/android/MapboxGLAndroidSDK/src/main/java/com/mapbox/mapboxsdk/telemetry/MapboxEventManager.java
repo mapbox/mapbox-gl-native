@@ -76,7 +76,7 @@ public class MapboxEventManager {
             mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "Default Value");
             Log.i(TAG, "Found Vendor Id = " + mapboxVendorId);
         } else {
-            String vendorId = "Mapbox-" + UUID.randomUUID().toString();
+            String vendorId = UUID.randomUUID().toString();
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, vendorId);
             editor.apply();
