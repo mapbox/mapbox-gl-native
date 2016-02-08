@@ -2,6 +2,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/thread.hpp>
+#include <mbgl/util/url.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -59,7 +60,8 @@ public:
         struct zip_stat stat;
         ::zip_stat_init(&stat);
 
-        std::string path = std::string("assets/") + url.substr(8);
+        std::string path = std::string("assets/") + mbgl::util::percentDecode(url.substr(8));
+
         int ret = ::zip_stat(archive.archive, path.c_str(), 0, &stat);
         if (ret < 0 || !(stat.valid & ZIP_STAT_SIZE)) {
             reportError(Response::Error::Reason::NotFound, "Could not stat file in zip archive", callback);
