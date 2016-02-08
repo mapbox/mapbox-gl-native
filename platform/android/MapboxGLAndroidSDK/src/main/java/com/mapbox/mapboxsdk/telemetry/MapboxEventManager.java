@@ -57,8 +57,6 @@ public class MapboxEventManager {
     private static final String MAPBOX_EVENTS_BASE_URL = "https://api.tiles.mapbox.com";
     private String eventsURL = MAPBOX_EVENTS_BASE_URL;
 
-    private static final String SESSION_UUID = UUID.randomUUID().toString();
-
     private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
 
     private Intent batteryStatus = null;
@@ -325,7 +323,6 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, mapboxSessionId);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_INSTANCE, SESSION_UUID);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
