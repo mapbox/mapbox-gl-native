@@ -25,6 +25,7 @@ struct NodeMap::RenderOptions {
     unsigned int width = 512;
     unsigned int height = 512;
     std::vector<std::string> classes;
+    mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,6 +241,30 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
         }
     }
 
+    if (Nan::Has(obj, Nan::New("debug").ToLocalChecked()).FromJust()) {
+        auto debug = Nan::Get(obj, Nan::New("debug").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Object>();
+        if (Nan::Has(debug, Nan::New("tileBorders").ToLocalChecked()).FromJust()) {
+            if (Nan::Get(debug, Nan::New("tileBorders").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::TileBorders;
+            }
+        }
+        if (Nan::Has(debug, Nan::New("parseStatus").ToLocalChecked()).FromJust()) {
+            if (Nan::Get(debug, Nan::New("parseStatus").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::ParseStatus;
+            }
+        }
+        if (Nan::Has(debug, Nan::New("timestamps").ToLocalChecked()).FromJust()) {
+            if (Nan::Get(debug, Nan::New("timestamps").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::Timestamps;
+            }
+        }
+        if (Nan::Has(debug, Nan::New("collision").ToLocalChecked()).FromJust()) {
+            if (Nan::Get(debug, Nan::New("collision").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::Collision;
+            }
+        }
+    }
+
     return options;
 }
 
@@ -302,6 +327,7 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     map->setLatLngZoom(mbgl::LatLng(options.latitude, options.longitude), options.zoom);
     map->setBearing(options.bearing);
     map->setPitch(options.pitch);
+    map->setDebug(options.debugOptions);
 
     map->renderStill([this](const std::exception_ptr eptr, mbgl::PremultipliedImage&& result) {
         if (eptr) {

@@ -137,22 +137,6 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
 
     config.depthMask = GL_FALSE;
 
-    if (bucket.hasCollisionBoxData()) {
-        config.stencilOp.reset();
-        config.stencilTest = GL_TRUE;
-
-        config.program = collisionBoxShader->program;
-        collisionBoxShader->u_matrix = matrix;
-        collisionBoxShader->u_scale = std::pow(2, state.getZoom() - id.z);
-        collisionBoxShader->u_zoom = state.getZoom() * 10;
-        collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
-        config.lineWidth = 1.0f;
-
-        setDepthSublayer(0);
-        bucket.drawCollisionBoxes(*collisionBoxShader);
-
-    }
-
     // TODO remove the `true ||` when #1673 is implemented
     const bool drawAcrossEdges = (data.mode == MapMode::Continuous) && (true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
           layout.text.ignorePlacement || layout.icon.ignorePlacement));
@@ -269,6 +253,22 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
                   *sdfGlyphShader,
                   &SymbolBucket::drawGlyphs);
+    }
+
+    if (bucket.hasCollisionBoxData()) {
+        config.stencilOp.reset();
+        config.stencilTest = GL_TRUE;
+
+        config.program = collisionBoxShader->program;
+        collisionBoxShader->u_matrix = matrix;
+        collisionBoxShader->u_scale = std::pow(2, state.getZoom() - id.z);
+        collisionBoxShader->u_zoom = state.getZoom() * 10;
+        collisionBoxShader->u_maxzoom = (id.z + 1) * 10;
+        config.lineWidth = 1.0f;
+
+        setDepthSublayer(0);
+        bucket.drawCollisionBoxes(*collisionBoxShader);
+
     }
 
 }
