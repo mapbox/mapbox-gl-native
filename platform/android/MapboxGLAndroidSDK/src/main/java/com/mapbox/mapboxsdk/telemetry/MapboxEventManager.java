@@ -27,6 +27,8 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
@@ -67,8 +69,10 @@ public class MapboxEventManager {
 
     private String mapboxSessionId = null;
     private static long hourInMillis = 1000 * 60 * 60;
-    private static long flushDelayInMillis = 1000 * 60 * 2;
+    private static long flushDelayInMillis = 1000 * 60 * 2;  // 2 Minutes
     private static final int SESSION_ID_ROTATION_HOURS = 24;
+
+    private static MessageDigest messageDigest = null;
 
     private Timer timer = null;
 
@@ -77,6 +81,13 @@ public class MapboxEventManager {
         this.accessToken = ApiAccess.getToken(context);
         this.context = context;
 
+        // Setup Message Digest
+        try {
+            messageDigest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            Log.w(TAG, "Error getting Encryption Algorithm: " + e);
+        }
+
         // Load / Create Vendor Id
         SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
         if (prefs.contains(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
@@ -84,6 +95,7 @@ public class MapboxEventManager {
             Log.i(TAG, "Found Vendor Id = " + mapboxVendorId);
         } else {
             String vendorId = UUID.randomUUID().toString();
+            vendorId = encodeString(vendorId);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, vendorId);
             editor.apply();
@@ -156,6 +168,20 @@ public class MapboxEventManager {
         events.add(event);
 
         rotateSessionId();
+    }
+
+    private String encodeString(String string) {
+        try {
+            if (messageDigest != null) {
+                messageDigest.reset();
+                messageDigest.update(string.getBytes("UTF-8"));
+                byte[] bytes = messageDigest.digest();
+                return new String(bytes);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error encoding string, will return in original form." + e);
+        }
+        return string;
     }
 
     private void rotateSessionId() {
@@ -321,7 +347,7 @@ public class MapboxEventManager {
 
                     // Basic Event Meta Data
                     jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get("event"));
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, mapboxSessionId);
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
