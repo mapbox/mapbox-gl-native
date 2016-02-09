@@ -68,6 +68,7 @@ public class MapboxEventManager {
     private String mapboxVendorId = null;
 
     private String mapboxSessionId = null;
+    private long mapboxSessionIdLastSet = 0;
     private static long hourInMillis = 1000 * 60 * 60;
     private static long flushDelayInMillis = 1000 * 60 * 2;  // 2 Minutes
     private static final int SESSION_ID_ROTATION_HOURS = 24;
@@ -185,24 +186,11 @@ public class MapboxEventManager {
     }
 
     private void rotateSessionId() {
-        if (mapboxSessionId == null) {
-            mapboxSessionId = generateNewSessionId();
-            return;
-        }
-
-        // Rotate if it's been SESSION_ID_ROTATION_HOURS hours
-        int start = mapboxSessionId.indexOf("-") + 1;
-        int end = mapboxSessionId.indexOf("-", start);
-        long time = Long.valueOf(mapboxSessionId.substring(start, end));
-
         long now = System.currentTimeMillis();
-        if (now - time > (SESSION_ID_ROTATION_HOURS * hourInMillis)) {
-            mapboxSessionId = generateNewSessionId();
+        if (now - mapboxSessionIdLastSet > (SESSION_ID_ROTATION_HOURS * hourInMillis)) {
+            mapboxSessionId = UUID.randomUUID().toString();
+            mapboxSessionIdLastSet = System.currentTimeMillis();
         }
-    }
-
-    private String generateNewSessionId() {
-        return context.getPackageName() + "-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString();
     }
 
     private String getOrientation() {
