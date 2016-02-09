@@ -122,6 +122,7 @@
         ],
         'mac_bundle_resources': [
           '<!@(find ../platform/ios/resources -type f \! -name "README" \! -name \'.*\')',
+          '<!@(find ../platform/default/resources -type f \! -name "README" \! -name \'.der\')',
         ],
       },
     },
