@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -46,19 +47,15 @@ public class InfoWindowActivity extends AppCompatActivity {
                 mapboxMap.addMarker(new MarkerOptions()
                         .title("Intersection")
                         .snippet("H St NW with 15th St NW")
-                        .icon(IconFactory.getInstance(InfoWindowActivity.this)
-                                .fromAsset("london-underground-24.png"))
                         .position(new LatLng(38.9002073, -77.03364419)));
 
                 mapboxMap.addMarker(new MarkerOptions()
                         .title("White House")
                         .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
-                        .icon(IconFactory.getInstance(InfoWindowActivity.this).fromAsset("town-hall-24.png"))
                         .position(new LatLng(38.897705003219784, -77.03655168667463)));
 
                 mapboxMap.addMarker(new MarkerOptions().title("Intersection")
                         .snippet("E St NW with 17th St NW")
-                        .icon(IconFactory.getInstance(InfoWindowActivity.this).fromAsset("commercial-24.png"))
                         .position(new LatLng(38.8954236, -77.0394623)));
 
                 final DecimalFormat formatter = new DecimalFormat("#.#####");
@@ -78,6 +75,25 @@ public class InfoWindowActivity extends AppCompatActivity {
                                 .position(point));
                     }
                 });
+
+
+                mapboxMap.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        Toast.makeText(getApplicationContext(), "OnClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
+                        // return false to close the info window
+                        // return true to leave the info window open
+                        return false;
+                    }
+                });
+
+                mapboxMap.setOnInfoWindowLongClickListener(new MapboxMap.OnInfoWindowLongClickListener() {
+                    @Override
+                    public void onInfoWindowLongClick(Marker marker) {
+                        Toast.makeText(getApplicationContext(),"OnLongClick: "+marker.getTitle(),Toast.LENGTH_LONG).show();
+                    }
+                });
+
             }
         });
     }

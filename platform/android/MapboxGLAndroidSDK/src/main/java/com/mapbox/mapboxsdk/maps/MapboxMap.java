@@ -54,6 +54,7 @@ public class MapboxMap {
     private MapboxMap.OnMapLongClickListener mOnMapLongClickListener;
     private MapboxMap.OnMarkerClickListener mOnMarkerClickListener;
     private MapboxMap.OnInfoWindowClickListener mOnInfoWindowClickListener;
+    private MapboxMap.OnInfoWindowLongClickListener mOnInfoWindowLongClickListener;
     private MapboxMap.OnFlingListener mOnFlingListener;
     private MapboxMap.OnScrollListener mOnScrollListener;
     private MapboxMap.OnMyLocationTrackingModeChangeListener mOnMyLocationTrackingModeChangeListener;
@@ -849,6 +850,25 @@ public class MapboxMap {
         return mOnInfoWindowClickListener;
     }
 
+    /**
+     * Sets a callback that's invoked when a marker's info window is long pressed.
+     *
+     * @param listener The callback that's invoked when a marker's info window is long pressed. To unset the callback, use null.
+     */
+    @UiThread
+    public void setOnInfoWindowLongClickListener(@Nullable OnInfoWindowLongClickListener listener) {
+        mOnInfoWindowLongClickListener = listener;
+    }
+
+    /**
+     * Return the InfoWindow long click listener
+     *
+     * @return Current active InfoWindow long Click Listener
+     */
+    public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
+        return mOnInfoWindowLongClickListener;
+    }
+
     //
     // User location
     //
@@ -1131,6 +1151,21 @@ public class MapboxMap {
          * @return If true the listener has consumed the event and the info window will not be closed.
          */
         boolean onMarkerClick(@NonNull Marker marker);
+    }
+
+    /**
+     * Callback interface for when the user long presses on a marker's info window.
+     *
+     * @see MapboxMap#setOnInfoWindowClickListener(OnInfoWindowClickListener)
+     */
+    public interface OnInfoWindowLongClickListener {
+
+        /**
+         * Called when the user makes a long-press gesture on the marker's info window.
+         *
+         * @param marker The marker were the info window is attached to
+         */
+        void onInfoWindowLongClick(Marker marker);
     }
 
     /**
