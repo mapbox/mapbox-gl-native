@@ -899,7 +899,7 @@ public:
 - (void)scaleBy:(double)scaleFactor atPoint:(NSPoint)point animated:(BOOL)animated {
     [self willChangeValueForKey:@"centerCoordinate"];
     [self willChangeValueForKey:@"zoomLevel"];
-    mbgl::PrecisionPoint center(point.x, self.bounds.size.height - point.y);
+    mbgl::ScreenCoordinate center(point.x, self.bounds.size.height - point.y);
     _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
     [self didChangeValueForKey:@"centerCoordinate"];
@@ -1214,7 +1214,7 @@ public:
             _directionAtBeginningOfGesture = self.direction;
             _pitchAtBeginningOfGesture = _mbglMap->getPitch();
         } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
-            mbgl::PrecisionPoint center(startPoint.x, self.bounds.size.height - startPoint.y);
+            mbgl::ScreenCoordinate center(startPoint.x, self.bounds.size.height - startPoint.y);
             if (self.rotateEnabled) {
                 CLLocationDirection newDirection = _directionAtBeginningOfGesture - delta.x / 10;
                 [self willChangeValueForKey:@"direction"];
@@ -1258,7 +1258,7 @@ public:
         _scaleAtBeginningOfGesture = _mbglMap->getScale();
     } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
         NSPoint zoomInPoint = [gestureRecognizer locationInView:self];
-        mbgl::PrecisionPoint center(zoomInPoint.x, self.bounds.size.height - zoomInPoint.y);
+        mbgl::ScreenCoordinate center(zoomInPoint.x, self.bounds.size.height - zoomInPoint.y);
         if (gestureRecognizer.magnification > -1) {
             [self willChangeValueForKey:@"zoomLevel"];
             [self willChangeValueForKey:@"centerCoordinate"];
@@ -1339,7 +1339,7 @@ public:
         _directionAtBeginningOfGesture = self.direction;
     } else if (gestureRecognizer.state == NSGestureRecognizerStateChanged) {
         NSPoint rotationPoint = [gestureRecognizer locationInView:self];
-        mbgl::PrecisionPoint center(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
+        mbgl::ScreenCoordinate center(rotationPoint.x, self.bounds.size.height - rotationPoint.y);
         _mbglMap->setBearing(_directionAtBeginningOfGesture + gestureRecognizer.rotationInDegrees, center);
     } else if (gestureRecognizer.state == NSGestureRecognizerStateEnded
                || gestureRecognizer.state == NSGestureRecognizerStateCancelled) {

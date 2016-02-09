@@ -380,8 +380,8 @@ void GLFWView::onMouseMove(GLFWwindow *window, double x, double y) {
         double dy = y - view->lastY;
         if (dx || dy) {
             view->map->setLatLng(
-                    view->map->latLngForPixel(mbgl::PrecisionPoint(x - dx, y - dy)),
-                    mbgl::PrecisionPoint(x, y));
+                    view->map->latLngForPixel(mbgl::ScreenCoordinate(x - dx, y - dy)),
+                    mbgl::ScreenCoordinate(x, y));
         }
     } else if (view->rotating) {
         view->map->rotateBy({ view->lastX, view->lastY }, { x, y });

@@ -9,7 +9,7 @@ namespace mbgl {
 
 class TileID;
 
-using PrecisionPoint = vec2<double>;
+using ScreenCoordinate = vec2<double>;
 
 class LatLng {
 public:
@@ -26,7 +26,7 @@ public:
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const TileID& id);
 
-    PrecisionPoint project() const;
+    ScreenCoordinate project() const;
 };
 
 inline bool operator==(const LatLng& a, const LatLng& b) {
@@ -195,7 +195,7 @@ public:
         };
     }
     
-    PrecisionPoint getCenter(uint16_t width, uint16_t height) const;
+    ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
 };
 
 } // namespace mbgl

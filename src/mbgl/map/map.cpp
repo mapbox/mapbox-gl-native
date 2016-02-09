@@ -166,7 +166,7 @@ void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) 
 
 #pragma mark - Position
 
-void Map::moveBy(const PrecisionPoint& point, const Duration& duration) {
+void Map::moveBy(const ScreenCoordinate& point, const Duration& duration) {
     transform->moveBy(point, duration);
     update(Update::Repaint);
 }
@@ -180,7 +180,7 @@ void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Durat
     update(Update::Repaint);
 }
 
-void Map::setLatLng(const LatLng& latLng, const PrecisionPoint& point, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, const ScreenCoordinate& point, const Duration& duration) {
     transform->setLatLng(latLng, point, duration);
     update(Update::Repaint);
 }
@@ -204,12 +204,12 @@ void Map::resetPosition(const EdgeInsets& padding) {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, const PrecisionPoint& point, const Duration& duration) {
+void Map::scaleBy(double ds, const ScreenCoordinate& point, const Duration& duration) {
     transform->scaleBy(ds, point, duration);
     update(Update::Zoom);
 }
 
-void Map::setScale(double scale, const PrecisionPoint& point, const Duration& duration) {
+void Map::setScale(double scale, const ScreenCoordinate& point, const Duration& duration) {
     transform->setScale(scale, point, duration);
     update(Update::Zoom);
 }
@@ -257,11 +257,11 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     }
 
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
-    PrecisionPoint nePixel = {-INFINITY, -INFINITY};
-    PrecisionPoint swPixel = {INFINITY, INFINITY};
+    ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
+    ScreenCoordinate swPixel = {INFINITY, INFINITY};
     double viewportHeight = getHeight();
     for (LatLng latLng : latLngs) {
-        PrecisionPoint pixel = pixelForLatLng(latLng);
+        ScreenCoordinate pixel = pixelForLatLng(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
         swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
@@ -278,15 +278,15 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
-    PrecisionPoint paddedNEPixel = {
+    ScreenCoordinate paddedNEPixel = {
         nePixel.x + padding.right / minScale,
         nePixel.y + padding.top / minScale,
     };
-    PrecisionPoint paddedSWPixel = {
+    ScreenCoordinate paddedSWPixel = {
         swPixel.x - padding.left / minScale,
         swPixel.y - padding.bottom / minScale,
     };
-    PrecisionPoint centerPixel = {
+    ScreenCoordinate centerPixel = {
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
@@ -339,7 +339,7 @@ uint16_t Map::getHeight() const {
 
 #pragma mark - Rotation
 
-void Map::rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& duration) {
+void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& duration) {
     transform->rotateBy(first, second, duration);
     update(Update::Repaint);
 }
@@ -348,7 +348,7 @@ void Map::setBearing(double degrees, const Duration& duration) {
     setBearing(degrees, EdgeInsets(), duration);
 }
 
-void Map::setBearing(double degrees, const PrecisionPoint& center, const Duration& duration) {
+void Map::setBearing(double degrees, const ScreenCoordinate& center, const Duration& duration) {
     transform->setAngle(-degrees * util::DEG2RAD, center, duration);
     update(Update::Repaint);
 }
@@ -374,7 +374,7 @@ void Map::setPitch(double pitch, const Duration& duration) {
     setPitch(pitch, {NAN, NAN}, duration);
 }
 
-void Map::setPitch(double pitch, const PrecisionPoint& anchor, const Duration& duration) {
+void Map::setPitch(double pitch, const ScreenCoordinate& anchor, const Duration& duration) {
     transform->setPitch(pitch * util::DEG2RAD, anchor, duration);
     update(Update::Repaint);
 }
@@ -420,12 +420,12 @@ LatLng Map::latLngForProjectedMeters(const ProjectedMeters& projectedMeters) con
     return Projection::latLngForProjectedMeters(projectedMeters);
 }
 
-PrecisionPoint Map::pixelForLatLng(const LatLng& latLng) const {
-    return transform->latLngToPoint(latLng);
+ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
+    return transform->latLngToScreenCoordinate(latLng);
 }
 
-LatLng Map::latLngForPixel(const PrecisionPoint& pixel) const {
-    return transform->pointToLatLng(pixel);
+LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
+    return transform->screenCoordinateToLatLng(pixel);
 }
 
 #pragma mark - Annotations

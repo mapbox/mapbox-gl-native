@@ -1333,7 +1333,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
+        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
@@ -1365,7 +1365,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             gesturePoint = self.userLocationAnnotationViewCenter;
         }
 
-        mbgl::PrecisionPoint center(gesturePoint.x, gesturePoint.y);
+        mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(0.5, center, MGLDurationInSeconds(MGLAnimationDuration));
 
         __weak MGLMapView *weakSelf = self;
@@ -2166,7 +2166,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (mbgl::LatLng)convertPoint:(CGPoint)point toLatLngFromView:(nullable UIView *)view
 {
     CGPoint convertedPoint = [self convertPoint:point fromView:view];
-    return _mbglMap->latLngForPixel(mbgl::PrecisionPoint(convertedPoint.x, convertedPoint.y));
+    return _mbglMap->latLngForPixel(mbgl::ScreenCoordinate(convertedPoint.x, convertedPoint.y));
 }
 
 - (CGPoint)convertCoordinate:(CLLocationCoordinate2D)coordinate toPointToView:(nullable UIView *)view

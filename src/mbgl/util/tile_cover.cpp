@@ -14,8 +14,8 @@ struct edge {
     double x1 = 0, y1 = 0;
     double dx = 0, dy = 0;
 
-    edge(vec2<double> a, vec2<double> b) {
-        if (a.y > b.y) { std::swap(a, b); }
+    edge(ScreenCoordinate a, ScreenCoordinate b) {
+        if (a.y > b.y) std::swap(a, b);
         x0 = a.x;
         y0 = a.y;
         x1 = b.x;
@@ -52,7 +52,7 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
 }
 
 // scan-line conversion
-static void scanTriangle(const mbgl::vec2<double> a, const mbgl::vec2<double> b, const mbgl::vec2<double> c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+static void scanTriangle(const ScreenCoordinate& a, const ScreenCoordinate& b, const ScreenCoordinate& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
@@ -76,7 +76,7 @@ int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t tileSize) {
     }
 }
 
-static mbgl::vec2<double> zoomTo(const TileCoordinate& c, double z) {
+static ScreenCoordinate zoomTo(const TileCoordinate& c, double z) {
     double scale = std::pow(2, z - c.zoom);
     return { c.column * scale, c.row * scale };
 }
@@ -100,11 +100,11 @@ std::vector<TileID> tileCover(const TileCoordinate& tl_,
         }
     };
 
-    mbgl::vec2<double> tl = zoomTo(tl_, z);
-    mbgl::vec2<double> tr = zoomTo(tr_, z);
-    mbgl::vec2<double> br = zoomTo(br_, z);
-    mbgl::vec2<double> bl = zoomTo(bl_, z);
-    mbgl::vec2<double> c  = zoomTo(center, z);
+    const ScreenCoordinate tl(zoomTo(tl_, z));
+    const ScreenCoordinate tr(zoomTo(tr_, z));
+    const ScreenCoordinate br(zoomTo(br_, z));
+    const ScreenCoordinate bl(zoomTo(bl_, z));
+    const ScreenCoordinate c(zoomTo(center, z));
 
     // Divide the screen up in two triangles and scan each of them:
     // \---+

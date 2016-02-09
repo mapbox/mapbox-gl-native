@@ -22,7 +22,7 @@ struct CameraOptions {
     
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */
-    optional<PrecisionPoint> anchor;
+    optional<ScreenCoordinate> anchor;
     
     /** Zero-based zoom level. Constrained to the minimum and maximum zoom
         levels. */

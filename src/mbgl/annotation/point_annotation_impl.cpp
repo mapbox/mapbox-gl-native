@@ -13,7 +13,7 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
     featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
 
     const uint16_t extent = 4096;
-    const mbgl::PrecisionPoint pp = point.position.project();
+    const mbgl::ScreenCoordinate pp = point.position.project();
     const uint32_t z2 = 1 << tileID.z;
     const uint32_t x = pp.x * z2;
     const uint32_t y = pp.y * z2;

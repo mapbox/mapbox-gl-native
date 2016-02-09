@@ -123,19 +123,19 @@ TEST(Transform, PerspectiveProjection) {
     ASSERT_NEAR(-77, loc.longitude, 0.0001);
     ASSERT_NEAR(38, loc.latitude, 0.0001);
 
-    loc = transform.getState().pointToLatLng({ 0, 1000 });
+    loc = transform.getState().screenCoordinateToLatLng({ 0, 1000 });
     ASSERT_NEAR(-77.59198961199148, loc.longitude, 0.0002);
     ASSERT_NEAR(38.74661326302018, loc.latitude, 0.0001);
 
-    loc = transform.getState().pointToLatLng({ 1000, 0 });
+    loc = transform.getState().screenCoordinateToLatLng({ 1000, 0 });
     ASSERT_NEAR(-76.75823239205641, loc.longitude, 0.0001);
     ASSERT_NEAR(37.692872969426375, loc.latitude, 0.0001);
 
-    PrecisionPoint point = transform.getState().latLngToPoint({38.74661326302018, -77.59198961199148});
+    ScreenCoordinate point = transform.getState().latLngToScreenCoordinate({38.74661326302018, -77.59198961199148});
     ASSERT_NEAR(point.x, 0, 0.01);
     ASSERT_NEAR(point.y, 1000, 0.01);
 
-    point = transform.getState().latLngToPoint({37.692872969426375, -76.75823239205641});
+    point = transform.getState().latLngToScreenCoordinate({37.692872969426375, -76.75823239205641});
     ASSERT_NEAR(point.x, 1000, 0.02);
     ASSERT_NEAR(point.y, 0, 0.02);
 }
@@ -193,8 +193,8 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const PrecisionPoint anchorPoint = {0, 0};
-    const LatLng anchorLatLng = transform.getState().pointToLatLng(anchorPoint);
+    const ScreenCoordinate anchorPoint = {0, 0};
+    const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
     transform.setAngle(M_PI_4, anchorPoint);
 
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
@@ -216,7 +216,7 @@ TEST(Transform, Padding) {
     ASSERT_DOUBLE_EQ(-100, trueCenter.longitude);
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     
-    const LatLng manualShiftedCenter = transform.getState().pointToLatLng({
+    const LatLng manualShiftedCenter = transform.getState().screenCoordinateToLatLng({
         1000.0 / 2.0,
         1000.0 / 4.0,
     });

@@ -41,10 +41,10 @@ public:
     /** Pans the map by the given amount.
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
-    void moveBy(const PrecisionPoint& offset, const Duration& = Duration::zero());
+    void moveBy(const ScreenCoordinate& offset, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const ScreenCoordinate&, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const Duration& = Duration::zero());
     LatLng getLatLng(const EdgeInsets& = {}) const;
@@ -55,12 +55,12 @@ public:
         @param ds The difference in scale factors to scale the map by.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void scaleBy(double ds, const PrecisionPoint& anchor = {NAN, NAN}, const Duration& = Duration::zero());
+    void scaleBy(double ds, const ScreenCoordinate& anchor = {NAN, NAN}, const Duration& = Duration::zero());
     /** Sets the scale factor, keeping the given point fixed within the view.
         @param scale The new scale factor.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setScale(double scale, const PrecisionPoint& anchor = {NAN, NAN}, const Duration& = Duration::zero());
+    void setScale(double scale, const ScreenCoordinate& anchor = {NAN, NAN}, const Duration& = Duration::zero());
     /** Sets the scale factor, keeping the center point fixed within the inset view.
         @param scale The new scale factor.
         @param padding The viewport padding that affects the fixed center point. */
@@ -69,7 +69,7 @@ public:
         @param zoom The new zoom level.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, const PrecisionPoint& anchor = {NAN, NAN}, const Duration& = Duration::zero());
+    void setZoom(double zoom, const ScreenCoordinate& anchor = {NAN, NAN}, const Duration& = Duration::zero());
     /** Sets the zoom level, keeping the center point fixed within the inset view.
         @param zoom The new zoom level.
         @param padding The viewport padding that affects the fixed center point. */
@@ -84,7 +84,7 @@ public:
 
     // Angle
 
-    void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
+    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
     /** Sets the angle of rotation.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north. */
@@ -93,7 +93,7 @@ public:
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, const PrecisionPoint& anchor, const Duration& = Duration::zero());
+    void setAngle(double angle, const ScreenCoordinate& anchor, const Duration& = Duration::zero());
     /** Sets the angle of rotation, keeping the center point fixed within the inset view.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
@@ -113,7 +113,7 @@ public:
         @param angle The new pitch angle, measured in radians toward the
             horizon.
         @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, const PrecisionPoint& anchor, const Duration& = Duration::zero());
+    void setPitch(double pitch, const ScreenCoordinate& anchor, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation
@@ -140,8 +140,8 @@ public:
     bool isPanning() const { return state.isPanning(); }
     
     // Conversion and projection
-    PrecisionPoint latLngToPoint(const LatLng&) const;
-    LatLng pointToLatLng(const PrecisionPoint&) const;
+    ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
     void unwrapLatLng(LatLng&);

@@ -65,14 +65,14 @@ public:
     bool isGestureInProgress() const;
 
     // Conversion and projection
-    PrecisionPoint latLngToPoint(const LatLng&) const;
-    LatLng pointToLatLng(const PrecisionPoint&) const;
+    ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
     TileCoordinate latLngToCoordinate(const LatLng&) const;
     LatLng coordinateToLatLng(const TileCoordinate&) const;
 
-    PrecisionPoint coordinateToPoint(const TileCoordinate&) const;
-    TileCoordinate pointToCoordinate(const PrecisionPoint&) const;
+    ScreenCoordinate coordinateToPoint(const TileCoordinate&) const;
+    TileCoordinate pointToCoordinate(const ScreenCoordinate&) const;
 
 private:
     bool rotatedNorth() const;
@@ -100,9 +100,9 @@ private:
     
     /** Recenter the map so that the given coordinate is located at the given
         point on screen. */
-    void moveLatLng(const LatLng&, const PrecisionPoint&);
+    void moveLatLng(const LatLng&, const ScreenCoordinate&);
     void setLatLngZoom(const LatLng &latLng, double zoom);
-    void setScalePoint(const double scale, const PrecisionPoint& point);
+    void setScalePoint(const double scale, const ScreenCoordinate& point);
 
 private:
     ConstrainMode constrainMode;

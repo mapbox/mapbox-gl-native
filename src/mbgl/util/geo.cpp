@@ -12,7 +12,7 @@ LatLng::LatLng(const TileID& id) {
     latitude = util::RAD2DEG * std::atan(0.5 * (std::exp(n) - std::exp(-n)));
 }
 
-PrecisionPoint LatLng::project() const {
+ScreenCoordinate LatLng::project() const {
     // Clamp to the latitude limits of Mercator.
     const double constrainedLatitude = ::fmin(::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
 
@@ -28,7 +28,7 @@ LatLngBounds::LatLngBounds(const TileID& id)
       ne(TileID{ id.z, id.x + 1, id.y, id.sourceZ }) {
 }
 
-PrecisionPoint EdgeInsets::getCenter(uint16_t width, uint16_t height) const {
+ScreenCoordinate EdgeInsets::getCenter(uint16_t width, uint16_t height) const {
     return {
         (width - left - right) / 2.0f + left,
         (height - top - bottom) / 2.0f + top,

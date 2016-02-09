@@ -97,16 +97,16 @@ public:
     void flyTo(const CameraOptions&, const AnimationOptions&);
 
     // Position
-    void moveBy(const PrecisionPoint&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const PrecisionPoint&, const Duration& = Duration::zero());
+    void moveBy(const ScreenCoordinate&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, const ScreenCoordinate&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
     LatLng getLatLng(const EdgeInsets& = {}) const;
     void resetPosition(const EdgeInsets& = {});
 
     // Scale
-    void scaleBy(double ds, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
-    void setScale(double scale, const PrecisionPoint& = { NAN, NAN }, const Duration& = Duration::zero());
+    void scaleBy(double ds, const ScreenCoordinate& = { NAN, NAN }, const Duration& = Duration::zero());
+    void setScale(double scale, const ScreenCoordinate& = { NAN, NAN }, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
     void setZoom(double zoom, const EdgeInsets&, const Duration& = Duration::zero());
@@ -122,9 +122,9 @@ public:
     double getMaxZoom() const;
 
     // Rotation
-    void rotateBy(const PrecisionPoint& first, const PrecisionPoint& second, const Duration& = Duration::zero());
+    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
-    void setBearing(double degrees, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setBearing(double degrees, const ScreenCoordinate&, const Duration& = Duration::zero());
     void setBearing(double degrees, const EdgeInsets&, const Duration& = Duration::zero());
     double getBearing() const;
     void resetNorth(const Duration& = Milliseconds(500));
@@ -132,7 +132,7 @@ public:
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());
-    void setPitch(double pitch, const PrecisionPoint&, const Duration& = Duration::zero());
+    void setPitch(double pitch, const ScreenCoordinate&, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation
@@ -151,8 +151,8 @@ public:
     double getMetersPerPixelAtLatitude(double lat, double zoom) const;
     ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
     LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
-    PrecisionPoint pixelForLatLng(const LatLng&) const;
-    LatLng latLngForPixel(const PrecisionPoint&) const;
+    ScreenCoordinate pixelForLatLng(const LatLng&) const;
+    LatLng latLngForPixel(const ScreenCoordinate&) const;
 
     // Annotations
     void addAnnotationIcon(const std::string&, std::shared_ptr<const SpriteImage>);
