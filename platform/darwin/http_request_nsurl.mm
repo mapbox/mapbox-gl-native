@@ -246,4 +246,8 @@ std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
     return std::make_unique<HTTPNSURLContext>();
 }
 
+uint32_t HTTPContextBase::maximumConcurrentRequests() {
+    return 20;
+}
+
 }

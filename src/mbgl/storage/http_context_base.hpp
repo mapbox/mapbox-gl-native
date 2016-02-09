@@ -11,6 +11,7 @@ namespace mbgl {
 class HTTPContextBase {
 public:
     static std::unique_ptr<HTTPContextBase> createContext();
+    static uint32_t maximumConcurrentRequests();
 
     virtual ~HTTPContextBase() = default;
     virtual HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) = 0;

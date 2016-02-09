@@ -247,6 +247,10 @@ std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
     return std::make_unique<HTTPAndroidContext>();
 }
 
+uint32_t HTTPContextBase::maximumConcurrentRequests() {
+    return 20;
+}
+
 void JNICALL nativeOnFailure(JNIEnv* env, jobject, jlong nativePtr, jint type, jstring message) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnFailure");
     assert(nativePtr != 0);

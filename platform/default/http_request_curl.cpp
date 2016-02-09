@@ -542,4 +542,8 @@ std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
     return std::make_unique<HTTPCURLContext>();
 }
 
+uint32_t HTTPContextBase::maximumConcurrentRequests() {
+    return 20;
+}
+
 } // namespace mbgl
