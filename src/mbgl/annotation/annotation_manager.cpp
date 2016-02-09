@@ -49,13 +49,14 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
 }
 
 void AnnotationManager::updatePointAnnotation(const AnnotationID id, const PointAnnotation& point, const uint8_t) {
-    if (pointAnnotations.find(id) != pointAnnotations.end()) {
+    auto foundAnnotation = pointAnnotations.find(id);
+    if (foundAnnotation != pointAnnotations.end()) {
         pointTree.remove(pointAnnotations.at(id));
 
         auto updatedAnnotation = std::make_shared<PointAnnotationImpl>(id, point);
 
         pointTree.insert(updatedAnnotation);
-        pointAnnotations[id] = updatedAnnotation;
+        foundAnnotation->second = updatedAnnotation;
     }
 }
 

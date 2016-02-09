@@ -91,8 +91,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -233,7 +234,7 @@ public final class MapView extends FrameLayout {
 
     // Used for displaying annotations
     // Every annotation that has been added to the map
-    private final List<Annotation> mAnnotations = new ArrayList<>();
+    private final Map<Long, Annotation> mAnnotations = new HashMap<>();
     private List<Marker> mMarkersNearLastTap = new ArrayList<>();
     private List<Marker> mSelectedMarkers = new ArrayList<>();
     private List<InfoWindow> mInfoWindows = new ArrayList<>();
@@ -2425,7 +2426,7 @@ public final class MapView extends FrameLayout {
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapView(this); // the annotation needs to know which map view it is in
-        mAnnotations.add(marker);
+        mAnnotations.put(id, marker);
         return marker;
     }
 
@@ -2450,13 +2451,8 @@ public final class MapView extends FrameLayout {
         ensureIconLoaded(updatedMarker);
         mNativeMapView.updateMarker(updatedMarker);
 
-        // this is a bit slow, perhaps a map would be more appropriate
-        ListIterator<Annotation> annotationListIterator = mAnnotations.listIterator();
-        while (annotationListIterator.hasNext()) {
-            Annotation currentAnnotation = annotationListIterator.next();
-            if (currentAnnotation.getId() == updatedMarker.getId()) {
-                annotationListIterator.set(updatedMarker);
-            }
+        if (mAnnotations.containsKey(updatedMarker.getId())) {
+            mAnnotations.put(updatedMarker.getId(), updatedMarker);
         }
     }
 
@@ -2493,7 +2489,7 @@ public final class MapView extends FrameLayout {
             m = markers.get(i);
             m.setId(ids[i]);
             m.setMapView(this);
-            mAnnotations.add(m);
+            mAnnotations.put(ids[i], m);
         }
 
         return new ArrayList<>(markers);
@@ -2517,7 +2513,7 @@ public final class MapView extends FrameLayout {
         long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
         polyline.setMapView(this);
-        mAnnotations.add(polyline);
+        mAnnotations.put(id, polyline);
         return polyline;
     }
 
@@ -2548,7 +2544,7 @@ public final class MapView extends FrameLayout {
             p = polylines.get(i);
             p.setId(ids[i]);
             p.setMapView(this);
-            mAnnotations.add(p);
+            mAnnotations.put(ids[i], p);
         }
 
         return new ArrayList<>(polylines);
@@ -2572,7 +2568,7 @@ public final class MapView extends FrameLayout {
         long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
         polygon.setMapView(this);
-        mAnnotations.add(polygon);
+        mAnnotations.put(id, polygon);
         return polygon;
     }
 
@@ -2604,7 +2600,7 @@ public final class MapView extends FrameLayout {
             p = polygons.get(i);
             p.setId(ids[i]);
             p.setMapView(this);
-            mAnnotations.add(p);
+            mAnnotations.put(ids[i], p);
         }
 
         return new ArrayList<>(polygons);
@@ -2693,7 +2689,7 @@ public final class MapView extends FrameLayout {
      */
     @NonNull
     public List<Annotation> getAllAnnotations() {
-        return new ArrayList<>(mAnnotations);
+        return new ArrayList<>(mAnnotations.values());
     }
 
     private List<Marker> getMarkersInBounds(@NonNull BoundingBox bbox) {
