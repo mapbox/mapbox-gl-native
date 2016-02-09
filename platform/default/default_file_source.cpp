@@ -114,7 +114,7 @@ public:
         getDownload(regionID).setState(state);
     }
 
-    void add(FileRequest* req, Resource resource, Callback callback) {
+    void request(FileRequest* req, Resource resource, Callback callback) {
         tasks[req] = std::make_unique<Task>(resource, callback, this);
     }
 
@@ -147,21 +147,6 @@ private:
     bool offline = false;
 };
 
-class DefaultFileRequest : public FileRequest {
-public:
-    DefaultFileRequest(Resource resource, FileSource::Callback callback, util::Thread<DefaultFileSource::Impl>& thread_)
-        : thread(thread_),
-          workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::add, callback, this, resource)) {
-    }
-
-    ~DefaultFileRequest() {
-        thread.invoke(&DefaultFileSource::Impl::cancel, this);
-    }
-
-    util::Thread<DefaultFileSource::Impl>& thread;
-    std::unique_ptr<WorkRequest> workRequest;
-};
-
 DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetRoot)
     : thread(std::make_unique<util::Thread<DefaultFileSource::Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low}, cachePath)),
       assetFileSource(std::make_unique<AssetFileSource>(assetRoot)) {
@@ -186,6 +171,21 @@ void DefaultFileSource::setMaximumCacheEntrySize(uint64_t) {
 }
 
 std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
+    class DefaultFileRequest : public FileRequest {
+    public:
+        DefaultFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<DefaultFileSource::Impl>& thread_)
+            : thread(thread_),
+              workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, callback_, this, resource_)) {
+        }
+
+        ~DefaultFileRequest() {
+            thread.invoke(&DefaultFileSource::Impl::cancel, this);
+        }
+
+        util::Thread<DefaultFileSource::Impl>& thread;
+        std::unique_ptr<WorkRequest> workRequest;
+    };
+
     if (isAssetURL(resource.url)) {
         return assetFileSource->request(resource, callback);
     } else {

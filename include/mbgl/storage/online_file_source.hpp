@@ -20,10 +20,7 @@ public:
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
 private:
-    friend class OnlineFileRequest;
     friend class OnlineFileRequestImpl;
-
-    void cancel(FileRequest*);
 
     class Impl;
     const std::unique_ptr<util::Thread<Impl>> thread;

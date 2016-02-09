@@ -20,20 +20,6 @@
 
 namespace mbgl {
 
-class OnlineFileRequest : public FileRequest {
-public:
-    OnlineFileRequest(OnlineFileSource& fileSource_)
-        : fileSource(fileSource_) {
-    }
-
-    ~OnlineFileRequest() {
-        fileSource.cancel(this);
-    }
-
-    OnlineFileSource& fileSource;
-    std::unique_ptr<WorkRequest> workRequest;
-};
-
 class OnlineFileRequestImpl : public util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
@@ -59,22 +45,35 @@ private:
 
 class OnlineFileSource::Impl {
 public:
-    using Callback = std::function<void (Response)>;
+    // Dummy parameter is a workaround for a gcc 4.9 bug.
+    Impl(int) {
+        NetworkStatus::Subscribe(&reachability);
+    }
 
-    Impl(int);
-    ~Impl();
+    ~Impl() {
+        NetworkStatus::Unsubscribe(&reachability);
+    }
 
-    void networkIsReachableAgain();
+    void request(FileRequest* req, Resource resource, Callback callback) {
+        pending[req] = std::make_unique<OnlineFileRequestImpl>(resource, callback, *this);
+    }
 
-    void add(Resource, FileRequest*, Callback);
-    void cancel(FileRequest*);
+    void cancel(FileRequest* req) {
+        pending.erase(req);
+    }
 
 private:
     friend OnlineFileRequestImpl;
 
+    void networkIsReachableAgain() {
+        for (auto& req : pending) {
+            req.second->networkIsReachableAgain(*this);
+        }
+    }
+
     std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> pending;
-    const std::unique_ptr<HTTPContextBase> httpContext;
-    util::AsyncTask reachability;
+    const std::unique_ptr<HTTPContextBase> httpContext { HTTPContextBase::createContext() };
+    util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
 
 OnlineFileSource::OnlineFileSource()
@@ -85,10 +84,6 @@ OnlineFileSource::OnlineFileSource()
 OnlineFileSource::~OnlineFileSource() = default;
 
 std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
-    if (!callback) {
-        throw util::MisuseException("FileSource callback can't be empty");
-    }
-
     Resource res = resource;
 
     switch (resource.kind) {
@@ -117,43 +112,23 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
         break;
     }
 
-    auto req = std::make_unique<OnlineFileRequest>(*this);
-    req->workRequest = thread->invokeWithCallback(&Impl::add, callback, res, req.get());
-    return std::move(req);
+    class OnlineFileRequest : public FileRequest {
+    public:
+        OnlineFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<OnlineFileSource::Impl>& thread_)
+            : thread(thread_),
+              workRequest(thread.invokeWithCallback(&OnlineFileSource::Impl::request, callback_, this, resource_)) {
+        }
+
+        ~OnlineFileRequest() {
+            thread.invoke(&OnlineFileSource::Impl::cancel, this);
+        }
+
+        util::Thread<OnlineFileSource::Impl>& thread;
+        std::unique_ptr<WorkRequest> workRequest;
+    };
+
+    return std::make_unique<OnlineFileRequest>(res, callback, *thread);
 }
-
-void OnlineFileSource::cancel(FileRequest* req) {
-    thread->invoke(&Impl::cancel, req);
-}
-
-// ----- Impl -----
-
-// Dummy parameter is a workaround for a gcc 4.9 bug.
-OnlineFileSource::Impl::Impl(int)
-    : httpContext(HTTPContextBase::createContext()),
-      reachability(std::bind(&Impl::networkIsReachableAgain, this)) {
-    NetworkStatus::Subscribe(&reachability);
-}
-
-OnlineFileSource::Impl::~Impl() {
-    NetworkStatus::Unsubscribe(&reachability);
-}
-
-void OnlineFileSource::Impl::networkIsReachableAgain() {
-    for (auto& req : pending) {
-        req.second->networkIsReachableAgain(*this);
-    }
-}
-
-void OnlineFileSource::Impl::add(Resource resource, FileRequest* req, Callback callback) {
-    pending[req] = std::make_unique<OnlineFileRequestImpl>(resource, callback, *this);
-}
-
-void OnlineFileSource::Impl::cancel(FileRequest* req) {
-    pending.erase(req);
-}
-
-// ----- OnlineFileRequest -----
 
 OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
     : resource(resource_),
@@ -165,9 +140,7 @@ OnlineFileRequestImpl::OnlineFileRequestImpl(const Resource& resource_, Callback
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {
     if (request) {
         request->cancel();
-        request = nullptr;
     }
-    // timer is automatically canceled upon destruction.
 }
 
 static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests) {
