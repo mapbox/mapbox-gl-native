@@ -194,7 +194,6 @@ public class InfoWindow {
             View view = mView.get();
             if (view != null) {
                 ((ViewGroup) view.getParent()).removeView(view);
-                setBoundMarker(null);
                 onClose();
             }
         }
@@ -223,7 +222,12 @@ public class InfoWindow {
     private void onClose() {
         MapboxMap mapboxMap = mMapboxMap.get();
         if (mapboxMap != null) {
+            MapboxMap.OnInfoWindowCloseListener listener = mapboxMap.getOnInfoWindowCloseListener();
+            if(listener!=null){
+                listener.onInfoWindowClose(getBoundMarker());
+            }
             mapboxMap.deselectMarker(getBoundMarker());
+            setBoundMarker(null);
         }
     }
 

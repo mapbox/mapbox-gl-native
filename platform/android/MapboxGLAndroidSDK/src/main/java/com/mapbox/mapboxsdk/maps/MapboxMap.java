@@ -56,6 +56,7 @@ public class MapboxMap {
     private MapboxMap.OnMarkerClickListener mOnMarkerClickListener;
     private MapboxMap.OnInfoWindowClickListener mOnInfoWindowClickListener;
     private MapboxMap.OnInfoWindowLongClickListener mOnInfoWindowLongClickListener;
+    private MapboxMap.OnInfoWindowCloseListener mOnInfoWindowCloseListener;
     private MapboxMap.OnFlingListener mOnFlingListener;
     private MapboxMap.OnScrollListener mOnScrollListener;
     private MapboxMap.OnMyLocationTrackingModeChangeListener mOnMyLocationTrackingModeChangeListener;
@@ -904,6 +905,7 @@ public class MapboxMap {
      *
      * @return Current active InfoWindow Click Listener
      */
+    @UiThread
     public OnInfoWindowClickListener getOnInfoWindowClickListener() {
         return mOnInfoWindowClickListener;
     }
@@ -925,6 +927,20 @@ public class MapboxMap {
      */
     public OnInfoWindowLongClickListener getOnInfoWindowLongClickListener() {
         return mOnInfoWindowLongClickListener;
+    }
+
+    public void setOnInfoWindowCloseListener(@Nullable OnInfoWindowCloseListener listener) {
+        mOnInfoWindowCloseListener = listener;
+    }
+
+    /**
+     * Return the InfoWindow close listener
+     *
+     * @return Current active InfoWindow Close Listener
+     */
+    @UiThread
+    public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
+        return mOnInfoWindowCloseListener;
     }
 
     //
@@ -1238,6 +1254,21 @@ public class MapboxMap {
          * @param marker The marker were the info window is attached to
          */
         void onInfoWindowLongClick(Marker marker);
+    }
+
+    /**
+     * Callback interface for close events on a marker's info window.
+     *
+     * @see MapboxMap#setOnInfoWindowCloseListener(OnInfoWindowCloseListener)
+     */
+    public interface OnInfoWindowCloseListener {
+
+        /**
+         * Called when the marker's info window is closed.
+         *
+         * @param marker The marker of the info window that was closed.
+         */
+        void onInfoWindowClose(Marker marker);
     }
 
     /**

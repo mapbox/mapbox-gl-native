@@ -58,6 +58,13 @@ public class InfoWindowActivity extends AppCompatActivity {
                         .snippet("E St NW with 17th St NW")
                         .position(new LatLng(38.8954236, -77.0394623)));
 
+                mapboxMap.setOnInfoWindowCloseListener(new MapboxMap.OnInfoWindowCloseListener() {
+                    @Override
+                    public void onInfoWindowClose(Marker marker) {
+                        Toast.makeText(getApplicationContext(),"OnClose: "+marker.getTitle(),Toast.LENGTH_LONG).show();
+                    }
+                });
+
                 final DecimalFormat formatter = new DecimalFormat("#.#####");
                 mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
                     @Override
