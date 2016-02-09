@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.maps.CameraUpdateFactory;
@@ -47,6 +48,12 @@ public class CameraActivity extends AppCompatActivity {
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 // set a style
                 mapboxMap.setStyle(Style.MAPBOX_STREETS);
+                mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition position) {
+                        Log.v(MapboxConstants.TAG, position.toString());
+                    }
+                });
 
                 // handle move button clicks
                 findViewById(R.id.cameraMoveButton).setOnClickListener(new View.OnClickListener() {

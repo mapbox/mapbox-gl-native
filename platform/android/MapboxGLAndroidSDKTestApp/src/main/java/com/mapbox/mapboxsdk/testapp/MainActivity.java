@@ -220,6 +220,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+
+                mMapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+                    @Override
+                    public void onCameraChange(CameraPosition position) {
+                        Log.v(TAG, "OnCameraChange : " + position);
+                    }
+                });
+
                 changeMapStyle(mSelectedStyle);
             }
         });
