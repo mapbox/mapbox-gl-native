@@ -323,6 +323,11 @@ public class MapboxEventManager {
         @Override
         protected Void doInBackground(Void... voids) {
 
+            if (events.size() < 1) {
+                Log.i(TAG, "No events in the queue to send so returning.");
+                return null;
+            }
+
             // Check for NetworkConnectivity
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -378,7 +383,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.i(TAG, "Response Code from Mapbox Events Server: " + response.code());
+                Log.i(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
 
                 // Reset Events
                 // ============
