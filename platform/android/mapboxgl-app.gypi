@@ -113,6 +113,9 @@
         {
           'files': [
             '../../common/ca-bundle.crt',
+            '../../platform/default/resources/api_mapbox_com-digicert.der',
+            '../../platform/default/resources/api_mapbox_com-geotrust.der',
+            '../../platform/default/resources/star_tilestream_net.der',
           ],
           'destination': '<(pwd)/../platform/android/MapboxGLAndroidSDK/src/main/assets'
         },
