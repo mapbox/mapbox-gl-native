@@ -21,12 +21,15 @@
 // 3. This notice may not be removed or altered from any source distribution.
 
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/util/vec.hpp>
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
-void matrix::identity(mat4& out) {
+namespace matrix {
+
+void identity(mat4& out) {
     out[0] = 1.0f;
     out[1] = 0.0f;
     out[2] = 0.0f;
@@ -45,7 +48,7 @@ void matrix::identity(mat4& out) {
     out[15] = 1.0f;
 }
 
-bool matrix::invert(mat4& out, mat4& a) {
+bool invert(mat4& out, mat4& a) {
     double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
           a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
           a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
@@ -92,7 +95,7 @@ bool matrix::invert(mat4& out, mat4& a) {
     return false;
 }
 
-void matrix::ortho(mat4& out, double left, double right, double bottom, double top, double near, double far) {
+void ortho(mat4& out, double left, double right, double bottom, double top, double near, double far) {
     double lr = 1.0f / (left - right),
           bt = 1.0f / (bottom - top),
           nf = 1.0f / (near - far);
@@ -114,7 +117,7 @@ void matrix::ortho(mat4& out, double left, double right, double bottom, double t
     out[15] = 1.0f;
 }
 
-void matrix::perspective(mat4& out, double fovy, double aspect, double near, double far) {
+void perspective(mat4& out, double fovy, double aspect, double near, double far) {
     double f = 1.0f / std::tan(fovy / 2.0f),
           nf = 1.0f / (near - far);
     out[0] = f / aspect;
@@ -135,7 +138,7 @@ void matrix::perspective(mat4& out, double fovy, double aspect, double near, dou
     out[15] = 0.0f;
 }
 
-void matrix::copy(mat4& out, const mat4& a) {
+void copy(mat4& out, const mat4& a) {
     out[0] = a[0];
     out[1] = a[1];
     out[2] = a[2];
@@ -154,7 +157,7 @@ void matrix::copy(mat4& out, const mat4& a) {
     out[15] = a[15];
 }
 
-void matrix::translate(mat4& out, const mat4& a, double x, double y, double z) {
+void translate(mat4& out, const mat4& a, double x, double y, double z) {
     if (&a == &out) {
         out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
         out[13] = a[1] * x + a[5] * y + a[9] * z + a[13];
@@ -180,7 +183,7 @@ void matrix::translate(mat4& out, const mat4& a, double x, double y, double z) {
     }
 }
 
-void matrix::rotate_x(mat4& out, const mat4& a, double rad) {
+void rotate_x(mat4& out, const mat4& a, double rad) {
     double s = std::sin(rad),
         c = std::cos(rad),
         a10 = a[4],
@@ -214,7 +217,7 @@ void matrix::rotate_x(mat4& out, const mat4& a, double rad) {
     out[11] = a23 * c - a13 * s;
 }
 
-void matrix::rotate_y(mat4& out, const mat4& a, double rad) {
+void rotate_y(mat4& out, const mat4& a, double rad) {
     double s = std::sin(rad),
         c = std::cos(rad),
         a00 = a[0],
@@ -248,7 +251,7 @@ void matrix::rotate_y(mat4& out, const mat4& a, double rad) {
     out[11] = a03 * s + a23 * c;
 }
 
-void matrix::rotate_z(mat4& out, const mat4& a, double rad) {
+void rotate_z(mat4& out, const mat4& a, double rad) {
     double s = std::sin(rad),
           c = std::cos(rad),
           a00 = a[0],
@@ -282,7 +285,7 @@ void matrix::rotate_z(mat4& out, const mat4& a, double rad) {
     out[7] = a13 * c - a03 * s;
 }
 
-void matrix::scale(mat4& out, const mat4& a, double x, double y, double z) {
+void scale(mat4& out, const mat4& a, double x, double y, double z) {
     out[0] = a[0] * x;
     out[1] = a[1] * x;
     out[2] = a[2] * x;
@@ -301,7 +304,7 @@ void matrix::scale(mat4& out, const mat4& a, double x, double y, double z) {
     out[15] = a[15];
 }
 
-void matrix::multiply(mat4& out, const mat4& a, const mat4& b) {
+void multiply(mat4& out, const mat4& a, const mat4& b) {
     double a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3],
           a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7],
           a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11],
@@ -332,3 +335,14 @@ void matrix::multiply(mat4& out, const mat4& a, const mat4& b) {
     out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
     out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 }
+
+void transformMat4(vec4<double>& out, vec4<double>& a, mat4& m) {
+    out.x = m[0] * a.x + m[4] * a.y + m[8] * a.z + m[12] * a.w;
+    out.y = m[1] * a.x + m[5] * a.y + m[9] * a.z + m[13] * a.w;
+    out.z = m[2] * a.x + m[6] * a.y + m[10] * a.z + m[14] * a.w;
+    out.w = m[3] * a.x + m[7] * a.y + m[11] * a.z + m[15] * a.w;
+}
+
+} // namespace matrix
+
+} // namespace mbgl

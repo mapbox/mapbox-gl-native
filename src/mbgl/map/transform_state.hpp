@@ -6,7 +6,6 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/vec4.hpp>
 
 #include <cstdint>
 #include <array>

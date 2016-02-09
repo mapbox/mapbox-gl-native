@@ -5,7 +5,7 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/math.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
 TransformState::TransformState(ConstrainMode constrainMode_)
     : constrainMode(constrainMode_)
@@ -278,10 +278,10 @@ LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
 
 PrecisionPoint TransformState::coordinateToPoint(const TileCoordinate& coord) const {
     mat4 mat = coordinatePointMatrix(coord.zoom);
-    matrix::vec4 p;
-    matrix::vec4 c = {{ coord.column, coord.row, 0, 1 }};
+    vec4<double> p;
+    vec4<double> c = { coord.column, coord.row, 0, 1 };
     matrix::transformMat4(p, c, mat);
-    return { p[0] / p[3], height - p[1] / p[3] };
+    return { p.x / p.w, height - p.y / p.w };
 }
 
 TileCoordinate TransformState::pointToCoordinate(const PrecisionPoint& point) const {
@@ -302,24 +302,24 @@ TileCoordinate TransformState::pointToCoordinate(const PrecisionPoint& point) co
     // unproject two points to get a line and then find the point on that
     // line with z=0
 
-    matrix::vec4 coord0;
-    matrix::vec4 coord1;
-    matrix::vec4 point0 = {{ point.x, flippedY, 0, 1 }};
-    matrix::vec4 point1 = {{ point.x, flippedY, 1, 1 }};
+    vec4<double> coord0;
+    vec4<double> coord1;
+    vec4<double> point0 = { point.x, flippedY, 0, 1 };
+    vec4<double> point1 = { point.x, flippedY, 1, 1 };
     matrix::transformMat4(coord0, point0, inverted);
     matrix::transformMat4(coord1, point1, inverted);
 
-    double w0 = coord0[3];
-    double w1 = coord1[3];
-    double x0 = coord0[0] / w0;
-    double x1 = coord1[0] / w1;
-    double y0 = coord0[1] / w0;
-    double y1 = coord1[1] / w1;
-    double z0 = coord0[2] / w0;
-    double z1 = coord1[2] / w1;
+    double w0 = coord0.w;
+    double w1 = coord1.w;
+    double x0 = coord0.x / w0;
+    double x1 = coord1.x / w1;
+    double y0 = coord0.y / w0;
+    double y1 = coord1.y / w1;
+    double z0 = coord0.z / w0;
+    double z1 = coord1.z / w1;
 
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
-  
+
     return { util::interpolate(x0, x1, t), util::interpolate(y0, y1, t), tileZoom };
 }
 
@@ -413,3 +413,5 @@ void TransformState::setScalePoint(const double newScale, const PrecisionPoint &
     Bc = worldSize() / 360;
     Cc = worldSize() / util::M2PI;
 }
+
+} // namespace mbgl

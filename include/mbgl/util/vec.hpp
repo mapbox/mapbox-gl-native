@@ -122,4 +122,4 @@ struct vec4 {
 
 } // namespace mbgl
 
-#endif
+#endif // MBGL_UTIL_VEC
