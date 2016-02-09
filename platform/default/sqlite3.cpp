@@ -310,5 +310,10 @@ void Statement::reset() {
     sqlite3_reset(stmt);
 }
 
+void Statement::clearBindings() {
+    assert(stmt);
+    sqlite3_clear_bindings(stmt);
+}
+
 } // namespace sqlite
 } // namespace mapbox

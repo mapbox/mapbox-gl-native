@@ -47,7 +47,21 @@ public:
 private:
     void ensureSchema();
     void removeExisting();
-    mapbox::sqlite::Statement& getStatement(const char *);
+
+    class Statement {
+    public:
+        explicit Statement(mapbox::sqlite::Statement& stmt_) : stmt(stmt_) {}
+        Statement(Statement&&) = default;
+        Statement(const Statement&) = delete;
+        ~Statement();
+
+        mapbox::sqlite::Statement* operator->() { return &stmt; };
+
+    private:
+        mapbox::sqlite::Statement& stmt;
+    };
+
+    Statement getStatement(const char *);
 
     optional<Response> getTile(const Resource::TileData&);
     uint64_t putTile(const Resource::TileData&, const Response&);

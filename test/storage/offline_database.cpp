@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 #include <sqlite3.h>
+#include <thread>
 
 namespace {
 
@@ -447,4 +448,35 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
 
     EXPECT_EQ(0, region.getDefinition().minZoom);
     EXPECT_EQ(INFINITY, region.getDefinition().maxZoom);
+}
+
+TEST(OfflineDatabase, ConcurrentUse) {
+    using namespace mbgl;
+
+    createDir("test/fixtures/database");
+    deleteFile("test/fixtures/database/offline.db");
+
+    OfflineDatabase db1("test/fixtures/database/offline.db");
+    OfflineDatabase db2("test/fixtures/database/offline.db");
+
+    Resource resource { Resource::Style, "http://example.com/" };
+    Response response;
+    response.noContent = true;
+
+    std::thread thread1([&] {
+        for (auto i = 0; i < 100; i++) {
+            db1.put(resource, response);
+            EXPECT_TRUE(bool(db1.get(resource)));
+        }
+    });
+
+    std::thread thread2([&] {
+        for (auto i = 0; i < 100; i++) {
+            db2.put(resource, response);
+            EXPECT_TRUE(bool(db2.get(resource)));
+        }
+    });
+
+    thread1.join();
+    thread2.join();
 }

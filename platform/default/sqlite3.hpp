@@ -81,6 +81,7 @@ public:
 
     bool run();
     void reset();
+    void clearBindings();
 
 private:
     sqlite3_stmt *stmt = nullptr;
