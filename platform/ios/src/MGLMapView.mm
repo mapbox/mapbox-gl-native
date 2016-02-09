@@ -2177,7 +2177,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 /// Converts a geographic coordinate to a point in the view’s coordinate system.
 - (CGPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable UIView *)view
 {
-    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
+    mbgl::ScreenCoordinate pixel = _mbglMap->pixelForLatLng(latLng);
     return [self convertPoint:CGPointMake(pixel.x, pixel.y) toView:view];
 }
 

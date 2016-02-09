@@ -1531,7 +1531,7 @@ jobject JNICALL nativePixelForLatLng(JNIEnv *env, jobject obj, jlong nativeMapVi
         return nullptr;
     }
 
-    mbgl::vec2<double> pixel = nativeMapView->getMap().pixelForLatLng(mbgl::LatLng(latitude, longitude));
+    mbgl::ScreenCoordinate pixel = nativeMapView->getMap().pixelForLatLng(mbgl::LatLng(latitude, longitude));
 
     jobject ret = env->NewObject(pointFClass, pointFConstructorId, static_cast<jfloat>(pixel.x), static_cast<jfloat>(pixel.y));
     if (ret == nullptr) {

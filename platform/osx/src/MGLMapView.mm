@@ -2165,7 +2165,7 @@ public:
 
 /// Converts a geographic coordinate to a point in the view’s coordinate system.
 - (NSPoint)convertLatLng:(mbgl::LatLng)latLng toPointToView:(nullable NSView *)view {
-    mbgl::vec2<double> pixel = _mbglMap->pixelForLatLng(latLng);
+    mbgl::ScreenCoordinate pixel = _mbglMap->pixelForLatLng(latLng);
     // Cocoa origin is at the lower-left corner.
     pixel.y = NSHeight(self.bounds) - pixel.y;
     return [self convertPoint:NSMakePoint(pixel.x, pixel.y) toView:view];
