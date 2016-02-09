@@ -384,6 +384,10 @@ final class NativeMapView {
         return nativeAddPolygons(mNativeMapViewPtr, polygon);
     }
 
+    public void updateMarker(Marker marker) {
+        nativeUpdateMarker(mNativeMapViewPtr, marker);
+    }
+
     public void removeAnnotation(long id) {
         nativeRemoveAnnotation(mNativeMapViewPtr, id);
     }
@@ -608,6 +612,8 @@ final class NativeMapView {
     private native void nativeResetNorth(long nativeMapViewPtr);
 
     private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
+
+    private native void nativeUpdateMarker(long nativeMapViewPtr, Marker marker);
 
     private native long[] nativeAddMarkers(long nativeMapViewPtr, List<Marker> markers);
 

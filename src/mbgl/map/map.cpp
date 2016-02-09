@@ -157,8 +157,8 @@ void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation)
     transform->easeTo(camera, animation);
     update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
-    
-    
+
+
 void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
     transform->flyTo(camera, animation);
     update(Update::Zoom);
@@ -290,7 +290,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
-    
+
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;
 
@@ -446,6 +446,11 @@ AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annot
     return result;
 }
 
+void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
+    data->getAnnotationManager()->updatePointAnnotation(annotationId, annotation, getMaxZoom());
+    update(Update::Annotations);
+}
+
 void Map::removeAnnotation(AnnotationID annotation) {
     removeAnnotations({ annotation });
 }
@@ -462,7 +467,7 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
 LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
     return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
 }
-    
+
 #pragma mark - Style API
 
 void Map::addCustomLayer(const std::string& id,

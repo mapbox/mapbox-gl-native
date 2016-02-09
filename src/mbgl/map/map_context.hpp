@@ -54,7 +54,7 @@ public:
     void removeAnnotationIcon(const std::string&);
     double getTopOffsetPixelsForAnnotationIcon(const std::string&);
     void updateAnnotations();
-    
+
     // Style API
     void addLayer(std::unique_ptr<StyleLayer>,
                   const optional<std::string> before);

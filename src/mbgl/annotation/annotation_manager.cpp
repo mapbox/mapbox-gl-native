@@ -48,6 +48,17 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
     return annotationIDs;
 }
 
+void AnnotationManager::updatePointAnnotation(const AnnotationID id, const PointAnnotation& point, const uint8_t) {
+    if (pointAnnotations.find(id) != pointAnnotations.end()) {
+        pointTree.remove(pointAnnotations.at(id));
+
+        auto updatedAnnotation = std::make_shared<PointAnnotationImpl>(id, point);
+
+        pointTree.insert(updatedAnnotation);
+        pointAnnotations[id] = updatedAnnotation;
+    }
+}
+
 void AnnotationManager::removeAnnotations(const AnnotationIDs& ids) {
     for (const auto& id : ids) {
         if (pointAnnotations.find(id) != pointAnnotations.end()) {
@@ -157,7 +168,7 @@ void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const S
     spriteStore.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
-    
+
 void AnnotationManager::removeIcon(const std::string& name) {
     spriteStore.removeSprite(name);
     spriteAtlas.updateDirty();

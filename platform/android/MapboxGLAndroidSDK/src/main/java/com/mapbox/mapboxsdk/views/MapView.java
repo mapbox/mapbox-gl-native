@@ -92,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -2380,6 +2381,11 @@ public final class MapView extends FrameLayout {
 
     private Marker prepareMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
+        ensureIconLoaded(marker);
+        return marker;
+    }
+
+    private void ensureIconLoaded(Marker marker) {
         Icon icon = marker.getIcon();
         if (icon == null) {
             icon = getIconFactory().defaultMarker();
@@ -2395,7 +2401,6 @@ public final class MapView extends FrameLayout {
             }
         }
         marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
-        return marker;
     }
 
     /**
@@ -2422,6 +2427,37 @@ public final class MapView extends FrameLayout {
         marker.setMapView(this); // the annotation needs to know which map view it is in
         mAnnotations.add(marker);
         return marker;
+    }
+
+    /**
+     * <p>
+     * Updates a marker on this map. Does nothing if the marker is already added.
+     * </p>
+     *
+     * @param updatedMarker An updated marker object.
+     */
+    @UiThread
+    public void updateMarker(@NonNull Marker updatedMarker) {
+        if (updatedMarker == null) {
+            Log.w(TAG, "marker was null, doing nothing");
+            return;
+        }
+
+        if (updatedMarker.getId() == -1) {
+            Log.w(TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
+        }
+
+        ensureIconLoaded(updatedMarker);
+        mNativeMapView.updateMarker(updatedMarker);
+
+        // this is a bit slow, perhaps a map would be more appropriate
+        ListIterator<Annotation> annotationListIterator = mAnnotations.listIterator();
+        while (annotationListIterator.hasNext()) {
+            Annotation currentAnnotation = annotationListIterator.next();
+            if (currentAnnotation.getId() == updatedMarker.getId()) {
+                annotationListIterator.set(updatedMarker);
+            }
+        }
     }
 
     /**
