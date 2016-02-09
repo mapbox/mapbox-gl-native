@@ -1,10 +1,13 @@
 package com.mapbox.mapboxsdk.location;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
@@ -61,7 +64,13 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     public void toggleGPS(boolean enableGPS) {
 
-        // Disconnect
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
+            return;
+        }
+
+            // Disconnect
         if (mLocationClient.isConnected()) {
             // Disconnect first to ensure that the new requests are GPS
             com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
