@@ -78,7 +78,7 @@ void parseTileJSONMember(const JSValue& value, uint16_t& target, const char* nam
 }
 
 template <size_t N>
-void parseTileJSONMember(const JSValue& value, std::array<float, N>& target, const char* name) {
+void parseTileJSONMember(const JSValue& value, std::array<double, N>& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
