@@ -70,7 +70,7 @@ void SQLiteCache::Impl::createDatabase() {
 int SQLiteCache::Impl::schemaVersion() const {
     // WARNING: Bump the version when changing the cache
     // scheme to force the table to be recreated.
-    return 1;
+    return 2;
 }
 
 void SQLiteCache::Impl::createSchema() {
