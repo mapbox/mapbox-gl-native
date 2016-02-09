@@ -109,8 +109,9 @@ TEST(Transform, InvalidBearing) {
 
 TEST(Transform, PerspectiveProjection) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    LatLng loc;
 
+    Transform transform(view, ConstrainMode::HeightOnly);
     transform.resize({{ 1000, 1000 }});
     transform.setScale(2 << 9);
     transform.setPitch(0.9);
@@ -118,7 +119,7 @@ TEST(Transform, PerspectiveProjection) {
 
     // expected values are from mapbox-gl-js
 
-    LatLng loc = transform.getState().pointToLatLng({ 500, 500 });
+    loc = transform.getLatLng();
     ASSERT_NEAR(-77, loc.longitude, 0.0001);
     ASSERT_NEAR(38, loc.latitude, 0.0001);
 
@@ -145,17 +146,17 @@ TEST(Transform, ConstrainHeightOnly) {
 
     Transform transform(view, ConstrainMode::HeightOnly);
     transform.resize({{ 1000, 1000 }});
-    transform.setScale(1024);
+    transform.setScale(std::pow(2, util::MAX_ZOOM));
 
     transform.setLatLng(LatLngBounds::world().southwest());
-    loc = transform.getState().pointToLatLng({ 500, 500 });
-    ASSERT_NEAR(-85.021422866378714, loc.latitude, 0.0001);
-    ASSERT_NEAR(180, std::abs(loc.longitude), 0.0001);
+    loc = transform.getLatLng();
+    ASSERT_NEAR(-util::LATITUDE_MAX, loc.latitude, 0.001);
+    ASSERT_NEAR(-util::LONGITUDE_MAX, loc.longitude, 0.001);
 
     transform.setLatLng(LatLngBounds::world().northeast());
-    loc = transform.getState().pointToLatLng({ 500, 500 });
-    ASSERT_NEAR(85.021422866378742, loc.latitude, 0.0001);
-    ASSERT_NEAR(180, std::abs(loc.longitude), 0.0001);
+    loc = transform.getLatLng();
+    ASSERT_NEAR(util::LATITUDE_MAX, loc.latitude, 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude), 0.001);
 }
 
 TEST(Transform, ConstrainWidthAndHeight) {
@@ -164,17 +165,17 @@ TEST(Transform, ConstrainWidthAndHeight) {
 
     Transform transform(view, ConstrainMode::WidthAndHeight);
     transform.resize({{ 1000, 1000 }});
-    transform.setScale(1024);
+    transform.setScale(std::pow(2, util::MAX_ZOOM));
 
     transform.setLatLng(LatLngBounds::world().southwest());
-    loc = transform.getState().pointToLatLng({ 500, 500 });
-    ASSERT_NEAR(-85.021422866378714, loc.latitude, 0.0001);
-    ASSERT_NEAR(-179.65667724609375, loc.longitude, 0.0001);
+    loc = transform.getLatLng();
+    ASSERT_NEAR(-util::LATITUDE_MAX, loc.latitude, 0.001);
+    ASSERT_NEAR(-util::LONGITUDE_MAX, loc.longitude, 0.001);
 
     transform.setLatLng(LatLngBounds::world().northeast());
-    loc = transform.getState().pointToLatLng({ 500, 500 });
-    ASSERT_NEAR(85.021422866378742, loc.latitude, 0.0001);
-    ASSERT_NEAR(179.65667724609358, std::abs(loc.longitude), 0.0001);
+    loc = transform.getLatLng();
+    ASSERT_NEAR(util::LATITUDE_MAX, loc.latitude, 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude), 0.001);
 }
 
 TEST(Transform, Anchor) {

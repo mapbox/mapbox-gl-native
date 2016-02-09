@@ -333,7 +333,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
  coordinate so that interpolating between the two endpoints will cross it. */
 void Transform::unwrapLatLng(LatLng& latLng) {
     LatLng startLatLng = getLatLng();
-    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > 180) {
+    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > util::LONGITUDE_MAX) {
         if (startLatLng.longitude > 0 && latLng.longitude < 0) {
             latLng.longitude += 360;
         } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {

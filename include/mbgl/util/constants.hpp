@@ -19,6 +19,7 @@ extern const double RAD2DEG;
 extern const double M2PI;
 extern const double EARTH_RADIUS_M;
 extern const double LATITUDE_MAX;
+extern const double LONGITUDE_MAX;
 extern const double PITCH_MAX;
 extern const double MIN_ZOOM;
 extern const double MAX_ZOOM;

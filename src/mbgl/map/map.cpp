@@ -349,17 +349,17 @@ void Map::setBearing(double degrees, const Duration& duration) {
 }
 
 void Map::setBearing(double degrees, const PrecisionPoint& center, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, center, duration);
+    transform->setAngle(-degrees * util::DEG2RAD, center, duration);
     update(Update::Repaint);
 }
 
 void Map::setBearing(double degrees, const EdgeInsets& padding, const Duration& duration) {
-    transform->setAngle(-degrees * M_PI / 180, padding, duration);
+    transform->setAngle(-degrees * util::DEG2RAD, padding, duration);
     update(Update::Repaint);
 }
 
 double Map::getBearing() const {
-    return -transform->getAngle() / M_PI * 180;
+    return -transform->getAngle() * util::RAD2DEG;
 }
 
 void Map::resetNorth(const Duration& duration) {
@@ -375,12 +375,12 @@ void Map::setPitch(double pitch, const Duration& duration) {
 }
 
 void Map::setPitch(double pitch, const PrecisionPoint& anchor, const Duration& duration) {
-    transform->setPitch(pitch * M_PI / 180, anchor, duration);
+    transform->setPitch(pitch * util::DEG2RAD, anchor, duration);
     update(Update::Repaint);
 }
 
 double Map::getPitch() const {
-    return transform->getPitch() / M_PI * 180;
+    return transform->getPitch() * util::RAD2DEG;
 }
 
 

@@ -3,6 +3,7 @@
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/constants.hpp>
 #include <cassert>
 
 namespace mbgl {
@@ -26,7 +27,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     vec2<float> bl{left, bottom};
 
 
-    float angle = layout.icon.rotate * M_PI / 180.0f;
+    float angle = layout.icon.rotate * util::DEG2RAD;
     if (alongLine) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const Coordinate &prev= line[anchor.segment];
@@ -134,7 +135,7 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
         const bool alongLine, const GlyphPositions& face) {
 
-    const float textRotate = layout.text.rotate * M_PI / 180;
+    const float textRotate = layout.text.rotate * util::DEG2RAD;
     const bool keepUpright = layout.text.keepUpright;
 
     SymbolQuads quads;

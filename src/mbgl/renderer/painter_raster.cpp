@@ -49,7 +49,7 @@ float Painter::contrastFactor(float contrast) {
 }
 
 std::array<float, 3> Painter::spinWeights(float spin) {
-    spin *= M_PI / 180;
+    spin *= util::DEG2RAD;
     float s = std::sin(spin);
     float c = std::cos(spin);
     std::array<float, 3> spin_weights = {{

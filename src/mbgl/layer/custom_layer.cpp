@@ -44,7 +44,7 @@ void CustomLayer::render(const TransformState& state) const {
     parameters.latitude = state.getLatLng().latitude;
     parameters.longitude = state.getLatLng().longitude;
     parameters.zoom = state.getZoom();
-    parameters.bearing = -state.getAngle() / M_PI * 180;
+    parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
     parameters.altitude = state.getAltitude();
 

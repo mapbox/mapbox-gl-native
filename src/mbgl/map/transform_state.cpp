@@ -96,8 +96,8 @@ LatLng TransformState::getLatLng() const {
     ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI);
 
     // adjust for world wrap
-    while (ll.longitude >  180) ll.longitude -= 180;
-    while (ll.longitude < -180) ll.longitude += 180;
+    while (ll.longitude >  util::LONGITUDE_MAX) ll.longitude -= util::LONGITUDE_MAX;
+    while (ll.longitude < -util::LONGITUDE_MAX) ll.longitude += util::LONGITUDE_MAX;
 
     // adjust for date line
     double w = util::tileSize * scale / 2;
@@ -106,18 +106,18 @@ LatLng TransformState::getLatLng() const {
         while (x_ > w) {
             x_ -= w;
             if (ll.longitude < 0) {
-                ll.longitude += 180;
+                ll.longitude += util::LONGITUDE_MAX;
             } else if (ll.longitude > 0) {
-                ll.longitude -= 180;
+                ll.longitude -= util::LONGITUDE_MAX;
             }
         }
     } else if (x_ < -w) {
         while (x_ < -w) {
             x_ += w;
             if (ll.longitude < 0) {
-                ll.longitude -= 180;
+                ll.longitude -= util::LONGITUDE_MAX;
             } else if (ll.longitude > 0) {
-                ll.longitude -= 180;
+                ll.longitude -= util::LONGITUDE_MAX;
             }
         }
     }
@@ -220,21 +220,21 @@ bool TransformState::isGestureInProgress() const {
 #pragma mark - Projection
 
 double TransformState::lngX(double lng) const {
-    return (180.0f + lng) * worldSize() / 360.0f;
+    return (util::LONGITUDE_MAX + lng) * worldSize() / 360.0f;
 }
 
 double TransformState::latY(double lat) const {
-    double y_ = 180.0f / M_PI * std::log(std::tan(M_PI / 4 + lat * M_PI / 360.0f));
-    return (180.0f - y_) * worldSize() / 360.0f;
+    double y_ = util::RAD2DEG * std::log(std::tan(M_PI / 4 + lat * M_PI / 360.0f));
+    return (util::LONGITUDE_MAX - y_) * worldSize() / 360.0f;
 }
 
 double TransformState::xLng(double x_, double worldSize_) const {
-    return x_ * 360.0f / worldSize_ - 180.0f;
+    return x_ * 360.0f / worldSize_ - util::LONGITUDE_MAX;
 }
 
 double TransformState::yLat(double y_, double worldSize_) const {
-    double y2 = 180.0f - y_ * 360.0f / worldSize_;
-    return 360.0f / M_PI * std::atan(std::exp(y2 * M_PI / 180.0f)) - 90.0f;
+    double y2 = util::LONGITUDE_MAX - y_ * 360.0f / worldSize_;
+    return 360.0f / M_PI * std::atan(std::exp(y2 * util::DEG2RAD)) - 90.0f;
 }
 
 double TransformState::zoomScale(double zoom) const {
@@ -271,8 +271,8 @@ LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
         yLat(coord.row, worldSize_),
         xLng(coord.column, worldSize_)
     };
-    while (latLng.longitude < -180.0f) latLng.longitude += 360.0f;
-    while (latLng.longitude > 180.0f) latLng.longitude -= 360.0f;
+    while (latLng.longitude < -util::LONGITUDE_MAX) latLng.longitude += 360.0f;
+    while (latLng.longitude > util::LONGITUDE_MAX) latLng.longitude -= 360.0f;
     return latLng;
 }
 

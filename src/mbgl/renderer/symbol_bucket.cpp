@@ -285,7 +285,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const bool avoidEdges = layout.avoidEdges && layout.placement != PlacementType::Line;
     const float textPadding = layout.text.padding * tilePixelRatio;
     const float iconPadding = layout.icon.padding * tilePixelRatio;
-    const float textMaxAngle = layout.text.maxAngle * M_PI / 180;
+    const float textMaxAngle = layout.text.maxAngle * util::DEG2RAD;
     const bool textAlongLine =
         layout.text.rotationAlignment == RotationAlignmentType::Map &&
         layout.placement == PlacementType::Line;

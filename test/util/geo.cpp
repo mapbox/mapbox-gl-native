@@ -1,5 +1,6 @@
 #include "../fixtures/util.hpp"
 
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/tile_id.hpp>
 
@@ -87,36 +88,36 @@ TEST(LatLngBounds, Northwest) {
 TEST(LatLng, FromTileID) {
     for (int i = 0; i < 20; i++) {
         const LatLng ll{ TileID(i, 0, 0, 0) };
-        ASSERT_DOUBLE_EQ(-180, ll.longitude);
-        ASSERT_DOUBLE_EQ(85.051128779806604, ll.latitude);
+        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, ll.longitude);
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
 
     {
         const LatLng ll{ TileID(0, 1, 0, 0) };
-        ASSERT_DOUBLE_EQ(180, ll.longitude);
-        ASSERT_DOUBLE_EQ(85.051128779806604, ll.latitude);
+        ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, ll.longitude);
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
 
     {
         const LatLng ll{ TileID(0, -1, 0, 0) };
         ASSERT_DOUBLE_EQ(-540, ll.longitude);
-        ASSERT_DOUBLE_EQ(85.051128779806604, ll.latitude);
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
 }
 
 TEST(LatLngBounds, FromTileID) {
     {
         const LatLngBounds bounds{ TileID(0, 0, 0, 0) };
-        ASSERT_DOUBLE_EQ(-180, bounds.west());
-        ASSERT_DOUBLE_EQ(-85.051128779806604, bounds.south());
-        ASSERT_DOUBLE_EQ(180, bounds.east());
-        ASSERT_DOUBLE_EQ(85.051128779806604, bounds.north());
+        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
+        ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
+        ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, bounds.east());
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, bounds.north());
     }
 
     {
         const LatLngBounds bounds{ TileID(1, 0, 1, 0) };
-        ASSERT_DOUBLE_EQ(-180, bounds.west());
-        ASSERT_DOUBLE_EQ(-85.051128779806604, bounds.south());
+        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
+        ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
         ASSERT_DOUBLE_EQ(0, bounds.east());
         ASSERT_DOUBLE_EQ(0, bounds.north());
     }
@@ -124,16 +125,16 @@ TEST(LatLngBounds, FromTileID) {
     {
         const LatLngBounds bounds{ TileID(1, 1, 1, 0) };
         ASSERT_DOUBLE_EQ(0, bounds.west());
-        ASSERT_DOUBLE_EQ(-85.051128779806604, bounds.south());
-        ASSERT_DOUBLE_EQ(180, bounds.east());
+        ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
+        ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, bounds.east());
         ASSERT_DOUBLE_EQ(0, bounds.north());
     }
 
     {
         const LatLngBounds bounds{ TileID(1, 0, 0, 0) };
-        ASSERT_DOUBLE_EQ(-180, bounds.west());
+        ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
         ASSERT_DOUBLE_EQ(0, bounds.south());
         ASSERT_DOUBLE_EQ(0, bounds.east());
-        ASSERT_DOUBLE_EQ(85.051128779806604, bounds.north());
+        ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, bounds.north());
     }
 }
