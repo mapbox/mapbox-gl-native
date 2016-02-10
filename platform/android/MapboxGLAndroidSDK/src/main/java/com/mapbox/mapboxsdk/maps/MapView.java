@@ -1038,7 +1038,7 @@ public class MapView extends FrameLayout {
      * @param updatedMarker An updated marker object.
      */
     @UiThread
-    public void updateMarker(@NonNull Marker updatedMarker) {
+    void updateMarker(@NonNull Marker updatedMarker) {
         if (updatedMarker == null) {
             Log.w(TAG, "marker was null, doing nothing");
             return;
