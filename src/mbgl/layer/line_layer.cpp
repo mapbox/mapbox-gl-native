@@ -2,6 +2,7 @@
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/map/tile_id.hpp>
+#include <mbgl/util/get_geometries.hpp>
 
 namespace mbgl {
 
@@ -79,7 +80,7 @@ std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameter
     bucket->layout.roundLimit.calculate(p);
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
-        bucket->addGeometry(feature.getGeometries());
+        bucket->addGeometry(getGeometries(feature));
     });
 
     return std::move(bucket);

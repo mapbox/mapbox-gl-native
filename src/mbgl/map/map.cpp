@@ -157,8 +157,8 @@ void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation)
     transform->easeTo(camera, animation);
     update(camera.zoom ? Update::Zoom : Update::Repaint);
 }
-
-
+    
+    
 void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
     transform->flyTo(camera, animation);
     update(Update::Zoom);
@@ -242,10 +242,10 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& pad
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) {
     AnnotationSegment segment = {
-        {bounds.ne.latitude, bounds.sw.longitude},
-        bounds.sw,
-        {bounds.sw.latitude, bounds.ne.longitude},
-        bounds.ne,
+        bounds.northwest(),
+        bounds.southwest(),
+        bounds.southeast(),
+        bounds.northeast(),
     };
     return cameraForLatLngs(segment, padding);
 }
@@ -290,7 +290,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
         (paddedNEPixel.x + paddedSWPixel.x) / 2,
         (paddedNEPixel.y + paddedSWPixel.y) / 2,
     };
-
+    
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;
 
@@ -303,8 +303,22 @@ void Map::resetZoom() {
     setZoom(0);
 }
 
+void Map::setMinZoom(const double minZoom) {
+    transform->setMinZoom(minZoom);
+    if (getZoom() < minZoom) {
+        setZoom(minZoom);
+    }
+}
+
 double Map::getMinZoom() const {
     return transform->getState().getMinZoom();
+}
+
+void Map::setMaxZoom(const double maxZoom) {
+    transform->setMaxZoom(maxZoom);
+    if (getZoom() > maxZoom) {
+        setZoom(maxZoom);
+    }
 }
 
 double Map::getMaxZoom() const {
@@ -384,14 +398,6 @@ NorthOrientation Map::getNorthOrientation() const {
 
 #pragma mark - Projection
 
-MetersBounds Map::getWorldBoundsMeters() const {
-    return Projection::getWorldBoundsMeters();
-}
-
-LatLngBounds Map::getWorldBoundsLatLng() const {
-    return Projection::getWorldBoundsLatLng();
-}
-
 double Map::getMetersPerPixelAtLatitude(double lat, double zoom) const {
     return Projection::getMetersPerPixelAtLatitude(lat, zoom);
 }
@@ -462,10 +468,6 @@ void Map::removeAnnotations(const AnnotationIDs& annotations) {
 
 AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return data->getAnnotationManager()->getPointAnnotationsInBounds(bounds);
-}
-
-LatLngBounds Map::getBoundsForAnnotations(const AnnotationIDs& annotations) {
-    return data->getAnnotationManager()->getBoundsForAnnotations(annotations);
 }
 
 #pragma mark - Style API

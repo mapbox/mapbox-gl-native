@@ -47,18 +47,12 @@ jmethodID latLngConstructorId = nullptr;
 jfieldID latLngLatitudeId = nullptr;
 jfieldID latLngLongitudeId = nullptr;
 
-jclass latLngZoomClass = nullptr;
-jmethodID latLngZoomConstructorId = nullptr;
-jfieldID latLngZoomLatitudeId = nullptr;
-jfieldID latLngZoomLongitudeId = nullptr;
-jfieldID latLngZoomZoomId = nullptr;
-
-jclass bboxClass = nullptr;
-jmethodID bboxConstructorId = nullptr;
-jfieldID bboxLatNorthId = nullptr;
-jfieldID bboxLatSouthId = nullptr;
-jfieldID bboxLonEastId = nullptr;
-jfieldID bboxLonWestId = nullptr;
+jclass latLngBoundsClass = nullptr;
+jmethodID latLngBoundsConstructorId = nullptr;
+jfieldID latLngBoundsLatNorthId = nullptr;
+jfieldID latLngBoundsLatSouthId = nullptr;
+jfieldID latLngBoundsLonEastId = nullptr;
+jfieldID latLngBoundsLonWestId = nullptr;
 
 jclass iconClass = nullptr;
 jfieldID iconIdId = nullptr;
@@ -728,49 +722,6 @@ jdouble JNICALL nativeGetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) 
     return nativeMapView->getMap().getZoom();
 }
 
-void JNICALL nativeSetLatLngZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr,
-                                 jobject latLngZoom, jlong duration) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetLatLngZoom");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-
-    jdouble latitude = env->GetDoubleField(latLngZoom, latLngZoomLatitudeId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return;
-    }
-
-    jdouble longitude = env->GetDoubleField(latLngZoom, latLngZoomLongitudeId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return;
-    }
-
-    jdouble zoom = env->GetDoubleField(latLngZoom, latLngZoomZoomId);
-    if (env->ExceptionCheck()) {
-        env->ExceptionDescribe();
-        return;
-    }
-
-    nativeMapView->getMap().setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom, mbgl::Milliseconds(duration));
-}
-
-jobject JNICALL nativeGetLatLngZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLatLngZoom");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng();
-    jdouble zoom = nativeMapView->getMap().getZoom();
-
-    jobject ret = env->NewObject(latLngZoomClass, latLngZoomConstructorId, latLng.longitude, latLng.latitude, zoom);
-    if (ret == nullptr) {
-        env->ExceptionDescribe();
-        return nullptr;
-    }
-
-    return ret;
-}
-
 void JNICALL nativeResetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetZoom");
     assert(nativeMapViewPtr != 0);
@@ -778,11 +729,25 @@ void JNICALL nativeResetZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     nativeMapView->getMap().resetZoom();
 }
 
+void JNICALL nativeSetMinZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetMinZoom");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setMinZoom(zoom);
+}
+
 jdouble JNICALL nativeGetMinZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetMinZoom");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     return nativeMapView->getMap().getMinZoom();
+}
+
+void JNICALL nativeSetMaxZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jdouble zoom) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetMaxZoom");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    nativeMapView->getMap().setMaxZoom(zoom);
 }
 
 jdouble JNICALL nativeGetMaxZoom(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
@@ -1219,44 +1184,43 @@ void JNICALL nativeRemoveAnnotations(JNIEnv *env, jobject obj, jlong nativeMapVi
     nativeMapView->getMap().removeAnnotations(ids);
 }
 
-jlongArray JNICALL nativeGetAnnotationsInBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject bbox) {
+jlongArray JNICALL nativeGetAnnotationsInBounds(JNIEnv *env, jobject obj, jlong nativeMapViewPtr, jobject latLngBounds) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetAnnotationsInBounds");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    if (env->ExceptionCheck() || (bbox == nullptr)) {
+    if (env->ExceptionCheck() || (latLngBounds == nullptr)) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jdouble swLat = env->GetDoubleField(bbox, bboxLatSouthId);
+    jdouble swLat = env->GetDoubleField(latLngBounds, latLngBoundsLatSouthId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jdouble swLon = env->GetDoubleField(bbox, bboxLonWestId);
+    jdouble swLon = env->GetDoubleField(latLngBounds, latLngBoundsLonWestId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jdouble neLat = env->GetDoubleField(bbox, bboxLatNorthId);
+    jdouble neLat = env->GetDoubleField(latLngBounds, latLngBoundsLatNorthId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
 
-    jdouble neLon = env->GetDoubleField(bbox, bboxLonEastId);
+    jdouble neLon = env->GetDoubleField(latLngBounds, latLngBoundsLonEastId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         return nullptr;
     }
-
-    mbgl::LatLngBounds bounds({ swLat, swLon }, { neLat, neLon });
 
     // assume only points for now
-    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(bounds);
+    std::vector<uint32_t> annotations = nativeMapView->getMap().getPointAnnotationsInBounds(
+        mbgl::LatLngBounds::hull({ swLat, swLon }, { neLat, neLon }));
 
     return std_vector_uint_to_jobject(env, annotations);
 }
@@ -1661,6 +1625,7 @@ void JNICALL nativeRemoveCustomLayer(JNIEnv *env, jobject obj, jlong nativeMapVi
 extern "C" {
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    // This reads out values from objects
     mbgl::Log::Debug(mbgl::Event::JNI, "JNI_OnLoad");
 
     theJVM = vm;
@@ -1696,68 +1661,38 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngZoomClass = env->FindClass("com/mapbox/mapboxsdk/geometry/LatLngZoom");
-    if (latLngZoomClass == nullptr) {
+    latLngBoundsClass = env->FindClass("com/mapbox/mapboxsdk/geometry/LatLngBounds");
+    if (latLngBoundsClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    latLngZoomConstructorId = env->GetMethodID(latLngZoomClass, "<init>", "(DDD)V");
-    if (latLngZoomConstructorId == nullptr) {
+    latLngBoundsConstructorId = env->GetMethodID(latLngBoundsClass, "<init>", "(DDDD)V");
+    if (latLngBoundsConstructorId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    latLngZoomLatitudeId = env->GetFieldID(latLngZoomClass, "latitude", "D");
-    if (latLngZoomLatitudeId == nullptr) {
+    latLngBoundsLatNorthId = env->GetFieldID(latLngBoundsClass, "mLatNorth", "D");
+    if (latLngBoundsLatNorthId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    latLngZoomLongitudeId = env->GetFieldID(latLngZoomClass, "longitude", "D");
-    if (latLngZoomLongitudeId == nullptr) {
+    latLngBoundsLatSouthId = env->GetFieldID(latLngBoundsClass, "mLatSouth", "D");
+    if (latLngBoundsLatSouthId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    latLngZoomZoomId = env->GetFieldID(latLngZoomClass, "zoom", "D");
-    if (latLngZoomZoomId == nullptr) {
+    latLngBoundsLonEastId = env->GetFieldID(latLngBoundsClass, "mLonEast", "D");
+    if (latLngBoundsLonEastId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
 
-    bboxClass = env->FindClass("com/mapbox/mapboxsdk/geometry/BoundingBox");
-    if (bboxClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    bboxConstructorId = env->GetMethodID(bboxClass, "<init>", "(DDDD)V");
-    if (bboxConstructorId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    bboxLatNorthId = env->GetFieldID(bboxClass, "mLatNorth", "D");
-    if (bboxLatNorthId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    bboxLatSouthId = env->GetFieldID(bboxClass, "mLatSouth", "D");
-    if (bboxLatSouthId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    bboxLonEastId = env->GetFieldID(bboxClass, "mLonEast", "D");
-    if (bboxLonEastId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    bboxLonWestId = env->GetFieldID(bboxClass, "mLonWest", "D");
-    if (bboxLonWestId == nullptr) {
+    latLngBoundsLonWestId = env->GetFieldID(latLngBoundsClass, "mLonWest", "D");
+    if (latLngBoundsLonWestId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -1858,7 +1793,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxsdk/views/NativeMapView");
+    jclass nativeMapViewClass = env->FindClass("com/mapbox/mapboxsdk/maps/NativeMapView");
     if (nativeMapViewClass == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -2129,13 +2064,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetScale", "(J)D", reinterpret_cast<void *>(&nativeGetScale)},
         {"nativeSetZoom", "(JDJ)V", reinterpret_cast<void *>(&nativeSetZoom)},
         {"nativeGetZoom", "(J)D", reinterpret_cast<void *>(&nativeGetZoom)},
-        {"nativeSetLatLngZoom", "(JLcom/mapbox/mapboxsdk/geometry/LatLngZoom;J)V",
-         reinterpret_cast<void *>(&nativeSetLatLngZoom)},
-        {"nativeGetLatLngZoom", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLngZoom;",
-         reinterpret_cast<void *>(&nativeGetLatLngZoom)},
         {"nativeResetZoom", "(J)V", reinterpret_cast<void *>(&nativeResetZoom)},
         {"nativeGetMinZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMinZoom)},
+        {"nativeSetMinZoom", "(JD)V", reinterpret_cast<void *>(&nativeSetMinZoom)},
         {"nativeGetMaxZoom", "(J)D", reinterpret_cast<void *>(&nativeGetMaxZoom)},
+        {"nativeSetMaxZoom", "(JD)V", reinterpret_cast<void *>(&nativeSetMaxZoom)},
         {"nativeRotateBy", "(JDDDDJ)V", reinterpret_cast<void *>(&nativeRotateBy)},
         {"nativeSetBearing", "(JDJ)V",
          reinterpret_cast<void *>(
@@ -2163,7 +2096,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         reinterpret_cast<void *>(&nativeUpdateMarker)} ,
         {"nativeRemoveAnnotation", "(JJ)V", reinterpret_cast<void *>(&nativeRemoveAnnotation)},
         {"nativeRemoveAnnotations", "(J[J)V", reinterpret_cast<void *>(&nativeRemoveAnnotations)},
-        {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/BoundingBox;)[J",
+        {"nativeGetAnnotationsInBounds", "(JLcom/mapbox/mapboxsdk/geometry/LatLngBounds;)[J",
          reinterpret_cast<void *>(&nativeGetAnnotationsInBounds)},
         {"nativeAddAnnotationIcon", "(JLjava/lang/String;IIF[B)V", reinterpret_cast<void *>(&nativeAddAnnotationIcon)},
         {"nativeSetVisibleCoordinateBounds", "(J[Lcom/mapbox/mapboxsdk/geometry/LatLng;Landroid/graphics/RectF;DJ)V",
@@ -2212,19 +2145,11 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    latLngZoomClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngZoomClass));
-    if (latLngZoomClass == nullptr) {
+    latLngBoundsClass = reinterpret_cast<jclass>(env->NewGlobalRef(latLngBoundsClass));
+    if (latLngBoundsClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        return JNI_ERR;
-    }
-
-    bboxClass = reinterpret_cast<jclass>(env->NewGlobalRef(bboxClass));
-    if (bboxClass == nullptr) {
-        env->ExceptionDescribe();
-        env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         return JNI_ERR;
     }
 
@@ -2232,8 +2157,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (iconClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         return JNI_ERR;
     }
 
@@ -2241,8 +2165,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (markerClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         return JNI_ERR;
     }
@@ -2251,8 +2174,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (polylineClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         return JNI_ERR;
@@ -2262,8 +2184,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (polygonClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2274,8 +2195,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (runtimeExceptionClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2288,8 +2208,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (nullPointerExceptionClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2302,8 +2221,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (arrayListClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2317,8 +2235,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (projectedMetersClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2333,8 +2250,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (pointFClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2351,8 +2267,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
         env->DeleteGlobalRef(markerClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(polylineClass);
         env->DeleteGlobalRef(polygonClass);
         env->DeleteGlobalRef(runtimeExceptionClass);
@@ -2367,8 +2282,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (httpContextClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2385,8 +2299,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     if (httpRequestClass == nullptr) {
         env->ExceptionDescribe();
         env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngZoomClass);
-        env->DeleteGlobalRef(bboxClass);
+        env->DeleteGlobalRef(latLngBoundsClass);
         env->DeleteGlobalRef(iconClass);
         env->DeleteGlobalRef(markerClass);
         env->DeleteGlobalRef(polylineClass);
@@ -2425,20 +2338,13 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     latLngLongitudeId = nullptr;
     latLngLatitudeId = nullptr;
 
-    env->DeleteGlobalRef(latLngZoomClass);
-    latLngZoomClass = nullptr;
-    latLngZoomConstructorId = nullptr;
-    latLngZoomLongitudeId = nullptr;
-    latLngZoomLatitudeId = nullptr;
-    latLngZoomZoomId = nullptr;
-
-    env->DeleteGlobalRef(bboxClass);
-    bboxClass = nullptr;
-    bboxConstructorId = nullptr;
-    bboxLatNorthId = nullptr;
-    bboxLatSouthId = nullptr;
-    bboxLonEastId = nullptr;
-    bboxLonWestId = nullptr;
+    env->DeleteGlobalRef(latLngBoundsClass);
+    latLngBoundsClass = nullptr;
+    latLngBoundsConstructorId = nullptr;
+    latLngBoundsLatNorthId = nullptr;
+    latLngBoundsLatSouthId = nullptr;
+    latLngBoundsLonEastId = nullptr;
+    latLngBoundsLonWestId = nullptr;
 
     env->DeleteGlobalRef(iconClass);
     iconClass = nullptr;

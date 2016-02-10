@@ -16,7 +16,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 {
     CLLocationCoordinate2D *_coords;
     size_t _count;
-    mbgl::LatLngBounds _bounds;
+    MGLCoordinateBounds _bounds;
 }
 
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords
@@ -28,13 +28,16 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     {
         _count = count;
         _coords = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
-        _bounds = mbgl::LatLngBounds::getExtendable();
+
+        mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
 
         for (NSUInteger i = 0; i < _count; i++)
         {
             _coords[i] = coords[i];
-            _bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
+            bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
         }
+
+        _bounds = MGLCoordinateBoundsFromLatLngBounds(bounds);
     }
 
     return self;
@@ -93,20 +96,12 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
 - (MGLCoordinateBounds)overlayBounds
 {
-    return {
-        CLLocationCoordinate2DMake(_bounds.sw.latitude,  _bounds.sw.longitude),
-        CLLocationCoordinate2DMake(_bounds.ne.latitude, _bounds.ne.longitude)
-    };
+    return _bounds;
 }
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds
 {
-    mbgl::LatLngBounds area(
-        mbgl::LatLng(overlayBounds.sw.latitude, overlayBounds.sw.longitude),
-        mbgl::LatLng(overlayBounds.ne.latitude, overlayBounds.ne.longitude)
-    );
-
-    return _bounds.intersects(area);
+    return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
 - (void)addShapeAnnotationObjectToCollection:(std::vector<mbgl::ShapeAnnotation> &)shapes withDelegate:(id <MGLMultiPointDelegate>)delegate {

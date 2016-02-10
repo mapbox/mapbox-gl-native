@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <com.mapbox.mapboxsdk.views.MapView
+    <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +18,7 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp">
 
-        <com.mapbox.mapboxsdk.views.MapView
+        <com.mapbox.mapboxsdk.maps.MapView
             android:id="@+id/mini_map"
             android:layout_width="100dp"
             android:layout_height="100dp"

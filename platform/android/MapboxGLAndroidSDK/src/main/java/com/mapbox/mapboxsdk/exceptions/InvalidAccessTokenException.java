@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.exceptions;
 
 import android.os.Bundle;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
  * A {@code InvalidAccessTokenException} is thrown by {@link MapView} when there is either no access

@@ -117,7 +117,9 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      * @param locationListener LocationListener
      */
     public void addLocationListener(@NonNull LocationListener locationListener) {
-        this.locationListeners.add(locationListener);
+		if(!this.locationListeners.contains(locationListener)){
+			this.locationListeners.add(locationListener);
+		}
     }
 
     /**

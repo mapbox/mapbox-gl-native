@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_UTIL_GL_OBJECT_STORE
 #define MBGL_MAP_UTIL_GL_OBJECT_STORE
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <cstdint>

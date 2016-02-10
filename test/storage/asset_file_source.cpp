@@ -173,3 +173,24 @@ TEST_F(Storage, AssetReadDirectory) {
 
     loop.run();
 }
+
+TEST_F(Storage, AssetURLEncoding) {
+    SCOPED_TEST(NonEmptyFile)
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+
+    AssetFileSource fs(getFileSourceRoot());
+
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("content is here\n", *res.data);
+        loop.stop();
+        NonEmptyFile.finish();
+    });
+
+    loop.run();
+}

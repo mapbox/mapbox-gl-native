@@ -13,25 +13,22 @@ class WorkRequest;
 
 class RasterTileData : public TileData {
 public:
-    RasterTileData(const TileID&, TexturePool&, Worker&);
+    RasterTileData(const TileID&,
+                   float pixelRatio,
+                   const std::string& urlTemplate,
+                   TexturePool&,
+                   Worker&,
+                   const std::function<void(std::exception_ptr)>& callback);
     ~RasterTileData();
 
-    using Callback = std::function<void(std::exception_ptr)>;
-
-    void request(const std::string& url,
-                 const Callback& callback);
-
     void cancel() override;
-
     Bucket* getBucket(StyleLayer const &layer_desc) override;
 
 private:
     TexturePool& texturePool;
     Worker& worker;
     std::unique_ptr<FileRequest> req;
-
     std::unique_ptr<Bucket> bucket;
-
     std::unique_ptr<WorkRequest> workRequest;
 };
 

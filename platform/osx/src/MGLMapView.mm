@@ -18,7 +18,7 @@
 #import <mbgl/annotation/point_annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/platform/darwin/reachability.h>
-#import <mbgl/platform/gl.hpp>
+#import <mbgl/gl/gl.hpp>
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
@@ -898,6 +898,16 @@ public:
     _mbglMap->scaleBy(scaleFactor, center, MGLDurationInSeconds(animated ? MGLAnimationDuration : 0));
     [self didChangeValueForKey:@"zoomLevel"];
     [self didChangeValueForKey:@"centerCoordinate"];
+}
+
+- (void)setMinimumZoomLevel:(double)minimumZoomLevel
+{
+    _mbglMap->setMinZoom(minimumZoomLevel);
+}
+
+- (void)setMaximumZoomLevel:(double)maximumZoomLevel
+{
+    _mbglMap->setMaxZoom(maximumZoomLevel);
 }
 
 - (double)maximumZoomLevel {
@@ -2170,8 +2180,8 @@ public:
 /// Converts a geographic bounding box to a rectangle in the view’s coordinate
 /// system.
 - (NSRect)convertLatLngBounds:(mbgl::LatLngBounds)bounds toRectToView:(nullable NSView *)view {
-    NSRect rect = { [self convertLatLng:bounds.sw toPointToView:view], NSZeroSize };
-    rect = MGLExtendRect(rect, [self convertLatLng:bounds.ne toPointToView:view]);
+    NSRect rect = { [self convertLatLng:bounds.southwest() toPointToView:view], NSZeroSize };
+    rect = MGLExtendRect(rect, [self convertLatLng:bounds.northeast() toPointToView:view]);
     return rect;
 }
 
@@ -2182,7 +2192,7 @@ public:
 /// Converts a rectangle in the given view’s coordinate system to a geographic
 /// bounding box.
 - (mbgl::LatLngBounds)convertRect:(NSRect)rect toLatLngBoundsFromView:(nullable NSView *)view {
-    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::getExtendable();
+    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
     bounds.extend([self convertPoint:rect.origin toLatLngFromView:view]);
     bounds.extend([self convertPoint:{ NSMaxX(rect), NSMinY(rect) } toLatLngFromView:view]);
     bounds.extend([self convertPoint:{ NSMaxX(rect), NSMaxY(rect) } toLatLngFromView:view]);
@@ -2191,22 +2201,22 @@ public:
     // The world is wrapping if a point just outside the bounds is also within
     // the rect.
     mbgl::LatLng outsideLatLng;
-    if (bounds.sw.longitude > -180) {
+    if (bounds.west() > -180) {
         outsideLatLng = {
-            (bounds.sw.latitude + bounds.ne.latitude) / 2,
-            bounds.sw.longitude - 1,
+            (bounds.south() + bounds.north()) / 2,
+            bounds.west() - 1,
         };
-    } else if (bounds.ne.longitude < 180) {
+    } else if (bounds.northeast().longitude < 180) {
         outsideLatLng = {
-            (bounds.sw.latitude + bounds.ne.latitude) / 2,
-            bounds.ne.longitude + 1,
+            (bounds.south() + bounds.north()) / 2,
+            bounds.east() + 1,
         };
     }
     
     // If the world is wrapping, extend the bounds to cover all longitudes.
     if (NSPointInRect([self convertLatLng:outsideLatLng toPointToView:view], rect)) {
-        bounds.sw.longitude = -180;
-        bounds.ne.longitude = 180;
+        bounds.extend(mbgl::LatLng(bounds.south(), -180));
+        bounds.extend(mbgl::LatLng(bounds.south(),  180));
     }
     
     return bounds;

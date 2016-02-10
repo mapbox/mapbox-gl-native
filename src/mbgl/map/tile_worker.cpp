@@ -37,7 +37,7 @@ TileWorker::~TileWorker() {
 }
 
 TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLayer>> layers_,
-                                           const GeometryTile& geometryTile,
+                                           std::unique_ptr<const GeometryTile> geometryTile,
                                            PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
@@ -55,7 +55,7 @@ TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLaye
         const StyleLayer* layer = i->get();
         if (parsed.find(layer->bucketName()) == parsed.end()) {
             parsed.emplace(layer->bucketName());
-            parseLayer(layer, geometryTile);
+            parseLayer(layer, *geometryTile);
         }
     }
 

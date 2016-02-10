@@ -2,7 +2,7 @@
 #define MBGL_SPRITE_ATLAS
 
 #include <mbgl/geometry/binpack.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/optional.hpp>

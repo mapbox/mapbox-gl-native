@@ -1,5 +1,5 @@
 #include <mbgl/geometry/line_atlas.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/gl_object_store.hpp>

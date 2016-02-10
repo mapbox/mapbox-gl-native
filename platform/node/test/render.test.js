@@ -41,6 +41,10 @@ suite.run('native', {tests: tests}, function (style, options, callback) {
     options.zoom = style.zoom;
     options.bearing = style.bearing;
     options.pitch = style.pitch;
+    options.debug = {
+        tileBorders: options.debug,
+        collision: options.collisionDebug
+    };
 
     map.load(style);
     map.render(options, function (err, pixels) {

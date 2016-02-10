@@ -1,6 +1,6 @@
 # [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)
 
-The Mapbox iOS SDK is an open-source framework for embedding interactive map views with scalable, customizable vector maps into Cocoa Touch applications on iOS 7.0 and above using Objective-C, Swift, or Interface Builder. It takes stylesheets that conform to the [Mapbox GL Style Specification](https://github.com/mapbox/mapbox-gl-style-spec/), applies them to vector tiles that conform to the [Mapbox Vector Tile Specification](https://github.com/mapbox/vector-tile-spec), and renders them using OpenGL.
+The Mapbox iOS SDK is an open-source framework for embedding interactive map views with scalable, customizable vector maps into Cocoa Touch applications on iOS 7.0 and above using Objective-C, Swift, or Interface Builder. It takes stylesheets that conform to the [Mapbox GL Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/), applies them to vector tiles that conform to the [Mapbox Vector Tile Specification](https://www.mapbox.com/developers/vector-tiles/), and renders them using OpenGL.
 
 For more information, check out the [Mapbox iOS SDK homepage](https://www.mapbox.com/ios-sdk/) and the [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/master/CHANGELOG.md) online.
 
@@ -54,16 +54,26 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 
-1. Mapbox Telemetry is a <a href="https://www.mapbox.com/telemetry/">powerful location analytics platform</a> included in this SDK. By default, anonymized location and usage data is sent to Mapbox whenever the host application causes it to be gathered. This SDK provides users with a way to individually opt out of Mapbox Telemetry. You can also add this opt-out setting to your application’s Settings screen, using the provided `Settings.bundle`.
+1. In order to show the user’s position on the map, you must first ask for their permission. In iOS 8 and above, this is accomplished by creating and setting the `NSLocationAlwaysUsageDescription` and/or `NSLocationWhenInUseUsageDescription` key in the `Info.plist` file.
 
-1. In order to show the user’s position on the map, you must first ask for their permission. In iOS 8 and above, this is accomplished by creating and setting the `NSLocationAlwaysUsageDescription` key in the `Info.plist` file.
-
-1. If you are on the free Starter plan, background location services must also be enabled. You can find instructions on how to do this in “[First steps with the Mapbox iOS SDK](https://www.mapbox.com/help/first-steps-ios-sdk/#background-location)”.
+1. _(Optional)_ Mapbox Telemetry is a <a href="https://www.mapbox.com/telemetry/">powerful location analytics platform</a> included in this SDK. By default, anonymized location and usage data is sent to Mapbox whenever the host application causes it to be gathered. This SDK provides users with a way to individually opt out of Mapbox Telemetry. You can also add this opt-out setting to your application’s Settings screen, using the provided `Settings.bundle`.
 
 ## Usage
 
-In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
+In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the Mapbox module in your view controller’s implementation file:
 
-Full API documentation is included in this package, within the `documentation` folder. For more details, read “[First steps with the Mapbox iOS SDK](https://www.mapbox.com/guides/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/).
+```objc
+// ViewController.m
+@import Mapbox;
+```
 
-If you have any questions, please contact <mobile@mapbox.com>. We welcome your [bug reports and feature requests](https://github.com/mapbox/mapbox-gl-native/issues/).
+```swift
+// ViewController.swift
+import Mapbox
+```
+
+Then switch to the Assistant Editor and create an outlet to the map view. (Control-drag from the map view in Interface Builder to a valid location in your view controller implementation.)
+
+Full API documentation is included in this package, within the `documentation` folder. For more details, read “[First steps with the Mapbox iOS SDK](https://www.mapbox.com/help/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/).
+
+If you have any questions, please [contact our support team](https://www.mapbox.com/contact/). We welcome your [bug reports and feature requests](https://github.com/mapbox/mapbox-gl-native/issues/).

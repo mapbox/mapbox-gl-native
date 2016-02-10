@@ -23,7 +23,7 @@ The Mapbox OS X SDK requires the OS X 10.10.0 SDK or above.
 
 ## Use
 
-The [Mapbox iOS SDK’s API documentation](https://www.mapbox.com/ios-sdk/api/3.0.1/) applies to the Mapbox OS X SDK with few differences, mostly around unimplemented features like user location tracking.
+The [Mapbox iOS SDK’s API documentation](https://www.mapbox.com/ios-sdk/api/) applies to the Mapbox OS X SDK with few differences, mostly around unimplemented features like user location tracking.
 
 ## Troubleshooting
 

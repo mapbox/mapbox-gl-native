@@ -1,7 +1,7 @@
 #include <mbgl/geometry/debug_font_buffer.hpp>
 #include <mbgl/geometry/debug_font_data.hpp>
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <cmath>
 #include <cstring>
 

@@ -28,7 +28,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
 
 ### Install
 
-There are two ways to install the Mapbox iOS SDK:
+There are a few ways to install the Mapbox iOS SDK:
 
 #### CocoaPods
 
@@ -63,6 +63,15 @@ Currently, until [#1437](https://github.com/mapbox/mapbox-gl-native/issues/1437)
     ```
 
 1. Run `pod update` to grab the newly-built library.
+
+
+
+##### Testing Pre-Releases with CocoaPods
+
+To test pre-releases and/or betas, you can reference the pre-release like so in your Podfile:
+
+    pod 'Mapbox-iOS-SDK', podspec: 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/<insert branch or tag>/ios/Mapbox-iOS-SDK.podspec'
+
 
 #### Dynamic framework
 
@@ -105,14 +114,28 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 
-1. In a XIB or storyboard, add a Custom View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
+1. In a XIB or storyboard, add a View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C), then connect the map view to a new outlet in your view controller class. The resulting outlet declaration should look something like:
 
-## Use
+```objc
+// ViewController.m
+#import <Mapbox/Mapbox.h>
 
-1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
+@interface ViewController : UIViewController
 
-1. In a XIB or storyboard, add a View and set its custom class to `MGLMapView`. If you need to manipulate the map view programmatically, import the `Mapbox` module (Swift) or `Mapbox.h` umbrella header (Objective-C).
+@property (strong) IBOutlet MGLMapView *mapView;
 
-## Troubleshooting
+@end
+```
+
+```swift
+// ViewController.swift
+import Mapbox
+
+class ViewController: UIViewController {
+    @IBOutlet var mapView: MGLMapView!
+}
+```
+
+### Troubleshooting
 
 On OS X, you can also try clearing the Xcode cache with `make clear_xcode_cache`.

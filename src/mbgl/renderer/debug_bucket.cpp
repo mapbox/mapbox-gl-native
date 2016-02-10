@@ -2,7 +2,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 #include <string>

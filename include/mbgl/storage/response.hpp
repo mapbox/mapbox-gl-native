@@ -38,7 +38,6 @@ public:
         NotFound = 2,
         Server = 3,
         Connection = 4,
-        Canceled = 5,
         Other = 6,
     } reason = Reason::Other;
 

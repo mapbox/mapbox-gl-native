@@ -21,7 +21,7 @@ void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) c
 
     matrix::identity(matrix);
     matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
-    matrix::scale(matrix, matrix, s / 4096.0f, s / 4096.0f, 1);
+    matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
 void TransformState::getProjMatrix(mat4& projMatrix) const {
@@ -67,10 +67,6 @@ box TransformState::cornersToBox(uint32_t z) const {
 
 
 #pragma mark - Dimensions
-
-bool TransformState::hasSize() const {
-    return width && height;
-}
 
 uint16_t TransformState::getWidth() const {
     return width;
@@ -148,10 +144,6 @@ double TransformState::pixel_y() const {
 
 #pragma mark - Zoom
 
-float TransformState::getNormalizedZoom() const {
-    return std::log(scale * util::tileSize / 512.0f) / M_LN2;
-}
-
 double TransformState::getZoom() const {
     return std::log(scale) / M_LN2;
 }
@@ -168,6 +160,12 @@ double TransformState::getScale() const {
     return scale;
 }
 
+void TransformState::setMinZoom(const double minZoom) {
+    if (minZoom <= getMaxZoom()) {
+        min_scale = zoomScale(util::clamp(minZoom, util::MIN_ZOOM, util::MAX_ZOOM));
+    }
+}
+
 double TransformState::getMinZoom() const {
     double test_scale = min_scale;
     double unused_x = x;
@@ -175,6 +173,12 @@ double TransformState::getMinZoom() const {
     constrain(test_scale, unused_x, unused_y);
 
     return scaleZoom(test_scale);
+}
+
+void TransformState::setMaxZoom(const double maxZoom) {
+    if (maxZoom >= getMinZoom()) {
+        max_scale = zoomScale(util::clamp(maxZoom, util::MIN_ZOOM, util::MAX_ZOOM));
+    }
 }
 
 double TransformState::getMaxZoom() const {
@@ -261,12 +265,10 @@ LatLng TransformState::pointToLatLng(const PrecisionPoint& point) const {
 }
 
 TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
-    const double tileZoom = getZoom();
-    const double k = zoomScale(tileZoom) / worldSize();
     return {
-        lngX(latLng.longitude) * k,
-        latY(latLng.latitude) * k,
-        tileZoom
+        lngX(latLng.longitude) / util::tileSize,
+        latY(latLng.latitude) / util::tileSize,
+        getZoom()
     };
 }
 

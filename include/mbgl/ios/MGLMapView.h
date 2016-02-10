@@ -29,6 +29,20 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
+/** Options for enabling debugging features in an MGLMapView instance. */
+typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
+    /** Edges of tile boundaries are shown as thick, red lines to help diagnose
+        tile clipping issues. */
+    MGLMapDebugTileBoundariesMask = 1 << 1,
+    /** Each tile shows its tile coordinate (x/y/z) in the upper-left corner. */
+    MGLMapDebugTileInfoMask = 1 << 2,
+    /** Each tile shows a timestamp indicating when it was loaded. */
+    MGLMapDebugTimestampsMask = 1 << 3,
+    /** Edges of glyphs and symbols are shown as faint, green lines to help
+        diagnose collision and label placement issues. */
+    MGLMapDebugCollisionBoxesMask = 1 << 4,
+};
+
 /**
  An interactive, customizable map view with an interface similar to the one
  provided by Apple's MapKit.
@@ -464,6 +478,30 @@ IB_DESIGNABLE
 - (void)setZoomLevel:(double)zoomLevel animated:(BOOL)animated;
 
 /**
+ * The minimum zoom level at which the map can be shown.
+ *
+ * Depending on the map view’s aspect ratio, the map view may be prevented
+ * from reaching the minimum zoom level, in order to keep the map from
+ * repeating within the current viewport.
+ *
+ * If the value of this property is greater than that of the
+ * maximumZoomLevel property, the behavior is undefined.
+ *
+ * The default minimumZoomLevel is 0.
+ */
+@property (nonatomic) double minimumZoomLevel;
+
+/**
+ * The maximum zoom level the map can be shown at.
+ *
+ * If the value of this property is smaller than that of the
+ * minimumZoomLevel property, the behavior is undefined.
+ *
+ * The default maximumZoomLevel is 20.
+ */
+@property (nonatomic) double maximumZoomLevel;
+
+/**
  The heading of the map, measured in degrees clockwise from true north.
  
  The value `0` means that the top edge of the map view corresponds to true
@@ -558,15 +596,32 @@ IB_DESIGNABLE
 
 /**
  Sets the visible region so that the map displays the specified annotations.
- 
- Calling this method updates the value in the visibleCoordinateBounds property
- and potentially other properties to reflect the new map region.
- 
+
+ Calling this method updates the value in the `visibleCoordinateBounds` property
+ and potentially other properties to reflect the new map region. A small amount
+ of padding is reserved around the edges of the map view. To specify a different
+ amount of padding, use the `-showAnnotations:edgePadding:animated:` method.
+
  @param annotations The annotations that you want to be visible in the map.
  @param animated `YES` if you want the map region change to be animated, or `NO`
     if you want the map to display the new region immediately without animations.
  */
 - (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated;
+
+/**
+ Sets the visible region so that the map displays the specified annotations with
+ the specified amount of padding on each side.
+
+ Calling this method updates the value in the visibleCoordinateBounds property
+ and potentially other properties to reflect the new map region.
+
+ @param annotations The annotations that you want to be visible in the map.
+ @param insets The minimum padding (in screen points) around the edges of the
+    map view to keep clear of annotations.
+ @param animated `YES` if you want the map region change to be animated, or `NO`
+    if you want the map to display the new region immediately without animations.
+ */
+- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(UIEdgeInsets)insets animated:(BOOL)animated;
 
 /**
  A camera representing the current viewpoint of the map.
@@ -906,23 +961,19 @@ IB_DESIGNABLE
  */
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays;
 
-#pragma mark Debugging
+#pragma mark Debugging the Map
 
 /**
- A Boolean value that determines whether map debugging information is shown.
- 
- The default value of this property is `NO`.
- */
-@property (nonatomic, getter=isDebugActive) BOOL debugActive;
-
-/**
- Cycle through the options that determine which debugging aids are shown on the
- map.
+ The options that determine which debugging aids are shown on the map.
  
  These options are all disabled by default and should remain disabled in
- released software.
+ released software for performance and aesthetic reasons.
  */
-- (void)cycleDebugOptions;
+@property (nonatomic) MGLMapDebugMaskOptions debugMask;
+
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
+
+- (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
 
 /**
     Empties the in-memory tile cache.

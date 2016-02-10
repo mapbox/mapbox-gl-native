@@ -24,7 +24,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VisibleCoordinateBoundsActivity"
+            android:name=".MapboxMapActivity"
+            android:label="@string/action_mapboxmap" />
+        <activity
+            android:name=".LatLngBoundsActivity"
             android:label="@string/activity_visible_coordinate_bounds" />
         <activity
             android:name=".InfoWindowAdapterActivity"
@@ -49,11 +52,17 @@
             android:name=".MapFragmentActivity"
             android:label="@string/activity_map_fragment" />
         <activity
+            android:name=".SupportMapFragmentActivity"
+            android:label="@string/activity_map_fragment_suport" />
+        <activity
             android:name=".PressForMarkerActivity"
             android:label="@string/activity_press_for_marker" />
         <activity
             android:name=".ManualZoomActivity"
             android:label="@string/action_manual_zoom" />
+        <activity
+            android:name=".MaxMinZoomActivity"
+            android:label="@string/action_minmax_zoom" />
         <activity
             android:name=".MyLocationTrackingModeActivity"
             android:label="@string/activity_user_tracking_mode" />
@@ -72,6 +81,9 @@
         <activity
             android:name=".DoubleMapActivity"
             android:label="@string/activity_double_map" />
+        <activity
+            android:name=".ScrollByActivity"
+            android:label="@string/activity_scroll_by" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"

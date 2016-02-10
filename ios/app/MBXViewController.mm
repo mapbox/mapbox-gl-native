@@ -104,7 +104,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         [defaults setObject:archivedCamera forKey:@"MBXCamera"];
         [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
         [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
-        [defaults setBool:self.mapView.debugActive forKey:@"MBXDebug"];
+        [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
         [defaults synchronize];
     }
 }
@@ -127,7 +127,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             self.mapView.userTrackingMode = (MGLUserTrackingMode)uncheckedTrackingMode;
         }
         self.mapView.showsUserLocation = [defaults boolForKey:@"MBXShowsUserLocation"];
-        self.mapView.debugActive = [defaults boolForKey:@"MBXDebug"];
+        NSInteger uncheckedDebugMask = [defaults integerForKey:@"MBXDebugMask"];
+        if (uncheckedDebugMask >= 0)
+        {
+            self.mapView.debugMask = (MGLMapDebugMaskOptions)uncheckedDebugMask;
+        }
     }
 }
 
@@ -140,12 +144,24 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (void)showSettings
 {
+    MGLMapDebugMaskOptions debugMask = self.mapView.debugMask;
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Map Settings"
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:nil
                                               otherButtonTitles:@"Reset Position",
-                                                                @"Cycle Debug Options",
+                                                                ((debugMask & MGLMapDebugTileBoundariesMask)
+                                                                 ? @"Hide Tile Boundaries"
+                                                                 : @"Show Tile Boundaries"),
+                                                                ((debugMask & MGLMapDebugTileInfoMask)
+                                                                 ? @"Hide Tile Info"
+                                                                 : @"Show Tile Info"),
+                                                                ((debugMask & MGLMapDebugTimestampsMask)
+                                                                 ? @"Hide Tile Timestamps"
+                                                                 : @"Show Tile Timestamps"),
+                                                                ((debugMask & MGLMapDebugCollisionBoxesMask)
+                                                                 ? @"Hide Collision Boxes"
+                                                                 : @"Show Collision Boxes"),
                                                                 @"Empty Memory",
                                                                 @"Add 100 Points",
                                                                 @"Add 1,000 Points",
@@ -154,7 +170,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                 @"Start World Tour",
                                                                 @"Add Custom Callout Point",
                                                                 @"Remove Annotations",
-                                                                @"Toggle Custom Style Layer",
+                                                                (_isShowingCustomStyleLayer
+                                                                 ? @"Hide Custom Style Layer"
+                                                                 : @"Show Custom Style Layer"),
                                                                 @"Print Telemetry Logfile",
                                                                 @"Delete Telemetry Logfile",
                                                                 nil];
@@ -170,25 +188,37 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 1)
     {
-        [self.mapView cycleDebugOptions];
+        self.mapView.debugMask ^= MGLMapDebugTileBoundariesMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 2)
     {
-        [self.mapView emptyMemoryCache];
+        self.mapView.debugMask ^= MGLMapDebugTileInfoMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 3)
     {
-        [self parseFeaturesAddingCount:100];
+        self.mapView.debugMask ^= MGLMapDebugTimestampsMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 4)
     {
-        [self parseFeaturesAddingCount:1000];
+        self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        [self parseFeaturesAddingCount:10000];
+        [self.mapView emptyMemoryCache];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
+    {
+        [self parseFeaturesAddingCount:100];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
+    {
+        [self parseFeaturesAddingCount:1000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    {
+        [self parseFeaturesAddingCount:10000];
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
     {
         // PNW triangle
         //
@@ -255,19 +285,19 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             free(polygonCoordinates);
         }
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
         [self startWorldTour:actionSheet];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
     {
         [self presentAnnotationWithCustomCallout];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
     {
         if (_isShowingCustomStyleLayer)
         {
@@ -278,12 +308,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [self insertCustomStyleLayer];
         }
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
     {
         NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogfilePath] encoding:NSUTF8StringEncoding error:nil];
         NSLog(@"%@", fileContents);
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
     {
         NSString *filePath = [self telemetryDebugLogfilePath];
         if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath]) {

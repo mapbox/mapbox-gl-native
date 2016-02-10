@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,8 +13,10 @@ import android.view.View;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +35,7 @@ public class PolylineActivity extends AppCompatActivity {
     private List<Polyline> mPolylines;
     private ArrayList<PolylineOptions> mPolylineOptions = new ArrayList<>();
     private MapView mMapView;
+    private MapboxMap mMapboxMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,33 +51,38 @@ public class PolylineActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
-
         if (savedInstanceState != null) {
             mPolylineOptions = savedInstanceState.getParcelableArrayList(STATE_POLYLINE_OPTIONS);
         } else {
             mPolylineOptions.addAll(getAllPolylines());
         }
 
-        mPolylines = mMapView.addPolylines(mPolylineOptions);
+        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                mMapboxMap = mapboxMap;
+                mPolylines = mapboxMap.addPolylines(mPolylineOptions);
+            }
+        });
 
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mPolylines != null && mPolylines.size() > 0) {
+                if (mMapboxMap != null && mPolylines != null && mPolylines.size() > 0) {
                     if (mPolylines.size() == 1) {
                         // test for removing annotation
-                        mMapView.removeAnnotation(mPolylines.get(0));
+                        mMapboxMap.removeAnnotation(mPolylines.get(0));
                     } else {
                         // test for removing annotations
-                        mMapView.removeAnnotations(mPolylines);
+                        mMapboxMap.removeAnnotations(mPolylines);
                     }
                 }
                 mPolylineOptions.clear();
                 mPolylineOptions.addAll(getRandomLine());
-                mPolylines = mMapView.addPolylines(mPolylineOptions);
+                mPolylines = mMapboxMap.addPolylines(mPolylineOptions);
             }
         });
     }
@@ -100,7 +109,7 @@ public class PolylineActivity extends AppCompatActivity {
     public List<PolylineOptions> getRandomLine() {
         final List<PolylineOptions> randomLines = getAllPolylines();
         Collections.shuffle(randomLines);
-        return new ArrayList<PolylineOptions>(){{
+        return new ArrayList<PolylineOptions>() {{
             add(randomLines.get(0));
         }};
     }
@@ -160,7 +169,7 @@ public class PolylineActivity extends AppCompatActivity {
             case R.id.action_id_remove:
                 // test to remove all annotations
                 mPolylineOptions.clear();
-                mMapView.removeAllAnnotations();
+                mMapboxMap.removeAllAnnotations();
                 return true;
 
             case android.R.id.home:
@@ -171,5 +180,4 @@ public class PolylineActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }

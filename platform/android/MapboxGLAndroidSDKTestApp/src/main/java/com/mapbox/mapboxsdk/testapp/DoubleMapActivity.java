@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -11,9 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.mapboxsdk.maps.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 
 public class DoubleMapActivity extends AppCompatActivity {
 
@@ -60,26 +65,44 @@ public class DoubleMapActivity extends AppCompatActivity {
             // MapView large
             mMapView = (MapView) view.findViewById(R.id.mapview);
             mMapView.onCreate(savedInstanceState);
-            mMapView.setStyle(Style.DARK);
-            mMapView.setZoom(18);
+            mMapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                    mapboxMap.setStyle(Style.DARK);
+
+                    mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
+                    try {
+                        mapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                    } catch (SecurityException e) {
+                        // permission is handled in MainActivity
+                        getActivity().finish();
+                    }
+                }
+            });
 
             // MapView mini
             mMapViewMini = (MapView) view.findViewById(R.id.mini_map);
             mMapViewMini.onCreate(savedInstanceState);
-            mMapViewMini.setStyle(Style.LIGHT);
-            mMapViewMini.setAttributionVisibility(View.GONE);
-            mMapViewMini.setLogoVisibility(View.GONE);
-            mMapViewMini.setCompassEnabled(false);
-            mMapViewMini.setZoom(4);
-            mMapViewMini.setAllGesturesEnabled(false);
+            mMapViewMini.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(@NonNull MapboxMap mapboxMap) {
+                    mapboxMap.setStyle(Style.LIGHT);
+                    mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
 
-            try {
-                mMapView.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-                mMapViewMini.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-            }catch (SecurityException e){
-                // permission is handled in MainActivity
-                getActivity().finish();
-            }
+                    UiSettings uiSettings = mapboxMap.getUiSettings();
+                    uiSettings.setAllGesturesEnabled(false);
+                    uiSettings.setCompassEnabled(false);
+                    uiSettings.setAttributionEnabled(false);
+                    uiSettings.setLogoEnabled(false);
+
+                    try {
+                        mapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                    }catch (SecurityException e){
+                        // permission is handled in MainActivity
+                        getActivity().finish();
+                    }
+                }
+            });
         }
 
         @Override
@@ -142,6 +165,4 @@ public class DoubleMapActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
 }

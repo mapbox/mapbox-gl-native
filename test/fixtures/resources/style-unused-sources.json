@@ -3,16 +3,14 @@
   "name": "Test",
   "sources": {
     "usedsource": {
-      "url": "test/fixtures/resources/source_vector.json",
+      "tiles": [],
       "type": "vector"
     },
     "unusedsource": {
-      "url": "test/fixtures/resources/source_vector.json",
+      "tiles": [],
       "type": "vector"
     }
   },
-  "sprite": "test/fixtures/resources/sprite",
-  "glyphs": "test/fixtures/resources/glyphs.pbf",
   "layers": [{
     "id": "usedlayer",
     "type": "symbol",

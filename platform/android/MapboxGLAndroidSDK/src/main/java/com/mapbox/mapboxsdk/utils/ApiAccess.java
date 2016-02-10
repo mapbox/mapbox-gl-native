@@ -25,7 +25,6 @@ public final class ApiAccess {
      * @return The Mapbox access token or null if not found.
      * @see MapboxConstants#KEY_META_DATA_MANIFEST
      */
-    @Nullable
     public static String getToken(@NonNull Context context) {
         try {
             // read out AndroidManifest

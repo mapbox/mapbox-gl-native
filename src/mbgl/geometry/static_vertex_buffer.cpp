@@ -1,5 +1,5 @@
 #include <mbgl/geometry/static_vertex_buffer.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 

@@ -116,7 +116,9 @@ public:
     CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&);
     CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&);
     void resetZoom();
+    void setMinZoom(const double minZoom);
     double getMinZoom() const;
+    void setMaxZoom(const double maxZoom);
     double getMaxZoom() const;
 
     // Rotation
@@ -142,9 +144,6 @@ public:
     uint16_t getHeight() const;
 
     // Projection
-    MetersBounds getWorldBoundsMeters() const;
-    LatLngBounds getWorldBoundsLatLng() const;
-
     double getMetersPerPixelAtLatitude(double lat, double zoom) const;
     ProjectedMeters projectedMetersForLatLng(const LatLng&) const;
     LatLng latLngForProjectedMeters(const ProjectedMeters&) const;
@@ -168,7 +167,6 @@ public:
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
-    LatLngBounds getBoundsForAnnotations(const AnnotationIDs&);
 
     void addCustomLayer(const std::string& id,
                         CustomLayerInitializeFunction,

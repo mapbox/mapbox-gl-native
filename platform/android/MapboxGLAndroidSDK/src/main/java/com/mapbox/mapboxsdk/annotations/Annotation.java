@@ -2,7 +2,8 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.NonNull;
 
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
  * Annotation is a overlay on top of a {@link MapView},
@@ -21,7 +22,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
-    private MapView mapView;
+    private MapboxMap mapboxMap;
 
     protected Annotation() {
     }
@@ -38,10 +39,10 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     public void remove() {
-        if (mapView == null) {
+        if (mapboxMap == null) {
             return;
         }
-        mapView.removeAnnotation(this);
+        mapboxMap.removeAnnotation(this);
     }
 
     /**
@@ -54,15 +55,12 @@ public abstract class Annotation implements Comparable<Annotation> {
     /**
      * Do not use this method. Used internally by the SDK.
      */
-    public void setMapView(MapView mapView) {
-        this.mapView = mapView;
+    public void setMapboxMap(MapboxMap mapView) {
+        this.mapboxMap = mapView;
     }
 
-    protected MapView getMapView() {
-        if (mapView == null) {
-            return null;
-        }
-        return mapView;
+    protected MapboxMap getMapboxMap() {
+        return mapboxMap;
     }
 
     @Override

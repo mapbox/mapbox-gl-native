@@ -24,17 +24,20 @@
 #include <mbgl/util/merge_lines.hpp>
 #include <mbgl/util/clip_lines.hpp>
 #include <mbgl/util/std.hpp>
+#include <mbgl/util/get_geometries.hpp>
+#include <mbgl/util/constants.hpp>
 
 namespace mbgl {
 
 SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
         const Shaping& shapedText, const PositionedIcon& shapedIcon,
-        const SymbolLayoutProperties& layout, const bool addToBuffers,
+        const SymbolLayoutProperties& layout, const bool addToBuffers, const uint32_t index_,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
         const GlyphPositions& face) :
     x(anchor.x),
     y(anchor.y),
+    index(index_),
     hasText(shapedText),
     hasIcon(shapedIcon),
 
@@ -54,7 +57,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& li
 
 
 SymbolBucket::SymbolBucket(float overscaling_, float zoom_, const MapMode mode_)
-    : overscaling(overscaling_), zoom(zoom_), tileSize(512 * overscaling_), tilePixelRatio(tileExtent / tileSize), mode(mode_) {
+    : overscaling(overscaling_), zoom(zoom_), tileSize(512 * overscaling_), tilePixelRatio(util::EXTENT / tileSize), mode(mode_) {
 }
 
 SymbolBucket::~SymbolBucket() {
@@ -141,7 +144,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
 
             auto &multiline = ft.geometry;
 
-            GeometryCollection geometryCollection = feature->getGeometries();
+            GeometryCollection geometryCollection = getGeometries(*feature);
             for (auto& line : geometryCollection) {
                 multiline.emplace_back();
                 for (auto& point : line) {
@@ -295,7 +298,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
     const float textRepeatDistance = symbolSpacing / 2;
 
     auto& clippedLines = isLine ?
-        util::clipLines(lines, 0, 0, 4096, 4096) :
+        util::clipLines(lines, 0, 0, util::EXTENT, util::EXTENT) :
         lines;
 
     for (const auto& line : clippedLines) {
@@ -314,7 +317,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
                 }
             }
 
-            const bool inside = !(anchor.x < 0 || anchor.x > 4096 || anchor.y < 0 || anchor.y > 4096);
+            const bool inside = !(anchor.x < 0 || anchor.x > util::EXTENT || anchor.y < 0 || anchor.y > util::EXTENT);
 
             if (avoidEdges && !inside) continue;
 
@@ -331,7 +334,7 @@ void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
             // TODO remove the `&& false` when is #1673 implemented
             const bool addToBuffers = (mode == MapMode::Still) || inside || (mayOverlap && false);
 
-            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers,
+            symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                     textBoxScale, textPadding, textAlongLine,
                     iconBoxScale, iconPadding, iconAlongLine,
                     face);
@@ -380,9 +383,11 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         const float cos = std::cos(collisionTile.config.angle);
 
         std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
-            const float aRotated = sin * a.x + cos * a.y;
-            const float bRotated = sin * b.x + cos * b.y;
-            return aRotated < bRotated;
+            const int32_t aRotated = sin * a.x + cos * a.y;
+            const int32_t bRotated = sin * b.x + cos * b.y;
+            return aRotated != bRotated ?
+                aRotated < bRotated :
+                a.index > b.index;
         });
     }
 

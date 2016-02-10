@@ -32,14 +32,10 @@ void SpriteStore::setURL(const std::string& url) {
         return;
     }
 
-    std::string spriteURL(url + (pixelRatio > 1 ? "@2x" : "") + ".png");
-    std::string jsonURL(url + (pixelRatio > 1 ? "@2x" : "") + ".json");
-
     loader = std::make_unique<Loader>();
 
     FileSource* fs = util::ThreadContext::getFileSource();
-    loader->jsonRequest = fs->request({ Resource::Kind::SpriteJSON, jsonURL },
-                                      [this, jsonURL](Response res) {
+    loader->jsonRequest = fs->request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
             return;
@@ -57,24 +53,22 @@ void SpriteStore::setURL(const std::string& url) {
         }
     });
 
-    loader->spriteRequest =
-        fs->request({ Resource::Kind::SpriteImage, spriteURL },
-                    [this, spriteURL](Response res) {
-            if (res.error) {
-                observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
-                return;
-            }
+    loader->spriteRequest = fs->request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+        if (res.error) {
+            observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+            return;
+        }
 
-            if (res.notModified) {
-                // We got the same data back as last time. Abort early.
-                return;
-            }
+        if (res.notModified) {
+            // We got the same data back as last time. Abort early.
+            return;
+        }
 
-            if (!loader->image || *loader->image != *res.data) {
-                loader->image = res.data;
-                emitSpriteLoadedIfComplete();
-            }
-        });
+        if (!loader->image || *loader->image != *res.data) {
+            loader->image = res.data;
+            emitSpriteLoadedIfComplete();
+        }
+    });
 }
 
 void SpriteStore::emitSpriteLoadedIfComplete() {

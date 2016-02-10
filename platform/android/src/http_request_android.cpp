@@ -172,6 +172,7 @@ void HTTPAndroidRequest::cancel() {
 
 void HTTPAndroidRequest::finish() {
     if (!cancelled) {
+        assert(response);
         notify(*response);
     }
 
@@ -234,7 +235,7 @@ void HTTPAndroidRequest::onFailure(JNIEnv* env, int type, jstring message) {
             response->error = std::make_unique<Error>(Error::Reason::Server, messageStr);
             break;
         case canceledError:
-            response->error = std::make_unique<Error>(Error::Reason::Canceled, "Request was cancelled");
+            response.reset();
             break;
         default:
             response->error = std::make_unique<Error>(Error::Reason::Other, messageStr);

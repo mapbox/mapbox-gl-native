@@ -1,5 +1,4 @@
 /**
- * This package contains the {@link com.mapbox.mapboxsdk.MapFragment} class. {@code MapFragment}
- * provides a quick and easy way to add a map to your app.
+ * This package is the base package of the Mapbox GL SDK for Android
  */
 package com.mapbox.mapboxsdk;

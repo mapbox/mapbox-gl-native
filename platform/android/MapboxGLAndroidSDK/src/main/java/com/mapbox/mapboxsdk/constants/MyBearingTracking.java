@@ -2,7 +2,8 @@ package com.mapbox.mapboxsdk.constants;
 
 import android.support.annotation.IntDef;
 
-import com.mapbox.mapboxsdk.views.MapView;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.UserLocationView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  * MyBearingTracking exposes different types bearing tracking modes.
  *
  * @see MapView#setMyBearingTrackingMode(int)
- * @see com.mapbox.mapboxsdk.views.UserLocationView#setMyBearingTrackingMode(int)
+ * @see UserLocationView#setMyBearingTrackingMode(int)
  */
 public class MyBearingTracking {
 

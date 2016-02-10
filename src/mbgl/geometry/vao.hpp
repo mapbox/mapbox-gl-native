@@ -2,7 +2,7 @@
 #define MBGL_GEOMETRY_VAO
 
 #include <mbgl/shader/shader.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <stdexcept>

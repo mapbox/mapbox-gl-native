@@ -18,6 +18,8 @@ Additional Mapbox GL Native–based libraries are developed outside of this repo
 
 * [React Native Mapbox GL](https://github.com/mapbox/react-native-mapbox-gl) for React Native applications on iOS and Android
 * [QMapboxGL](https://github.com/tmpsantos/qmapboxgl) for Qt-based applications
-* Telerik’s [Mapbox plugin](http://plugins.telerik.com/cordova/plugin/mapbox) for Apache Cordova applications
+* Telerik’s [Mapbox plugin](http://plugins.telerik.com/cordova/plugin/mapbox) for Apache Cordova Hybrid applications
+* Telerik’s [Mapbox plugin](http://plugins.telerik.com/nativescript/plugin/mapbox) for NativeScript Hybrid applications
+* Xamarin's [Mapbox component](https://components.xamarin.com/view/mapboxsdk) for Xamarin Hybrid applications
 
 If your platform or hybrid application framework isn’t listed here, consider embedding [Mapbox GL JS](https://github.com/mapbox/mapbox-gl-js) using the standard Web capabilities on your platform.

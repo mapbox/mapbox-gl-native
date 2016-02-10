@@ -6,6 +6,7 @@
 #ifdef MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
 #endif
+#define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
 #include <atomic>

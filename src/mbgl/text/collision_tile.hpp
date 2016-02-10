@@ -55,7 +55,6 @@ private:
     Tree tree;
     std::array<float, 4> rotationMatrix;
     std::array<float, 4> reverseRotationMatrix;
-    const float extent = 4096;
     std::array<CollisionBox, 4> edges;
 };
 

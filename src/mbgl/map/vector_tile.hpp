@@ -18,6 +18,7 @@ public:
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override;
+    uint32_t getExtent() const override;
 
 private:
     const VectorTileLayer& layer;
@@ -61,12 +62,13 @@ class TileID;
 
 class VectorTileMonitor : public GeometryTileMonitor {
 public:
-    VectorTileMonitor(const TileID&, const std::string& urlTemplate);
+    VectorTileMonitor(const TileID&, float pixelRatio, const std::string& urlTemplate);
 
     std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
 private:
     TileID tileID;
+    float pixelRatio;
     std::string urlTemplate;
 };
 

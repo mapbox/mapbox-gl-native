@@ -23,7 +23,7 @@ content = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 #ifndef MBGL_SHADER_{NAME}_{TYPE}
 #define MBGL_SHADER_{NAME}_{TYPE}
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {{
 namespace shaders {{

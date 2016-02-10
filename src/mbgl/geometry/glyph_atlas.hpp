@@ -4,7 +4,7 @@
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <string>
 #include <set>

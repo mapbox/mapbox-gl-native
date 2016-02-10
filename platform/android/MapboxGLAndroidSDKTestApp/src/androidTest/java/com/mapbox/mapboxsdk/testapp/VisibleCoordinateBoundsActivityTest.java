@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on VisibleCoordinateBoundsActivity
+ * Tests on LatLngBoundsActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class VisibleCoordinateBoundsActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<VisibleCoordinateBoundsActivity> mActivityRule = new ActivityTestRule<>(
-            VisibleCoordinateBoundsActivity.class);
+    public ActivityTestRule<LatLngBoundsActivity> mActivityRule = new ActivityTestRule<>(
+            LatLngBoundsActivity.class);
 
-    private VisibleCoordinateBoundsActivity mActivity = null;
+    private LatLngBoundsActivity mActivity = null;
 
     @Before
     public void setActivity() {

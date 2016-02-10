@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_RASTER
 #define MBGL_UTIL_RASTER
 
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>

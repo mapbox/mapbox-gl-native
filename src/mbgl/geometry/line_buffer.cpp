@@ -1,5 +1,5 @@
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/platform/gl.hpp>
+#include <mbgl/gl/gl.hpp>
 
 #include <cmath>
 

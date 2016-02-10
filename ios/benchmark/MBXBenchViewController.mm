@@ -52,7 +52,6 @@
     self.mapView.scrollEnabled = NO;
     self.mapView.rotateEnabled = NO;
     self.mapView.userInteractionEnabled = YES;
-    [self.mapView setDebugActive:NO];
 
     [self startBenchmarkIteration];
 
