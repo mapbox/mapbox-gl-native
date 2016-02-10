@@ -148,6 +148,11 @@ public class MapboxEventManager {
         timer.schedule(new FlushEventsTimerTask(), 1, flushDelayInMillis);
     }
 
+    /**
+     * Primary Access method using Singleton pattern
+     * @param context Application Context
+     * @return MapboxEventManager
+     */
     public static MapboxEventManager getMapboxEventManager(@NonNull Context context) {
         if (mapboxEventManager == null) {
             mapboxEventManager = new MapboxEventManager(context);
@@ -155,6 +160,10 @@ public class MapboxEventManager {
         return mapboxEventManager;
     }
 
+    /**
+     * Adds a Location Event to the system for processing
+     * @param location Location event
+     */
     public void addLocationEvent(Location location) {
         // Add Location even to queue
         Hashtable<String, Object> event = new Hashtable<>();
@@ -172,6 +181,11 @@ public class MapboxEventManager {
         rotateSessionId();
     }
 
+    /**
+     * SHA-1 Encoding for strings
+     * @param string String to encode
+     * @return String encoded if no error, original string if error
+     */
     private String encodeString(String string) {
         try {
             if (messageDigest != null) {
@@ -186,6 +200,9 @@ public class MapboxEventManager {
         return string;
     }
 
+    /**
+     * Changes Session Id based on time boundary
+     */
     private void rotateSessionId() {
         long now = System.currentTimeMillis();
         if (now - mapboxSessionIdLastSet > (SESSION_ID_ROTATION_HOURS * hourInMillis)) {
@@ -307,6 +324,9 @@ public class MapboxEventManager {
         return status;
     }
 
+    /**
+     * Task responsible for converting stored events and sending them to the server
+     */
     private class FlushTheEventsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -380,7 +400,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.i(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
+                Log.d(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
 
                 // Reset Events
                 // ============
@@ -395,6 +415,9 @@ public class MapboxEventManager {
     }
 
 
+    /**
+     * TimerTask responsible for sending event data to server
+     */
     private class FlushEventsTimerTask extends TimerTask {
         /**
          * The task to run should be specified in the implementation of the {@code run()}
