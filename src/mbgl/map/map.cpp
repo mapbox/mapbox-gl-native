@@ -395,6 +395,16 @@ NorthOrientation Map::getNorthOrientation() const {
     return transform->getNorthOrientation();
 }
 
+#pragma mark - Constrain mode
+
+void Map::setConstrainMode(mbgl::ConstrainMode mode) {
+    transform->setConstrainMode(mode);
+    update(Update::Repaint);
+}
+
+ConstrainMode Map::getConstrainMode() const {
+    return transform->getConstrainMode();
+}
 
 #pragma mark - Projection
 

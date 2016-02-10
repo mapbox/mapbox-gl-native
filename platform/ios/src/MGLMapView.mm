@@ -314,7 +314,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String], [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
 
     // setup mbgl map
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -920,6 +920,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
+        if (_mbglMap->getConstrainMode() == mbgl::ConstrainMode::None)
+        {
+            _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+        }
+        
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
         _displayLink.frameInterval = MGLTargetFrameInterval;
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];

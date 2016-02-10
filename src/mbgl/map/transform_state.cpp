@@ -94,6 +94,12 @@ double TransformState::getNorthOrientationAngle() const {
     return angleOrientation;
 }
 
+#pragma mark - Constrain mode
+
+ConstrainMode TransformState::getConstrainMode() const {
+    return constrainMode;
+}
+
 #pragma mark - Position
 
 LatLng TransformState::getLatLng() const {
@@ -367,8 +373,10 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
         x_ = std::max(-max_x, std::min(x_, max_x));
     }
 
-    double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
-    y_ = std::max(-max_y, std::min(y_, max_y));
+    if (constrainMode != ConstrainMode::None) {
+        double max_y = (scale_ * util::tileSize - (rotatedNorth() ? width : height)) / 2;
+        y_ = std::max(-max_y, std::min(y_, max_y));
+    }
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const PrecisionPoint& anchor) {

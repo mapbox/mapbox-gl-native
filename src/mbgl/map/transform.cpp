@@ -560,6 +560,17 @@ NorthOrientation Transform::getNorthOrientation() const {
     return state.getNorthOrientation();
 }
 
+#pragma mark - Constrain mode
+
+void Transform::setConstrainMode(mbgl::ConstrainMode mode) {
+    state.constrainMode = mode;
+    state.constrain(state.scale, state.x, state.y);
+}
+
+ConstrainMode Transform::getConstrainMode() const {
+    return state.getConstrainMode();
+}
+
 #pragma mark - Transition
 
 void Transform::startTransition(const CameraOptions& camera,

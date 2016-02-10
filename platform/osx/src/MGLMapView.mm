@@ -249,7 +249,7 @@ public:
     NSString *cachePath = cacheURL ? cacheURL.path : @"";
     _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
     
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
     
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -559,19 +559,24 @@ public:
 }
 
 - (void)viewDidMoveToWindow {
-    if (self.dormant && self.window) {
+    NSWindow *window = self.window;
+    if (self.dormant && window) {
         _mbglMap->resume();
         self.dormant = NO;
     }
     
-    [self.window addObserver:self
-                  forKeyPath:@"contentLayoutRect"
-                     options:NSKeyValueObservingOptionInitial
-                     context:NULL];
-    [self.window addObserver:self
-                  forKeyPath:@"titlebarAppearsTransparent"
-                     options:NSKeyValueObservingOptionInitial
-                     context:NULL];
+    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+        _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+    }
+    
+    [window addObserver:self
+             forKeyPath:@"contentLayoutRect"
+                options:NSKeyValueObservingOptionInitial
+                context:NULL];
+    [window addObserver:self
+             forKeyPath:@"titlebarAppearsTransparent"
+                options:NSKeyValueObservingOptionInitial
+                context:NULL];
 }
 
 - (BOOL)wantsLayer {
