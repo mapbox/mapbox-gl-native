@@ -1757,17 +1757,23 @@ public:
             // set of annotations as we do now. Cycle through them.
             if (_lastSelectedAnnotationTag == MGLAnnotationTagNotFound
                 || _lastSelectedAnnotationTag == _annotationsNearbyLastClick.back()) {
-                // Either an annotation from this set hasn’t been selected
-                // before or the last annotation in the set was selected. Wrap
-                // around to the first annotation in the set.
+                // Either no annotation is selected or the last annotation in
+                // the set was selected. Wrap around to the first annotation in
+                // the set.
                 hitAnnotationTag = _annotationsNearbyLastClick.front();
             } else {
-                // Step to the next annotation in the set.
                 auto result = std::find(_annotationsNearbyLastClick.begin(),
                                         _annotationsNearbyLastClick.end(),
                                         _lastSelectedAnnotationTag);
-                auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
-                hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
+                if (result == _annotationsNearbyLastClick.end()) {
+                    // An annotation from this set hasn’t been selected before.
+                    // Select the first (nearest) one.
+                    hitAnnotationTag = _annotationsNearbyLastClick.front();
+                } else {
+                    // Step to the next annotation in the set.
+                    auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
+                    hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
+                }
             }
         } else {
             // Remember the nearby annotations for the next time this method is

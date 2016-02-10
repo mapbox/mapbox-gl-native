@@ -2698,19 +2698,28 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             if (_selectedAnnotationTag == MGLAnnotationTagNotFound
                 || _selectedAnnotationTag == _annotationsNearbyLastTap.back())
             {
-                // Either an annotation from this set hasn’t been selected
-                // before or the last annotation in the set was selected. Wrap
-                // around to the first annotation in the set.
+                // Either no annotation is selected or the last annotation in
+                // the set was selected. Wrap around to the first annotation in
+                // the set.
                 hitAnnotationTag = _annotationsNearbyLastTap.front();
             }
             else
             {
-                // Step to the next annotation in the set.
                 auto result = std::find(_annotationsNearbyLastTap.begin(),
                                         _annotationsNearbyLastTap.end(),
                                         _selectedAnnotationTag);
-                auto distance = std::distance(_annotationsNearbyLastTap.begin(), result);
-                hitAnnotationTag = _annotationsNearbyLastTap[distance + 1];
+                if (result == _annotationsNearbyLastTap.end())
+                {
+                    // An annotation from this set hasn’t been selected before.
+                    // Select the first (nearest) one.
+                    hitAnnotationTag = _annotationsNearbyLastTap.front();
+                }
+                else
+                {
+                    // Step to the next annotation in the set.
+                    auto distance = std::distance(_annotationsNearbyLastTap.begin(), result);
+                    hitAnnotationTag = _annotationsNearbyLastTap[distance + 1];
+                }
             }
         }
         else
