@@ -5,6 +5,7 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <unordered_map>
 #include <memory>
@@ -24,7 +25,11 @@ class TileID;
 
 class OfflineDatabase : private util::noncopyable {
 public:
-    OfflineDatabase(const std::string& path);
+    // Limits affect ambient caching (put) only; resources required by offline
+    // regions are exempt.
+    OfflineDatabase(const std::string& path,
+                    uint64_t maximumCacheSize      = util::DEFAULT_MAX_CACHE_SIZE,
+                    uint64_t maximumCacheEntrySize = util::DEFAULT_MAX_CACHE_ENTRY_SIZE);
     ~OfflineDatabase();
 
     optional<Response> get(const Resource&);
@@ -36,7 +41,6 @@ public:
                                const OfflineRegionMetadata&);
 
     void deleteRegion(OfflineRegion&&);
-    void removeUnusedResources();
 
     optional<Response> getRegionResource(int64_t regionID, const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
@@ -62,6 +66,7 @@ private:
     };
 
     Statement getStatement(const char *);
+    uint64_t putInternal(const Resource&, const Response&);
 
     optional<Response> getTile(const Resource::TileData&);
     uint64_t putTile(const Resource::TileData&, const Response&);
@@ -74,6 +79,14 @@ private:
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
+
+    template <class T>
+    T getPragma(const char *);
+
+    uint64_t maximumCacheSize;
+    uint64_t maximumCacheEntrySize;
+
+    bool evict();
 };
 
 } // namespace mbgl

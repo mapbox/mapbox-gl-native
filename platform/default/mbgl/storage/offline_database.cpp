@@ -22,8 +22,10 @@ OfflineDatabase::Statement::~Statement() {
     stmt.clearBindings();
 }
 
-OfflineDatabase::OfflineDatabase(const std::string& path_)
-    : path(path_) {
+OfflineDatabase::OfflineDatabase(const std::string& path_, uint64_t maximumCacheSize_, uint64_t maximumCacheEntrySize_)
+    : path(path_),
+      maximumCacheSize(maximumCacheSize_),
+      maximumCacheEntrySize(maximumCacheEntrySize_) {
     ensureSchema();
 }
 
@@ -110,6 +112,18 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
 }
 
 uint64_t OfflineDatabase::put(const Resource& resource, const Response& response) {
+    if (response.data && response.data->size() > maximumCacheEntrySize) {
+        Log::Warning(Event::Database, "Entry too big for caching");
+        return 0;
+    } else if (!evict()) {
+        Log::Warning(Event::Database, "Unable to make space for new entries");
+        return 0;
+    } else {
+        return putInternal(resource, response);
+    }
+}
+
+uint64_t OfflineDatabase::putInternal(const Resource& resource, const Response& response) {
     // Don't store errors in the cache.
     if (response.error) {
         return 0;
@@ -124,6 +138,13 @@ uint64_t OfflineDatabase::put(const Resource& resource, const Response& response
 }
 
 optional<Response> OfflineDatabase::getResource(const Resource& resource) {
+    Statement accessedStmt = getStatement(
+        "UPDATE resources SET accessed = ?1 WHERE url = ?2");
+
+    accessedStmt->bind(1, SystemClock::now());
+    accessedStmt->bind(2, resource.url);
+    accessedStmt->run();
+
     Statement stmt = getStatement(
         //        0      1        2       3        4
         "SELECT etag, expires, modified, data, compressed "
@@ -203,6 +224,24 @@ uint64_t OfflineDatabase::putResource(const Resource& resource, const Response& 
 }
 
 optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
+    Statement accessedStmt = getStatement(
+        "UPDATE tiles SET accessed = ?1 "
+        "WHERE tileset_id = ( "
+        "  SELECT id FROM tilesets "
+        "  WHERE url_template = ?2 "
+        "  AND pixel_ratio = ?3) "
+        "AND tiles.x = ?4 "
+        "AND tiles.y = ?5 "
+        "AND tiles.z = ?6 ");
+
+    accessedStmt->bind(1, SystemClock::now());
+    accessedStmt->bind(2, tile.urlTemplate);
+    accessedStmt->bind(3, tile.pixelRatio);
+    accessedStmt->bind(4, tile.x);
+    accessedStmt->bind(5, tile.y);
+    accessedStmt->bind(6, tile.z);
+    accessedStmt->run();
+
     Statement stmt = getStatement(
         //        0      1        2       3        4
         "SELECT etag, expires, modified, data, compressed "
@@ -348,6 +387,8 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
 
     stmt->bind(1, region.getID());
     stmt->run();
+
+    evict();
 }
 
 optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
@@ -361,7 +402,7 @@ optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Re
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
-    uint64_t result = put(resource, response);
+    uint64_t result = putInternal(resource, response);
     markUsed(regionID, resource);
     return result;
 }
@@ -431,27 +472,76 @@ OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) 
     return result;
 }
 
-void OfflineDatabase::removeUnusedResources() {
-    Statement stmt1 = getStatement(
-        "DELETE FROM resources "
-        "WHERE ROWID NOT IN ( "
-        "  SELECT resources.ROWID "
-        "  FROM resources, region_resources "
-        "  WHERE resources.url = region_resources.resource_url "
-        ") ");
-    stmt1->run();
+template <class T>
+T OfflineDatabase::getPragma(const char * sql) {
+    Statement stmt = getStatement(sql);
+    stmt->run();
+    return stmt->get<T>(0);
+}
 
-    Statement stmt2 = getStatement(
-        "DELETE FROM tiles "
-        "WHERE ROWID NOT IN ( "
-        "  SELECT tiles.ROWID "
-        "  FROM tiles, region_tiles "
-        "  AND tiles.tileset_id = region_tiles.tileset_id "
-        "  AND tiles.z = region_tiles.z "
-        "  AND tiles.x = region_tiles.x "
-        "  AND tiles.y = region_tiles.y "
-        ") ");
-    stmt2->run();
+// Remove least-recently used resources and tiles until the used database size,
+// as calculated by multiplying the number of in-use pages by the page size, is
+// less than the maximum cache size. Returns false if this condition cannot be
+// satisfied.
+//
+// SQLite database never shrinks in size unless we call VACCUM. We here
+// are monitoring the soft limit (i.e. number of free pages in the file)
+// and as it approaches to the hard limit (i.e. the actual file size) we
+// delete an arbitrary number of old cache entries.
+//
+// The free pages approach saves us from calling VACCUM or keeping a
+// running total, which can be costly. We need a buffer because pages can
+// get fragmented on the database.
+bool OfflineDatabase::evict() {
+    uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
+    uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
+
+    if (pageSize * pageCount > maximumCacheSize) {
+        Log::Warning(mbgl::Event::Database, "Current size is larger than the maximum size. Database won't get truncated.");
+    }
+
+    auto usedSize = [&] {
+        return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
+    };
+
+    while (usedSize() > maximumCacheSize - 5 * pageSize) {
+        Statement stmt1 = getStatement(
+            "DELETE FROM resources "
+            "WHERE ROWID IN ( "
+            "  SELECT resources.ROWID "
+            "  FROM resources "
+            "  LEFT JOIN region_resources "
+            "  ON resources.url = region_resources.resource_url "
+            "  WHERE region_resources.resource_url IS NULL "
+            "  ORDER BY accessed ASC LIMIT ?1 "
+            ") ");
+        stmt1->bind(1, 50);
+        stmt1->run();
+        uint64_t changes1 = db->changes();
+
+        Statement stmt2 = getStatement(
+            "DELETE FROM tiles "
+            "WHERE ROWID IN ( "
+            "  SELECT tiles.ROWID "
+            "  FROM tiles "
+            "  LEFT JOIN region_tiles "
+            "  ON tiles.tileset_id = region_tiles.tileset_id "
+            "    AND tiles.z = region_tiles.z "
+            "    AND tiles.x = region_tiles.x "
+            "    AND tiles.y = region_tiles.y "
+            "  WHERE region_tiles.tileset_id IS NULL "
+            "  ORDER BY accessed ASC LIMIT ?1 "
+            ") ");
+        stmt2->bind(1, 50);
+        stmt2->run();
+        uint64_t changes2 = db->changes();
+
+        if (changes1 == 0 && changes2 == 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace mbgl

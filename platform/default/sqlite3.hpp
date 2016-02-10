@@ -47,6 +47,7 @@ public:
     Statement prepare(const char *query);
 
     int64_t lastInsertRowid() const;
+    uint64_t changes() const;
 
 private:
     sqlite3 *db = nullptr;

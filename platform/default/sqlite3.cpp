@@ -91,6 +91,11 @@ int64_t Database::lastInsertRowid() const {
     return sqlite3_last_insert_rowid(db);
 }
 
+uint64_t Database::changes() const {
+    assert(db);
+    return sqlite3_changes(db);
+}
+
 Statement::Statement(sqlite3 *db, const char *sql) {
     const int err = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (err != SQLITE_OK) {

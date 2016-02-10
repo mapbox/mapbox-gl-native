@@ -3,6 +3,7 @@
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/offline.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <vector>
 
@@ -14,14 +15,14 @@ template <typename T> class Thread;
 
 class DefaultFileSource : public FileSource {
 public:
-    DefaultFileSource(const std::string& cachePath, const std::string& assetRoot);
+    DefaultFileSource(const std::string& cachePath,
+                      const std::string& assetRoot,
+                      uint64_t maximumCacheSize      = util::DEFAULT_MAX_CACHE_SIZE,
+                      uint64_t maximumCacheEntrySize = util::DEFAULT_MAX_CACHE_ENTRY_SIZE);
     ~DefaultFileSource() override;
 
     void setAccessToken(const std::string&);
     std::string getAccessToken() const;
-
-    void setMaximumCacheSize(uint64_t size);
-    void setMaximumCacheEntrySize(uint64_t size);
 
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
@@ -71,13 +72,11 @@ public:
                                                                     optional<OfflineRegionStatus>)>) const;
 
     /*
-     * Initiate the removal of offline region from the database.
+     * Remove an offline region from the database and perform any resources evictions
+     * necessary as a result.
      *
-     * All resources required by the region, but not also required by other regions, will
-     * become eligible for removal for space-optimization. Because the offline database is
-     * also used for ambient usage-based caching, and offline resources may still be useful
-     * for ambient usage, they are not immediately removed. To immediately remove resources
-     * not used by any extant region, call removeUnusedOfflineResources().
+     * Eviction works by removing the least-recently requested resources not also required
+     * by other regions, until the database shrinks below a certain size.
      *
      * Note that this method takes ownership of the input, reflecting the fact that once
      * region deletion is initiated, it is not legal to perform further actions with the
@@ -88,16 +87,6 @@ public:
      * to re-execute a user-provided callback on the main thread.
      */
     void deleteOfflineRegion(OfflineRegion&&, std::function<void (std::exception_ptr)>);
-
-    /*
-     * Remove all resources in the database that are not required by any region, thus
-     * optimizing the disk space used by the offline database.
-     *
-     * When the operation is complete or encounters an error, the given callback will be
-     * executed on the database thread; it is the responsibility of the SDK bindings
-     * to re-execute a user-provided callback on the main thread.
-     */
-    void removeUnusedOfflineResources(std::function<void (std::exception_ptr)>);
 
     // For testing only.
     void put(const Resource&, const Response&);

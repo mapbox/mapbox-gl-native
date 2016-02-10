@@ -50,8 +50,8 @@ public:
         std::unique_ptr<FileRequest> onlineRequest;
     };
 
-    Impl(const std::string& cachePath)
-        : offlineDatabase(cachePath) {
+    Impl(const std::string& cachePath, uint64_t maximumCacheSize, uint64_t maximumCacheEntrySize)
+        : offlineDatabase(cachePath, maximumCacheSize, maximumCacheEntrySize) {
     }
 
     void setAccessToken(const std::string& accessToken) {
@@ -91,15 +91,6 @@ public:
     void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
         try {
             offlineDatabase.deleteRegion(std::move(region));
-            callback({});
-        } catch (...) {
-            callback(std::current_exception());
-        }
-    }
-
-    void removeUnusedOfflineResources(std::function<void (std::exception_ptr)> callback) {
-        try {
-            offlineDatabase.removeUnusedResources();
             callback({});
         } catch (...) {
             callback(std::current_exception());
@@ -147,8 +138,12 @@ private:
     bool offline = false;
 };
 
-DefaultFileSource::DefaultFileSource(const std::string& cachePath, const std::string& assetRoot)
-    : thread(std::make_unique<util::Thread<DefaultFileSource::Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low}, cachePath)),
+DefaultFileSource::DefaultFileSource(const std::string& cachePath,
+                                     const std::string& assetRoot,
+                                     uint64_t maximumCacheSize,
+                                     uint64_t maximumCacheEntrySize)
+    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low},
+            cachePath, maximumCacheSize, maximumCacheEntrySize)),
       assetFileSource(std::make_unique<AssetFileSource>(assetRoot)) {
 }
 
@@ -160,14 +155,6 @@ void DefaultFileSource::setAccessToken(const std::string& accessToken) {
 
 std::string DefaultFileSource::getAccessToken() const {
     return thread->invokeSync<std::string>(&Impl::getAccessToken);
-}
-
-void DefaultFileSource::setMaximumCacheSize(uint64_t) {
-    // TODO
-}
-
-void DefaultFileSource::setMaximumCacheEntrySize(uint64_t) {
-    // TODO
 }
 
 std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
@@ -217,10 +204,6 @@ void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, Off
 
 void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
     thread->invoke(&Impl::getRegionStatus, region.getID(), callback);
-}
-
-void DefaultFileSource::removeUnusedOfflineResources(std::function<void (std::exception_ptr)> callback) {
-    thread->invoke(&Impl::removeUnusedOfflineResources, callback);
 }
 
 // For testing only:

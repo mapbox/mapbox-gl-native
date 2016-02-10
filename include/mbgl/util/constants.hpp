@@ -21,6 +21,9 @@ extern const double PITCH_MAX;
 extern const double MIN_ZOOM;
 extern const double MAX_ZOOM;
 
+extern const uint64_t DEFAULT_MAX_CACHE_SIZE;
+extern const uint64_t DEFAULT_MAX_CACHE_ENTRY_SIZE;
+
 } // namespace util
 
 namespace debug {

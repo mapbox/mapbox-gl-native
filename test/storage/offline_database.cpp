@@ -4,10 +4,13 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <gtest/gtest.h>
 #include <sqlite3.h>
 #include <thread>
+
+using namespace std::literals::string_literals;
 
 namespace {
 
@@ -479,4 +482,73 @@ TEST(OfflineDatabase, ConcurrentUse) {
 
     thread1.join();
     thread2.join();
+}
+
+TEST(OfflineDatabase, PutIgnoresOversizedResources) {
+    using namespace mbgl;
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+    OfflineDatabase db(":memory:", 1000, 1);
+
+    Resource resource = Resource::style("http://example.com/");
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    db.put(resource, response);
+    EXPECT_FALSE(bool(db.get(resource)));
+
+    auto observer = Log::removeObserver();
+    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Entry too big for caching" }));
+}
+
+TEST(OfflineDatabase, PutRegionResourceDoesNotIgnoreOversizedResources) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1000, 1);
+
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+
+    Resource resource = Resource::style("http://example.com/");
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    db.putRegionResource(region.getID(), resource, response);
+    EXPECT_TRUE(bool(db.get(resource)));
+}
+
+TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1024 * 20);
+
+    Response response;
+    response.data = std::make_shared<std::string>(1024, '0');
+
+    for (uint32_t i = 1; i <= 20; i++) {
+        db.put(Resource::style("http://example.com/"s + util::toString(i)), response);
+    }
+
+    EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/1"))));
+    EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
+}
+
+TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:", 1024 * 20);
+
+    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
+    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+
+    Response response;
+    response.data = std::make_shared<std::string>(1024, '0');
+
+    for (uint32_t i = 1; i <= 20; i++) {
+        db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+    }
+
+    EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/1"))));
+    EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
 }

@@ -106,8 +106,6 @@ int main(int argc, char *argv[]) {
     view = std::make_unique<GLFWView>(fullscreen, benchmark);
 
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
-    fileSource.setMaximumCacheEntrySize(1 * 1024 * 1024); // 1 MB
-    fileSource.setMaximumCacheSize(50 * 1024 * 1024); // 50 MB
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
