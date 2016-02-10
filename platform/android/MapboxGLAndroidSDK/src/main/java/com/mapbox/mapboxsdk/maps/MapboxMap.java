@@ -40,6 +40,7 @@ public class MapboxMap {
 
     private MapView mMapView;
     private UiSettings mUiSettings;
+    private TrackingSettings mTrackingSettings;
     private Projection mProjection;
     private CameraPosition mCameraPosition;
     private boolean mInvalidCameraPosition;
@@ -68,6 +69,7 @@ public class MapboxMap {
         mMapView = mapView;
         mMapView.addOnMapChangedListener(new MapChangeCameraPositionListener());
         mUiSettings = new UiSettings(mapView);
+        mTrackingSettings = new TrackingSettings(mMapView, mUiSettings);
         mProjection = new Projection(mapView);
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
@@ -84,6 +86,19 @@ public class MapboxMap {
      */
     public UiSettings getUiSettings() {
         return mUiSettings;
+    }
+
+    //
+    // TrackingSettings
+    //
+
+    /**
+     * Gets the tracking interface settings for the map.
+     *
+     * @return
+     */
+    public TrackingSettings getTrackingSettings(){
+        return mTrackingSettings;
     }
 
     //
@@ -796,6 +811,32 @@ public class MapboxMap {
     }
 
     //
+    // Padding
+    //
+
+    /**
+     * Sets the distance from the edges of the map view’s frame to the edges of the map
+     * view’s logical viewport.
+     * <p/>
+     * When the value of this property is equal to {0,0,0,0}, viewport
+     * properties such as `centerCoordinate` assume a viewport that matches the map
+     * view’s frame. Otherwise, those properties are inset, excluding part of the
+     * frame from the viewport. For instance, if the only the top edge is inset, the
+     * map center is effectively shifted downward.
+     *
+     * @param left   The left margin in pixels.
+     * @param top    The top margin in pixels.
+     * @param right  The right margin in pixels.
+     * @param bottom The bottom margin in pixels.
+     */
+    public void setPadding(int left, int top, int right, int bottom) {
+        mMapView.setContentPadding(left, top, right, bottom);
+        mUiSettings.invalidate();
+
+        moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(mCameraPosition).build()));
+    }
+
+    //
     // Map events
     //
 
@@ -1015,40 +1056,6 @@ public class MapboxMap {
     }
 
     /**
-     * <p>
-     * Set the current my location tracking mode.
-     * </p>
-     * <p>
-     * Will enable my location if not active.
-     * </p>
-     * See {@link MyLocationTracking} for different values.
-     *
-     * @param myLocationTrackingMode The location tracking mode to be used.
-     * @throws SecurityException if no suitable permission is present
-     * @see MyLocationTracking
-     */
-    @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
-    public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        mMapView.setMyLocationTrackingMode(myLocationTrackingMode);
-    }
-
-    /**
-     * Returns the current user location tracking mode.
-     *
-     * @return The current user location tracking mode.
-     * One of the values from {@link MyLocationTracking.Mode}.
-     * @see MyLocationTracking.Mode
-     */
-    @UiThread
-    @MyLocationTracking.Mode
-    public int getMyLocationTrackingMode() {
-        return mMapView.getMyLocationTrackingMode();
-    }
-
-    /**
      * Sets a callback that's invoked when the location tracking mode changes.
      *
      * @param listener The callback that's invoked when the location tracking mode changes.
@@ -1062,42 +1069,6 @@ public class MapboxMap {
     // used by MapView
     MapboxMap.OnMyLocationTrackingModeChangeListener getOnMyLocationTrackingModeChangeListener() {
         return mOnMyLocationTrackingModeChangeListener;
-    }
-
-    /**
-     * <p>
-     * Set the current my bearing tracking mode.
-     * </p>
-     * Shows the direction the user is heading.
-     * <p>
-     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
-     * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
-     * </p>
-     * See {@link MyBearingTracking} for different values.
-     *
-     * @param myBearingTrackingMode The bearing tracking mode to be used.
-     * @throws SecurityException if no suitable permission is present
-     * @see MyBearingTracking
-     */
-    @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
-    public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        mMapView.setMyBearingTrackingMode(myBearingTrackingMode);
-    }
-
-    /**
-     * Returns the current user bearing tracking mode.
-     * See {@link MyBearingTracking} for possible return values.
-     *
-     * @return the current user bearing tracking mode.
-     * @see MyBearingTracking
-     */
-    @UiThread
-    @MyLocationTracking.Mode
-    public int getMyBearingTrackingMode() {
-        return mMapView.getMyBearingTrackingMode();
     }
 
     /**

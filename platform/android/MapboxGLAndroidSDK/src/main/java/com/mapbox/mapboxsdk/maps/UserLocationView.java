@@ -84,7 +84,6 @@ public final class UserLocationView extends View {
 
     private LatLng mCurrentMapViewCoordinate;
     private double mCurrentBearing;
-
     private boolean mPaused = false;
     private Location mUserLocation;
     private UserLocationListener mUserLocationListener;
@@ -97,9 +96,9 @@ public final class UserLocationView extends View {
     @MyBearingTracking.Mode
     private int mMyBearingTrackingMode;
 
+
     // Compass data
     private MyBearingListener mBearingChangeListener;
-    private static final long BEARING_DURATION = 100;
 
     public UserLocationView(Context context) {
         super(context);
@@ -251,9 +250,8 @@ public final class UserLocationView extends View {
 
             // center view directly
             mMarkerScreenMatrix.reset();
-            mMarkerScreenMatrix.setTranslate(
-                    getMeasuredWidth() / 2,
-                    getMeasuredHeight() / 2);
+            mMarkerScreenPoint = getMarkerScreenPoint();
+            mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
         }
     }
 
@@ -278,7 +276,7 @@ public final class UserLocationView extends View {
             // compute new marker position
             // TODO add JNI method that takes existing pointf
             if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
+                mMarkerScreenPoint = getMarkerScreenPoint();
                 mMarkerScreenMatrix.reset();
                 mMarkerScreenMatrix.setTranslate(
                         mMarkerScreenPoint.x,
@@ -304,9 +302,8 @@ public final class UserLocationView extends View {
                             .build();
                     mMapView.getMapboxMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
                     mMarkerScreenMatrix.reset();
-                    mMarkerScreenMatrix.setTranslate(
-                            getMeasuredWidth() / 2,
-                            getMeasuredHeight() / 2);
+                    mMarkerScreenPoint = getMarkerScreenPoint();
+                    mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
 
                     // set values for next check for actual change
                     mCurrentMapViewCoordinate = mMarkerCoordinate;
@@ -770,4 +767,13 @@ public final class UserLocationView extends View {
         return mPaused;
     }
 
+    public PointF getMarkerScreenPoint() {
+        if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            mMarkerScreenPoint = mMapView.toScreenLocation(mMarkerCoordinate);
+        } else {
+            mMarkerScreenPoint = new PointF(((getMeasuredWidth() + mMapView.getContentPaddingLeft() - mMapView.getContentPaddingRight()) / 2)
+                    , ((getMeasuredHeight() - mMapView.getContentPaddingBottom() + mMapView.getContentPaddingTop()) / 2));
+        }
+        return mMarkerScreenPoint;
+    }
 }

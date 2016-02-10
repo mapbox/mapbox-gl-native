@@ -3,4 +3,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="attr_margin">10dp</dimen>
     <dimen name="coordinatebounds_margin">32dp</dimen>
+    <dimen name="map_padding_left">96dp</dimen>
+    <dimen name="map_padding_bottom">256dp</dimen>
+    <dimen name="map_padding_right">32dp</dimen>
+
 </resources>

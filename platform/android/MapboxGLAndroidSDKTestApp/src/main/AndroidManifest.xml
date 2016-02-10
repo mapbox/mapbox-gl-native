@@ -89,6 +89,10 @@
         <activity
             android:name=".DynamicMarkerChangeActivity"
             android:label="@string/activity_dynamic_marker" />
+        <activity
+            android:name=".MapPaddingActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_map_padding" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"

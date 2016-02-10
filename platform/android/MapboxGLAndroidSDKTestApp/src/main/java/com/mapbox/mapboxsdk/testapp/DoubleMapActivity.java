@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 
 public class DoubleMapActivity extends AppCompatActivity {
@@ -72,7 +73,8 @@ public class DoubleMapActivity extends AppCompatActivity {
 
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
                     try {
-                        mapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                        TrackingSettings settings = mapboxMap.getTrackingSettings();
+                        settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
                     } catch (SecurityException e) {
                         // permission is handled in MainActivity
                         getActivity().finish();
@@ -96,7 +98,8 @@ public class DoubleMapActivity extends AppCompatActivity {
                     uiSettings.setLogoEnabled(false);
 
                     try {
-                        mapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+                        TrackingSettings settings = mapboxMap.getTrackingSettings();
+                        settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
                     }catch (SecurityException e){
                         // permission is handled in MainActivity
                         getActivity().finish();

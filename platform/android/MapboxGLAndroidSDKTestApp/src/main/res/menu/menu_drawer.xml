@@ -198,7 +198,12 @@
                 android:icon="@drawable/ic_dynamic_marker"
                 android:title="@string/action_dynamic_marker" />
 
+            <item
+                android:id="@+id/action_map_padding"
+                android:checkable="false"
+                android:icon="@drawable/ic_map_padding"
+                android:title="@string/action_map_padding" />
+            
         </menu>
     </item>
-
 </menu>

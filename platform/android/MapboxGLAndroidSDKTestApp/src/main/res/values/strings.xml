@@ -26,6 +26,7 @@
     <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_scroll_by">Scroll By Activity</string>
     <string name="activity_dynamic_marker">Dynamic Marker Activity</string>
+    <string name="activity_map_padding">Map Padding Activity</string>
 
     <string name="navdrawer_menu_title_mainactivity_controls">Main Activity Controls</string>
     <string name="navdrawer_menu_title_mainactivity_styles">Main Activity Styles</string>
@@ -54,6 +55,7 @@
     <string name="action_remove_polylines">Remove polylines</string>
     <string name="action_double_mapview">Double MapView</string>
     <string name="action_dynamic_marker">Dynamic Marker</string>
+    <string name="action_map_padding">Map Padding</string>
 
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>

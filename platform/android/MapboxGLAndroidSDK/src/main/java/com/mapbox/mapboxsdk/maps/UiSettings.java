@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.VideoView;
 
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
@@ -12,17 +13,9 @@ public class UiSettings {
 
     private MapView mapView;
 
-    private boolean compassEnabled;
-    private int compassGravity;
-    private int[] compassMargins;
-
-    private boolean logoEnabled;
-    private int logoGravity;
-    private int[] logoMargins;
-
-    private boolean attributionEnabled;
-    private int attributionGravity;
-    private int[] attributionMargins;
+    private ViewSettings compassSettings;
+    private ViewSettings logoSettings;
+    private ViewSettings attributionSettings;
 
     private boolean rotateGesturesEnabled;
     private boolean tiltGesturesEnabled;
@@ -32,9 +25,9 @@ public class UiSettings {
 
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
-        this.compassMargins = new int[4];
-        this.attributionMargins = new int[4];
-        this.logoMargins = new int[4];
+        this.compassSettings = new ViewSettings();
+        this.logoSettings = new ViewSettings();
+        this.attributionSettings = new ViewSettings();
     }
 
     /**
@@ -49,8 +42,8 @@ public class UiSettings {
      * @param compassEnabled True to enable the compass; false to disable the compass.
      */
     public void setCompassEnabled(boolean compassEnabled) {
-        this.compassEnabled = compassEnabled;
-        this.mapView.setCompassEnabled(compassEnabled);
+        compassSettings.setEnabled(compassEnabled);
+        mapView.setCompassEnabled(compassEnabled);
     }
 
     /**
@@ -59,7 +52,7 @@ public class UiSettings {
      * @return True if the compass is enabled; false if the compass is disabled.
      */
     public boolean isCompassEnabled() {
-        return compassEnabled;
+        return compassSettings.isEnabled();
     }
 
     /**
@@ -74,8 +67,8 @@ public class UiSettings {
      */
     @UiThread
     public void setCompassGravity(int gravity) {
-        this.compassGravity = gravity;
-        this.mapView.setCompassGravity(gravity);
+        compassSettings.setGravity(gravity);
+        mapView.setCompassGravity(gravity);
     }
 
     /**
@@ -84,7 +77,7 @@ public class UiSettings {
      * @return The gravity
      */
     public int getCompassGravity() {
-        return compassGravity;
+        return compassSettings.getGravity();
     }
 
     /**
@@ -98,8 +91,8 @@ public class UiSettings {
      */
     @UiThread
     public void setCompassMargins(int left, int top, int right, int bottom) {
-        this.compassMargins = new int[]{left, top, right, bottom};
-        this.mapView.setCompassMargins(left, top, right, bottom);
+        compassSettings.setMargins(new int[]{left, top, right, bottom});
+        mapView.setCompassMargins(left, top, right, bottom);
     }
 
     /**
@@ -108,7 +101,7 @@ public class UiSettings {
      * @return The left margin in pixels
      */
     public int getCompassMarginLeft() {
-        return compassMargins[0];
+        return compassSettings.getMargins()[0];
     }
 
     /**
@@ -117,7 +110,7 @@ public class UiSettings {
      * @return The top margin in pixels
      */
     public int getCompassMarginTop() {
-        return compassMargins[1];
+        return  compassSettings.getMargins()[1];
     }
 
     /**
@@ -126,7 +119,7 @@ public class UiSettings {
      * @return The right margin in pixels
      */
     public int getCompassMarginRight() {
-        return compassMargins[2];
+        return  compassSettings.getMargins()[2];
     }
 
     /**
@@ -135,7 +128,7 @@ public class UiSettings {
      * @return The bottom margin in pixels
      */
     public int getCompassMarginBottom() {
-        return compassMargins[3];
+        return  compassSettings.getMargins()[3];
     }
 
     /**
@@ -147,8 +140,8 @@ public class UiSettings {
      * @param enabled True to enable the logo; false to disable the logo.
      */
     public void setLogoEnabled(boolean enabled) {
-        this.logoEnabled = enabled;
-        this.mapView.setLogoVisibility(enabled );
+        logoSettings.setEnabled(enabled);
+        mapView.setLogoVisibility(enabled );
     }
 
     /**
@@ -157,7 +150,7 @@ public class UiSettings {
      * @return True if the logo is enabled; false if the logo is disabled.
      */
     public boolean isLogoEnabled() {
-        return logoEnabled;
+        return logoSettings.isEnabled();
     }
 
     /**
@@ -171,8 +164,8 @@ public class UiSettings {
      * @see Gravity
      */
     public void setLogoGravity(int gravity) {
-        this.logoGravity = gravity;
-        this.mapView.setLogoGravity(gravity);
+        logoSettings.setGravity(gravity);
+        mapView.setLogoGravity(gravity);
     }
 
     /**
@@ -181,7 +174,7 @@ public class UiSettings {
      * @return The gravity
      */
     public int getLogoGravity() {
-        return logoGravity;
+        return logoSettings.getGravity();
     }
 
     /**
@@ -194,8 +187,8 @@ public class UiSettings {
      * @param bottom The bottom margin in pixels.
      */
     public void setLogoMargins(int left, int top, int right, int bottom) {
-        this.logoMargins = new int[]{left, top, right, bottom};
-        this.mapView.setLogoMargins(left, top, right, bottom);
+        logoSettings.setMargins(new int[]{left, top, right, bottom});
+        mapView.setLogoMargins(left, top, right, bottom);
     }
 
     /**
@@ -204,7 +197,7 @@ public class UiSettings {
      * @return The left margin in pixels
      */
     public int getLogoMarginLeft(){
-        return logoMargins[0];
+        return logoSettings.getMargins()[0];
     }
 
     /**
@@ -213,7 +206,7 @@ public class UiSettings {
      * @return The top margin in pixels
      */
     public int getLogoMarginTop(){
-        return logoMargins[1];
+        return logoSettings.getMargins()[1];
     }
 
     /**
@@ -222,7 +215,7 @@ public class UiSettings {
      * @return The right margin in pixels
      */
     public int getLogoMarginRight(){
-        return logoMargins[2];
+        return logoSettings.getMargins()[2];
     }
 
     /**
@@ -231,7 +224,7 @@ public class UiSettings {
      * @return The bottom margin in pixels
      */
     public int getLogoMarginBottom(){
-        return logoMargins[3];
+        return logoSettings.getMargins()[3];
     }
 
     /**
@@ -243,8 +236,8 @@ public class UiSettings {
      * @param enabled True to enable the logo; false to disable the logo.
      */
     public void setAttributionEnabled(boolean enabled) {
-        this.attributionEnabled = enabled;
-        this.mapView.setAttributionVisibility(enabled ? View.VISIBLE : View.GONE);
+        attributionSettings.setEnabled(enabled);
+        mapView.setAttributionVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -253,7 +246,7 @@ public class UiSettings {
      * @return True if the logo is enabled; false if the logo is disabled.
      */
     public boolean isAttributionEnabled() {
-        return attributionEnabled;
+        return attributionSettings.isEnabled();
     }
 
     /**
@@ -267,8 +260,8 @@ public class UiSettings {
      * @see Gravity
      */
     public void setAttributionGravity(int gravity) {
-        this.attributionGravity = gravity;
-        this.mapView.setAttributionGravity(gravity);
+        attributionSettings.setGravity(gravity);
+        mapView.setAttributionGravity(gravity);
     }
 
     /**
@@ -277,7 +270,7 @@ public class UiSettings {
      * @return The gravity
      */
     public int getAttributionGravity() {
-        return attributionGravity;
+        return attributionSettings.getGravity();
     }
 
     /**
@@ -290,8 +283,8 @@ public class UiSettings {
      * @param bottom The bottom margin in pixels.
      */
     public void setAttributionMargins(int left, int top, int right, int bottom) {
-        this.attributionMargins = new int[]{left, top, right, bottom};
-        this.mapView.setAttributionMargins(left, top, right, bottom);
+        attributionSettings.setMargins(new int[]{left, top, right, bottom});
+        mapView.setAttributionMargins(left, top, right, bottom);
     }
 
     /**
@@ -300,7 +293,7 @@ public class UiSettings {
      * @return The left margin in pixels
      */
     public int getAttributionMarginLeft(){
-        return attributionMargins[0];
+        return attributionSettings.getMargins()[0];
     }
 
     /**
@@ -309,7 +302,7 @@ public class UiSettings {
      * @return The top margin in pixels
      */
     public int getAttributionMarginTop(){
-        return attributionMargins[1];
+        return attributionSettings.getMargins()[1];
     }
 
     /**
@@ -318,7 +311,7 @@ public class UiSettings {
      * @return The right margin in pixels
      */
     public int getAttributionMarginRight(){
-        return attributionMargins[2];
+        return attributionSettings.getMargins()[2];
     }
 
     /**
@@ -327,7 +320,7 @@ public class UiSettings {
      * @return The bottom margin in pixels
      */
     public int getAttributionMarginBottom(){
-        return attributionMargins[3];
+        return attributionSettings.getMargins()[3];
     }
 
     /**
@@ -476,5 +469,11 @@ public class UiSettings {
         setRotateGesturesEnabled(enabled);
         setTiltGesturesEnabled(enabled);
         setZoomGesturesEnabled(enabled);
+    }
+
+    public void invalidate(){
+        mapView.setLogoMargins(getLogoMarginLeft(), getLogoMarginTop(), getLogoMarginRight(), getLogoMarginBottom());
+        mapView.setCompassMargins(getCompassMarginLeft(),getCompassMarginTop(),getCompassMarginRight(),getCompassMarginBottom());
+        mapView.setAttributionMargins(getAttributionMarginLeft(), getAttributionMarginTop(), getAttributionMarginRight(), getAttributionMarginBottom());
     }
 }

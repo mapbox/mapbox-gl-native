@@ -38,6 +38,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
@@ -466,6 +467,10 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.action_dynamic_marker:
                                 startActivity(new Intent(getApplicationContext(), DynamicMarkerChangeActivity.class));
                                 return true;
+                            
+                            case R.id.action_map_padding:
+                                startActivity(new Intent(getApplicationContext(),MapPaddingActivity.class));
+                                return true;
 
                             default:
                                 return changeMapStyle(menuItem.getItemId());
@@ -551,8 +556,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 mMapboxMap.setMyLocationEnabled(true);
-                mMapboxMap.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-                mMapboxMap.setMyBearingTrackingMode(MyBearingTracking.GPS);
+
+                TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+                trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+                trackingSettings.setMyBearingTrackingMode(MyBearingTracking.GPS);
+
                 mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
             }
         } else {
