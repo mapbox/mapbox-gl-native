@@ -57,7 +57,7 @@ public class MapboxEventManager {
 
     private Context context = null;
     private String accessToken = null;
-    private static final String MAPBOX_EVENTS_BASE_URL = "https://api.tiles.mapbox.com";
+    private static final String MAPBOX_EVENTS_BASE_URL = "https://api.mapbox.com";
     private String eventsURL = MAPBOX_EVENTS_BASE_URL;
 
     private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
@@ -364,6 +364,8 @@ public class MapboxEventManager {
                 CertificatePinner certificatePinner = new CertificatePinner.Builder()
                         .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
                         .add("cloudfront-staging.tilestream.net", "sha1//KDE76PP0DQBDcTnMFBv+efp4eg=")
+                        .add("api.mapbox.com", "sha1/Uv71ooi32pyba+oLD7egnXm7/GQ=")
+                        .add("api.mapbox.com", "sha1/hOP0d37/ZTSGgCSseE3DIZ1uSg0=")
                         .build();
 
                 OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
