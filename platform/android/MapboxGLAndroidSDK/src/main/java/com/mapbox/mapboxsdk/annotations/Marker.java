@@ -68,9 +68,9 @@ public final class Marker extends Annotation {
      */
     public void setPosition(LatLng position) {
         this.position = position;
-        MapView mapView = getMapView();
-        if (mapView != null) {
-            mapView.updateMarker(this);
+        MapboxMap map = getMapboxMap();
+        if (map != null) {
+            map.updateMarker(this);
         }
     }
 
@@ -85,9 +85,9 @@ public final class Marker extends Annotation {
      */
     public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
-        MapView mapView = getMapView();
-        if (mapView != null) {
-            mapView.updateMarker(this);
+        MapboxMap map = getMapboxMap();
+        if (map != null) {
+            map.updateMarker(this);
         }
     }
 

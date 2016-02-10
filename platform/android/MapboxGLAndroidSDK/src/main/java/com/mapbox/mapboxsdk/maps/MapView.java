@@ -114,7 +114,7 @@ public class MapView extends FrameLayout {
     private static final float DIMENSION_SEVENTYSIX_DP = 76f;
 
     private MapboxMap mMapboxMap;
-    private final Map<Long, Annotation> mAnnotations = new HashMap<>();
+    private Map<Long, Annotation> mAnnotations;
     private List<Icon> mIcons;
 
     private NativeMapView mNativeMapView;
@@ -165,7 +165,7 @@ public class MapView extends FrameLayout {
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
         mOnMapChangedListener = new ArrayList<>();
         mMapboxMap = new MapboxMap(this);
-        mAnnotations = new ArrayList<>();
+        mAnnotations = new HashMap<>();
         mIcons = new ArrayList<>();
 
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
