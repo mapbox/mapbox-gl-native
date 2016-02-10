@@ -30,7 +30,6 @@ const double MIN_ZOOM = 0.0;
 const double MAX_ZOOM = 25.5;
 
 const uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
-const uint64_t DEFAULT_MAX_CACHE_ENTRY_SIZE = std::numeric_limits<uint64_t>::max();
 
 } // namespace util
 

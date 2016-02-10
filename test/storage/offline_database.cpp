@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <sqlite3.h>
 #include <thread>
+#include <random>
 
 using namespace std::literals::string_literals;
 
@@ -484,38 +485,33 @@ TEST(OfflineDatabase, ConcurrentUse) {
     thread2.join();
 }
 
-TEST(OfflineDatabase, PutIgnoresOversizedResources) {
-    using namespace mbgl;
+static std::shared_ptr<std::string> randomString(size_t size) {
+    auto result = std::make_shared<std::string>(size, 0);
+    std::mt19937 random;
 
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
-    OfflineDatabase db(":memory:", 1000, 1);
+    for (size_t i = 0; i < size; i++) {
+        (*result)[i] = random();
+    }
 
-    Resource resource = Resource::style("http://example.com/");
-    Response response;
-    response.data = std::make_shared<std::string>("data");
-
-    db.put(resource, response);
-    EXPECT_FALSE(bool(db.get(resource)));
-
-    auto observer = Log::removeObserver();
-    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Entry too big for caching" }));
+    return result;
 }
 
-TEST(OfflineDatabase, PutRegionResourceDoesNotIgnoreOversizedResources) {
+TEST(OfflineDatabase, PutReturnsSize) {
     using namespace mbgl;
 
-    OfflineDatabase db(":memory:", 1000, 1);
+    OfflineDatabase db(":memory:");
 
-    OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
-    OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
+    Response compressible;
+    compressible.data = std::make_shared<std::string>(1024, 0);
+    EXPECT_EQ(17, db.put(Resource::style("http://example.com/compressible"), compressible));
 
-    Resource resource = Resource::style("http://example.com/");
-    Response response;
-    response.data = std::make_shared<std::string>("data");
+    Response incompressible;
+    incompressible.data = randomString(1024);
+    EXPECT_EQ(1024, db.put(Resource::style("http://example.com/incompressible"), incompressible));
 
-    db.putRegionResource(region.getID(), resource, response);
-    EXPECT_TRUE(bool(db.get(resource)));
+    Response noContent;
+    noContent.noContent = true;
+    EXPECT_EQ(0, db.put(Resource::style("http://example.com/noContent"), noContent));
 }
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
@@ -524,7 +520,7 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     OfflineDatabase db(":memory:", 1024 * 20);
 
     Response response;
-    response.data = std::make_shared<std::string>(1024, '0');
+    response.data = randomString(1024);
 
     for (uint32_t i = 1; i <= 20; i++) {
         db.put(Resource::style("http://example.com/"s + util::toString(i)), response);
@@ -538,12 +534,11 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     using namespace mbgl;
 
     OfflineDatabase db(":memory:", 1024 * 20);
-
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
 
     Response response;
-    response.data = std::make_shared<std::string>(1024, '0');
+    response.data = randomString(1024);
 
     for (uint32_t i = 1; i <= 20; i++) {
         db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
@@ -551,4 +546,27 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/1"))));
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
+}
+
+TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
+    using namespace mbgl;
+
+    Log::setObserver(std::make_unique<FixtureLogObserver>());
+    OfflineDatabase db(":memory:", 1024 * 20);
+
+    Response small;
+    small.data = randomString(1024);
+
+    for (uint32_t i = 1; i <= 10; i++) {
+        db.put(Resource::style("http://example.com/"s + util::toString(i)), small);
+    }
+
+    Response big;
+    big.data = randomString(1024 * 15);
+    db.put(Resource::style("http://example.com/big"), big);
+    EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
+
+    auto observer = Log::removeObserver();
+    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
+    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Unable to make space for entry" }));
 }

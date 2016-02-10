@@ -28,8 +28,7 @@ public:
     // Limits affect ambient caching (put) only; resources required by offline
     // regions are exempt.
     OfflineDatabase(const std::string& path,
-                    uint64_t maximumCacheSize      = util::DEFAULT_MAX_CACHE_SIZE,
-                    uint64_t maximumCacheEntrySize = util::DEFAULT_MAX_CACHE_ENTRY_SIZE);
+                    uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~OfflineDatabase();
 
     optional<Response> get(const Resource&);
@@ -66,14 +65,16 @@ private:
     };
 
     Statement getStatement(const char *);
-    uint64_t putInternal(const Resource&, const Response&);
 
     optional<Response> getTile(const Resource::TileData&);
-    uint64_t putTile(const Resource::TileData&, const Response&);
+    void putTile(const Resource::TileData&, const Response&,
+                 const std::string&, bool compressed);
 
     optional<Response> getResource(const Resource&);
-    uint64_t putResource(const Resource&, const Response&);
+    void putResource(const Resource&, const Response&,
+                     const std::string&, bool compressed);
 
+    uint64_t putInternal(const Resource&, const Response&, bool evict);
     void markUsed(int64_t regionID, const Resource&);
 
     const std::string path;
@@ -84,9 +85,8 @@ private:
     T getPragma(const char *);
 
     uint64_t maximumCacheSize;
-    uint64_t maximumCacheEntrySize;
 
-    bool evict();
+    bool evict(uint64_t neededFreeSize);
 };
 
 } // namespace mbgl

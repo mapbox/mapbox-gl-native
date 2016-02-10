@@ -22,10 +22,9 @@ OfflineDatabase::Statement::~Statement() {
     stmt.clearBindings();
 }
 
-OfflineDatabase::OfflineDatabase(const std::string& path_, uint64_t maximumCacheSize_, uint64_t maximumCacheEntrySize_)
+OfflineDatabase::OfflineDatabase(const std::string& path_, uint64_t maximumCacheSize_)
     : path(path_),
-      maximumCacheSize(maximumCacheSize_),
-      maximumCacheEntrySize(maximumCacheEntrySize_) {
+      maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
 }
 
@@ -112,29 +111,41 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
 }
 
 uint64_t OfflineDatabase::put(const Resource& resource, const Response& response) {
-    if (response.data && response.data->size() > maximumCacheEntrySize) {
-        Log::Warning(Event::Database, "Entry too big for caching");
-        return 0;
-    } else if (!evict()) {
-        Log::Warning(Event::Database, "Unable to make space for new entries");
-        return 0;
-    } else {
-        return putInternal(resource, response);
-    }
+    return putInternal(resource, response, true);
 }
 
-uint64_t OfflineDatabase::putInternal(const Resource& resource, const Response& response) {
-    // Don't store errors in the cache.
+uint64_t OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
     if (response.error) {
+        return 0;
+    }
+
+    std::string compressedData;
+    bool compressed = false;
+    uint64_t size = 0;
+
+    if (response.data) {
+        compressedData = util::compress(*response.data);
+        compressed = compressedData.size() < response.data->size();
+        size = compressed ? compressedData.size() : response.data->size();
+    }
+
+    if (evict_ && !evict(size)) {
+        Log::Warning(Event::Database, "Unable to make space for entry");
         return 0;
     }
 
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        return putTile(*resource.tileData, response);
+        putTile(*resource.tileData, response,
+                compressed ? compressedData : *response.data,
+                compressed);
     } else {
-        return putResource(resource, response);
+        putResource(resource, response,
+                compressed ? compressedData : *response.data,
+                compressed);
     }
+
+    return size;
 }
 
 optional<Response> OfflineDatabase::getResource(const Resource& resource) {
@@ -175,7 +186,10 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
     return response;
 }
 
-uint64_t OfflineDatabase::putResource(const Resource& resource, const Response& response) {
+void OfflineDatabase::putResource(const Resource& resource,
+                                  const Response& response,
+                                  const std::string& data,
+                                  bool compressed) {
     if (response.notModified) {
         Statement stmt = getStatement(
             //                               1            2             3
@@ -185,7 +199,6 @@ uint64_t OfflineDatabase::putResource(const Resource& resource, const Response& 
         stmt->bind(2, response.expires);
         stmt->bind(3, resource.url);
         stmt->run();
-        return 0;
     } else {
         Statement stmt = getStatement(
             //                        1     2    3      4        5         6        7       8
@@ -199,27 +212,15 @@ uint64_t OfflineDatabase::putResource(const Resource& resource, const Response& 
         stmt->bind(5 /* modified */, response.modified);
         stmt->bind(6 /* accessed */, SystemClock::now());
 
-        std::string data;
-        uint64_t size = 0;
-
         if (response.noContent) {
             stmt->bind(7 /* data */, nullptr);
             stmt->bind(8 /* compressed */, false);
         } else {
-            data = util::compress(*response.data);
-            if (data.size() < response.data->size()) {
-                size = data.size();
-                stmt->bindBlob(7 /* data */, data.data(), size, false);
-                stmt->bind(8 /* compressed */, true);
-            } else {
-                size = response.data->size();
-                stmt->bindBlob(7 /* data */, response.data->data(), size, false);
-                stmt->bind(8 /* compressed */, false);
-            }
+            stmt->bindBlob(7 /* data */, data.data(), data.size(), false);
+            stmt->bind(8 /* compressed */, compressed);
         }
 
         stmt->run();
-        return size;
     }
 }
 
@@ -281,7 +282,10 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     return response;
 }
 
-uint64_t OfflineDatabase::putTile(const Resource::TileData& tile, const Response& response) {
+void OfflineDatabase::putTile(const Resource::TileData& tile,
+                              const Response& response,
+                              const std::string& data,
+                              bool compressed) {
     if (response.notModified) {
         Statement stmt = getStatement(
             "UPDATE tiles SET accessed = ?1, expires = ?2 "
@@ -301,7 +305,6 @@ uint64_t OfflineDatabase::putTile(const Resource::TileData& tile, const Response
         stmt->bind(6, tile.y);
         stmt->bind(7, tile.z);
         stmt->run();
-        return 0;
     } else {
         Statement stmt1 = getStatement(
             "REPLACE INTO tilesets (url_template, pixel_ratio) "
@@ -328,27 +331,15 @@ uint64_t OfflineDatabase::putTile(const Resource::TileData& tile, const Response
         stmt2->bind(8 /* expires */, response.expires);
         stmt2->bind(9 /* accessed */, SystemClock::now());
 
-        std::string data;
-        uint64_t size = 0;
-
         if (response.noContent) {
             stmt2->bind(10 /* data */, nullptr);
             stmt2->bind(11 /* compressed */, false);
         } else {
-            data = util::compress(*response.data);
-            if (data.size() < response.data->size()) {
-                size = data.size();
-                stmt2->bindBlob(10 /* data */, data.data(), size, false);
-                stmt2->bind(11 /* compressed */, true);
-            } else {
-                size = response.data->size();
-                stmt2->bindBlob(10 /* data */, response.data->data(), size, false);
-                stmt2->bind(11 /* compressed */, false);
-            }
+            stmt2->bindBlob(10 /* data */, data.data(), data.size(), false);
+            stmt2->bind(11 /* compressed */, compressed);
         }
 
         stmt2->run();
-        return size;
     }
 }
 
@@ -388,7 +379,7 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     stmt->bind(1, region.getID());
     stmt->run();
 
-    evict();
+    evict(0);
 }
 
 optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
@@ -402,7 +393,7 @@ optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Re
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
-    uint64_t result = putInternal(resource, response);
+    uint64_t result = putInternal(resource, response, false);
     markUsed(regionID, resource);
     return result;
 }
@@ -487,12 +478,9 @@ T OfflineDatabase::getPragma(const char * sql) {
 // SQLite database never shrinks in size unless we call VACCUM. We here
 // are monitoring the soft limit (i.e. number of free pages in the file)
 // and as it approaches to the hard limit (i.e. the actual file size) we
-// delete an arbitrary number of old cache entries.
-//
-// The free pages approach saves us from calling VACCUM or keeping a
-// running total, which can be costly. We need a buffer because pages can
-// get fragmented on the database.
-bool OfflineDatabase::evict() {
+// delete an arbitrary number of old cache entries. The free pages approach saves
+// us from calling VACCUM or keeping a running total, which can be costly.
+bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
     uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
 
@@ -504,7 +492,9 @@ bool OfflineDatabase::evict() {
         return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
     };
 
-    while (usedSize() > maximumCacheSize - 5 * pageSize) {
+    // The addition of pageSize is a fudge factor to account for non `data` column
+    // size, and because pages can get fragmented on the database.
+    while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
         Statement stmt1 = getStatement(
             "DELETE FROM resources "
             "WHERE ROWID IN ( "

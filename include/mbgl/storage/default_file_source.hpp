@@ -17,8 +17,7 @@ class DefaultFileSource : public FileSource {
 public:
     DefaultFileSource(const std::string& cachePath,
                       const std::string& assetRoot,
-                      uint64_t maximumCacheSize      = util::DEFAULT_MAX_CACHE_SIZE,
-                      uint64_t maximumCacheEntrySize = util::DEFAULT_MAX_CACHE_ENTRY_SIZE);
+                      uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
     void setAccessToken(const std::string&);

@@ -50,8 +50,8 @@ public:
         std::unique_ptr<FileRequest> onlineRequest;
     };
 
-    Impl(const std::string& cachePath, uint64_t maximumCacheSize, uint64_t maximumCacheEntrySize)
-        : offlineDatabase(cachePath, maximumCacheSize, maximumCacheEntrySize) {
+    Impl(const std::string& cachePath, uint64_t maximumCacheSize)
+        : offlineDatabase(cachePath, maximumCacheSize) {
     }
 
     void setAccessToken(const std::string& accessToken) {
@@ -140,10 +140,9 @@ private:
 
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
                                      const std::string& assetRoot,
-                                     uint64_t maximumCacheSize,
-                                     uint64_t maximumCacheEntrySize)
+                                     uint64_t maximumCacheSize)
     : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadType::Unknown, util::ThreadPriority::Low},
-            cachePath, maximumCacheSize, maximumCacheEntrySize)),
+            cachePath, maximumCacheSize)),
       assetFileSource(std::make_unique<AssetFileSource>(assetRoot)) {
 }
 
