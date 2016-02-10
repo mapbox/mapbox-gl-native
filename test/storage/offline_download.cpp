@@ -300,3 +300,35 @@ TEST(OfflineDownload, RequestError) {
 
     test.loop.run();
 }
+
+TEST(OfflineDownload, RequestErrorsAreRetried) {
+    OfflineTest test;
+    OfflineDownload download(
+        1,
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource&) {
+        test.fileSource.styleResponse = [&] (const Resource&) {
+            return test.response("offline/empty.style.json");
+        };
+
+        Response response;
+        response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection, "connection error");
+        return response;
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (status.complete()) {
+            EXPECT_EQ(1, status.completedResourceCount);
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}

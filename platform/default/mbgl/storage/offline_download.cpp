@@ -220,12 +220,12 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
 
     auto it = requests.insert(requests.begin(), nullptr);
     *it = onlineFileSource.request(resource, [=] (Response onlineResponse) {
-        requests.erase(it);
-
         if (onlineResponse.error) {
             observer->responseError(*onlineResponse.error);
             return;
         }
+
+        requests.erase(it);
 
         if (callback) {
             callback(onlineResponse);

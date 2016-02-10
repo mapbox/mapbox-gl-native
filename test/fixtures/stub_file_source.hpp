@@ -15,18 +15,20 @@ public:
 
     std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
 
+    using ResponseFunction = std::function<optional<Response> (const Resource&)>;
+
     // You can set the response callback on a global level by assigning this callback:
-    std::function<optional<Response> (const Resource&)> response = [this] (const Resource& resource) {
+    ResponseFunction response = [this] (const Resource& resource) {
         return defaultResponse(resource);
     };
 
     // Or set per-kind responses by setting these callbacks:
-    std::function<optional<Response> (const Resource&)> styleResponse;
-    std::function<optional<Response> (const Resource&)> sourceResponse;
-    std::function<optional<Response> (const Resource&)> tileResponse;
-    std::function<optional<Response> (const Resource&)> glyphsResponse;
-    std::function<optional<Response> (const Resource&)> spriteJSONResponse;
-    std::function<optional<Response> (const Resource&)> spriteImageResponse;
+    ResponseFunction styleResponse;
+    ResponseFunction sourceResponse;
+    ResponseFunction tileResponse;
+    ResponseFunction glyphsResponse;
+    ResponseFunction spriteJSONResponse;
+    ResponseFunction spriteImageResponse;
 
 private:
     friend class StubFileRequest;
@@ -34,7 +36,7 @@ private:
     // The default behavior is to throw if no per-kind callback has been set.
     optional<Response> defaultResponse(const Resource&);
 
-    std::unordered_map<FileRequest*, std::pair<optional<Response>, Callback>> pending;
+    std::unordered_map<FileRequest*, std::tuple<Resource, ResponseFunction, Callback>> pending;
     util::Timer timer;
 };
 

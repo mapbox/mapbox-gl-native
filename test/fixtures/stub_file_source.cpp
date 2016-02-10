@@ -19,11 +19,12 @@ public:
 
 StubFileSource::StubFileSource() {
     timer.start(10ms, 10ms, [this] {
-        // Explicit move to avoid iterator invalidation if ~StubFileRequest gets called within the loop.
-        auto pending_ = std::move(pending);
+        // Explicit copy to avoid iterator invalidation if ~StubFileRequest gets called within the loop.
+        auto pending_ = pending;
         for (auto& pair : pending_) {
-            if (pair.second.first) {
-                pair.second.second(*pair.second.first);
+            optional<Response> res = std::get<1>(pair.second)(std::get<0>(pair.second));
+            if (res) {
+                std::get<2>(pair.second)(*res);
             }
         }
     });
@@ -33,7 +34,7 @@ StubFileSource::~StubFileSource() = default;
 
 std::unique_ptr<FileRequest> StubFileSource::request(const Resource& resource, Callback callback) {
     auto req = std::make_unique<StubFileRequest>(*this);
-    pending.emplace(req.get(), std::make_pair(response(resource), callback));
+    pending.emplace(req.get(), std::make_tuple(resource, response, callback));
     return std::move(req);
 }
 
