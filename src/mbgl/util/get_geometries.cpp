@@ -1,6 +1,8 @@
 #include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <cmath>
+
 namespace mbgl {
 
 GeometryCollection getGeometries(const GeometryTileFeature& feature) {
@@ -8,8 +10,8 @@ GeometryCollection getGeometries(const GeometryTileFeature& feature) {
     GeometryCollection geometryCollection = feature.getGeometries();
     for (auto& line : geometryCollection) {
         for (auto& point : line) {
-            point.x = std::round(point.x * scale);
-            point.y = std::round(point.y * scale);
+            point.x = ::round(point.x * scale);
+            point.y = ::round(point.y * scale);
         }
     }
     return geometryCollection;
