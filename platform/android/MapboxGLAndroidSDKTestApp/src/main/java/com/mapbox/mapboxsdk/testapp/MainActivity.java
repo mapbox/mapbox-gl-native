@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mMapboxMap.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
                     @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
+                    public boolean onInfoWindowClick(@NonNull Marker marker) {
                         Snackbar.make(mCoordinatorLayout, "InfoWindow Click Listener for " + marker.getTitle(), Snackbar.LENGTH_SHORT).show();
                         marker.hideInfoWindow();
                         return true;

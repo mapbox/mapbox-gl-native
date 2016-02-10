@@ -61,7 +61,7 @@ public class InfoWindow {
                     MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener = mapboxMap.getOnInfoWindowClickListener();
                     boolean handledDefaultClick = false;
                     if (onInfoWindowClickListener != null) {
-                        handledDefaultClick = onInfoWindowClickListener.onMarkerClick(getBoundMarker());
+                        handledDefaultClick = onInfoWindowClickListener.onInfoWindowClick(getBoundMarker());
                     }
 
                     if (!handledDefaultClick) {

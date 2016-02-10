@@ -86,7 +86,7 @@ public class InfoWindowActivity extends AppCompatActivity {
 
                 mapboxMap.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
                     @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
+                    public boolean onInfoWindowClick(@NonNull Marker marker) {
                         Toast.makeText(getApplicationContext(), "OnClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
                         // return false to close the info window
                         // return true to leave the info window open

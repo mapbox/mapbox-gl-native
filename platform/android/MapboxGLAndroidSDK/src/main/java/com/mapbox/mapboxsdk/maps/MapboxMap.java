@@ -1238,7 +1238,7 @@ public class MapboxMap {
          * @param marker The marker of the info window the user clicked on.
          * @return If true the listener has consumed the event and the info window will not be closed.
          */
-        boolean onMarkerClick(@NonNull Marker marker);
+        boolean onInfoWindowClick(@NonNull Marker marker);
     }
 
     /**
