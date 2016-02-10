@@ -38,6 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Vector;
+import okhttp3.CertificatePinner;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -359,7 +360,13 @@ public class MapboxEventManager {
                     jsonArray.put(jsonObject);
                 }
 
-                OkHttpClient client = new OkHttpClient();
+                // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
+                CertificatePinner certificatePinner = new CertificatePinner.Builder()
+                        .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
+                        .add("cloudfront-staging.tilestream.net", "sha1//KDE76PP0DQBDcTnMFBv+efp4eg=")
+                        .build();
+
+                OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
                 String url = eventsURL + "/events/v1?access_token=" + accessToken;
