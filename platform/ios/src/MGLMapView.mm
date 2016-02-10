@@ -147,6 +147,7 @@ public:
                           GLKViewDelegate,
                           CLLocationManagerDelegate,
                           UIActionSheetDelegate,
+                          SMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           UIAlertViewDelegate,
                           MGLMultiPointDelegate,
@@ -1480,6 +1481,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (BOOL)calloutViewShouldHighlight:(__unused MGLCompactCalloutView *)calloutView
 {
     return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
+}
+
+- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
+{
+    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
+    {
+        [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
+    }
 }
 
 - (void)calloutViewTapped:(__unused MGLCompactCalloutView *)calloutView
