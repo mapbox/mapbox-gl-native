@@ -23,6 +23,7 @@
         'DEFINES_MODULE': 'YES',
         'DYLIB_INSTALL_NAME_BASE': '@rpath',
         'INFOPLIST_FILE': '../ios/framework/Info.plist',
+        'IPHONEOS_DEPLOYMENT_TARGET': '8.0',
         'LD_RUNPATH_SEARCH_PATHS': [
           '$(inherited)',
           '@executable_path/Frameworks',

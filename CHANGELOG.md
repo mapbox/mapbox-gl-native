@@ -51,6 +51,7 @@ Known issues:
 
 ## iOS 3.1.1
 
+- Corrected the dynamic framework’s minimum deployment target to iOS 8.0. ([#3872](https://github.com/mapbox/mapbox-gl-native/pull/3872))
 - Fixed Fabric compatibility. ([#3847](https://github.com/mapbox/mapbox-gl-native/pull/3847))
 
 ## iOS 3.1.0
