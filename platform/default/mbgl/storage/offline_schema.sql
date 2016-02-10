@@ -1,12 +1,14 @@
 CREATE TABLE resources (                   -- Generic table for style, source, sprite, and glyph resources.
-  url TEXT NOT NULL PRIMARY KEY,           -- Same schema as http_cache table.
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  url TEXT NOT NULL,
   kind INTEGER NOT NULL,
   expires INTEGER,
   modified INTEGER,
-  accessed INTEGER,
   etag TEXT,
-  data BLOB,                               -- NULL if the response was a 404
-  compressed INTEGER NOT NULL DEFAULT 0
+  data BLOB,
+  compressed INTEGER NOT NULL DEFAULT 0,
+  accessed INTEGER NOT NULL,
+  UNIQUE (url)
 );
 
 CREATE TABLE tilesets (
@@ -17,17 +19,18 @@ CREATE TABLE tilesets (
 );
 
 CREATE TABLE tiles (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   tileset_id INTEGER NOT NULL REFERENCES tilesets(id),
-  z INTEGER NOT NULL,                   -- Fully abandon TMS coordinates in favor of ZXY.
+  z INTEGER NOT NULL,
   x INTEGER NOT NULL,
   y INTEGER NOT NULL,
   expires INTEGER,
   modified INTEGER,
-  accessed INTEGER,
   etag TEXT,
-  data BLOB,                            -- NULL if the response was a 404
+  data BLOB,
   compressed INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (tileset_id, z, x, y)
+  accessed INTEGER NOT NULL,
+  UNIQUE (tileset_id, z, x, y)
 );
 
 CREATE TABLE regions (
@@ -40,23 +43,26 @@ CREATE TABLE regions (
 
 CREATE TABLE region_resources (
   region_id INTEGER NOT NULL REFERENCES regions(id),
-  resource_url TEXT NOT NULL REFERENCES resources(url),
-  PRIMARY KEY (region_id, resource_url)
+  resource_id INTEGER NOT NULL REFERENCES resources(id),
+  UNIQUE (region_id, resource_id)
 );
 
 CREATE TABLE region_tiles (
   region_id INTEGER NOT NULL REFERENCES regions(id),
-  tileset_id INTEGER NOT NULL REFERENCES tilesets(id),
-  z INTEGER NOT NULL,
-  x INTEGER NOT NULL,
-  y INTEGER NOT NULL,
-  PRIMARY KEY (region_id, tileset_id, z, x, y),
-  FOREIGN KEY (tileset_id, z, x, y) REFERENCES tiles (tileset_id, z, x, y)
+  tile_id INTEGER NOT NULL REFERENCES tiles(id),
+  UNIQUE (region_id, tile_id)
 );
 
--- `region_resources` and `region_tiles` are used for deduplication and deletion logic.
--- A row in `tiles` exists IFF one or more corresponding rows exist in `region_tiles`. If
--- more than one corresponding row exists, it indicates multiple regions contain the tile, and
--- storage for the tile is being deduplicated. When a region is deleted, corresponding rows in
--- `region_tiles` must also be deleted, and then rows in `tiles` and `tilesets` without a
--- corresponding `region_tiles` row must be deleted. Similarly for `resources` / `region_resources`.
+-- Indexes for efficient eviction queries
+
+CREATE INDEX resources_accessed
+ON resources (accessed);
+
+CREATE INDEX tiles_accessed
+ON tiles (accessed);
+
+CREATE INDEX region_resources_resource_id
+ON region_resources (resource_id);
+
+CREATE INDEX region_tiles_tile_id
+ON region_tiles (tile_id);

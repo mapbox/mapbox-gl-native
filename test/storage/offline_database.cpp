@@ -517,23 +517,24 @@ TEST(OfflineDatabase, PutReturnsSize) {
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     using namespace mbgl;
 
-    OfflineDatabase db(":memory:", 1024 * 20);
+    OfflineDatabase db(":memory:", 1024 * 25);
 
     Response response;
     response.data = randomString(1024);
 
     for (uint32_t i = 1; i <= 20; i++) {
-        db.put(Resource::style("http://example.com/"s + util::toString(i)), response);
+        Resource resource = Resource::style("http://example.com/"s + util::toString(i));
+        db.put(resource, response);
+        EXPECT_TRUE(bool(db.get(resource))) << i;
     }
 
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/1"))));
-    EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
 }
 
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     using namespace mbgl;
 
-    OfflineDatabase db(":memory:", 1024 * 20);
+    OfflineDatabase db(":memory:", 1024 * 25);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
 
@@ -552,7 +553,7 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     using namespace mbgl;
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
-    OfflineDatabase db(":memory:", 1024 * 20);
+    OfflineDatabase db(":memory:", 1024 * 25);
 
     Response small;
     small.data = randomString(1024);

@@ -12,7 +12,7 @@ using namespace std::literals::chrono_literals;
 int main(int, char * []) {
     using namespace mbgl;
 
-    util::deleteFile("offline.db");
+    unlink("offline.db");
 
     util::RunLoop loop;
     DefaultFileSource fileSource("offline.db", ".");

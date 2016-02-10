@@ -400,28 +400,35 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& re
 
 void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
-        Statement stmt1 = getStatement(
-            "REPLACE INTO region_tiles (region_id, tileset_id,  x,  y,  z) "
-            "SELECT                     ?1,        tilesets.id, ?4, ?5, ?6 "
-            "FROM tilesets "
-            "WHERE url_template = ?2 "
-            "AND pixel_ratio    = ?3 ");
+        Statement stmt = getStatement(
+            "REPLACE INTO region_tiles (region_id, tile_id) "
+            "SELECT                     ?1,        tiles.id "
+            "FROM tilesets, tiles "
+            "WHERE tilesets.url_template = ?2 "
+            "  AND tilesets.pixel_ratio  = ?3 "
+            "  AND tiles.x               = ?4 "
+            "  AND tiles.y               = ?5 "
+            "  AND tiles.z               = ?6 "
+            "  AND tiles.tileset_id = tilesets.id ");
 
-        stmt1->bind(1, regionID);
-        stmt1->bind(2, (*resource.tileData).urlTemplate);
-        stmt1->bind(3, (*resource.tileData).pixelRatio);
-        stmt1->bind(4, (*resource.tileData).x);
-        stmt1->bind(5, (*resource.tileData).y);
-        stmt1->bind(6, (*resource.tileData).z);
-        stmt1->run();
+        const Resource::TileData& tile = *resource.tileData;
+        stmt->bind(1, regionID);
+        stmt->bind(2, tile.urlTemplate);
+        stmt->bind(3, tile.pixelRatio);
+        stmt->bind(4, tile.x);
+        stmt->bind(5, tile.y);
+        stmt->bind(6, tile.z);
+        stmt->run();
     } else {
-        Statement stmt1 = getStatement(
-            "REPLACE INTO region_resources (region_id, resource_url) "
-            "VALUES                        (?1,        ?2) ");
+        Statement stmt = getStatement(
+            "REPLACE INTO region_resources (region_id, resource_id) "
+            "SELECT                         ?1,        resources.id "
+            "FROM resources "
+            "WHERE resources.url = ?2 ");
 
-        stmt1->bind(1, regionID);
-        stmt1->bind(2, resource.url);
-        stmt1->run();
+        stmt->bind(1, regionID);
+        stmt->bind(2, resource.url);
+        stmt->run();
     }
 }
 
@@ -443,15 +450,12 @@ OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) 
         "  SELECT LENGTH(data) as size "
         "  FROM region_resources, resources "
         "  WHERE region_id = ?1 "
-        "  AND resources.url = region_resources.resource_url "
+        "  AND resource_id = resources.id "
         "  UNION ALL "
         "  SELECT LENGTH(data) as size "
         "  FROM region_tiles, tiles "
         "  WHERE region_id = ?1 "
-        "  AND tiles.tileset_id = region_tiles.tileset_id "
-        "  AND tiles.z = region_tiles.z "
-        "  AND tiles.x = region_tiles.x "
-        "  AND tiles.y = region_tiles.y "
+        "  AND tile_id = tiles.id "
         ") ");
 
     stmt->bind(1, regionID);
@@ -497,12 +501,11 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     while (usedSize() + neededFreeSize + pageSize > maximumCacheSize) {
         Statement stmt1 = getStatement(
             "DELETE FROM resources "
-            "WHERE ROWID IN ( "
-            "  SELECT resources.ROWID "
-            "  FROM resources "
+            "WHERE id IN ( "
+            "  SELECT id FROM resources "
             "  LEFT JOIN region_resources "
-            "  ON resources.url = region_resources.resource_url "
-            "  WHERE region_resources.resource_url IS NULL "
+            "  ON resource_id = resources.id "
+            "  WHERE resource_id IS NULL "
             "  ORDER BY accessed ASC LIMIT ?1 "
             ") ");
         stmt1->bind(1, 50);
@@ -511,15 +514,11 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
 
         Statement stmt2 = getStatement(
             "DELETE FROM tiles "
-            "WHERE ROWID IN ( "
-            "  SELECT tiles.ROWID "
-            "  FROM tiles "
+            "WHERE id IN ( "
+            "  SELECT id FROM tiles "
             "  LEFT JOIN region_tiles "
-            "  ON tiles.tileset_id = region_tiles.tileset_id "
-            "    AND tiles.z = region_tiles.z "
-            "    AND tiles.x = region_tiles.x "
-            "    AND tiles.y = region_tiles.y "
-            "  WHERE region_tiles.tileset_id IS NULL "
+            "  ON tile_id = tiles.id "
+            "  WHERE tile_id IS NULL "
             "  ORDER BY accessed ASC LIMIT ?1 "
             ") ");
         stmt2->bind(1, 50);
