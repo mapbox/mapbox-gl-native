@@ -2401,7 +2401,12 @@ public final class MapView extends FrameLayout {
                 throw new IconBitmapChangedException();
             }
         }
-        marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
+
+        // this seems to be a costly operation according to the profiler so I'm trying to save some calls
+        Marker previousMarker = marker.getId() != -1 ? (Marker) mAnnotations.get(marker.getId()) : null;
+        if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
+            marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
+        }
     }
 
     /**
