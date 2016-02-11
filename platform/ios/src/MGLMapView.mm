@@ -461,6 +461,38 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }];
 }
 
+- (NS_ARRAY_OF(NSDictionary *) *)featureDescriptionsAtPoint:(CGPoint)point radius:(CGFloat)radius
+{
+    // flip y for core
+    point.y = self.bounds.size.height - point.y;
+
+    std::vector<mbgl::FeatureDescription> results = _mbglMap->featureDescriptionsAt(mbgl::PrecisionPoint(point.x, point.y), radius);
+
+    NSMutableArray *features = [NSMutableArray arrayWithCapacity:results.size()];
+
+    for (const auto& result : results)
+    {
+        NSString *layerName  = @(result.layer.c_str());
+        NSString *sourceName = @(result.source.c_str());
+
+        NSMutableDictionary *featureProperties = [NSMutableDictionary dictionaryWithCapacity:result.properties.size()];
+
+        for (const auto& property : result.properties)
+        {
+            NSString *key = @(property.first.c_str());
+            NSString *val = @(property.second.c_str());
+
+            featureProperties[key] = val;
+        }
+
+        [features addObject:@{ MGLFeatureLayerNameKey:  layerName,
+                               MGLFeatureSourceNameKey: sourceName,
+                               MGLFeaturePropertiesKey: featureProperties }];
+    }
+
+    return [NSArray arrayWithArray:features];
+}
+
 - (void)createGLView
 {
     if (_context) return;

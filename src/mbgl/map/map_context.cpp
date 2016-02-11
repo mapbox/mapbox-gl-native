@@ -290,6 +290,12 @@ void MapContext::removeLayer(const std::string& id) {
     asyncUpdate.send();
 }
 
+std::vector<FeatureDescription> MapContext::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    if (!style) return std::vector<FeatureDescription>();
+    return style->featureDescriptionsAt(point, radius, transformState);
+}
+
 void MapContext::setSourceTileCacheSize(size_t size) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (size != sourceCacheSize) {

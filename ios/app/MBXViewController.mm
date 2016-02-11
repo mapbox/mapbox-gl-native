@@ -21,6 +21,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) NSUInteger styleIndex;
+@property (nonatomic) UIView *interactiveShield;
+@property (nonatomic) UITextView *featuresView;
 
 @end
 
@@ -175,6 +177,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                  : @"Show Custom Style Layer"),
                                                                 @"Print Telemetry Logfile",
                                                                 @"Delete Telemetry Logfile",
+                                                                @"Enable Interactivity",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -326,6 +329,35 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             }
         }
     }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
+    {
+        if ([self.mapView.styleURL.scheme isEqualToString:@"mapbox"])
+        {
+            self.mapView.userInteractionEnabled = NO;
+
+            self.interactiveShield = [[UIView alloc] initWithFrame:self.mapView.frame];
+            self.interactiveShield.backgroundColor = [UIColor clearColor];
+            self.interactiveShield.userInteractionEnabled = YES;
+            [self.view insertSubview:self.interactiveShield aboveSubview:self.mapView];
+
+            UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleInteractivityPan:)];
+            [self.interactiveShield addGestureRecognizer:pan];
+
+            self.featuresView = [[UITextView alloc] initWithFrame:CGRectMake(20, self.topLayoutGuide.length + 20,
+                                                                             self.view.bounds.size.width / 2 - 40, self.view.bounds.size.height / 4)];
+            self.featuresView.selectable = NO;
+            self.featuresView.font = [UIFont systemFontOfSize:16];
+            self.featuresView.backgroundColor = [UIColor whiteColor];
+            self.featuresView.alpha = 0.75;
+            self.featuresView.text = @"Moving the map is now disabled until you change the style. Pan with your finger to query for features.";
+
+            [self.view addSubview:self.featuresView];
+
+            self.mapView.styleURL = [NSURL URLWithString:@"asset://streets-interactive-poi-v8.json"];
+
+            [(UIButton *)self.navigationItem.titleView setTitle:@"Interactive Streets" forState:UIControlStateNormal];
+        }
+    }
 }
 
 - (void)parseFeaturesAddingCount:(NSUInteger)featuresCount
@@ -455,8 +487,84 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
 }
 
+- (void)handleInteractivityPan:(UIPanGestureRecognizer *)pan
+{
+    if (pan.state == UIGestureRecognizerStateBegan || pan.state == UIGestureRecognizerStateChanged)
+    {
+        self.featuresView.userInteractionEnabled = NO;
+
+        CGPoint point = [pan locationInView:pan.view];
+
+        NSArray *features = [self.mapView featureDescriptionsAtPoint:point radius:50];
+
+        if ([features count])
+        {
+            NSMutableArray *outputNames = [NSMutableArray array];
+            NSMutableArray *seenIDs = [NSMutableArray array];
+
+            for (NSDictionary *feature in features)
+            {
+                NSDictionary *properties = feature[MGLFeaturePropertiesKey];
+
+                NSString *featureID = properties[@"osm_id"];
+
+                if ( ! [seenIDs containsObject:featureID])
+                {
+                    [seenIDs addObject:featureID];
+
+                    NSString *featureName = properties[@"name_en"];
+
+                    // Mapbox-returned OSM IDs have 1 + zero padding in front of
+                    // the actual OSM ID, so let's remove that.
+                    //
+                    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^10+(.*)"
+                                                                                           options:0
+                                                                                             error:nil];
+
+                    featureID = [regex stringByReplacingMatchesInString:featureID
+                                                                options:0
+                                                                  range:NSMakeRange(0, featureID.length)
+                                                           withTemplate:@"$1"];
+
+                    [outputNames addObject:[NSString stringWithFormat:@"- %@ (OSM #%@)", featureName, featureID]];
+                }
+            }
+
+            NSMutableString *output = [NSMutableString stringWithString:@"Features:\n\n"];
+
+            for (NSString *outputName in outputNames)
+            {
+                [output appendString:outputName];
+                [output appendString:@"\n"];
+            }
+
+            self.featuresView.text = output;
+            self.featuresView.contentOffset = CGPointZero;
+        }
+        else
+        {
+            self.featuresView.text = nil;
+        }
+    }
+    else
+    {
+        self.featuresView.userInteractionEnabled = YES;
+    }
+}
+
 - (void)cycleStyles
 {
+    if (self.interactiveShield)
+    {
+        [self.interactiveShield removeFromSuperview];
+        self.interactiveShield = nil;
+
+        [self.featuresView removeFromSuperview];
+        self.featuresView = nil;
+
+        self.mapView.userInteractionEnabled = YES;
+    }
+
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
 
     self.styleIndex = (self.styleIndex + 1) % mbgl::util::default_styles::numOrderedStyles;

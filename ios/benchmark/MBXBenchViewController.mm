@@ -4,7 +4,7 @@
 
 #include "locations.hpp"
 
-#include <chrono>
+#include <mbgl/util/chrono.hpp>
 
 @interface MGLMapView (MBXBenchmarkAdditions)
 
@@ -62,7 +62,7 @@
 size_t idx = 0;
 enum class State { None, WaitingForAssets, WarmingUp, Benchmarking } state = State::None;
 int frames = 0;
-TimePoint started;
+mbgl::TimePoint started;
 std::vector<std::pair<std::string, double>> result;
 
 static const int warmupDuration = 20; // frames
@@ -102,8 +102,8 @@ static const int benchmarkDuration = 200; // frames
             state = State::None;
 
             // Report FPS
-            const auto duration = Microseconds(Clock::now() - started);
-            const auto fps = double(frames * 1e6) / duration;
+            const auto duration = std::chrono::duration_cast<mbgl::Milliseconds>(mbgl::Clock::now() - started).count();
+            const auto fps = double(frames * 1e3) / duration;
             result.emplace_back(mbgl::bench::locations[idx].name, fps);
             NSLog(@"- FPS: %.1f", fps);
 
@@ -123,7 +123,7 @@ static const int benchmarkDuration = 200; // frames
         {
             frames = 0;
             state = State::Benchmarking;
-            started = Clock::now();
+            started = mbgl::Clock::now();
             NSLog(@"- Benchmarking for %d frames...", benchmarkDuration);
         }
         [mapView setNeedsGLDisplay];

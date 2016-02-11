@@ -11,6 +11,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
 
 #include <cstdint>
 #include <string>
@@ -98,6 +99,8 @@ public:
     void addLayer(std::unique_ptr<StyleLayer>,
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
+
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius, const TransformState& transform) const;
 
     RenderData getRenderData() const;
 

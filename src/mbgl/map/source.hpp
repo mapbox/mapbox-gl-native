@@ -6,6 +6,8 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/interactive_features_impl.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <vector>
 #include <map>
@@ -72,6 +74,8 @@ public:
 
     void setObserver(Observer* observer);
     void dumpDebugLogs() const;
+
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius, const TransformState&) const;
 
     const SourceType type;
     const std::string id;

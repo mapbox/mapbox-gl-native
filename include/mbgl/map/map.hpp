@@ -8,6 +8,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/interactive_features.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/types.hpp>
 
@@ -166,6 +167,7 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
+    // Style API
     void addCustomLayer(const std::string& id,
                         CustomLayerInitializeFunction,
                         CustomLayerRenderFunction,
@@ -173,6 +175,9 @@ public:
                         void* context,
                         const char* before = nullptr);
     void removeCustomLayer(const std::string& id);
+
+    // Features
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius = 0) const;
 
     // Memory
     void setSourceTileCacheSize(size_t);

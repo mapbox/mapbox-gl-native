@@ -465,6 +465,7 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return data->getAnnotationManager()->getPointAnnotationsInBounds(bounds);
 }
 
+
 #pragma mark - Style API
 
 void Map::addCustomLayer(const std::string& id,
@@ -481,6 +482,14 @@ void Map::addCustomLayer(const std::string& id,
 void Map::removeCustomLayer(const std::string& id) {
     context->invoke(&MapContext::removeLayer, id);
 }
+
+
+#pragma mark - Features
+
+std::vector<FeatureDescription> Map::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius) const {
+    return context->invokeSync<std::vector<FeatureDescription>>(&MapContext::featureDescriptionsAt, point, radius);
+}
+
 
 #pragma mark - Toggles
 

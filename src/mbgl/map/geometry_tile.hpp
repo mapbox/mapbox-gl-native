@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -31,6 +32,7 @@ public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
+    virtual std::unordered_map<std::string, std::string> getValues() const = 0;
     virtual GeometryCollection getGeometries() const = 0;
     virtual uint32_t getExtent() const = 0;
 };

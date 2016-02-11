@@ -55,7 +55,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         }
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
-        // when tile data changed. Replacing the workdRequest will cancel a pending work
+        // when tile data changed. Replacing the workRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
@@ -76,6 +76,9 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // Move over all buckets we received in this parse request, potentially overwriting
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
+
+                // Move over interactivity feature tree in case we got a refresh parse.
+                featureTree = std::move(resultBuckets.featureTree);
 
             } else {
                 error = result.get<std::exception_ptr>();

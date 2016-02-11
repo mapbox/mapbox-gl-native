@@ -363,6 +363,21 @@ void Style::onSpriteError(std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
+std::vector<FeatureDescription> Style::featureDescriptionsAt(const PrecisionPoint point, const uint16_t radius, const TransformState& transform) const {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+
+    std::vector<FeatureDescription> results;
+
+    for (const auto& source : sources) {
+        if (source->type == SourceType::Vector && source->isLoaded()) {
+            const auto sourceResults = source->featureDescriptionsAt(point, radius, transform);
+            results.insert(results.end(), sourceResults.begin(), sourceResults.end());
+        }
+    }
+
+    return results;
+}
+
 void Style::dumpDebugLogs() const {
     for (const auto& source : sources) {
         source->dumpDebugLogs();

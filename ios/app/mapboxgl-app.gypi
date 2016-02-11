@@ -16,6 +16,7 @@
         './threestates.geojson',
         './Settings.bundle/',
         './app-info.plist',
+        './streets-interactive-poi-v8.json',
       ],
 
       'dependencies': [
@@ -63,7 +64,7 @@
           },
         },
       },
-      
+
       'copies': [
         {
           'destination': '<(PRODUCT_DIR)/$(FRAMEWORKS_FOLDER_PATH)',

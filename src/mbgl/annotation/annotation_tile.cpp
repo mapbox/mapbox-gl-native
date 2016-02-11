@@ -20,6 +20,10 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     return optional<Value>();
 }
 
+std::unordered_map<std::string, std::string> AnnotationTileFeature::getValues() const {
+    return properties;
+}
+
 util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) const {
     auto it = layers.find(name);
     if (it != layers.end()) {

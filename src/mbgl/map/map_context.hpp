@@ -10,6 +10,7 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/geo.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <vector>
@@ -59,6 +60,8 @@ public:
     void addLayer(std::unique_ptr<StyleLayer>,
                   const optional<std::string> before);
     void removeLayer(const std::string& id);
+
+    std::vector<FeatureDescription> featureDescriptionsAt(const PrecisionPoint, const uint16_t radius) const;
 
     void setSourceTileCacheSize(size_t size);
     void onLowMemory();
