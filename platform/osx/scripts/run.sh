@@ -12,7 +12,7 @@ BUILDTYPE=${BUILDTYPE:-Release}
 ################################################################################
 
 mapbox_time "compile_render_binary" \
-make xrender -j${JOBS} BUILDTYPE=${BUILDTYPE}
+make render -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
 mapbox_time "compile_tests" \
 make xtest -j${JOBS} BUILDTYPE=${BUILDTYPE}
