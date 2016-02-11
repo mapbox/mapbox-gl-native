@@ -552,7 +552,12 @@ public class MainActivity extends AppCompatActivity {
                 mLocationFAB.setColorFilter(ContextCompat.getColor(this, R.color.primary));
             }
         } else {
-            mMapboxMap.setMyLocationEnabled(false);
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) ||
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED)){
+                mMapboxMap.setMyLocationEnabled(false);
+            }
             mLocationFAB.setColorFilter(Color.TRANSPARENT);
         }
     }
