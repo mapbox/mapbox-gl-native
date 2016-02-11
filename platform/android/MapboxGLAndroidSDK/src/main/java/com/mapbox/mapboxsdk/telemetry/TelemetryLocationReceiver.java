@@ -60,19 +60,12 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-
         Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         if (location != null) {
-            Log.i(TAG, "location received = " + location);
+            Log.d(TAG, "location received = " + location);
             MapboxEventManager.getMapboxEventManager(context).addLocationEvent(location);
-
-            final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-            tg.startTone(ToneGenerator.TONE_PROP_BEEP);
-            tg.stopTone();
-            tg.release();
         } else {
-            Log.i(TAG, "location NOT received");
+            Log.d(TAG, "location NOT received");
         }
-
     }
 }
