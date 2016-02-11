@@ -20,7 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-class HTTPContext {
+public class HTTPContext {
 
     private static final int CONNECTION_ERROR = 0;
     private static final int TEMPORARY_ERROR = 1;
@@ -35,6 +35,12 @@ class HTTPContext {
         super();
         mClient = new OkHttpClient();
         //mClient.interceptors().add(new LoggingInterceptor());
+    }
+
+    public static void setClient(OkHttpClient client){
+        HTTPContext httpContext = new HTTPContext();
+        httpContext.mClient = client;
+        mInstance = httpContext;
     }
 
     public static HTTPContext getInstance() {
