@@ -78,6 +78,7 @@ GYP_FLAGS += -Dasset_lib=$(ASSET)
 GYP_FLAGS += -Dheadless_lib=$(HEADLESS)
 GYP_FLAGS += -Dtest=$(BUILD_TEST)
 GYP_FLAGS += -Drender=$(BUILD_RENDER)
+GYP_FLAGS += -Doffline=$(BUILD_OFFLINE)
 GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
 GYP_FLAGS += --depth=.
 GYP_FLAGS += -Goutput_dir=.
