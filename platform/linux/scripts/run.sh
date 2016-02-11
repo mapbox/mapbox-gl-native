@@ -17,6 +17,9 @@ make linux -j${JOBS} BUILDTYPE=${BUILDTYPE}
 mapbox_time "compile_render_binary" \
 make render -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
+mapbox_time "compile_offline_binary" \
+make offline -j${JOBS} BUILDTYPE=${BUILDTYPE}
+
 mapbox_time "compile_tests" \
 make test -j${JOBS} BUILDTYPE=${BUILDTYPE}
 
