@@ -88,6 +88,11 @@ inline T dist(const S1& a, const S2& b) {
 }
 
 template <typename T>
+inline T round(const T& a) {
+    return T(::round(a.x), ::round(a.y));
+}
+
+template <typename T>
 inline T length(T a, T b) {
     return std::sqrt(a * a + b * b);
 }
