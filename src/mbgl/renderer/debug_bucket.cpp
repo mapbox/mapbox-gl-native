@@ -11,8 +11,8 @@ using namespace mbgl;
 
 DebugBucket::DebugBucket(const TileID id, const TileData::State state_, optional<SystemTimePoint> modified_, optional<SystemTimePoint> expires_, MapDebugOptions debugMode_)
     : state(state_),
-      modified(modified_),
-      expires(expires_),
+      modified(std::move(modified_)),
+      expires(std::move(expires_)),
       debugMode(debugMode_) {
     double baseline = 200;
     if (debugMode & MapDebugOptions::ParseStatus) {

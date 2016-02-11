@@ -190,7 +190,7 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
 OnlineFileRequestImpl::OnlineFileRequestImpl(FileRequest* key_, const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
     : key(key_),
       resource(resource_),
-      callback(callback_) {
+      callback(std::move(callback_)) {
     // Force an immediate first request if we don't have an expiration time.
     schedule(impl, !resource.priorExpires);
 }

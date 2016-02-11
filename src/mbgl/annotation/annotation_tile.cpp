@@ -10,7 +10,7 @@ AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollecti
                                  std::unordered_map<std::string, std::string> properties_)
     : type(type_),
       properties(std::move(properties_)),
-      geometries(geometries_) {}
+      geometries(std::move(geometries_)) {}
 
 optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     auto it = properties.find(key);

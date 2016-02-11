@@ -31,7 +31,7 @@ public:
     Resource(Kind kind_, const std::string& url_, optional<TileData> tileData_ = {})
         : kind(kind_),
           url(url_),
-          tileData(tileData_) {
+          tileData(std::move(tileData_)) {
     }
 
     static Resource style(const std::string& url);
