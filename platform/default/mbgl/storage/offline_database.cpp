@@ -192,8 +192,10 @@ void OfflineDatabase::putResource(const Resource& resource,
                                   bool compressed) {
     if (response.notModified) {
         Statement stmt = getStatement(
-            //                               1            2             3
-            "UPDATE resources SET accessed = ?, expires = ? WHERE url = ?");
+            "UPDATE resources "
+            "SET accessed = ?1, "
+            "    expires  = ?2 "
+            "WHERE url    = ?3 ");
 
         stmt->bind(1, SystemClock::now());
         stmt->bind(2, response.expires);
@@ -201,23 +203,22 @@ void OfflineDatabase::putResource(const Resource& resource,
         stmt->run();
     } else {
         Statement stmt = getStatement(
-            //                        1     2    3      4        5         6        7       8
             "REPLACE INTO resources (url, kind, etag, expires, modified, accessed, data, compressed) "
-            "VALUES                 (?,   ?,    ?,    ?,       ?,        ?,        ?,    ?)");
+            "VALUES                 (?1,  ?2,   ?3,   ?4,      ?5,       ?6,       ?7,   ?8) ");
 
-        stmt->bind(1 /* url */, resource.url);
-        stmt->bind(2 /* kind */, int(resource.kind));
-        stmt->bind(3 /* etag */, response.etag);
-        stmt->bind(4 /* expires */, response.expires);
-        stmt->bind(5 /* modified */, response.modified);
-        stmt->bind(6 /* accessed */, SystemClock::now());
+        stmt->bind(1, resource.url);
+        stmt->bind(2, int(resource.kind));
+        stmt->bind(3, response.etag);
+        stmt->bind(4, response.expires);
+        stmt->bind(5, response.modified);
+        stmt->bind(6, SystemClock::now());
 
         if (response.noContent) {
-            stmt->bind(7 /* data */, nullptr);
-            stmt->bind(8 /* compressed */, false);
+            stmt->bind(7, nullptr);
+            stmt->bind(8, false);
         } else {
-            stmt->bindBlob(7 /* data */, data.data(), data.size(), false);
-            stmt->bind(8 /* compressed */, compressed);
+            stmt->bindBlob(7, data.data(), data.size(), false);
+            stmt->bind(8, compressed);
         }
 
         stmt->run();
@@ -226,14 +227,13 @@ void OfflineDatabase::putResource(const Resource& resource,
 
 optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     Statement accessedStmt = getStatement(
-        "UPDATE tiles SET accessed = ?1 "
-        "WHERE tileset_id = ( "
-        "  SELECT id FROM tilesets "
-        "  WHERE url_template = ?2 "
-        "  AND pixel_ratio = ?3) "
-        "AND tiles.x = ?4 "
-        "AND tiles.y = ?5 "
-        "AND tiles.z = ?6 ");
+        "UPDATE tiles "
+        "SET accessed       = ?1 "
+        "WHERE url_template = ?2 "
+        "  AND pixel_ratio  = ?3 "
+        "  AND x            = ?4 "
+        "  AND y            = ?5 "
+        "  AND z            = ?6 ");
 
     accessedStmt->bind(1, SystemClock::now());
     accessedStmt->bind(2, tile.urlTemplate);
@@ -246,13 +246,12 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     Statement stmt = getStatement(
         //        0      1        2       3        4
         "SELECT etag, expires, modified, data, compressed "
-        "FROM tilesets, tiles "
-        "WHERE tilesets.url_template = ? " // 1
-        "AND tilesets.pixel_ratio = ? "    // 2
-        "AND tiles.x = ? "                 // 3
-        "AND tiles.y = ? "                 // 4
-        "AND tiles.z = ? "                 // 5
-        "AND tilesets.id = tiles.tileset_id ");
+        "FROM tiles "
+        "WHERE url_template = ?1 "
+        "  AND pixel_ratio  = ?2 "
+        "  AND x            = ?3 "
+        "  AND y            = ?4 "
+        "  AND z            = ?5 ");
 
     stmt->bind(1, tile.urlTemplate);
     stmt->bind(2, tile.pixelRatio);
@@ -288,14 +287,14 @@ void OfflineDatabase::putTile(const Resource::TileData& tile,
                               bool compressed) {
     if (response.notModified) {
         Statement stmt = getStatement(
-            "UPDATE tiles SET accessed = ?1, expires = ?2 "
-            "WHERE tileset_id = ( "
-            "  SELECT id FROM tilesets "
-            "  WHERE url_template = ?3 "
-            "  AND pixel_ratio = ?4) "
-            "AND tiles.x = ?5 "
-            "AND tiles.y = ?6 "
-            "AND tiles.z = ?7 ");
+            "UPDATE tiles "
+            "SET accessed       = ?1, "
+            "    expires        = ?2 "
+            "WHERE url_template = ?3 "
+            "  AND pixel_ratio  = ?4 "
+            "  AND x            = ?5 "
+            "  AND y            = ?6 "
+            "  AND z            = ?7 ");
 
         stmt->bind(1, SystemClock::now());
         stmt->bind(2, response.expires);
@@ -306,37 +305,26 @@ void OfflineDatabase::putTile(const Resource::TileData& tile,
         stmt->bind(7, tile.z);
         stmt->run();
     } else {
-        Statement stmt1 = getStatement(
-            "REPLACE INTO tilesets (url_template, pixel_ratio) "
-            "VALUES                (?1,           ?2) ");
-
-        stmt1->bind(1 /* url_template */, tile.urlTemplate);
-        stmt1->bind(2 /* pixel_ratio */, tile.pixelRatio);
-        stmt1->run();
-
         Statement stmt2 = getStatement(
-            "REPLACE INTO tiles (tileset_id,  x,  y,  z,  modified,  etag,  expires,  accessed,  data, compressed) "
-            "SELECT              tilesets.id, ?3, ?4, ?5, ?6,        ?7,    ?8,       ?9,        ?10,  ?11 "
-            "FROM tilesets "
-            "WHERE url_template = ?1 "
-            "AND pixel_ratio    = ?2 ");
+            "REPLACE INTO tiles (url_template, pixel_ratio, x,  y,  z,  modified,  etag,  expires,  accessed,  data, compressed) "
+            "VALUES             (?1,           ?2,          ?3, ?4, ?5, ?6,        ?7,    ?8,       ?9,        ?10,  ?11) ");
 
-        stmt2->bind(1 /* url_template */, tile.urlTemplate);
-        stmt2->bind(2 /* pixel_ratio */, tile.pixelRatio);
-        stmt2->bind(3 /* x */, tile.x);
-        stmt2->bind(4 /* y */, tile.y);
-        stmt2->bind(5 /* z */, tile.z);
-        stmt2->bind(6 /* modified */, response.modified);
-        stmt2->bind(7 /* etag */, response.etag);
-        stmt2->bind(8 /* expires */, response.expires);
-        stmt2->bind(9 /* accessed */, SystemClock::now());
+        stmt2->bind(1, tile.urlTemplate);
+        stmt2->bind(2, tile.pixelRatio);
+        stmt2->bind(3, tile.x);
+        stmt2->bind(4, tile.y);
+        stmt2->bind(5, tile.z);
+        stmt2->bind(6, response.modified);
+        stmt2->bind(7, response.etag);
+        stmt2->bind(8, response.expires);
+        stmt2->bind(9, SystemClock::now());
 
         if (response.noContent) {
-            stmt2->bind(10 /* data */, nullptr);
-            stmt2->bind(11 /* compressed */, false);
+            stmt2->bind(10, nullptr);
+            stmt2->bind(11, false);
         } else {
-            stmt2->bindBlob(10 /* data */, data.data(), data.size(), false);
-            stmt2->bind(11 /* compressed */, compressed);
+            stmt2->bindBlob(10, data.data(), data.size(), false);
+            stmt2->bind(11, compressed);
         }
 
         stmt2->run();
@@ -403,13 +391,12 @@ void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         Statement stmt = getStatement(
             "REPLACE INTO region_tiles (region_id, tile_id) "
             "SELECT                     ?1,        tiles.id "
-            "FROM tilesets, tiles "
-            "WHERE tilesets.url_template = ?2 "
-            "  AND tilesets.pixel_ratio  = ?3 "
-            "  AND tiles.x               = ?4 "
-            "  AND tiles.y               = ?5 "
-            "  AND tiles.z               = ?6 "
-            "  AND tiles.tileset_id = tilesets.id ");
+            "FROM tiles "
+            "WHERE url_template = ?2 "
+            "  AND pixel_ratio  = ?3 "
+            "  AND x            = ?4 "
+            "  AND y            = ?5 "
+            "  AND z            = ?6 ");
 
         const Resource::TileData& tile = *resource.tileData;
         stmt->bind(1, regionID);

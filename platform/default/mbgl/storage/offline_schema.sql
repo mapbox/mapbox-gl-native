@@ -11,16 +11,10 @@ CREATE TABLE resources (                   -- Generic table for style, source, s
   UNIQUE (url)
 );
 
-CREATE TABLE tilesets (
+CREATE TABLE tiles (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   url_template TEXT NOT NULL,           -- As it would appear in TileJSON (but no support for host sharding).
   pixel_ratio INTEGER,                  -- If NULL, 1 is assumed for raster sources.
-  UNIQUE (url_template, pixel_ratio)    -- Capable of caching the same tileset at multiple resolutions.
-);
-
-CREATE TABLE tiles (
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  tileset_id INTEGER NOT NULL REFERENCES tilesets(id),
   z INTEGER NOT NULL,
   x INTEGER NOT NULL,
   y INTEGER NOT NULL,
@@ -30,7 +24,7 @@ CREATE TABLE tiles (
   data BLOB,
   compressed INTEGER NOT NULL DEFAULT 0,
   accessed INTEGER NOT NULL,
-  UNIQUE (tileset_id, z, x, y)
+  UNIQUE (url_template, pixel_ratio, z, x, y)
 );
 
 CREATE TABLE regions (
