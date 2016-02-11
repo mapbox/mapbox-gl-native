@@ -1,4 +1,4 @@
-#import <mbgl/osx/MGLAccountManager.h>
+#import <MGLAccountManager.h>
 
 @interface MGLAccountManager (Private)
 

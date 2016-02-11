@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../../gyp/common.gypi',
+    '../../../gyp/common.gypi',
   ],
   'targets': [
     { 'target_name': 'ios-bench',
@@ -9,7 +9,7 @@
       'product_extension': 'app',
       'mac_bundle': 1,
       'mac_bundle_resources': [
-        '<!@(find ../ios/benchmark/img -type f)',
+        '<!@(find ../platform/ios/benchmark/img -type f)',
         'assets/glyphs',
         'assets/sprites',
         'assets/tiles',
@@ -36,7 +36,7 @@
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphoneos',
         'IPHONEOS_DEPLOYMENT_TARGET': '7.0',
-        'INFOPLIST_FILE': '../ios/benchmark/app-info.plist',
+        'INFOPLIST_FILE': '../platform/ios/benchmark/app-info.plist',
         'TARGETED_DEVICE_FAMILY': '1,2',
         'COMBINE_HIDPI_IMAGES': 'NO', # don't merge @2x.png images into .tiff files
         'CLANG_ENABLE_OBJC_ARC': 'YES',

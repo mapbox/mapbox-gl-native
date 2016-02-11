@@ -1,4 +1,4 @@
-#import "../../darwin/MGLGeometry_Private.h"
+#import "../../darwin/src/MGLGeometry_Private.h"
 
 #pragma clang diagnostic ignored "-Wgnu-statement-expression"
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"

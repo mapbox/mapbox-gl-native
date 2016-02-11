@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../../gyp/common.gypi',
+    '../../../gyp/common.gypi',
   ],
   'targets': [
     {
@@ -10,7 +10,7 @@
       'product_extension': 'app',
       'mac_bundle': 1,
       'mac_bundle_resources': [
-        '<!@(find ../ios/app/img -type f)',
+        '<!@(find ../platform/ios/app/img -type f)',
         './points.geojson',
         './polyline.geojson',
         './threestates.geojson',
@@ -36,7 +36,7 @@
         'SDKROOT': 'iphoneos',
         'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
         'IPHONEOS_DEPLOYMENT_TARGET': '8.0',
-        'INFOPLIST_FILE': '../ios/app/app-info.plist',
+        'INFOPLIST_FILE': '../platform/ios/app/app-info.plist',
         'TARGETED_DEVICE_FAMILY': '1,2',
         'COMBINE_HIDPI_IMAGES': 'NO', # disable combining @2x, @3x images into .tiff files
         'COPY_PHASE_STRIP': 'NO',

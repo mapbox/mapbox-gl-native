@@ -1,4 +1,4 @@
-#import <mbgl/osx/MGLAnnotationImage.h>
+#import <MGLAnnotationImage.h>
 
 @interface MGLAnnotationImage ()
 

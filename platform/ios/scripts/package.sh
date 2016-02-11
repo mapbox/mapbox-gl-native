@@ -187,34 +187,34 @@ fi
 if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     mkdir -p "${OUTPUT}/static/${NAME}.framework/Headers"
-    cp -pv include/mbgl/{darwin,ios}/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
+    cp -pv platform/{darwin,ios}/include/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
 fi
 
 step "Copying library resources…"
 SHORT_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
 cp -pv LICENSE.md "${OUTPUT}"
-cp -rv ios/app/Settings.bundle "${OUTPUT}"
+cp -rv platform/ios/app/Settings.bundle "${OUTPUT}"
 if [[ ${BUILD_STATIC} == true ]]; then
     cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.framework"
-    cp -pv ios/framework/Info.plist "${OUTPUT}/static/${NAME}.framework/Info.plist"
+    cp -pv platform/ios/framework/Info.plist "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleExecutable -string ${NAME} "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleIdentifier -string com.mapbox.sdk.ios "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleName -string ${NAME} "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleVersion -string ${PROJ_VERSION} "${OUTPUT}/static/${NAME}.framework/Info.plist"
     mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
-    cp -pv ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
+    cp -pv platform/ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${OUTPUT}/dynamic/${NAME}.framework/Info.plist"
-    cp -pv ios/framework/strip-frameworks.sh "${OUTPUT}/dynamic/${NAME}.framework/strip-frameworks.sh"
+    cp -pv platform/ios/framework/strip-frameworks.sh "${OUTPUT}/dynamic/${NAME}.framework/strip-frameworks.sh"
 fi
 sed -n -e '/^## iOS/,$p' CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
-cp ios/docs/pod-README.md "${README}"
+cp platform/ios/docs/pod-README.md "${README}"
 if [[ ${BUILD_DYNAMIC} == false ]]; then
     sed -i '' -e '/{{DYNAMIC}}/,/{{\/DYNAMIC}}/d' "${README}"
 fi

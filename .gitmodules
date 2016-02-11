@@ -3,7 +3,7 @@
 	url = https://github.com/mapbox/mason.git
 
 [submodule "test/ios/KIF"]
-	path = test/ios/KIF
+	path = platform/ios/test/KIF
 	url = https://github.com/kif-framework/KIF.git
 
 [submodule "platform/ios/vendor/SMCalloutView"]

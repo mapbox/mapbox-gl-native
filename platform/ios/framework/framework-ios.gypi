@@ -1,6 +1,6 @@
 {
   'includes': [
-    '../../gyp/common.gypi',
+    '../../../gyp/common.gypi',
   ],
   'targets': [
     {
@@ -22,7 +22,7 @@
         'CURRENT_PROJECT_VERSION': '0',
         'DEFINES_MODULE': 'YES',
         'DYLIB_INSTALL_NAME_BASE': '@rpath',
-        'INFOPLIST_FILE': '../ios/framework/Info.plist',
+        'INFOPLIST_FILE': '../platform/ios/framework/Info.plist',
         'LD_RUNPATH_SEARCH_PATHS': [
           '$(inherited)',
           '@executable_path/Frameworks',
@@ -41,7 +41,7 @@
       
       'mac_framework_headers': [
         'Mapbox.h',
-        '<!@(find ../include/mbgl/{darwin,ios} -type f \! -name \'.*\' \! -name Mapbox.h)',
+        '<!@(find ../platform/{darwin,ios}/include -type f \! -name \'.*\' \! -name Mapbox.h)',
       ],
       
       'sources': [

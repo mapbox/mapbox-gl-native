@@ -8,8 +8,8 @@ if [ -z "$(which ios-deploy)" ] ; then
     npm install -g ios-deploy
 fi
 
-(cd ios/benchmark/assets/tiles && ./download.sh)
-(cd ios/benchmark/assets/glyphs && ./download.sh)
+(cd platform/ios/benchmark/assets/tiles && ./download.sh)
+(cd platform/ios/benchmark/assets/glyphs && ./download.sh)
 
 make ibench
 

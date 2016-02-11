@@ -48,7 +48,7 @@ Run
 
 To run the included integration tests on the command line.
 
-If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `test/ios/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target.
+If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `platform/ios/test/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target.
 
 ### Usage
 

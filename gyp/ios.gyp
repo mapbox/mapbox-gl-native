@@ -1,7 +1,7 @@
 {
   'includes': [
-    '../ios/app/mapboxgl-app.gypi',
-    '../ios/framework/framework-ios.gypi',
-    '../ios/benchmark/benchmark-ios.gypi',
+    '../platform/ios/app/mapboxgl-app.gypi',
+    '../platform/ios/framework/framework-ios.gypi',
+    '../platform/ios/benchmark/benchmark-ios.gypi',
   ],
 }

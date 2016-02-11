@@ -1,4 +1,4 @@
-#import <mbgl/osx/MGLMapView+IBAdditions.h>
+#import <MGLMapView+IBAdditions.h>
 
 #import "MGLMapView_Private.h"
 

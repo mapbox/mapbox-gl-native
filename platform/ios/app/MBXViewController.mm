@@ -2,7 +2,7 @@
 #import "MBXCustomCalloutView.h"
 
 #import <Mapbox/Mapbox.h>
-#import "../../include/mbgl/util/default_styles.hpp"
+#import "../../../include/mbgl/util/default_styles.hpp"
 
 #import <CoreLocation/CoreLocation.h>
 #import <OpenGLES/ES2/gl.h>

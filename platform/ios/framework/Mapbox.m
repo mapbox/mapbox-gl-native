@@ -1,8 +1,8 @@
 #import <Mapbox/Mapbox.h>
 
-#import "../../platform/ios/src/NSBundle+MGLAdditions.h"
-#import "../../platform/ios/src/NSProcessInfo+MGLAdditions.h"
-#import "../../platform/darwin/NSString+MGLAdditions.h"
+#import "../src/NSBundle+MGLAdditions.h"
+#import "../src/NSProcessInfo+MGLAdditions.h"
+#import "../../darwin/src/NSString+MGLAdditions.h"
 
 __attribute__((constructor))
 static void InitializeMapbox() {

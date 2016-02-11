@@ -1,6 +1,6 @@
 #import "MGLAccountManager_Private.h"
 
-#import <mbgl/osx/MGLMapView.h>
+#import <MGLMapView.h>
 
 @interface MGLAccountManager ()
 

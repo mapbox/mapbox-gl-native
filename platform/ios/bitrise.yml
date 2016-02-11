@@ -48,7 +48,7 @@ workflows:
         title: Run Xcode Tests
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
-        - project_path: "./test/ios/ios-tests.xcodeproj"
+        - project_path: "./platform/ios/test/ios-tests.xcodeproj"
         - scheme: Mapbox GL Tests
         - simulator_device: iPhone 6
           opts:

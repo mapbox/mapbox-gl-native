@@ -82,7 +82,7 @@
 /* Begin PBXFileReference section */
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
-		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mapbox.framework; path = ../../build/ios/pkg/dynamic/Mapbox.framework; sourceTree = "<group>"; };
+		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mapbox.framework; path = ../../../build/ios/pkg/dynamic/Mapbox.framework; sourceTree = "<group>"; };
 		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
 		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -539,7 +539,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
 				);
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
@@ -564,7 +564,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
 				);
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
@@ -588,7 +588,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -625,7 +625,7 @@
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "KIF_XCTEST=1";
 				HEADER_SEARCH_PATHS = (

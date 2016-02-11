@@ -48,8 +48,8 @@
       ],
 
       'include_dirs': [
-        '../../../include/mbgl/osx',
-        '../../../include/mbgl/darwin',
+        '../../../platform/osx/include',
+        '../../../platform/darwin/include',
         '../../../include',
         '../../../src',
       ],
