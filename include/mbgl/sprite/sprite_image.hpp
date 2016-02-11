@@ -13,7 +13,7 @@ namespace mbgl {
 
 class SpriteImage : private util::noncopyable {
 public:
-    SpriteImage(PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    SpriteImage(PremultipliedImage&&, float pixelRatio, bool sdf = false, vec2<float> offset = {0.0, 0.0});
 
     PremultipliedImage image;
 
@@ -25,6 +25,9 @@ public:
 
     float getWidth() const { return image.width / pixelRatio; }
     float getHeight() const { return image.height / pixelRatio; }
+    
+    // position offset
+    const vec2<float> offset;
 };
 
 } // namespace mbgl

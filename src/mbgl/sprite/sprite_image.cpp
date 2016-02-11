@@ -8,10 +8,12 @@ namespace mbgl {
 
 SpriteImage::SpriteImage(PremultipliedImage&& image_,
                          const float pixelRatio_,
-                         bool sdf_)
+                         bool sdf_,
+                         vec2<float> offset_)
     : image(std::move(image_)),
       pixelRatio(pixelRatio_),
-      sdf(sdf_) {
+      sdf(sdf_),
+      offset(offset_) {
 
     if (image.size() == 0) {
         throw util::SpriteImageException("Sprite image dimensions may not be zero");
