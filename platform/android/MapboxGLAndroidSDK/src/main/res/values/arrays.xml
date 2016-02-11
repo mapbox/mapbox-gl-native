@@ -4,6 +4,7 @@
         <item>&#169; Mapbox</item>
         <item>&#169; OpenStreetMap</item>
         <item>Improve this map</item>
+        <item>Telemetry Settings</item>
     </array>
     <!-- If editing this array update MapView.ATTRIBUTION_INDEX_IMPROVE_THIS_MAP -->
     <array name="attribution_links" formatted="false" translatable="false">
