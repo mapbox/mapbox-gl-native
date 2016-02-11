@@ -49,6 +49,7 @@ Resource Resource::glyphs(const std::string& urlTemplate, const std::string& fon
 }
 
 Resource Resource::tile(const std::string& urlTemplate, float pixelRatio, int32_t x, int32_t y, int8_t z) {
+    bool supportsRatio = urlTemplate.find("{ratio}") != std::string::npos;
     return Resource {
         Resource::Kind::Tile,
         util::replaceTokens(urlTemplate, [&](const std::string& token) {
@@ -71,7 +72,7 @@ Resource Resource::tile(const std::string& urlTemplate, float pixelRatio, int32_
         }),
         Resource::TileData {
             urlTemplate,
-            uint8_t(pixelRatio > 1.0 ? 2 : 1),
+            uint8_t(supportsRatio && pixelRatio > 1.0 ? 2 : 1),
             x,
             y,
             z

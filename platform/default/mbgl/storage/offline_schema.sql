@@ -13,8 +13,8 @@ CREATE TABLE resources (                   -- Generic table for style, source, s
 
 CREATE TABLE tiles (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  url_template TEXT NOT NULL,           -- As it would appear in TileJSON (but no support for host sharding).
-  pixel_ratio INTEGER,                  -- If NULL, 1 is assumed for raster sources.
+  url_template TEXT NOT NULL,
+  pixel_ratio INTEGER NOT NULL,
   z INTEGER NOT NULL,
   x INTEGER NOT NULL,
   y INTEGER NOT NULL,

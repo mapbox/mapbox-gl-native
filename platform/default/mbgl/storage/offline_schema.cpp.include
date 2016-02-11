@@ -15,7 +15,7 @@ static const char * schema =
 "CREATE TABLE tiles (\n"
 "  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\n"
 "  url_template TEXT NOT NULL,\n"
-"  pixel_ratio INTEGER,\n"
+"  pixel_ratio INTEGER NOT NULL,\n"
 "  z INTEGER NOT NULL,\n"
 "  x INTEGER NOT NULL,\n"
 "  y INTEGER NOT NULL,\n"

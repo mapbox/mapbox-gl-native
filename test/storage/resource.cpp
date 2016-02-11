@@ -18,14 +18,24 @@ TEST(Resource, Source) {
 
 TEST(Resource, Tile) {
     using namespace mbgl;
-    Resource resource = Resource::tile("http://example.com/{z}/{x}/{y}{ratio}.png", 2.0, 1, 2, 3);
-    EXPECT_EQ(Resource::Kind::Tile, resource.kind);
-    EXPECT_EQ("http://example.com/3/1/2@2x.png", resource.url);
-    EXPECT_EQ("http://example.com/{z}/{x}/{y}{ratio}.png", resource.tileData->urlTemplate);
-    EXPECT_EQ(2.0, resource.tileData->pixelRatio);
-    EXPECT_EQ(1, resource.tileData->x);
-    EXPECT_EQ(2, resource.tileData->y);
-    EXPECT_EQ(3, resource.tileData->z);
+
+    Resource rasterTile = Resource::tile("http://example.com/{z}/{x}/{y}{ratio}.png", 2.0, 1, 2, 3);
+    EXPECT_EQ(Resource::Kind::Tile, rasterTile.kind);
+    EXPECT_EQ("http://example.com/3/1/2@2x.png", rasterTile.url);
+    EXPECT_EQ("http://example.com/{z}/{x}/{y}{ratio}.png", rasterTile.tileData->urlTemplate);
+    EXPECT_EQ(2, rasterTile.tileData->pixelRatio);
+    EXPECT_EQ(1, rasterTile.tileData->x);
+    EXPECT_EQ(2, rasterTile.tileData->y);
+    EXPECT_EQ(3, rasterTile.tileData->z);
+
+    Resource vectorTile = Resource::tile("http://example.com/{z}/{x}/{y}.mvt", 2.0, 1, 2, 3);
+    EXPECT_EQ(Resource::Kind::Tile, vectorTile.kind);
+    EXPECT_EQ("http://example.com/3/1/2.mvt", vectorTile.url);
+    EXPECT_EQ("http://example.com/{z}/{x}/{y}.mvt", vectorTile.tileData->urlTemplate);
+    EXPECT_EQ(1, vectorTile.tileData->pixelRatio);
+    EXPECT_EQ(1, vectorTile.tileData->x);
+    EXPECT_EQ(2, vectorTile.tileData->y);
+    EXPECT_EQ(3, vectorTile.tileData->z);
 }
 
 TEST(Resource, Glyphs) {
