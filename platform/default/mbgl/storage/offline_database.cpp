@@ -344,7 +344,7 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() {
             stmt->get<std::vector<uint8_t>>(2)));
     }
 
-    return std::move(result);
+    return result;
 }
 
 OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
