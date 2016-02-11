@@ -6,13 +6,14 @@
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 
 using namespace mbgl;
 
-LineBucket::LineBucket() {
+LineBucket::LineBucket(float overscaling_) : overscaling(overscaling_) {
 }
 
 LineBucket::~LineBucket() {
@@ -24,6 +25,21 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
         addGeometry(line);
     }
 }
+
+
+/*
+ * Sharp corners cause dashed lines to tilt because the distance along the line
+ * is the same at both the inner and outer corners. To improve the appearance of
+ * dashed lines we add extra points near sharp corners so that a smaller part
+ * of the line is tilted.
+ *
+ * COS_HALF_SHARP_CORNER controls how sharp a corner has to be for us to add an
+ * extra vertex. The default is 75 degrees.
+ *
+ * The newly created vertices are placed SHARP_CORNER_OFFSET pixels from the corner.
+ */
+const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
+const float SHARP_CORNER_OFFSET = 15.0f;
 
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     const GLsizei len = [&vertices] {
@@ -41,6 +57,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 
     const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : float(layout.miterLimit);
+
+    const double sharpCornerOffset = SHARP_CORNER_OFFSET * (util::EXTENT / (512.0 * overscaling));
 
     const Coordinate firstVertex = vertices.front();
     const Coordinate lastVertex = vertices[len - 1];
@@ -98,10 +116,6 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         currentVertex = vertices[i];
 
-        // Calculate how far along the line the currentVertex is
-        if (prevVertex)
-            distance += util::dist<double>(currentVertex, prevVertex);
-
         // Calculate the normal towards the next vertex in this line. In case
         // there is no next vertex, pretend that the line is continuing straight,
         // meaning that we are just using the previous normal.
@@ -133,6 +147,18 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         // using dot product. The inverse of that is the miter length.
         const float cosHalfAngle = joinNormal.x * nextNormal.x + joinNormal.y * nextNormal.y;
         const float miterLength = cosHalfAngle != 0 ? 1 / cosHalfAngle: 1;
+
+        const bool isSharpCorner = cosHalfAngle < COS_HALF_SHARP_CORNER && prevVertex && nextVertex;
+
+        if (isSharpCorner && i > 0) {
+            const double prevSegmentLength = util::dist<double>(currentVertex, prevVertex);
+            if (prevSegmentLength > 2.0 * sharpCornerOffset) {
+                Coordinate newPrevVertex = currentVertex - (util::round(vec2<double>(currentVertex - prevVertex) * (sharpCornerOffset / prevSegmentLength)));
+                distance += util::dist<double>(newPrevVertex, prevVertex);
+                addCurrentVertex(newPrevVertex, flip, distance, prevNormal, 0, 0, false, startVertex, triangleStore);
+                prevVertex = newPrevVertex;
+            }
+        }
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
@@ -166,6 +192,10 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
                 }
             }
         }
+
+        // Calculate how far along the line the currentVertex is
+        if (prevVertex)
+            distance += util::dist<double>(currentVertex, prevVertex);
 
         if (middleVertex && currentJoin == JoinType::Miter) {
             joinNormal = joinNormal * miterLength;
@@ -292,6 +322,16 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
                 addCurrentVertex(currentVertex, flip, distance, nextNormal, 0, 0, false,
                                  startVertex, triangleStore);
+            }
+        }
+
+        if (isSharpCorner && i < len - 1) {
+            const double nextSegmentLength = util::dist<double>(currentVertex, nextVertex);
+            if (nextSegmentLength > 2 * sharpCornerOffset) {
+                Coordinate newCurrentVertex = currentVertex + util::round(vec2<double>(nextVertex - currentVertex) * (sharpCornerOffset / nextSegmentLength));
+                distance += util::dist<double>(newCurrentVertex, currentVertex);
+                addCurrentVertex(newCurrentVertex, flip, distance, nextNormal, 0, 0, false, startVertex, triangleStore);
+                currentVertex = newCurrentVertex;
             }
         }
 
