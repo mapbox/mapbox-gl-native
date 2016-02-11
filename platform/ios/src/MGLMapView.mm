@@ -2657,7 +2657,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag)
+        auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(),
+                                  [&](const MGLAnnotationTag annotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             NSAssert(annotation, @"Unknown annotation found nearby tap");
@@ -2674,6 +2675,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                   centeredAtCoordinate:annotation.coordinate];
             return !!!CGRectIntersectsRect(annotationRect, hitRect);
         });
+        nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
     }
     
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
