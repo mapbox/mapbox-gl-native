@@ -193,6 +193,7 @@ public class MapboxEventManager {
         } else {
             Log.i(TAG, "Shutting Telemetry Down");
             // Shut It Down
+            events.removeAllElements();
             context.stopService(new Intent(context, TelemetryService.class));
 
             if (timer != null) {
