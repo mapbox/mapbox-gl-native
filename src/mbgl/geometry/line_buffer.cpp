@@ -22,7 +22,7 @@ GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, 
     // The z component's first bit, as well as the sign bit is reserved for the direction,
     // so we need to shift the linesofar.
     extrude[6] = ((dir < 0) ? -1 : 1) * ((dir ? 1 : 0) | static_cast<int8_t>((linesofar << 1) & 0x7F));
-    extrude[7] = (linesofar >> 6) & 0x7F;
+    extrude[7] = ((linesofar >> 6) & 0xFF) - 128;
 
     return idx;
 }
