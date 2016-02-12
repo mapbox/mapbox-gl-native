@@ -2,6 +2,7 @@
 #define MBGL_MAP_TILE_CACHE
 
 #include <list>
+#include <memory>
 #include <unordered_map>
 
 namespace mbgl {

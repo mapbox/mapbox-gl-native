@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include <mbgl/util/clip_id.hpp>
-#include <mbgl/map/tile.hpp>
+#include <mbgl/tile/tile.hpp>
 
 using namespace mbgl;
 

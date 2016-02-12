@@ -1,6 +1,6 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/map/source_info.hpp>
+#include <mbgl/source/source_info.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>

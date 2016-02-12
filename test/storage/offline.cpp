@@ -1,5 +1,5 @@
 #include <mbgl/storage/offline.hpp>
-#include <mbgl/map/source_info.hpp>
+#include <mbgl/source/source_info.hpp>
 #include <mbgl/map/tile_id.hpp>
 
 #include <gtest/gtest.h>

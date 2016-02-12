@@ -3,7 +3,7 @@
 #include "../fixtures/mock_view.hpp"
 #include "../fixtures/stub_style_observer.hpp"
 
-#include <mbgl/map/source.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
