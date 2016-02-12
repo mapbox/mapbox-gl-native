@@ -130,7 +130,7 @@ TEST(Annotations, NonImmediateAdd) {
     checkRendering(map, "non_immediate_add");
 }
 
-TEST(Annotations, UpdatePoint) {
+TEST(Annotations, UpdateIcon) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     OnlineFileSource fileSource;
@@ -146,6 +146,24 @@ TEST(Annotations, UpdatePoint) {
     map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
     map.update(Update::Annotations);
 
+    checkRendering(map, "update_icon");
+}
+
+TEST(Annotations, UpdatePoint) {
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    OnlineFileSource fileSource;
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
+    AnnotationID point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+
+    test::render(map);
+
+    map.updatePointAnnotation(point, PointAnnotation({ 0, -10 }, "flipped_marker"));
+
     checkRendering(map, "update_point");
 }
 
@@ -157,7 +175,7 @@ TEST(Annotations, RemovePoint) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    uint32_t point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+    AnnotationID point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
 
     test::render(map);
 
@@ -179,7 +197,7 @@ TEST(Annotations, RemoveShape) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    uint32_t shape = map.addShapeAnnotation(ShapeAnnotation(segments, properties));
+    AnnotationID shape = map.addShapeAnnotation(ShapeAnnotation(segments, properties));
 
     test::render(map);
 
