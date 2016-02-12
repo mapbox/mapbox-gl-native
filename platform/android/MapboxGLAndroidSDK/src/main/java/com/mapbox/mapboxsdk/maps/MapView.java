@@ -2867,7 +2867,7 @@ public class MapView extends FrameLayout {
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Context context = ((Dialog) dialog).getContext();
+            final Context context = ((Dialog) dialog).getContext();
             if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
 
                 int array = R.array.attribution_telemetry_options;
@@ -2877,7 +2877,26 @@ public class MapView extends FrameLayout {
                 String[] items = context.getResources().getStringArray(array);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
                 builder.setTitle(R.string.attributionsDialogTitle);
-                builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
+                builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                String url = context.getResources().getStringArray(R.array.attribution_links)[3];
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(url));
+                                context.startActivity(intent);
+                                return;
+                            case 1:
+                                MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(false);
+                                return;
+                            case 2:
+                                MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(true);
+                                return;
+                        }
+                    }
+                });
+
                 builder.show();
                 return;
             }
