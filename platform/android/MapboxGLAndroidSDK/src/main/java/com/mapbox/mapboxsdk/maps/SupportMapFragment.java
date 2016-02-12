@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,7 +30,7 @@ public class SupportMapFragment extends Fragment {
 
     private MapView mMap;
 
-    public static SupportMapFragment newInstance(){
+    public static SupportMapFragment newInstance() {
         return new SupportMapFragment();
     }
 
@@ -94,7 +95,12 @@ public class SupportMapFragment extends Fragment {
     }
 
     @NonNull
-    public void getMapAsync(@NonNull OnMapReadyCallback onMapReadyCallback){
-        mMap.getMapAsync(onMapReadyCallback);
+    public void getMapAsync(@NonNull final OnMapReadyCallback onMapReadyCallback) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                mMap.getMapAsync(onMapReadyCallback);
+            }
+        });
     }
 }
