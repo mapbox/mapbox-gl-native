@@ -1,12 +1,14 @@
 #ifndef MBGL_MAP_SOURCE
 #define MBGL_MAP_SOURCE
 
-#include <mbgl/map/tile_cache.hpp>
-#include <mbgl/map/source_info.hpp>
+#include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_cache.hpp>
+#include <mbgl/source/source_info.hpp>
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
+#include <forward_list>
 #include <vector>
 #include <map>
 

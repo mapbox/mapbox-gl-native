@@ -1,4 +1,4 @@
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
 

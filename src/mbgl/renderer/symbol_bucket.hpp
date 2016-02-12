@@ -2,7 +2,7 @@
 #define MBGL_RENDERER_SYMBOLBUCKET
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>

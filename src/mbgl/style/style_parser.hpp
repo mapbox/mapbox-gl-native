@@ -2,7 +2,7 @@
 #define MBGL_STYLE_STYLE_PARSER
 
 #include <mbgl/style/style_layer.hpp>
-#include <mbgl/map/source.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
 #include <vector>

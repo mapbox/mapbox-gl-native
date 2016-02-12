@@ -1,7 +1,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/map/map_data.hpp>
-#include <mbgl/map/source.hpp>
-#include <mbgl/map/tile.hpp>
+#include <mbgl/source/source.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/layer/custom_layer.hpp>

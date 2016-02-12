@@ -3,7 +3,7 @@
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
 
 #include <cassert>

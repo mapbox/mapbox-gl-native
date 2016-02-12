@@ -3,7 +3,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/thread.hpp>
-#include <mbgl/map/tile_worker.hpp>
+#include <mbgl/tile/tile_worker.hpp>
 
 #include <functional>
 #include <memory>

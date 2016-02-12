@@ -1,7 +1,7 @@
 #ifndef MBGL_ANNOTATION_TILE
 #define MBGL_ANNOTATION_TILE
 
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 
 #include <map>

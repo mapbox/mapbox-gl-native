@@ -1,8 +1,8 @@
-#include <mbgl/map/source.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/tile.hpp>
-#include <mbgl/map/vector_tile.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -20,8 +20,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
-#include <mbgl/map/vector_tile_data.hpp>
-#include <mbgl/map/raster_tile_data.hpp>
+#include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/gl/debugging.hpp>

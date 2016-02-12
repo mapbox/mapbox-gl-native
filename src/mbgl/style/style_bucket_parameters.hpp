@@ -3,7 +3,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/style/filter_expression.hpp>
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile_data.hpp>
 
 #include <functional>
 

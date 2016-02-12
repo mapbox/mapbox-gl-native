@@ -1,5 +1,5 @@
-#include <mbgl/map/raster_tile_data.hpp>
-#include <mbgl/map/source.hpp>
+#include <mbgl/tile/raster_tile_data.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>

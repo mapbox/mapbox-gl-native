@@ -1,7 +1,7 @@
 #ifndef MBGL_ANNOTATION_GEOJSON_VT_TILE
 #define MBGL_ANNOTATION_GEOJSON_VT_TILE
 
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 
 #include <unordered_map>

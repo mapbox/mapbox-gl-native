@@ -1,8 +1,8 @@
 #ifndef MBGL_MAP_VECTOR_TILE_DATA
 #define MBGL_MAP_VECTOR_TILE_DATA
 
-#include <mbgl/map/tile_data.hpp>
-#include <mbgl/map/tile_worker.hpp>
+#include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
 
 #include <atomic>

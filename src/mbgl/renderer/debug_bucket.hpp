@@ -1,7 +1,7 @@
 #ifndef MBGL_RENDERER_DEBUGBUCKET
 #define MBGL_RENDERER_DEBUGBUCKET
 
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/geometry/debug_font_buffer.hpp>
 #include <mbgl/geometry/vao.hpp>

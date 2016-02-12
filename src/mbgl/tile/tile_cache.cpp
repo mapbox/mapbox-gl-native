@@ -1,4 +1,5 @@
-#include <mbgl/map/tile_cache.hpp>
+#include <mbgl/tile/tile_cache.hpp>
+#include <mbgl/tile/tile_data.hpp>
 
 #include <cassert>
 

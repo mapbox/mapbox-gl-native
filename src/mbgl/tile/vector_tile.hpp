@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_VECTOR_TILE
 #define MBGL_MAP_VECTOR_TILE
 
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/pbf.hpp>
 

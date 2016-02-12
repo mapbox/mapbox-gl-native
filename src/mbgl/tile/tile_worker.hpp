@@ -4,7 +4,7 @@
 #include <mapbox/variant.hpp>
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>

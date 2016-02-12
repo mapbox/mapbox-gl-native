@@ -1,5 +1,5 @@
 #include <mbgl/style/style_bucket_parameters.hpp>
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 
 namespace mbgl {
 

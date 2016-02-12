@@ -3,7 +3,7 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/map/tile.hpp>
+#include <mbgl/tile/tile.hpp>
 
 #include <list>
 #include <vector>

@@ -1,7 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/map/source.hpp>
-#include <mbgl/map/tile.hpp>
+#include <mbgl/source/source.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/map/map_data.hpp>
 

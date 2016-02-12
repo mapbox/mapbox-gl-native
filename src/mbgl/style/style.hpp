@@ -3,7 +3,7 @@
 
 #include <mbgl/style/zoom_history.hpp>
 
-#include <mbgl/map/source.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 

@@ -1,7 +1,7 @@
 #ifndef MBGL_MAP_RASTER_TILE_DATA
 #define MBGL_MAP_RASTER_TILE_DATA
 
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {

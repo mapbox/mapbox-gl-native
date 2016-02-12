@@ -2,7 +2,6 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/map/source_info.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {

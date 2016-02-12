@@ -1,5 +1,5 @@
-#include <mbgl/map/vector_tile_data.hpp>
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>

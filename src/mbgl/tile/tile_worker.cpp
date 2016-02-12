@@ -1,6 +1,6 @@
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/map/tile_worker.hpp>
-#include <mbgl/map/geometry_tile.hpp>
+#include <mbgl/tile/tile_worker.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/layer/background_layer.hpp>

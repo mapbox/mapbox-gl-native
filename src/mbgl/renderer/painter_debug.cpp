@@ -1,7 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
-#include <mbgl/map/tile.hpp>
-#include <mbgl/map/tile_data.hpp>
+#include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/string.hpp>
