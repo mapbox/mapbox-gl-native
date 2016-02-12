@@ -88,7 +88,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <p>
@@ -124,7 +126,7 @@ public class MapView extends FrameLayout {
     private ImageView mAttributionsView;
     private UserLocationView mUserLocationView;
 
-    private List<OnMapChangedListener> mOnMapChangedListener;
+    private CopyOnWriteArrayList<OnMapChangedListener> mOnMapChangedListener;
     private ZoomButtonsController mZoomButtonsController;
     private ConnectivityReceiver mConnectivityReceiver;
     private float mScreenDensity = 1.0f;
@@ -164,7 +166,7 @@ public class MapView extends FrameLayout {
     }
 
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
-        mOnMapChangedListener = new ArrayList<>();
+        mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mAnnotations = new ArrayList<>();
         mIcons = new ArrayList<>();
@@ -2440,9 +2442,11 @@ public class MapView extends FrameLayout {
     // Forward to any listeners
     protected void onMapChanged(int mapChange) {
         if (mOnMapChangedListener != null) {
-            int count = mOnMapChangedListener.size();
-            for (int i = 0; i < count; i++) {
-                mOnMapChangedListener.get(i).onMapChanged(mapChange);
+            OnMapChangedListener listener;
+            final Iterator<OnMapChangedListener>iterator= mOnMapChangedListener.iterator();
+            while(iterator.hasNext()){
+                listener = iterator.next();
+                listener.onMapChanged(mapChange);
             }
         }
     }

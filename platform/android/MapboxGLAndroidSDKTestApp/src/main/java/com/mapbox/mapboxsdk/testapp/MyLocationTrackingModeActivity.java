@@ -39,24 +39,12 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-
-        ArrayAdapter<CharSequence> locationTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_tracking_mode, android.R.layout.simple_spinner_item);
-        locationTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mLocationSpinner = (Spinner) findViewById(R.id.spinner_location);
-        mLocationSpinner.setAdapter(locationTrackingAdapter);
-        mLocationSpinner.setOnItemSelectedListener(this);
-
-        ArrayAdapter<CharSequence> bearingTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_bearing_mode, android.R.layout.simple_spinner_item);
-        bearingTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mBearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
-        mBearingSpinner.setAdapter(bearingTrackingAdapter);
-        mBearingSpinner.setOnItemSelectedListener(this);
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
@@ -67,6 +55,18 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 mMapboxMap = mapboxMap;
 
                 mapboxMap.setOnMyLocationChangeListener(MyLocationTrackingModeActivity.this);
+
+                ArrayAdapter<CharSequence> locationTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_tracking_mode, android.R.layout.simple_spinner_item);
+                locationTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mLocationSpinner = (Spinner) findViewById(R.id.spinner_location);
+                mLocationSpinner.setAdapter(locationTrackingAdapter);
+                mLocationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+
+                ArrayAdapter<CharSequence> bearingTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_bearing_mode, android.R.layout.simple_spinner_item);
+                bearingTrackingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                mBearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
+                mBearingSpinner.setAdapter(bearingTrackingAdapter);
+                mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
 
                 try {
                     mapboxMap.setMyLocationEnabled(true);
