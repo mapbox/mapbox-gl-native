@@ -79,6 +79,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.telemetry.TelemetryService;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import java.lang.annotation.Retention;
@@ -368,12 +369,8 @@ public class MapView extends FrameLayout {
             // Force a check for Telemetry
             validateTelemetryServiceConfigured();
 
-            // Start Telemetry Service
-            Intent telemetryService = new Intent(getContext(), TelemetryService.class);
-            getContext().startService(telemetryService);
-
-            // Start PASSIVE Telemetry
-            LocationServices.getLocationServices(getContext()).toggleGPS(false);
+            // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
+            MapboxEventManager.getMapboxEventManager(getContext()).isTelemetryEnabled();
         }
 
         // Force a check for an access token
@@ -2848,9 +2845,11 @@ public class MapView extends FrameLayout {
     private static class AttributionOnClickListener implements View.OnClickListener, DialogInterface.OnClickListener {
 
         private static final int ATTRIBUTION_INDEX_IMPROVE_THIS_MAP = 2;
+        private static final int ATTRIBUTION_INDEX_TELEMETRY_SETTINGS = 3;
         private MapView mMapView;
 
         public AttributionOnClickListener(MapView mapView) {
+            super();
             mMapView = mapView;
         }
 
@@ -2869,6 +2868,19 @@ public class MapView extends FrameLayout {
         @Override
         public void onClick(DialogInterface dialog, int which) {
             Context context = ((Dialog) dialog).getContext();
+            if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
+
+                int array = R.array.attribution_telemetry_options;
+                if (MapboxEventManager.getMapboxEventManager(context).isTelemetryEnabled()) {
+                    array = R.array.attribution_telemetry_options_already_participating;
+                }
+                String[] items = context.getResources().getStringArray(array);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
+                builder.setTitle(R.string.attributionsDialogTitle);
+                builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
+                builder.show();
+                return;
+            }
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
             if (which == ATTRIBUTION_INDEX_IMPROVE_THIS_MAP) {
                 LatLng latLng = mMapView.getMapboxMap().getCameraPosition().target;

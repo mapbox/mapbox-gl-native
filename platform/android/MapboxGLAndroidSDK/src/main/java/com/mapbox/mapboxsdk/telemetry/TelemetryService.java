@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public class TelemetryService extends Service {
 
@@ -49,6 +50,8 @@ public class TelemetryService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Log.i(TAG, "onCreate() called");
 
         // Enable Location Listening for lifecycle of app
         IntentFilter filter = new IntentFilter(TelemetryLocationReceiver.INTENT_STRING);
@@ -124,6 +127,8 @@ public class TelemetryService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Log.i(TAG, "onStartCommand() called");
 
         // Start WakeLock to keep Location Data working when device sleeps
         PowerManager mgr = (PowerManager)getSystemService(Context.POWER_SERVICE);

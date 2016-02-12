@@ -24,6 +24,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -50,6 +51,8 @@ public class MapboxEventManager {
     private static final String TAG = "MapboxEventManager";
 
     private static MapboxEventManager mapboxEventManager = null;
+
+    private boolean telemetryEnabled;
 
     private final Vector<Hashtable<String, Object>> events = new Vector<>();
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
@@ -90,11 +93,15 @@ public class MapboxEventManager {
             Log.w(TAG, "Error getting Encryption Algorithm: " + e);
         }
 
-        // Load / Create Vendor Id
         SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+        // Determine if Telemetry Should Be Enabled
+        setTelemetryEnabled(prefs.getBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
+
+        // Load / Create Vendor Id
         if (prefs.contains(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
             mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "Default Value");
-            Log.i(TAG, "Found Vendor Id = " + mapboxVendorId);
+            Log.d(TAG, "Found Vendor Id = " + mapboxVendorId);
         } else {
             String vendorId = UUID.randomUUID().toString();
             vendorId = encodeString(vendorId);
@@ -102,7 +109,7 @@ public class MapboxEventManager {
             editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, vendorId);
             editor.apply();
             editor.commit();
-            Log.i(TAG, "Set New Vendor Id = " + vendorId);
+            Log.d(TAG, "Set New Vendor Id = " + vendorId);
         }
 
         // Create Initial Session Id
@@ -140,12 +147,8 @@ public class MapboxEventManager {
         }
 
         // Register for battery updates
-        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batteryStatus = context.registerReceiver(null, ifilter);
-
-        // Manage Timer Flush
-        timer = new Timer();
-        timer.schedule(new FlushEventsTimerTask(), 1, flushDelayInMillis);
+        IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = context.registerReceiver(null, iFilter);
     }
 
     /**
@@ -158,6 +161,53 @@ public class MapboxEventManager {
             mapboxEventManager = new MapboxEventManager(context);
         }
         return mapboxEventManager;
+    }
+
+    public boolean isTelemetryEnabled() {
+        return telemetryEnabled;
+    }
+
+    /**
+     * Enables / Disables Telemetry
+     * @param telemetryEnabled True to start telemetry, false to stop it
+     */
+    public void setTelemetryEnabled(boolean telemetryEnabled) {
+        if (this.telemetryEnabled == telemetryEnabled) {
+            Log.i(TAG, "no need to start / stop telemetry as it's already in that state.");
+            return;
+        }
+
+        if (telemetryEnabled) {
+            Log.i(TAG, "Starting Telemetry Up!");
+            // Start It Up
+            context.startService(new Intent(context, TelemetryService.class));
+
+            // Make sure Ambient Mode is started at a minimum
+            if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                LocationServices.getLocationServices(context).toggleGPS(false);
+            }
+
+            // Manage Timer Flush
+            timer = new Timer();
+            timer.schedule(new FlushEventsTimerTask(), 1, flushDelayInMillis);
+        } else {
+            Log.i(TAG, "Shutting Telemetry Down");
+            // Shut It Down
+            context.stopService(new Intent(context, TelemetryService.class));
+
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
+        }
+
+        // Persist
+        this.telemetryEnabled = telemetryEnabled;
+        SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, telemetryEnabled);
+        editor.apply();
+        editor.commit();
     }
 
     /**
@@ -400,7 +450,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.d(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
+                Log.i(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
 
                 // Reset Events
                 // ============
