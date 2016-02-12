@@ -161,6 +161,8 @@ public:
     AnnotationID addShapeAnnotation(const ShapeAnnotation&);
     AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
 
+    void updatePointAnnotation(AnnotationID, const PointAnnotation&);
+
     void removeAnnotation(AnnotationID);
     void removeAnnotations(const AnnotationIDs&);
 

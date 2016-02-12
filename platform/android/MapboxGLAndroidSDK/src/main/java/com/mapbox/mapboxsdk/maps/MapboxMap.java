@@ -537,6 +537,18 @@ public class MapboxMap {
     }
 
     /**
+     * <p>
+     * Updates a marker on this map. Does nothing if the marker is already added.
+     * </p>
+     *
+     * @param updatedMarker An updated marker object.
+     */
+    @UiThread
+    public void updateMarker(@NonNull Marker updatedMarker) {
+        mMapView.updateMarker(updatedMarker);
+    }
+
+    /**
      * Adds a polyline to this map.
      *
      * @param polylineOptions A polyline options object that defines how to render the polyline.

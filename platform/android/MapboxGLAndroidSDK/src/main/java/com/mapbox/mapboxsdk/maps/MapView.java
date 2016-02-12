@@ -88,7 +88,10 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -115,7 +118,7 @@ public class MapView extends FrameLayout {
     private static final float DIMENSION_SEVENTYSIX_DP = 76f;
 
     private MapboxMap mMapboxMap;
-    private List<Annotation> mAnnotations;
+    private Map<Long, Annotation> mAnnotations;
     private List<Icon> mIcons;
 
     private NativeMapView mNativeMapView;
@@ -166,7 +169,7 @@ public class MapView extends FrameLayout {
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
         mOnMapChangedListener = new ArrayList<>();
         mMapboxMap = new MapboxMap(this);
-        mAnnotations = new ArrayList<>();
+        mAnnotations = new HashMap<>();
         mIcons = new ArrayList<>();
 
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
@@ -1006,6 +1009,11 @@ public class MapView extends FrameLayout {
 
     private Marker prepareMarker(MarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
+        ensureIconLoaded(marker);
+        return marker;
+    }
+
+    private void ensureIconLoaded(Marker marker) {
         Icon icon = marker.getIcon();
         if (icon == null) {
             icon = IconFactory.getInstance(getContext()).defaultMarker();
@@ -1020,8 +1028,12 @@ public class MapView extends FrameLayout {
                 throw new IconBitmapChangedException();
             }
         }
-        marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
-        return marker;
+
+        // this seems to be a costly operation according to the profiler so I'm trying to save some calls
+        Marker previousMarker = marker.getId() != -1 ? (Marker) mAnnotations.get(marker.getId()) : null;
+        if (previousMarker == null || previousMarker.getIcon() == null || previousMarker.getIcon() != marker.getIcon()) {
+            marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
+        }
     }
 
     /**
@@ -1046,8 +1058,34 @@ public class MapView extends FrameLayout {
         long id = mNativeMapView.addMarker(marker);
         marker.setId(id);        // the annotation needs to know its id
         marker.setMapboxMap(mMapboxMap); // the annotation needs to know which map view it is in
-        mAnnotations.add(marker);
+        mAnnotations.put(id, marker);
         return marker;
+    }
+
+    /**
+     * <p>
+     * Updates a marker on this map. Does nothing if the marker is already added.
+     * </p>
+     *
+     * @param updatedMarker An updated marker object.
+     */
+    @UiThread
+    void updateMarker(@NonNull Marker updatedMarker) {
+        if (updatedMarker == null) {
+            Log.w(TAG, "marker was null, doing nothing");
+            return;
+        }
+
+        if (updatedMarker.getId() == -1) {
+            Log.w(TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
+        }
+
+        ensureIconLoaded(updatedMarker);
+        mNativeMapView.updateMarker(updatedMarker);
+
+        if (mAnnotations.containsKey(updatedMarker.getId())) {
+            mAnnotations.put(updatedMarker.getId(), updatedMarker);
+        }
     }
 
     /**
@@ -1083,7 +1121,7 @@ public class MapView extends FrameLayout {
             m = markers.get(i);
             m.setId(ids[i]);
             m.setMapboxMap(mMapboxMap);
-            mAnnotations.add(m);
+            mAnnotations.put(ids[i], m);
         }
 
         return new ArrayList<>(markers);
@@ -1107,7 +1145,7 @@ public class MapView extends FrameLayout {
         long id = mNativeMapView.addPolyline(polyline);
         polyline.setId(id);
         polyline.setMapboxMap(mMapboxMap);
-        mAnnotations.add(polyline);
+        mAnnotations.put(id, polyline);
         return polyline;
     }
 
@@ -1138,7 +1176,7 @@ public class MapView extends FrameLayout {
             p = polylines.get(i);
             p.setId(ids[i]);
             p.setMapboxMap(mMapboxMap);
-            mAnnotations.add(p);
+            mAnnotations.put(ids[i], p);
         }
 
         return new ArrayList<>(polylines);
@@ -1162,7 +1200,7 @@ public class MapView extends FrameLayout {
         long id = mNativeMapView.addPolygon(polygon);
         polygon.setId(id);
         polygon.setMapboxMap(mMapboxMap);
-        mAnnotations.add(polygon);
+        mAnnotations.put(id, polygon);
         return polygon;
     }
 
@@ -1194,7 +1232,7 @@ public class MapView extends FrameLayout {
             p = polygons.get(i);
             p.setId(ids[i]);
             p.setMapboxMap(mMapboxMap);
-            mAnnotations.add(p);
+            mAnnotations.put(ids[i], p);
         }
 
         return new ArrayList<>(polygons);
@@ -1282,8 +1320,8 @@ public class MapView extends FrameLayout {
      * list will not update the map.
      */
     @NonNull
-    List<Annotation> getAllAnnotations() {
-        return new ArrayList<>(mAnnotations);
+    public List<Annotation> getAllAnnotations() {
+        return new ArrayList<>(mAnnotations.values());
     }
 
     private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {

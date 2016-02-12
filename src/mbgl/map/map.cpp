@@ -452,6 +452,11 @@ AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annot
     return result;
 }
 
+void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
+    data->getAnnotationManager()->updatePointAnnotation(annotationId, annotation, getMaxZoom());
+    update(Update::Annotations);
+}
+
 void Map::removeAnnotation(AnnotationID annotation) {
     removeAnnotations({ annotation });
 }
