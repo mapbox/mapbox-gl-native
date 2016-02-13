@@ -20,7 +20,7 @@
 
 namespace mbgl {
 
-class OnlineFileRequestImpl : public util::noncopyable {
+class OnlineFileRequestImpl : private util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
 

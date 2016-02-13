@@ -38,7 +38,7 @@ using TileParseResult = mapbox::util::variant<
     TileParseResultBuckets, // success
     std::exception_ptr>;    // error
 
-class TileWorker : public util::noncopyable {
+class TileWorker : private util::noncopyable {
 public:
     TileWorker(TileID,
                std::string sourceID,

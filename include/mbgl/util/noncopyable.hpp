@@ -1,24 +1,20 @@
 #ifndef MBGL_UTIL_NONCOPYABLE
 #define MBGL_UTIL_NONCOPYABLE
 
-namespace mbgl { namespace util {
+namespace mbgl {
+namespace util {
 
-namespace non_copyable_
-{
-
-class noncopyable
-{
+class noncopyable {
 protected:
     constexpr noncopyable() = default;
-    ~noncopyable() = default;
-    noncopyable( noncopyable const& ) = delete;
-    noncopyable& operator=(noncopyable const& ) = delete;
-};
-} // namespace non_copyable_
+    virtual ~noncopyable() = default;
 
-typedef non_copyable_::noncopyable noncopyable;
+    // Disable copy semantics.
+    noncopyable(noncopyable const&) = delete;
+    noncopyable& operator=(noncopyable const&) = delete;
+};
 
 } // namespace util
 } // namespace mbgl
 
-#endif
+#endif // MBGL_UTIL_NONCOPYABLE

@@ -52,7 +52,7 @@ struct RenderData {
 class Style : public GlyphStore::Observer,
               public SpriteStore::Observer,
               public Source::Observer,
-              public util::noncopyable {
+              private util::noncopyable {
 public:
     Style(MapData&);
     ~Style();

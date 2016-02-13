@@ -11,7 +11,7 @@
 namespace mbgl {
 
 template <GLsizei count>
-struct ElementGroup : public util::noncopyable {
+struct ElementGroup : private util::noncopyable {
     std::array<VertexArrayObject, count> array;
     GLsizei vertex_length;
     GLsizei elements_length;

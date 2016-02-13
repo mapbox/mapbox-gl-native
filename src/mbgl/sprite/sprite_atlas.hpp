@@ -36,7 +36,7 @@ struct SpriteAtlasElement {
     float relativePixelRatio;
 };
 
-class SpriteAtlas : public util::noncopyable {
+class SpriteAtlas : private util::noncopyable {
 public:
     typedef uint16_t dimension;
 
