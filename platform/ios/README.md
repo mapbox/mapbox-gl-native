@@ -9,4 +9,4 @@ This repository is for day-to-day development of the SDK. Building the SDK yours
 * [Integrating the Mapbox iOS SDK into your application](INSTALL.md)
 * [Contributing to the Mapbox iOS SDK](DEVELOPING.md)
 
-![](../../ios/screenshot.png)
+![](screenshot.png)
