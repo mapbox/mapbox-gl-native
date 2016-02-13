@@ -191,7 +191,8 @@ if [[ ${BUILD_STATIC} == true ]]; then
 fi
 
 step "Copying library resources…"
-SHORT_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
+SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
+SHORT_VERSION=${SEM_VERSION%-*}
 cp -pv LICENSE.md "${OUTPUT}"
 cp -rv ios/app/Settings.bundle "${OUTPUT}"
 if [[ ${BUILD_STATIC} == true ]]; then
@@ -202,11 +203,16 @@ if [[ ${BUILD_STATIC} == true ]]; then
     plutil -replace CFBundleName -string ${NAME} "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundleVersion -string ${PROJ_VERSION} "${OUTPUT}/static/${NAME}.framework/Info.plist"
+    plutil -replace MGLSemanticVersionString -string "${SEM_VERSION}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
+    plutil -replace MGLCommitHash -string "${HASH}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
     mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
     cp -pv ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${OUTPUT}/dynamic/${NAME}.framework/Info.plist"
+    plutil -replace CFBundleVersion -string "${PROJ_VERSION}" "${OUTPUT}/dynamic/${NAME}.framework/Info.plist"
+    plutil -replace MGLSemanticVersionString -string "${SEM_VERSION}" "${OUTPUT}/dynamic/${NAME}.framework/Info.plist"
+    plutil -replace MGLCommitHash -string "${HASH}" "${OUTPUT}/dynamic/${NAME}.framework/Info.plist"
     cp -pv ios/framework/strip-frameworks.sh "${OUTPUT}/dynamic/${NAME}.framework/strip-frameworks.sh"
 fi
 sed -n -e '/^## iOS/,$p' CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
