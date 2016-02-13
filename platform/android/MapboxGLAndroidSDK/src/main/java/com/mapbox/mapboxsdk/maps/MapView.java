@@ -49,9 +49,11 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
@@ -78,15 +80,12 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
-import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
-import com.mapbox.mapboxsdk.telemetry.TelemetryService;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -2880,28 +2879,38 @@ public class MapView extends FrameLayout {
                 }
                 String[] items = context.getResources().getStringArray(array);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
-                builder.setTitle(R.string.attributionsDialogTitle);
-                builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.attributionTelemetryTitle);
+                LayoutInflater factory = LayoutInflater.from(context);
+                View content = factory.inflate(R.layout.attribution_telemetry_view, null);
+
+                ListView lv = (ListView) content.findViewById(R.id.telemetryOptionsList);
+                lv.setAdapter(new ArrayAdapter<String>(context, R.layout.attribution_list_item, items));
+                lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+                builder.setView(content);
+                final AlertDialog telemDialog = builder.show();
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        switch (position) {
                             case 0:
                                 String url = context.getResources().getStringArray(R.array.attribution_links)[3];
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
                                 intent.setData(Uri.parse(url));
                                 context.startActivity(intent);
+                                telemDialog.cancel();
                                 return;
                             case 1:
                                 MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(false);
+                                telemDialog.cancel();
                                 return;
                             case 2:
                                 MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(true);
+                                telemDialog.cancel();
                                 return;
                         }
                     }
                 });
-
-                builder.show();
                 return;
             }
             String url = context.getResources().getStringArray(R.array.attribution_links)[which];
