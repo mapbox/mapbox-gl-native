@@ -11,7 +11,7 @@ namespace mbgl {
 namespace util {
 
 template <class T>
-class ThreadLocal : public noncopyable {
+class ThreadLocal : private noncopyable {
 public:
     inline ThreadLocal(T* val) {
         ThreadLocal();

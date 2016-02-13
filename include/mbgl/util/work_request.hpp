@@ -9,7 +9,7 @@ namespace mbgl {
 
 class WorkTask;
 
-class WorkRequest : public util::noncopyable {
+class WorkRequest : private util::noncopyable {
 public:
     using Task = std::shared_ptr<WorkTask>;
     WorkRequest(Task);

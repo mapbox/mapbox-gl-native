@@ -18,7 +18,7 @@ using RasterTileParseResult = mapbox::util::variant<
     std::unique_ptr<Bucket>, // success
     std::exception_ptr>;     // error
 
-class Worker : public mbgl::util::noncopyable {
+class Worker : private util::noncopyable {
 public:
     explicit Worker(std::size_t count);
     ~Worker();
