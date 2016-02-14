@@ -35,15 +35,28 @@ void ShaderHolder::reset() {
     id = 0;
 }
 
+void BufferHolder::create() {
+    if (id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+}
+
+void BufferHolder::reset() {
+    if (!id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glDeleteBuffers(1, &id));
+    id = 0;
+}
+
 
 void GLObjectStore::abandonVAO(GLuint vao) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     abandonedVAOs.emplace_back(vao);
 }
 
-void GLObjectStore::abandonBuffer(GLuint buffer) {
+void GLObjectStore::abandon(BufferHolder&& buffer) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedBuffers.emplace_back(buffer);
+    abandonedBuffers.push_back(std::move(buffer));
 }
 
 void GLObjectStore::abandonTexture(GLuint texture) {
@@ -60,16 +73,12 @@ void GLObjectStore::performCleanup() {
         abandonedVAOs.clear();
     }
 
+    abandonedBuffers.clear();
+
     if (!abandonedTextures.empty()) {
         MBGL_CHECK_ERROR(glDeleteTextures(static_cast<GLsizei>(abandonedTextures.size()),
                                           abandonedTextures.data()));
         abandonedTextures.clear();
-    }
-
-    if (!abandonedBuffers.empty()) {
-        MBGL_CHECK_ERROR(glDeleteBuffers(static_cast<GLsizei>(abandonedBuffers.size()),
-                                         abandonedBuffers.data()));
-        abandonedBuffers.clear();
     }
 }
 

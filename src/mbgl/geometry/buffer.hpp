@@ -2,11 +2,12 @@
 #define MBGL_GEOMETRY_BUFFER
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/platform/log.hpp>
 #include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/thread_context.hpp>
 
+#include <memory>
 #include <cstdlib>
 #include <cassert>
 #include <stdexcept>
@@ -23,9 +24,8 @@ class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
         cleanup();
-        if (buffer != 0) {
-            util::ThreadContext::getGLObjectStore()->abandonBuffer(buffer);
-            buffer = 0;
+        if (buffer) {
+            util::ThreadContext::getGLObjectStore()->abandon(std::move(buffer));
         }
     }
 
@@ -44,7 +44,7 @@ public:
         if (buffer) {
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
         } else {
-            MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
+            buffer.create();
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
@@ -64,8 +64,8 @@ public:
         }
     }
 
-    inline GLuint getID() const {
-        return buffer;
+    GLuint getID() const {
+        return buffer.getID();
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
@@ -78,7 +78,7 @@ public:
 protected:
     // increase the buffer size by at least /required/ bytes.
     inline void *addElement() {
-        if (buffer != 0) {
+        if (buffer) {
             throw std::runtime_error("Can't add elements after buffer was bound to GPU");
         }
         if (length < pos + itemSize) {
@@ -118,8 +118,8 @@ private:
     // Number of bytes that are valid in this buffer.
     size_t length = 0;
 
-    // GL buffer ID
-    GLuint buffer = 0;
+    // GL buffer object handle.
+    gl::BufferHolder buffer;
 };
 
 } // namespace mbgl

@@ -51,11 +51,23 @@ private:
     GLenum type = 0;
 };
 
+class BufferHolder : public GLHolder {
+public:
+    BufferHolder() = default;
+    ~BufferHolder() { reset(); }
+
+    BufferHolder(BufferHolder&& o) noexcept : GLHolder(std::move(o)) {}
+    BufferHolder& operator=(BufferHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
+
+    void create();
+    void reset();
+};
+
 class GLObjectStore : private util::noncopyable {
 public:
     // Mark OpenGL objects for deletion
     void abandonVAO(GLuint vao);
-    void abandonBuffer(GLuint buffer);
+    void abandon(BufferHolder&&);
     void abandonTexture(GLuint texture);
 
     // Actually remove the objects we marked as abandoned with the above methods.
@@ -63,8 +75,10 @@ public:
     void performCleanup();
 
 private:
+    // We split the holder objects in separate containers because each
+    // GLHolder-derived object can vary in size.
     std::vector<GLuint> abandonedVAOs;
-    std::vector<GLuint> abandonedBuffers;
+    std::vector<BufferHolder> abandonedBuffers;
     std::vector<GLuint> abandonedTextures;
 };
 
