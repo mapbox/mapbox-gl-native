@@ -6,54 +6,28 @@
 
 namespace mbgl {
 
-static gl::ExtensionFunction<
-    void (GLuint array)>
-    BindVertexArray({
-        {"GL_ARB_vertex_array_object", "glBindVertexArray"},
-        {"GL_OES_vertex_array_object", "glBindVertexArrayOES"},
-        {"GL_APPLE_vertex_array_object", "glBindVertexArrayAPPLE"}
-    });
-
-static gl::ExtensionFunction<
-    void (GLsizei n,
-          const GLuint* arrays)>
-    DeleteVertexArrays({
-        {"GL_ARB_vertex_array_object", "glDeleteVertexArrays"},
-        {"GL_OES_vertex_array_object", "glDeleteVertexArraysOES"},
-        {"GL_APPLE_vertex_array_object", "glDeleteVertexArraysAPPLE"}
-    });
-
-static gl::ExtensionFunction<
-    void (GLsizei n,
-          GLuint* arrays)>
-    GenVertexArrays({
-        {"GL_ARB_vertex_array_object", "glGenVertexArrays"},
-        {"GL_OES_vertex_array_object", "glGenVertexArraysOES"},
-        {"GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE"}
-    });
-
 void VertexArrayObject::Unbind() {
-    if (!BindVertexArray) return;
-    MBGL_CHECK_ERROR(BindVertexArray(0));
+    if (!gl::BindVertexArray) return;
+    MBGL_CHECK_ERROR(gl::BindVertexArray(0));
 }
 
 void VertexArrayObject::Delete(GLsizei n, const GLuint* arrays) {
-    MBGL_CHECK_ERROR(DeleteVertexArrays(n, arrays));
+    if (!gl::DeleteVertexArrays) return;
+    MBGL_CHECK_ERROR(gl::DeleteVertexArrays(n, arrays));
 }
 
 VertexArrayObject::VertexArrayObject() {
 }
 
 VertexArrayObject::~VertexArrayObject() {
-    if (!DeleteVertexArrays) return;
-
+    if (!gl::DeleteVertexArrays) return;
     if (vao) {
         util::ThreadContext::getGLObjectStore()->abandonVAO(vao);
     }
 }
 
 void VertexArrayObject::bindVertexArrayObject() {
-    if (!GenVertexArrays || !BindVertexArray) {
+    if (!gl::GenVertexArrays || !gl::BindVertexArray) {
         static bool reported = false;
         if (!reported) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
@@ -63,9 +37,9 @@ void VertexArrayObject::bindVertexArrayObject() {
     }
 
     if (!vao) {
-        MBGL_CHECK_ERROR(GenVertexArrays(1, &vao));
+        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &vao));
     }
-    MBGL_CHECK_ERROR(BindVertexArray(vao));
+    MBGL_CHECK_ERROR(gl::BindVertexArray(vao));
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
