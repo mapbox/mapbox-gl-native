@@ -270,7 +270,7 @@ void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<cons
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     data.getAnnotationManager()->addIcon(name, sprite);
 }
-    
+
 void MapContext::removeAnnotationIcon(const std::string& name) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     data.getAnnotationManager()->removeIcon(name);
