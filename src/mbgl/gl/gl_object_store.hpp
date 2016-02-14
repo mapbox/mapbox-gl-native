@@ -36,6 +36,21 @@ public:
     void reset();
 };
 
+class ShaderHolder : public GLHolder {
+public:
+    ShaderHolder(GLenum type_) : type(type_) {}
+    ~ShaderHolder() { reset(); }
+
+    ShaderHolder(ShaderHolder&& o) noexcept : GLHolder(std::move(o)), type(o.type) {}
+    ShaderHolder& operator=(ShaderHolder&& o) noexcept { GLHolder::operator=(std::move(o)); type = o.type; return *this; }
+
+    void create();
+    void reset();
+
+private:
+    GLenum type = 0;
+};
+
 class GLObjectStore : private util::noncopyable {
 public:
     // Mark OpenGL objects for deletion

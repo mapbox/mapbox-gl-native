@@ -22,6 +22,20 @@ void ProgramHolder::reset() {
     id = 0;
 }
 
+void ShaderHolder::create() {
+    if (id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    id = MBGL_CHECK_ERROR(glCreateShader(type));
+}
+
+void ShaderHolder::reset() {
+    if (!id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glDeleteShader(id));
+    id = 0;
+}
+
+
 void GLObjectStore::abandonVAO(GLuint vao) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     abandonedVAOs.emplace_back(vao);
