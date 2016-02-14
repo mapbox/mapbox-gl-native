@@ -1,5 +1,5 @@
 #include <mbgl/gl/gl_object_store.hpp>
-
+#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -8,6 +8,19 @@
 
 namespace mbgl {
 namespace gl {
+
+void ProgramHolder::create() {
+    if (id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    id = MBGL_CHECK_ERROR(glCreateProgram());
+}
+
+void ProgramHolder::reset() {
+    if (!id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glDeleteProgram(id));
+    id = 0;
+}
 
 void GLObjectStore::abandonVAO(GLuint vao) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));

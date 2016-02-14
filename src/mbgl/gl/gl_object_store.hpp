@@ -4,15 +4,40 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <memory>
 #include <vector>
 
 namespace mbgl {
 namespace gl {
 
+class GLHolder : private util::noncopyable {
+public:
+    GLHolder() {}
+
+    GLHolder(GLHolder&& o) noexcept : id(o.id) { o.id = 0; }
+    GLHolder& operator=(GLHolder&& o) noexcept { id = o.id; o.id = 0; return *this; }
+
+    explicit operator bool() const { return id; }
+    GLuint getID() const { return id; }
+
+protected:
+    GLuint id = 0;
+};
+
+class ProgramHolder : public GLHolder {
+public:
+    ProgramHolder() = default;
+    ~ProgramHolder() { reset(); }
+
+    ProgramHolder(ProgramHolder&& o) noexcept : GLHolder(std::move(o)) {}
+    ProgramHolder& operator=(ProgramHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
+
+    void create();
+    void reset();
+};
+
 class GLObjectStore : private util::noncopyable {
 public:
-    GLObjectStore() = default;
-
     // Mark OpenGL objects for deletion
     void abandonVAO(GLuint vao);
     void abandonBuffer(GLuint buffer);
