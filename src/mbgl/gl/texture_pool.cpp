@@ -1,38 +1,44 @@
 #include <mbgl/gl/texture_pool.hpp>
-
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 #include <vector>
 
-const GLsizei TextureMax = 64;
-
 namespace mbgl {
 namespace gl {
 
 GLuint TexturePool::getTextureID() {
-    if (texture_ids.empty()) {
-        GLuint new_texture_ids[TextureMax];
-        MBGL_CHECK_ERROR(glGenTextures(TextureMax, new_texture_ids));
-        for (GLuint id = 0; id < TextureMax; id++) {
-            texture_ids.insert(new_texture_ids[id]);
-        }
+    if (pools.empty()) pools.emplace_back();
+
+    for (auto& impl : pools) {
+        if (impl.ids.empty()) continue;
+        auto it = impl.ids.begin();
+        GLuint id = *it;
+        impl.ids.erase(it);
+        return id;
     }
 
-    GLuint id = 0;
-
-    if (!texture_ids.empty()) {
-        std::set<GLuint>::iterator id_iterator = texture_ids.begin();
-        id = *id_iterator;
-        texture_ids.erase(id_iterator);
-    }
-
+    // All texture IDs are in use.
+    pools.emplace_back();
+    auto it = pools.back().ids.begin();
+    GLuint id = *it;
+    pools.back().ids.erase(it);
     return id;
 }
 
-void TexturePool::removeTextureID(GLuint texture_id) {
-    texture_ids.insert(texture_id);
-    // TODO: We need to find a better way to deal with texture pool cleanup
+void TexturePool::releaseTextureID(GLuint id) {
+    for (auto it = pools.begin(); it != pools.end(); ++it) {
+        for (GLsizei i = 0; i < gl::TexturePoolHolder::TextureMax; ++i) {
+            if (it->pool[i] == id) {
+                it->ids.push_back(id);
+                if (GLsizei(it->ids.size()) == gl::TexturePoolHolder::TextureMax) {
+                    util::ThreadContext::getGLObjectStore()->abandon(std::move(it->pool));
+                    pools.erase(it);
+                }
+                return;
+            }
+        }
+    }
 }
 
 } // namespace gl
