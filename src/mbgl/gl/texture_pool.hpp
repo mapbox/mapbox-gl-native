@@ -14,7 +14,6 @@ class TexturePool : private util::noncopyable {
 public:
     GLuint getTextureID();
     void removeTextureID(GLuint texture_id);
-    void clearTextureIDs();
 
 private:
     std::set<GLuint> texture_ids;

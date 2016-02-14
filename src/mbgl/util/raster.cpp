@@ -15,7 +15,8 @@ Raster::Raster(gl::TexturePool& texturePool_)
 
 Raster::~Raster() {
     if (textured) {
-        texturePool.removeTextureID(texture);
+        texturePool.removeTextureID(textureID);
+        textureID = 0;
     }
 }
 
@@ -45,7 +46,7 @@ void Raster::bind(bool linear) {
     if (img.data && !textured) {
         upload();
     } else if (textured) {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
     }
 
     GLint new_filter = linear ? GL_LINEAR : GL_NEAREST;
@@ -58,8 +59,8 @@ void Raster::bind(bool linear) {
 
 void Raster::upload() {
     if (img.data && !textured) {
-        texture = texturePool.getTextureID();
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        textureID = texturePool.getTextureID();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif

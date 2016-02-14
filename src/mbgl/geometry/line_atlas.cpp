@@ -1,8 +1,8 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 #include <boost/functional/hash.hpp>
@@ -21,11 +21,6 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
 
 LineAtlas::~LineAtlas() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (texture) {
-        mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
-        texture = 0;
-    }
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round) {
@@ -141,15 +136,15 @@ void LineAtlas::bind() {
 
     bool first = false;
     if (!texture) {
-        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        texture.create();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
     }
 
     if (dirty) {

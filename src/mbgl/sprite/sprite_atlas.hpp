@@ -3,6 +3,7 @@
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/optional.hpp>
@@ -94,7 +95,7 @@ private:
     std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
-    GLuint texture = 0;
+    gl::TextureHolder texture;
     uint32_t filter = 0;
     static const int buffer = 1;
 };

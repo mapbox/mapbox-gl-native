@@ -48,6 +48,32 @@ void BufferHolder::reset() {
     id = 0;
 }
 
+void TextureHolder::create() {
+    if (id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glGenTextures(1, &id));
+}
+
+void TextureHolder::reset() {
+    if (!id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glDeleteTextures(1, &id));
+    id = 0;
+}
+
+void TexturePoolHolder::create() {
+    if (bool()) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
+}
+
+void TexturePoolHolder::reset() {
+    if (!bool()) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(glDeleteTextures(TextureMax, ids.data()));
+    ids.fill(0);
+}
+
 
 void GLObjectStore::abandonVAO(GLuint vao) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
@@ -59,9 +85,14 @@ void GLObjectStore::abandon(BufferHolder&& buffer) {
     abandonedBuffers.push_back(std::move(buffer));
 }
 
-void GLObjectStore::abandonTexture(GLuint texture) {
+void GLObjectStore::abandon(TextureHolder&& texture) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedTextures.emplace_back(texture);
+    abandonedTextures.push_back(std::move(texture));
+}
+
+void GLObjectStore::abandon(TexturePoolHolder&& texture) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    abandonedTexturePools.push_back(std::move(texture));
 }
 
 void GLObjectStore::performCleanup() {
@@ -74,12 +105,8 @@ void GLObjectStore::performCleanup() {
     }
 
     abandonedBuffers.clear();
-
-    if (!abandonedTextures.empty()) {
-        MBGL_CHECK_ERROR(glDeleteTextures(static_cast<GLsizei>(abandonedTextures.size()),
-                                          abandonedTextures.data()));
-        abandonedTextures.clear();
-    }
+    abandonedTextures.clear();
+    abandonedTexturePools.clear();
 }
 
 } // namespace gl

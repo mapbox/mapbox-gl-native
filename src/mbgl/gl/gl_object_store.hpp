@@ -4,6 +4,8 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <array>
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -63,12 +65,46 @@ public:
     void reset();
 };
 
+class TextureHolder : public GLHolder {
+public:
+    TextureHolder() = default;
+    ~TextureHolder() { reset(); }
+
+    TextureHolder(TextureHolder&& o) noexcept : GLHolder(std::move(o)) {}
+    TextureHolder& operator=(TextureHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
+
+    void create();
+    void reset();
+};
+
+class TexturePoolHolder : private util::noncopyable {
+public:
+    static const GLsizei TextureMax = 64;
+
+    TexturePoolHolder() { ids.fill(0); }
+    ~TexturePoolHolder() { reset(); }
+
+    TexturePoolHolder(TexturePoolHolder&& o) noexcept : ids(std::move(o.ids)) {}
+    TexturePoolHolder& operator=(TexturePoolHolder&& o) noexcept { ids = std::move(o.ids); return *this; }
+
+    explicit operator bool() { return std::none_of(ids.begin(), ids.end(), [](int id) { return id == 0; }); }
+    const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
+    const GLuint& operator[](size_t pos) { return ids[pos]; }
+
+    void create();
+    void reset();
+
+private:
+    std::array<GLuint, TextureMax> ids;
+};
+
 class GLObjectStore : private util::noncopyable {
 public:
     // Mark OpenGL objects for deletion
     void abandonVAO(GLuint vao);
     void abandon(BufferHolder&&);
-    void abandonTexture(GLuint texture);
+    void abandon(TextureHolder&&);
+    void abandon(TexturePoolHolder&&);
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -79,7 +115,8 @@ private:
     // GLHolder-derived object can vary in size.
     std::vector<GLuint> abandonedVAOs;
     std::vector<BufferHolder> abandonedBuffers;
-    std::vector<GLuint> abandonedTextures;
+    std::vector<TextureHolder> abandonedTextures;
+    std::vector<TexturePoolHolder> abandonedTexturePools;
 };
 
 } // namespace gl

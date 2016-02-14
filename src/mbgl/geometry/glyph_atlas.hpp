@@ -5,6 +5,7 @@
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 
 #include <string>
 #include <set>
@@ -53,7 +54,7 @@ private:
     std::map<std::string, std::map<uint32_t, GlyphValue>> index;
     const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
-    GLuint texture = 0;
+    gl::TextureHolder texture;
 };
 
 } // namespace mbgl

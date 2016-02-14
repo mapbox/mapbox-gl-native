@@ -3,7 +3,6 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
@@ -187,8 +186,8 @@ void SpriteAtlas::bind(bool linear) {
     }
 
     if (!texture) {
-        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        texture.create();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -198,7 +197,7 @@ void SpriteAtlas::bind(bool linear) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         fullUploadRequired = true;
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
     }
 
     GLuint filter_val = linear ? GL_LINEAR : GL_NEAREST;
@@ -250,8 +249,7 @@ void SpriteAtlas::bind(bool linear) {
 SpriteAtlas::~SpriteAtlas() {
     std::lock_guard<std::recursive_mutex> lock(mtx);
     if (texture) {
-        mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
-        texture = 0;
+        mbgl::util::ThreadContext::getGLObjectStore()->abandon(std::move(texture));
     }
 }
 

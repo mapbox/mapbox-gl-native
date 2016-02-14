@@ -2,10 +2,10 @@
 #define MBGL_GEOMETRY_LINE_ATLAS
 
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 
 #include <vector>
 #include <map>
-#include <memory>
 
 namespace mbgl {
 
@@ -36,7 +36,7 @@ public:
 private:
     const std::unique_ptr<GLbyte[]> data;
     bool dirty;
-    GLuint texture = 0;
+    gl::TextureHolder texture;
     int nextRow = 0;
     std::map<size_t, LinePatternPos> positions;
 };

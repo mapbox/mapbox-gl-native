@@ -38,7 +38,7 @@ public:
     bool textured = false;
 
     // the uploaded texture
-    GLuint texture = 0;
+    GLuint textureID = 0;
 
     // texture opacity
     double opacity = 0;

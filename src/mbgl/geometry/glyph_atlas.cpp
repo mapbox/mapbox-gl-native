@@ -3,9 +3,9 @@
 #include <mbgl/text/font_stack.hpp>
 
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
@@ -24,11 +24,6 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
 
 GlyphAtlas::~GlyphAtlas() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (texture) {
-        mbgl::util::ThreadContext::getGLObjectStore()->abandonTexture(texture);
-        texture = 0;
-    }
 }
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
@@ -194,8 +189,8 @@ void GlyphAtlas::upload() {
 
 void GlyphAtlas::bind() {
     if (!texture) {
-        MBGL_CHECK_ERROR(glGenTextures(1, &texture));
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        texture.create();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -204,6 +199,6 @@ void GlyphAtlas::bind() {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
     }
 };
