@@ -13,7 +13,7 @@ void Painter::drawClippingMasks(const std::map<TileID, ClipID>& stencils) {
     mat4 matrix;
     const GLuint mask = 0b11111111;
 
-    config.program = plainShader->program;
+    config.program = plainShader->getID();
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
     config.depthTest = GL_FALSE;

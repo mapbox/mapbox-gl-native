@@ -49,7 +49,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float fontScale = fontSize / sdfFontSize;
     matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
-    config.program = sdfShader.program;
+    config.program = sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_exmatrix = exMatrix;
     sdfShader.u_texsize = texsize;
@@ -211,7 +211,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
             float extra = (topedgelength + x) / topedgelength - 1;
 
-            config.program = iconShader->program;
+            config.program = iconShader->getID();
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_exmatrix = exMatrix;
             iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
@@ -259,7 +259,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         config.stencilOp.reset();
         config.stencilTest = GL_TRUE;
 
-        config.program = collisionBoxShader->program;
+        config.program = collisionBoxShader->getID();
         collisionBoxShader->u_matrix = matrix;
         collisionBoxShader->u_scale = std::pow(2, state.getZoom() - id.z);
         collisionBoxShader->u_zoom = state.getZoom() * 10;

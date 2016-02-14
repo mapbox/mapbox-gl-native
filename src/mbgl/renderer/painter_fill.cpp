@@ -44,7 +44,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        config.program = outlineShader->program;
+        config.program = outlineShader->getID();
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
@@ -78,7 +78,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
                     1.0f / ((*posB).size[0] * factor * properties.pattern.value.toScale),
                     1.0f / ((*posB).size[1] * factor * properties.pattern.value.toScale));
 
-            config.program = patternShader->program;
+            config.program = patternShader->getID();
             patternShader->u_matrix = vtxMatrix;
             patternShader->u_pattern_tl_a = (*posA).tl;
             patternShader->u_pattern_br_a = (*posA).br;
@@ -125,7 +125,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            config.program = plainShader->program;
+            config.program = plainShader->getID();
             plainShader->u_matrix = vtxMatrix;
             plainShader->u_color = fill_color;
 
@@ -138,7 +138,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        config.program = outlineShader->program;
+        config.program = outlineShader->getID();
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 

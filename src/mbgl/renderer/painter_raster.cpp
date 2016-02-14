@@ -12,7 +12,7 @@ void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const
     const RasterPaintProperties& properties = layer.paint;
 
     if (bucket.hasData()) {
-        config.program = rasterShader->program;
+        config.program = rasterShader->getID();
         rasterShader->u_matrix = matrix;
         rasterShader->u_buffer = 0;
         rasterShader->u_opacity = properties.opacity;

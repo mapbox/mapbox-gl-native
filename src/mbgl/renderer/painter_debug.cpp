@@ -33,7 +33,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
         tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, data.getDebug());
     }
 
-    config.program = plainShader->program;
+    config.program = plainShader->getID();
     plainShader->u_matrix = matrix;
 
     // Draw white outline
@@ -66,7 +66,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
 
-    config.program = plainShader->program;
+    config.program = plainShader->getID();
     plainShader->u_matrix = matrix;
 
     // draw tile outline

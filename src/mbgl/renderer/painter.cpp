@@ -270,7 +270,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         float zoomFraction = state.getZoomFraction();
 
-        config.program = patternShader->program;
+        config.program = patternShader->getID();
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = (*imagePosA).tl;
         patternShader->u_pattern_br_a = (*imagePosA).br;
@@ -325,7 +325,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         color[2] *= properties.opacity;
         color[3] *= properties.opacity;
 
-        config.program = plainShader->program;
+        config.program = plainShader->getID();
         plainShader->u_matrix = identityMatrix;
         plainShader->u_color = color;
         backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
