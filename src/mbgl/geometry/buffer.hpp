@@ -42,10 +42,10 @@ public:
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
     void bind() {
         if (buffer) {
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
         } else {
             MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, buffer));
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
                 pos = 0;
