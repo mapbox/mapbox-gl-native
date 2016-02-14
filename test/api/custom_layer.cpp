@@ -7,6 +7,7 @@
 #include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 
 using namespace mbgl;
 
@@ -17,38 +18,35 @@ class TestLayer {
 public:
     ~TestLayer() {
         if (program) {
-            MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
-            MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
-            MBGL_CHECK_ERROR(glDetachShader(program, fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteShader(vertexShader));
-            MBGL_CHECK_ERROR(glDeleteShader(fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteProgram(program));
+            MBGL_CHECK_ERROR(glDetachShader(program.getID(), vertexShader.getID()));
+            MBGL_CHECK_ERROR(glDetachShader(program.getID(), fragmentShader.getID()));
         }
     }
 
     void initialize() {
-        program = MBGL_CHECK_ERROR(glCreateProgram());
-        vertexShader = MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
-        fragmentShader = MBGL_CHECK_ERROR(glCreateShader(GL_FRAGMENT_SHADER));
+        program.create();
+        vertexShader.create();
+        fragmentShader.create();
 
-        MBGL_CHECK_ERROR(glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr));
-        MBGL_CHECK_ERROR(glCompileShader(vertexShader));
-        MBGL_CHECK_ERROR(glAttachShader(program, vertexShader));
-        MBGL_CHECK_ERROR(glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr));
-        MBGL_CHECK_ERROR(glCompileShader(fragmentShader));
-        MBGL_CHECK_ERROR(glAttachShader(program, fragmentShader));
-        MBGL_CHECK_ERROR(glLinkProgram(program));
-        a_pos = glGetAttribLocation(program, "a_pos");
+        MBGL_CHECK_ERROR(glShaderSource(vertexShader.getID(), 1, &vertexShaderSource, nullptr));
+        MBGL_CHECK_ERROR(glCompileShader(vertexShader.getID()));
+        MBGL_CHECK_ERROR(glAttachShader(program.getID(), vertexShader.getID()));
+        MBGL_CHECK_ERROR(glShaderSource(fragmentShader.getID(), 1, &fragmentShaderSource, nullptr));
+        MBGL_CHECK_ERROR(glCompileShader(fragmentShader.getID()));
+        MBGL_CHECK_ERROR(glAttachShader(program.getID(), fragmentShader.getID()));
+        MBGL_CHECK_ERROR(glLinkProgram(program.getID()));
+        a_pos = glGetAttribLocation(program.getID(), "a_pos");
 
-        GLfloat background[] = { -1,-1, 1,-1, -1,1, 1,1 };
-        MBGL_CHECK_ERROR(glGenBuffers(1, &buffer));
-        MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+        buffer.create();
+        MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer.getID()));
+
+        GLfloat background[] = { -1,-1, 1,-1,-1, 1, 1, 1 };
         MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW));
     }
 
     void render() {
-        MBGL_CHECK_ERROR(glUseProgram(program));
-        MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+        MBGL_CHECK_ERROR(glUseProgram(program.getID()));
+        MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer.getID()));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
         MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, NULL));
         MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
@@ -56,10 +54,10 @@ public:
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
     }
 
-    GLuint program = 0;
-    GLuint vertexShader = 0;
-    GLuint fragmentShader = 0;
-    GLuint buffer = 0;
+    gl::ProgramHolder program;
+    gl::ShaderHolder vertexShader = { GL_VERTEX_SHADER };
+    gl::ShaderHolder fragmentShader = { GL_FRAGMENT_SHADER };
+    gl::BufferHolder buffer;
     GLuint a_pos = 0;
 };
 
