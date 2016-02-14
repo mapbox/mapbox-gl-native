@@ -1,8 +1,5 @@
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
-#include <mbgl/util/thread.hpp>
-#include <mbgl/geometry/vao.hpp>
-#include <mbgl/gl/gl.hpp>
 
 #include <cassert>
 
@@ -74,10 +71,17 @@ void TexturePoolHolder::reset() {
     ids.fill(0);
 }
 
-
-void GLObjectStore::abandonVAO(GLuint vao) {
+void VAOHolder::create() {
+    if (id) return;
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedVAOs.emplace_back(vao);
+    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+}
+
+void VAOHolder::reset() {
+    if (!id) return;
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    MBGL_CHECK_ERROR(gl::DeleteVertexArrays(1, &id));
+    id = 0;
 }
 
 void GLObjectStore::abandon(BufferHolder&& buffer) {
@@ -95,18 +99,17 @@ void GLObjectStore::abandon(TexturePoolHolder&& texture) {
     abandonedTexturePools.push_back(std::move(texture));
 }
 
+void GLObjectStore::abandon(VAOHolder&& vao) {
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    abandonedVAOs.push_back(std::move(vao));
+}
+
 void GLObjectStore::performCleanup() {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
-    if (!abandonedVAOs.empty()) {
-        MBGL_CHECK_ERROR(VertexArrayObject::Delete(static_cast<GLsizei>(abandonedVAOs.size()),
-                                                   abandonedVAOs.data()));
-        abandonedVAOs.clear();
-    }
-
     abandonedBuffers.clear();
     abandonedTextures.clear();
     abandonedTexturePools.clear();
+    abandonedVAOs.clear();
 }
 
 } // namespace gl

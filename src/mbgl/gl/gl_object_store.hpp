@@ -98,10 +98,22 @@ private:
     std::array<GLuint, TextureMax> ids;
 };
 
+class VAOHolder : public GLHolder {
+public:
+    VAOHolder() = default;
+    ~VAOHolder() { reset(); }
+
+    VAOHolder(VAOHolder&& o) noexcept : GLHolder(std::move(o)) {}
+    VAOHolder& operator=(VAOHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
+
+    void create();
+    void reset();
+};
+
 class GLObjectStore : private util::noncopyable {
 public:
     // Mark OpenGL objects for deletion
-    void abandonVAO(GLuint vao);
+    void abandon(VAOHolder&&);
     void abandon(BufferHolder&&);
     void abandon(TextureHolder&&);
     void abandon(TexturePoolHolder&&);
@@ -113,7 +125,7 @@ public:
 private:
     // We split the holder objects in separate containers because each
     // GLHolder-derived object can vary in size.
-    std::vector<GLuint> abandonedVAOs;
+    std::vector<VAOHolder> abandonedVAOs;
     std::vector<BufferHolder> abandonedBuffers;
     std::vector<TextureHolder> abandonedTextures;
     std::vector<TexturePoolHolder> abandonedTexturePools;

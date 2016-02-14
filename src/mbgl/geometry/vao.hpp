@@ -3,16 +3,18 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <stdexcept>
 
 namespace mbgl {
 
+class Shader;
+
 class VertexArrayObject : public util::noncopyable {
 public:
     static void Unbind();
-    static void Delete(GLsizei n, const GLuint* arrays);
 
     VertexArrayObject();
     ~VertexArrayObject();
@@ -46,8 +48,8 @@ public:
         }
     }
 
-    inline GLuint getID() const {
-        return vao;
+    GLuint getID() const {
+        return vao.getID();
     }
 
 private:
@@ -55,7 +57,7 @@ private:
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 
-    GLuint vao = 0;
+    gl::VAOHolder vao;
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report

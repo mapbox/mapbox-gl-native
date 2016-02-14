@@ -11,19 +11,11 @@ void VertexArrayObject::Unbind() {
     MBGL_CHECK_ERROR(gl::BindVertexArray(0));
 }
 
-void VertexArrayObject::Delete(GLsizei n, const GLuint* arrays) {
-    if (!gl::DeleteVertexArrays) return;
-    MBGL_CHECK_ERROR(gl::DeleteVertexArrays(n, arrays));
-}
-
 VertexArrayObject::VertexArrayObject() {
 }
 
 VertexArrayObject::~VertexArrayObject() {
-    if (!gl::DeleteVertexArrays) return;
-    if (vao) {
-        util::ThreadContext::getGLObjectStore()->abandonVAO(vao);
-    }
+    if (vao) util::ThreadContext::getGLObjectStore()->abandon(std::move(vao));
 }
 
 void VertexArrayObject::bindVertexArrayObject() {
@@ -36,10 +28,8 @@ void VertexArrayObject::bindVertexArrayObject() {
         return;
     }
 
-    if (!vao) {
-        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &vao));
-    }
-    MBGL_CHECK_ERROR(gl::BindVertexArray(vao));
+    if (!vao) vao.create();
+    MBGL_CHECK_ERROR(gl::BindVertexArray(vao.getID()));
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,
