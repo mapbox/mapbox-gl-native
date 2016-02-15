@@ -192,6 +192,12 @@
                 android:icon="@drawable/ic_input_24dp"
                 android:title="@string/activity_scroll_by" />
 
+            <item
+                android:id="@+id/action_dynamic_marker"
+                android:checkable="false"
+                android:icon="@drawable/ic_dynamic_marker"
+                android:title="@string/action_dynamic_marker" />
+
         </menu>
     </item>
 

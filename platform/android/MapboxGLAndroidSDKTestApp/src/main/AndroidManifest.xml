@@ -5,8 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name=".MapboxApplication"
@@ -86,18 +86,23 @@
         <activity
             android:name=".ScrollByActivity"
             android:label="@string/activity_scroll_by" />
+        <activity
+            android:name=".DynamicMarkerChangeActivity"
+            android:label="@string/activity_dynamic_marker" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"
             android:value="" />
 
-        <meta-data android:name="com.mapbox.TestEventsServer"
-                   android:value="https://cloudfront-staging.tilestream.net"/>
+        <meta-data
+            android:name="com.mapbox.TestEventsServer"
+            android:value="https://cloudfront-staging.tilestream.net" />
 
-        <meta-data android:name="com.mapbox.TestEventsAccessToken"
-                   android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg"/>
+        <meta-data
+            android:name="com.mapbox.TestEventsAccessToken"
+            android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg" />
 
-        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService"/>
+        <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
     </application>
 
 </manifest>

@@ -463,6 +463,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), ScrollByActivity.class));
                                 return true;
 
+                            case R.id.action_dynamic_marker:
+                                startActivity(new Intent(getApplicationContext(), DynamicMarkerChangeActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }
@@ -555,7 +559,7 @@ public class MainActivity extends AppCompatActivity {
             if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) ||
                     (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED)){
+                            == PackageManager.PERMISSION_GRANTED)) {
                 mMapboxMap.setMyLocationEnabled(false);
             }
             mLocationFAB.setColorFilter(Color.TRANSPARENT);
