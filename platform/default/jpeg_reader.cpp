@@ -153,7 +153,7 @@ PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
 
     jpeg_finish_decompress(&cinfo);
 
-    return std::move(image);
+    return image;
 }
 
 }
