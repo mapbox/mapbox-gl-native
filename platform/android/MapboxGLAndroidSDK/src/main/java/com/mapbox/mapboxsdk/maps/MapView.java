@@ -31,6 +31,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
@@ -56,6 +57,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -83,6 +85,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -365,9 +368,7 @@ public class MapView extends FrameLayout {
                 // User did not accept location permissions
             }
 
-            //noinspection ResourceType
             setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
-            //noinspection ResourceType
             setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else {
             // Force a check for Telemetry
@@ -2521,8 +2522,8 @@ public class MapView extends FrameLayout {
     protected void onMapChanged(int mapChange) {
         if (mOnMapChangedListener != null) {
             OnMapChangedListener listener;
-            final Iterator<OnMapChangedListener>iterator= mOnMapChangedListener.iterator();
-            while(iterator.hasNext()){
+            final Iterator<OnMapChangedListener> iterator = mOnMapChangedListener.iterator();
+            while (iterator.hasNext()) {
                 listener = iterator.next();
                 listener.onMapChanged(mapChange);
             }
@@ -2547,10 +2548,13 @@ public class MapView extends FrameLayout {
      * @throws SecurityException if no suitable permission is present
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     void setMyLocationEnabled(boolean enabled) {
+        if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
+                !(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+            Log.e(TAG, "Could not activate user location tracking: " +
+                    "user did not accept the permission or permissions were not requested.");
+            return;
+        }
         mUserLocationView.setEnabled(enabled);
     }
 
@@ -2591,12 +2595,8 @@ public class MapView extends FrameLayout {
      * @see MyLocationTracking
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && !mMapboxMap.isMyLocationEnabled()) {
-            //noinspection ResourceType
             mMapboxMap.setMyLocationEnabled(true);
         }
 

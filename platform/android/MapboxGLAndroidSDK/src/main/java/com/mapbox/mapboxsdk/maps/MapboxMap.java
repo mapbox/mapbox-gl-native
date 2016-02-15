@@ -1024,9 +1024,6 @@ public class MapboxMap {
      * @throws SecurityException if no suitable permission is present
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyLocationEnabled(boolean enabled) {
         mMyLocationEnabled = enabled;
         mMapView.setMyLocationEnabled(enabled);
