@@ -136,7 +136,9 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 @property (atomic) NSMutableArray *movingAvgQueue;
 @property (atomic) BOOL hasBackgroundCapability;
-
+@property (atomic) CLLocation *lastLocation;
+@property (atomic) UIBackgroundTaskIdentifier bgTaskID;
+@property (atomic) NSTimer *bgTimer;
 
 // Main thread only
 @property (nonatomic) CLLocationManager *locationManager;
@@ -302,10 +304,30 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 - (void)wakeEvents:(__unused NSNotification *)notification {
+//    if ([self debugLoggingEnabled]) {
+//        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"wakeEvents"}];
+//    }
+//    [self configureBackgroundLocationUpdatesWithValue:YES];
+}
+
+- (void)bgTimerStatus {
+  
+    UIApplication *app = [UIApplication sharedApplication];
+   
     if ([self debugLoggingEnabled]) {
-        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"wakeEvents"}];
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"bgTask.status",
+                                                                                @"backgroundTimeRemaining": @(app.backgroundTimeRemaining)}];
     }
-    [self configureBackgroundLocationUpdatesWithValue:YES];
+    
+}
+
+- (void)startBackgroundTimer {
+ 
+    [self.bgTimer invalidate];
+    if (!self.bgTimer) {
+        self.bgTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(bgTimerStatus) userInfo:nil repeats:YES];
+    }
+    
 }
 
 - (void)sleepEvents:(__unused NSNotification *)notification {
@@ -313,13 +335,26 @@ const NSTimeInterval MGLFlushInterval = 60;
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"sleepEvents"}];
     }
     
-    // if we are passive and have established a geofence then turn off background location updates
-    if (self.locationManager.desiredAccuracy == kCLLocationAccuracyKilometer && self.locationManager.monitoredRegions.count > 0) {
-        if ([self debugLoggingEnabled]) {
-            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"sleepEvents.configureBackgroundLocationUpdates"}];
-        }
-        [self configureBackgroundLocationUpdatesWithValue:NO];
-    }
+//    // if we are passive and have established a geofence then turn off background location updates
+//    if (self.locationManager.desiredAccuracy == kCLLocationAccuracyKilometer && self.locationManager.monitoredRegions.count > 0) {
+//        if ([self debugLoggingEnabled]) {
+//            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"sleepEvents.configureBackgroundLocationUpdates"}];
+//        }
+//        [self configureBackgroundLocationUpdatesWithValue:NO];
+//    }
+    
+    // beging background task
+//    UIApplication *app = [UIApplication sharedApplication];
+//    __block UIBackgroundTaskIdentifier *bgTaskID = [app beginBackgroundTaskWithExpirationHandler:^{
+//        if ([self debugLoggingEnabled]) {
+//            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"bgTask.timeout1"}];
+//        }
+//        [app endBackgroundTask:bgTaskID];
+//        bgTaskID = UIBackgroundTaskInvalid;
+//    }];
+//    self.bgTaskID = bgTaskID;
+//    
+//    [self startBackgroundTimer];
     
     [self.locationManager requestLocation];
 }
@@ -464,16 +499,19 @@ const NSTimeInterval MGLFlushInterval = 60;
                  @"MGLMapboxEvents should not have a CLLocationManager while paused.");
         return;
     }
+    
     _locationManager = [[CLLocationManager alloc] init];
-    [self applyDefaultConfigurationToLocationManager];
+//    [self applyOtherNavigationConfigurationToLocationManager];
+    [self applyOtherNavigationConfigurationToLocationManager];
     _locationManager.delegate = self;
     [_locationManager startUpdatingLocation];
     [self configureBackgroundLocationUpdatesWithValue:YES];
+//    [self.locationManager requestLocation];
 
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
-    if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
-        [_locationManager startMonitoringVisits];
-    }
+//    if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+//        [_locationManager startMonitoringVisits];
+//    }
 }
 
 - (void)configureBackgroundLocationUpdatesWithValue:(BOOL)value {
@@ -527,8 +565,8 @@ const NSTimeInterval MGLFlushInterval = 60;
     if (_locationManager.desiredAccuracy  == CLActivityTypeOtherNavigation) {
         return;
     }
-    _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    _locationManager.distanceFilter = 10;
+    _locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+    _locationManager.distanceFilter = 75;
     _locationManager.activityType = CLActivityTypeOtherNavigation;
     if ([self debugLoggingEnabled]) {
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"mode.other"}];
@@ -990,6 +1028,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)updateLocationManagerActivityTypeWithSpeed:(CGFloat)speed movingAvgSpeed:(CGFloat)movingAvgSpeed backgroundState:(BOOL)appIsInBackgroundOrInactive {
 
+    return;
     
     if ([self debugLoggingEnabled]) {
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"updateLocationManagerActivityTypeWithSpeed",
@@ -1010,17 +1049,25 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)updateLocationManagerRegionMonitoringWithLocation:(CLLocation *)location backgroundState:(BOOL)appIsInBackgroundOrInactive {
    
-    if (self.locationManager.monitoredRegions.count == 0) {
-        if ([self debugLoggingEnabled]) {
-            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.startMonitoringForRegion"}];
-        }
-      
-        // TODO: increase the size of the radius
-        CGFloat radius = self.locationManager.desiredAccuracy == kCLLocationAccuracyKilometer ? 50 : 10;
-        
-        CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:radius identifier:@"fence.center"];
-        [self.locationManager startMonitoringForRegion:region];
+    if (location.horizontalAccuracy > 100) {
+//        [self configureBackgroundLocationUpdatesWithValue:YES];
+        [self.locationManager requestLocation];
+        return;
     }
+   
+//    if (self.locationManager.monitoredRegions.count == 0)
+//    {
+    if ([self debugLoggingEnabled]) {
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.startMonitoringForRegion"}];
+    }
+    
+    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:50 identifier:@"fence.center"];
+    
+   
+    // start monitoring
+    [self.locationManager startMonitoringForRegion:region];
+    
+//    }
     
 }
 
@@ -1036,6 +1083,13 @@ const NSTimeInterval MGLFlushInterval = 60;
         }
     }
     
+    if (loc.horizontalAccuracy > 200) {
+        if ([self debugLoggingEnabled]) {
+            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.wildlyInaccurateLocationAccuracy"}];
+        }
+        return;
+    }
+    
     [MGLMapboxEvents pushEvent:MGLEventTypeLocation withAttributes:@{MGLEventKeyLatitude: @(loc.coordinate.latitude),
                                                                      MGLEventKeyLongitude: @(loc.coordinate.longitude),
                                                                      MGLEventKeySpeed: @(loc.speed),
@@ -1046,13 +1100,27 @@ const NSTimeInterval MGLFlushInterval = 60;
     
     [self storeMovingAvg:loc.speed];
     CGFloat movingAvgSpeed = [self computedMovingAverage];
+    
     UIApplication *app = [UIApplication sharedApplication];
     BOOL appIsInBackgroundOrInactive = [app applicationState] == UIApplicationStateBackground || [app applicationState] == UIApplicationStateInactive;
-   
-    [self updateLocationManagerRegionMonitoringWithLocation:loc backgroundState:appIsInBackgroundOrInactive];
-    [self updateLocationManagerActivityTypeWithSpeed:loc.speed movingAvgSpeed:movingAvgSpeed backgroundState:appIsInBackgroundOrInactive];
     
-    // TODO: if location is very inaccurate (and staying innacurate or getting worse) then turn off background updates and go passive
+//    if (appIsInBackgroundOrInactive && (self.bgTaskID == UIBackgroundTaskInvalid)) {
+//        __block UIBackgroundTaskIdentifier bgTaskID = [app beginBackgroundTaskWithExpirationHandler:^{
+//            if ([self debugLoggingEnabled]) {
+//                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"bgTask.timeout2"}];
+//            }
+//            [app endBackgroundTask:bgTaskID];
+//            bgTaskID = UIBackgroundTaskInvalid;
+//        }];
+//        self.bgTaskID = bgTaskID;
+//    }
+   
+    
+    
+//    [self updateLocationManagerRegionMonitoringWithLocation:loc backgroundState:appIsInBackgroundOrInactive];
+//    [self updateLocationManagerActivityTypeWithSpeed:loc.speed movingAvgSpeed:movingAvgSpeed backgroundState:appIsInBackgroundOrInactive];
+   
+    
     
 }
 
@@ -1060,13 +1128,39 @@ const NSTimeInterval MGLFlushInterval = 60;
     if ([self debugLoggingEnabled]) {
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.didExitRegion"}];
     }
-    [self.locationManager stopMonitoringForRegion:region];
+    
+//    [self.locationManager stopMonitoringForRegion:region];
+    
+    UIApplication *app = [UIApplication sharedApplication];
+    BOOL appIsInBackgroundOrInactive = [app applicationState] == UIApplicationStateBackground || [app applicationState] == UIApplicationStateInactive;
+    if (appIsInBackgroundOrInactive && (self.bgTaskID == UIBackgroundTaskInvalid)) {
+        __block UIBackgroundTaskIdentifier bgTaskID = [app beginBackgroundTaskWithExpirationHandler:^{
+            if ([self debugLoggingEnabled]) {
+                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"bgTask.timeout2"}];
+            }
+            [app endBackgroundTask:bgTaskID];
+            bgTaskID = UIBackgroundTaskInvalid;
+        }];
+        self.bgTaskID = bgTaskID;
+    }
+    
+    [self configureBackgroundLocationUpdatesWithValue:YES];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLCircularRegion *)region {
     if ([self debugLoggingEnabled]) {
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.didStartMonitoringForRegion",
                                                                                 @"regionDescription": region.description}];
+    }
+    UIApplication *app = [UIApplication sharedApplication];
+    [app endBackgroundTask:self.bgTaskID];
+    self.bgTaskID = UIBackgroundTaskInvalid;
+}
+
+- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
+    if ([self debugLoggingEnabled]) {
+        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.didDetermineStateforRegion",
+                                                                                @"state": @(state)}];
     }
 }
 
@@ -1076,7 +1170,8 @@ const NSTimeInterval MGLFlushInterval = 60;
                                                                                 @"regionDescription": region.description,
                                                                                 @"error": error.description}];
     }
-    [self.locationManager stopMonitoringForRegion:region];
+//    [self.locationManager stopMonitoringForRegion:region];
+    [self.locationManager requestLocation];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
@@ -1084,21 +1179,16 @@ const NSTimeInterval MGLFlushInterval = 60;
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.didFailWithError",
                                                                                 @"errorDescription": error.description}];
     }
+    [self.locationManager requestLocation];
 }
 
 
-- (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
-    if ([self debugLoggingEnabled]) {
-        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"locationManager.didDetermineStateforRegion",
-                                                                                @"state": @(state)}];
-    }
-    [self.locationManager stopMonitoringForRegion:region];
-}
 
 - (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager {
     if ([self debugLoggingEnabled]) {
         [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription:   @"locationManager.locationManagerDidPauseLocationUpdates"}];
     }
+    [self.locationManager requestLocation];
 }
 
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
