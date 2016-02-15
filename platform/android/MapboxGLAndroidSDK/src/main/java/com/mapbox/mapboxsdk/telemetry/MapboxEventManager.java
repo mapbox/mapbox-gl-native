@@ -158,7 +158,7 @@ public class MapboxEventManager {
      */
     public static MapboxEventManager getMapboxEventManager(@NonNull Context context) {
         if (mapboxEventManager == null) {
-            mapboxEventManager = new MapboxEventManager(context);
+            mapboxEventManager = new MapboxEventManager(context.getApplicationContext());
         }
         return mapboxEventManager;
     }
