@@ -40,16 +40,49 @@ public class MainActivityScreenTest extends BaseTest {
         checkViewIsDisplayed(R.id.mainMapView);
     }
 
-    /*
-     * Take a screenshot of Mapbox Streets to monitor #1649
-     */
     @Test
-    public void testMapboxStreetsBlackAndWhite() {
+    public void testStyleEmerald() {
         DrawerUtils.openDrawer();
         DrawerUtils.clickItem(R.string.styleEmerald);
         GestureUtils.doubleClickGesture(R.id.mainMapView);
         GestureUtils.doubleClickGesture(R.id.mainMapView);
         takeNamedScreenshot(mActivity, "testEmeraldStyle");
+    }
+
+    @Test
+    public void testStyleStreets() {
+        DrawerUtils.openDrawer();
+        DrawerUtils.clickItem(R.string.styleMapboxStreets);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        takeNamedScreenshot(mActivity, "testStreetsStyle");
+    }
+
+    @Test
+    public void testStyleDark() {
+        DrawerUtils.openDrawer();
+        DrawerUtils.clickItem(R.string.styleDark);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        takeNamedScreenshot(mActivity, "testDarkStyle");
+    }
+
+    @Test
+    public void testStyleLight() {
+        DrawerUtils.openDrawer();
+        DrawerUtils.clickItem(R.string.styleLight);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        takeNamedScreenshot(mActivity, "testLightStyle");
+    }
+
+    @Test
+    public void testStyleSatellite() {
+        DrawerUtils.openDrawer();
+        DrawerUtils.clickItem(R.string.styleSatellite);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        GestureUtils.doubleClickGesture(R.id.mainMapView);
+        takeNamedScreenshot(mActivity, "testSatelliteStyle");
     }
 
 }

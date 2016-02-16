@@ -129,34 +129,6 @@ public class MainActivityTest extends BaseTest {
                 .check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testSwipeLeftMap() {
-        onView(withId(R.id.mainMapView))
-                .perform(swipeLeft())
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testSwipeRightMap() {
-        onView(withId(R.id.mainMapView))
-                .perform(swipeRight())
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testSwipeDownMap() {
-        onView(withId(R.id.mainMapView))
-                .perform(swipeDown())
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testSwipeUpMap() {
-        onView(withId(R.id.mainMapView))
-                .perform(swipeUp())
-                .check(matches(isDisplayed()));
-    }
-
     /*
      * Test the main drawer options
      */

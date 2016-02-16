@@ -64,7 +64,7 @@ public class DoubleMapActivity extends AppCompatActivity {
             super.onViewCreated(view, savedInstanceState);
 
             // MapView large
-            mMapView = (MapView) view.findViewById(R.id.mapview);
+            mMapView = (MapView) view.findViewById(R.id.mapView);
             mMapView.onCreate(savedInstanceState);
             mMapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
