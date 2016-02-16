@@ -60,8 +60,7 @@ public class MapboxEventManager {
 
     private Context context = null;
     private String accessToken = null;
-    private static final String MAPBOX_EVENTS_BASE_URL = "https://api.mapbox.com";
-    private String eventsURL = MAPBOX_EVENTS_BASE_URL;
+    private String eventsURL = MapboxEvent.MAPBOX_EVENTS_BASE_URL;
 
     private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
 
@@ -230,6 +229,44 @@ public class MapboxEventManager {
         events.add(event);
 
         rotateSessionId();
+    }
+
+    /**
+     * Push Interactive Events to the system for processing
+     * @param eventWithAttributes Event with attributes
+     */
+    public void pushEvent(Hashtable<String, Object> eventWithAttributes) {
+
+        if (eventWithAttributes == null) {
+            return;
+        }
+
+        if (eventWithAttributes.get(MapboxEvent.TYPE_MAP_LOAD) != null) {
+            pushTurnstileEvent();
+        }
+
+ //       events.add(eventWithAttributes);
+    }
+
+    /**
+     * Pushes turnstile event for internal billing purposes
+     */
+    private void pushTurnstileEvent() {
+
+        Hashtable<String, Object> event = new Hashtable<>();
+        event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_TURNSTILE);
+        event.put(MapboxEvent.ATTRIBUTE_CREATED, dateFormat.format(new Date()));
+/*
+        // Already set by processing
+        event.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
+        event.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
+        event.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
+*/
+
+        events.add(event);
+
+        // Send to Server Immediately
+        new FlushTheEventsTask().execute();
     }
 
     /**
@@ -420,10 +457,10 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, evt.get(MapboxEvent.KEY_HORIZONTAL_ACCURACY));
 
                     // Basic Event Meta Data
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get("event"));
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));
+                    jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get(MapboxEvent.ATTRIBUTE_CREATED));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get("created"));
                     jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
                     jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
                     jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
