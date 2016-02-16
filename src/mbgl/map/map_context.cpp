@@ -117,8 +117,6 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
 }
 
 void MapContext::loadStyleJSON(const std::string& json, const std::string& base) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     style->setJSON(json, base);
     style->setObserver(this);
     styleJSON = json;
@@ -130,8 +128,6 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 }
 
 void MapContext::update() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     if (!style) {
         updateFlags = Update::Nothing;
     }
@@ -205,8 +201,6 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
 }
 
 bool MapContext::renderSync(const TransformState& state, const FrameData& frame) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     // Style was not loaded yet.
     if (!style) {
         return false;
@@ -240,17 +234,14 @@ bool MapContext::isLoaded() const {
 }
 
 void MapContext::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     data.getAnnotationManager()->addIcon(name, sprite);
 }
     
 void MapContext::removeAnnotationIcon(const std::string& name) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     data.getAnnotationManager()->removeIcon(name);
 }
 
 double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     return data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
 }
 
@@ -286,7 +277,6 @@ void MapContext::setClasses(const std::vector<std::string>& classNames, const Pr
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (size != sourceCacheSize) {
         sourceCacheSize = size;
         if (!style) return;
@@ -296,7 +286,6 @@ void MapContext::setSourceTileCacheSize(size_t size) {
 }
 
 void MapContext::onLowMemory() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (!style) return;
     style->onLowMemory();
     view.invalidate();

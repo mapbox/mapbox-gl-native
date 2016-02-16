@@ -1,7 +1,5 @@
 #include <mbgl/text/glyph_store.hpp>
-
 #include <mbgl/text/glyph_pbf.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 
@@ -14,8 +12,6 @@ GlyphStore::GlyphStore(FileSource& fileSource_)
 GlyphStore::~GlyphStore() = default;
 
 void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     std::lock_guard<std::mutex> lock(rangesMutex);
     auto& rangeSets = ranges[fontStackName];
 

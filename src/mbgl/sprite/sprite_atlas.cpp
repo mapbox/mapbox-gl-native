@@ -6,7 +6,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 #include <cmath>

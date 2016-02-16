@@ -3,7 +3,6 @@
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <boost/functional/hash.hpp>
 
@@ -20,12 +19,9 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
 }
 
 LineAtlas::~LineAtlas() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 }
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round, gl::GLObjectStore& glObjectStore) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         boost::hash_combine<float>(key, part);
@@ -132,8 +128,6 @@ void LineAtlas::upload(gl::GLObjectStore& glObjectStore) {
 }
 
 void LineAtlas::bind(gl::GLObjectStore& glObjectStore) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-
     bool first = false;
     if (!texture) {
         texture.create(glObjectStore);

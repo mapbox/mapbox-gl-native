@@ -98,7 +98,7 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
     AsyncTask async([&count] { ++count; });
 
     std::vector<std::unique_ptr<Thread<TestWorker>>> threads;
-    ThreadContext context = {"Test", ThreadType::Map, ThreadPriority::Regular};
+    ThreadContext context = {"Test"};
 
     unsigned numThreads = 25;
     for (unsigned i = 0; i < numThreads; ++i) {
@@ -133,7 +133,7 @@ TEST(AsyncTask, ThreadSafety) {
 
     std::vector<std::unique_ptr<Thread<TestWorker>>> threads;
     std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
-    ThreadContext context = {"Test", ThreadType::Map, ThreadPriority::Regular};
+    ThreadContext context = {"Test"};
 
     for (unsigned i = 0; i < numThreads; ++i) {
         std::unique_ptr<Thread<TestWorker>> thread =

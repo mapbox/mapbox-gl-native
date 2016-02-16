@@ -11,7 +11,7 @@ namespace mbgl {
 
 class PlainShader;
 
-namespace util {
+namespace gl {
 class GLObjectStore;
 }
 

@@ -9,8 +9,6 @@ using namespace mbgl;
 
 TEST(Style, UnusedSource) {
     util::RunLoop loop;
-    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
-    util::ThreadContext::Set(&context);
 
     MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
     StubFileSource fileSource;
@@ -33,8 +31,6 @@ TEST(Style, UnusedSource) {
 
 TEST(Style, UnusedSourceActiveViaClassUpdate) {
     util::RunLoop loop;
-    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
-    util::ThreadContext::Set(&context);
 
     MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
     StubFileSource fileSource;

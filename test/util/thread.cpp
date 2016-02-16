@@ -55,9 +55,7 @@ public:
     }
 
     void checkContext(std::function<void (bool)> cb) const {
-        cb(ThreadContext::currentlyOn(ThreadType::Worker)
-            && ThreadContext::getName() == "Test"
-            && ThreadContext::getPriority() == ThreadPriority::Low);
+        cb(tid == std::this_thread::get_id());
     }
 
     const std::thread::id tid;
@@ -71,7 +69,7 @@ TEST(Thread, invoke) {
 
     loop.invoke([&] {
         EXPECT_EQ(tid, std::this_thread::get_id());
-        Thread<TestObject> thread({"Test", ThreadType::Map, ThreadPriority::Regular}, tid);
+        Thread<TestObject> thread({"Test"}, tid);
 
         thread.invoke(&TestObject::fn1, 1);
         requests.push_back(thread.invokeWithCallback(&TestObject::fn2, [&] (int result) {
@@ -114,19 +112,13 @@ TEST(Thread, invoke) {
 }
 
 TEST(Thread, context) {
-    bool isMainThreadContext = ThreadContext::currentlyOn(ThreadType::Main)
-        && ThreadContext::getName() == "Main"
-        && ThreadContext::getPriority() == ThreadPriority::Regular;
-
-    EXPECT_EQ(isMainThreadContext, true);
-
     const std::thread::id tid = std::this_thread::get_id();
 
     RunLoop loop;
     std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
 
     loop.invoke([&] {
-        Thread<TestObject> thread({"Test", ThreadType::Worker, ThreadPriority::Low}, tid);
+        Thread<TestObject> thread({"Test"}, tid);
 
         requests.push_back(thread.invokeWithCallback(&TestObject::checkContext, [&] (bool inTestThreadContext) {
             EXPECT_EQ(inTestThreadContext, true);
@@ -149,7 +141,7 @@ public:
 
 TEST(Thread, ExecutesAfter) {
     RunLoop loop;
-    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+    Thread<TestWorker> thread({"Test"});
 
     bool didWork = false;
     bool didAfter = false;
@@ -170,7 +162,7 @@ TEST(Thread, ExecutesAfter) {
 TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
     RunLoop loop;
 
-    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+    Thread<TestWorker> thread({"Test"});
 
     std::promise<void> started;
     bool didWork = false;
@@ -188,7 +180,7 @@ TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
 
 TEST(Thread, WorkRequestDeletionCancelsAfter) {
     RunLoop loop;
-    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+    Thread<TestWorker> thread({"Test"});
 
     std::promise<void> started;
     bool didAfter = false;
@@ -207,7 +199,7 @@ TEST(Thread, WorkRequestDeletionCancelsAfter) {
 
 TEST(Thread, WorkRequestDeletionCancelsImmediately) {
     RunLoop loop;
-    Thread<TestWorker> thread({"Test", ThreadType::Map, ThreadPriority::Regular});
+    Thread<TestWorker> thread({"Test"});
 
     std::promise<void> started;
 

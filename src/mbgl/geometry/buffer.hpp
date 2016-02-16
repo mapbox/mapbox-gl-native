@@ -5,7 +5,6 @@
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <memory>
 #include <cstdlib>

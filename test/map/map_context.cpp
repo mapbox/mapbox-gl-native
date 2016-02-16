@@ -17,7 +17,7 @@ TEST(MapContext, DoubleStyleLoad) {
     HeadlessView view(display, 1, 512, 512);
     StubFileSource fileSource;
 
-    util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular},
+    util::Thread<MapContext> context({"Map"},
         view, fileSource, MapMode::Continuous, GLContextMode::Unique, view.getPixelRatio());
 
     context.invokeSync(&MapContext::setStyleJSON, "", "");

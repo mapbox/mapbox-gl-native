@@ -49,7 +49,7 @@ namespace util {
 
 RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
     using namespace mbgl::android;
-    detach = attach_jni_thread(theJVM, &env, ThreadContext::getName());
+    detach = attach_jni_thread(theJVM, &env, "");
 
     loop = ALooper_prepare(0);
     assert(loop);

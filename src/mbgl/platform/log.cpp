@@ -1,7 +1,5 @@
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/util/thread_context.hpp>
-
 #include <cstdio>
 #include <cstdarg>
 #include <sstream>
@@ -49,7 +47,13 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
     }
 
     std::stringstream logStream;
-    logStream << "{" << util::ThreadContext::getName() << "}";
+
+    #if !defined(__ANDROID__) && (defined( __APPLE__) || defined(__linux__))
+    char name[32];
+    pthread_getname_np(pthread_self(), name, sizeof(name));
+    logStream << "{" << name << "}";
+    #endif
+
     logStream << "[" << event << "]";
 
     if (code >= 0) {

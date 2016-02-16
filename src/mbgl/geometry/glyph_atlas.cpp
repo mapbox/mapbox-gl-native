@@ -6,7 +6,6 @@
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 #include <algorithm>
@@ -23,7 +22,6 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
 }
 
 GlyphAtlas::~GlyphAtlas() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 }
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,

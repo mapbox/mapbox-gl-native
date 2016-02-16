@@ -13,8 +13,6 @@ public:
     TestThread(WorkQueue* queue_) : queue(queue_) {}
 
     void send(std::function<void()>&& fn) {
-        EXPECT_TRUE(ThreadContext::currentlyOn(ThreadType::Map));
-
         queue->push(std::move(fn));
     }
 
@@ -26,13 +24,11 @@ TEST(WorkQueue, push) {
     RunLoop loop;
 
     WorkQueue queue;
-    Thread<TestThread> thread({"Test", ThreadType::Map, ThreadPriority::Regular}, &queue);
+    Thread<TestThread> thread({"Test"}, &queue);
 
     uint8_t count = 0;
 
     auto endTest = [&]() {
-        EXPECT_TRUE(ThreadContext::currentlyOn(ThreadType::Main));
-
         if (++count == 4) {
             loop.stop();
         }

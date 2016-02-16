@@ -100,7 +100,7 @@ private:
 
 AssetFileSource::AssetFileSource(const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource", util::ThreadType::Worker, util::ThreadPriority::Regular},
+        util::ThreadContext{"AssetFileSource"},
         root)) {
 }
 

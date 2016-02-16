@@ -13,7 +13,6 @@ using namespace mbgl;
 
 class GlyphStoreTest {
 public:
-    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
@@ -22,8 +21,6 @@ public:
     void run(const std::string& url, const std::string& fontStack, const std::set<GlyphRange>& glyphRanges) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
-
-        util::ThreadContext::Set(&context);
 
         glyphStore.setObserver(&observer);
         glyphStore.setURL(url);

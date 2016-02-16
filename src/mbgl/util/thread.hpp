@@ -76,7 +76,7 @@ private:
     }
 
     template <typename P, std::size_t... I>
-    void run(ThreadContext, P&& params, std::index_sequence<I...>);
+    void run(P&& params, std::index_sequence<I...>);
 
     std::promise<void> running;
     std::promise<void> joinable;
@@ -107,7 +107,7 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
             platform::makeThreadLowPriority();
         }
 
-        run(context, std::move(params), std::index_sequence_for<Args...>{});
+        run(std::move(params), std::index_sequence_for<Args...>{});
     });
 
     running.get_future().get();
@@ -115,9 +115,7 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
 
 template <class Object>
 template <typename P, std::size_t... I>
-void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<I...>) {
-    ThreadContext::Set(&context);
-
+void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
     RunLoop loop_(RunLoop::Type::New);
     loop = &loop_;
 
@@ -129,8 +127,6 @@ void Thread<Object>::run(ThreadContext context, P&& params, std::index_sequence<
 
     loop = nullptr;
     object = nullptr;
-
-    ThreadContext::Set(nullptr);
 
     joinable.get_future().get();
 }
