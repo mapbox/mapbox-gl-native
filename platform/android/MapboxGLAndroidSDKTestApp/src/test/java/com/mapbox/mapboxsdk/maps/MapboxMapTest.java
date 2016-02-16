@@ -1,7 +1,10 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.v4.content.ContextCompat;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -61,7 +64,7 @@ public class MapboxMapTest {
     }
 
     @Test
-    public void testGetMapView(){
+    public void testGetMapView() {
         assertNotNull("MapView should be non null", mMapboxMap.getMapView());
     }
 
@@ -106,22 +109,17 @@ public class MapboxMapTest {
 
     @Test
     public void testMyLocationEnabled() {
-        try {
-            mMapboxMap.setMyLocationEnabled(true);
-            assertTrue("MyLocationEnabled should be true", mMapboxMap.isMyLocationEnabled());
-        } catch (SecurityException e) {
-            assertTrue(false);
-        }
+        when(mMapView.isPermissionsAccepted()).thenReturn(true);
+        mMapboxMap.setMyLocationEnabled(true);
+        assertTrue("MyLocationEnabled should be true", mMapboxMap.isMyLocationEnabled());
+
     }
 
     @Test
     public void testMyLocationDisabled() {
-        try {
-            mMapboxMap.setMyLocationEnabled(false);
-            assertFalse("MyLocationEnabled should be false", mMapboxMap.isMyLocationEnabled());
-        } catch (SecurityException e) {
-            assertTrue(false);
-        }
+        when(mMapView.isPermissionsAccepted()).thenReturn(true);
+        mMapboxMap.setMyLocationEnabled(false);
+        assertFalse("MyLocationEnabled should be false", mMapboxMap.isMyLocationEnabled());
     }
 
     //

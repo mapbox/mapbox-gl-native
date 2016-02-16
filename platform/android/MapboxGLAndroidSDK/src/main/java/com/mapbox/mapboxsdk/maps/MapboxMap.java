@@ -3,14 +3,15 @@ package com.mapbox.mapboxsdk.maps;
 import android.Manifest;
 import android.content.Context;
 
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,7 +20,6 @@ import android.view.View;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -32,13 +32,11 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -1260,6 +1258,11 @@ public class MapboxMap {
      */
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
+        if (!mMapView.isPermissionsAccepted()) {
+            Log.e(MapboxConstants.TAG, "Could not activate user location tracking: " +
+                    "user did not accept the permission or permissions were not requested.");
+            return;
+        }
         mMyLocationEnabled = enabled;
         mMapView.setMyLocationEnabled(enabled);
     }

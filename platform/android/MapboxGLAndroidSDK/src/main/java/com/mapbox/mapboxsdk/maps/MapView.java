@@ -2313,6 +2313,11 @@ public class MapView extends FrameLayout {
     // User location
     //
 
+    boolean isPermissionsAccepted() {
+        return (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) ||
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
     /**
      * <p>
      * Enables or disables the my-location layer.
@@ -2328,12 +2333,6 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     void setMyLocationEnabled(boolean enabled) {
-        if (!(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) &&
-                !(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-            Log.e(TAG, "Could not activate user location tracking: " +
-                    "user did not accept the permission or permissions were not requested.");
-            return;
-        }
         mUserLocationView.setEnabled(enabled);
     }
 
