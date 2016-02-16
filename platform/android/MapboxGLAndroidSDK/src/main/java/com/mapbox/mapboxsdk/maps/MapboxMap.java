@@ -804,6 +804,12 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations() {
+        int count = mAnnotations.size();
+        long[] ids = new long[count];
+        for (int i = 0; i < count; i++) {
+            ids[i] = mAnnotations.keyAt(i);
+        }
+        mMapView.removeAnnotations(ids);
         mAnnotations.clear();
     }
 
