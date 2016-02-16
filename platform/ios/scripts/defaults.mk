@@ -2,6 +2,7 @@ HEADLESS = eagl
 PLATFORM ?= ios
 ASSET ?= fs
 HTTP ?= nsurl
+LOOP ?= darwin
 
 HOST_VERSION = all
 

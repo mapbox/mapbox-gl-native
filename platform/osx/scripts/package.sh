@@ -7,7 +7,6 @@ set -u
 NAME=Mapbox
 OUTPUT=build/osx/pkg
 OSX_SDK_VERSION=`xcrun --sdk macosx --show-sdk-version`
-LIBUV_VERSION=1.7.5
 
 if [[ ${#} -eq 0 ]]; then # e.g. "make xpackage"
     BUILDTYPE="Release"

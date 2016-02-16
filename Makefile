@@ -100,11 +100,11 @@ apackage: android-lib-mips
 
 # Builds the Node.js library
 .PHONY: node
-node: ; $(RUN) HTTP=none ASSET=none Makefile/node
+node: ; $(RUN) LOOP=uv HTTP=none ASSET=none Makefile/node
 
 
 .PHONY: Xcode/node
-Xcode/node: ; $(RUN) HTTP=none ASSET=none Xcode/node
+Xcode/node: ; $(RUN) LOOP=uv HTTP=none ASSET=none Xcode/node
 
 .PHONY: xnode
 xnode: Xcode/node ; @open ./build/binding.xcodeproj

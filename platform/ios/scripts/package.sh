@@ -6,7 +6,6 @@ set -u
 
 NAME=Mapbox
 OUTPUT=build/ios/pkg
-LIBUV_VERSION=1.7.5
 
 BUILDTYPE=${BUILDTYPE:-Release}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -150,7 +149,6 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         step "Assembling static framework for iOS Simulator and devices…"
         mkdir -p ${OUTPUT}/static/${NAME}.framework
         libtool -static -no_warning_for_no_symbols \
-            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
@@ -176,7 +174,6 @@ else
         step "Assembling static library for iOS Simulator…"
         mkdir -p ${OUTPUT}/static/${NAME}.framework
         libtool -static -no_warning_for_no_symbols \
-            `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libuv.a` \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}

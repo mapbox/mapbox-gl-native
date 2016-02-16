@@ -15,33 +15,37 @@
       'type': 'static_library',
       'standalone_static_library': 1,
 
-      'sources': [
-        '../platform/default/async_task.cpp',
-        '../platform/default/run_loop.cpp',
-        '../platform/default/timer.cpp',
-      ],
-
       'include_dirs': [
         '../include',
         '../src',
       ],
 
-      'cflags_cc': [
-        '<@(libuv_cflags)',
-      ],
-
-      'link_settings': {
-        'libraries': [
-          '<@(libuv_static_libs)',
-          '<@(libuv_ldflags)',
-        ],
-      },
-
       'conditions': [
-        ['OS == "mac"', {
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(libuv_cflags)' ],
-          }
+        ['loop_lib == "darwin"', {
+          'sources': [
+            '../platform/darwin/src/async_task.cpp',
+            '../platform/darwin/src/run_loop.cpp',
+            '../platform/darwin/src/timer.cpp',
+          ],
+        }],
+
+        ['loop_lib == "uv"', {
+          'sources': [
+            '../platform/default/async_task.cpp',
+            '../platform/default/run_loop.cpp',
+            '../platform/default/timer.cpp',
+          ],
+
+          'cflags_cc': [
+            '<@(libuv_cflags)',
+          ],
+
+          'link_settings': {
+            'libraries': [
+              '<@(libuv_static_libs)',
+              '<@(libuv_ldflags)',
+            ],
+          },
         }]
       ],
     },
