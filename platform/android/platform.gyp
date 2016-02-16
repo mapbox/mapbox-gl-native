@@ -27,7 +27,7 @@
         'src/jni.cpp',
         'src/attach_env.cpp',
         'src/log_android.cpp',
-        'src/http_request_android.cpp',
+        'src/http_file_source.cpp',
         'src/asset_file_source.cpp',
         '../default/thread.cpp',
         '../default/string_stdlib.cpp',

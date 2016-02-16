@@ -25,5 +25,13 @@ CacheControl CacheControl::parse(const std::string& value) {
     return result;
 }
 
+optional<SystemTimePoint> CacheControl::toTimePoint() const {
+    // Round trip through time_t to truncate fractional seconds.
+    return maxAge
+        ? SystemClock::from_time_t(SystemClock::to_time_t(
+            SystemClock::now() + std::chrono::seconds(*maxAge)))
+        : optional<SystemTimePoint>();
+}
+
 } // namespace http
 } // namespace mbgl

@@ -2,6 +2,7 @@
 #define MBGL_UTIL_HTTP_HEADER
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/chrono.hpp>
 
 #include <string>
 
@@ -14,6 +15,8 @@ public:
 
     optional<uint64_t> maxAge;
     bool mustRevalidate = false;
+
+    optional<SystemTimePoint> toTimePoint() const;
 };
 
 } // namespace http

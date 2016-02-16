@@ -98,7 +98,7 @@
         '../default/mbgl/storage/offline_download.cpp',
         '../default/sqlite3.hpp',
         '../default/sqlite3.cpp',
-        '../darwin/src/http_request_nsurl.mm',
+        '../darwin/src/http_file_source.mm',
         '../darwin/src/log_nslog.mm',
         '../darwin/src/string_nsstring.mm',
         '../darwin/src/image.mm',

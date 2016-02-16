@@ -1,5 +1,5 @@
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/http_context_base.hpp>
+#include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
@@ -35,7 +35,7 @@ public:
 
     OnlineFileSource::Impl& impl;
     Resource resource;
-    HTTPRequestBase* request = nullptr;
+    std::unique_ptr<AsyncRequest> request;
     util::Timer timer;
     Callback callback;
 
@@ -82,7 +82,7 @@ public:
         assert(activeRequests.find(request) == activeRequests.end());
         assert(!request->request);
 
-        if (activeRequests.size() >= HTTPContextBase::maximumConcurrentRequests()) {
+        if (activeRequests.size() >= HTTPFileSource::maximumConcurrentRequests()) {
             queueRequest(request);
         } else {
             activateRequest(request);
@@ -96,10 +96,10 @@ public:
 
     void activateRequest(OnlineFileRequest* request) {
         activeRequests.insert(request);
-        request->request = httpContext->createRequest(request->resource, [=] (Response response) {
+        request->request = httpFileSource.request(request->resource, [=] (Response response) {
             activeRequests.erase(request);
             activatePendingRequest();
-            request->request = nullptr;
+            request->request.reset();
             request->completed(response);
         });
     }
@@ -140,7 +140,7 @@ private:
     std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
-    const std::unique_ptr<HTTPContextBase> httpContext { HTTPContextBase::createContext() };
+    HTTPFileSource httpFileSource;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
 
@@ -198,9 +198,6 @@ OnlineFileRequest::OnlineFileRequest(const Resource& resource_, Callback callbac
 
 OnlineFileRequest::~OnlineFileRequest() {
     impl.remove(this);
-    if (request) {
-        request->cancel();
-    }
 }
 
 static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, uint32_t failedRequests) {
