@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <cassert>
 #include <list>
-#include <set>
+#include <unordered_set>
 #include <unordered_map>
 
 namespace mbgl {
@@ -135,7 +135,7 @@ private:
     std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> allRequests;
     std::list<FileRequest*> pendingRequestsList;
     std::unordered_map<FileRequest*, std::list<FileRequest*>::iterator> pendingRequestsMap;
-    std::set<FileRequest*> activeRequests;
+    std::unordered_set<FileRequest*> activeRequests;
 
     const std::unique_ptr<HTTPContextBase> httpContext { HTTPContextBase::createContext() };
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
