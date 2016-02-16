@@ -10,6 +10,7 @@
 
 #include <map>
 #include <cassert>
+#include <mutex>
 
 namespace mbgl {
 
@@ -17,17 +18,17 @@ class HTTPNSURLContext;
 
 class HTTPNSURLRequest : public HTTPRequestBase {
 public:
-    HTTPNSURLRequest(HTTPNSURLContext*, const Resource&, Callback);
+    HTTPNSURLRequest(HTTPNSURLContext*, Resource, Callback);
     ~HTTPNSURLRequest();
 
     void cancel() final;
 
 private:
-    void handleResult(NSData *data, NSURLResponse *res, NSError *error);
+    static std::unique_ptr<Response> handleResult(NSData *data, NSURLResponse *res, NSError *error, Resource);
     void handleResponse();
 
     HTTPNSURLContext *context = nullptr;
-    bool cancelled = false;
+    std::shared_ptr<std::pair<bool, std::mutex>> cancelled;
     NSURLSessionDataTask *task = nullptr;
     std::unique_ptr<Response> response;
     util::AsyncTask async;
@@ -81,15 +82,18 @@ HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource, HTTPR
 // -------------------------------------------------------------------------------------------------
 
 HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
-                                   const Resource& resource_,
+                                   Resource resource_,
                                    Callback callback_)
     : HTTPRequestBase(resource_, callback_),
       context(context_),
       async([this] { handleResponse(); }) {
-    // Hold the main loop alive until the request returns. This
-    // is needed because completion handler runs in another
-    // thread and will notify this thread using AsyncTask.
-    util::RunLoop::Get()->ref();
+
+    // Ensure that a stack-allocated std::shared_ptr gets copied into the Objective-C
+    // block used as the completion handler below. Objective-C will implicitly copy captured
+    // stack variables. For member variable access it will implicitly copy the this pointer.
+    // That wouldn't work here because we need the block to have its own shared_ptr.
+    auto cancelled_ = cancelled = std::make_shared<std::pair<bool, std::mutex>>();
+    cancelled->first = false;
 
     @autoreleasepool {
         NSURL* url = [NSURL URLWithString:@(resource.url.c_str())];
@@ -114,7 +118,12 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
         task = [context->session
             dataTaskWithRequest:req
               completionHandler:^(NSData* data, NSURLResponse* res, NSError* error) {
-                handleResult(data, res, error);
+                    std::unique_ptr<Response> response_ = HTTPNSURLRequest::handleResult(data, res, error, resource_);
+                    std::lock_guard<std::mutex> lock(cancelled_->second);
+                    if (!cancelled_->first) {
+                        response = std::move(response_);
+                        async.send();
+                    }
               }];
         [task retain];
         [task resume];
@@ -122,7 +131,6 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
 }
 
 HTTPNSURLRequest::~HTTPNSURLRequest() {
-    util::RunLoop::Get()->unref();
     assert(!task);
 }
 
@@ -132,28 +140,27 @@ void HTTPNSURLRequest::handleResponse() {
         task = nullptr;
     }
 
-    if (!cancelled) {
-        assert(response);
-        notify(*response);
-    }
+    assert(response);
+    notify(*response);
 
     delete this;
 }
 
 void HTTPNSURLRequest::cancel() {
-    cancelled = true;
-
     if (task) {
         [task cancel];
         [task release];
         task = nullptr;
-    } else {
-        delete this;
     }
+
+    std::lock_guard<std::mutex> lock(cancelled->second);
+    cancelled->first = true;
+
+    delete this;
 }
 
-void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error) {
-    response = std::make_unique<Response>();
+std::unique_ptr<Response> HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *error, Resource resource) {
+    std::unique_ptr<Response> response = std::make_unique<Response>();
     using Error = Response::Error;
 
     if (error) {
@@ -239,7 +246,7 @@ void HTTPNSURLRequest::handleResult(NSData *data, NSURLResponse *res, NSError *e
                                                   "Response class is not NSHTTPURLResponse");
     }
 
-    async.send();
+    return response;
 }
 
 std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
