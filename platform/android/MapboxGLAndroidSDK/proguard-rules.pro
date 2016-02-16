@@ -15,8 +15,11 @@
 # Package: http
 -keep class com.mapbox.mapboxsdk.http.** { *; }
 
-# Package views
--keep class com.mapbox.mapboxsdk.views.** { *; }
+# Package maps
+-keep class com.mapbox.mapboxsdk.maps.** { *; }
+
+# Package telemetry
+-keep class com.mapbox.mapboxsdk.telemetry.** { *; }
 
 # Package layers
 -keep class com.mapbox.mapboxsdk.layers.** { *; }
