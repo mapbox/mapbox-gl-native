@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <list>
 #include <set>
 #include <unordered_map>
 
@@ -62,6 +63,12 @@ public:
         allRequests.erase(key);
         if (activeRequests.erase(key)) {
             activatePendingRequest();
+        } else {
+            auto it = pendingRequestsMap.find(key);
+            if (it != pendingRequestsMap.end()) {
+                pendingRequestsList.erase(it->second);
+                pendingRequestsMap.erase(it);
+            }
         }
     }
 
@@ -78,7 +85,8 @@ public:
     }
 
     void queueRequest(OnlineFileRequestImpl* impl) {
-        pendingRequests.push(impl->key);
+        auto it = pendingRequestsList.insert(pendingRequestsList.end(), impl->key);
+        pendingRequestsMap.emplace(impl->key, std::move(it));
     }
 
     void activateRequest(OnlineFileRequestImpl* impl) {
@@ -92,19 +100,18 @@ public:
     }
 
     void activatePendingRequest() {
-        while (!pendingRequests.empty()) {
-            FileRequest* key = pendingRequests.front();
-            pendingRequests.pop();
-
-            auto it = allRequests.find(key);
-            if (it == allRequests.end()) {
-                // It must have been cancelled.
-                continue;
-            }
-
-            activateRequest(it->second.get());
+        if (pendingRequestsList.empty()) {
             return;
         }
+
+        FileRequest* key = pendingRequestsList.front();
+        pendingRequestsList.pop_front();
+
+        pendingRequestsMap.erase(key);
+
+        auto it = allRequests.find(key);
+        assert(it != allRequests.end());
+        activateRequest(it->second.get());
     }
 
 private:
@@ -126,7 +133,8 @@ private:
      * `pendingRequests`. Requests in the active state are in `activeRequests`.
      */
     std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> allRequests;
-    std::queue<FileRequest*> pendingRequests;
+    std::list<FileRequest*> pendingRequestsList;
+    std::unordered_map<FileRequest*, std::list<FileRequest*>::iterator> pendingRequestsMap;
     std::set<FileRequest*> activeRequests;
 
     const std::unique_ptr<HTTPContextBase> httpContext { HTTPContextBase::createContext() };
