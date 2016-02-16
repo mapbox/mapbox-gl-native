@@ -804,10 +804,15 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations() {
+        Annotation annotation;
         int count = mAnnotations.size();
         long[] ids = new long[count];
         for (int i = 0; i < count; i++) {
             ids[i] = mAnnotations.keyAt(i);
+            annotation = mAnnotations.get(ids[i]);
+            if(annotation instanceof Marker){
+                ((Marker)annotation).hideInfoWindow();
+            }
         }
         mMapView.removeAnnotations(ids);
         mAnnotations.clear();
