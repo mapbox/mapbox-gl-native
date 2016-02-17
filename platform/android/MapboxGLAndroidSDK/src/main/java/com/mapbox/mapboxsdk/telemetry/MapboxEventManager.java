@@ -73,6 +73,7 @@ public class MapboxEventManager {
     private String mapboxSessionId = null;
     private long mapboxSessionIdLastSet = 0;
     private static long hourInMillis = 1000 * 60 * 60;
+    private static long flushDelayInitialInMillis = 1000 * 10;  // 10 Seconds
     private static long flushDelayInMillis = 1000 * 60 * 2;  // 2 Minutes
     private static final int SESSION_ID_ROTATION_HOURS = 24;
 
@@ -188,7 +189,7 @@ public class MapboxEventManager {
 
             // Manage Timer Flush
             timer = new Timer();
-            timer.schedule(new FlushEventsTimerTask(), flushDelayInMillis, flushDelayInMillis);
+            timer.schedule(new FlushEventsTimerTask(), flushDelayInitialInMillis, flushDelayInMillis);
         } else {
             Log.i(TAG, "Shutting Telemetry Down");
             // Shut It Down
