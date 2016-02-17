@@ -4,6 +4,8 @@
 *.actual.png
 *.diff.png
 *.pyc
+*.gcno
+*.gcda
 offline.db
 /platform/android/debug
 /platform/android/sdk

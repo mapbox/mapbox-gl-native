@@ -47,7 +47,14 @@
             'OTHER_LDFLAGS': [ '<@(ldflags)' ],
             'SDKROOT': 'macosx',
             'MACOSX_DEPLOYMENT_TARGET': '10.10',
-          }
+          },
+          'configurations': {
+            'Debug': {
+              'xcode_settings': {
+                'OTHER_LDFLAGS': [ '-lgcov' ],
+              },
+            },
+          },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
           'libraries': [ '<@(libraries)', '<@(ldflags)' ],

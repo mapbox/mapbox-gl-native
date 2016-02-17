@@ -106,7 +106,9 @@
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
-          'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common']
+          'GCC_INSTRUMENT_PROGRAM_FLOW_ARCS': 'YES',
+          'GCC_GENERATE_TEST_COVERAGE_FILES': 'YES',
+          'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common', '-fprofile-arcs', '-ftest-coverage' ],
         }
       },
       'Release': {
