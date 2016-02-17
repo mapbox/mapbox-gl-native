@@ -166,6 +166,9 @@ tidy: Ninja/compdb
 test-%: Makefile/test
 	./scripts/run_tests.sh "build/$(HOST_SLUG)/$(BUILDTYPE)/test" --gtest_filter=$*
 
+check: Makefile/test
+	./scripts/collect-coverage.sh
+
 #### Helper targets ############################################################
 
 .PHONY: print-env

@@ -117,6 +117,9 @@ ifeq ($(BUILD),osx)
 xtest: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/test
 endif
 
+.PHONY: check
+check: ; $(RUN) BUILDTYPE=Debug check
+
 .PHONY: render
 render: ; $(RUN) Makefile/mbgl-render
 
