@@ -9,6 +9,22 @@
 
 using namespace mbgl;
 
+namespace {
+
+auto readImage(const std::string& name) {
+    return decodeImage(util::read_file(name));
+}
+
+auto imageFromAtlas(const SpriteAtlas& atlas) {
+    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
+    auto data = std::make_unique<uint8_t[]>(bytes);
+    const auto src = reinterpret_cast<const uint8_t*>(atlas.getData());
+    std::copy(src, src + bytes, data.get());
+    return PremultipliedImage{ atlas.getTextureWidth(), atlas.getTextureHeight(), std::move(data) };
+}
+
+} // namespace
+
 TEST(Sprite, SpriteAtlas) {
     FixtureLog log;
 
@@ -67,13 +83,7 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(20, metro2.pos.w);
     EXPECT_EQ(20, metro2.pos.h);
 
-    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(11868256915183397177u, hash) << std::hex << hash;
-
-    // util::write_file(
-    //     "test/fixtures/annotations/atlas1.png",
-    //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
+    EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas.png"), imageFromAtlas(atlas));
 }
 
 TEST(Sprite, SpriteAtlasSize) {
@@ -102,13 +112,8 @@ TEST(Sprite, SpriteAtlasSize) {
     EXPECT_EQ(18, metro.spriteImage->image.height);
     EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
-    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(18324190582232646342u, hash) << std::hex << hash;
-
-    // util::write_file(
-    //     "test/fixtures/annotations/atlas2.png",
-    //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
+    EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlassize.png"),
+              imageFromAtlas(atlas));
 }
 
 TEST(Sprite, SpriteAtlasUpdates) {
@@ -134,9 +139,8 @@ TEST(Sprite, SpriteAtlasUpdates) {
     EXPECT_EQ(12, one.spriteImage->image.height);
     EXPECT_EQ(1.0f, one.spriteImage->pixelRatio);
 
-    const size_t bytes = atlas.getTextureWidth() * atlas.getTextureHeight() * 4;
-    const auto hash = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x0000000000000000u, hash) << std::hex << hash;
+    EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas-empty.png"),
+              imageFromAtlas(atlas));
 
     // Update sprite
     PremultipliedImage image2(16, 12);
@@ -148,16 +152,12 @@ TEST(Sprite, SpriteAtlasUpdates) {
     ASSERT_EQ(newSprite, store.getSprite("one"));
 
     // Atlas texture hasn't changed yet.
-    const auto hash2 = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x0000000000000000u, hash2) << std::hex << hash2;
+    EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas-empty.png"),
+              imageFromAtlas(atlas));
 
     atlas.updateDirty();
 
     // Now the atlas texture has changed.
-    const auto hash3 = test::crc64(reinterpret_cast<const char*>(atlas.getData()), bytes);
-    EXPECT_EQ(0x4E6D4900CD2D9149u, hash3) << std::hex << hash3;
-
-    // util::write_file(
-    //     "test/fixtures/annotations/atlas3.png",
-    //     util::compress_png(atlas.getTextureWidth(), atlas.getTextureHeight(), atlas.getData()));
+    EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas-updated.png"),
+              imageFromAtlas(atlas));
 }

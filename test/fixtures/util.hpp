@@ -31,10 +31,6 @@ private:
     int fd = -1;
 };
 
-uint64_t crc64(const char*, size_t);
-uint64_t crc64(const std::string&);
-uint64_t crc64(const PremultipliedImage&);
-
 PremultipliedImage render(Map&);
 
 void checkImage(const std::string& base,

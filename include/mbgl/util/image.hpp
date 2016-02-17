@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <algorithm>
 
 namespace mbgl {
 
@@ -25,6 +26,12 @@ public:
         : width(w),
           height(h),
           data(std::move(data_)) {}
+
+    bool operator==(const Image& rhs) const {
+        return width == rhs.width && height == rhs.height &&
+               std::equal(data.get(), data.get() + size(), rhs.data.get(),
+                          rhs.data.get() + rhs.size());
+    }
 
     size_t stride() const { return width * 4; }
     size_t size() const { return width * height * 4; }

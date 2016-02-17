@@ -8,11 +8,6 @@
 
 #include <mapbox/pixelmatch.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/crc.hpp>
-#pragma GCC diagnostic pop
-
 #include <csignal>
 #include <future>
 
@@ -88,22 +83,6 @@ Server::~Server() {
     if (fd > 0) {
         close(fd);
     }
-}
-
-
-// from https://gist.github.com/ArtemGr/997887
-uint64_t crc64(const char* data, size_t size) {
-    boost::crc_optimal<64, 0x04C11DB7, 0, 0, false, false> crc;
-    crc.process_bytes(data, size);
-    return crc.checksum();
-}
-
-uint64_t crc64(const std::string& str) {
-    return crc64(str.data(), str.size());
-}
-
-uint64_t crc64(const PremultipliedImage &image) {
-    return crc64(reinterpret_cast<const char*>(image.data.get()), image.size());
 }
 
 PremultipliedImage render(Map& map) {
