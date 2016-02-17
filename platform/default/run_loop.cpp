@@ -13,12 +13,6 @@ namespace {
 using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void dummyCallback(uv_async_t*, int) {};
-#else
-void dummyCallback(uv_async_t*) {};
-#endif
-
 } // namespace
 
 namespace mbgl {
@@ -62,18 +56,7 @@ RunLoop* RunLoop::Get() {
 
 class RunLoop::Impl {
 public:
-    void closeHolder() {
-        uv_close(holderHandle(), [](uv_handle_t* h) {
-            delete reinterpret_cast<uv_async_t*>(h);
-        });
-    }
-
-    uv_handle_t* holderHandle() {
-        return reinterpret_cast<uv_handle_t*>(holder);
-    }
-
     uv_loop_t *loop = nullptr;
-    uv_async_t* holder = new uv_async_t;
 
     RunLoop::Type type;
     std::unique_ptr<AsyncTask> async;
@@ -99,12 +82,6 @@ RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
         break;
     }
 
-    // Just for holding a ref to the main loop and keep
-    // it alive as required by libuv.
-    if (uv_async_init(impl->loop, impl->holder, dummyCallback) != 0) {
-        throw std::runtime_error("Failed to initialize async.");
-    }
-
     impl->type = type;
 
     current.set(this);
@@ -113,10 +90,6 @@ RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
 
 RunLoop::~RunLoop() {
     current.set(nullptr);
-
-    // Close the dummy handle that we have
-    // just to keep the main loop alive.
-    impl->closeHolder();
 
     if (impl->type == Type::Default) {
         return;
@@ -161,7 +134,7 @@ void RunLoop::runOnce() {
 }
 
 void RunLoop::stop() {
-    invoke([&] { uv_unref(impl->holderHandle()); });
+    invoke([&] { uv_stop(impl->loop); });
 }
 
 void RunLoop::addWatch(int fd, Event event, std::function<void(int, Event)>&& callback) {

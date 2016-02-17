@@ -22,7 +22,6 @@ public:
         }
 
         handle()->data = this;
-        uv_unref(handle());
     }
 
     ~Impl() {
