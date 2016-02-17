@@ -18,10 +18,11 @@ namespace mbgl {
 
 class View;
 class MapData;
-class TexturePool;
 class Painter;
 class SpriteImage;
 class FileRequest;
+
+namespace gl { class TexturePool; }
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
@@ -86,7 +87,7 @@ private:
     util::AsyncTask asyncUpdate;
     util::AsyncTask asyncInvalidate;
 
-    std::unique_ptr<TexturePool> texturePool;
+    std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
 

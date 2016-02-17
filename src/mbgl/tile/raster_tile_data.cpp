@@ -11,7 +11,7 @@ using namespace mbgl;
 RasterTileData::RasterTileData(const TileID& id_,
                                float pixelRatio,
                                const std::string& urlTemplate,
-                               TexturePool &texturePool_,
+                               gl::TexturePool &texturePool_,
                                Worker& worker_,
                                const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),

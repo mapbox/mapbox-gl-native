@@ -5,7 +5,7 @@
 
 using namespace mbgl;
 
-RasterBucket::RasterBucket(TexturePool& texturePool)
+RasterBucket::RasterBucket(gl::TexturePool& texturePool)
 : raster(texturePool) {
 }
 

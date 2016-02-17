@@ -9,7 +9,7 @@
 
 using namespace mbgl;
 
-Raster::Raster(TexturePool& texturePool_)
+Raster::Raster(gl::TexturePool& texturePool_)
     : texturePool(texturePool_)
 {}
 

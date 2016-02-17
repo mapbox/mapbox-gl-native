@@ -17,8 +17,9 @@
 #include <mbgl/sprite/sprite_store.hpp>
 
 #include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/texture_pool.hpp>
+
 #include <mbgl/util/worker.hpp>
-#include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/mapbox.hpp>
@@ -33,7 +34,7 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLCon
       data(*dataPtr),
       asyncUpdate([this] { update(); }),
       asyncInvalidate([&view_] { view_.invalidate(); }),
-      texturePool(std::make_unique<TexturePool>()) {
+      texturePool(std::make_unique<gl::TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     util::ThreadContext::setFileSource(&fileSource);

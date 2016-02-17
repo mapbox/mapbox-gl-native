@@ -12,7 +12,7 @@ class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(TexturePool&);
+    RasterBucket(gl::TexturePool&);
 
     void upload() override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;

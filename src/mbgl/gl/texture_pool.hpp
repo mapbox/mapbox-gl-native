@@ -5,9 +5,9 @@
 #include <mbgl/gl/gl.hpp>
 
 #include <set>
-#include <mutex>
 
 namespace mbgl {
+namespace gl {
 
 class TexturePool : private util::noncopyable {
 
@@ -20,6 +20,7 @@ private:
     std::set<GLuint> texture_ids;
 };
 
+} // namespace gl
 } // namespace mbgl
 
 #endif

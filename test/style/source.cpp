@@ -12,7 +12,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/util/worker.hpp>
-#include <mbgl/util/texture_pool.hpp>
+#include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
 #include <mbgl/layer/line_layer.hpp>
@@ -29,7 +29,7 @@ public:
     Transform transform { view, ConstrainMode::HeightOnly };
     TransformState transformState;
     Worker worker { 1 };
-    TexturePool texturePool;
+    gl::TexturePool texturePool;
     MapData mapData { MapMode::Still, GLContextMode::Unique, 1.0 };
     Style style { mapData };
 

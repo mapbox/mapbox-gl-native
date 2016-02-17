@@ -26,10 +26,10 @@ class SpriteAtlas;
 class LineAtlas;
 class StyleLayer;
 class TransformState;
-class TexturePool;
-
 class Tile;
 class Bucket;
+
+namespace gl { class TexturePool; }
 
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
@@ -79,7 +79,7 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const TransformState&, TexturePool&);
+    void update(const TransformState&, gl::TexturePool&);
 
     void cascade();
     void recalculate(float z);

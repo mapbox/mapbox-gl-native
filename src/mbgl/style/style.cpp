@@ -116,7 +116,7 @@ void Style::removeLayer(const std::string& id) {
 }
 
 void Style::update(const TransformState& transform,
-                   TexturePool& texturePool) {
+                   gl::TexturePool& texturePool) {
     bool allTilesUpdated = true;
     StyleUpdateParameters parameters(data.pixelRatio,
                                      data.getDebug(),

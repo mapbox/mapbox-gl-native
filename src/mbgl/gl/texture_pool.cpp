@@ -1,4 +1,4 @@
-#include <mbgl/util/texture_pool.hpp>
+#include <mbgl/gl/texture_pool.hpp>
 
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/thread_context.hpp>
@@ -7,7 +7,8 @@
 
 const GLsizei TextureMax = 64;
 
-using namespace mbgl;
+namespace mbgl {
+namespace gl {
 
 GLuint TexturePool::getTextureID() {
     if (texture_ids.empty()) {
@@ -51,3 +52,6 @@ void TexturePool::clearTextureIDs() {
     }
     texture_ids.clear();
 }
+
+} // namespace gl
+} // namespace mbgl
