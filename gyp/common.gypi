@@ -88,7 +88,18 @@
     ],
     'configurations': {
       'Debug': {
-        'cflags_cc': [ '-g', '-O0', '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
+        'cflags_cc': [
+          '-g',
+          '-O0',
+          '-fno-omit-frame-pointer',
+          '-fwrapv',
+          '-fstack-protector-all',
+          '-fno-common',
+          '--coverage',
+        ],
+        'ldflags': [
+          '--coverage',
+        ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
           'GCC_OPTIMIZATION_LEVEL': '0',
