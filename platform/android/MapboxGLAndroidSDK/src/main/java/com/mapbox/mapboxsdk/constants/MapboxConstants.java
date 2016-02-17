@@ -68,6 +68,7 @@ public class MapboxConstants {
     public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
 
     // Save instance state keys
+    public static final String STATE_HAS_SAVED_STATE = "savedState";
     public static final String STATE_CAMERA_POSITION = "cameraPosition";
     public static final String STATE_ZOOM_ENABLED = "zoomEnabled";
     public static final String STATE_SCROLL_ENABLED = "scrollEnabled";

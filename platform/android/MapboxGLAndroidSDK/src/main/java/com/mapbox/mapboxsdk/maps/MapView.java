@@ -309,7 +309,7 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
 
             // Get previous camera position
             CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
@@ -363,7 +363,9 @@ public class MapView extends FrameLayout {
                 // User did not accept location permissions
             }
 
+            //noinspection ResourceType
             setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+            //noinspection ResourceType
             setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else {
             // Force a check for Telemetry
@@ -402,6 +404,7 @@ public class MapView extends FrameLayout {
 
     @UiThread
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
         outState.putString(MapboxConstants.STATE_STYLE_URL, mMapboxMap.getStyleUrl());
@@ -1145,7 +1148,7 @@ public class MapView extends FrameLayout {
     /**
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     * <p/>
+     * <p>
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
@@ -1413,7 +1416,7 @@ public class MapView extends FrameLayout {
 
     /**
      * Sets Bearing in degrees
-     * <p/>
+     * <p>
      * NOTE: Used by UserLocationView
      *
      * @param bearing  Bearing in degrees
@@ -2369,7 +2372,6 @@ public class MapView extends FrameLayout {
      * See {@link MyLocationTracking} for different values.
      *
      * @param myLocationTrackingMode The location tracking mode to be used.
-     * @throws SecurityException if no suitable permission is present
      * @see MyLocationTracking
      */
     @UiThread
@@ -2410,16 +2412,11 @@ public class MapView extends FrameLayout {
      * See {@link MyBearingTracking} for different values.
      *
      * @param myBearingTrackingMode The bearing tracking mode to be used.
-     * @throws SecurityException if no suitable permission is present
      * @see MyBearingTracking
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         if (myBearingTrackingMode != MyBearingTracking.NONE && !mMapboxMap.isMyLocationEnabled()) {
-            //noinspection ResourceType
             mMapboxMap.setMyLocationEnabled(true);
         }
         mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);

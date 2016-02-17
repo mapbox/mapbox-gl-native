@@ -1265,7 +1265,6 @@ public class MapboxMap {
      * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
      *
      * @param enabled True to enable; false to disable.
-     * @throws SecurityException if no suitable permission is present
      */
     @UiThread
     public void setMyLocationEnabled(boolean enabled) {
