@@ -46,7 +46,7 @@ public class CompassView extends ImageView {
 
         // View configuration
         setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
-        setContentDescription(getResources().getString(R.string.compassContentDescription));
+        setContentDescription(getResources().getString(R.string.mapbox_compassContentDescription));
         setEnabled(false);
 
         // Layout params

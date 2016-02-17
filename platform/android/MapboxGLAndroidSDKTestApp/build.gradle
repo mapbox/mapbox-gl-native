@@ -7,7 +7,7 @@ task accessToken {
     if (!tokenFile.exists()) {
         String tokenFileContents = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
                 "<resources>\n" +
-                "    <string name=\"access_token\">" + "$System.env.MAPBOX_ACCESS_TOKEN" + "</string>\n" +
+                "    <string name=\"mapbox_access_token\">" + "$System.env.MAPBOX_ACCESS_TOKEN" + "</string>\n" +
                 "</resources>"
 
         if (tokenFileContents == null) {

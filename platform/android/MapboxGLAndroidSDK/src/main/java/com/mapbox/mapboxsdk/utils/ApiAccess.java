@@ -37,7 +37,7 @@ public final class ApiAccess {
             return token;
         } catch (Exception e) {
             // use fallback on string resource, used for development
-            int tokenResId = context.getResources().getIdentifier("access_token", "string", context.getPackageName());
+            int tokenResId = context.getResources().getIdentifier("mapbox_access_token", "string", context.getPackageName());
             return tokenResId != 0 ? context.getString(tokenResId) : null;
         }
     }

@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/attributionTelemetryMessage"
+        android:text="@string/mapbox_attributionTelemetryMessage"
         android:gravity="center_horizontal"/>
 
     <ListView

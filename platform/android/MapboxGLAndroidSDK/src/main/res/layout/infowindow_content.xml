@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:maxEms="17"
-            android:text="@string/infoWindowTitle"
+            android:text="@string/mapbox_infoWindowTitle"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -31,7 +31,7 @@
             android:layout_marginTop="2dp"
             android:lineSpacingExtra="1dp"
             android:maxEms="17"
-            android:text="@string/infoWindowDescription"
+            android:text="@string/mapbox_infoWindowDescription"
             android:textColor="@color/gray"
             android:textSize="14sp" />
 
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxEms="17"
-            android:text="@string/infoWindowAddress"
+            android:text="@string/mapbox_infoWindowAddress"
             android:textColor="@color/black"
             android:textSize="12sp"
             android:visibility="gone" />
