@@ -7,6 +7,7 @@
 
       'sources': [
         '../platform/default/headless_view.cpp',
+        '../platform/default/headless_view_glx.cpp',
         '../platform/default/headless_display.cpp',
       ],
 

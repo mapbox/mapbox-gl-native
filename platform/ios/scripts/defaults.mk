@@ -1,4 +1,4 @@
-HEADLESS = none
+HEADLESS = eagl
 PLATFORM ?= ios
 ASSET ?= fs
 HTTP ?= nsurl

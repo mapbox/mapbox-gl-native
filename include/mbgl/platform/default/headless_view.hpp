@@ -2,7 +2,12 @@
 #define MBGL_COMMON_HEADLESS_VIEW
 
 #ifdef __APPLE__
+#include <TargetConditionals.h>
+#if TARGET_OS_IOS
+#define MBGL_USE_EAGL 1
+#else
 #define MBGL_USE_CGL 1
+#endif
 #else
 #define GL_GLEXT_PROTOTYPES
 #define MBGL_USE_GLX 1
@@ -45,10 +50,16 @@ public:
     void resize(uint16_t width, uint16_t height);
 
 private:
-    void createContext();
     void loadExtensions();
-    void clearBuffers();
     bool isActive() const;
+
+    // Implementation specific functions
+    static gl::glProc initializeExtension(const char*);
+    void createContext();
+    void destroyContext();
+    void clearBuffers();
+    void activateContext();
+    void deactivateContext();
 
 private:
     std::shared_ptr<HeadlessDisplay> display;
@@ -58,6 +69,10 @@ private:
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;
+#endif
+
+#if MBGL_USE_EAGL
+    void *glContext = nullptr;
 #endif
 
 #if MBGL_USE_GLX
