@@ -32,7 +32,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -81,6 +80,7 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
@@ -89,13 +89,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -394,6 +391,17 @@ public class MapView extends FrameLayout {
                 }
             }
         });
+
+        // Fire MapLoad
+        if (savedInstanceState == null) {
+            Hashtable<String, Object> evt = new Hashtable<>();
+            evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
+            evt.put(MapboxEvent.KEY_LATITUDE, mMapboxMap.getCameraPosition().target.getLatitude());
+            evt.put(MapboxEvent.KEY_LONGITUDE, mMapboxMap.getCameraPosition().target.getLongitude());
+            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+            // TODO - Punting on Push Enabled Key due to iOS nature for now
+            MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+        }
     }
 
     /**

@@ -188,7 +188,7 @@ public class MapboxEventManager {
 
             // Manage Timer Flush
             timer = new Timer();
-            timer.schedule(new FlushEventsTimerTask(), 1, flushDelayInMillis);
+            timer.schedule(new FlushEventsTimerTask(), flushDelayInMillis, flushDelayInMillis);
         } else {
             Log.i(TAG, "Shutting Telemetry Down");
             // Shut It Down
@@ -245,7 +245,7 @@ public class MapboxEventManager {
             pushTurnstileEvent();
         }
 
- //       events.add(eventWithAttributes);
+       events.add(eventWithAttributes);
     }
 
     /**
@@ -455,6 +455,7 @@ public class MapboxEventManager {
                     jsonObject.put(MapboxEvent.KEY_COURSE, evt.get(MapboxEvent.KEY_COURSE));
                     jsonObject.put(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
                     jsonObject.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, evt.get(MapboxEvent.KEY_HORIZONTAL_ACCURACY));
+                    jsonObject.put(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
 
                     // Basic Event Meta Data
                     jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));

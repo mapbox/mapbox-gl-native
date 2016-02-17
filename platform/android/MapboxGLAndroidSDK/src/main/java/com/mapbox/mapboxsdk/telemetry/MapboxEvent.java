@@ -22,6 +22,7 @@ public class MapboxEvent implements Serializable {
     public static final String KEY_COURSE = "course";
     public static final String KEY_ALTITUDE = "altitude";
     public static final String KEY_HORIZONTAL_ACCURACY = "horizontalAccuracy";
+    public static final String KEY_ZOOM = "zoom";
 
     public static final String KEY_PUSH_ENABLED = "enabled.push";
     public static final String KEY_EMAIL_ENABLED = "enabled.email";
