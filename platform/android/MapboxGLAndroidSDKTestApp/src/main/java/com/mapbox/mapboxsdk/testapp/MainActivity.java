@@ -472,6 +472,10 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(),MapPaddingActivity.class));
                                 return true;
 
+                            case R.id.action_offline:
+                                startActivity(new Intent(getApplicationContext(), OfflineActivity.class));
+                                return true;
+
                             default:
                                 return changeMapStyle(menuItem.getItemId());
                         }

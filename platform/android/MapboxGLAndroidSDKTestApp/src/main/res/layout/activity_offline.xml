@@ -11,17 +11,26 @@
         android:background="@color/primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@+id/toolbar"
+        style="@android:style/Widget.Material.ProgressBar.Horizontal" />
+
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/cameraMapView"
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"/>
+        android:layout_below="@+id/progress_bar" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_move"
-        android:id="@+id/cameraMoveButton"
+        android:padding="10dp"
+        android:text="@string/button_download_region"
+        android:id="@+id/button_download_region"
         android:layout_margin="@dimen/fab_margin"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -31,18 +40,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_ease"
-        android:id="@+id/cameraEaseButton"
-        android:layout_alignTop="@+id/cameraMoveButton"
-        android:layout_centerHorizontal="true"
-        android:background="@color/white"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_camera_animate"
-        android:id="@+id/cameraAnimateButton"
-        android:layout_alignBottom="@+id/cameraEaseButton"
+        android:padding="10dp"
+        android:text="@string/button_list_regions"
+        android:id="@+id/button_list_regions"
+        android:layout_alignBottom="@+id/button_download_region"
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/fab_margin"
         android:background="@color/white"/>

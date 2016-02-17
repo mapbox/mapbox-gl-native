@@ -21,7 +21,6 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -91,22 +90,24 @@
             android:label="@string/activity_dynamic_marker" />
         <activity
             android:name=".MapPaddingActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/activity_map_padding" />
+            android:label="@string/activity_map_padding"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OfflineActivity"
+            android:label="@string/activity_offline" />
 
         <meta-data
             android:name="com.mapbox.AccessToken"
             android:value="" />
-
         <meta-data
             android:name="com.mapbox.TestEventsServer"
             android:value="https://cloudfront-staging.tilestream.net" />
-
         <meta-data
             android:name="com.mapbox.TestEventsAccessToken"
             android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg" />
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
+
     </application>
 
 </manifest>

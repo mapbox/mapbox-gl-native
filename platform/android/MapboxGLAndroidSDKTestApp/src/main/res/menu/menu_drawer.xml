@@ -73,6 +73,12 @@
         <menu>
 
             <item
+                android:id="@+id/action_offline"
+                android:checkable="false"
+                android:icon="@drawable/ic_airplanemode_active_black_24dp"
+                android:title="@string/action_offline" />
+
+            <item
                 android:id="@+id/action_mapboxmap"
                 android:checkable="false"
                 android:icon="@drawable/ic_mapboxmap"

@@ -103,6 +103,66 @@ extern jclass httpRequestClass;
 extern jmethodID httpRequestStartId;
 extern jmethodID httpRequestCancelId;
 
+// Offline declarations start
+
+extern jclass offlineManagerClass;
+extern jfieldID offlineManagerClassPtrId;
+
+extern jclass listOfflineRegionsCallbackClass;
+extern jmethodID listOnListMethodId;
+extern jmethodID listOnErrorMethodId;
+
+extern jclass offlineRegionClass;
+extern jfieldID offlineRegionOfflineManagerId;
+extern jfieldID offlineRegionIdId;
+extern jfieldID offlineRegionDefinitionId;
+extern jfieldID offlineRegionMetadataId;
+extern jfieldID offlineRegionPtrId;
+
+extern jclass offlineRegionDefinitionClass;
+extern jmethodID offlineRegionDefinitionConstructorId;
+extern jfieldID offlineRegionDefinitionStyleURLId;
+extern jfieldID offlineRegionDefinitionBoundsId;
+extern jfieldID offlineRegionDefinitionMinZoomId;
+extern jfieldID offlineRegionDefinitionMaxZoomId;
+extern jfieldID offlineRegionDefinitionPixelRatioId;
+
+extern jclass offlineRegionMetadataClass;
+extern jmethodID offlineRegionMetadataConstructorId;
+extern jfieldID offlineRegionMetadataMetadataId;
+
+extern jclass createOfflineRegionCallbackClass;
+extern jmethodID createOnCreateMethodId;
+extern jmethodID createOnErrorMethodId;
+
+extern jclass offlineRegionObserverClass;
+extern jmethodID offlineRegionObserveronStatusChangedId;
+extern jmethodID offlineRegionObserveronErrorId;
+extern jmethodID offlineRegionObserveronLimitId;
+
+extern jclass offlineRegionStatusClass;
+extern jmethodID offlineRegionStatusConstructorId;
+extern jfieldID offlineRegionStatusDownloadStateId;
+extern jfieldID offlineRegionStatusCompletedResourceCountId;
+extern jfieldID offlineRegionStatusCompletedResourceSizeId;
+extern jfieldID offlineRegionStatusRequiredResourceCountId;
+extern jfieldID offlineRegionStatusRequiredResourceCountIsIndeterminateId;
+
+extern jclass offlineRegionErrorClass;
+extern jmethodID offlineRegionErrorConstructorId;
+extern jfieldID offlineRegionErrorReasonId;
+extern jfieldID offlineRegionErrorMessageId;
+
+extern jclass offlineRegionStatusCallbackClass;
+extern jmethodID offlineRegionStatusOnStatusId;
+extern jmethodID offlineRegionStatusOnErrorId;
+
+extern jclass offlineRegionDeleteCallbackClass;
+extern jmethodID offlineRegionDeleteOnDeleteId;
+extern jmethodID offlineRegionDeleteOnErrorId;
+
+// Offline declarations end
+
 extern bool throw_jni_error(JNIEnv *env, const char *msg);
 extern bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName);
 extern void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);
