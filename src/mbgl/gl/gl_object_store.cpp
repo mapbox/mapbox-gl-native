@@ -1,4 +1,4 @@
-#include <mbgl/util/gl_object_store.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 
 #include <mbgl/util/thread.hpp>
 #include <mbgl/geometry/vao.hpp>
@@ -7,25 +7,25 @@
 #include <cassert>
 
 namespace mbgl {
-namespace util {
+namespace gl {
 
 void GLObjectStore::abandonVAO(GLuint vao) {
-    assert(ThreadContext::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     abandonedVAOs.emplace_back(vao);
 }
 
 void GLObjectStore::abandonBuffer(GLuint buffer) {
-    assert(ThreadContext::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     abandonedBuffers.emplace_back(buffer);
 }
 
 void GLObjectStore::abandonTexture(GLuint texture) {
-    assert(ThreadContext::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     abandonedTextures.emplace_back(texture);
 }
 
 void GLObjectStore::performCleanup() {
-    assert(ThreadContext::currentlyOn(ThreadType::Map));
+    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
     if (!abandonedVAOs.empty()) {
         MBGL_CHECK_ERROR(VertexArrayObject::Delete(static_cast<GLsizei>(abandonedVAOs.size()),
@@ -46,5 +46,5 @@ void GLObjectStore::performCleanup() {
     }
 }
 
-} // namespace util
+} // namespace gl
 } // namespace mbgl

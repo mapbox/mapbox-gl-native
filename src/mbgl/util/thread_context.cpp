@@ -60,7 +60,7 @@ void ThreadContext::setFileSource(FileSource* fileSource) {
     }
 }
 
-GLObjectStore* ThreadContext::getGLObjectStore() {
+gl::GLObjectStore* ThreadContext::getGLObjectStore() {
     if (current.get() != nullptr) {
         return current.get()->glObjectStore;
     } else {
@@ -68,7 +68,7 @@ GLObjectStore* ThreadContext::getGLObjectStore() {
     }
 }
 
-void ThreadContext::setGLObjectStore(GLObjectStore* glObjectStore) {
+void ThreadContext::setGLObjectStore(gl::GLObjectStore* glObjectStore) {
     if (current.get() != nullptr) {
         current.get()->glObjectStore = glObjectStore;
     } else {

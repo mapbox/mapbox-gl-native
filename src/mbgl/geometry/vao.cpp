@@ -1,6 +1,6 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/gl_object_store.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread_context.hpp>
 

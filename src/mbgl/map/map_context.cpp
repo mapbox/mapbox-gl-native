@@ -16,7 +16,7 @@
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 
-#include <mbgl/util/gl_object_store.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/texture_pool.hpp>
 #include <mbgl/util/exception.hpp>

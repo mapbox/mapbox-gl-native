@@ -8,9 +8,9 @@
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/gl_object_store.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/gl/gl_object_store.hpp>
 
 #include <vector>
 
@@ -80,7 +80,7 @@ private:
     std::unique_ptr<MapData> dataPtr;
     MapData& data;
 
-    util::GLObjectStore glObjectStore;
+    gl::GLObjectStore glObjectStore;
 
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
