@@ -156,7 +156,6 @@ public:
     SpriteStoreTest()
         : spriteStore(1.0) {}
 
-    util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
@@ -166,11 +165,8 @@ public:
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
-        util::ThreadContext::Set(&context);
-        util::ThreadContext::setFileSource(&fileSource);
-
         spriteStore.setObserver(&observer);
-        spriteStore.setURL("test/fixtures/resources/sprite");
+        spriteStore.load("test/fixtures/resources/sprite", fileSource);
 
         loop.run();
     }

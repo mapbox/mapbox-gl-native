@@ -68,10 +68,7 @@ bool Source::isLoading() const {
     return !loaded && req.operator bool();
 }
 
-// Note: This is a separate function that must be called exactly once after creation
-// The reason this isn't part of the constructor is that calling shared_from_this() in
-// the constructor fails.
-void Source::load() {
+void Source::load(FileSource& fileSource) {
     if (url.empty()) {
         // In case there is no URL set, we assume that we already have all of the data because the
         // TileJSON was specified inline in the stylesheet.
@@ -86,8 +83,7 @@ void Source::load() {
     }
 
     // URL may either be a TileJSON file, or a GeoJSON file.
-    FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request(Resource::source(url), [this](Response res) {
+    req = fileSource.request(Resource::source(url), [this](Response res) {
         if (res.error) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -259,12 +255,13 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
                                                              info->tiles.at(0),
                                                              parameters.texturePool,
                                                              parameters.worker,
+                                                             parameters.fileSource,
                                                              callback);
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
             if (type == SourceType::Vector) {
-                monitor = std::make_unique<VectorTileMonitor>(normalizedID, parameters.pixelRatio, info->tiles.at(0));
+                monitor = std::make_unique<VectorTileMonitor>(normalizedID, parameters.pixelRatio, info->tiles.at(0), parameters.fileSource);
             } else if (type == SourceType::Annotations) {
                 monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.data);
             } else if (type == SourceType::GeoJSON) {

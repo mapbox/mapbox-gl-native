@@ -22,6 +22,7 @@ namespace mbgl {
 
 class StyleUpdateParameters;
 class Painter;
+class FileSource;
 class FileRequest;
 class TransformState;
 class Tile;
@@ -51,7 +52,7 @@ public:
     ~Source();
 
     bool loaded = false;
-    void load();
+    void load(FileSource&);
     bool isLoading() const;
     bool isLoaded() const;
 

@@ -7,7 +7,6 @@
 
 namespace mbgl {
 
-class FileSource;
 namespace gl { class GLObjectStore; }
 
 namespace util {
@@ -34,8 +33,6 @@ public:
     static std::string getName();
     static ThreadPriority getPriority();
 
-    static FileSource* getFileSource();
-    static void setFileSource(FileSource* fileSource);
     static gl::GLObjectStore* getGLObjectStore();
     static void setGLObjectStore(gl::GLObjectStore* glObjectStore);
 
@@ -43,7 +40,6 @@ public:
     ThreadType type;
     ThreadPriority priority;
 
-    FileSource* fileSource = nullptr;
     gl::GLObjectStore* glObjectStore = nullptr;
 };
 

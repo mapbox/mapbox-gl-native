@@ -31,7 +31,7 @@ public:
     Worker worker { 1 };
     gl::TexturePool texturePool;
     MapData mapData { MapMode::Still, GLContextMode::Unique, 1.0 };
-    Style style { mapData };
+    Style style { mapData, fileSource };
 
     StyleUpdateParameters updateParameters {
         1.0,
@@ -39,6 +39,7 @@ public:
         TimePoint(),
         transformState,
         worker,
+        fileSource,
         texturePool,
         true,
         MapMode::Continuous,
@@ -51,7 +52,6 @@ public:
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         util::ThreadContext::Set(&context);
-        util::ThreadContext::setFileSource(&fileSource);
 
         transform.resize({{ 512, 512 }});
         transform.setLatLngZoom({0, 0}, 0);
@@ -88,7 +88,7 @@ TEST(Source, LoadingFail) {
 
     Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
 
     test.run();
 }
@@ -111,7 +111,7 @@ TEST(Source, LoadingCorrupt) {
 
     Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
 
     test.run();
 }
@@ -139,7 +139,7 @@ TEST(Source, RasterTileEmpty) {
 
     Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -168,7 +168,7 @@ TEST(Source, VectorTileEmpty) {
 
     Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -197,7 +197,7 @@ TEST(Source, RasterTileFail) {
 
     Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -226,7 +226,7 @@ TEST(Source, VectorTileFail) {
 
     Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -254,7 +254,7 @@ TEST(Source, RasterTileCorrupt) {
 
     Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -287,7 +287,7 @@ TEST(Source, VectorTileCorrupt) {
 
     Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -314,7 +314,7 @@ TEST(Source, RasterTileCancel) {
 
     Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();
@@ -341,7 +341,7 @@ TEST(Source, VectorTileCancel) {
 
     Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
     source.setObserver(&test.observer);
-    source.load();
+    source.load(test.fileSource);
     source.update(test.updateParameters);
 
     test.run();

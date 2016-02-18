@@ -1,4 +1,5 @@
 #include "../fixtures/util.hpp"
+#include "../fixtures/stub_file_source.hpp"
 
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/style/style.hpp>
@@ -7,11 +8,13 @@
 using namespace mbgl;
 
 TEST(Style, UnusedSource) {
+    util::RunLoop loop;
     util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
     util::ThreadContext::Set(&context);
 
     MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
-    Style style { data };
+    StubFileSource fileSource;
+    Style style { data, fileSource };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"), "");
     style.cascade();
@@ -27,11 +30,13 @@ TEST(Style, UnusedSource) {
 }
 
 TEST(Style, UnusedSourceActiveViaClassUpdate) {
+    util::RunLoop loop;
     util::ThreadContext context { "Map", util::ThreadType::Map, util::ThreadPriority::Regular };
     util::ThreadContext::Set(&context);
 
     MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
-    Style style { data };
+    StubFileSource fileSource;
+    Style style { data, fileSource };
 
     data.addClass("visible");
 

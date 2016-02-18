@@ -14,6 +14,7 @@
 
 namespace mbgl {
 
+class FileSource;
 class GlyphPBF;
 
 // The GlyphStore manages the loading and storage of Glyphs
@@ -29,7 +30,7 @@ public:
         virtual void onGlyphsError(const std::string& /* fontStack */, const GlyphRange&, std::exception_ptr) {};
     };
 
-    GlyphStore();
+    GlyphStore(FileSource&);
     ~GlyphStore();
 
     util::exclusive<FontStack> getFontStack(const std::string& fontStack);
@@ -54,6 +55,7 @@ public:
 private:
     void requestGlyphRange(const std::string& fontStackName, const GlyphRange& range);
 
+    FileSource& fileSource;
     std::string glyphURL;
 
     std::unordered_map<std::string, std::map<GlyphRange, std::unique_ptr<GlyphPBF>>> ranges;

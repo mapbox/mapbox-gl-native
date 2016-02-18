@@ -28,8 +28,9 @@
 
 namespace mbgl {
 
-MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
+MapContext::MapContext(View& view_, FileSource& fileSource_, MapMode mode_, GLContextMode contextMode_, const float pixelRatio_)
     : view(view_),
+      fileSource(fileSource_),
       dataPtr(std::make_unique<MapData>(mode_, contextMode_, pixelRatio_)),
       data(*dataPtr),
       asyncUpdate([this] { update(); }),
@@ -37,7 +38,6 @@ MapContext::MapContext(View& view_, FileSource& fileSource, MapMode mode_, GLCon
       texturePool(std::make_unique<gl::TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    util::ThreadContext::setFileSource(&fileSource);
     util::ThreadContext::setGLObjectStore(&glObjectStore);
 
     view.activate();
@@ -96,7 +96,7 @@ void MapContext::setStyleURL(const std::string& url) {
     styleURL = url;
     styleJSON.clear();
 
-    style = std::make_unique<Style>(data);
+    style = std::make_unique<Style>(data, fileSource);
 
     const size_t pos = styleURL.rfind('/');
     std::string base = "";
@@ -104,8 +104,7 @@ void MapContext::setStyleURL(const std::string& url) {
         base = styleURL.substr(0, pos + 1);
     }
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-    styleRequest = fs->request(Resource::style(styleURL), [this, base](Response res) {
+    styleRequest = fileSource.request(Resource::style(styleURL), [this, base](Response res) {
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(styleURL)) {
@@ -130,7 +129,7 @@ void MapContext::setStyleJSON(const std::string& json, const std::string& base) 
     styleURL.clear();
     styleJSON.clear();
 
-    style = std::make_unique<Style>(data);
+    style = std::make_unique<Style>(data, fileSource);
 
     loadStyleJSON(json, base);
 }

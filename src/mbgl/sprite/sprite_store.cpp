@@ -5,7 +5,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 #include <string>
@@ -25,7 +24,7 @@ SpriteStore::SpriteStore(float pixelRatio_)
 
 SpriteStore::~SpriteStore() = default;
 
-void SpriteStore::setURL(const std::string& url) {
+void SpriteStore::load(const std::string& url, FileSource& fileSource) {
     if (url.empty()) {
         // Treat a non-existent sprite as a successfully loaded empty sprite.
         loaded = true;
@@ -34,8 +33,7 @@ void SpriteStore::setURL(const std::string& url) {
 
     loader = std::make_unique<Loader>();
 
-    FileSource* fs = util::ThreadContext::getFileSource();
-    loader->jsonRequest = fs->request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
+    loader->jsonRequest = fileSource.request(Resource::spriteJSON(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
@@ -50,7 +48,7 @@ void SpriteStore::setURL(const std::string& url) {
         }
     });
 
-    loader->spriteRequest = fs->request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
+    loader->spriteRequest = fileSource.request(Resource::spriteImage(url, pixelRatio), [this](Response res) {
         if (res.error) {
             observer->onSpriteError(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

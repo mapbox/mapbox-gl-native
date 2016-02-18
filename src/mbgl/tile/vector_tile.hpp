@@ -59,10 +59,11 @@ private:
 };
 
 class TileID;
+class FileSource;
 
 class VectorTileMonitor : public GeometryTileMonitor {
 public:
-    VectorTileMonitor(const TileID&, float pixelRatio, const std::string& urlTemplate);
+    VectorTileMonitor(const TileID&, float pixelRatio, const std::string& urlTemplate, FileSource&);
 
     std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
@@ -70,6 +71,7 @@ private:
     TileID tileID;
     float pixelRatio;
     std::string urlTemplate;
+    FileSource& fileSource;
 };
 
 } // namespace mbgl

@@ -19,6 +19,7 @@
 namespace mbgl {
 
 class MapData;
+class FileSource;
 class GlyphAtlas;
 class GlyphStore;
 class SpriteStore;
@@ -54,7 +55,7 @@ class Style : public GlyphStore::Observer,
               public Source::Observer,
               public util::noncopyable {
 public:
-    Style(MapData&);
+    Style(MapData&, FileSource&);
     ~Style();
 
     class Observer : public GlyphStore::Observer,
@@ -107,6 +108,7 @@ public:
     void dumpDebugLogs() const;
 
     MapData& data;
+    FileSource& fileSource;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
     std::unique_ptr<SpriteStore> spriteStore;

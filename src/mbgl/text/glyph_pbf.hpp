@@ -14,13 +14,15 @@ namespace mbgl {
 
 class FontStack;
 class FileRequest;
+class FileSource;
 
 class GlyphPBF : private util::noncopyable {
 public:
     GlyphPBF(GlyphStore* store,
              const std::string& fontStack,
              const GlyphRange&,
-             GlyphStore::Observer*);
+             GlyphStore::Observer*,
+             FileSource&);
     ~GlyphPBF();
 
     bool isParsed() const {

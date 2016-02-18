@@ -17,14 +17,13 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    GlyphStore glyphStore;
+    GlyphStore glyphStore { fileSource };
 
     void run(const std::string& url, const std::string& fontStack, const std::set<GlyphRange>& glyphRanges) {
         // Squelch logging.
         Log::setObserver(std::make_unique<Log::NullObserver>());
 
         util::ThreadContext::Set(&context);
-        util::ThreadContext::setFileSource(&fileSource);
 
         glyphStore.setObserver(&observer);
         glyphStore.setURL(url);

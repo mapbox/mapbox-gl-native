@@ -44,22 +44,6 @@ ThreadPriority ThreadContext::getPriority() {
     }
 }
 
-FileSource* ThreadContext::getFileSource() {
-    if (current.get() != nullptr) {
-        return current.get()->fileSource;
-    } else {
-        return nullptr;
-    }
-}
-
-void ThreadContext::setFileSource(FileSource* fileSource) {
-    if (current.get() != nullptr) {
-        current.get()->fileSource = fileSource;
-    } else {
-        throw std::runtime_error("Current thread has no current ThreadContext.");
-    }
-}
-
 gl::GLObjectStore* ThreadContext::getGLObjectStore() {
     if (current.get() != nullptr) {
         return current.get()->glObjectStore;

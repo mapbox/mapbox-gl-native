@@ -7,6 +7,7 @@ namespace mbgl {
 
 class TransformState;
 class Worker;
+class FileSource;
 class MapData;
 class Style;
 namespace gl { class TexturePool; }
@@ -18,6 +19,7 @@ public:
                           TimePoint animationTime_,
                           const TransformState& transformState_,
                           Worker& worker_,
+                          FileSource& fileSource_,
                           gl::TexturePool& texturePool_,
                           bool shouldReparsePartialTiles_,
                           const MapMode mode_,
@@ -28,6 +30,7 @@ public:
           animationTime(animationTime_),
           transformState(transformState_),
           worker(worker_),
+          fileSource(fileSource_),
           texturePool(texturePool_),
           shouldReparsePartialTiles(shouldReparsePartialTiles_),
           mode(mode_),
@@ -39,6 +42,7 @@ public:
     TimePoint animationTime;
     const TransformState& transformState;
     Worker& worker;
+    FileSource& fileSource;
     gl::TexturePool& texturePool;
     bool shouldReparsePartialTiles;
     const MapMode mode;

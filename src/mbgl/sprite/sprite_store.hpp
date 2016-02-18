@@ -10,6 +10,8 @@
 
 namespace mbgl {
 
+class FileSource;
+
 class SpriteStore : private util::noncopyable {
 public:
     using Sprites = std::map<std::string, std::shared_ptr<const SpriteImage>>;
@@ -25,7 +27,7 @@ public:
     SpriteStore(float pixelRatio);
     ~SpriteStore();
 
-    void setURL(const std::string&);
+    void load(const std::string& url, FileSource&);
 
     bool isLoaded() const {
         return loaded;

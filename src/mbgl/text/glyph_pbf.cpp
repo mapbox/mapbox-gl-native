@@ -8,7 +8,6 @@
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/url.hpp>
 
@@ -64,11 +63,11 @@ namespace mbgl {
 GlyphPBF::GlyphPBF(GlyphStore* store,
                    const std::string& fontStack,
                    const GlyphRange& glyphRange,
-                   GlyphStore::Observer* observer_)
+                   GlyphStore::Observer* observer_,
+                   FileSource& fileSource)
     : parsed(false),
       observer(observer_) {
-    FileSource* fs = util::ThreadContext::getFileSource();
-    req = fs->request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
+    req = fileSource.request(Resource::glyphs(store->getURL(), fontStack, glyphRange), [this, store, fontStack, glyphRange](Response res) {
         if (res.error) {
             observer->onGlyphsError(fontStack, glyphRange, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

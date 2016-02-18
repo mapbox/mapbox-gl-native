@@ -3,7 +3,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/url.hpp>
 
 #include <utility>
@@ -182,15 +181,16 @@ util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) 
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
 }
 
-VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, const std::string& urlTemplate_)
+VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, const std::string& urlTemplate_, FileSource& fileSource_)
     : tileID(tileID_),
       pixelRatio(pixelRatio_),
-      urlTemplate(urlTemplate_) {
+      urlTemplate(urlTemplate_),
+      fileSource(fileSource_) {
 }
 
 std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
     const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.x, tileID.y, tileID.sourceZ);
-    return util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
+    return fileSource.request(resource, [callback, this](Response res) {
         if (res.error) {
             callback(std::make_exception_ptr(std::runtime_error(res.error->message)), nullptr, res.modified, res.expires);
         } else if (res.notModified) {

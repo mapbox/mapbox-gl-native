@@ -7,7 +7,10 @@
 
 namespace mbgl {
 
-GlyphStore::GlyphStore() = default;
+GlyphStore::GlyphStore(FileSource& fileSource_)
+    : fileSource(fileSource_) {
+}
+
 GlyphStore::~GlyphStore() = default;
 
 void GlyphStore::requestGlyphRange(const std::string& fontStackName, const GlyphRange& range) {
@@ -22,7 +25,7 @@ void GlyphStore::requestGlyphRange(const std::string& fontStackName, const Glyph
     }
 
     rangeSets.emplace(range,
-        std::make_unique<GlyphPBF>(this, fontStackName, range, observer));
+        std::make_unique<GlyphPBF>(this, fontStackName, range, observer, fileSource));
 }
 
 

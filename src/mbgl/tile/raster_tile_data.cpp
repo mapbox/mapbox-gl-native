@@ -13,6 +13,7 @@ RasterTileData::RasterTileData(const TileID& id_,
                                const std::string& urlTemplate,
                                gl::TexturePool &texturePool_,
                                Worker& worker_,
+                               FileSource& fileSource,
                                const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
       texturePool(texturePool_),
@@ -20,7 +21,7 @@ RasterTileData::RasterTileData(const TileID& id_,
     state = State::loading;
 
     const Resource resource = Resource::tile(urlTemplate, pixelRatio, id.x, id.y, id.sourceZ);
-    req = util::ThreadContext::getFileSource()->request(resource, [callback, this](Response res) {
+    req = fileSource.request(resource, [callback, this](Response res) {
         if (res.error) {
             callback(std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {

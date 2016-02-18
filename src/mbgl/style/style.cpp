@@ -27,9 +27,10 @@
 
 namespace mbgl {
 
-Style::Style(MapData& data_)
+Style::Style(MapData& data_, FileSource& fileSource_)
     : data(data_),
-      glyphStore(std::make_unique<GlyphStore>()),
+      fileSource(fileSource_),
+      glyphStore(std::make_unique<GlyphStore>(fileSource)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, data.pixelRatio, *spriteStore)),
@@ -55,7 +56,7 @@ void Style::setJSON(const std::string& json, const std::string&) {
     }
 
     glyphStore->setURL(parser.glyphURL);
-    spriteStore->setURL(parser.spriteURL);
+    spriteStore->load(parser.spriteURL, fileSource);
 
     loaded = true;
 }
@@ -123,6 +124,7 @@ void Style::update(const TransformState& transform,
                                      data.getAnimationTime(),
                                      transform,
                                      workers,
+                                     fileSource,
                                      texturePool,
                                      shouldReparsePartialTiles,
                                      data.mode,
@@ -180,7 +182,9 @@ void Style::recalculate(float z) {
         Source* source = getSource(layer->source);
         if (source && layer->needsRendering()) {
             source->enabled = true;
-            if (!source->loaded && !source->isLoading()) source->load();
+            if (!source->loaded && !source->isLoading()) {
+                source->load(fileSource);
+            }
         }
     }
 }

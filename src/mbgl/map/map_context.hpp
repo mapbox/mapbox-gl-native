@@ -78,6 +78,7 @@ private:
     void loadStyleJSON(const std::string& json, const std::string& base);
 
     View& view;
+    FileSource& fileSource;
     std::unique_ptr<MapData> dataPtr;
     MapData& data;
 
