@@ -51,7 +51,7 @@
           'configurations': {
             'Debug': {
               'xcode_settings': {
-                'OTHER_LDFLAGS': [ '-lgcov' ],
+                'OTHER_LDFLAGS': [ '--coverage' ],
               },
             },
           },
