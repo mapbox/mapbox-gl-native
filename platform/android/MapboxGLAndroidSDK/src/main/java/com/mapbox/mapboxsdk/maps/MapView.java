@@ -1587,6 +1587,7 @@ public class MapView extends FrameLayout {
                     if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
+                        trackGestureEvent(MapboxEvent.GESTURE_QUICK_ZOOM, e);
                     } else {
                         // Zoom in on user location view
                         PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
