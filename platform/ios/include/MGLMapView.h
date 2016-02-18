@@ -1133,7 +1133,7 @@ IB_DESIGNABLE
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation;
 
 /**
- Returns the stroke color to use when rendering a shape annotation. Defaults to black.
+ Returns the stroke color to use when rendering a shape annotation. Defaults to the map view’s tint color.
  
  @param mapView The map view rendering the shape annotation.
  @param annotation The annotation being rendered.
@@ -1142,7 +1142,7 @@ IB_DESIGNABLE
 - (UIColor *)mapView:(MGLMapView *)mapView strokeColorForShapeAnnotation:(MGLShape *)annotation;
 
 /**
- Returns the fill color to use when rendering a polygon annotation. Defaults to blue.
+ Returns the fill color to use when rendering a polygon annotation. Defaults to the map view’s tint color.
  
  @param mapView The map view rendering the polygon annotation.
  @param annotation The annotation being rendered.

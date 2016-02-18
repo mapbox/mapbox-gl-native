@@ -2469,7 +2469,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     UIColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
-                      : [UIColor blackColor]);
+                      : self.tintColor);
     return MGLColorObjectFromUIColor(color);
 }
 
@@ -2477,7 +2477,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     UIColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
-                      : [UIColor blueColor]);
+                      : self.tintColor);
     return MGLColorObjectFromUIColor(color);
 }
 
