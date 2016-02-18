@@ -33,8 +33,8 @@ android {
         applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 7
-        versionName "3.1.0"
+        versionCode 8
+        versionName "4.0.0"
 
         // Specify AndroidJUnitRunner as the default test instrumentation runner
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
