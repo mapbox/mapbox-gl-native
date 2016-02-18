@@ -12,9 +12,9 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * <p>
  * Builder for composing {@link com.mapbox.mapboxsdk.annotations.Marker} objects.
  * </p>
- *
+ * <p/>
  * <h3>Example</h3>
- *
+ * <p/>
  * <pre>
  * mMapView.addMarker(new MarkerOptions()
  *   .title("Intersection")
@@ -77,43 +77,27 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
      * @return Marker The build marker
      */
     public Marker getMarker() {
+        marker.setPosition(position);
+        marker.setSnippet(snippet);
+        marker.setTitle(title);
+        marker.setIcon(icon);
         return marker;
     }
 
     public LatLng getPosition() {
-        return marker.getPosition();
+        return position;
     }
 
     public String getSnippet() {
-        return marker.getSnippet();
+        return snippet;
     }
 
     public String getTitle() {
-        return marker.getTitle();
+        return title;
     }
 
     public Icon getIcon() {
-        return marker.getIcon();
-    }
-
-    public MarkerOptions position(LatLng position) {
-        marker.setPosition(position);
-        return this;
-    }
-
-    public MarkerOptions snippet(String snippet) {
-        marker.setSnippet(snippet);
-        return this;
-    }
-
-    public MarkerOptions icon(@Nullable Icon icon) {
-        marker.setIcon(icon);
-        return this;
-    }
-
-    public MarkerOptions title(String title) {
-        marker.setTitle(title);
-        return this;
+        return icon;
     }
 
     @Override
@@ -130,7 +114,6 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         if (getIcon() != null ? !getIcon().equals(marker.getIcon()) : marker.getIcon() != null)
             return false;
         return !(getTitle() != null ? !getTitle().equals(marker.getTitle()) : marker.getTitle() != null);
-
     }
 
     @Override
