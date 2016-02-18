@@ -1848,6 +1848,7 @@ public class MapView extends FrameLayout {
             }
 
             mBeginTime = detector.getEventTime();
+            trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
             return true;
         }
 
