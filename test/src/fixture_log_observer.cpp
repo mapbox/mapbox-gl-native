@@ -1,5 +1,5 @@
-#include "fixture_log_observer.hpp"
-#include "../fixtures/util.hpp"
+#include <mbgl/test/fixture_log_observer.hpp>
+#include <mbgl/test/util.hpp>
 
 namespace mbgl {
 

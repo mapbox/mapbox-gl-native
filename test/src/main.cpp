@@ -1,4 +1,4 @@
-#include "util.hpp"
+#include <mbgl/test/util.hpp>
 
 GTEST_API_ int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);

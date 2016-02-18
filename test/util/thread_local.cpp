@@ -2,7 +2,7 @@
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/thread_local.hpp>
 
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 using namespace mbgl::util;
 

@@ -1,5 +1,5 @@
-#include "../fixtures/util.hpp"
-#include "../fixtures/mock_view.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/mock_view.hpp>
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/geo.hpp>

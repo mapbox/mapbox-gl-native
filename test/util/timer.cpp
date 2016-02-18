@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 using namespace mbgl::util;
 

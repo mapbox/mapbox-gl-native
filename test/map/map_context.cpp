@@ -1,4 +1,4 @@
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/map_context.hpp>

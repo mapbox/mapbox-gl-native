@@ -2,7 +2,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <vector>
 

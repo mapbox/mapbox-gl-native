@@ -1,6 +1,6 @@
-#include "../fixtures/util.hpp"
-#include "../fixtures/stub_file_source.hpp"
-#include "../fixtures/stub_style_observer.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph_store.hpp>

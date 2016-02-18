@@ -1,4 +1,4 @@
-#include "util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/log.hpp>
@@ -97,10 +97,12 @@ void checkImage(const std::string& base,
                 const PremultipliedImage& actual,
                 double imageThreshold,
                 double pixelThreshold) {
+#if !TEST_READ_ONLY
     if (getenv("UPDATE")) {
         util::write_file(base + "/expected.png", encodePNG(actual));
         return;
     }
+#endif
 
     PremultipliedImage expected = decodeImage(util::read_file(base + "/expected.png"));
     PremultipliedImage diff { expected.width, expected.height };
@@ -117,8 +119,10 @@ void checkImage(const std::string& base,
 
     EXPECT_LE(pixels / (expected.width * expected.height), imageThreshold);
 
+#if !TEST_READ_ONLY
     util::write_file(base + "/actual.png", encodePNG(actual));
     util::write_file(base + "/diff.png", encodePNG(diff));
+#endif
 }
 
 } // namespace test

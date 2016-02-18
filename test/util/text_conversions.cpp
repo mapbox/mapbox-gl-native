@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/platform/platform.hpp>

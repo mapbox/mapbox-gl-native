@@ -1,4 +1,4 @@
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/mapbox.hpp>

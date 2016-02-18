@@ -1,4 +1,4 @@
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/image.hpp>

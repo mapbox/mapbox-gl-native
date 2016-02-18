@@ -1,4 +1,5 @@
-#include "../fixtures/fixture_log_observer.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/resource.hpp>

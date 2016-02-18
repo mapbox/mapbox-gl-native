@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/style/function.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>

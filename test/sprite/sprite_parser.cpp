@@ -1,5 +1,5 @@
-#include "../fixtures/util.hpp"
-#include "../fixtures/fixture_log_observer.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/sprite/sprite_parser.hpp>
 #include <mbgl/sprite/sprite_image.hpp>

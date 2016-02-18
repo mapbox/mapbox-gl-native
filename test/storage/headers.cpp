@@ -1,5 +1,5 @@
 #include "storage.hpp"
-#include "../fixtures/fixture_log_observer.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/util/http_header.hpp>
 

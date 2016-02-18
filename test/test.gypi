@@ -2,39 +2,35 @@
   'includes': [
     '../gyp/common.gypi',
   ],
+
   'targets': [
-    { 'target_name': 'symlink_TEST_DATA',
-      'type': 'none',
-      'hard_dependency': 1,
-      'actions': [
-        {
-          'action_name': 'Symlink Fixture Directory',
-          'inputs': ['<!@(pwd)/../test'],
-          'outputs': ['<(PRODUCT_DIR)/TEST_DATA'], # symlinks the test dir into TEST_DATA
-          'action': ['ln', '-s', '-f', '-n', '<@(_inputs)', '<@(_outputs)' ],
-        }
-      ],
-    },
     { 'target_name': 'test',
       'type': 'executable',
-      'include_dirs': [ '../include', '../src', '../platform/default' ],
+
+      'include_dirs': [
+        '../src',
+        '../platform/default',
+        'include',
+      ],
+
       'dependencies': [
-        'symlink_TEST_DATA',
         'mbgl.gyp:core',
         'mbgl.gyp:platform-<(platform_lib)',
         'mbgl.gyp:http-<(http_lib)',
         'mbgl.gyp:asset-<(asset_lib)',
         'mbgl.gyp:headless-<(headless_lib)',
       ],
+
       'sources': [
-        'fixtures/main.cpp',
-        'fixtures/stub_file_source.cpp',
-        'fixtures/stub_file_source.hpp',
-        'fixtures/mock_view.hpp',
-        'fixtures/util.hpp',
-        'fixtures/util.cpp',
-        'fixtures/fixture_log_observer.hpp',
-        'fixtures/fixture_log_observer.cpp',
+        # Test helper files
+        'src/main.cpp',
+        'src/stub_file_source.cpp',
+        'include/mbgl/test/stub_file_source.hpp',
+        'include/mbgl/test/mock_view.hpp',
+        'include/mbgl/test/util.hpp',
+        'src/util.cpp',
+        'include/mbgl/test/fixture_log_observer.hpp',
+        'src/fixture_log_observer.cpp',
 
         'util/assert.cpp',
         'util/async_task.cpp',
@@ -102,6 +98,7 @@
         'sprite/sprite_parser.cpp',
         'sprite/sprite_store.cpp',
       ],
+
       'variables': {
         'cflags_cc': [
           '<@(gtest_cflags)',
@@ -123,6 +120,7 @@
           '<@(geojsonvt_static_libs)',
         ],
       },
+
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {

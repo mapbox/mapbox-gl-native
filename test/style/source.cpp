@@ -1,7 +1,7 @@
-#include "../fixtures/util.hpp"
-#include "../fixtures/stub_file_source.hpp"
-#include "../fixtures/mock_view.hpp"
-#include "../fixtures/stub_style_observer.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/mock_view.hpp>
+#include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/source/source.hpp>
 #include <mbgl/util/run_loop.hpp>

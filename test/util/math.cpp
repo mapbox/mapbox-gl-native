@@ -1,4 +1,4 @@
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>

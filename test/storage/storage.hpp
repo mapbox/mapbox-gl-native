@@ -1,7 +1,7 @@
 #ifndef MBGL_TEST_STORAGE_STORAGE
 #define MBGL_TEST_STORAGE_STORAGE
 
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
 #include <mbgl/storage/response.hpp>
 #include <memory>
 

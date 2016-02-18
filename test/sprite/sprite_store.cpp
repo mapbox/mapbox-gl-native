@@ -1,7 +1,7 @@
-#include "../fixtures/util.hpp"
-#include "../fixtures/fixture_log_observer.hpp"
-#include "../fixtures/stub_file_source.hpp"
-#include "../fixtures/stub_style_observer.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
+#include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/util/run_loop.hpp>

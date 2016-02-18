@@ -1,4 +1,4 @@
-#include "../fixtures/stub_file_source.hpp"
+#include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/storage/offline_database.hpp>

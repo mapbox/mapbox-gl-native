@@ -1,4 +1,4 @@
-#include "stub_file_source.hpp"
+#include <mbgl/test/stub_file_source.hpp>
 
 namespace mbgl {
 

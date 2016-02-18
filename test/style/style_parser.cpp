@@ -1,11 +1,10 @@
-#include "../fixtures/util.hpp"
+#include <mbgl/test/util.hpp>
+#include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <rapidjson/document.h>
-
-#include "../fixtures/fixture_log_observer.hpp"
 
 #include <iostream>
 #include <fstream>
