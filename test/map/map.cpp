@@ -1,4 +1,5 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -43,4 +44,16 @@ TEST(Map, Offline) {
                      0.1);
 
     NetworkStatus::Set(NetworkStatus::Status::Online);
+}
+
+TEST(Map, DoubleStyleLoad) {
+    util::RunLoop runLoop;
+
+    std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
+    HeadlessView view(display, 1, 512, 512);
+    StubFileSource fileSource;
+
+    Map map(view, fileSource);
+    map.setStyleJSON("", "");
+    map.setStyleJSON("", "");
 }

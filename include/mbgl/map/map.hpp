@@ -8,7 +8,6 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_transition.hpp>
@@ -23,18 +22,13 @@ namespace mbgl {
 
 class FileSource;
 class View;
-class MapData;
-class MapContext;
 class SpriteImage;
-class Transform;
 class PointAnnotation;
 class ShapeAnnotation;
 struct CameraOptions;
 struct AnimationOptions;
 
 class Map : private util::noncopyable {
-    friend class View;
-
 public:
     explicit Map(View&, FileSource&,
                  MapMode mapMode = MapMode::Continuous,
@@ -176,19 +170,8 @@ public:
     void dumpDebugLogs() const;
 
 private:
-    View& view;
-    const std::unique_ptr<Transform> transform;
-    const std::unique_ptr<MapContext> context;
-    MapData* data;
-
-    enum class RenderState {
-        never,
-        partial,
-        fully
-    };
-
-    RenderState renderState = RenderState::never;
-    bool loading = false;
+    class Impl;
+    const std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl

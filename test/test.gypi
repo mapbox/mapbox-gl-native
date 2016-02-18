@@ -41,7 +41,7 @@
 
         'geometry/binpack.cpp',
 
-        'map/map_context.cpp',
+        'map/map.cpp',
         'map/tile.cpp',
         'map/transform.cpp',
 

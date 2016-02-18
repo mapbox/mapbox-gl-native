@@ -2,7 +2,6 @@
 #define MBGL_RENDERER_PAINTER
 
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/map_context.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/renderer/bucket.hpp>
@@ -13,6 +12,7 @@
 #include <mbgl/gl/gl_config.hpp>
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/style.hpp>
 
 #include <mbgl/gl/gl.hpp>
 
@@ -23,9 +23,11 @@
 #include <array>
 #include <vector>
 #include <set>
+#include <map>
 
 namespace mbgl {
 
+class MapData;
 class Style;
 class StyleLayer;
 class Tile;
@@ -34,6 +36,7 @@ class GlyphAtlas;
 class LineAtlas;
 class Source;
 struct FrameData;
+class TileData;
 
 class DebugBucket;
 class FillBucket;
@@ -69,6 +72,11 @@ struct ClipID;
 namespace util {
 class GLObjectStore;
 }
+
+struct FrameData {
+    std::array<uint16_t, 2> framebufferSize;
+    TimePoint timePoint;
+};
 
 class Painter : private util::noncopyable {
 public:

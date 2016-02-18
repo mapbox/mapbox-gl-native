@@ -3,6 +3,7 @@
 #include <mbgl/layer/background_layer.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
