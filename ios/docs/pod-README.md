@@ -16,7 +16,7 @@ The Mapbox iOS SDK may be installed as either a dynamic framework or a static fr
 
 This is the recommended workflow for manually integrating the SDK into an application targeting iOS 8 and above:
 
-1. Open the project editor and select your application target. Drag `Mapbox.framework` from the `dynamic` folder into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Open the project editor and select your application target. Drag `Mapbox.framework` from the `dynamic` folder into the “Embedded Binaries” section of the General tab. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
 1. In the Build Phases tab, click the + button at the top and select “New Run Script Phase”. Enter the following code into the script text field:
 
@@ -33,18 +33,13 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 If your application targets iOS 7.x, you’ll need to install the static framework instead:
 
-1. Open the project editor and select your application target. Drag `Mapbox.framework` from the `static` folder into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Open the project editor and select your application target. Drag `Mapbox.framework` from the `static` folder into the “Embedded Binaries” section of the General tab. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
 1. Add the following Cocoa Touch frameworks and libraries to the “Linked Frameworks and Libraries” section:
 
    - `GLKit.framework`
    - `ImageIO.framework`
    - `MobileCoreServices.framework`
-   - `QuartzCore.framework`
-   - `SystemConfiguration.framework`
-   - `libc++.tbd`
-   - `libsqlite3.tbd`
-   - `libz.tbd`
 
 1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
 

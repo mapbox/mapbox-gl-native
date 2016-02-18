@@ -188,6 +188,8 @@ if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     mkdir -p "${OUTPUT}/static/${NAME}.framework/Headers"
     cp -pv include/mbgl/{darwin,ios}/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
+    cat ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
+    cat ios/framework/Mapbox.h >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
 fi
 
 step "Copying library resources…"
