@@ -226,7 +226,7 @@ public class InfoWindow {
             if(listener!=null){
                 listener.onInfoWindowClose(getBoundMarker());
             }
-            mapboxMap.deselectMarker(getBoundMarker());
+            mapboxMap.deselectAnnotation(getBoundMarker());
             setBoundMarker(null);
         }
     }
