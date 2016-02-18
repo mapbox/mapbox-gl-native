@@ -192,10 +192,10 @@ public class InfoWindow {
         if (mIsVisible) {
             mIsVisible = false;
             View view = mView.get();
-            if (view != null) {
+            if (view != null && view.getParent() != null) {
                 ((ViewGroup) view.getParent()).removeView(view);
-                onClose();
             }
+            onClose();
         }
         return this;
     }
@@ -223,7 +223,7 @@ public class InfoWindow {
         MapboxMap mapboxMap = mMapboxMap.get();
         if (mapboxMap != null) {
             MapboxMap.OnInfoWindowCloseListener listener = mapboxMap.getOnInfoWindowCloseListener();
-            if(listener!=null){
+            if (listener != null) {
                 listener.onInfoWindowClose(getBoundMarker());
             }
             mapboxMap.deselectMarker(getBoundMarker());
@@ -252,6 +252,10 @@ public class InfoWindow {
             view.setX(mCoordinates.x + mViewWidthOffset);
             view.setY(mCoordinates.y + mMarkerHeightOffset);
         }
+    }
+
+    boolean isVisible() {
+        return mIsVisible;
     }
 
 }
