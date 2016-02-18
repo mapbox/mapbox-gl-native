@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.Manifest;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -13,6 +11,12 @@ public class TrackingSettings {
     private MapView mapView;
     private UiSettings uiSettings;
     private boolean dismissTrackingOnGesture = true;
+
+    @MyLocationTracking.Mode
+    private int mMyLocationTrackingMode;
+
+    @MyBearingTracking.Mode
+    private int mMyBearingTrackingMode;
 
     TrackingSettings(@NonNull MapView mapView, UiSettings uiSettings) {
         this.mapView = mapView;
@@ -33,10 +37,8 @@ public class TrackingSettings {
      * @see MyLocationTracking
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+        mMyLocationTrackingMode = myLocationTrackingMode;
         mapView.setMyLocationTrackingMode(myLocationTrackingMode);
         validateGesturesForTrackingModes();
     }
@@ -51,7 +53,7 @@ public class TrackingSettings {
     @UiThread
     @MyLocationTracking.Mode
     public int getMyLocationTrackingMode() {
-        return mapView.getMyLocationTrackingMode();
+        return mMyLocationTrackingMode;
     }
 
     /**
@@ -70,10 +72,8 @@ public class TrackingSettings {
      * @see MyBearingTracking
      */
     @UiThread
-    @RequiresPermission(anyOf = {
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION})
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
+        mMyBearingTrackingMode = myBearingTrackingMode;
         mapView.setMyBearingTrackingMode(myBearingTrackingMode);
     }
 
@@ -87,7 +87,7 @@ public class TrackingSettings {
     @UiThread
     @MyLocationTracking.Mode
     public int getMyBearingTrackingMode() {
-        return mapView.getMyBearingTrackingMode();
+        return mMyBearingTrackingMode;
     }
 
     public boolean isDismissTrackingOnGesture() {
@@ -100,7 +100,7 @@ public class TrackingSettings {
     }
 
     private void validateGesturesForTrackingModes() {
-        if(!dismissTrackingOnGesture) {
+        if (!dismissTrackingOnGesture) {
             int myLocationTrackingMode = getMyLocationTrackingMode();
             int myBearingTrackingMode = getMyBearingTrackingMode();
 
@@ -113,5 +113,9 @@ public class TrackingSettings {
                 uiSettings.setRotateGesturesEnabled((myBearingTrackingMode == MyBearingTracking.NONE));
             }
         }
+    }
+
+    public boolean isLocationTrackingDisabled(){
+        return mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }

@@ -255,11 +255,6 @@ public final class UserLocationView extends View {
         }
     }
 
-    @MyLocationTracking.Mode
-    public int getMyLocationTrackingMode() {
-        return mMyLocationTrackingMode;
-    }
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -410,11 +405,6 @@ public final class UserLocationView extends View {
             }
         }
         update();
-    }
-
-    @MyBearingTracking.Mode
-    public int getMyBearingTrackingMode() {
-        return mMyBearingTrackingMode;
     }
 
     private class MyBearingListener implements SensorEventListener {

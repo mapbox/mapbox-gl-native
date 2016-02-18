@@ -204,4 +204,11 @@ public class UiSettingsTest {
         assertEquals("Scroll gesture should be disabled", false, uiSettings.isScrollGesturesEnabled());
     }
 
+
+    @Test
+    public void testInvalidate() {
+        UiSettings uiSettings = new UiSettings(mMapView);
+        uiSettings.invalidate();
+    }
+
 }

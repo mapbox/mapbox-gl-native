@@ -363,10 +363,11 @@ public class MapView extends FrameLayout {
                 // User did not accept location permissions
             }
 
+            TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
             //noinspection ResourceType
-            setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
+            trackingSettings.setMyLocationTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, MyLocationTracking.TRACKING_NONE));
             //noinspection ResourceType
-            setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
+            trackingSettings.setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else {
             // Force a check for Telemetry
             validateTelemetryServiceConfigured();
@@ -411,8 +412,12 @@ public class MapView extends FrameLayout {
         outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
         outState.putLong(MapboxConstants.STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
-        outState.putInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, getMyLocationTrackingMode());
-        outState.putInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, getMyBearingTrackingMode());
+
+
+        // TrackingSettings
+        TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+        outState.putInt(MapboxConstants.STATE_MY_LOCATION_TRACKING_MODE, trackingSettings.getMyLocationTrackingMode());
+        outState.putInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, trackingSettings.getMyBearingTrackingMode());
 
         // UiSettings
         UiSettings uiSettings = mMapboxMap.getUiSettings();
@@ -1148,7 +1153,7 @@ public class MapView extends FrameLayout {
     /**
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     * <p>
+     * <p/>
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
@@ -1416,7 +1421,7 @@ public class MapView extends FrameLayout {
 
     /**
      * Sets Bearing in degrees
-     * <p>
+     * <p/>
      * NOTE: Used by UserLocationView
      *
      * @param bearing  Bearing in degrees
@@ -1550,7 +1555,7 @@ public class MapView extends FrameLayout {
                     }
 
                     // Single finger double tap
-                    if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+                    if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
                     } else {
@@ -1775,7 +1780,7 @@ public class MapView extends FrameLayout {
             mQuickZoom = !mTwoTap;
 
             // Scale the map
-            if (mMapboxMap.getUiSettings().isScrollGesturesEnabled() && !mQuickZoom && mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+            if (mMapboxMap.getUiSettings().isScrollGesturesEnabled() && !mQuickZoom && mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
@@ -1853,7 +1858,7 @@ public class MapView extends FrameLayout {
             bearing += detector.getRotationDegreesDelta();
 
             // Rotate the map
-            if (mUserLocationView.getMyLocationTrackingMode() == MyLocationTracking.TRACKING_NONE) {
+            if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                 // around gesture
                 mNativeMapView.setBearing(bearing,
                         detector.getFocusX() / mScreenDensity,
@@ -2379,25 +2384,11 @@ public class MapView extends FrameLayout {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && !mMapboxMap.isMyLocationEnabled()) {
             mMapboxMap.setMyLocationEnabled(true);
         }
-
         mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
         MapboxMap.OnMyLocationTrackingModeChangeListener listener = mMapboxMap.getOnMyLocationTrackingModeChangeListener();
         if (listener != null) {
             listener.onMyLocationTrackingModeChange(myLocationTrackingMode);
         }
-    }
-
-    /**
-     * Returns the current user location tracking mode.
-     *
-     * @return The current user location tracking mode.
-     * One of the values from {@link MyLocationTracking.Mode}.
-     * @see MyLocationTracking.Mode
-     */
-    @UiThread
-    @MyLocationTracking.Mode
-    int getMyLocationTrackingMode() {
-        return mUserLocationView.getMyLocationTrackingMode();
     }
 
     /**
@@ -2426,26 +2417,11 @@ public class MapView extends FrameLayout {
         }
     }
 
-    /**
-     * Returns the current user bearing tracking mode.
-     * See {@link MyBearingTracking} for possible return values.
-     *
-     * @return the current user bearing tracking mode.
-     * @see MyBearingTracking
-     */
-    @UiThread
-    @MyLocationTracking.Mode
-    int getMyBearingTrackingMode() {
-        //noinspection ResourceType
-        return mUserLocationView.getMyBearingTrackingMode();
-    }
-
     private void resetTrackingModes() {
         try {
-            //noinspection ResourceType
-            setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-            //noinspection ResourceType
-            setMyBearingTrackingMode(MyBearingTracking.NONE);
+            TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+            trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
+            trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }
