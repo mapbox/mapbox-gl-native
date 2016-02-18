@@ -44,22 +44,6 @@ ThreadPriority ThreadContext::getPriority() {
     }
 }
 
-gl::GLObjectStore* ThreadContext::getGLObjectStore() {
-    if (current.get() != nullptr) {
-        return current.get()->glObjectStore;
-    } else {
-        return nullptr;
-    }
-}
-
-void ThreadContext::setGLObjectStore(gl::GLObjectStore* glObjectStore) {
-    if (current.get() != nullptr) {
-        current.get()->glObjectStore = glObjectStore;
-    } else {
-        throw std::runtime_error("Current thread has no current ThreadContext.");
-    }
-}
-
 class MainThreadContextRegistrar {
 public:
     MainThreadContextRegistrar() : context("Main", ThreadType::Main, ThreadPriority::Regular) {

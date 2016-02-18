@@ -12,6 +12,29 @@
 namespace mbgl {
 namespace gl {
 
+class GLObjectStore : private util::noncopyable {
+public:
+    ~GLObjectStore();
+
+    // Actually remove the objects we marked as abandoned with the above methods.
+    // Only call this while the OpenGL context is exclusive to this thread.
+    void performCleanup();
+
+private:
+    friend class ProgramHolder;
+    friend class ShaderHolder;
+    friend class BufferHolder;
+    friend class TextureHolder;
+    friend class TexturePoolHolder;
+    friend class VAOHolder;
+
+    std::vector<GLuint> abandonedPrograms;
+    std::vector<GLuint> abandonedShaders;
+    std::vector<GLuint> abandonedBuffers;
+    std::vector<GLuint> abandonedTextures;
+    std::vector<GLuint> abandonedVAOs;
+};
+
 class GLHolder : private util::noncopyable {
 public:
     GLHolder() {}
@@ -24,6 +47,7 @@ public:
 
 protected:
     GLuint id = 0;
+    GLObjectStore* objectStore = nullptr;
 };
 
 class ProgramHolder : public GLHolder {
@@ -34,7 +58,7 @@ public:
     ProgramHolder(ProgramHolder&& o) noexcept : GLHolder(std::move(o)) {}
     ProgramHolder& operator=(ProgramHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
 };
 
@@ -46,7 +70,7 @@ public:
     ShaderHolder(ShaderHolder&& o) noexcept : GLHolder(std::move(o)), type(o.type) {}
     ShaderHolder& operator=(ShaderHolder&& o) noexcept { GLHolder::operator=(std::move(o)); type = o.type; return *this; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
 
 private:
@@ -61,7 +85,7 @@ public:
     BufferHolder(BufferHolder&& o) noexcept : GLHolder(std::move(o)) {}
     BufferHolder& operator=(BufferHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
 };
 
@@ -73,7 +97,7 @@ public:
     TextureHolder(TextureHolder&& o) noexcept : GLHolder(std::move(o)) {}
     TextureHolder& operator=(TextureHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
 };
 
@@ -91,11 +115,12 @@ public:
     const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
     const GLuint& operator[](size_t pos) { return ids[pos]; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
 
 private:
     std::array<GLuint, TextureMax> ids;
+    GLObjectStore* objectStore = nullptr;
 };
 
 class VAOHolder : public GLHolder {
@@ -106,29 +131,8 @@ public:
     VAOHolder(VAOHolder&& o) noexcept : GLHolder(std::move(o)) {}
     VAOHolder& operator=(VAOHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create();
+    void create(GLObjectStore&);
     void reset();
-};
-
-class GLObjectStore : private util::noncopyable {
-public:
-    // Mark OpenGL objects for deletion
-    void abandon(VAOHolder&&);
-    void abandon(BufferHolder&&);
-    void abandon(TextureHolder&&);
-    void abandon(TexturePoolHolder&&);
-
-    // Actually remove the objects we marked as abandoned with the above methods.
-    // Only call this while the OpenGL context is exclusive to this thread.
-    void performCleanup();
-
-private:
-    // We split the holder objects in separate containers because each
-    // GLHolder-derived object can vary in size.
-    std::vector<VAOHolder> abandonedVAOs;
-    std::vector<BufferHolder> abandonedBuffers;
-    std::vector<TextureHolder> abandonedTextures;
-    std::vector<TexturePoolHolder> abandonedTexturePools;
 };
 
 } // namespace gl

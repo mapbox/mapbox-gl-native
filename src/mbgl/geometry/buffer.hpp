@@ -24,9 +24,6 @@ class Buffer : private util::noncopyable {
 public:
     ~Buffer() {
         cleanup();
-        if (buffer) {
-            util::ThreadContext::getGLObjectStore()->abandon(std::move(buffer));
-        }
     }
 
     // Returns the number of elements in this buffer. This is not the number of
@@ -40,11 +37,11 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind() {
+    void bind(gl::GLObjectStore& glObjectStore) {
         if (buffer) {
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
         } else {
-            buffer.create();
+            buffer.create(glObjectStore);
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
@@ -69,9 +66,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    inline void upload() {
+    inline void upload(gl::GLObjectStore& glObjectStore) {
         if (!buffer) {
-            bind();
+            bind(glObjectStore);
         }
     }
 

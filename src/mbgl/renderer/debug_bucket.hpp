@@ -11,6 +11,10 @@ namespace mbgl {
 
 class PlainShader;
 
+namespace util {
+class GLObjectStore;
+}
+
 class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(TileID id, TileData::State,
@@ -18,8 +22,8 @@ public:
                 optional<SystemTimePoint> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader& shader);
-    void drawPoints(PlainShader& shader);
+    void drawLines(PlainShader&, gl::GLObjectStore&);
+    void drawPoints(PlainShader&, gl::GLObjectStore&);
 
     const TileData::State state;
     const optional<SystemTimePoint> modified;

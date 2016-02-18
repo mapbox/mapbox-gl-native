@@ -79,9 +79,9 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.dasharray.value.from, layout.cap == CapType::Round);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == CapType::Round);
-        lineAtlas->bind();
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.dasharray.value.from, layout.cap == CapType::Round, glObjectStore);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == CapType::Round, glObjectStore);
+        lineAtlas->bind(glObjectStore);
 
         const float widthA = posA.width * properties.dasharray.value.fromScale;
         const float widthB = posB.width * properties.dasharray.value.toScale;
@@ -102,7 +102,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_offset = -properties.offset;
         linesdfShader->u_antialiasingmatrix = antialiasingMatrix;
 
-        bucket.drawLineSDF(*linesdfShader);
+        bucket.drawLineSDF(*linesdfShader, glObjectStore);
 
     } else if (!properties.pattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
@@ -134,9 +134,9 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linepatternShader->u_antialiasingmatrix = antialiasingMatrix;
 
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
-        spriteAtlas->bind(true);
+        spriteAtlas->bind(true, glObjectStore);
 
-        bucket.drawLinePatterns(*linepatternShader);
+        bucket.drawLinePatterns(*linepatternShader, glObjectStore);
 
     } else {
         config.program = lineShader->getID();
@@ -152,6 +152,6 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
 
         lineShader->u_color = color;
 
-        bucket.drawLines(*lineShader);
+        bucket.drawLines(*lineShader, glObjectStore);
     }
 }

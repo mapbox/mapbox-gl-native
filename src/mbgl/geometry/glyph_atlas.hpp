@@ -28,11 +28,11 @@ public:
     void removeGlyphs(uintptr_t tileUID);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind();
+    void bind(gl::GLObjectStore&);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload();
+    void upload(gl::GLObjectStore&);
 
     const GLsizei width;
     const GLsizei height;

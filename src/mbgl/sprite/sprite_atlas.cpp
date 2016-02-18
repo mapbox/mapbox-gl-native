@@ -143,9 +143,9 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     dirty = true;
 }
 
-void SpriteAtlas::upload() {
+void SpriteAtlas::upload(gl::GLObjectStore& glObjectStore) {
     if (dirty) {
-        bind();
+        bind(false, glObjectStore);
     }
 }
 
@@ -180,13 +180,13 @@ void SpriteAtlas::updateDirty() {
     }
 }
 
-void SpriteAtlas::bind(bool linear) {
+void SpriteAtlas::bind(bool linear, gl::GLObjectStore& glObjectStore) {
     if (!data) {
         return; // Empty atlas
     }
 
     if (!texture) {
-        texture.create();
+        texture.create(glObjectStore);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
@@ -246,12 +246,7 @@ void SpriteAtlas::bind(bool linear) {
     }
 };
 
-SpriteAtlas::~SpriteAtlas() {
-    std::lock_guard<std::recursive_mutex> lock(mtx);
-    if (texture) {
-        mbgl::util::ThreadContext::getGLObjectStore()->abandon(std::move(texture));
-    }
-}
+SpriteAtlas::~SpriteAtlas() = default;
 
 SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& spriteImage_,
                             const Rect<dimension>& pos_)

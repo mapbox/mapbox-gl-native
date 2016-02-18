@@ -66,9 +66,13 @@ class CollisionBoxShader;
 
 struct ClipID;
 
+namespace util {
+class GLObjectStore;
+}
+
 class Painter : private util::noncopyable {
 public:
-    Painter(MapData&, TransformState&);
+    Painter(MapData&, TransformState&, gl::GLObjectStore&);
     ~Painter();
 
     void render(const Style& style,
@@ -118,7 +122,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&));
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::GLObjectStore&));
 
     void setDepthSublayer(int n);
 
@@ -142,6 +146,8 @@ private:
 
     MapData& data;
     TransformState& state;
+    gl::GLObjectStore& glObjectStore;
+
     FrameData frame;
 
     int indent = 0;

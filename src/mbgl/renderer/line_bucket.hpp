@@ -27,16 +27,16 @@ public:
     LineBucket(float overscaling);
     ~LineBucket() override;
 
-    void upload() override;
+    void upload(gl::GLObjectStore&) override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
     bool hasData() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const std::vector<Coordinate>& line);
 
-    void drawLines(LineShader& shader);
-    void drawLineSDF(LineSDFShader& shader);
-    void drawLinePatterns(LinepatternShader& shader);
+    void drawLines(LineShader&, gl::GLObjectStore&);
+    void drawLineSDF(LineSDFShader&, gl::GLObjectStore&);
+    void drawLinePatterns(LinepatternShader&, gl::GLObjectStore&);
 
 private:
     struct TriangleElement {

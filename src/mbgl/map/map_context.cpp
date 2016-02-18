@@ -38,8 +38,6 @@ MapContext::MapContext(View& view_, FileSource& fileSource_, MapMode mode_, GLCo
       texturePool(std::make_unique<gl::TexturePool>()) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
 
-    util::ThreadContext::setGLObjectStore(&glObjectStore);
-
     view.activate();
 }
 
@@ -238,7 +236,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     // Cleanup OpenGL objects that we abandoned since the last render call.
     glObjectStore.performCleanup();
 
-    if (!painter) painter = std::make_unique<Painter>(data, transformState);
+    if (!painter) painter = std::make_unique<Painter>(data, transformState, glObjectStore);
     painter->render(*style, frame, data.getAnnotationManager()->getSpriteAtlas());
 
     if (data.mode == MapMode::Still) {

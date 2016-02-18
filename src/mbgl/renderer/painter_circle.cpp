@@ -46,5 +46,5 @@ void Painter::renderCircle(CircleBucket& bucket,
     circleShader->u_blur = std::max<float>(properties.blur, antialiasing);
     circleShader->u_size = properties.radius;
 
-    bucket.drawCircles(*circleShader);
+    bucket.drawCircles(*circleShader, glObjectStore);
 }

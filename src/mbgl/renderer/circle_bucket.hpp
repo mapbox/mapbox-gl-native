@@ -20,13 +20,13 @@ public:
     CircleBucket();
     ~CircleBucket() override;
 
-    void upload() override;
+    void upload(gl::GLObjectStore&) override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
 
     bool hasData() const override;
     void addGeometry(const GeometryCollection&);
 
-    void drawCircles(CircleShader& shader);
+    void drawCircles(CircleShader&, gl::GLObjectStore&);
 
 private:
     CircleVertexBuffer vertexBuffer_;

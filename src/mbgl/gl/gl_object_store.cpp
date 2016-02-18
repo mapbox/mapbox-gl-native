@@ -1,115 +1,119 @@
 #include <mbgl/gl/gl_object_store.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 namespace gl {
 
-void ProgramHolder::create() {
+void ProgramHolder::create(GLObjectStore& objectStore_) {
     if (id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateProgram());
 }
 
 void ProgramHolder::reset() {
     if (!id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(glDeleteProgram(id));
+    objectStore->abandonedPrograms.push_back(id);
     id = 0;
 }
 
-void ShaderHolder::create() {
+void ShaderHolder::create(GLObjectStore& objectStore_) {
     if (id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateShader(type));
 }
 
 void ShaderHolder::reset() {
     if (!id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(glDeleteShader(id));
+    objectStore->abandonedShaders.push_back(id);
     id = 0;
 }
 
-void BufferHolder::create() {
+void BufferHolder::create(GLObjectStore& objectStore_) {
     if (id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
 }
 
 void BufferHolder::reset() {
     if (!id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(glDeleteBuffers(1, &id));
+    objectStore->abandonedBuffers.push_back(id);
     id = 0;
 }
 
-void TextureHolder::create() {
+void TextureHolder::create(GLObjectStore& objectStore_) {
     if (id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(1, &id));
 }
 
 void TextureHolder::reset() {
     if (!id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(glDeleteTextures(1, &id));
+    objectStore->abandonedTextures.push_back(id);
     id = 0;
 }
 
-void TexturePoolHolder::create() {
+void TexturePoolHolder::create(GLObjectStore& objectStore_) {
     if (bool()) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
 }
 
 void TexturePoolHolder::reset() {
     if (!bool()) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(glDeleteTextures(TextureMax, ids.data()));
+    for (GLuint id : ids) {
+        if (id) {
+            objectStore->abandonedTextures.push_back(id);
+        }
+    }
     ids.fill(0);
 }
 
-void VAOHolder::create() {
+void VAOHolder::create(GLObjectStore& objectStore_) {
     if (id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
+    objectStore = &objectStore_;
     MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
 }
 
 void VAOHolder::reset() {
     if (!id) return;
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    MBGL_CHECK_ERROR(gl::DeleteVertexArrays(1, &id));
+    objectStore->abandonedVAOs.push_back(id);
     id = 0;
 }
 
-void GLObjectStore::abandon(BufferHolder&& buffer) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedBuffers.push_back(std::move(buffer));
-}
-
-void GLObjectStore::abandon(TextureHolder&& texture) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedTextures.push_back(std::move(texture));
-}
-
-void GLObjectStore::abandon(TexturePoolHolder&& texture) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedTexturePools.push_back(std::move(texture));
-}
-
-void GLObjectStore::abandon(VAOHolder&& vao) {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedVAOs.push_back(std::move(vao));
+GLObjectStore::~GLObjectStore() {
+    assert(abandonedPrograms.empty());
+    assert(abandonedShaders.empty());
+    assert(abandonedBuffers.empty());
+    assert(abandonedTextures.empty());
+    assert(abandonedVAOs.empty());
 }
 
 void GLObjectStore::performCleanup() {
-    assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
-    abandonedBuffers.clear();
-    abandonedTextures.clear();
-    abandonedTexturePools.clear();
-    abandonedVAOs.clear();
+    for (GLuint id : abandonedPrograms) {
+        MBGL_CHECK_ERROR(glDeleteProgram(id));
+    }
+    abandonedPrograms.clear();
+
+    for (GLuint id : abandonedShaders) {
+        MBGL_CHECK_ERROR(glDeleteShader(id));
+    }
+    abandonedShaders.clear();
+
+    if (!abandonedBuffers.empty()) {
+        MBGL_CHECK_ERROR(glDeleteBuffers(int(abandonedBuffers.size()), abandonedBuffers.data()));
+        abandonedBuffers.clear();
+    }
+
+    if (!abandonedTextures.empty()) {
+        MBGL_CHECK_ERROR(glDeleteTextures(int(abandonedTextures.size()), abandonedTextures.data()));
+        abandonedTextures.clear();
+    }
+
+    if (!abandonedVAOs.empty()) {
+        MBGL_CHECK_ERROR(gl::DeleteVertexArrays(int(abandonedVAOs.size()), abandonedVAOs.data()));
+        abandonedVAOs.clear();
+    }
 }
 
 } // namespace gl

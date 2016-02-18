@@ -46,23 +46,25 @@
 
 using namespace mbgl;
 
-Painter::Painter(MapData& data_, TransformState& state_)
-    : data(data_), state(state_) {
+Painter::Painter(MapData& data_, TransformState& state_, gl::GLObjectStore& glObjectStore_)
+    : data(data_),
+      state(state_),
+      glObjectStore(glObjectStore_) {
     gl::debugging::enable();
 
-    plainShader = std::make_unique<PlainShader>();
-    outlineShader = std::make_unique<OutlineShader>();
-    lineShader = std::make_unique<LineShader>();
-    linesdfShader = std::make_unique<LineSDFShader>();
-    linepatternShader = std::make_unique<LinepatternShader>();
-    patternShader = std::make_unique<PatternShader>();
-    iconShader = std::make_unique<IconShader>();
-    rasterShader = std::make_unique<RasterShader>();
-    sdfGlyphShader = std::make_unique<SDFGlyphShader>();
-    sdfIconShader = std::make_unique<SDFIconShader>();
-    dotShader = std::make_unique<DotShader>();
-    collisionBoxShader = std::make_unique<CollisionBoxShader>();
-    circleShader = std::make_unique<CircleShader>();
+    plainShader = std::make_unique<PlainShader>(glObjectStore);
+    outlineShader = std::make_unique<OutlineShader>(glObjectStore);
+    lineShader = std::make_unique<LineShader>(glObjectStore);
+    linesdfShader = std::make_unique<LineSDFShader>(glObjectStore);
+    linepatternShader = std::make_unique<LinepatternShader>(glObjectStore);
+    patternShader = std::make_unique<PatternShader>(glObjectStore);
+    iconShader = std::make_unique<IconShader>(glObjectStore);
+    rasterShader = std::make_unique<RasterShader>(glObjectStore);
+    sdfGlyphShader = std::make_unique<SDFGlyphShader>(glObjectStore);
+    sdfIconShader = std::make_unique<SDFIconShader>(glObjectStore);
+    dotShader = std::make_unique<DotShader>(glObjectStore);
+    collisionBoxShader = std::make_unique<CollisionBoxShader>(glObjectStore);
+    circleShader = std::make_unique<CircleShader>(glObjectStore);
 
     // Reset GL values
     config.reset();
@@ -108,16 +110,16 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload();
-        tileBorderBuffer.upload();
-        spriteAtlas->upload();
-        lineAtlas->upload();
-        glyphAtlas->upload();
-        annotationSpriteAtlas.upload();
+        tileStencilBuffer.upload(glObjectStore);
+        tileBorderBuffer.upload(glObjectStore);
+        spriteAtlas->upload(glObjectStore);
+        lineAtlas->upload(glObjectStore);
+        glyphAtlas->upload(glObjectStore);
+        annotationSpriteAtlas.upload(glObjectStore);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload();
+                item.bucket->upload(glObjectStore);
             }
         }
     }
@@ -315,9 +317,9 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_patternmatrix_b = matrixB;
 
         VertexArrayObject::Unbind();
-        backgroundBuffer.bind();
+        backgroundBuffer.bind(glObjectStore);
         patternShader->bind(0);
-        spriteAtlas->bind(true);
+        spriteAtlas->bind(true, glObjectStore);
     } else {
         Color color = properties.color;
         color[0] *= properties.opacity;
@@ -328,7 +330,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         config.program = plainShader->getID();
         plainShader->u_matrix = identityMatrix;
         plainShader->u_color = color;
-        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0));
+        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0), glObjectStore);
     }
 
     config.stencilTest = GL_FALSE;

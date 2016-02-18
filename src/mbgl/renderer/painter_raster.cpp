@@ -28,7 +28,7 @@ void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const
         config.depthTest = GL_TRUE;
         config.depthMask = GL_FALSE;
         setDepthSublayer(0);
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray);
+        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, glObjectStore);
     }
 }
 

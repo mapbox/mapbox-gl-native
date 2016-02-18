@@ -18,13 +18,17 @@ class StyleLayer;
 class TileID;
 class CollisionTile;
 
+namespace gl {
+class GLObjectStore;
+}
+
 class Bucket : private util::noncopyable {
 public:
     Bucket() : uploaded(false) {}
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
-    virtual void upload() = 0;
+    virtual void upload(gl::GLObjectStore&) = 0;
 
     // Every time this bucket is getting rendered, this function is called. This happens either
     // once or twice (for Opaque and Transparent render passes).

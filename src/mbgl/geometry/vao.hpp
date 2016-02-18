@@ -20,10 +20,10 @@ public:
     ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset) {
-        bindVertexArrayObject();
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset, gl::GLObjectStore& glObjectStore) {
+        bindVertexArrayObject(glObjectStore);
         if (bound_shader == 0) {
-            vertexBuffer.bind();
+            vertexBuffer.bind(glObjectStore);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
@@ -34,11 +34,11 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset) {
-        bindVertexArrayObject();
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset, gl::GLObjectStore& glObjectStore) {
+        bindVertexArrayObject(glObjectStore);
         if (bound_shader == 0) {
-            vertexBuffer.bind();
-            elementsBuffer.bind();
+            vertexBuffer.bind(glObjectStore);
+            elementsBuffer.bind(glObjectStore);
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    void bindVertexArrayObject();
+    void bindVertexArrayObject(gl::GLObjectStore&);
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 

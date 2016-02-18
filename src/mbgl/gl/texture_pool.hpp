@@ -14,14 +14,14 @@ namespace gl {
 
 class TexturePool : private util::noncopyable {
 public:
-    GLuint getTextureID();
+    GLuint getTextureID(gl::GLObjectStore&);
     void releaseTextureID(GLuint);
 
 private:
     class Impl : private util::noncopyable {
     public:
-        Impl() : ids(gl::TexturePoolHolder::TextureMax) {
-            pool.create();
+        Impl(gl::GLObjectStore& glObjectStore) : ids(gl::TexturePoolHolder::TextureMax) {
+            pool.create(glObjectStore);
             std::copy(pool.getIDs().begin(), pool.getIDs().end(), ids.begin());
         }
 

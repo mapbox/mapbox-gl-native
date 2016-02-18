@@ -6,9 +6,6 @@
 #include <thread>
 
 namespace mbgl {
-
-namespace gl { class GLObjectStore; }
-
 namespace util {
 
 enum class ThreadPriority : bool {
@@ -33,14 +30,9 @@ public:
     static std::string getName();
     static ThreadPriority getPriority();
 
-    static gl::GLObjectStore* getGLObjectStore();
-    static void setGLObjectStore(gl::GLObjectStore* glObjectStore);
-
     std::string name;
     ThreadType type;
     ThreadPriority priority;
-
-    gl::GLObjectStore* glObjectStore = nullptr;
 };
 
 } // namespace util

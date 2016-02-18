@@ -56,7 +56,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(*outlineShader, glObjectStore);
     }
 
     if (pattern) {
@@ -111,11 +111,11 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
             MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
-            spriteAtlas->bind(true);
+            spriteAtlas->bind(true, glObjectStore);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader);
+            bucket.drawElements(*patternShader, glObjectStore);
         }
     }
     else {
@@ -131,7 +131,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader);
+            bucket.drawElements(*plainShader, glObjectStore);
         }
     }
 
@@ -151,6 +151,6 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader);
+        bucket.drawVertices(*outlineShader, glObjectStore);
     }
 }

@@ -2,7 +2,6 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/util/string.hpp>
-#include <mbgl/util/thread_context.hpp>
 
 namespace mbgl {
 
@@ -15,10 +14,9 @@ VertexArrayObject::VertexArrayObject() {
 }
 
 VertexArrayObject::~VertexArrayObject() {
-    if (vao) util::ThreadContext::getGLObjectStore()->abandon(std::move(vao));
 }
 
-void VertexArrayObject::bindVertexArrayObject() {
+void VertexArrayObject::bindVertexArrayObject(gl::GLObjectStore& glObjectStore) {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {
         static bool reported = false;
         if (!reported) {
@@ -28,7 +26,7 @@ void VertexArrayObject::bindVertexArrayObject() {
         return;
     }
 
-    if (!vao) vao.create();
+    if (!vao) vao.create(glObjectStore);
     MBGL_CHECK_ERROR(gl::BindVertexArray(vao.getID()));
 }
 
