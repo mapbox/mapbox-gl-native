@@ -33,6 +33,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     BOOL _showsToolTipsOnDroppedPins;
     BOOL _randomizesCursorsOnDroppedPins;
     BOOL _isTouringWorld;
+    BOOL _isShowingPolygonAndPolylineAnnotations;
 }
 
 #pragma mark Lifecycle
@@ -241,7 +242,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 }
 
 - (IBAction)dropManyPins:(id)sender {
-    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self removeAllAnnotations:sender];
     
     NSRect bounds = self.mapView.bounds;
     NSMutableArray *annotations = [NSMutableArray array];
@@ -273,14 +274,15 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
 }
 
-- (IBAction)removeAllPins:(id)sender {
+- (IBAction)removeAllAnnotations:(id)sender {
     [self.mapView removeAnnotations:self.mapView.annotations];
+    _isShowingPolygonAndPolylineAnnotations = NO;
 }
 
 - (IBAction)startWorldTour:(id)sender {
     _isTouringWorld = YES;
     
-    [self removeAllPins:sender];
+    [self removeAllAnnotations:sender];
     NSUInteger numberOfAnnotations = sizeof(WorldTourDestinations) / sizeof(WorldTourDestinations[0]);
     NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
     for (NSUInteger i = 0; i < numberOfAnnotations; i++) {
@@ -317,6 +319,35 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     _isTouringWorld = NO;
     // Any programmatic viewpoint change cancels outstanding animations.
     self.mapView.camera = self.mapView.camera;
+}
+
+- (IBAction)drawPolygonAndPolyLineAnnotations:(id)sender {
+
+    if (_isShowingPolygonAndPolylineAnnotations) {
+        [self removeAllAnnotations:sender];
+        return;
+    }
+
+    _isShowingPolygonAndPolylineAnnotations = YES;
+
+    // Pacific Northwest triangle
+    CLLocationCoordinate2D triangleCoordinates[3] = {
+        CLLocationCoordinate2DMake(44, -122),
+        CLLocationCoordinate2DMake(46, -122),
+        CLLocationCoordinate2DMake(46, -121)
+    };
+    MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
+    [self.mapView addAnnotation:triangle];
+
+    // West coast line
+    CLLocationCoordinate2D lineCoordinates[4] = {
+        CLLocationCoordinate2DMake(47.6025, -122.3327),
+        CLLocationCoordinate2DMake(45.5189, -122.6726),
+        CLLocationCoordinate2DMake(37.7790, -122.4177),
+        CLLocationCoordinate2DMake(34.0532, -118.2349)
+    };
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
+    [self.mapView addAnnotation:line];
 }
 
 #pragma mark Help methods
@@ -457,14 +488,17 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (menuItem.action == @selector(dropManyPins:)) {
         return YES;
     }
-    if (menuItem.action == @selector(removeAllPins:)) {
-        return self.mapView.annotations.count;
+    if (menuItem.action == @selector(removeAllAnnotations:)) {
+        return self.mapView.annotations.count > 0;
     }
     if (menuItem.action == @selector(startWorldTour:)) {
         return !_isTouringWorld;
     }
     if (menuItem.action == @selector(stopWorldTour:)) {
         return _isTouringWorld;
+    }
+    if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
+        return !_isShowingPolygonAndPolylineAnnotations;
     }
     if (menuItem.action == @selector(giveFeedback:)) {
         return YES;

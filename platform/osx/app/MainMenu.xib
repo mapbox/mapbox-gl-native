@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10109" systemVersion="15E39d" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10109"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -473,10 +473,16 @@
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Pins" id="6rC-68-vk0">
+                            <menuItem title="Add Polygon and Polyline" id="DVr-vT-lpe">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="removeAllPins:" target="-1" id="NRM-y5-Wul"/>
+                                    <action selector="drawPolygonAndPolyLineAnnotations:" target="-1" id="EhT-CB-gee"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Remove All Annotations" id="6rC-68-vk0">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="removeAllAnnotations:" target="-1" id="6v3-0E-LsR"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="wQq-Mx-QY0"/>
@@ -545,7 +551,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="109" y="131" width="350" height="62"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
             <view key="contentView" id="eA4-n3-qPe">
                 <rect key="frame" x="0.0" y="0.0" width="350" height="62"/>
                 <autoresizingMask key="autoresizingMask"/>

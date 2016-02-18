@@ -104,8 +104,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Returns the color to use when rendering the outline of a shape annotation.
     
-    The default stroke color is black. If a pattern color is specified, the
-    result is undefined.
+    The default stroke color is the selected menu item color. If a pattern
+    color is specified, the result is undefined.
     
     @param mapView The map view rendering the shape annotation.
     @param annotation The annotation being rendered.
@@ -114,8 +114,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Returns the color to use when rendering the fill of a polygon annotation.
     
-    The default fill color is blue. If a pattern color is specified, the result
-    is undefined.
+    The default fill color is selected menu item color. If a pattern color
+    is specified, the result is undefined.
     
     @param mapView The map view rendering the polygon annotation.
     @param annotation The annotation being rendered.

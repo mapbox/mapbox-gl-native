@@ -1987,14 +1987,14 @@ public:
 - (mbgl::Color)strokeColorForShapeAnnotation:(MGLShape *)annotation {
     NSColor *color = (_delegateHasStrokeColorsForShapeAnnotations
                       ? [self.delegate mapView:self strokeColorForShapeAnnotation:annotation]
-                      : [NSColor blackColor]);
+                      : [NSColor selectedMenuItemColor]);
     return MGLColorObjectFromNSColor(color);
 }
 
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation {
     NSColor *color = (_delegateHasFillColorsForShapeAnnotations
                       ? [self.delegate mapView:self fillColorForPolygonAnnotation:annotation]
-                      : [NSColor blueColor]);
+                      : [NSColor selectedMenuItemColor]);
     return MGLColorObjectFromNSColor(color);
 }
 
