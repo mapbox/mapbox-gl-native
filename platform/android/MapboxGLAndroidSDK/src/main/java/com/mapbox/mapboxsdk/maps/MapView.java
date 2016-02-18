@@ -29,7 +29,6 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresPermission;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
@@ -1472,11 +1471,12 @@ public class MapView extends FrameLayout {
     /**
      * Helper method for tracking gesture events
      * @param gestureId Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
-     * @param motionEvent Original MotionEvent at start of gesture
+     * @param xCoordinate Original x screen coordinate at start of gesture
+     * @param yCoordinate Original y screen cooridnate at start of gesture
      */
-    private void trackGestureEvent(@NonNull String gestureId, @NonNull MotionEvent motionEvent) {
+    private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, float yCoordinate) {
 
-        LatLng tapLatLng = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
@@ -1514,7 +1514,7 @@ public class MapView extends FrameLayout {
                 mTwoTap = event.getPointerCount() == 2;
                 if (mTwoTap) {
                     // Confirmed 2nd Finger Down
-                    trackGestureEvent(MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, event);
+                    trackGestureEvent(MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, event.getX(), event.getY());
                 }
                 break;
 
@@ -1587,7 +1587,7 @@ public class MapView extends FrameLayout {
                     if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
-                        trackGestureEvent(MapboxEvent.GESTURE_QUICK_ZOOM, e);
+                        trackGestureEvent(MapboxEvent.GESTURE_QUICK_ZOOM, e.getX(), e.getY());
                     } else {
                         // Zoom in on user location view
                         PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
@@ -1596,7 +1596,7 @@ public class MapView extends FrameLayout {
                     break;
             }
 
-            trackGestureEvent(MapboxEvent.GESTURE_DOUBLETAP, e);
+            trackGestureEvent(MapboxEvent.GESTURE_DOUBLETAP, e.getX(), e.getY());
 
             return true;
         }
@@ -1673,7 +1673,7 @@ public class MapView extends FrameLayout {
                 }
             }
 
-            trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, e);
+            trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, e.getX(), e.getY());
 
             return true;
         }
@@ -1721,7 +1721,7 @@ public class MapView extends FrameLayout {
                 listener.onFling();
             }
 
-            trackGestureEvent(MapboxEvent.GESTURE_PAN_START, e1);
+            trackGestureEvent(MapboxEvent.GESTURE_PAN_START, e1.getX(), e1.getY());
             return true;
         }
 
@@ -1771,6 +1771,7 @@ public class MapView extends FrameLayout {
             }
 
             mBeginTime = detector.getEventTime();
+            trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
             return true;
         }
 
