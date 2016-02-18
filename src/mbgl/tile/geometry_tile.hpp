@@ -24,7 +24,10 @@ enum class FeatureType : uint8_t {
     Polygon = 3
 };
 
-typedef std::vector<std::vector<Coordinate>> GeometryCollection;
+// Normalized vector tile coordinates.
+using GeometryCoordinate  = vec2<int16_t>;
+using GeometryCoordinates = std::vector<GeometryCoordinate>;
+using GeometryCollection  = std::vector<GeometryCoordinates>;
 
 class GeometryTileFeature : private util::noncopyable {
 public:

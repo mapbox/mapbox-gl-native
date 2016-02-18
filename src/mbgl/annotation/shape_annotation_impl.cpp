@@ -133,7 +133,7 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
 
         GeometryCollection renderGeometry;
         for (auto& shapeRing : shapeFeature.tileGeometry.get<geojsonvt::TileRings>()) {
-            std::vector<Coordinate> renderLine;
+            GeometryCoordinates renderLine;
 
             for (auto& shapePoint : shapeRing) {
                 renderLine.emplace_back(shapePoint.x, shapePoint.y);

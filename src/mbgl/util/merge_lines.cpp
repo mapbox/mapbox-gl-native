@@ -11,7 +11,7 @@ unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
                             Index &rightIndex,
                             Index::iterator left,
                             size_t rightKey,
-                            std::vector<std::vector<Coordinate>> &geom) {
+                            GeometryCollection &geom) {
 
     unsigned int index = left->second;
     rightIndex.erase(left);
@@ -27,7 +27,7 @@ unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
                            Index &leftIndex,
                            size_t leftKey,
                            Index::iterator right,
-                           std::vector<std::vector<Coordinate>> &geom) {
+                           GeometryCollection &geom) {
 
     unsigned int index = right->second;
     leftIndex.erase(right);
@@ -41,8 +41,8 @@ unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
 }
 
 size_t
-getKey(const std::u32string& text, const std::vector<std::vector<Coordinate>>& geom, bool onRight) {
-    const Coordinate& coord = onRight ? geom[0].back() : geom[0].front();
+getKey(const std::u32string& text, const GeometryCollection& geom, bool onRight) {
+    const GeometryCoordinate& coord = onRight ? geom[0].back() : geom[0].front();
 
     auto hash = std::hash<std::u32string>()(text);
     boost::hash_combine(hash, coord.x);
@@ -57,7 +57,7 @@ void mergeLines(std::vector<SymbolFeature> &features) {
 
     for (unsigned int k = 0; k < features.size(); k++) {
         SymbolFeature &feature = features[k];
-        std::vector<std::vector<Coordinate>> &geometry = feature.geometry;
+        GeometryCollection &geometry = feature.geometry;
 
         if (!feature.label.length()) {
             continue;

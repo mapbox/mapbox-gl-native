@@ -41,7 +41,7 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
 
-void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
+void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
     const GLsizei len = [&vertices] {
         GLsizei l = static_cast<GLsizei>(vertices.size());
         // If the line has duplicate vertices at the end, adjust length to remove them.
@@ -60,8 +60,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (util::EXTENT / (512.0 * overscaling));
 
-    const Coordinate firstVertex = vertices.front();
-    const Coordinate lastVertex = vertices[len - 1];
+    const GeometryCoordinate firstVertex = vertices.front();
+    const GeometryCoordinate lastVertex = vertices[len - 1];
     const bool closed = firstVertex == lastVertex;
 
     if (len == 2 && closed) {
@@ -75,8 +75,8 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     int8_t flip = 1;
     double distance = 0;
     bool startOfLine = true;
-    Coordinate currentVertex = Coordinate::null(), prevVertex = Coordinate::null(),
-               nextVertex = Coordinate::null();
+    GeometryCoordinate currentVertex = GeometryCoordinate::null(), prevVertex = GeometryCoordinate::null(),
+               nextVertex = GeometryCoordinate::null();
     vec2<double> prevNormal = vec2<double>::null(), nextNormal = vec2<double>::null();
 
     // the last three vertices added
@@ -99,7 +99,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             nextVertex = vertices[i + 1];
         } else {
             // there is no next vertex
-            nextVertex = Coordinate::null();
+            nextVertex = GeometryCoordinate::null();
         }
 
         // if two consecutive vertices exist, skip the current one
@@ -153,7 +153,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         if (isSharpCorner && i > 0) {
             const double prevSegmentLength = util::dist<double>(currentVertex, prevVertex);
             if (prevSegmentLength > 2.0 * sharpCornerOffset) {
-                Coordinate newPrevVertex = currentVertex - (util::round(vec2<double>(currentVertex - prevVertex) * (sharpCornerOffset / prevSegmentLength)));
+                GeometryCoordinate newPrevVertex = currentVertex - (util::round(vec2<double>(currentVertex - prevVertex) * (sharpCornerOffset / prevSegmentLength)));
                 distance += util::dist<double>(newPrevVertex, prevVertex);
                 addCurrentVertex(newPrevVertex, flip, distance, prevNormal, 0, 0, false, startVertex, triangleStore);
                 prevVertex = newPrevVertex;
@@ -328,7 +328,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
         if (isSharpCorner && i < len - 1) {
             const double nextSegmentLength = util::dist<double>(currentVertex, nextVertex);
             if (nextSegmentLength > 2 * sharpCornerOffset) {
-                Coordinate newCurrentVertex = currentVertex + util::round(vec2<double>(nextVertex - currentVertex) * (sharpCornerOffset / nextSegmentLength));
+                GeometryCoordinate newCurrentVertex = currentVertex + util::round(vec2<double>(nextVertex - currentVertex) * (sharpCornerOffset / nextSegmentLength));
                 distance += util::dist<double>(newCurrentVertex, currentVertex);
                 addCurrentVertex(newCurrentVertex, flip, distance, nextNormal, 0, 0, false, startVertex, triangleStore);
                 currentVertex = newCurrentVertex;
@@ -361,7 +361,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     }
 }
 
-void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
+void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
                                   float flip,
                                   double distance,
                                   const vec2<double>& normal,
@@ -395,7 +395,7 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     e2 = e3;
 }
 
-void LineBucket::addPieSliceVertex(const Coordinate& currentVertex,
+void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    float flip,
                                    double distance,
                                    const vec2<double>& extrude,

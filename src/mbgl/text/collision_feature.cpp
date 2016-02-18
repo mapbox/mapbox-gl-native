@@ -3,7 +3,7 @@
 
 namespace mbgl {
 
-CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
+CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
         const float top, const float bottom, const float left, const float right,
         const float boxScale, const float padding, const bool alongLine, const bool straight) {
 
@@ -22,12 +22,12 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
 
         height = std::max(10.0f * boxScale, height);
 
-        Coordinate anchorPoint(int16_t(anchor.x), int16_t(anchor.y));
+        GeometryCoordinate anchorPoint(int16_t(anchor.x), int16_t(anchor.y));
 
         if (straight) {
             // used for icon labels that are aligned with the line, but don't curve along it
             const vec2<double> vector = util::unit(vec2<double>(line[anchor.segment + 1] - line[anchor.segment])) * length;
-            const std::vector<Coordinate> newLine({ anchorPoint - vector, anchorPoint + vector });
+            const GeometryCoordinates newLine({ anchorPoint - vector, anchorPoint + vector });
             bboxifyLabel(newLine, anchorPoint, 0, length, height);
         } else {
             // used for text labels that curve along a line
@@ -38,8 +38,8 @@ CollisionFeature::CollisionFeature(const std::vector<Coordinate> &line, const An
     }
 }
 
-void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
-        Coordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
+void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
+        GeometryCoordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
 
     const float step = boxSize / 2;
     const unsigned int nBoxes = std::floor(labelLength / step);
@@ -48,7 +48,7 @@ void CollisionFeature::bboxifyLabel(const std::vector<Coordinate> &line,
     // box is at the edge of the label.
     const float firstBoxOffset = -boxSize / 2;
 
-    Coordinate &p = anchorPoint;
+    GeometryCoordinate &p = anchorPoint;
     int index = segment + 1;
     float anchorDistance = firstBoxOffset;
 

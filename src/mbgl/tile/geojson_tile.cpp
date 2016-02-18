@@ -51,7 +51,7 @@ std::unique_ptr<GeoJSONTile> convertTile(const mapbox::geojsonvt::Tile& tile) {
 
     if (tile) {
         std::vector<std::shared_ptr<const GeoJSONTileFeature>> features;
-        std::vector<Coordinate> line;
+        GeometryCoordinates line;
 
         for (auto& feature : tile.features) {
             const FeatureType featureType =

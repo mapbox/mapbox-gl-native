@@ -2,6 +2,7 @@
 #define MBGL_TEXT_QUADS
 
 #include <mbgl/text/glyph.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/vec.hpp>
 
 #include <vector>
@@ -37,11 +38,11 @@ namespace mbgl {
     class PositionedIcon;
 
     SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
-            const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+            const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
             const bool alongLine);
     
     SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-            const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+            const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
             const bool alongLine, const GlyphPositions& face);
 } // namespace mbgl
 

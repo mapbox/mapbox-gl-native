@@ -1,5 +1,6 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/util/math.hpp>
@@ -11,7 +12,7 @@ namespace mbgl {
 const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
-        const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+        const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
         const bool alongLine) {
 
     auto image = *(shapedIcon.image);
@@ -30,10 +31,10 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     float angle = layout.icon.rotate * util::DEG2RAD;
     if (alongLine) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
-        const Coordinate &prev= line[anchor.segment];
+        const GeometryCoordinate &prev= line[anchor.segment];
         if (anchor.y == prev.y && anchor.x == prev.x &&
             static_cast<unsigned int>(anchor.segment + 1) < line.size()) {
-            const Coordinate &next= line[anchor.segment + 1];
+            const GeometryCoordinate &next= line[anchor.segment + 1];
             angle += std::atan2(anchor.y - next.y, anchor.x - next.x) + M_PI;
         } else {
             angle += std::atan2(anchor.y - prev.y, anchor.x - prev.x);
@@ -74,7 +75,7 @@ struct GlyphInstance {
 typedef std::vector<GlyphInstance> GlyphInstances;
 
 void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &anchor,
-        float offset, const std::vector<Coordinate> &line, int segment, bool forward) {
+        float offset, const GeometryCoordinates &line, int segment, bool forward) {
 
     const bool upsideDown = !forward;
 
@@ -132,7 +133,7 @@ void getSegmentGlyphs(std::back_insert_iterator<GlyphInstances> glyphs, Anchor &
 }
 
 SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-        const float boxScale, const std::vector<Coordinate>& line, const SymbolLayoutProperties& layout,
+        const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
         const bool alongLine, const GlyphPositions& face) {
 
     const float textRotate = layout.text.rotate * util::DEG2RAD;

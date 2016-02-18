@@ -4,6 +4,8 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/text/shaping.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
+
 #include <vector>
 
 namespace mbgl {
@@ -32,7 +34,7 @@ namespace mbgl {
     class CollisionFeature {
         public:
             // for text
-            inline explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
+            inline explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const Shaping &shapedText,
                     const float boxScale, const float padding, const bool alongLine)
                 : CollisionFeature(line, anchor,
@@ -40,14 +42,14 @@ namespace mbgl {
                         boxScale, padding, alongLine, false) {}
 
             // for icons
-            inline explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
+            inline explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const PositionedIcon &shapedIcon,
                     const float boxScale, const float padding, const bool alongLine)
                 : CollisionFeature(line, anchor,
                         shapedIcon.top, shapedIcon.bottom, shapedIcon.left, shapedIcon.right,
                         boxScale, padding, alongLine, true) {}
 
-            explicit CollisionFeature(const std::vector<Coordinate> &line, const Anchor &anchor,
+            explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const float top, const float bottom, const float left, const float right,
                     const float boxScale, const float padding, const bool alongLine, const bool straight);
 
@@ -55,7 +57,7 @@ namespace mbgl {
             std::vector<CollisionBox> boxes;
 
         private:
-            void bboxifyLabel(const std::vector<Coordinate> &line, Coordinate &anchorPoint, const int segment, const float length, const float height);
+            void bboxifyLabel(const GeometryCoordinates &line, GeometryCoordinate &anchorPoint, const int segment, const float length, const float height);
     };
 } // namespace mbgl
 

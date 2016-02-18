@@ -17,7 +17,7 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
     const uint32_t z2 = 1 << tileID.z;
     const uint32_t x = pp.x * z2;
     const uint32_t y = pp.y * z2;
-    const Coordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
+    const GeometryCoordinate coordinate(extent * (pp.x * z2 - x), extent * (pp.y * z2 - y));
 
     layer.features.emplace_back(
         std::make_shared<const AnnotationTileFeature>(FeatureType::Point,

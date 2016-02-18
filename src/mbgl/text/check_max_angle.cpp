@@ -1,4 +1,7 @@
 #include <mbgl/text/check_max_angle.hpp>
+#include <mbgl/geometry/anchor.hpp>
+#include <mbgl/util/math.hpp>
+
 #include <queue>
 
 namespace mbgl{
@@ -10,14 +13,14 @@ struct Corner {
     float angleDelta;
 };
 
-bool checkMaxAngle(const std::vector<Coordinate> &line, Anchor &anchor, const float labelLength,
+bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float labelLength,
         const float windowSize, const float maxAngle) {
 
     // horizontal labels always pass
     if (anchor.segment < 0) return true;
 
-    Coordinate anchorPoint = Coordinate{ (int16_t)anchor.x, (int16_t)anchor.y };
-    Coordinate &p = anchorPoint;
+    GeometryCoordinate anchorPoint = { (int16_t)anchor.x, (int16_t)anchor.y };
+    GeometryCoordinate &p = anchorPoint;
     int index = anchor.segment + 1;
     float anchorDistance = 0;
 

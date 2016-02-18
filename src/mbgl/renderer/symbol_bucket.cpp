@@ -29,7 +29,7 @@
 
 namespace mbgl {
 
-SymbolInstance::SymbolInstance(Anchor& anchor, const std::vector<Coordinate>& line,
+SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         const Shaping& shapedText, const PositionedIcon& shapedIcon,
         const SymbolLayoutProperties& layout, const bool addToBuffers, const uint32_t index_,
         const float textBoxScale, const float textPadding, const float textAlongLine,
@@ -271,7 +271,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 }
 
 
-void SymbolBucket::addFeature(const std::vector<std::vector<Coordinate>> &lines,
+void SymbolBucket::addFeature(const GeometryCollection &lines,
         const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face) {
 
     const float minScale = 0.5f;

@@ -13,13 +13,13 @@ unsigned int mergeFromRight(std::vector<SymbolFeature> &features,
                             std::map<std::string, unsigned int> &rightIndex,
                             std::map<std::string, unsigned int>::iterator left,
                             std::string &rightKey,
-                            std::vector<std::vector<Coordinate>> &geom);
+                            GeometryCollection &geom);
 
 unsigned int mergeFromLeft(std::vector<SymbolFeature> &features,
                            std::map<std::string, unsigned int> &leftIndex,
                            std::string &leftKey,
                            std::map<std::string, unsigned int>::iterator right,
-                           std::vector<std::vector<Coordinate>> &geom);
+                           GeometryCollection &geom);
 
 void mergeLines(std::vector<SymbolFeature> &features);
 
