@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-TEST_F(Storage, HTTPCancel) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPCancel)) {
     SCOPED_TEST(HTTPCancel)
 
     using namespace mbgl;
@@ -25,7 +25,7 @@ TEST_F(Storage, HTTPCancel) {
     loop.runOnce();
 }
 
-TEST_F(Storage, HTTPCancelMultiple) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPCancelMultiple)) {
     SCOPED_TEST(HTTPCancelMultiple)
 
     using namespace mbgl;

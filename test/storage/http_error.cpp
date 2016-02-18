@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-TEST_F(Storage, HTTPTemporaryError) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPTemporaryError)) {
     SCOPED_TEST(HTTPTemporaryError)
 
     using namespace mbgl;
@@ -51,7 +51,7 @@ TEST_F(Storage, HTTPTemporaryError) {
     loop.run();
 }
 
-TEST_F(Storage, HTTPConnectionError) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPConnectionError)) {
     SCOPED_TEST(HTTPConnectionError)
 
     using namespace mbgl;

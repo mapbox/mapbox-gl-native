@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-TEST_F(Storage, HTTPExpiresParsing) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPExpiresParsing)) {
     SCOPED_TEST(HTTPExpiresTest)
 
     using namespace mbgl;
@@ -31,7 +31,7 @@ TEST_F(Storage, HTTPExpiresParsing) {
     loop.run();
 }
 
-TEST_F(Storage, HTTPCacheControlParsing) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPCacheControlParsing)) {
     SCOPED_TEST(HTTPCacheControlTest)
 
     using namespace mbgl;

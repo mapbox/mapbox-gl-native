@@ -14,7 +14,7 @@
 // gets invalidated by the first notify's pending.erase, and when it gets notified, the crash
 // occurs.
 
-TEST_F(Storage, HTTPIssue1369) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     SCOPED_TEST(HTTPIssue1369)
 
     using namespace mbgl;

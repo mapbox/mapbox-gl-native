@@ -4,7 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-TEST_F(Storage, HTTPLoad) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPLoad)) {
     SCOPED_TEST(HTTPLoad)
 
     using namespace mbgl;

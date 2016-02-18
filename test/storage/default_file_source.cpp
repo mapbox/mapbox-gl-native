@@ -5,7 +5,7 @@
 
 class DefaultFileSourceTest : public Storage {};
 
-TEST_F(DefaultFileSourceTest, CacheResponse) {
+TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheResponse)) {
     SCOPED_TEST(CacheResponse);
 
     using namespace mbgl;
@@ -48,7 +48,7 @@ TEST_F(DefaultFileSourceTest, CacheResponse) {
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, CacheRevalidateSame) {
+TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     SCOPED_TEST(CacheRevalidateSame)
 
     using namespace mbgl;
@@ -97,7 +97,7 @@ TEST_F(DefaultFileSourceTest, CacheRevalidateSame) {
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, CacheRevalidateModified) {
+TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     SCOPED_TEST(CacheRevalidateModified)
 
     using namespace mbgl;
@@ -146,7 +146,7 @@ TEST_F(DefaultFileSourceTest, CacheRevalidateModified) {
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, CacheRevalidateEtag) {
+TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     SCOPED_TEST(CacheRevalidateEtag)
 
     using namespace mbgl;

@@ -1,6 +1,42 @@
 #ifndef MBGL_TEST_UTIL
 #define MBGL_TEST_UTIL
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
+#if TARGET_OS_IOS
+#define TEST_READ_ONLY 1
+#define TEST_HAS_SERVER 0
+#else
+#define TEST_READ_ONLY 0
+#define TEST_HAS_SERVER 1
+#endif
+
+#if TARGET_OS_SIMULATOR
+#define TEST_IS_SIMULATOR 1
+#else
+#define TEST_IS_SIMULATOR 0
+#endif
+
+#if !TEST_IS_SIMULATOR
+#define TEST_REQUIRES_ACCURATE_TIMING(name) name
+#else
+#define TEST_REQUIRES_ACCURATE_TIMING(name) DISABLED_ ## name
+#endif
+
+#if !TEST_READ_ONLY
+#define TEST_REQUIRES_WRITE(name) name
+#else
+#define TEST_REQUIRES_WRITE(name) DISABLED_ ## name
+#endif
+
+#if TEST_HAS_SERVER
+#define TEST_REQUIRES_SERVER(name) name
+#else
+#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
+#endif
+
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/chrono.hpp>
 

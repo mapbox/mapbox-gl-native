@@ -23,7 +23,6 @@
 
       'sources': [
         # Test helper files
-        'src/main.cpp',
         'src/stub_file_source.cpp',
         'include/mbgl/test/stub_file_source.hpp',
         'include/mbgl/test/mock_view.hpp',
@@ -122,6 +121,31 @@
       },
 
       'conditions': [
+        ['host == "ios"', {
+          'product_name': 'ios-test',
+          # iOS tests
+          'includes': [
+            '../gyp/target-ios-bundle.gypi',
+          ],
+          'sources': [
+            'src/main.mm',
+            '../src/mbgl/util/premultiply.cpp',
+          ],
+          'xcode_settings': {
+            'INFOPLIST_FILE': '../test/src/app-info.plist',
+          },
+          'copies': [
+            { 'destination': '<(PRODUCT_DIR)/$(WRAPPER_NAME)/test',
+              # Hack: When a filename begins with a $, gyp doesn't prepend $(SRCROOT)
+              'files': [ '$()../test/fixtures' ],
+            },
+          ]
+        }, {
+          # non-iOS tests
+          'sources': [
+            'src/main.cpp',
+          ]
+        }],
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],

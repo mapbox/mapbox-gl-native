@@ -22,7 +22,7 @@ std::shared_ptr<SpriteImage> namedMarker(const std::string &name) {
 namespace {
 
 void checkRendering(Map& map, const char * name) {
-    test::checkImage(std::string("test/fixtures/annotations/") + name + "/",
+    test::checkImage(std::string("test/fixtures/annotations/") + name,
                      test::render(map), 0.0002, 0.1);
 }
 

@@ -4,7 +4,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-TEST_F(Storage, HTTPOtherLoop) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPOtherLoop)) {
     SCOPED_TEST(HTTPOtherLoop)
 
     using namespace mbgl;

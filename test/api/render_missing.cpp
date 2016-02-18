@@ -10,7 +10,13 @@
 
 #include <future>
 
-TEST(API, RenderMissingTile) {
+#if TEST_HAS_SERVER
+#define TEST_REQUIRES_SERVER(name) name
+#else
+#define TEST_REQUIRES_SERVER(name) DISABLED_ ## name
+#endif
+
+TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
     using namespace mbgl;
 
     const auto style = util::read_file("test/fixtures/api/water_missing_tiles.json");

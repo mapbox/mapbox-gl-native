@@ -1,3 +1,5 @@
+#include <mbgl/test/util.hpp>
+
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -5,11 +7,9 @@
 
 #include <memory>
 
-#include <mbgl/test/util.hpp>
-
 using namespace mbgl::util;
 
-TEST(Timer, Basic) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) {
     RunLoop loop;
 
     Timer timer;
@@ -33,7 +33,7 @@ TEST(Timer, Basic) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, Repeat) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) {
     RunLoop loop;
 
     Timer timer;
@@ -59,7 +59,7 @@ TEST(Timer, Repeat) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, Stop) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) {
     RunLoop loop;
 
     Timer timer1;
@@ -95,7 +95,7 @@ TEST(Timer, Stop) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, DestroyShouldStop) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
     RunLoop loop;
 
     auto timer1 = std::make_unique<Timer>();
@@ -131,7 +131,7 @@ TEST(Timer, DestroyShouldStop) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, StartOverrides) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
     RunLoop loop;
 
     Timer timer;
@@ -165,7 +165,7 @@ TEST(Timer, StartOverrides) {
     EXPECT_LE(totalTime, expectedTotalTime * 1.2);
 }
 
-TEST(Timer, CanStopNonStartedTimer) {
+TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(CanStopNonStartedTimer)) {
     RunLoop loop;
 
     Timer timer;

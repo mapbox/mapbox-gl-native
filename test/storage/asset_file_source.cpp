@@ -60,7 +60,12 @@ TEST_F(Storage, AssetStress) {
 
     AssetFileSource fs(getFileSourceRoot());
 
+    // iOS seems to run out of file descriptors...
+#if TARGET_OS_IPHONE
+    unsigned numThreads = 30;
+#else
     unsigned numThreads = 50;
+#endif
 
     auto callback = [&] {
         if (!--numThreads) {
