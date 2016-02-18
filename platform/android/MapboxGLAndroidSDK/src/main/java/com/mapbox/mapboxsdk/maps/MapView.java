@@ -1469,6 +1469,25 @@ public class MapView extends FrameLayout {
     // Touch events
     //
 
+    /**
+     * Helper method for tracking gesture events
+     * @param gestureId Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
+     * @param motionEvent Original MotionEvent at start of gesture
+     */
+    private void trackGestureEvent(@NonNull String gestureId, @NonNull MotionEvent motionEvent) {
+
+        LatLng tapLatLng = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+
+        Hashtable<String, Object> evt = new Hashtable<>();
+        evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
+        evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
+        evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
+        evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
+        evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+
+        MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+    }
+
     // Called when user touches the screen, all positions are absolute
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
@@ -1493,6 +1512,10 @@ public class MapView extends FrameLayout {
             case MotionEvent.ACTION_POINTER_DOWN:
                 // Second pointer down
                 mTwoTap = event.getPointerCount() == 2;
+                if (mTwoTap) {
+                    // Confirmed 2nd Finger Down
+                    trackGestureEvent(MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, event);
+                }
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
@@ -1571,6 +1594,8 @@ public class MapView extends FrameLayout {
                     }
                     break;
             }
+
+            trackGestureEvent(MapboxEvent.GESTURE_DOUBLETAP, e);
 
             return true;
         }
@@ -1722,25 +1747,6 @@ public class MapView extends FrameLayout {
             }
 
             return true;
-        }
-
-        /**
-         * Helper method for tracking gesture events
-         * @param gestureId Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
-         * @param motionEvent Original MotionEvent at start of gesture
-         */
-        private void trackGestureEvent(@NonNull String gestureId, @NonNull MotionEvent motionEvent) {
-
-            LatLng tapLatLng = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
-
-            Hashtable<String, Object> evt = new Hashtable<>();
-            evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
-            evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
-            evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
-            evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
-            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
-
-            MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
         }
     }
 
