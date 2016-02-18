@@ -5,9 +5,17 @@
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/async_task.hpp>
 
+#include "version.hpp"
+
 #import <Foundation/Foundation.h>
 
 #include <mutex>
+
+@interface MBGLBundleCanary : NSObject
+@end
+
+@implementation MBGLBundleCanary
+@end
 
 namespace mbgl {
 
@@ -82,8 +90,7 @@ public:
 
             session = [NSURLSession sessionWithConfiguration:sessionConfig];
 
-            // Write user agent string
-            userAgent = @"MapboxGL";
+            userAgent = getUserAgent();
 
             accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
         }
@@ -92,7 +99,92 @@ public:
     NSURLSession* session = nil;
     NSString* userAgent = nil;
     NSInteger accountType = 0;
+    
+private:
+    NSString* getUserAgent() const;
+    NSBundle* getSDKBundle() const;
 };
+
+NSString *HTTPFileSource::Impl::getUserAgent() const {
+    NSMutableArray *userAgentComponents = [NSMutableArray array];
+    
+    NSBundle *appBundle = [NSBundle mainBundle];
+    if (appBundle) {
+        NSString *appName = appBundle.infoDictionary[@"CFBundleName"];
+        [userAgentComponents addObject:[NSString stringWithFormat:@"%@/%@",
+                                        appName.length ? appName : appBundle.infoDictionary[@"CFBundleIdentifier"],
+                                        appBundle.infoDictionary[@"CFBundleShortVersionString"]]];
+    } else {
+        [userAgentComponents addObject:[NSProcessInfo processInfo].processName];
+    }
+    
+    NSBundle *sdkBundle = HTTPFileSource::Impl::getSDKBundle();
+    if (sdkBundle) {
+        NSString *versionString = sdkBundle.infoDictionary[@"MGLSemanticVersionString"];
+        if (!versionString) {
+            versionString = sdkBundle.infoDictionary[@"CFBundleShortVersionString"];
+        }
+        if (versionString) {
+            [userAgentComponents addObject:[NSString stringWithFormat:@"%@/%@",
+                                            sdkBundle.infoDictionary[@"CFBundleName"], versionString]];
+        }
+    }
+    
+    // Avoid %s here because it inserts hidden bidirectional markers on OS X when the system
+    // language is set to a right-to-left language.
+    [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/%@ (%@)",
+                                    CFSTR(MBGL_VERSION_STRING), CFSTR(MBGL_VERSION_REV)]];
+    
+    NSString *systemName = @"Darwin";
+#if TARGET_OS_IPHONE
+    systemName = @"iOS";
+#elif TARGET_OS_MAC
+    systemName = @"OS X";
+#elif TARGET_OS_WATCH
+    systemName = @"watchOS";
+#elif TARGET_OS_TV
+    systemName = @"tvOS";
+#endif
+#if TARGET_OS_SIMULATOR
+    systemName = [systemName stringByAppendingString:@" Simulator"];
+#endif
+    NSString *systemVersion = nil;
+    if ([NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)]) {
+        NSOperatingSystemVersion osVersion = [NSProcessInfo processInfo].operatingSystemVersion;
+        systemVersion = [NSString stringWithFormat:@"%ld.%ld.%ld",
+                         (long)osVersion.majorVersion, (long)osVersion.minorVersion, (long)osVersion.patchVersion];
+    }
+    if (systemVersion) {
+        [userAgentComponents addObject:[NSString stringWithFormat:@"%@/%@", systemName, systemVersion]];
+    }
+    
+    NSString *cpu = nil;
+#if TARGET_CPU_X86
+    cpu = @"x86";
+#elif TARGET_CPU_X86_64
+    cpu = @"x86_64";
+#elif TARGET_CPU_ARM
+    cpu = @"arm";
+#elif TARGET_CPU_ARM64
+    cpu = @"arm64";
+#endif
+    if (cpu) {
+        [userAgentComponents addObject:[NSString stringWithFormat:@"(%@)", cpu]];
+    }
+    
+    return [userAgentComponents componentsJoinedByString:@" "];
+}
+
+NSBundle *HTTPFileSource::Impl::getSDKBundle() const {
+    NSBundle *bundle = [NSBundle bundleForClass:[MBGLBundleCanary class]];
+    if (bundle && ![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"]) {
+        // For static frameworks, the class is contained in the application bundle rather than the
+        // framework bundle.
+        bundle = [NSBundle bundleWithPath:[bundle.privateFrameworksPath
+                                           stringByAppendingPathComponent:@"Mapbox.framework"]];
+    }
+    return bundle;
+}
 
 HTTPFileSource::HTTPFileSource()
     : impl(std::make_unique<Impl>()) {
