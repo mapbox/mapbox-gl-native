@@ -57,6 +57,12 @@ public class VisibleRegionTest {
     }
 
     @Test
+    public void testHashcode() {
+        VisibleRegion region = new VisibleRegion(FAR_LEFT, FAR_RIGHT, NEAR_LEFT, NEAR_RIGHT, BOUNDS);
+        assertEquals("hashcode should match", -923534102, region.hashCode());
+    }
+
+    @Test
     public void testToString() {
         VisibleRegion region = new VisibleRegion(FAR_LEFT, FAR_RIGHT, NEAR_LEFT, NEAR_RIGHT, BOUNDS);
         assertEquals("string should match",

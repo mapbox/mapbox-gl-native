@@ -2,9 +2,11 @@ package com.mapbox.mapboxsdk.geometry;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -82,6 +84,18 @@ public class LatLngBoundsTest {
                 .include(LAT_LNG_NULL_ISLAND)
                 .build();
         assertFalse("Should not be empty", mLatLngBounds.isEmptySpan());
+    }
+
+    @Test
+    public void testToLatLngs() {
+        mLatLngBounds = new LatLngBounds.Builder()
+                .include(LAT_LNG_NOT_NULL_ISLAND)
+                .include(LAT_LNG_NULL_ISLAND)
+                .build();
+
+        assertArrayEquals("LatLngs should match",
+                new LatLng[]{LAT_LNG_NOT_NULL_ISLAND, LAT_LNG_NULL_ISLAND},
+                mLatLngBounds.toLatLngs());
     }
 
     @Test

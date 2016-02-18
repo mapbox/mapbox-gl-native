@@ -67,6 +67,7 @@ public class VisibleRegion implements Parcelable {
      * If the other object is actually a pointer to this object,
      * or if all four corners and the bounds of the two objects are the same,
      * this method returns true. Otherwise, this method returns false.
+     *
      * @param o The Object to compare with.
      * @return true if both objects are the same object.
      */
@@ -89,7 +90,15 @@ public class VisibleRegion implements Parcelable {
 
     @Override
     public String toString() {
-        return "[farLeft [" + farLeft + "], farRight [" + farRight + "], nearLeft [" + nearLeft + "], nearRight [" + nearRight + "], latLngBounds ["+latLngBounds+"]]";
+        return "[farLeft [" + farLeft + "], farRight [" + farRight + "], nearLeft [" + nearLeft + "], nearRight [" + nearRight + "], latLngBounds [" + latLngBounds + "]]";
+    }
+
+    @Override
+    public int hashCode() {
+        return ((farLeft.hashCode() + 90)
+                + ((farRight.hashCode() + 90) * 1000)
+                + ((nearLeft.hashCode() + 180) * 1000000)
+                + ((nearRight.hashCode() + 180) * 1000000000));
     }
 
     @Override
