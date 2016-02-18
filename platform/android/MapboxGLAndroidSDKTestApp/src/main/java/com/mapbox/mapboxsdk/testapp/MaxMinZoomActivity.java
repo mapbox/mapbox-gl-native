@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 public class MaxMinZoomActivity extends AppCompatActivity {
@@ -44,8 +45,11 @@ public class MaxMinZoomActivity extends AppCompatActivity {
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
                 mMapboxMap.setStyle(Style.SATELLITE_STREETS);
-                mMapboxMap.setMinZoom(3);
-                mMapboxMap.setMaxZoom(5);
+
+                UiSettings uiSettings = mapboxMap.getUiSettings();
+                uiSettings.setMinZoom(3);
+                uiSettings.setMaxZoom(5);
+
                 mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(-1.063510, 32.895425)));
             }
         });

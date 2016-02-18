@@ -235,13 +235,15 @@ public class MapView extends FrameLayout {
             mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             // Access token
-            if (typedArray.getString(R.styleable.MapView_access_token) != null) {
+            String accessToken = typedArray.getString(R.styleable.MapView_access_token);
+            if (accessToken != null) {
                 setAccessToken(typedArray.getString(R.styleable.MapView_access_token));
             }
 
             // Style url
-            if (typedArray.getString(R.styleable.MapView_style_url) != null) {
-                mMapboxMap.setStyleUrl(typedArray.getString(R.styleable.MapView_style_url));
+            String styleUrl = typedArray.getString(R.styleable.MapView_style_url);
+            if (styleUrl != null) {
+                mMapboxMap.setStyleUrl(styleUrl);
             }
 
             // Enable gestures
@@ -251,6 +253,10 @@ public class MapView extends FrameLayout {
             uiSettings.setRotateGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
             uiSettings.setTiltGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
             uiSettings.setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, false));
+
+            // Zoom
+            uiSettings.setMaxZoom(typedArray.getFloat(R.styleable.MapView_zoom_max, (float) MapboxConstants.MAXIMUM_ZOOM));
+            uiSettings.setMinZoom(typedArray.getFloat(R.styleable.MapView_zoom_min, (float) MapboxConstants.MINIMUM_ZOOM));
 
             // Compass
             uiSettings.setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
@@ -277,13 +283,7 @@ public class MapView extends FrameLayout {
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
 
             // User location
-            try {
-                //noinspection ResourceType
-                mMapboxMap.setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
-            } catch (SecurityException ignore) {
-                // User did not accept location permissions
-            }
-
+            mMapboxMap.setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
         } finally {
             typedArray.recycle();
         }
@@ -732,7 +732,7 @@ public class MapView extends FrameLayout {
      * @return The minimum zoom level.
      */
     @UiThread
-    public double getMinZoom() {
+    double getMinZoom() {
         return mNativeMapView.getMinZoom();
     }
 
@@ -744,7 +744,7 @@ public class MapView extends FrameLayout {
      * @param maxZoom The new maximum zoom level.
      */
     @UiThread
-    public void setMaxZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+    void setMaxZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
         mNativeMapView.setMaxZoom(maxZoom);
     }
 
@@ -756,7 +756,7 @@ public class MapView extends FrameLayout {
      * @return The maximum zoom level.
      */
     @UiThread
-    public double getMaxZoom() {
+    double getMaxZoom() {
         return mNativeMapView.getMaxZoom();
     }
 

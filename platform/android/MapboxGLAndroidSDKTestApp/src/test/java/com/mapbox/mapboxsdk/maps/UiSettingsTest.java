@@ -22,6 +22,30 @@ public class UiSettingsTest {
     }
 
     @Test
+    public void testMinZoom() {
+        double zoom = 10;
+        UiSettings uiSettings = new UiSettings(mMapView);
+        uiSettings.setMinZoom(zoom);
+        assertEquals("MinZoom should match", zoom, uiSettings.getMinZoom(), 0);
+    }
+
+    @Test
+    public void testMaxZoom() {
+        double zoom = 10;
+        UiSettings uiSettings = new UiSettings(mMapView);
+        uiSettings.setMaxZoom(zoom);
+        assertEquals("MaxZoom should match", zoom, uiSettings.getMaxZoom(), 0);
+    }
+
+    @Test
+    public void testInitialZoomLevels() {
+        //we are mocking MapView we expect a value of 0 to be returned
+        UiSettings uiSettings = new UiSettings(mMapView);
+        assertEquals("MaxZoom should match", 0, uiSettings.getMaxZoom(), 0);
+        assertEquals("MinZoom should match", 0, uiSettings.getMinZoom(), 0);
+    }
+
+    @Test
     public void testCompassEnabled() {
         UiSettings uiSettings = new UiSettings(mMapView);
         uiSettings.setCompassEnabled(true);
@@ -203,7 +227,6 @@ public class UiSettingsTest {
         assertEquals("Zoom gesture should be disabled", false, uiSettings.isZoomGesturesEnabled());
         assertEquals("Scroll gesture should be disabled", false, uiSettings.isScrollGesturesEnabled());
     }
-
 
     @Test
     public void testInvalidate() {
