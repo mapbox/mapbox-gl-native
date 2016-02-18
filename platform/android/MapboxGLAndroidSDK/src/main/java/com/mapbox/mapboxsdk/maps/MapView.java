@@ -1721,6 +1721,7 @@ public class MapView extends FrameLayout {
                 listener.onFling();
             }
 
+            trackGestureEvent(MapboxEvent.GESTURE_PAN_START, e1);
             return true;
         }
 
