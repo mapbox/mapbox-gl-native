@@ -242,7 +242,8 @@ public class MapboxEventManager {
             return;
         }
 
-        if (eventWithAttributes.get(MapboxEvent.TYPE_MAP_LOAD) != null) {
+        String eventType = (String)eventWithAttributes.get(MapboxEvent.ATTRIBUTE_EVENT);
+        if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_LOAD)) {
             pushTurnstileEvent();
         }
 
@@ -268,6 +269,7 @@ public class MapboxEventManager {
 
         // Send to Server Immediately
         new FlushTheEventsTask().execute();
+        Log.d(TAG, "turnstile event pushed.");
     }
 
     /**
@@ -499,7 +501,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.i(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
+                Log.d(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
 
                 // Reset Events
                 // ============
