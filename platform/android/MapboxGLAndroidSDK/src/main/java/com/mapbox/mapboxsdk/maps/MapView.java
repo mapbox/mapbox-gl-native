@@ -399,7 +399,6 @@ public class MapView extends FrameLayout {
             evt.put(MapboxEvent.KEY_LATITUDE, mMapboxMap.getCameraPosition().target.getLatitude());
             evt.put(MapboxEvent.KEY_LONGITUDE, mMapboxMap.getCameraPosition().target.getLongitude());
             evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
-            // TODO - Punting on Push Enabled Key due to iOS nature for now
             MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
         }
     }
