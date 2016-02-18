@@ -77,14 +77,13 @@ void parseTileJSONMember(const JSValue& value, uint16_t& target, const char* nam
     target = uint;
 }
 
-template <size_t N>
-void parseTileJSONMember(const JSValue& value, std::array<double, N>& target, const char* name) {
+void parseTileJSONMember(const JSValue& value, std::array<double, 4>& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
 
     const JSValue& property = value[name];
-    if (!property.IsArray() || property.Size() != N) {
+    if (!property.IsArray() || property.Size() > 4) {
         return;
     }
 
@@ -284,8 +283,14 @@ std::unique_ptr<SourceInfo> StyleParser::parseTileJSON(const JSValue& value) {
     parseTileJSONMember(value, info->minZoom, "minzoom");
     parseTileJSONMember(value, info->maxZoom, "maxzoom");
     parseTileJSONMember(value, info->attribution, "attribution");
-    parseTileJSONMember(value, info->center, "center");
-    parseTileJSONMember(value, info->bounds, "bounds");
+
+    std::array<double, 4> array;
+    parseTileJSONMember(value, array, "center");
+    info->center = { array[0], array[1] };
+    info->zoom = array[2];
+    parseTileJSONMember(value, array, "bounds");
+    info->bounds = LatLngBounds::hull({ array[0], array[1] }, { array[2], array[3] });
+
     return info;
 }
 

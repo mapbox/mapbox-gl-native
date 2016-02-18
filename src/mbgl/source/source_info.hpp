@@ -3,6 +3,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <array>
 #include <vector>
@@ -19,8 +20,9 @@ public:
     uint16_t minZoom = 0;
     uint16_t maxZoom = 22;
     std::string attribution;
-    std::array<double, 3> center = { { 0, 0, 0 } };
-    std::array<double, 4> bounds = { { -util::LONGITUDE_MAX, -util::LATITUDE_MAX, util::LONGITUDE_MAX, util::LATITUDE_MAX } };
+    LatLng center;
+    double zoom = 0;
+    LatLngBounds bounds = LatLngBounds::world();
 };
 
 } // namespace mbgl
