@@ -1529,8 +1529,7 @@ public class MapView extends FrameLayout {
     }
 
     // This class handles one finger gestures
-    private class GestureListener extends
-            GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         // Must always return true otherwise all events are ignored
         @Override
@@ -1648,6 +1647,8 @@ public class MapView extends FrameLayout {
                 }
             }
 
+            trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, e);
+
             return true;
         }
 
@@ -1721,6 +1722,25 @@ public class MapView extends FrameLayout {
             }
 
             return true;
+        }
+
+        /**
+         * Helper method for tracking gesture events
+         * @param gestureId Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
+         * @param motionEvent Original MotionEvent at start of gesture
+         */
+        private void trackGestureEvent(@NonNull String gestureId, @NonNull MotionEvent motionEvent) {
+
+            LatLng tapLatLng = fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+
+            Hashtable<String, Object> evt = new Hashtable<>();
+            evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
+            evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
+            evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
+            evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
+            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+
+            MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
         }
     }
 
