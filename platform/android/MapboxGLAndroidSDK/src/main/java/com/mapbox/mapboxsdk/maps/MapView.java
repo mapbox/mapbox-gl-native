@@ -203,7 +203,7 @@ public class MapView extends FrameLayout {
         // Shows the zoom controls
         if (!context.getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
-            mMapboxMap.setZoomControlsEnabled(true);
+            mMapboxMap.getUiSettings().setZoomControlsEnabled(true);
         }
         mZoomButtonsController = new ZoomButtonsController(this);
         mZoomButtonsController.setZoomSpeed(MapboxConstants.ANIMATION_DURATION);

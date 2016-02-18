@@ -4,7 +4,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -47,6 +50,39 @@ public class MapboxMapTest {
     @Mock
     MapboxMap.OnMarkerClickListener mOnMarkerClickListener;
 
+    @Mock
+    MapboxMap.OnCameraChangeListener mOnCameraChangeListener;
+
+    @Mock
+    MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
+
+    @Mock
+    MapboxMap.OnScrollListener mScrollListener;
+
+    @Mock
+    MapboxMap.OnFlingListener mFlingListener;
+
+    @Mock
+    MapboxMap.OnFpsChangedListener mFpsChangedListener;
+
+    @Mock
+    MapboxMap.OnInfoWindowClickListener mWindowClickListener;
+
+    @Mock
+    MapboxMap.OnInfoWindowCloseListener mWindowCloseListener;
+
+    @Mock
+    MapboxMap.OnInfoWindowLongClickListener mWindowLongClickListener;
+
+    @Mock
+    MapboxMap.OnMyLocationChangeListener mLocationChangeListener;
+
+    @Mock
+    MapboxMap.OnMyLocationTrackingModeChangeListener mMyLocationTrackingModeChangeListener;
+
+    @Mock
+    MapboxMap.OnMyBearingTrackingModeChangeListener mMyBearingTrackingModeChangeListener;
+
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
@@ -78,6 +114,15 @@ public class MapboxMapTest {
     }
 
     //
+    // TrackingSettings
+    //
+
+    @Test
+    public void testTrackingSettings() {
+        assertNotNull("TrackingSettings should not be null", mMapboxMap.getTrackingSettings());
+    }
+
+    //
     // Projection
     //
 
@@ -85,7 +130,6 @@ public class MapboxMapTest {
     public void testProjection() {
         assertNotNull("Projection should not be null", mMapboxMap.getProjection());
     }
-
 
     //
     // InfoWindow
@@ -101,6 +145,12 @@ public class MapboxMapTest {
     public void testConcurrentInfoWindowDisabled() {
         mMapboxMap.setAllowConcurrentMultipleOpenInfoWindows(false);
         assertFalse("ConcurrentWindows should be false", mMapboxMap.isAllowConcurrentMultipleOpenInfoWindows());
+    }
+
+    @Test
+    public void testInfoWindowAdapter() {
+        mMapboxMap.setInfoWindowAdapter(mInfoWindowAdapter);
+        assertEquals("InfoWindowAdpter should be the same", mInfoWindowAdapter, mMapboxMap.getInfoWindowAdapter());
     }
 
     //
@@ -122,6 +172,71 @@ public class MapboxMapTest {
         assertFalse("MyLocationEnabled should be false", mMapboxMap.isMyLocationEnabled());
     }
 
+    //
+    // padding
+    //
+
+    @Test
+    public void testPadding() {
+        mMapboxMap.setOnCameraChangeListener(mOnCameraChangeListener);
+        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
+        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+        mMapboxMap.setPadding(0, 0, 0, 0);
+        verify(mOnCameraChangeListener, times(2)).onCameraChange(position);
+    }
+
+    //
+    // setters/getters interfaces
+    //
+
+    @Test
+    public void testScrollListener() {
+        mMapboxMap.setOnScrollListener(mScrollListener);
+        assertEquals("ScrollListener should match", mScrollListener, mMapboxMap.getOnScrollListener());
+    }
+
+    @Test
+    public void testFlingListener() {
+        mMapboxMap.setOnFlingListener(mFlingListener);
+        assertEquals("FlingListener should match", mFlingListener, mMapboxMap.getOnFlingListener());
+    }
+
+    @Test
+    public void testFpsListener() {
+        mMapboxMap.setOnFpsChangedListener(mFpsChangedListener);
+        assertEquals("FpsListener should match", mFpsChangedListener, mMapboxMap.getOnFpsChangedListener());
+    }
+
+    @Test
+    public void testInfoWindowClickListener() {
+        mMapboxMap.setOnInfoWindowClickListener(mWindowClickListener);
+        assertEquals("InfoWidowClickListener should match", mWindowClickListener, mMapboxMap.getOnInfoWindowClickListener());
+    }
+
+    @Test
+    public void testInfoWindowCloseListener() {
+        mMapboxMap.setOnInfoWindowCloseListener(mWindowCloseListener);
+        assertEquals("InfoWindowCloseListener should match", mWindowCloseListener, mMapboxMap.getOnInfoWindowCloseListener());
+    }
+
+    @Test
+    public void testInfoWindowLongClickListener() {
+        mMapboxMap.setOnInfoWindowLongClickListener(mWindowLongClickListener);
+        assertEquals("InfoWindowLongClickListener should match", mWindowLongClickListener, mMapboxMap.getOnInfoWindowLongClickListener());
+    }
+
+    @Test
+    public void testOnBearingTrackingModeChangeListener(){
+        mMapboxMap.setOnMyBearingTrackingModeChangeListener(mMyBearingTrackingModeChangeListener);
+        assertEquals("MyBearingTrackingChangeListerner should match",mMyBearingTrackingModeChangeListener, mMapboxMap.getOnMyBearingTrackingModeChangeListener());
+    }
+
+    @Test
+    public void testOnLocationTrackingModeChangeListener(){
+        mMapboxMap.setOnMyLocationTrackingModeChangeListener(mMyLocationTrackingModeChangeListener);
+        assertEquals("MyLocationTrackigChangeListener should match",mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
+    }
+    
     //
     // Style
     //
@@ -199,7 +314,7 @@ public class MapboxMapTest {
     @Test
     public void testNewCameraPositionEaseCamera() {
         CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
-        mMapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000);
+        mMapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position));
         assertEquals("CameraPosition should be same", position, mMapboxMap.getCameraPosition());
     }
 
@@ -382,6 +497,18 @@ public class MapboxMapTest {
         mMapboxMap.setCameraPosition(position);
         mMapboxMap.easeCamera(CameraUpdateFactory.zoomTo(12), 1000);
         assertTrue("Zoomlevel should be same", 12 == mMapboxMap.getCameraPosition().zoom);
+    }
+
+    //
+    // OnCameraChangeListener
+    //
+
+    @Test
+    public void testOnCameraChangeListener() {
+        CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
+        mMapboxMap.setOnCameraChangeListener(mOnCameraChangeListener);
+        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+        verify(mOnCameraChangeListener, times(1)).onCameraChange(position);
     }
 
     //
