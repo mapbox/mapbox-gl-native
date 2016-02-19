@@ -40,6 +40,7 @@
         'util/async_task.cpp',
         'util/clip_ids.cpp',
         'util/geo.cpp',
+        'util/id.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',
         'util/merge_lines.cpp',
