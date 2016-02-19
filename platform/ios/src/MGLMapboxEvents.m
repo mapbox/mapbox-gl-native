@@ -5,13 +5,12 @@
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
+#import "MGLAPIClient.h"
 
 #include <mbgl/platform/darwin/reachability.h>
 #include <sys/sysctl.h>
 
 static const NSUInteger version = 1;
-static NSString *const MGLMapboxEventsUserAgent = @"MapboxEventsiOS/1.1";
-static NSString *MGLMapboxEventsAPIBase = @"https://api.tiles.mapbox.com";
 
 NSString *const MGLEventTypeAppUserTurnstile = @"appUserTurnstile";
 NSString *const MGLEventTypeMapLoad = @"map.load";
@@ -94,16 +93,13 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 @property (nonatomic) MGLMapboxEventsData *data;
 @property (nonatomic, copy) NSString *appBundleId;
-@property (nonatomic, copy) NSString *appName;
-@property (nonatomic, copy) NSString *appVersion;
-@property (nonatomic, copy) NSString *appBuildNumber;
 @property (nonatomic, copy) NSString *instanceID;
 @property (nonatomic, copy) NSString *dateForDebugLogFile;
 @property (nonatomic, copy) NSData *digicertCert;
 @property (nonatomic, copy) NSData *geoTrustCert;
 @property (nonatomic, copy) NSData *testServerCert;
 @property (nonatomic) NSDateFormatter *rfc3339DateFormatter;
-@property (nonatomic) NSURLSession *session;
+@property (nonatomic) MGLAPIClient *apiClient;
 @property (nonatomic) BOOL usesTestServer;
 @property (nonatomic) BOOL canEnableDebugLogging;
 @property (nonatomic, getter=isPaused) BOOL paused;
@@ -145,46 +141,15 @@ const NSTimeInterval MGLFlushInterval = 60;
     self = [super init];
     if (self) {
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
-        _appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
-        _appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-        _appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
         _instanceID = [[NSUUID UUID] UUIDString];
+        _apiClient = [[MGLAPIClient alloc] init];
 
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
         _serialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.serial", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
 
-        // Configure Events Infrastructure
-        // ===============================
-
-        // Check for TEST Metrics URL
-        NSString *testURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
-        if (testURL != nil) {
-            MGLMapboxEventsAPIBase = testURL;
-            _usesTestServer = YES;
-        } else {
-            // Explicitly Set For Clarity
-            _usesTestServer = NO;
-        }
-
         _paused = YES;
         [self resumeMetricsCollection];
         NSBundle *resourceBundle = [NSBundle mgl_frameworkBundle];
-
-        // Load Local Copy of Server's Public Key
-        NSString *cerPath = nil;
-        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
-        if (cerPath != nil) {
-            _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
-        }
-
-        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
-        if (cerPath != nil) {
-            _digicertCert = [NSData dataWithContentsOfFile:cerPath];
-        }
-        cerPath = [resourceBundle pathForResource:@"star_tilestream_net" ofType:@"der"];
-        if (cerPath != nil) {
-            _testServerCert = [NSData dataWithContentsOfFile:cerPath];
-        }
 
         // Events Control
         _eventQueue = [[NSMutableArray alloc] init];
@@ -313,8 +278,6 @@ const NSTimeInterval MGLFlushInterval = 60;
     self.timer = nil;
     [self.eventQueue removeAllObjects];
     self.data = nil;
-    [self.session invalidateAndCancel];
-    self.session = nil;
     
     [self validateUpdatingLocation];
 }
@@ -341,7 +304,6 @@ const NSTimeInterval MGLFlushInterval = 60;
     
     self.paused = NO;
     self.data = [[MGLMapboxEventsData alloc] init];
-    self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
     
     [self validateUpdatingLocation];
 }
@@ -429,16 +391,24 @@ const NSTimeInterval MGLFlushInterval = 60;
             return;
         }
         
-        NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
-                               @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                               @"appBundleId" : strongSelf.appBundleId,
-                               @"vendorId": vendorID,
-                               @"version": @(version),
-                               @"instance": strongSelf.instanceID};
-        
-        [strongSelf.eventQueue addObject:vevt];
-        [strongSelf flush];
-        [strongSelf writeEventToLocalDebugLog:vevt];
+        NSDictionary *turnstileEventAttributes = @{@"event" : MGLEventTypeAppUserTurnstile,
+                                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                                   @"appBundleId" : strongSelf.appBundleId,
+                                                   @"vendorId": vendorID,
+                                                   @"version": @(version),
+                                                   @"instance": strongSelf.instanceID};
+      
+        if ([MGLAccountManager accessToken] == nil) {
+            return;
+        }
+        [strongSelf.apiClient postEvent:turnstileEventAttributes completionHandler:^(NSError * _Nullable error) {
+            if (error) {
+                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"Network error",
+                                                                                        @"error": error}];
+                return;
+            }
+            [strongSelf writeEventToLocalDebugLog:turnstileEventAttributes];
+        }];
     });
 }
 
@@ -471,42 +441,22 @@ const NSTimeInterval MGLFlushInterval = 60;
 // Called implicitly from public use of +flush.
 //
 - (void)postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
-    __weak MGLMapboxEvents *weakSelf = self;
-
+    if ([self isPaused]) {
+        return;
+    }
+    
+    __weak __typeof__(self) weakSelf = self;
     dispatch_async(self.serialQueue, ^{
-        MGLMapboxEvents *strongSelf = weakSelf;
-        
-        if (!strongSelf) {
-            return;
-        }
-
-        NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, [MGLAccountManager accessToken]];
-        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
-        [request setValue:strongSelf.userAgent forHTTPHeaderField:@"User-Agent"];
-        [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-        [request setHTTPMethod:@"POST"];
-        
-        if ([NSJSONSerialization isValidJSONObject:events]) {
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:events options:NSJSONWritingPrettyPrinted error:nil];
-            [request setHTTPBody:jsonData];
-
-            if (!strongSelf.paused) {
-                [[strongSelf.session dataTaskWithRequest:request] resume];
-            } else {
-                for (MGLMapboxEventAttributes *event in events) {
-                    if ([event[@"event"] isEqualToString:MGLEventTypeAppUserTurnstile]) {
-                        NSURLSession *temporarySession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                                                                                       delegate:strongSelf
-                                                                                  delegateQueue:nil];
-                        [[temporarySession dataTaskWithRequest:request] resume];
-                        [temporarySession finishTasksAndInvalidate];
-                    }
-                }
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        [self.apiClient postEvents:events completionHandler:^(NSError * _Nullable error) {
+            if (error) {
+                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"Network error",
+                                                                                        @"error": error}];
+                return;
             }
-
             [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"post",
                                                                                     @"debug.eventsCount": @(events.count)}];
-        }
+        }];
     });
 }
 
@@ -517,10 +467,6 @@ const NSTimeInterval MGLFlushInterval = 60;
                                                 selector:@selector(flush)
                                                 userInfo:nil
                                                  repeats:YES];
-}
-
-- (NSString *)userAgent {
-    return [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, MGLMapboxEventsUserAgent];
 }
 
 - (NSInteger)batteryLevel {
@@ -692,84 +638,6 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     [self validateUpdatingLocation];
-}
-
-#pragma mark NSURLSessionDelegate
-
-- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-
-    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-
-        SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
-        SecTrustResultType trustResult;
-
-        // Validate the certificate chain with the device's trust store anyway
-        // This *might* give use revocation checking
-        SecTrustEvaluate(serverTrust, &trustResult);
-        if (trustResult == kSecTrustResultUnspecified)
-        {
-            // Look for a pinned certificate in the server's certificate chain
-            long numKeys = SecTrustGetCertificateCount(serverTrust);
-
-            BOOL found = NO;
-            // Try GeoTrust Cert First
-            for (int lc = 0; lc < numKeys; lc++) {
-                SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-                NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-
-                // Compare Remote Key With Local Version
-                if ([remoteCertificateData isEqualToData:_geoTrustCert]) {
-                    // Found the certificate; continue connecting
-                    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                    found = YES;
-                    break;
-                }
-            }
-
-            if (!found) {
-                // Fallback to Digicert Cert
-                for (int lc = 0; lc < numKeys; lc++) {
-                    SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-                    NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-
-                    // Compare Remote Key With Local Version
-                    if ([remoteCertificateData isEqualToData:_digicertCert]) {
-                        // Found the certificate; continue connecting
-                        completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                        found = YES;
-                        break;
-                    }
-                }
-
-                if (!found && _usesTestServer) {
-                    // See if this is test server
-                    for (int lc = 0; lc < numKeys; lc++) {
-                        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, lc);
-                        NSData *remoteCertificateData = CFBridgingRelease(SecCertificateCopyData(certificate));
-
-                        // Compare Remote Key With Local Version
-                        if ([remoteCertificateData isEqualToData:_testServerCert]) {
-                            // Found the certificate; continue connecting
-                            completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                            found = YES;
-                            break;
-                        }
-                    }
-                }
-
-                if (!found) {
-                    // The certificate wasn't found in GeoTrust nor Digicert. Cancel the connection.
-                    completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-                }
-            }
-        }
-        else
-        {
-            // Certificate chain validation failed; cancel the connection
-            completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
-        }
-    }
-
 }
 
 #pragma mark MGLMapboxEvents Debug
