@@ -1,15 +1,12 @@
 #import "MGLMapboxEvents.h"
-
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
-
-#include <mbgl/platform/darwin/reachability.h>
-
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 
+#include <mbgl/platform/darwin/reachability.h>
 #include <sys/sysctl.h>
 
 static const NSUInteger version = 1;
@@ -53,14 +50,11 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 @interface MGLMapboxEventsData : NSObject
 
-// All of the following properties are written to only from
-// the main thread, but can be read on any thread.
-//
-@property (atomic) NSString *vendorId;
-@property (atomic) NSString *model;
-@property (atomic) NSString *iOSVersion;
-@property (atomic) NSString *carrier;
-@property (atomic) CGFloat scale;
+@property (nonatomic) NSString *vendorId;
+@property (nonatomic) NSString *model;
+@property (nonatomic) NSString *iOSVersion;
+@property (nonatomic) NSString *carrier;
+@property (nonatomic) CGFloat scale;
 
 @end
 
@@ -81,10 +75,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     return self;
 }
 
-// Can be called from any thread.
-//
-- (NSString *)sysInfoByName:(char *)typeSpecifier
-{
+- (NSString *)sysInfoByName:(char *)typeSpecifier {
     size_t size;
     sysctlbyname(typeSpecifier, NULL, &size, NULL, 0);
     
@@ -99,63 +90,28 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 @end
 
-//
-// Threadsafety conventions:
-//
-// All variables accessed from more than one thread are
-// designated `atomic` and accessed through dot syntax. The
-// main thread uses underscore syntax during the
-// initialization of the variable.
-//
-// All variables accessed outside of initialization and
-// from within a single thread use underscore syntax.
-//
-// All captures of `self` from within asynchronous
-// dispatches will use a `strongSelf` to avoid cyclical
-// strong references.
-//
-
 @interface MGLMapboxEvents () <CLLocationManagerDelegate>
 
-// All of the following properties are written to only from
-// the main thread, but can be read on any thread.
-//
-@property (atomic) MGLMapboxEventsData *data;
-@property (atomic) NSString *appBundleId;
-@property (atomic) NSString *appName;
-@property (atomic) NSString *appVersion;
-@property (atomic) NSString *appBuildNumber;
-@property (atomic) NSString *instanceID;
-@property (atomic) NSDateFormatter *rfc3339DateFormatter;
-@property (atomic) NSURLSession *session;
-@property (atomic) NSData *digicertCert;
-@property (atomic) NSData *geoTrustCert;
-@property (atomic) NSData *testServerCert;
-@property (atomic) BOOL usesTestServer;
-
-// Main thread only
-@property (nonatomic) CLLocationManager *locationManager;
-
-// The paused state tracker is only ever accessed from the main thread.
-//
+@property (nonatomic) MGLMapboxEventsData *data;
+@property (nonatomic, copy) NSString *appBundleId;
+@property (nonatomic, copy) NSString *appName;
+@property (nonatomic, copy) NSString *appVersion;
+@property (nonatomic, copy) NSString *appBuildNumber;
+@property (nonatomic, copy) NSString *instanceID;
+@property (nonatomic, copy) NSString *dateForDebugLogFile;
+@property (nonatomic, copy) NSData *digicertCert;
+@property (nonatomic, copy) NSData *geoTrustCert;
+@property (nonatomic, copy) NSData *testServerCert;
+@property (nonatomic) NSDateFormatter *rfc3339DateFormatter;
+@property (nonatomic) NSURLSession *session;
+@property (nonatomic) BOOL usesTestServer;
+@property (nonatomic) BOOL canEnableDebugLogging;
 @property (nonatomic, getter=isPaused) BOOL paused;
-
-// The timer is only ever accessed from the main thread.
-//
-@property (nonatomic) NSTimer *timer;
-
-// This is an array of events to push. All access to it will be
-// from our own serial queue.
-//
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(MGLMapboxEventAttributes *) *eventQueue;
-
-// This is a custom serial queue for accessing the event queue.
-//
 @property (nonatomic) dispatch_queue_t serialQueue;
-
-@property (atomic) BOOL canEnableDebugLogging;
 @property (nonatomic) dispatch_queue_t debugLogSerialQueue;
-@property (nonatomic) NSString *dateForDebugLogFile;
+@property (nonatomic) CLLocationManager *locationManager;
+@property (nonatomic) NSTimer *timer;
 
 @end
 
@@ -185,15 +141,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"]);
 }
 
-+ (BOOL)debugLoggingEnabled {
-    return [[MGLMapboxEvents sharedManager] debugLoggingEnabled];
-}
-
-// Must be called from the main thread. Only called internally.
-//
 - (instancetype) init {
-    MGLAssertIsMainThread();
-
     self = [super init];
     if (self) {
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
@@ -279,8 +227,8 @@ const NSTimeInterval MGLFlushInterval = 60;
     return self;
 }
 
-// Can be called from any thread. Called implicitly from any
-// public class convenience methods. May return nil if this feature is disabled.
+// Called implicitly from any public class convenience methods.
+// May return nil if this feature is disabled.
 //
 + (nullable instancetype)sharedManager {
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
@@ -313,21 +261,19 @@ const NSTimeInterval MGLFlushInterval = 60;
     [[MGLMapboxEvents sharedManager] validate];
 }
 
-// Used to determine if Mapbox Metrics should be collected at any given point in time
 - (void)validate {
-    MGLAssertIsMainThread();
     BOOL enabledInSettings = [[self class] isEnabled];
+    
     if (self.paused && enabledInSettings) {
         [self resumeMetricsCollection];
     } else if (!self.paused && !enabledInSettings) {
         [self pauseMetricsCollection];
     }
-    
+   
     [self validateUpdatingLocation];
 }
 
 - (void)validateUpdatingLocation {
-    MGLAssertIsMainThread();
     if (self.paused) {
         [self stopUpdatingLocation];
     } else {
@@ -357,253 +303,194 @@ const NSTimeInterval MGLFlushInterval = 60;
     [[MGLMapboxEvents sharedManager] pauseMetricsCollection];
 }
 
-// Must be called from the main thread.
-//
 - (void)pauseMetricsCollection {
-    MGLAssertIsMainThread();
     if (self.paused) {
         return;
     }
+    
     self.paused = YES;
-    [_timer invalidate];
-    _timer = nil;
-    [_eventQueue removeAllObjects];
-    _data = nil;
-    [_session invalidateAndCancel];
-    _session = nil;
+    [self.timer invalidate];
+    self.timer = nil;
+    [self.eventQueue removeAllObjects];
+    self.data = nil;
+    [self.session invalidateAndCancel];
+    self.session = nil;
     
     [self validateUpdatingLocation];
 }
 
 - (void)stopUpdatingLocation {
-    [_locationManager stopUpdatingLocation];
+    [self.locationManager stopUpdatingLocation];
     
     // -[CLLocationManager stopMonitoringVisits] is only available in iOS 8+.
-    if ([_locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
-        [_locationManager stopMonitoringVisits];
+    if ([self.locationManager respondsToSelector:@selector(stopMonitoringVisits)]) {
+        [self.locationManager stopMonitoringVisits];
     }
     
-    _locationManager = nil;
+    self.locationManager = nil;
 }
 
 + (void)resumeMetricsCollection {
     [[MGLMapboxEvents sharedManager] resumeMetricsCollection];
 }
 
-// Must be called from the main thread.
-//
 - (void)resumeMetricsCollection {
-    MGLAssertIsMainThread();
     if (!self.paused || ![[self class] isEnabled]) {
         return;
     }
+    
     self.paused = NO;
-    _data = [[MGLMapboxEventsData alloc] init];
-    _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+    self.data = [[MGLMapboxEventsData alloc] init];
+    self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
     
     [self validateUpdatingLocation];
 }
 
 - (void)startUpdatingLocation {
-    MGLAssertIsMainThread();
-    if (_locationManager || _paused) {
-        NSAssert(!(_locationManager && _paused),
+    if (self.locationManager || self.paused) {
+        NSAssert(!(self.locationManager && self.paused),
                  @"MGLMapboxEvents should not have a CLLocationManager while paused.");
         return;
     }
-    _locationManager = [[CLLocationManager alloc] init];
-    _locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-    _locationManager.distanceFilter = 10;
-    _locationManager.delegate = self;
-
-    [_locationManager startUpdatingLocation];
+    
+    CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    locationManager.distanceFilter = 10;
+    [locationManager startUpdatingLocation];
 
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
-    if ([_locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
-        [_locationManager startMonitoringVisits];
+    if ([locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [locationManager startMonitoringVisits];
+    }
+    
+    self.locationManager = locationManager;
+}
+
++ (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
+}
+
+- (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    if (!event) {
+        return;
+    }
+    
+    if ([event isEqualToString:MGLEventTypeMapLoad]) {
+        [self pushTurnstileEvent];
+    }
+    
+    if ([self isPaused]) {
+        return;
+    }
+    
+    NSDictionary *stockAttributes = @{@"event": event,
+                                      @"version": @(version),
+                                      @"created": [self.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                      @"instance": self.instanceID,
+                                      @"vendorId": self.data.vendorId,
+                                      @"appBundleId": self.appBundleId,
+                                      @"model": self.data.model,
+                                      @"operatingSystem": self.data.iOSVersion,
+                                      @"resolution": @(self.data.scale),
+                                      @"wifi": @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi]),
+                                      @"orientation": [self deviceOrientation],
+                                      @"batteryLevel": @([self batteryLevel]),
+                                      @"applicationState": [self applicationState],
+                                      @"accessibilityFontScale": @([self contentSizeScale])};
+    MGLMutableMapboxEventAttributes *allEventAttributes = [NSMutableDictionary dictionaryWithDictionary:attributeDictionary];
+    [allEventAttributes addEntriesFromDictionary:stockAttributes];
+    MGLMapboxEventAttributes *finalEvent = [allEventAttributes copy];
+    [self.eventQueue addObject:finalEvent];
+    [self writeEventToLocalDebugLog:finalEvent];
+    
+    // Has Flush Limit Been Reached?
+    if (self.eventQueue.count >= MGLMaximumEventsPerFlush) {
+        [self flush];
+    } else if (self.eventQueue.count ==  1) {
+        // If this is first new event on queue start timer,
+        [self startTimer];
     }
 }
 
-
-- (void) pushTurnstileEvent {
-
+- (void)pushTurnstileEvent {
     __weak MGLMapboxEvents *weakSelf = self;
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        dispatch_async(_serialQueue, ^{
-            
-            MGLMapboxEvents *strongSelf = weakSelf;
-            
-            if ( ! strongSelf) return;
-            
-            // Build only IDFV event
-            NSString *vid = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-            
-            if (!vid) return;
-            
-            NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
-                                   @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                                   @"appBundleId" : strongSelf.appBundleId,
-                                   @"vendorId": vid,
-                                   @"version": @(version),
-                                   @"instance": strongSelf.instanceID};
-            
-            // Add to Queue
-            [_eventQueue addObject:vevt];
-            
-            // Flush
-            [strongSelf flush];
-            
-            if ([strongSelf debugLoggingEnabled]) {
-                [strongSelf writeEventToLocalDebugLog:vevt];
-            }
-            
-        });
-    });
-}
-
-// Can be called from any thread. Can be called rapidly from
-// the UI thread, so performance is paramount.
-//
-+ (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [[MGLMapboxEvents sharedManager] pushEvent:event withAttributes:attributeDictionary];
-    });
-}
-
-// Can be called from any thread. Called implicitly from public
-// use of +pushEvent:withAttributes:.
-//
-- (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
-    __weak MGLMapboxEvents *weakSelf = self;
-
-    dispatch_async(_serialQueue, ^{
-
         MGLMapboxEvents *strongSelf = weakSelf;
-
-        if ( ! strongSelf) return;
         
-        if (!event) return;
-
-        // If it's a map load event then turn the Mapbox Turnstile to count app users
-        if ([event isEqualToString:MGLEventTypeMapLoad]) {
-            [self pushTurnstileEvent];
-        }
-        
-        // Metrics Collection Has Been Paused
-        if (_paused) {
+        if (!strongSelf) {
             return;
         }
-
-        MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
-        // mapbox-events stock attributes
-        [evt setObject:event forKey:@"event"];
-        [evt setObject:@(version) forKey:@"version"];
-        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setObject:strongSelf.instanceID forKey:@"instance"];
-        [evt setObject:strongSelf.data.vendorId forKey:@"vendorId"];
-        [evt setObject:strongSelf.appBundleId forKeyedSubscript:@"appBundleId"];
-
-        // mapbox-events-ios stock attributes
-        [evt setValue:strongSelf.data.model forKey:@"model"];
-        [evt setValue:strongSelf.data.iOSVersion forKey:@"operatingSystem"];
-        [evt setValue:[strongSelf deviceOrientation] forKey:@"orientation"];
-        [evt setValue:@((int)(100 * [UIDevice currentDevice].batteryLevel)) forKey:@"batteryLevel"];
-        [evt setValue:@(strongSelf.data.scale) forKey:@"resolution"];
-
-        MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
-        [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
-
-        [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
-
-        [evt setValue:@([strongSelf contentSizeScale]) forKey:@"accessibilityFontScale"];
-
-        // Make Immutable Version
-        NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
         
-        // Put On The Queue
-        [_eventQueue addObject:finalEvent];
-       
+        NSString *vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+        if (!vendorID) {
+            return;
+        }
         
-        // Has Flush Limit Been Reached?
-        if (_eventQueue.count >= MGLMaximumEventsPerFlush) {
-            [strongSelf flush];
-        } else if (_eventQueue.count ==  1) {
-            // If this is first new event on queue start timer,
-            [strongSelf startTimer];
-        }
-
-        if ([strongSelf debugLoggingEnabled]) {
-            [strongSelf writeEventToLocalDebugLog:finalEvent];
-        }
+        NSDictionary *vevt = @{@"event" : MGLEventTypeAppUserTurnstile,
+                               @"created" : [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                               @"appBundleId" : strongSelf.appBundleId,
+                               @"vendorId": vendorID,
+                               @"version": @(version),
+                               @"instance": strongSelf.instanceID};
+        
+        [strongSelf.eventQueue addObject:vevt];
+        [strongSelf flush];
+        [strongSelf writeEventToLocalDebugLog:vevt];
     });
 }
 
-// Can be called from any thread.
-//
-+ (void) flush {
++ (void)flush {
     [[MGLMapboxEvents sharedManager] flush];
 }
 
-// Can be called from any thread.
-//
-- (void) flush {
-    if ([MGLAccountManager accessToken] == nil) return;
-
-    __weak MGLMapboxEvents *weakSelf = self;
-
-    dispatch_async(_serialQueue, ^{
-        MGLMapboxEvents *strongSelf = weakSelf;
-        if ( ! strongSelf || [_eventQueue count] == 0) return;
-
-        // Make an immutable copy
-        NSArray *events = [NSArray arrayWithArray:_eventQueue];
-
-        // Update Queue to remove events sent to server
-        [_eventQueue removeAllObjects];
-
-        // Send Array of Events to Server
-        [strongSelf postEvents:events];
-
-        // Cancel Any Timer That May Running
-        if (strongSelf.timer) {
-            [strongSelf.timer invalidate];
-            strongSelf.timer = nil;
-        }
-    });
-
-    if ([self debugLoggingEnabled]) {
-        [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{
-            MGLEventKeyLocalDebugDescription: @"flush"
-        }];
+- (void)flush {
+    if ([MGLAccountManager accessToken] == nil) {
+        return;
     }
+    
+    if ([self.eventQueue count] == 0) {
+        return;
+    }
+    
+    NSArray *events = [NSArray arrayWithArray:self.eventQueue];
+    [self.eventQueue removeAllObjects];
+    
+    [self postEvents:events];
+    
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+
+    [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription:@"flush"}];
 }
 
-// Can be called from any thread. Called implicitly from public
-// use of +flush. Posts an async network request to upload metrics.
+// Called implicitly from public use of +flush.
 //
-- (void) postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
+- (void)postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
     __weak MGLMapboxEvents *weakSelf = self;
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    dispatch_async(self.serialQueue, ^{
         MGLMapboxEvents *strongSelf = weakSelf;
-        if (!strongSelf) return;
+        
+        if (!strongSelf) {
+            return;
+        }
 
-        // Setup URL Request
         NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", MGLMapboxEventsAPIBase, [MGLAccountManager accessToken]];
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
         [request setValue:strongSelf.userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
         [request setHTTPMethod:@"POST"];
         
-        // Convert Array of Dictionaries to JSON
         if ([NSJSONSerialization isValidJSONObject:events]) {
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:events options:NSJSONWritingPrettyPrinted error:nil];
             [request setHTTPBody:jsonData];
 
-            // Send non blocking HTTP Request to server
-            if ( ! strongSelf.paused) {
+            if (!strongSelf.paused) {
                 [[strongSelf.session dataTaskWithRequest:request] resume];
             } else {
                 for (MGLMapboxEventAttributes *event in events) {
@@ -617,217 +504,138 @@ const NSTimeInterval MGLFlushInterval = 60;
                 }
             }
 
-            if ([self debugLoggingEnabled]) {
-                [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{
-                    MGLEventKeyLocalDebugDescription: @"post",
-                    @"debug.eventsCount": @(events.count)
-                }];
-            }
+            [MGLMapboxEvents pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"post",
+                                                                                    @"debug.eventsCount": @(events.count)}];
         }
     });
 }
 
-// Can be called from any thread.
-//
-- (void) startTimer {
-    void (^timerBlock)() = ^{
-        // Stop Timer if it already exists
-        [_timer invalidate];
-
-        // Start New Timer
-        _timer = [NSTimer scheduledTimerWithTimeInterval:MGLFlushInterval
+- (void)startTimer {
+    [self.timer invalidate];
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:MGLFlushInterval
                                                   target:self
                                                 selector:@selector(flush)
                                                 userInfo:nil
                                                  repeats:YES];
-    };
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            timerBlock();
-        });
-    } else {
-        timerBlock();
-    }
 }
 
-// Can be called from any thread.
-//
-- (NSString *) userAgent {
+- (NSString *)userAgent {
     return [NSString stringWithFormat:@"%@/%@/%@ %@", self.appName, self.appVersion, self.appBuildNumber, MGLMapboxEventsUserAgent];
 }
 
-// Can be called from any thread.
-//
-- (NSString *) deviceOrientation {
-    __block NSString *result;
+- (NSInteger)batteryLevel {
+    return [[NSNumber numberWithFloat:100 * [UIDevice currentDevice].batteryLevel] integerValue];
+}
 
-    NSString *(^deviceOrientationBlock)(void) = ^{
-        switch ([UIDevice currentDevice].orientation) {
-            case UIDeviceOrientationUnknown:
-                result = @"Unknown";
-                break;
-            case UIDeviceOrientationPortrait:
-                result = @"Portrait";
-                break;
-            case UIDeviceOrientationPortraitUpsideDown:
-                result = @"PortraitUpsideDown";
-                break;
-            case UIDeviceOrientationLandscapeLeft:
-                result = @"LandscapeLeft";
-                break;
-            case UIDeviceOrientationLandscapeRight:
-                result = @"LandscapeRight";
-                break;
-            case UIDeviceOrientationFaceUp:
-                result = @"FaceUp";
-                break;
-            case UIDeviceOrientationFaceDown:
-                result = @"FaceDown";
-                break;
-            default:
-                result = @"Default - Unknown";
-                break;
-        }
+- (NSString *)deviceOrientation {
+    NSString *result;
 
-        return result;
-    };
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            result = deviceOrientationBlock();
-        });
-    } else {
-        result = deviceOrientationBlock();
+    switch ([UIDevice currentDevice].orientation) {
+        case UIDeviceOrientationUnknown:
+            result = @"Unknown";
+            break;
+        case UIDeviceOrientationPortrait:
+            result = @"Portrait";
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            result = @"PortraitUpsideDown";
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            result = @"LandscapeLeft";
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            result = @"LandscapeRight";
+            break;
+        case UIDeviceOrientationFaceUp:
+            result = @"FaceUp";
+            break;
+        case UIDeviceOrientationFaceDown:
+            result = @"FaceDown";
+            break;
+        default:
+            result = @"Default - Unknown";
+            break;
     }
-
+    
     return result;
 }
 
-// Can be called from any thread.
-//
-- (NSString *) applicationState {
-    __block NSString *result;
+- (NSString *)applicationState {
+    NSString *result;
 
-    NSString *(^applicationStateBlock)(void) = ^{
-        switch ([UIApplication sharedApplication].applicationState) {
-            case UIApplicationStateActive:
-                result = @"Active";
-                break;
-            case UIApplicationStateInactive:
-                result = @"Inactive";
-                break;
-            case UIApplicationStateBackground:
-                result = @"Background";
-                break;
-            default:
-                result = @"Default - Unknown";
-                break;
-        }
-
-        return result;
-    };
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            result = applicationStateBlock();
-        });
-    } else {
-        result = applicationStateBlock();
+    switch ([UIApplication sharedApplication].applicationState) {
+        case UIApplicationStateActive:
+            result = @"Active";
+            break;
+        case UIApplicationStateInactive:
+            result = @"Inactive";
+            break;
+        case UIApplicationStateBackground:
+            result = @"Background";
+            break;
+        default:
+            result = @"Default - Unknown";
+            break;
     }
-
+    
     return result;
 }
 
-// Can be called from any thread.
-//
-- (NSInteger) contentSizeScale {
-    __block NSInteger result = -9999;
-
-    NSInteger (^contentSizeScaleBlock)(void) = ^{
-        NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
-
-        if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
-            result = -3;
-        } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
-            result = -2;
-        } else if ([sc isEqualToString:UIContentSizeCategoryMedium]) {
-            result = -1;
-        } else if ([sc isEqualToString:UIContentSizeCategoryLarge]) {
-            result = 0;
-        } else if ([sc isEqualToString:UIContentSizeCategoryExtraLarge]) {
-            result = 1;
-        } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
-            result = 2;
-        } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
-            result = 3;
-        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
-            result = -11;
-        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
-            result = 10;
-        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
-            result = 11;
-        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
-            result = 12;
-        } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
-            result = 13;
-        }
-
-        return result;
-    };
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            result = contentSizeScaleBlock();
-        });
-    } else {
-        result = contentSizeScaleBlock();
+- (NSInteger)contentSizeScale {
+    NSInteger result = -9999;
+    
+    NSString *sc = [UIApplication sharedApplication].preferredContentSizeCategory;
+    
+    if ([sc isEqualToString:UIContentSizeCategoryExtraSmall]) {
+        result = -3;
+    } else if ([sc isEqualToString:UIContentSizeCategorySmall]) {
+        result = -2;
+    } else if ([sc isEqualToString:UIContentSizeCategoryMedium]) {
+        result = -1;
+    } else if ([sc isEqualToString:UIContentSizeCategoryLarge]) {
+        result = 0;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraLarge]) {
+        result = 1;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraLarge]) {
+        result = 2;
+    } else if ([sc isEqualToString:UIContentSizeCategoryExtraExtraExtraLarge]) {
+        result = 3;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityMedium]) {
+        result = -11;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityLarge]) {
+        result = 10;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraLarge]) {
+        result = 11;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraLarge]) {
+        result = 12;
+    } else if ([sc isEqualToString:UIContentSizeCategoryAccessibilityExtraExtraExtraLarge]) {
+        result = 13;
     }
-
+    
     return result;
 }
 
-// Can be called from any thread.
-//
-+ (BOOL) checkPushEnabled {
-    BOOL (^pushCheckBlock)(void) = ^{
-        BOOL blockResult;
-        if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
-            // iOS 8+
-            blockResult = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
-        } else {
-            // iOS 7
++ (BOOL)checkPushEnabled {
+    BOOL blockResult;
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
+        // iOS 8+
+        blockResult = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+    } else {
+        // iOS 7
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
-            blockResult = (types == UIRemoteNotificationTypeNone) ? NO : YES;
+        UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+        blockResult = (types == UIRemoteNotificationTypeNone) ? NO : YES;
 #pragma clang diagnostic pop
-        }
-        return blockResult;
-    };
-
-    __block BOOL result;
-
-    if ( ! [[NSThread currentThread] isMainThread]) {
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            result = pushCheckBlock();
-        });
-    } else {
-        result = pushCheckBlock();
     }
-
-    return result;
+    return blockResult;
 }
 
-// Main thread only
-//
-+ (void) ensureMetricsOptoutExists {
-    MGLAssertIsMainThread();
-
++ (void)ensureMetricsOptoutExists {
     NSNumber *shownInAppNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxMetricsEnabledSettingShownInApp"];
     BOOL metricsEnabledSettingShownInAppFlag = [shownInAppNumber boolValue];
 
-    if ( ! metricsEnabledSettingShownInAppFlag &&
+    if (!metricsEnabledSettingShownInAppFlag &&
         [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
         // Opt-out is not configured in UI, so check for Settings.bundle
         id defaultEnabledValue;
@@ -844,7 +652,7 @@ const NSTimeInterval MGLFlushInterval = 60;
             }
         }
 
-        if ( ! defaultEnabledValue) {
+        if (!defaultEnabledValue) {
             [NSException raise:@"Telemetry opt-out missing" format:
              @"End users must be able to opt out of Mapbox Telemetry in your app, either inside Settings (via Settings.bundle) or inside this app. "
              @"By default, this opt-out control is included as a menu item in the attribution action sheet. "
@@ -856,6 +664,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 #pragma mark CLLocationManagerDelegate
+
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     //  Iterate through locations to pass all data
     for (CLLocation *loc in locations) {
@@ -886,6 +695,7 @@ const NSTimeInterval MGLFlushInterval = 60;
 }
 
 #pragma mark NSURLSessionDelegate
+
 - (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
 
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
@@ -964,70 +774,58 @@ const NSTimeInterval MGLFlushInterval = 60;
 
 #pragma mark MGLMapboxEvents Debug
 
-// Can be called from any thread.
-//
-+ (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [[MGLMapboxEvents sharedManager] pushDebugEvent:event withAttributes:attributeDictionary];
-    });
++ (void)pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    [[MGLMapboxEvents sharedManager] pushDebugEvent:event withAttributes:attributeDictionary];
 }
 
-// Can be called from any thread. Called implicitly from public
-// use of +pushDebugEvent:withAttributes:.
-//
-- (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
-    __weak MGLMapboxEvents *weakSelf = self;
-
-    if (![self debugLoggingEnabled] || !event) return;
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-
-        MGLMapboxEvents *strongSelf = weakSelf;
-
-        if (!strongSelf) return;
-
-        MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
-
-        [evt setObject:event forKey:@"event"];
-        [evt setObject:[strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-        [evt setValue:[strongSelf applicationState] forKey:@"applicationState"];
-        [evt setValue:@([[self class] isEnabled]) forKey:@"telemetryEnabled"];
-        [evt setObject:strongSelf.instanceID forKey:@"instance"];
-
-        // Make immutable version
-        MGLMapboxEventAttributes *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
-
-        [strongSelf writeEventToLocalDebugLog:finalEvent];
-
-    });
+- (void)pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
+    if (![self debugLoggingEnabled]) {
+        return;
+    }
+    
+    if (!event) {
+        return;
+    }
+    
+    MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
+    [evt setObject:event forKey:@"event"];
+    [evt setObject:[self.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
+    [evt setValue:[self applicationState] forKey:@"applicationState"];
+    [evt setValue:@([[self class] isEnabled]) forKey:@"telemetryEnabled"];
+    [evt setObject:self.instanceID forKey:@"instance"];
+    
+    MGLMapboxEventAttributes *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+    [self writeEventToLocalDebugLog:finalEvent];
 }
 
-- (void) writeEventToLocalDebugLog:(MGLMapboxEventAttributes *)event {
-    if (![self debugLoggingEnabled]) return;
+- (void)writeEventToLocalDebugLog:(MGLMapboxEventAttributes *)event {
+    if (![self debugLoggingEnabled]) {
+        return;
+    }
 
     NSLog(@"%@", [self stringForDebugEvent:event]);
 
-    if ( ! self.dateForDebugLogFile) {
+    if (!self.dateForDebugLogFile) {
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy'-'MM'-'dd"];
         [dateFormatter setTimeZone:[NSTimeZone systemTimeZone]];
         self.dateForDebugLogFile = [dateFormatter stringFromDate:[NSDate date]];
     }
 
-    if ( ! _debugLogSerialQueue) {
+    if (!self.debugLogSerialQueue) {
         NSString *uniqueID = [[NSProcessInfo processInfo] globallyUniqueString];
-        _debugLogSerialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.debugLog", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
+        self.debugLogSerialQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@.%@.events.debugLog", _appBundleId, uniqueID] UTF8String], DISPATCH_QUEUE_SERIAL);
     }
 
-    dispatch_sync(_debugLogSerialQueue, ^{
+    dispatch_async(self.debugLogSerialQueue, ^{
         if ([NSJSONSerialization isValidJSONObject:event]) {
             NSData *jsonData = [NSJSONSerialization dataWithJSONObject:event options:NSJSONWritingPrettyPrinted error:nil];
+            
             NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
             jsonString = [jsonString stringByAppendingString:@",\n"];
-
+            
             NSString *logFilePath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:[NSString stringWithFormat:@"telemetry_log-%@.json", self.dateForDebugLogFile]];
-
+            
             NSFileManager *fileManager = [[NSFileManager alloc] init];
             if ([fileManager fileExistsAtPath:logFilePath]) {
                 NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:logFilePath];
@@ -1037,11 +835,10 @@ const NSTimeInterval MGLFlushInterval = 60;
                 [fileManager createFileAtPath:logFilePath contents:[jsonString dataUsingEncoding:NSUTF8StringEncoding] attributes:@{ NSFileProtectionKey: NSFileProtectionCompleteUntilFirstUserAuthentication }];
             }
         }
-
     });
 }
 
-- (NSString *) stringForDebugEvent:(MGLMapboxEventAttributes *)event {
+- (NSString *)stringForDebugEvent:(MGLMapboxEventAttributes *)event {
     // redact potentially sensitive location details from system console log
     if ([event[@"event"] isEqualToString:MGLEventTypeLocation] ||
         [event[@"event"] isEqualToString:MGLEventTypeVisit]) {
@@ -1054,7 +851,7 @@ const NSTimeInterval MGLFlushInterval = 60;
     return [NSString stringWithFormat:@"Mapbox Telemetry event %@", event];
 }
 
-- (BOOL) isProbablyAppStoreBuild {
+- (BOOL)isProbablyAppStoreBuild {
 #if TARGET_IPHONE_SIMULATOR
     return NO;
 #else
@@ -1062,23 +859,35 @@ const NSTimeInterval MGLFlushInterval = 60;
     // Adapted from https://github.com/blindsightcorp/BSMobileProvision
 
     NSString *binaryMobileProvision = [NSString stringWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"] encoding:NSISOLatin1StringEncoding error:NULL];
-    if (! binaryMobileProvision) return YES; // no provision
+    if (!binaryMobileProvision) {
+        return YES; // no provision
+    }
 
     NSScanner *scanner = [NSScanner scannerWithString:binaryMobileProvision];
     NSString *plistString;
-    if (! [scanner scanUpToString:@"<plist" intoString:nil] || ! [scanner scanUpToString:@"</plist>" intoString:&plistString]) return YES; // no XML plist found in provision
+    if (![scanner scanUpToString:@"<plist" intoString:nil] || ! [scanner scanUpToString:@"</plist>" intoString:&plistString]) {
+        return YES; // no XML plist found in provision
+    }
     plistString = [plistString stringByAppendingString:@"</plist>"];
 
     NSData *plistdata_latin1 = [plistString dataUsingEncoding:NSISOLatin1StringEncoding];
     NSError *error = nil;
     NSDictionary *mobileProvision = [NSPropertyListSerialization propertyListWithData:plistdata_latin1 options:NSPropertyListImmutable format:NULL error:&error];
-    if (error) return YES; // unknown plist format
+    if (error) {
+        return YES; // unknown plist format
+    }
 
-    if (! mobileProvision || ! mobileProvision.count) return YES; // no entitlements
+    if (!mobileProvision || ! mobileProvision.count) {
+        return YES; // no entitlements
+    }
 
-    if (mobileProvision[@"ProvisionsAllDevices"]) return NO; // enterprise provisioning
+    if (mobileProvision[@"ProvisionsAllDevices"]) {
+        return NO; // enterprise provisioning
+    }
 
-    if (mobileProvision[@"ProvisionedDevices"] && [mobileProvision[@"ProvisionedDevices"] count]) return NO; // development or ad-hoc
+    if (mobileProvision[@"ProvisionedDevices"] && [mobileProvision[@"ProvisionedDevices"] count]) {
+        return NO; // development or ad-hoc
+    }
     
     return YES; // expected development/enterprise/ad-hoc entitlements not found
 #endif

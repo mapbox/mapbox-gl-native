@@ -45,37 +45,14 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 
 // You must call these methods from the main thread.
 //
-+ (void) pauseMetricsCollection;
-+ (void) resumeMetricsCollection;
-
-// You can call this method from any thread. Significant work will
-// be dispatched to a low-priority background queue and all
-// resulting calls are guaranteed threadsafe.
-//
-// Events or attributes passed could be accessed on non-main threads,
-// so you must not reference UI elements from within any arguments.
-// Copy any values needed first or create dedicated methods in this
-// class for threadsafe access to UIKit classes.
-//
-+ (void) pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
-
-+ (void) pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
-
-+ (BOOL) debugLoggingEnabled;
-
-// You can call these methods from any thread.
-//
-+ (BOOL) checkPushEnabled;
-
-// You can call this method from any thread.
-//
-+ (void) flush;
-
-// Main thread only
-+ (void) validate;
-
-// Main thread only
-+ (void) ensureMetricsOptoutExists;
++ (void)pauseMetricsCollection;
++ (void)resumeMetricsCollection;
++ (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
++ (void)pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
++ (void)validate;
++ (void)ensureMetricsOptoutExists;
++ (void)flush;
++ (BOOL)checkPushEnabled;
 
 @end
 
