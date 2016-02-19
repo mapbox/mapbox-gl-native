@@ -547,16 +547,15 @@ TEST(OfflineDatabase, PutReturnsSize) {
     EXPECT_EQ(0, db.put(Resource::style("http://example.com/noContent"), noContent).second);
 }
 
-// TODO: disabled because it fails on iOS
-TEST(OfflineDatabase, DISABLED_PutEvictsLeastRecentlyUsedResources) {
+TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     using namespace mbgl;
 
-    OfflineDatabase db(":memory:", 1024 * 25);
+    OfflineDatabase db(":memory:", 1024 * 100);
 
     Response response;
     response.data = randomString(1024);
 
-    for (uint32_t i = 1; i <= 20; i++) {
+    for (uint32_t i = 1; i <= 100; i++) {
         Resource resource = Resource::style("http://example.com/"s + util::toString(i));
         db.put(resource, response);
         EXPECT_TRUE(bool(db.get(resource))) << i;
@@ -568,14 +567,14 @@ TEST(OfflineDatabase, DISABLED_PutEvictsLeastRecentlyUsedResources) {
 TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     using namespace mbgl;
 
-    OfflineDatabase db(":memory:", 1024 * 25);
+    OfflineDatabase db(":memory:", 1024 * 100);
     OfflineRegionDefinition definition { "", LatLngBounds::world(), 0, INFINITY, 1.0 };
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
 
     Response response;
     response.data = randomString(1024);
 
-    for (uint32_t i = 1; i <= 20; i++) {
+    for (uint32_t i = 1; i <= 100; i++) {
         db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
     }
 
@@ -583,22 +582,14 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/20"))));
 }
 
-// TODO: disabled because it fails on iOS
-TEST(OfflineDatabase, DISABLED_PutFailsWhenEvictionInsuffices) {
+TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     using namespace mbgl;
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
-    OfflineDatabase db(":memory:", 1024 * 25);
-
-    Response small;
-    small.data = randomString(1024);
-
-    for (uint32_t i = 1; i <= 10; i++) {
-        db.put(Resource::style("http://example.com/"s + util::toString(i)), small);
-    }
+    OfflineDatabase db(":memory:", 1024 * 100);
 
     Response big;
-    big.data = randomString(1024 * 15);
+    big.data = randomString(1024 * 100);
     db.put(Resource::style("http://example.com/big"), big);
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
 
