@@ -8,7 +8,7 @@ This repository hosts the cross-platform Mapbox GL Native library, plus convenie
 
 SDK | Languages | Build status
 ----|-----------|-------------
-[Mapbox GL Native](INSTALL.md) | C++14 | [![Travis](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
+[Mapbox GL Native](INSTALL.md) | C++14 | [![Travis](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds) [![Coverage Status](https://coveralls.io/repos/github/mapbox/mapbox-gl-native/badge.svg?branch=master)](https://coveralls.io/github/mapbox/mapbox-gl-native?branch=master)
 [Mapbox Android SDK](platform/android/) | Java | [![Bitrise](https://www.bitrise.io/app/79cdcbdc42de4303.svg?token=_InPF8bII6W7J6kFr-L8QQ&branch=master)](https://www.bitrise.io/app/79cdcbdc42de4303)
 [Mapbox iOS SDK](platform/ios/) | Objective-C or Swift | [![Bitrise](https://www.bitrise.io/app/7514e4cf3da2cc57.svg?token=OwqZE5rSBR9MVWNr_lf4sA&branch=master)](https://www.bitrise.io/app/7514e4cf3da2cc57)
 [Mapbox OS X SDK](platform/osx/) | Objective-C or Swift | [![Bitrise](https://www.bitrise.io/app/155ef7da24b38dcd.svg?token=4KSOw_gd6WxTnvGE2rMttg&branch=master)](https://www.bitrise.io/app/155ef7da24b38dcd)

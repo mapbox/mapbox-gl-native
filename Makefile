@@ -119,6 +119,7 @@ endif
 
 .PHONY: check
 check: ; $(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 check
+coveralls: ; $(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 coveralls
 
 .PHONY: render
 render: ; $(RUN) Makefile/mbgl-render

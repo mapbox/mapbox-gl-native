@@ -174,6 +174,9 @@ test-%: Makefile/test
 check: Makefile/test
 	./scripts/collect-coverage.sh
 
+coveralls: Makefile/test
+	./scripts/coveralls.sh
+
 #### Helper targets ############################################################
 
 .PHONY: print-env
