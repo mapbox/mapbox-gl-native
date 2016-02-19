@@ -6,6 +6,7 @@
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <memory>
 #include <string>
@@ -17,6 +18,7 @@ class StyleCascadeParameters;
 class StyleCalculationParameters;
 class StyleBucketParameters;
 class Bucket;
+class Source;
 
 class StyleLayer {
 public:
@@ -63,7 +65,7 @@ public:
 public:
     std::string id;
     std::string ref;
-    std::string source;
+    util::ID<Source> source;
     std::string sourceLayer;
     FilterExpression filter;
     float minZoom = -std::numeric_limits<float>::infinity();

@@ -4,6 +4,7 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <atomic>
 #include <memory>
@@ -15,12 +16,13 @@ class Style;
 class WorkRequest;
 class FileRequest;
 class GeometryTileMonitor;
+class Source;
 
 class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    std::unique_ptr<GeometryTileMonitor> monitor,
-                   std::string sourceID,
+                   util::ID<Source> sourceID,
                    Style&,
                    const MapMode,
                    const std::function<void(std::exception_ptr)>& callback);

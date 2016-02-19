@@ -7,6 +7,7 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <forward_list>
 #include <vector>
@@ -44,7 +45,7 @@ public:
     };
 
     Source(SourceType,
-           const std::string& id,
+           util::ID<Source> id,
            const std::string& url,
            uint16_t tileSize,
            std::unique_ptr<SourceInfo>&&,
@@ -77,7 +78,7 @@ public:
     void dumpDebugLogs() const;
 
     const SourceType type;
-    const std::string id;
+    const util::ID<Source> id;
     const std::string url;
     uint16_t tileSize = util::tileSize;
     bool enabled = false;

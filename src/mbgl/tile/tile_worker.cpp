@@ -17,7 +17,7 @@
 using namespace mbgl;
 
 TileWorker::TileWorker(TileID id_,
-                       std::string sourceID_,
+                       util::ID<Source> sourceID_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,

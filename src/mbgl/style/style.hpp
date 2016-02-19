@@ -92,6 +92,7 @@ public:
     }
 
     Source* getSource(const std::string& id) const;
+    Source* getSource(util::ID<Source> id) const;
     void addSource(std::unique_ptr<Source>);
 
     std::vector<std::unique_ptr<StyleLayer>> getLayers() const;

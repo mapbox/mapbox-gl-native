@@ -37,7 +37,7 @@
 namespace mbgl {
 
 Source::Source(SourceType type_,
-               const std::string& id_,
+               util::ID<Source> id_,
                const std::string& url_,
                uint16_t tileSize_,
                std::unique_ptr<SourceInfo>&& info_,

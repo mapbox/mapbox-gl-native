@@ -7,6 +7,7 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/id.hpp>
 #include <mbgl/text/placement_config.hpp>
 
 #include <string>
@@ -25,6 +26,7 @@ class GlyphStore;
 class Bucket;
 class StyleLayer;
 class SymbolLayer;
+class Source;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
@@ -41,7 +43,7 @@ using TileParseResult = mapbox::util::variant<
 class TileWorker : public util::noncopyable {
 public:
     TileWorker(TileID,
-               std::string sourceID,
+               util::ID<Source> sourceID,
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
@@ -64,7 +66,7 @@ private:
     void placeLayers(PlacementConfig);
 
     const TileID id;
-    const std::string sourceID;
+    const util::ID<Source> sourceID;
 
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;

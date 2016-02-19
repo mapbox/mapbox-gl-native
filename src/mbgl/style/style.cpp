@@ -190,6 +190,10 @@ void Style::recalculate(float z) {
 }
 
 Source* Style::getSource(const std::string& id) const {
+    return getSource(util::ID<Source>(id));
+}
+
+Source* Style::getSource(util::ID<Source> id) const {
     const auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
         return source->id == id;
     });

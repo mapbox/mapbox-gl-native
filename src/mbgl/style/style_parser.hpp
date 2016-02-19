@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
 #include <unordered_map>
 #include <forward_list>
 
@@ -42,7 +43,7 @@ private:
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSValue& value);
 
-    std::unordered_map<std::string, const Source*> sourcesMap;
+    std::map<util::ID<Source>, const Source*> sourcesMap;
     std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<StyleLayer>>> layersMap;
 
     // Store a stack of layer IDs we're parsing right now. This is to prevent reference cycles.
