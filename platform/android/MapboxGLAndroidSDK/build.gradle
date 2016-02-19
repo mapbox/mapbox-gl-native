@@ -67,7 +67,7 @@ android {
         }
     }
 
-    resourcePrefix 'mapbox_'
+//    resourcePrefix 'mapbox_'
 
 }
 
