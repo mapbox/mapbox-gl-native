@@ -7,10 +7,19 @@ import static org.junit.Assert.assertNotNull;
 
 public class ProjectedMetersTest {
 
+    private static final LatLng LAT_LNG_NULL_ISLAND = new LatLng(0, 0);
+
     @Test
     public void testSanity() {
         ProjectedMeters projectedMeters = new ProjectedMeters(0.0, 0.0);
         assertNotNull("projectedMeters should not be null", projectedMeters);
+    }
+
+    @Test
+    public void testEquality() {
+        ProjectedMeters projectedMeters = new ProjectedMeters(0.0, 0.0);
+        assertEquals("projectedMeters is not equal to a LatLng", projectedMeters.equals(LAT_LNG_NULL_ISLAND), false);
+        assertEquals("projectedMeters is equal to itself", projectedMeters.equals(projectedMeters), true);
     }
 
     @Test

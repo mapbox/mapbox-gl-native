@@ -10,11 +10,18 @@ import static org.junit.Assert.assertNotNull;
 public class LatLngSpanTest {
 
     private static final double DELTA = 1e-15;
+    private static final LatLng LAT_LNG_NULL_ISLAND = new LatLng(0, 0);
 
     @Test
     public void testSanity() {
         LatLngSpan latLngSpan = new LatLngSpan(0.0, 0.0);
         assertNotNull("latLngSpan should not be null", latLngSpan);
+    }
+
+    @Test
+    public void testEquality() {
+        LatLngSpan latLngSpan = new LatLngSpan(0.0, 0.0);
+        assertEquals("latLngSpan is not equal to a LatLng", latLngSpan.equals(LAT_LNG_NULL_ISLAND), false);
     }
 
     @Test

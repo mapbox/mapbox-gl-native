@@ -20,6 +20,13 @@ public class VisibleRegionTest {
     }
 
     @Test
+    public void testEquality() {
+        VisibleRegion region = new VisibleRegion(FAR_LEFT, FAR_RIGHT, NEAR_LEFT, NEAR_RIGHT, BOUNDS);
+        assertEquals("visibleRegion is not equal to a LatLng", region.equals(FAR_LEFT), false);
+        assertEquals("visibleRegion is equal to itself", region.equals(region), true);
+    }
+
+    @Test
     public void testFarLeftConstructor() {
         VisibleRegion region = new VisibleRegion(FAR_LEFT, FAR_RIGHT, NEAR_LEFT, NEAR_RIGHT, BOUNDS);
         assertEquals("LatLng should match", region.farLeft, FAR_LEFT);

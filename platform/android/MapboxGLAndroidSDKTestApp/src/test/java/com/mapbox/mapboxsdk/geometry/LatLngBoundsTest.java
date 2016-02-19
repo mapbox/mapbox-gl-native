@@ -120,6 +120,7 @@ public class LatLngBoundsTest {
                 .include(LAT_LNG_NOT_NULL_ISLAND)
                 .build();
         assertEquals("equality should match", mLatLngBounds, latLngBounds);
+        assertEquals("not equal to a different object type", mLatLngBounds.equals(LAT_LNG_NOT_NULL_ISLAND), false);
     }
 
     @Test
