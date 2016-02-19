@@ -153,8 +153,15 @@ void HTTPNSURLRequest::cancel() {
         task = nullptr;
     }
 
-    std::lock_guard<std::mutex> lock(cancelled->second);
-    cancelled->first = true;
+    {
+        std::lock_guard<std::mutex> lock(cancelled->second);
+        cancelled->first = true;
+    }
+
+    // The lock is in place to enforce that `async` is not accessed if the request has been
+    // cancelled. Therefore it's not necessary to hold the lock beyond setting cancelled to
+    // true, and in fact it's unsafe to so: if this is the last remaining shared reference,
+    // `delete this` will destroy the mutex. If the lock was held, it would then be orphaned.
 
     delete this;
 }
