@@ -47,7 +47,8 @@ public class MapboxMap {
     private boolean mInvalidCameraPosition;
     private String mStyleUrl;
     private LongSparseArray<Annotation> mAnnotations;
-    private List<Marker> mSelectedMarkers;
+    private List<Annotation> mSelectedAnnotations;
+
     private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
 
@@ -57,6 +58,8 @@ public class MapboxMap {
     private MapboxMap.OnMapClickListener mOnMapClickListener;
     private MapboxMap.OnMapLongClickListener mOnMapLongClickListener;
     private MapboxMap.OnMarkerClickListener mOnMarkerClickListener;
+    //private MapboxMap.OnPolygonClickListener mOnPolygonClickListener;
+    //private MapboxMap.OnPolylineClickListener mOnPolylineClickListener;
     private MapboxMap.OnInfoWindowClickListener mOnInfoWindowClickListener;
     private MapboxMap.OnInfoWindowLongClickListener mOnInfoWindowLongClickListener;
     private MapboxMap.OnInfoWindowCloseListener mOnInfoWindowCloseListener;
@@ -74,7 +77,7 @@ public class MapboxMap {
         mTrackingSettings = new TrackingSettings(mMapView, mUiSettings);
         mProjection = new Projection(mapView);
         mAnnotations = new LongSparseArray<>();
-        mSelectedMarkers = new ArrayList<>();
+        mSelectedAnnotations = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
     }
 
@@ -742,8 +745,8 @@ public class MapboxMap {
         for (int i = 0; i < count; i++) {
             ids[i] = mAnnotations.keyAt(i);
             annotation = mAnnotations.get(ids[i]);
-            if(annotation instanceof Marker){
-                ((Marker)annotation).hideInfoWindow();
+            if (annotation instanceof Marker) {
+                ((Marker) annotation).hideInfoWindow();
             }
         }
         mMapView.removeAnnotations(ids);
@@ -758,7 +761,13 @@ public class MapboxMap {
     @UiThread
     @Nullable
     public Annotation getAnnotation(long id) {
-        return mAnnotations.get(id);
+        for (int i = 0; i < mAnnotations.size(); i++) {
+            Annotation annotation = mAnnotations.valueAt(i);
+            if (annotation.getId() == id) {
+                return annotation;
+            }
+        }
+        return null;
     }
 
     /**
@@ -833,81 +842,46 @@ public class MapboxMap {
         return polylines;
     }
 
-    /**
-     * <p>
-     * Selects a marker. The selected marker will have it's info window opened.
-     * Any other open info windows will be closed unless isAllowConcurrentMultipleOpenInfoWindows()
-     * is true.
-     * </p>
-     * Selecting an already selected marker will have no effect.
-     *
-     * @param marker The marker to select.
-     */
-    @UiThread
-    public void selectMarker(@NonNull Marker marker) {
-        if (marker == null) {
-            Log.w(MapboxConstants.TAG, "marker was null, so just" +
-                    " returning");
+    public void selectAnnotation(@NonNull Annotation annotation) {
+        if (mSelectedAnnotations.contains(annotation)) {
+            // can't select an already selected annotation
             return;
         }
 
-        if (mSelectedMarkers.contains(marker)) {
-            return;
-        }
-
-        // Need to deselect any currently selected annotation first
         if (!isAllowConcurrentMultipleOpenInfoWindows()) {
-            deselectMarkers();
+            // we can only have one selected annotation at a time
+            deselectAnnotations();
         }
 
-        boolean handledDefaultClick = false;
-        if (mOnMarkerClickListener != null) {
-            // end developer has provided a custom click listener
-            handledDefaultClick = mOnMarkerClickListener.onMarkerClick(marker);
-        }
-
-        if (!handledDefaultClick) {
+        if (annotation instanceof Marker) {
+            Marker marker = (Marker) annotation;
             if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
                 mInfoWindows.add(marker.showInfoWindow(this, mMapView));
             }
         }
 
-        mSelectedMarkers.add(marker);
+        mSelectedAnnotations.add(annotation);
     }
 
-    /**
-     * Deselects any currently selected marker. All markers will have it's info window closed.
-     */
-    @UiThread
-    public void deselectMarkers() {
-        if (mSelectedMarkers.isEmpty()) {
-            return;
-        }
-
-        for (Marker marker : mSelectedMarkers) {
-            if (marker.isInfoWindowShown()) {
-                marker.hideInfoWindow();
+    public void deselectAnnotations() {
+        for (Annotation annotation : mSelectedAnnotations) {
+            if (annotation instanceof Marker) {
+                ((Marker) annotation).hideInfoWindow();
             }
         }
-
-        // Removes all selected markers from the list
-        mSelectedMarkers.clear();
+        mSelectedAnnotations.clear();
     }
 
-    /**
-     * Deselects a currently selected marker. The selected marker will have it's info window closed.
-     */
-    @UiThread
-    public void deselectMarker(@NonNull Marker marker) {
-        if (!mSelectedMarkers.contains(marker)) {
-            return;
+    public void deselectAnnotation(@NonNull Annotation annotation) {
+        if (mSelectedAnnotations.contains(annotation)) {
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                if (marker.isInfoWindowShown()) {
+                    marker.hideInfoWindow();
+                }
+            }
+            mSelectedAnnotations.remove(annotation);
         }
-
-        if (marker.isInfoWindowShown()) {
-            marker.hideInfoWindow();
-        }
-
-        mSelectedMarkers.remove(marker);
     }
 
     /**
@@ -917,7 +891,17 @@ public class MapboxMap {
      */
     @UiThread
     public List<Marker> getSelectedMarkers() {
-        return mSelectedMarkers;
+        final List<Marker> markers = new ArrayList<>();
+        for (Annotation a : mSelectedAnnotations) {
+            if (a instanceof Marker) {
+                markers.add((Marker) a);
+            }
+        }
+        return markers;
+    }
+
+    public List<Annotation> getSelectedAnnotations() {
+        return mSelectedAnnotations;
     }
 
     private Marker prepareMarker(BaseMarkerOptions markerOptions) {
@@ -1117,6 +1101,46 @@ public class MapboxMap {
     public void setOnMarkerClickListener(@Nullable OnMarkerClickListener listener) {
         mOnMarkerClickListener = listener;
     }
+
+    // used by MapView
+    @Nullable
+    OnMarkerClickListener getOnMarkerClickListener() {
+        return mOnMarkerClickListener;
+    }
+
+//    /**
+//     * Sets a callback that's invoked when the user clicks on a polygon.
+//     *
+//     * @param listener The callback that's invoked when the user clicks on a polygon.
+//     *                 To unset the callback, use null.
+//     */
+//    @UiThread
+//    public void setOnPolygonClickListener(@Nullable OnPolygonClickListener listener) {
+//        mOnPolygonClickListener = listener;
+//    }
+//
+//    // used by MapView
+//    @Nullable
+//    OnPolygonClickListener getOnPolygonClickListener() {
+//        return mOnPolygonClickListener;
+//    }
+//
+//    /**
+//     * Sets a callback that's invoked when the user clicks on a polyline.
+//     *
+//     * @param listener The callback that's invoked when the user clicks on a polyline.
+//     *                 To unset the callback, use null.
+//     */
+//    @UiThread
+//    public void setOnPolylineClickListener(@Nullable OnPolylineClickListener listener) {
+//        mOnPolylineClickListener = listener;
+//    }
+//
+//    // used by MapView
+//    @Nullable
+//    OnPolylineClickListener getOnPolylineClickListener() {
+//        return mOnPolylineClickListener;
+//    }
 
     /**
      * Sets a callback that's invoked when the user clicks on an info window.
@@ -1385,6 +1409,36 @@ public class MapboxMap {
          */
         boolean onMarkerClick(@NonNull Marker marker);
     }
+
+//    /**
+//     * Interface definition for a callback to be invoked when the user clicks on a polyline.
+//     *
+//     * @see MapboxMap#setOnPolylineClickListener(OnPolylineClickListener)
+//     */
+//    public interface OnPolylineClickListener {
+//        /**
+//         * Called when the user clicks on a polyline.
+//         *
+//         * @param polyline The polyline the user clicked on.
+//         * @return If true the listener has consumed the event and polyline will not be selected.
+//         */
+//        boolean onPolylineClick(@NonNull Polyline polyline);
+//    }
+//
+//    /**
+//     * Interface definition for a callback to be invoked when the user clicks on a polygon.
+//     *
+//     * @see MapboxMap#setOnPolygonClickListener(OnPolygonClickListener)
+//     */
+//    public interface OnPolygonClickListener {
+//        /**
+//         * Called when the user clicks on a polygon.
+//         *
+//         * @param polygon The polygon the user clicked on.
+//         * @return If true the listener has consumed the event and the polygon will not be selected.
+//         */
+//        boolean onPolygonClick(@NonNull Polygon polygon);
+//    }
 
     /**
      * Interface definition for a callback to be invoked when the user clicks on an info window.

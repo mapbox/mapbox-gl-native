@@ -68,6 +68,7 @@ import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
+import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -1085,10 +1086,9 @@ public class MapView extends FrameLayout {
 
 
     long addMarker(@NonNull Marker marker) {
-        if (mNativeMapView == null) {
-            return 0l;
-        }
-        return mNativeMapView.addMarker(marker);
+        long id = mNativeMapView.addMarker(marker);
+        Log.v(MapboxConstants.TAG, "MapView.addMarker with id " + id);
+        return id;
     }
 
     long[] addMarkers(@NonNull List<Marker> markerList) {
@@ -1117,6 +1117,26 @@ public class MapView extends FrameLayout {
 
     void removeAnnotations(@NonNull long[] ids) {
         mNativeMapView.removeAnnotations(ids);
+    }
+
+    private List<Annotation> getAnnotationsInBounds(@NonNull LatLngBounds bounds) {
+        long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
+        Log.e(MapboxConstants.TAG,"getAnnnotationsInBounds "+ids.length);
+        List<Long> idsList = new ArrayList<>(ids.length);
+        for (int i = 0; i < ids.length; i++) {
+            idsList.add(ids[i]);
+        }
+
+        List<Annotation> inBoundsAnnotations = new ArrayList<>(ids.length);
+        List<Annotation> annotationList = mMapboxMap.getAnnotations();
+        int count = annotationList.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
+            if (idsList.contains(annotation.getId())) {
+                inBoundsAnnotations.add(annotation);
+            }
+        }
+        return inBoundsAnnotations;
     }
 
     private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
@@ -1588,7 +1608,7 @@ public class MapView extends FrameLayout {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
 
-            List<Marker> selectedMarkers = mMapboxMap.getSelectedMarkers();
+            List<Annotation> selectedAnnotations = mMapboxMap.getSelectedAnnotations();
 
             final float toleranceSides = 15 * mScreenDensity;
             final float toleranceTop = 20 * mScreenDensity;
@@ -1603,51 +1623,74 @@ public class MapView extends FrameLayout {
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
             builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
 
-            List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
-            long newSelectedMarkerId = -1;
+            mMapboxMap.addPolygon(new PolygonOptions().add(fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)))
+                            .add(fromScreenLocation(new PointF(tapRect.left, tapRect.top)))
+                            .add(fromScreenLocation(new PointF(tapRect.right, tapRect.top)))
+                            .add(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)))
+            );
 
-            if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
-                Collections.sort(nearbyMarkers);
-                for (Marker nearbyMarker : nearbyMarkers) {
+            List<Annotation> nearbyAnnotations = getAnnotationsInBounds(builder.build());
+            long newSelectedAnnotationId = -1;
+
+            // are there annotations nearby?
+            if (nearbyAnnotations.size() > 0) {
+                Collections.sort(nearbyAnnotations);
+
+                // is annotation already selected?
+                for (Annotation nearbyAnnotation : nearbyAnnotations) {
                     boolean found = false;
-                    for (Marker selectedMarker : selectedMarkers) {
-                        if (selectedMarker.equals(nearbyMarker)) {
+                    for (Annotation selectedAnnotation : selectedAnnotations) {
+                        if (nearbyAnnotation.equals(selectedAnnotation)) {
                             found = true;
                         }
                     }
                     if (!found) {
-                        newSelectedMarkerId = nearbyMarker.getId();
+                        // not selected annotation found
+                        newSelectedAnnotationId = nearbyAnnotation.getId();
                         break;
                     }
                 }
             }
 
-            if (newSelectedMarkerId >= 0) {
-                List<Annotation> annotations = mMapboxMap.getAnnotations();
-                int count = annotations.size();
-                for (int i = 0; i < count; i++) {
-                    Annotation annotation = annotations.get(i);
-                    if (annotation instanceof Marker) {
-                        if (annotation.getId() == newSelectedMarkerId) {
-                            if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                mMapboxMap.selectMarker((Marker) annotation);
-                            }
-                            break;
-                        }
+            // did we find a not selected annotation?
+            if (newSelectedAnnotationId >= 0) {
+                Annotation annotationToSelect = mMapboxMap.getAnnotation(newSelectedAnnotationId);
+
+                boolean clickHandled = false;
+                if (annotationToSelect instanceof Marker) {
+                    MapboxMap.OnMarkerClickListener onMarkerClickListener = mMapboxMap.getOnMarkerClickListener();
+                    if (onMarkerClickListener != null) {
+                        clickHandled = onMarkerClickListener.onMarkerClick((Marker) annotationToSelect);
                     }
                 }
-            } else {
-                // deselect any selected marker
-                mMapboxMap.deselectMarkers();
+//                else if (annotationToSelect instanceof Polygon) {
+//                    MapboxMap.OnPolygonClickListener onPolygonClickListener = mMapboxMap.getOnPolygonClickListener();
+//                    if (onPolygonClickListener != null) {
+//                        clickHandled = onPolygonClickListener.onPolygonClick((Polygon) annotationToSelect);
+//                    }
+//                } else if (annotationToSelect instanceof Polyline) {
+//                    MapboxMap.OnPolylineClickListener onPolylineClickListener = mMapboxMap.getOnPolylineClickListener();
+//                    if (onPolylineClickListener != null) {
+//                        clickHandled = onPolylineClickListener.onPolylineClick((Polyline) annotationToSelect);
+//                    }
+//                }
 
-                // notify app of map click
+                if (!clickHandled) {
+                    // click is not being handled by client
+                    mMapboxMap.selectAnnotation(annotationToSelect);
+                }
+
+            } else {
+                // we did not find any selectable annotation
+                mMapboxMap.deselectAnnotations();
+
+                // notify client of map click
                 MapboxMap.OnMapClickListener listener = mMapboxMap.getOnMapClickListener();
                 if (listener != null) {
                     LatLng point = fromScreenLocation(tapPoint);
                     listener.onMapClick(point);
                 }
             }
-
             return true;
         }
 
