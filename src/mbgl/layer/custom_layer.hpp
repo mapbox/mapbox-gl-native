@@ -9,7 +9,7 @@ class TransformState;
 
 class CustomLayer : public StyleLayer {
 public:
-    CustomLayer(const std::string& id,
+    CustomLayer(util::ID<StyleLayer> id,
                 CustomLayerInitializeFunction,
                 CustomLayerRenderFunction,
                 CustomLayerDeinitializeFunction,

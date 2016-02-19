@@ -4,7 +4,7 @@
 
 namespace mbgl {
 
-CustomLayer::CustomLayer(const std::string& id_,
+CustomLayer::CustomLayer(util::ID<StyleLayer> id_,
                          CustomLayerInitializeFunction initializeFn_,
                          CustomLayerRenderFunction renderFn_,
                          CustomLayerDeinitializeFunction deinitializeFn_,

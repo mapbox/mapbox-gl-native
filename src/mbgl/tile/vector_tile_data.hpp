@@ -8,7 +8,7 @@
 
 #include <atomic>
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 
@@ -49,7 +49,7 @@ private:
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> buckets;
 
     // Stores the placement configuration of the text that is currently placed on the screen.
     PlacementConfig placedConfig;

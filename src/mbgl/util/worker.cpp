@@ -51,7 +51,7 @@ public:
     }
 
     void redoPlacement(TileWorker* worker,
-                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
+                       const std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
                        std::function<void()> callback) {
         worker->redoPlacement(buckets, config);
@@ -99,7 +99,7 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
 
 std::unique_ptr<WorkRequest>
 Worker::redoPlacement(TileWorker& worker,
-                      const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
+                      const std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,
                       std::function<void()> callback) {
     current = (current + 1) % threads.size();

@@ -9,7 +9,6 @@
 #include <memory>
 #include <string>
 #include <map>
-#include <unordered_map>
 #include <forward_list>
 
 namespace mbgl {
@@ -40,14 +39,14 @@ public:
 private:
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);
-    void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<StyleLayer>&);
+    void parseLayer(util::ID<StyleLayer> id, const JSValue&, std::unique_ptr<StyleLayer>&);
     void parseVisibility(StyleLayer&, const JSValue& value);
 
     std::map<util::ID<Source>, const Source*> sourcesMap;
-    std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<StyleLayer>>> layersMap;
+    std::map<util::ID<StyleLayer>, std::pair<const JSValue&, std::unique_ptr<StyleLayer>>> layersMap;
 
     // Store a stack of layer IDs we're parsing right now. This is to prevent reference cycles.
-    std::forward_list<std::string> stack;
+    std::forward_list<util::ID<StyleLayer>> stack;
 };
 
 } // namespace mbgl

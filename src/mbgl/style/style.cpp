@@ -84,18 +84,18 @@ std::vector<std::unique_ptr<StyleLayer>> Style::getLayers() const {
     return result;
 }
 
-std::vector<std::unique_ptr<StyleLayer>>::const_iterator Style::findLayer(const std::string& id) const {
-    return std::find_if(layers.begin(), layers.end(), [&](const auto& layer) {
+std::vector<std::unique_ptr<StyleLayer>>::const_iterator Style::findLayer(const util::ID<StyleLayer> id) const {
+    return std::find_if(layers.begin(), layers.end(), [=](const auto& layer) {
         return layer->id == id;
     });
 }
 
-StyleLayer* Style::getLayer(const std::string& id) const {
+StyleLayer* Style::getLayer(const util::ID<StyleLayer> id) const {
     auto it = findLayer(id);
     return it != layers.end() ? it->get() : nullptr;
 }
 
-void Style::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> before) {
+void Style::addLayer(std::unique_ptr<StyleLayer> layer, util::ID<StyleLayer> before) {
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->spriteAtlas) {
             symbolLayer->spriteAtlas = spriteAtlas.get();
@@ -106,10 +106,10 @@ void Style::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> be
         customLayer->initialize();
     }
 
-    layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer));
+    layers.emplace(before.valid() ? findLayer(before) : layers.end(), std::move(layer));
 }
 
-void Style::removeLayer(const std::string& id) {
+void Style::removeLayer(const util::ID<StyleLayer> id) {
     auto it = findLayer(id);
     if (it == layers.end())
         throw std::runtime_error("no such layer");

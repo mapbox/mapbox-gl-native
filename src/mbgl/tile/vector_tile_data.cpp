@@ -131,7 +131,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 }
 
 Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
-    const auto it = buckets.find(layer.bucketName());
+    const auto it = buckets.find(layer.bucketID());
     if (it == buckets.end()) {
         return nullptr;
     }

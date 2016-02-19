@@ -14,7 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <list>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 
@@ -33,7 +33,7 @@ class Source;
 class TileParseResultBuckets {
 public:
     TileData::State state = TileData::State::invalid;
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> buckets;
 };
 
 using TileParseResult = mapbox::util::variant<
@@ -57,12 +57,12 @@ public:
 
     TileParseResult parsePendingLayers(PlacementConfig);
 
-    void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
+    void redoPlacement(const std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>>*,
                        PlacementConfig);
 
 private:
     void parseLayer(const StyleLayer*, const GeometryTile&);
-    void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
+    void insertBucket(util::ID<StyleLayer> name, std::unique_ptr<Bucket>);
     void placeLayers(PlacementConfig);
 
     const TileID id;
@@ -84,7 +84,7 @@ private:
 
     // Contains buckets that have been parsed, but still need placement.
     // They will be placed when all buckets have been parsed.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> placementPending;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> placementPending;
 
     // Temporary holder
     TileParseResultBuckets result;

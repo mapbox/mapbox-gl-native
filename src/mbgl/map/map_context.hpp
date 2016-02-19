@@ -57,8 +57,7 @@ public:
     void updateAnnotations();
     
     // Style API
-    void addLayer(std::unique_ptr<StyleLayer>,
-                  const optional<std::string> before);
+    void addLayer(std::unique_ptr<StyleLayer>, util::ID<StyleLayer> before);
     void removeLayer(const std::string& id);
 
     void setSourceTileCacheSize(size_t size);
