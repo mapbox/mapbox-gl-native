@@ -137,6 +137,7 @@ public class MapView extends FrameLayout {
     private boolean mTwoTap = false;
     private boolean mZoomStarted = false;
     private boolean mQuickZoom = false;
+    private boolean mScrollInProgress = false;
 
     private int mContentPaddingLeft;
     private int mContentPaddingTop;
@@ -1535,6 +1536,12 @@ public class MapView extends FrameLayout {
                     return true;
                 }
 
+                // Scroll / Pan Has Stopped
+                if (mScrollInProgress) {
+                    trackGestureEvent(MapboxEvent.TYPE_MAP_DRAGEND, event.getX(), event.getY());
+                    mScrollInProgress = false;
+                }
+
                 mTwoTap = false;
                 mNativeMapView.setGestureInProgress(false);
                 break;
@@ -1726,6 +1733,10 @@ public class MapView extends FrameLayout {
         // Called for drags
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.i(TAG, "onScroll() started");
+            if (!mScrollInProgress) {
+                mScrollInProgress = true;
+            }
             if (!mMapboxMap.getUiSettings().isScrollGesturesEnabled()) {
                 return false;
             }
@@ -1746,6 +1757,7 @@ public class MapView extends FrameLayout {
                 listener.onScroll();
             }
 
+            Log.i(TAG, "onScroll() done");
             return true;
         }
     }
