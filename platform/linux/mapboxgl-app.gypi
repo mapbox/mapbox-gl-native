@@ -51,7 +51,11 @@
           'configurations': {
             'Debug': {
               'xcode_settings': {
-                'OTHER_LDFLAGS': [ '--coverage' ],
+                'conditions': [
+                  ['enable_coverage=="1"', {
+                    'OTHER_LDFLAGS': [ '--coverage' ],
+                  }],
+                ],
               },
             },
           },

@@ -83,6 +83,11 @@ GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
 GYP_FLAGS += --depth=.
 GYP_FLAGS += -Goutput_dir=.
 GYP_FLAGS += --generator-output=./build/$(HOST_SLUG)
+ifeq ($(ENABLE_COVERAGE),1)
+GYP_FLAGS += -Denable_coverage=1
+else ifneq ($(ENABLE_COVERAGE),1)
+GYP_FLAGS += -Denable_coverage=0
+endif
 
 .PHONY: Makefile/__project__
 Makefile/__project__: print-env $(SUBMODULES) config/$(HOST_SLUG).gypi

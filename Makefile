@@ -118,7 +118,7 @@ xtest: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/test
 endif
 
 .PHONY: check
-check: ; $(RUN) BUILDTYPE=Debug check
+check: ; $(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 check
 
 .PHONY: render
 render: ; $(RUN) Makefile/mbgl-render

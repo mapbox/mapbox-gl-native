@@ -97,8 +97,12 @@
           '-fno-common',
           '--coverage',
         ],
-        'ldflags': [
-          '--coverage',
+        'conditions': [
+          ['enable_coverage=="1"', {
+            'cflags_cc': [ '<@(cflags_cc)', '--coverage' ],
+          }, {
+            'ldflags': [ '--coverage' ],
+          }],
         ],
         'defines': [ 'DEBUG' ],
         'xcode_settings': {
@@ -106,10 +110,15 @@
           'GCC_GENERATE_DEBUGGING_SYMBOLS': 'YES',
           'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
           'DEAD_CODE_STRIPPING': 'NO',
-          'GCC_INSTRUMENT_PROGRAM_FLOW_ARCS': 'YES',
-          'GCC_GENERATE_TEST_COVERAGE_FILES': 'YES',
-          'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common', '-fprofile-arcs', '-ftest-coverage' ],
-        }
+          'OTHER_CPLUSPLUSFLAGS': [ '-fno-omit-frame-pointer','-fwrapv', '-fstack-protector-all', '-fno-common' ],
+          'conditions': [
+            ['enable_coverage=="1"', {
+              'GCC_INSTRUMENT_PROGRAM_FLOW_ARCS': 'YES',
+              'GCC_GENERATE_TEST_COVERAGE_FILES': 'YES',
+              'OTHER_CPLUSPLUSFLAGS': [ '<@(OTHER_CPLUSPLUSFLAGS)', '-fprofile-arcs', '-ftest-coverage' ],
+            }],
+          ],
+        },
       },
       'Release': {
         'cflags_cc': [ '-g', '-O3' ],

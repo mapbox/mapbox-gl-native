@@ -3,6 +3,11 @@
 set -e
 set -o pipefail
 
+if [ -z ${ENABLE_COVERAGE} ] ; then
+    echo "ENABLE_COVERAGE environment variable is not set, aborting."
+    exit 1
+fi
+
 function usage() {
     echo "Error: LCOV and genhtml are required for generating coverage reports."
     if [ `uname -s` = 'Linux' ]; then
