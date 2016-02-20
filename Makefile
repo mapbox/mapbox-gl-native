@@ -155,7 +155,7 @@ endif
 
 clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
-	-rm -rf ./build/
+	-find ./build -type f -not -path '*/*.xcodeproj/*' -exec rm {} \;
 	-rm -rf ./gyp/build/
 	-rm -rf ./config/*.gypi
 	-rm -rf ./platform/android/MapboxGLAndroidSDK/build \
