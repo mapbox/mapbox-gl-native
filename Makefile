@@ -157,13 +157,8 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build/
 	-rm -rf ./gyp/build/
-	-rm -rf ./macosx/build
-	-rm -rf ./linux/build
-	-rm -rf ./ios/build
-	-rm -rf ./test/build
 	-rm -rf ./config/*.gypi
-	-rm -rf ./platform/android/build \
-	        ./platform/android/MapboxGLAndroidSDK/build \
+	-rm -rf ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/obj.target \
