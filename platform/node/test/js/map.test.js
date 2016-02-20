@@ -41,7 +41,8 @@ test('Map', function(t) {
 
         options.request = function() {};
         t.doesNotThrow(function() {
-            new mbgl.Map(options);
+            var map = new mbgl.Map(options);
+            map.release();
         });
 
         t.end();
@@ -59,7 +60,8 @@ test('Map', function(t) {
 
         options.cancel = function() {};
         t.doesNotThrow(function() {
-            new mbgl.Map(options);
+            var map = new mbgl.Map(options);
+            map.release();
         });
 
         t.end();
@@ -78,7 +80,8 @@ test('Map', function(t) {
 
         options.ratio = 1.0;
         t.doesNotThrow(function() {
-            new mbgl.Map(options);
+            var map = new mbgl.Map(options);
+            map.release();
         });
 
         t.end();
@@ -300,6 +303,7 @@ test('Map', function(t) {
             });
             map.load(style);
             map.render({ zoom: 1 }, function(err, data) {
+                map.release();
                 t.ok(err, 'returns error');
                 t.equal(err.message, 'request error');
                 t.end();
@@ -314,6 +318,7 @@ test('Map', function(t) {
             });
             map.load(style);
             map.render({ zoom: 1 }, function(err, data) {
+                map.release();
                 t.ok(data, 'no error');
                 t.end();
             });
