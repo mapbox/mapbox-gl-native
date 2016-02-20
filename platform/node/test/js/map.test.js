@@ -290,4 +290,33 @@ test('Map', function(t) {
             t.end();
         });
     });
+
+    t.test('request callback', function (t) {
+        t.test('returning an error', function(t) {
+            var map = new mbgl.Map({
+                request: function(req, callback) {
+                    callback(new Error('request error'));
+                },
+            });
+            map.load(style);
+            map.render({ zoom: 1 }, function(err, data) {
+                t.ok(err, 'returns error');
+                t.equal(err.message, 'request error');
+                t.end();
+            });
+        });
+
+        t.test('returning no content for a tile', function(t) {
+            var map = new mbgl.Map({
+                request: function(req, callback) {
+                    callback();
+                },
+            });
+            map.load(style);
+            map.render({ zoom: 1 }, function(err, data) {
+                t.ok(data, 'no error');
+                t.end();
+            });
+        });
+    });
 });

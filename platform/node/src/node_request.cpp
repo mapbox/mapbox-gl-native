@@ -48,7 +48,7 @@ NAN_METHOD(NodeRequest::Respond) {
     mbgl::Response response;
 
     if (info.Length() < 1) {
-        response.error = std::make_unique<Error>(Error::Reason::NotFound);
+        response.noContent = true;
 
     } else if (info[0]->BooleanValue()) {
         std::unique_ptr<Nan::Utf8String> message;
