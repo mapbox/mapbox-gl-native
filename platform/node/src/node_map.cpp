@@ -439,6 +439,7 @@ void NodeMap::release() {
     });
 
     map.reset(nullptr);
+    loop.reset();
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {
@@ -458,6 +459,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
         Nan::HandleScope scope;
         return Nan::Has(options, Nan::New("ratio").ToLocalChecked()).FromJust() ? Nan::Get(options, Nan::New("ratio").ToLocalChecked()).ToLocalChecked()->NumberValue() : 1.0;
     }()),
+    loop(NodeRunLoop()),
     map(std::make_unique<mbgl::Map>(view, *this, mbgl::MapMode::Still)),
     async(new uv_async_t) {
 
@@ -484,7 +486,7 @@ std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resour
 
     // This function can be called from any thread. Make sure we're executing the
     // JS implementation in the node event loop.
-    req->workRequest = NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
+    req->workRequest = loop->invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
         Nan::HandleScope scope;
 
         auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();

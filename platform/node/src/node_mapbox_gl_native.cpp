@@ -12,19 +12,21 @@
 
 namespace node_mbgl {
 
-mbgl::util::RunLoop& NodeRunLoop() {
-    static mbgl::util::RunLoop nodeRunLoop;
-    return nodeRunLoop;
+std::shared_ptr<mbgl::util::RunLoop> NodeRunLoop() {
+    static std::weak_ptr<mbgl::util::RunLoop> nodeRunLoop;
+
+    auto loop = nodeRunLoop.lock();
+    if (!loop) {
+        loop = std::make_shared<mbgl::util::RunLoop>();
+        nodeRunLoop = loop;
+    }
+
+    return std::move(loop);
 }
 
 }
 
 NAN_MODULE_INIT(RegisterModule) {
-    // This has the effect of:
-    //   a) Ensuring that the static local variable is initialized before any thread contention.
-    //   b) unreffing an async handle, which otherwise would keep the default loop running.
-    node_mbgl::NodeRunLoop().stop();
-
     node_mbgl::NodeMap::Init(target);
     node_mbgl::NodeRequest::Init(target);
 

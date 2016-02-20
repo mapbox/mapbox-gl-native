@@ -2,8 +2,10 @@
 
 #include <mbgl/util/run_loop.hpp>
 
+#include <memory>
+
 namespace node_mbgl {
 
-mbgl::util::RunLoop& NodeRunLoop();
+std::shared_ptr<mbgl::util::RunLoop> NodeRunLoop();
 
 }
