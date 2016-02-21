@@ -31,11 +31,13 @@ using GeometryCollection  = std::vector<GeometryCoordinates>;
 
 class GeometryTileFeature : private util::noncopyable {
 public:
+    static const uint32_t defaultExtent = 4096;
+
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
     virtual GeometryCollection getGeometries() const = 0;
-    virtual uint32_t getExtent() const = 0;
+    virtual uint32_t getExtent() const { return defaultExtent; }
 };
 
 class GeometryTileLayer : private util::noncopyable {

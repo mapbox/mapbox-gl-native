@@ -25,7 +25,6 @@ public:
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
     GeometryCollection getGeometries() const override;
-    uint32_t getExtent() const override { return 4096; }
 
 private:
     const FeatureType type;
