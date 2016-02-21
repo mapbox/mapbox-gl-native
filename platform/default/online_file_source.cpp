@@ -38,6 +38,11 @@ public:
     util::Timer timer;
     Callback callback;
 
+    // Counts the number of times a response was already expired when received. We're using
+    // this to add a delay when making a new request so we don't keep retrying immediately
+    // in case of a server serving expired tiles.
+    uint32_t expiredRequests = 0;
+
     // Counts the number of subsequent failed requests. We're using this value for exponential
     // backoff when retrying requests.
     uint32_t failedRequests = 0;
@@ -223,8 +228,10 @@ static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, u
     }
 }
 
-static Duration expirationTimeout(optional<SystemTimePoint> expires) {
-    if (expires) {
+static Duration expirationTimeout(optional<SystemTimePoint> expires, uint32_t expiredRequests) {
+    if (expiredRequests) {
+        return Seconds(1 << std::min(expiredRequests - 1, 31u));
+    } else if (expires) {
         return std::max(SystemDuration::zero(), *expires - SystemClock::now());
     } else {
         return Duration::max();
@@ -242,7 +249,7 @@ void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, bool forceImm
     Duration timeout = forceImmediate
         ? Duration::zero()
         : std::min(errorRetryTimeout(failedRequestReason, failedRequests),
-                   expirationTimeout(resource.priorExpires));
+                   expirationTimeout(resource.priorExpires, expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -267,6 +274,12 @@ void OnlineFileRequestImpl::completed(OnlineFileSource::Impl& impl, Response res
         response.expires = resource.priorExpires;
     } else {
         resource.priorExpires = response.expires;
+    }
+
+    if (response.expires && response.expires < SystemClock::now()) {
+        expiredRequests++;
+    } else {
+        expiredRequests = 0;
     }
 
     if (!response.etag) {
