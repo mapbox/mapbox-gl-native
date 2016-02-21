@@ -77,6 +77,7 @@
         'storage/headers.cpp',
         'storage/http_cancel.cpp',
         'storage/http_error.cpp',
+        'storage/http_expires.cpp',
         'storage/http_header_parsing.cpp',
         'storage/http_issue_1369.cpp',
         'storage/http_load.cpp',
