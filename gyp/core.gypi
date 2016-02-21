@@ -32,6 +32,7 @@
           '<@(boost_cflags)',
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
+          '<@(variant_cflags)',
         ],
         'cflags': [
           '<@(opengl_cflags)',

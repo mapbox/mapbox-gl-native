@@ -43,6 +43,7 @@
           '<@(sqlite_cflags)',
           '<@(webp_cflags)',
           '<@(rapidjson_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',

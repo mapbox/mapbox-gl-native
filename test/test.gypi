@@ -109,6 +109,7 @@
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(gtest_ldflags)',

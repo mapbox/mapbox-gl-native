@@ -40,6 +40,7 @@
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(rapidjson_cflags)',
+          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(libpng_ldflags)',

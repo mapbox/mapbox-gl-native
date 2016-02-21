@@ -26,6 +26,7 @@
 
       'cflags_cc': [
         '<@(boost_cflags)',
+        '<@(variant_cflags)',
       ],
       'libraries': [
           '<@(libpng_static_libs)',
