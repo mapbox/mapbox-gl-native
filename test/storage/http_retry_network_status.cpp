@@ -41,11 +41,6 @@ TEST_F(Storage, HTTPNetworkStatusChange) {
         mbgl::NetworkStatus::Reachable();
     });
 
-    // This timer will keep the loop alive to make sure we would be getting a response in caes the
-    // network status change triggered another change (which it shouldn't).
-    util::Timer delayTimer;
-    delayTimer.start(Milliseconds(300), Duration::zero(), [] () {});
-
     loop.run();
 }
 
