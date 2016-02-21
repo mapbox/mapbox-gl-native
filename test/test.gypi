@@ -100,11 +100,6 @@
         'sprite/sprite_parser.cpp',
         'sprite/sprite_store.cpp',
       ],
-      'libraries': [
-        '<@(gtest_static_libs)',
-        '<@(sqlite_static_libs)',
-        '<@(geojsonvt_static_libs)',
-      ],
       'variables': {
         'cflags_cc': [
           '<@(gtest_cflags)',
@@ -119,29 +114,31 @@
           '<@(gtest_ldflags)',
           '<@(sqlite_ldflags)',
         ],
+        'libraries': [
+          '<@(gtest_static_libs)',
+          '<@(sqlite_static_libs)',
+          '<@(geojsonvt_static_libs)',
+        ],
       },
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
-          },
-          'configurations': {
-            'Debug': {
-              'xcode_settings': {
-                'conditions': [
-                  ['enable_coverage=="1"', {
-                    'OTHER_LDFLAGS': [ '--coverage' ],
-                  }],
-                ],
-              },
-            },
           },
         }, {
          'cflags_cc': [ '<@(cflags_cc)' ],
-         'libraries': [ '<@(ldflags)' ],
         }],
       ],
+      'link_settings': {
+        'conditions': [
+          ['OS == "mac"', {
+            'libraries': [ '<@(libraries)' ],
+            'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
+          }, {
+            'libraries': [ '<@(libraries)', '<@(ldflags)' ],
+          }]
+        ],
+      },
     },
   ]
 }

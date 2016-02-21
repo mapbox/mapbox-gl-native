@@ -2,6 +2,7 @@ export BUILDTYPE ?= Release
 export BUILD_TEST ?= 1
 export BUILD_RENDER ?= 1
 export BUILD_OFFLINE ?= 1
+export ENABLE_COVERAGE ?= 0
 
 # Determine build platform
 ifeq ($(shell uname -s), Darwin)
