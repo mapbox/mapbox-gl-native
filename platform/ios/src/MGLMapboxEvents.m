@@ -352,17 +352,19 @@ const NSTimeInterval MGLFlushInterval = 60;
                  @"MGLMapboxEvents should not have a CLLocationManager while paused.");
         return;
     }
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-    self.locationManager.distanceFilter = 10;
-    self.locationManager.delegate = self;
-
-    [self.locationManager startUpdatingLocation];
+    
+    CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    locationManager.distanceFilter = 10;
+    [locationManager startUpdatingLocation];
 
     // -[CLLocationManager startMonitoringVisits] is only available in iOS 8+.
-    if ([self.locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
-        [self.locationManager startMonitoringVisits];
+    if ([locationManager respondsToSelector:@selector(startMonitoringVisits)]) {
+        [locationManager startMonitoringVisits];
     }
+    
+    self.locationManager = locationManager;
 }
 
 + (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
