@@ -204,6 +204,8 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
             jbyte* bodyData = env->GetByteArrayElements(body, nullptr);
             response->data = std::make_shared<std::string>(reinterpret_cast<char*>(bodyData), env->GetArrayLength(body));
             env->ReleaseByteArrayElements(body, bodyData, JNI_ABORT);
+        } else {
+            response->data = std::make_shared<std::string>();
         }
     } else if (code == 204 || (code == 404 && resource.kind == Resource::Kind::Tile)) {
         response->noContent = true;
