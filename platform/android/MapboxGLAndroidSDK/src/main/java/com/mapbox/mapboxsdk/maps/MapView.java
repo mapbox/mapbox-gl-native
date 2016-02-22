@@ -577,13 +577,13 @@ public class MapView extends FrameLayout {
     }
 
     //
-    // Rotation
+    // Direction
     //
 
     /**
-     * Returns the current heading of the map relative to true north.
+     * Returns the current direction of the map relative to true north.
      *
-     * @return The current heading measured in degrees.
+     * @return The current direction measured in degrees.
      */
     @UiThread
     @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION)
