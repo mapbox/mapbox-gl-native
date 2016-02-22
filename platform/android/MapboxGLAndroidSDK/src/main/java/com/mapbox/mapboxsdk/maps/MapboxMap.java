@@ -485,7 +485,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull MarkerOptions markerOptions) {
-        return addMarker((BaseMarkerOptions)markerOptions);
+        return addMarker((BaseMarkerOptions) markerOptions);
     }
 
     @UiThread
@@ -567,10 +567,12 @@ public class MapboxMap {
     @NonNull
     public Polyline addPolyline(@NonNull PolylineOptions polylineOptions) {
         Polyline polyline = polylineOptions.getPolyline();
-        long id = mMapView.addPolyline(polyline);
-        polyline.setMapboxMap(this);
-        polyline.setId(id);
-        mAnnotations.put(id, polyline);
+        if (!polyline.getPoints().isEmpty()) {
+            long id = mMapView.addPolyline(polyline);
+            polyline.setMapboxMap(this);
+            polyline.setId(id);
+            mAnnotations.put(id, polyline);
+        }
         return polyline;
     }
 
@@ -584,9 +586,13 @@ public class MapboxMap {
     @NonNull
     public List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList) {
         int count = polylineOptionsList.size();
+        Polyline polyline;
         List<Polyline> polylines = new ArrayList<>(count);
         for (PolylineOptions options : polylineOptionsList) {
-            polylines.add(options.getPolyline());
+            polyline = options.getPolyline();
+            if (!polyline.getPoints().isEmpty()) {
+                polylines.add(polyline);
+            }
         }
 
         long[] ids = mMapView.addPolylines(polylines);
@@ -618,10 +624,12 @@ public class MapboxMap {
     @NonNull
     public Polygon addPolygon(@NonNull PolygonOptions polygonOptions) {
         Polygon polygon = polygonOptions.getPolygon();
-        long id = mMapView.addPolygon(polygon);
-        polygon.setId(id);
-        polygon.setMapboxMap(this);
-        mAnnotations.put(id, polygon);
+        if (!polygon.getPoints().isEmpty()) {
+            long id = mMapView.addPolygon(polygon);
+            polygon.setId(id);
+            polygon.setMapboxMap(this);
+            mAnnotations.put(id, polygon);
+        }
         return polygon;
     }
 
@@ -635,21 +643,24 @@ public class MapboxMap {
     @NonNull
     public List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList) {
         int count = polygonOptionsList.size();
+
+        Polygon polygon;
         List<Polygon> polygons = new ArrayList<>(count);
         for (PolygonOptions polygonOptions : polygonOptionsList) {
-            polygons.add(polygonOptions.getPolygon());
+            polygon = polygonOptions.getPolygon();
+            if (!polygon.getPoints().isEmpty()) {
+                polygons.add(polygon);
+            }
         }
 
         long[] ids = mMapView.addPolygons(polygons);
         long id = 0;
-        Polygon polygon;
-
         for (int i = 0; i < polygons.size(); i++) {
             polygon = polygons.get(i);
             polygon.setMapboxMap(this);
-            if(ids!=null){
+            if (ids != null) {
                 id = ids[i];
-            }else{
+            } else {
                 // unit test
                 id++;
             }
@@ -757,8 +768,8 @@ public class MapboxMap {
         for (int i = 0; i < count; i++) {
             ids[i] = mAnnotations.keyAt(i);
             annotation = mAnnotations.get(ids[i]);
-            if(annotation instanceof Marker){
-                ((Marker)annotation).hideInfoWindow();
+            if (annotation instanceof Marker) {
+                ((Marker) annotation).hideInfoWindow();
             }
         }
         mMapView.removeAnnotations(ids);
