@@ -52,7 +52,6 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 + (void)validate;
 + (void)ensureMetricsOptoutExists;
 + (void)flush;
-+ (BOOL)debugLoggingEnabled;
 + (BOOL)checkPushEnabled;
 
 @end

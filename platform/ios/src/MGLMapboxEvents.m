@@ -136,10 +136,6 @@ const NSTimeInterval MGLFlushInterval = 60;
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
 }
 
-+ (BOOL)debugLoggingEnabled {
-    return [[MGLMapboxEvents sharedManager] debugLoggingEnabled];
-}
-
 - (BOOL)debugLoggingEnabled {
     return (self.canEnableDebugLogging &&
             [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"]);
