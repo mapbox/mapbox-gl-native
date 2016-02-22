@@ -3,12 +3,12 @@
     <!--Add references to exposed resources-->
     <public name="AttributionAlertDialogStyle" type="style" />
 
-    <public name="style_mapbox_streets" type="string" />
-    <public name="style_emerald" type="string" />
-    <public name="style_light" type="string" />
-    <public name="style_dark" type="string" />
-    <public name="style_satellite" type="string" />
-    <public name="style_satellite_streets" type="string" />
+    <public name="mapbox_style_mapbox_streets" type="string" />
+    <public name="mapbox_style_emerald" type="string" />
+    <public name="mapbox_style_light" type="string" />
+    <public name="mapbox_style_dark" type="string" />
+    <public name="mapbox_style_satellite" type="string" />
+    <public name="mapbox_style_satellite_streets" type="string" />
 
     <public name="center_longitude" type="attr" />
     <public name="center_latitude" type="attr" />
