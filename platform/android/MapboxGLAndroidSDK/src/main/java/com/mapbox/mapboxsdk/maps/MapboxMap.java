@@ -152,10 +152,25 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update) {
+        moveCamera(update, null);
+    }
+
+    /**
+     * Repositions the camera according to the instructions defined in the update.
+     * The move is instantaneous, and a subsequent getCameraPosition() will reflect the new position.
+     * See CameraUpdateFactory for a set of updates.
+     *
+     * @param update The change that should be applied to the camera.
+     */
+    @UiThread
+    public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
         mCameraPosition = update.getCameraPosition(this);
         mMapView.jumpTo(mCameraPosition.bearing, mCameraPosition.target, mCameraPosition.tilt, mCameraPosition.zoom);
         if (mOnCameraChangeListener != null) {
             mOnCameraChangeListener.onCameraChange(mCameraPosition);
+        }
+        if (callback != null) {
+            callback.onFinish();
         }
     }
 
