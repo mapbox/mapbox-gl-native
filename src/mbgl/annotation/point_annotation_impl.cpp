@@ -12,15 +12,15 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
     std::unordered_map<std::string, std::string> featureProperties;
     featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
 
-    const mbgl::ScreenCoordinate pp = point.position.project();
-    const uint32_t z2 = 1 << tileID.z;
-    const uint32_t x = pp.x * z2;
-    const uint32_t y = pp.y * z2;
-    const GeometryCoordinate coordinate(GeometryTileFeature::defaultExtent * (pp.x * z2 - x), GeometryTileFeature::defaultExtent * (pp.y * z2 - y));
+    mbgl::ScreenCoordinate projected = point.position.project();
+    projected *= 1 << tileID.z;
+    projected.x -= int16_t(projected.x);
+    projected.y -= int16_t(projected.y);
+    projected *= GeometryTileFeature::defaultExtent;
 
     layer.features.emplace_back(
         std::make_shared<const AnnotationTileFeature>(FeatureType::Point,
-                                                      GeometryCollection {{ {{ coordinate }} }},
+                                                      GeometryCollection {{ {{ GeometryCoordinate { projected } }} }},
                                                       featureProperties));
 }
 
