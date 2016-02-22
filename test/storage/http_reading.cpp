@@ -84,6 +84,31 @@ TEST_F(Storage, HTTPTile404) {
     loop.run();
 }
 
+TEST_F(Storage, HTTP200EmptyData) {
+    SCOPED_TEST(HTTP200EmptyData)
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    OnlineFileSource fs;
+
+    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/empty-data" },
+               [&](Response res) {
+        req.reset();
+        EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
+        EXPECT_FALSE(res.noContent);
+        EXPECT_FALSE(bool(res.error));
+        EXPECT_EQ(*res.data, std::string());
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+        HTTP200EmptyData.finish();
+    });
+
+    loop.run();
+}
+
 TEST_F(Storage, HTTP204) {
     SCOPED_TEST(HTTP204)
 
