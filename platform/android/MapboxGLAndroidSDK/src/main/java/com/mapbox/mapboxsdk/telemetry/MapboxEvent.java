@@ -3,9 +3,9 @@ package com.mapbox.mapboxsdk.telemetry;
 import java.io.Serializable;
 
 public class MapboxEvent implements Serializable {
-    public static final int VERSION_NUMBER = 1;
-    public static final String MGLMapboxEventsUserAgent = "MapboxEventsAndroid/1.1";
+    public static final int VERSION_NUMBER = 2;
     public static final String MAPBOX_EVENTS_BASE_URL = "https://api.mapbox.com";
+    public static final String SOURCE_MAPBOX = "mapbox";
 
     // Event Types
     public static final String TYPE_TURNSTILE = "appUserTurnstile";
@@ -41,6 +41,9 @@ public class MapboxEvent implements Serializable {
 
     // Event Attributes
     public static final String ATTRIBUTE_EVENT = "event";
+    public static final String ATTRIBUTE_USERID = "userId";
+    public static final String ATTRIBUTE_SOURCE = "source";
+    public static final String ATTRIBUTE_ENABLED_TELEMETRY = "enabled.telemetry";
     public static final String ATTRIBUTE_SESSION_ID = "sessionId";
     public static final String ATTRIBUTE_VERSION = "version";
     public static final String ATTRIBUTE_CREATED = "created";
@@ -50,6 +53,7 @@ public class MapboxEvent implements Serializable {
     public static final String ATTRIBUTE_OPERATING_SYSTEM= "operatingSystem";
     public static final String ATTRIBUTE_ORIENTATION = "orientation";
     public static final String ATTRIBUTE_BATTERY_LEVEL = "batteryLevel";
+    public static final String ATTRIBUTE_PLUGGED_IN = "pluggedIn";
     public static final String ATTRIBUTE_APPLICATION_STATE = "applicationState";
     public static final String ATTRIBUTE_RESOLUTION = "resolution";
     public static final String ATTRIBUTE_ACCESSIBILITY_FONT_SCALE = "accessibilityFontScale";

@@ -59,10 +59,12 @@ android {
     buildTypes {
         debug {
             jniDebuggable true
+            buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT_BASE", new StringBuilder().append("\"").append("MapboxEventsAndroid/").append(project.VERSION_NAME).append("\"").toString()
         }
 
         release {
             jniDebuggable false
+            buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT_BASE", new StringBuilder().append("\"").append("MapboxEventsAndroid/").append(project.VERSION_NAME).append("\"").toString()
             consumerProguardFiles 'proguard-rules.pro'
         }
     }

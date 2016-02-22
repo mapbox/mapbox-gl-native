@@ -397,9 +397,7 @@ public class MapView extends FrameLayout {
         if (savedInstanceState == null) {
             Hashtable<String, Object> evt = new Hashtable<>();
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
-            evt.put(MapboxEvent.KEY_LATITUDE, mMapboxMap.getCameraPosition().target.getLatitude());
-            evt.put(MapboxEvent.KEY_LONGITUDE, mMapboxMap.getCameraPosition().target.getLongitude());
-            evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+            evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
             MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
         }
     }
@@ -1476,13 +1474,33 @@ public class MapView extends FrameLayout {
      * @param xCoordinate Original x screen coordinate at start of gesture
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
-    private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, float yCoordinate) {
+    private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
 
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
+        evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
         evt.put(MapboxEvent.KEY_GESTURE_ID, gestureId);
+        evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
+        evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
+        evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
+
+        MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+    }
+
+    /**
+     * Helper method for tracking DragEnd gesture event
+     * See {@see MapboxEvent#TYPE_MAP_DRAGEND}
+     * @param xCoordinate Original x screen coordinate at end of drag
+     * @param yCoordinate Orginal y screen coordinate at end of drag
+     */
+    private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
+        LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+
+        Hashtable<String, Object> evt = new Hashtable<>();
+        evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_DRAGEND);
+        evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
         evt.put(MapboxEvent.KEY_LATITUDE, tapLatLng.getLatitude());
         evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
         evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
@@ -1541,7 +1559,7 @@ public class MapView extends FrameLayout {
 
                 // Scroll / Pan Has Stopped
                 if (mScrollInProgress) {
-                    trackGestureEvent(MapboxEvent.TYPE_MAP_DRAGEND, event.getX(), event.getY());
+                    trackGestureDragEndEvent(event.getX(), event.getY());
                     mScrollInProgress = false;
                 }
 
@@ -1736,7 +1754,6 @@ public class MapView extends FrameLayout {
         // Called for drags
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            Log.i(TAG, "onScroll() started");
             if (!mScrollInProgress) {
                 mScrollInProgress = true;
             }
@@ -1759,8 +1776,6 @@ public class MapView extends FrameLayout {
             if (listener != null) {
                 listener.onScroll();
             }
-
-            Log.i(TAG, "onScroll() done");
             return true;
         }
     }

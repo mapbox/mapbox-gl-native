@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
+import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -62,9 +63,10 @@ public class MapboxEventManager {
     private String accessToken = null;
     private String eventsURL = MapboxEvent.MAPBOX_EVENTS_BASE_URL;
 
-    private String userAgent = MapboxEvent.MGLMapboxEventsUserAgent;
+    private String userAgent = BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE;
 
     private Intent batteryStatus = null;
+    private final String operatingSystem = "Android - " + Build.VERSION.RELEASE;
 
     private DisplayMetrics displayMetrics = null;
 
@@ -100,16 +102,15 @@ public class MapboxEventManager {
 
         // Load / Create Vendor Id
         if (prefs.contains(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID)) {
-            mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "Default Value");
-            Log.d(TAG, "Found Vendor Id = " + mapboxVendorId);
-        } else {
+            mapboxVendorId = prefs.getString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, "");
+        }
+        if (TextUtils.isEmpty(mapboxVendorId)) {
             String vendorId = UUID.randomUUID().toString();
-            vendorId = encodeString(vendorId);
+            mapboxVendorId = encodeString(vendorId);
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, vendorId);
+            editor.putString(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_VENDORID, mapboxVendorId);
             editor.apply();
             editor.commit();
-            Log.d(TAG, "Set New Vendor Id = " + vendorId);
         }
 
         // Create Initial Session Id
@@ -163,6 +164,10 @@ public class MapboxEventManager {
         return mapboxEventManager;
     }
 
+    public static String generateCreateDate() {
+        return dateFormat.format(new Date());
+    }
+
     public boolean isTelemetryEnabled() {
         return telemetryEnabled;
     }
@@ -173,12 +178,12 @@ public class MapboxEventManager {
      */
     public void setTelemetryEnabled(boolean telemetryEnabled) {
         if (this.telemetryEnabled == telemetryEnabled) {
-            Log.i(TAG, "no need to start / stop telemetry as it's already in that state.");
+            Log.d(TAG, "No need to start / stop telemetry as it's already in that state.");
             return;
         }
 
         if (telemetryEnabled) {
-            Log.i(TAG, "Starting Telemetry Up!");
+            Log.d(TAG, "Starting Telemetry Up!");
             // Start It Up
             context.startService(new Intent(context, TelemetryService.class));
 
@@ -191,7 +196,7 @@ public class MapboxEventManager {
             timer = new Timer();
             timer.schedule(new FlushEventsTimerTask(), flushDelayInitialInMillis, flushDelayInMillis);
         } else {
-            Log.i(TAG, "Shutting Telemetry Down");
+            Log.d(TAG, "Shutting Telemetry Down");
             // Shut It Down
             events.removeAllElements();
             context.stopService(new Intent(context, TelemetryService.class));
@@ -218,14 +223,15 @@ public class MapboxEventManager {
     public void addLocationEvent(Location location) {
         // Add Location even to queue
         Hashtable<String, Object> event = new Hashtable<>();
+        event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_LOCATION);
+        event.put(MapboxEvent.ATTRIBUTE_CREATED, generateCreateDate());
+        event.put(MapboxEvent.ATTRIBUTE_SOURCE, MapboxEvent.SOURCE_MAPBOX);
+        event.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
         event.put(MapboxEvent.KEY_LATITUDE, location.getLatitude());
         event.put(MapboxEvent.KEY_LONGITUDE, location.getLongitude());
-        event.put(MapboxEvent.KEY_SPEED, location.getSpeed());
-        event.put(MapboxEvent.KEY_COURSE, location.getBearing());
         event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
-        event.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, location.getAccuracy());
-        event.put(MapboxEvent.ATTRIBUTE_CREATED, dateFormat.format(new Date()));
-        event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_LOCATION);
+        event.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, operatingSystem);
+        event.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
 
         events.add(event);
 
@@ -243,8 +249,50 @@ public class MapboxEventManager {
         }
 
         String eventType = (String)eventWithAttributes.get(MapboxEvent.ATTRIBUTE_EVENT);
-        if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_LOAD)) {
+        if (TextUtils.isEmpty(eventType)) {
+            return;
+        }
+
+        if (eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_LOAD)) {
+            // Map Load Data Model
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_USERID, mapboxVendorId);
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, operatingSystem);
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_RESOLUTION, displayMetrics.density);
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, getAccesibilityFontScaleSize());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_PLUGGED_IN, isPluggedIn());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
+
+            // Put Map Load on events before Turnstile clears it
+            events.add(eventWithAttributes);
+
+            // Turnstile
             pushTurnstileEvent();
+
+            // Return immediately to avoid double adding of event
+            return;
+
+        } else if (eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_CLICK)) {
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_PLUGGED_IN, isPluggedIn());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
+        } else if (eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_DRAGEND)) {
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_PLUGGED_IN, isPluggedIn());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
+            eventWithAttributes.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
+        } else {
+            Log.w(TAG, "This is not an event type in the Events Data Model.");
+            return;
         }
 
        events.add(eventWithAttributes);
@@ -257,13 +305,9 @@ public class MapboxEventManager {
 
         Hashtable<String, Object> event = new Hashtable<>();
         event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_TURNSTILE);
-        event.put(MapboxEvent.ATTRIBUTE_CREATED, dateFormat.format(new Date()));
-/*
-        // Already set by processing
-        event.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
-        event.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
-        event.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
-*/
+        event.put(MapboxEvent.ATTRIBUTE_CREATED, generateCreateDate());
+        event.put(MapboxEvent.ATTRIBUTE_USERID, mapboxVendorId);
+        event.put(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY, telemetryEnabled);
 
         events.add(event);
 
@@ -290,7 +334,6 @@ public class MapboxEventManager {
                     sb.append( String.format("%02X", b) );
                 }
                 String hex = sb.toString();
-                Log.d(TAG, "original = " + string + "; hex = " + hex);
 
                 return hex;
             }
@@ -318,7 +361,7 @@ public class MapboxEventManager {
             case Configuration.ORIENTATION_PORTRAIT:
                 return "Portrait";
             default:
-                return "Undefined";
+                return "";
         }
     }
 
@@ -329,12 +372,28 @@ public class MapboxEventManager {
         return Math.round((level / (float)scale) * 100);
     }
 
+    /**
+     * Determine if device is plugged in to power via USB or AC or not.
+     *
+     * http://developer.android.com/reference/android/os/BatteryManager.html#EXTRA_PLUGGED
+     * @return true if plugged in, false if not
+     */
+    private boolean isPluggedIn() {
+
+        int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        if (chargePlug == BatteryManager.BATTERY_PLUGGED_USB || chargePlug == BatteryManager.BATTERY_PLUGGED_AC) {
+            return true;
+        }
+
+        return false;
+    }
+
     private String getApplicationState() {
 
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         if (appProcesses == null) {
-            return "Unknown";
+            return "";
         }
         final String packageName = context.getPackageName();
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
@@ -359,7 +418,7 @@ public class MapboxEventManager {
         TelephonyManager manager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         String carrierName = manager.getNetworkOperatorName();
         if (TextUtils.isEmpty(carrierName)) {
-            carrierName = "None";
+            carrierName = "";
         }
         return carrierName;
     }
@@ -400,29 +459,29 @@ public class MapboxEventManager {
             case TelephonyManager.NETWORK_TYPE_UNKNOWN:
                 return "Unknown";
             default:
-                return "Default Unknown";
+                return "";
         }
     }
 
+    public Boolean getConnectedToWifi() {
 
-    public String getConnectedToWifi() {
-
-        String status = "No";
+        Boolean status = false;
         WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiMgr.isWifiEnabled()) {
             try {
                 WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-                if( wifiInfo.getNetworkId() != -1 ){
-                    status = "Yes";
+                if (wifiInfo.getNetworkId() != -1){
+                    status = true;
                 }
             } catch (Exception e) {
                 Log.w(TAG, "Error getting Wifi Connection Status: " + e);
-                status = "Unknown";
+                status = false;
             }
         }
 
         return status;
     }
+
 
     /**
      * Task responsible for converting stored events and sending them to the server
@@ -433,7 +492,7 @@ public class MapboxEventManager {
         protected Void doInBackground(Void... voids) {
 
             if (events.size() < 1) {
-                Log.i(TAG, "No events in the queue to send so returning.");
+                Log.d(TAG, "No events in the queue to send so returning.");
                 return null;
             }
 
@@ -452,31 +511,57 @@ public class MapboxEventManager {
 
                 for (Hashtable<String, Object> evt : events) {
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
-                    jsonObject.put(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
-                    jsonObject.put(MapboxEvent.KEY_SPEED, evt.get(MapboxEvent.KEY_SPEED));
-                    jsonObject.put(MapboxEvent.KEY_COURSE, evt.get(MapboxEvent.KEY_COURSE));
-                    jsonObject.put(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
-                    jsonObject.put(MapboxEvent.KEY_HORIZONTAL_ACCURACY, evt.get(MapboxEvent.KEY_HORIZONTAL_ACCURACY));
-                    jsonObject.put(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
 
-                    // Basic Event Meta Data
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CREATED, evt.get(MapboxEvent.ATTRIBUTE_CREATED));
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_VERSION, MapboxEvent.VERSION_NUMBER);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_VENDOR_ID, mapboxVendorId);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_APP_BUNDLE_ID, context.getPackageName());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_MODEL, Build.MODEL);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, Build.VERSION.RELEASE);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_ORIENTATION, getOrientation());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, getBatteryLevel());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_RESOLUTION, displayMetrics.density);
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, getAccesibilityFontScaleSize());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CARRIER, getCellularCarrier());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, getCellularNetworkType());
-                    jsonObject.put(MapboxEvent.ATTRIBUTE_WIFI, getConnectedToWifi());
+                    // Build the JSON but only if there's a value for it in the evt
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CREATED, evt.get(MapboxEvent.ATTRIBUTE_CREATED));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY, evt.get(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SOURCE, evt.get(MapboxEvent.ATTRIBUTE_SOURCE));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SESSION_ID, evt.get(MapboxEvent.ATTRIBUTE_SESSION_ID));
+                    jsonObject.putOpt(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_MODEL, evt.get(MapboxEvent.ATTRIBUTE_MODEL));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_RESOLUTION, evt.get(MapboxEvent.ATTRIBUTE_RESOLUTION));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, evt.get(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, evt.get(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_PLUGGED_IN, evt.get(MapboxEvent.ATTRIBUTE_PLUGGED_IN));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_WIFI, evt.get(MapboxEvent.ATTRIBUTE_WIFI));
+
+                    // Special Cases where empty string is denoting null and therefore should not be sent at all
+                    // This arises as thread safe Hashtable does not accept null values (nor keys)
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_ORIENTATION)) {
+                        String orientation =  (String)evt.get(MapboxEvent.ATTRIBUTE_ORIENTATION);
+                        if (!TextUtils.isEmpty(orientation)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ORIENTATION, orientation);
+                        }
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_CARRIER)) {
+                        String carrier =  (String)evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
+                        if (!TextUtils.isEmpty(carrier)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CARRIER, carrier);
+                        }
+                    }
+
+                    // Special Cases where null has to be passed if no value exists
+                    // Requires using put() instead of putOpt()
+                    String eventType = (String)evt.get(MapboxEvent.ATTRIBUTE_EVENT);
+                    if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_CLICK)) {
+                        jsonObject.put(MapboxEvent.KEY_GESTURE_ID, evt.get(MapboxEvent.KEY_GESTURE_ID));
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE)) {
+                        String cellularNetworkType = (String)evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE);
+                        if (TextUtils.isEmpty(cellularNetworkType)) {
+                            jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, null);
+                        } else {
+                            jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE));
+                        }
+                    }
 
                     jsonArray.put(jsonObject);
                 }
@@ -492,8 +577,7 @@ public class MapboxEventManager {
                 OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
-                String url = eventsURL + "/events/v1?access_token=" + accessToken;
-                Log.d(TAG, "url = " + url);
+                String url = eventsURL + "/events/v2?access_token=" + accessToken;
 
                 Request request = new Request.Builder()
                         .url(url)
@@ -501,7 +585,6 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.d(TAG, "Response Code from Mapbox Events Server: " + response.code() + " for " + events.size() + " events sent in.");
 
                 // Reset Events
                 // ============
