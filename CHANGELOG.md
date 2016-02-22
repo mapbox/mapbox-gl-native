@@ -52,6 +52,7 @@ Known issues:
 ## iOS master
 
 - Polygons and polylines now default to using the map view's tint color. ([#4028](https://github.com/mapbox/mapbox-gl-native/pull/4028))
+- The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 
 ## iOS 3.1.0
 
