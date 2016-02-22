@@ -1797,7 +1797,8 @@ public class MapView extends FrameLayout {
         // Called for pinch zooms and quickzooms/quickscales
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            if (!mMapboxMap.getUiSettings().isZoomGesturesEnabled()) {
+            UiSettings uiSettings = mMapboxMap.getUiSettings();
+            if (!uiSettings.isZoomGesturesEnabled()) {
                 return false;
             }
 
@@ -1825,14 +1826,21 @@ public class MapView extends FrameLayout {
             // Gesture is a quickzoom if there aren't two fingers
             mQuickZoom = !mTwoTap;
 
+            TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+
             // Scale the map
-            if (mMapboxMap.getUiSettings().isScrollGesturesEnabled() && !mQuickZoom && mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
+            if (uiSettings.isScrollGesturesEnabled() && !mQuickZoom && trackingSettings.isLocationTrackingDisabled()) {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
-                // around center map
-                PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
-                mNativeMapView.scaleBy(detector.getScaleFactor(), centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
+                if(trackingSettings.isLocationTrackingDisabled()) {
+                    // around center map
+                    mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
+                }else {
+                    // around user location view
+                    PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
+                    mNativeMapView.scaleBy(detector.getScaleFactor(), centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
+                }
             }
             return true;
         }
