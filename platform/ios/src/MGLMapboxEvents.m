@@ -110,13 +110,14 @@ const NSTimeInterval MGLFlushInterval = 60;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(MGLMapboxEventAttributes *) *eventQueue;
 @property (nonatomic) dispatch_queue_t serialQueue;
 @property (nonatomic) dispatch_queue_t debugLogSerialQueue;
-@property (nonatomic) id userDefaultsObserver;
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) NSTimer *timer;
 
 @end
 
-@implementation MGLMapboxEvents
+@implementation MGLMapboxEvents {
+    id _userDefaultsObserver;
+}
 
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
