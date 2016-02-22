@@ -384,29 +384,25 @@ const NSTimeInterval MGLFlushInterval = 60;
         return;
     }
     
-    MGLMutableMapboxEventAttributes *evt = [MGLMutableMapboxEventAttributes dictionaryWithDictionary:attributeDictionary];
-    
-    // mapbox-events stock attributes
-    [evt setObject:event forKey:@"event"];
-    [evt setObject:@(version) forKey:@"version"];
-    [evt setObject:[self.rfc3339DateFormatter stringFromDate:[NSDate date]] forKey:@"created"];
-    [evt setObject:self.instanceID forKey:@"instance"];
-    [evt setObject:self.data.vendorId forKey:@"vendorId"];
-    [evt setObject:self.appBundleId forKey:@"appBundleId"];
-    
-    // mapbox-events-ios stock attributes
-    [evt setValue:self.data.model forKey:@"model"];
-    [evt setValue:self.data.iOSVersion forKey:@"operatingSystem"];
-    [evt setValue:@(self.data.scale) forKey:@"resolution"];
-    MGLReachability *reachability = [MGLReachability reachabilityForLocalWiFi];
-    [evt setValue:([reachability isReachableViaWiFi] ? @YES : @NO) forKey:@"wifi"];
-    [evt setValue:[self deviceOrientation] forKey:@"orientation"];
-    [evt setValue:@([self batteryLevel]) forKey:@"batteryLevel"];
-    [evt setValue:[self applicationState] forKey:@"applicationState"];
-    [evt setValue:@([self contentSizeScale]) forKey:@"accessibilityFontScale"];
-    
-    NSDictionary *finalEvent = [NSDictionary dictionaryWithDictionary:evt];
+    NSDictionary *stockAttributes = @{@"event": event,
+                                      @"version": @(version),
+                                      @"created": [self.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                      @"instance": self.instanceID,
+                                      @"vendorId": self.data.vendorId,
+                                      @"appBundleId": self.appBundleId,
+                                      @"model": self.data.model,
+                                      @"operatingSystem": self.data.iOSVersion,
+                                      @"resolution": @(self.data.scale),
+                                      @"wifi": @([[MGLReachability reachabilityForLocalWiFi] isReachableViaWiFi]),
+                                      @"orientation": [self deviceOrientation],
+                                      @"batteryLevel": @([self batteryLevel]),
+                                      @"applicationState": [self applicationState],
+                                      @"accessibilityFontScale": @([self contentSizeScale])};
+    MGLMutableMapboxEventAttributes *allEventAttributes = [NSMutableDictionary dictionaryWithDictionary:attributeDictionary];
+    [allEventAttributes addEntriesFromDictionary:stockAttributes];
+    MGLMapboxEventAttributes *finalEvent = [allEventAttributes copy];
     [self.eventQueue addObject:finalEvent];
+    [self writeEventToLocalDebugLog:finalEvent];
     
     // Has Flush Limit Been Reached?
     if (self.eventQueue.count >= MGLMaximumEventsPerFlush) {
@@ -415,8 +411,6 @@ const NSTimeInterval MGLFlushInterval = 60;
         // If this is first new event on queue start timer,
         [self startTimer];
     }
-    
-    [self writeEventToLocalDebugLog:finalEvent];
 }
 
 - (void)pushTurnstileEvent {
