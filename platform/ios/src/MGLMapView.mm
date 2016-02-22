@@ -4085,7 +4085,7 @@ public:
 - (void)didUpdateLocationIncrementallyAnimated:(BOOL)animated
 {
     [self _setCenterCoordinate:self.userLocation.location.coordinate
-                   edgePadding:self.edgePaddingForFollowing
+                   edgePadding:self.contentInset
                      zoomLevel:self.zoomLevel
                      direction:self.directionByFollowingWithCourse
                       duration:animated ? MGLUserLocationAnimationDuration : 0
@@ -4112,7 +4112,7 @@ public:
     
     __weak MGLMapView *weakSelf = self;
     [self _flyToCamera:camera
-           edgePadding:self.edgePaddingForFollowing
+           edgePadding:self.contentInset
           withDuration:animated ? -1 : 0
           peakAltitude:-1
      completionHandler:^{
