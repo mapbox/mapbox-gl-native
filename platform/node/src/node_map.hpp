@@ -3,7 +3,6 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -46,7 +45,6 @@ public:
     std::unique_ptr<mbgl::FileRequest> request(const mbgl::Resource&, Callback);
 
     mbgl::HeadlessView view;
-    std::shared_ptr<mbgl::util::RunLoop> loop;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
