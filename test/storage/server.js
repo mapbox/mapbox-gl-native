@@ -55,6 +55,11 @@ app.get('/revalidate-same', function(req, res) {
     }
 });
 
+var expiresCounter = 0;
+app.get('/clockskew', function (req, res) {
+    res.setHeader('Expires', (new Date(2010, 1, 1, 10, ++expiresCounter, 0)).toUTCString());
+    res.status(200).send('Response');
+});
 
 app.get('/revalidate-modified', function(req, res) {
     var jan1 = new Date('jan 1 2015 utc');
