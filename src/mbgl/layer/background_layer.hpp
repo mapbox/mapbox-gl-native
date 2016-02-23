@@ -15,6 +15,7 @@ public:
 
 class BackgroundLayer : public StyleLayer {
 public:
+    BackgroundLayer() : StyleLayer(Type::Background) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override {};
@@ -27,6 +28,11 @@ public:
 
     BackgroundPaintProperties paint;
 };
+
+template <>
+inline bool StyleLayer::is<BackgroundLayer>() const {
+    return type == Type::Background;
+}
 
 } // namespace mbgl
 

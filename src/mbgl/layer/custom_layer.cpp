@@ -8,7 +8,8 @@ CustomLayer::CustomLayer(const std::string& id_,
                          CustomLayerInitializeFunction initializeFn_,
                          CustomLayerRenderFunction renderFn_,
                          CustomLayerDeinitializeFunction deinitializeFn_,
-                         void * context_) {
+                         void* context_)
+    : StyleLayer(Type::Custom) {
     id = id_;
     initializeFn = initializeFn_;
     renderFn = renderFn_;

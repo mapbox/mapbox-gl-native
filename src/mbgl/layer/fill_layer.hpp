@@ -19,6 +19,7 @@ public:
 
 class FillLayer : public StyleLayer {
 public:
+    FillLayer() : StyleLayer(Type::Fill) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override {};
@@ -31,6 +32,11 @@ public:
 
     FillPaintProperties paint;
 };
+
+template <>
+inline bool StyleLayer::is<FillLayer>() const {
+    return type == Type::Fill;
+}
 
 } // namespace mbgl
 

@@ -19,6 +19,7 @@ public:
 
 class RasterLayer : public StyleLayer {
 public:
+    RasterLayer() : StyleLayer(Type::Raster) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override {};
@@ -31,6 +32,11 @@ public:
 
     RasterPaintProperties paint;
 };
+
+template <>
+inline bool StyleLayer::is<RasterLayer>() const {
+    return type == Type::Raster;
+}
 
 } // namespace mbgl
 

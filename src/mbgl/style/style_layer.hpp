@@ -23,11 +23,18 @@ public:
     virtual ~StyleLayer() = default;
 
     // Check whether this layer is of the given subtype.
-    template <class T> bool is() const { return dynamic_cast<const T*>(this); }
+    template <class T>
+    bool is() const;
 
     // Dynamically cast this layer to the given subtype.
-    template <class T>       T* as()       { return dynamic_cast<      T*>(this); }
-    template <class T> const T* as() const { return dynamic_cast<const T*>(this); }
+    template <class T>
+    T* as() {
+        return is<T>() ? reinterpret_cast<T*>(this) : nullptr;
+    }
+    template <class T>
+    const T* as() const {
+        return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
+    }
 
     // Create a copy of this layer.
     virtual std::unique_ptr<StyleLayer> clone() const = 0;
@@ -64,9 +71,21 @@ public:
     VisibilityType visibility = VisibilityType::Visible;
 
 protected:
-    StyleLayer() = default;
+    enum class Type {
+        Fill,
+        Line,
+        Circle,
+        Symbol,
+        Raster,
+        Background,
+        Custom,
+    };
+
+    StyleLayer(Type type_) : type(type_) {}
     StyleLayer(const StyleLayer&) = default;
     StyleLayer& operator=(const StyleLayer&) = delete;
+
+    const Type type;
 
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.

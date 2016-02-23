@@ -22,6 +22,7 @@ public:
 
 class CircleLayer : public StyleLayer {
 public:
+    CircleLayer() : StyleLayer(Type::Circle) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override {};
@@ -34,6 +35,11 @@ public:
 
     CirclePaintProperties paint;
 };
+
+template <>
+inline bool StyleLayer::is<CircleLayer>() const {
+    return type == Type::Circle;
+}
 
 } // namespace mbgl
 

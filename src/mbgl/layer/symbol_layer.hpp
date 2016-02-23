@@ -84,6 +84,7 @@ public:
 
 class SymbolLayer : public StyleLayer {
 public:
+    SymbolLayer() : StyleLayer(Type::Symbol) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override;
@@ -99,6 +100,11 @@ public:
 
     SpriteAtlas* spriteAtlas = nullptr;
 };
+
+template <>
+inline bool StyleLayer::is<SymbolLayer>() const {
+    return type == Type::Symbol;
+}
 
 } // namespace mbgl
 

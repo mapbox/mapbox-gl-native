@@ -38,6 +38,7 @@ public:
 
 class LineLayer : public StyleLayer {
 public:
+    LineLayer() : StyleLayer(Type::Line) {}
     std::unique_ptr<StyleLayer> clone() const override;
 
     void parseLayout(const JSValue&) override;
@@ -51,6 +52,11 @@ public:
     LineLayoutProperties layout;
     LinePaintProperties paint;
 };
+
+template <>
+inline bool StyleLayer::is<LineLayer>() const {
+    return type == Type::Line;
+}
 
 } // namespace mbgl
 

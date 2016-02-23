@@ -38,6 +38,11 @@ private:
     void* context = nullptr;
 };
 
+template <>
+inline bool StyleLayer::is<CustomLayer>() const {
+    return type == Type::Custom;
+}
+
 } // namespace mbgl
 
 #endif
