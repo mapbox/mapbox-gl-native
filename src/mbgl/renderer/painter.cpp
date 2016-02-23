@@ -34,7 +34,6 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat3.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -270,8 +269,6 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         if (!imagePosA || !imagePosB)
             return;
 
-        float zoomFraction = state.getZoomFraction();
-
         config.program = patternShader->getID();
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = (*imagePosA).tl;
@@ -282,8 +279,9 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_opacity = properties.opacity;
 
         LatLng latLng = state.getLatLng();
-        TileCoordinate center = state.latLngToCoordinate(latLng);
-        float scale = 1 / std::pow(2, zoomFraction);
+        double centerX = state.lngX(latLng.longitude);
+        double centerY = state.latY(latLng.latitude);
+        float scale = 1 / std::pow(2, state.getZoomFraction());
 
         std::array<float, 2> sizeA = (*imagePosA).size;
         mat3 matrixA;
@@ -292,8 +290,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                       1.0f / (sizeA[0] * properties.pattern.value.fromScale),
                       1.0f / (sizeA[1] * properties.pattern.value.fromScale));
         matrix::translate(matrixA, matrixA,
-                          std::fmod(center.column * util::tileSize, sizeA[0] * properties.pattern.value.fromScale),
-                          std::fmod(center.row    * util::tileSize, sizeA[1] * properties.pattern.value.fromScale));
+                          std::fmod(centerX, sizeA[0] * properties.pattern.value.fromScale),
+                          std::fmod(centerY, sizeA[1] * properties.pattern.value.fromScale));
         matrix::rotate(matrixA, matrixA, -state.getAngle());
         matrix::scale(matrixA, matrixA,
                        scale * state.getWidth()  / 2,
@@ -306,8 +304,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                       1.0f / (sizeB[0] * properties.pattern.value.toScale),
                       1.0f / (sizeB[1] * properties.pattern.value.toScale));
         matrix::translate(matrixB, matrixB,
-                          std::fmod(center.column * util::tileSize, sizeB[0] * properties.pattern.value.toScale),
-                          std::fmod(center.row    * util::tileSize, sizeB[1] * properties.pattern.value.toScale));
+                          std::fmod(centerX, sizeB[0] * properties.pattern.value.toScale),
+                          std::fmod(centerY, sizeB[1] * properties.pattern.value.toScale));
         matrix::rotate(matrixB, matrixB, -state.getAngle());
         matrix::scale(matrixB, matrixB,
                        scale * state.getWidth()  / 2,

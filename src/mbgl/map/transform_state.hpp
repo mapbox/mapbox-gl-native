@@ -74,6 +74,11 @@ public:
     ScreenCoordinate coordinateToPoint(const TileCoordinate&) const;
     TileCoordinate pointToCoordinate(const ScreenCoordinate&) const;
 
+    double xLng(double x, double worldSize) const;
+    double yLat(double y, double worldSize) const;
+    double lngX(double lon) const;
+    double latY(double lat) const;
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
@@ -87,10 +92,6 @@ private:
     // logical dimensions
     uint16_t width = 0, height = 0;
 
-    double xLng(double x, double worldSize) const;
-    double yLat(double y, double worldSize) const;
-    double lngX(double lon) const;
-    double latY(double lat) const;
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
     double worldSize() const;
