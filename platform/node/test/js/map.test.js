@@ -323,5 +323,21 @@ test('Map', function(t) {
                 t.end();
             });
         });
+
+        t.test('not holding references', function(t) {
+            var options = {
+                request: function() {},
+                ratio: 1
+            };
+
+            // We explicitly don't call release. mbgl.Map should
+            // not hold any reference to the node's main loop and
+            // prevent the test from exit.
+            var map1 = new mbgl.Map(options);
+            var map2 = new mbgl.Map(options);
+            var map3 = new mbgl.Map(options);
+
+            t.end();
+        });
     });
 });
