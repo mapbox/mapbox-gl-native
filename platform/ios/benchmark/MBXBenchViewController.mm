@@ -1,6 +1,6 @@
 #import "MBXBenchViewController.h"
 
-#import <mbgl/ios/MGLMapView.h>
+#import <Mapbox/Mapbox.h>
 
 #include "locations.hpp"
 
@@ -44,7 +44,7 @@
 {
     [super viewDidLoad];
 
-    NSURL* url = [[NSURL alloc] initWithString:@"mapbox://styles/mapbox/streets-v8.json"];
+    NSURL* url = [[NSURL alloc] initWithString:@"mapbox://styles/mapbox/streets-v8"];
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds styleURL:url];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;
@@ -62,7 +62,7 @@
 size_t idx = 0;
 enum class State { None, WaitingForAssets, WarmingUp, Benchmarking } state = State::None;
 int frames = 0;
-TimePoint started;
+std::chrono::steady_clock::time_point started;
 std::vector<std::pair<std::string, double>> result;
 
 static const int warmupDuration = 20; // frames
@@ -102,7 +102,7 @@ static const int benchmarkDuration = 200; // frames
             state = State::None;
 
             // Report FPS
-            const auto duration = Microseconds(Clock::now() - started);
+            const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - started).count() ;
             const auto fps = double(frames * 1e6) / duration;
             result.emplace_back(mbgl::bench::locations[idx].name, fps);
             NSLog(@"- FPS: %.1f", fps);
@@ -123,7 +123,7 @@ static const int benchmarkDuration = 200; // frames
         {
             frames = 0;
             state = State::Benchmarking;
-            started = Clock::now();
+            started = std::chrono::steady_clock::now();
             NSLog(@"- Benchmarking for %d frames...", benchmarkDuration);
         }
         [mapView setNeedsGLDisplay];
