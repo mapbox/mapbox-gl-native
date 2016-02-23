@@ -15,6 +15,13 @@ template <typename T> class Thread;
 
 class DefaultFileSource : public FileSource {
 public:
+    /*
+     * The maximumCacheSize parameter is a limit applied to non-offline resources only,
+     * i.e. resources added to the database for the "ambient use" caching functionality.
+     * There is no size limit for offline resources. If a user never creates any offline
+     * regions, we want the database to remain fairly small (order tens or low hundreds
+     * of megabytes).
+     */
     DefaultFileSource(const std::string& cachePath,
                       const std::string& assetRoot,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
