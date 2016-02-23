@@ -63,7 +63,7 @@ TEST(OfflineDownload, NoSubresources) {
         if (status.complete()) {
             EXPECT_EQ(1, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
-            EXPECT_FALSE(status.requiredResourceCountIsIndeterminate);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
             test.loop.stop();
         }
     };
@@ -102,7 +102,7 @@ TEST(OfflineDownload, InlineSource) {
         if (status.complete()) {
             EXPECT_EQ(2, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
-            EXPECT_FALSE(status.requiredResourceCountIsIndeterminate);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
             test.loop.stop();
         }
     };
@@ -136,7 +136,7 @@ TEST(OfflineDownload, GeoJSONSource) {
         if (status.complete()) {
             EXPECT_EQ(2, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
-            EXPECT_FALSE(status.requiredResourceCountIsIndeterminate);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
             test.loop.stop();
         }
     };
@@ -200,7 +200,7 @@ TEST(OfflineDownload, Activate) {
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
-            EXPECT_FALSE(status.requiredResourceCountIsIndeterminate);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
 
             test.loop.stop();
         }
@@ -224,7 +224,7 @@ TEST(OfflineDownload, GetStatusNoResources) {
     EXPECT_EQ(0, status.completedResourceCount);
     EXPECT_EQ(0, status.completedResourceSize);
     EXPECT_EQ(1, status.requiredResourceCount);
-    EXPECT_TRUE(status.requiredResourceCountIsIndeterminate);
+    EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
 
@@ -245,7 +245,7 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
     EXPECT_EQ(1, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(260, status.requiredResourceCount);
-    EXPECT_TRUE(status.requiredResourceCountIsIndeterminate);
+    EXPECT_FALSE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
 
@@ -270,7 +270,7 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
     EXPECT_EQ(2, status.completedResourceCount);
     EXPECT_EQ(test.size, status.completedResourceSize);
     EXPECT_EQ(261, status.requiredResourceCount);
-    EXPECT_FALSE(status.requiredResourceCountIsIndeterminate);
+    EXPECT_TRUE(status.requiredResourceCountIsPrecise);
     EXPECT_FALSE(status.complete());
 }
 

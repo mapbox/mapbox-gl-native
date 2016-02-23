@@ -40,7 +40,7 @@ int main(int, char * []) {
 
             std::cout << status.completedResourceCount << " / " << status.requiredResourceCount
                       << " resources"
-                      << (status.requiredResourceCountIsIndeterminate ? " (indeterminate); " : "; ")
+                      << (status.requiredResourceCountIsPrecise ? "; " : " (indeterminate); ")
                       << status.completedResourceSize << " bytes downloaded"
                       << " (" << bytesPerSecond << " bytes/sec)"
                       << std::endl;

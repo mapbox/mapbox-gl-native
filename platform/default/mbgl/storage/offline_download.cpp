@@ -94,7 +94,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     StyleParser parser;
     parser.parse(*styleResponse->data);
 
-    result.requiredResourceCountIsIndeterminate = false;
+    result.requiredResourceCountIsPrecise = true;
 
     for (const auto& source : parser.sources) {
         switch (source->type) {
@@ -109,7 +109,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                     result.requiredResourceCount += tileResources(source->type, source->tileSize,
                         *StyleParser::parseTileJSON(*sourceResponse->data, source->url, source->type, source->tileSize)).size();
                 } else {
-                    result.requiredResourceCountIsIndeterminate = true;
+                    result.requiredResourceCountIsPrecise = false;
                 }
             }
             break;
@@ -137,7 +137,7 @@ void OfflineDownload::activateDownload() {
     requiredSourceURLs.clear();
 
     ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {
-        status.requiredResourceCountIsIndeterminate = false;
+        status.requiredResourceCountIsPrecise = true;
 
         StyleParser parser;
         parser.parse(*styleResponse.data);
@@ -153,7 +153,7 @@ void OfflineDownload::activateDownload() {
                 if (source->getInfo()) {
                     ensureTiles(type, tileSize, *source->getInfo());
                 } else {
-                    status.requiredResourceCountIsIndeterminate = true;
+                    status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=] (Response sourceResponse) {
@@ -161,7 +161,7 @@ void OfflineDownload::activateDownload() {
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {
-                            status.requiredResourceCountIsIndeterminate = false;
+                            status.requiredResourceCountIsPrecise = true;
                         }
                     });
                 }
