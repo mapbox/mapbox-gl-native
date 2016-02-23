@@ -1,6 +1,8 @@
 #ifndef MBGL_UTIL_CONSTANTS
 #define MBGL_UTIL_CONSTANTS
 
+#include <mbgl/util/chrono.hpp>
+
 #include <cmath>
 #include <string>
 #include <vector>
@@ -22,6 +24,8 @@ extern const double MIN_ZOOM;
 extern const double MAX_ZOOM;
 
 extern const uint64_t DEFAULT_MAX_CACHE_SIZE;
+
+extern const Duration CLOCK_SKEW_RETRY_TIMEOUT;
 
 } // namespace util
 

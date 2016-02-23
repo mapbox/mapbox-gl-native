@@ -5,6 +5,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
 
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
@@ -29,7 +30,7 @@ public:
     ~OnlineFileRequestImpl();
 
     void networkIsReachableAgain(OnlineFileSource::Impl&);
-    void schedule(OnlineFileSource::Impl&, bool forceImmediate = false);
+    void schedule(OnlineFileSource::Impl&, optional<SystemTimePoint> expires);
     void completed(OnlineFileSource::Impl&, Response);
 
     FileRequest* key;
@@ -205,7 +206,7 @@ OnlineFileRequestImpl::OnlineFileRequestImpl(FileRequest* key_, const Resource& 
       resource(resource_),
       callback(std::move(callback_)) {
     // Force an immediate first request if we don't have an expiration time.
-    schedule(impl, !resource.priorExpires);
+    schedule(impl, SystemClock::now());
 }
 
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {
@@ -238,7 +239,42 @@ static Duration expirationTimeout(optional<SystemTimePoint> expires, uint32_t ex
     }
 }
 
-void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, bool forceImmediate) {
+SystemTimePoint interpolateExpiration(const SystemTimePoint& current,
+                                      optional<SystemTimePoint> prior,
+                                      bool& expired) {
+    auto now = SystemClock::now();
+    if (current > now) {
+        return current;
+    }
+
+    if (!bool(prior)) {
+        expired = true;
+        return current;
+    }
+
+    // Expiring date is going backwards,
+    // fallback to exponential backoff.
+    if (current < *prior) {
+        expired = true;
+        return current;
+    }
+
+    auto delta = current - *prior;
+
+    // Server is serving the same expired resource
+    // over and over, fallback to exponential backoff.
+    if (delta == Duration::zero()) {
+        expired = true;
+        return current;
+    }
+
+    // Assume that either the client or server clock is wrong and
+    // try to interpolate a valid expiration date (from the client POV)
+    // observing a minimum timeout.
+    return now + std::max<Duration>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
+}
+
+void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, optional<SystemTimePoint> expires) {
     if (request) {
         // There's already a request in progress; don't start another one.
         return;
@@ -246,10 +282,8 @@ void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, bool forceImm
 
     // If we're not being asked for a forced refresh, calculate a timeout that depends on how many
     // consecutive errors we've encountered, and on the expiration time, if present.
-    Duration timeout = forceImmediate
-        ? Duration::zero()
-        : std::min(errorRetryTimeout(failedRequestReason, failedRequests),
-                   expirationTimeout(resource.priorExpires, expiredRequests));
+    Duration timeout = std::min(errorRetryTimeout(failedRequestReason, failedRequests),
+        expirationTimeout(expires, expiredRequests));
 
     if (timeout == Duration::max()) {
         return;
@@ -270,13 +304,15 @@ void OnlineFileRequestImpl::completed(OnlineFileSource::Impl& impl, Response res
         resource.priorModified = response.modified;
     }
 
-    if (!response.expires) {
-        response.expires = resource.priorExpires;
-    } else {
+    bool isExpired = false;
+
+    if (response.expires) {
+        auto prior = resource.priorExpires;
         resource.priorExpires = response.expires;
+        response.expires = interpolateExpiration(*response.expires, prior, isExpired);
     }
 
-    if (response.expires && response.expires < SystemClock::now()) {
+    if (isExpired) {
         expiredRequests++;
     } else {
         expiredRequests = 0;
@@ -297,14 +333,14 @@ void OnlineFileRequestImpl::completed(OnlineFileSource::Impl& impl, Response res
     }
 
     callback(response);
-    schedule(impl);
+    schedule(impl, response.expires);
 }
 
 void OnlineFileRequestImpl::networkIsReachableAgain(OnlineFileSource::Impl& impl) {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
     if (failedRequestReason == Response::Error::Reason::Connection) {
-        schedule(impl, true);
+        schedule(impl, SystemClock::now());
     }
 }
 

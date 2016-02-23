@@ -31,6 +31,8 @@ const double MAX_ZOOM = 25.5;
 
 const uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
+const Duration CLOCK_SKEW_RETRY_TIMEOUT = Seconds(30);
+
 } // namespace util
 
 namespace debug {
