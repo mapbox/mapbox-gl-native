@@ -144,8 +144,6 @@ public:
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
-    void unwrapLatLng(LatLng&);
-    
     View &view;
 
     TransformState state;

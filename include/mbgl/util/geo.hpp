@@ -2,6 +2,7 @@
 #define MBGL_UTIL_GEO
 
 #include <mbgl/util/vec.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <cmath>
 
@@ -13,11 +14,28 @@ using ScreenCoordinate = vec2<double>;
 
 class LatLng {
 public:
-    double latitude = 0;
-    double longitude = 0;
+    double latitude;
+    double longitude;
 
-    LatLng(double lat = 0, double lon = 0)
-        : latitude(lat), longitude(lon) {}
+    enum WrapMode : bool { Unwrapped, Wrapped };
+
+    LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
+        : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }
+
+    LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
+
+    void wrap() {
+        if (longitude < -util::LONGITUDE_MAX) longitude = std::fmod(longitude, util::LONGITUDE_MAX * 2);
+        if (longitude > util::LONGITUDE_MAX) longitude = -util::LONGITUDE_MAX + std::fmod(longitude, util::LONGITUDE_MAX);
+    }
+
+    /** If a path crossing the antemeridian would be shorter, extend the final
+      coordinate so that interpolating between the two endpoints will cross it. */
+    void unwrapForShortestPath(const LatLng& start) {
+        if (std::abs(start.longitude) + std::abs(longitude) > util::LONGITUDE_MAX) {
+            longitude += (start.longitude > 0 && longitude < 0) ? 360 : -360;
+        }
+    }
 
     explicit operator bool() const {
         return !(std::isnan(latitude) || std::isnan(longitude));

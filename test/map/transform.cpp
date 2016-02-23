@@ -140,6 +140,29 @@ TEST(Transform, PerspectiveProjection) {
     ASSERT_NEAR(point.y, 0, 0.02);
 }
 
+TEST(Transform, UnwrappedLatLng) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
+    transform.setScale(2 << 9);
+    transform.setPitch(0.9);
+    transform.setLatLng(LatLng(38, -77));
+
+    const TransformState& state = transform.getState();
+
+    LatLng fromScreenCoordinate = state.screenCoordinateToLatLng({ 500, 500 });
+    ASSERT_NEAR(fromScreenCoordinate.latitude,   37.999999999999829, 0.0001); // 1.71E-13
+    ASSERT_NEAR(fromScreenCoordinate.longitude, -76.999999999999773, 0.0001); // 2.27E-13
+
+    LatLng unwrappedForwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, 283 }));
+    ASSERT_NEAR(unwrappedForwards.latitude, 37.999999999999716, 0.0001); // 2.84E-13
+    ASSERT_DOUBLE_EQ(unwrappedForwards.longitude, fromScreenCoordinate.longitude);
+
+    LatLng unwrappedBackwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, -437 }));
+    ASSERT_DOUBLE_EQ(unwrappedBackwards.latitude, unwrappedForwards.latitude);
+    ASSERT_DOUBLE_EQ(unwrappedBackwards.longitude, fromScreenCoordinate.longitude);
+}
+
 TEST(Transform, ConstrainHeightOnly) {
     MockView view;
     LatLng loc;

@@ -101,7 +101,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
-    unwrapLatLng(latLng);
+    latLng.unwrapForShortestPath(getLatLng());
     const ScreenCoordinate endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
@@ -184,7 +184,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
-    unwrapLatLng(latLng);
+    latLng.unwrapForShortestPath(getLatLng());
     const ScreenCoordinate endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
@@ -327,19 +327,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         }
         return Update::Zoom;
     }, duration);
-}
-
-/** If a path crossing the antemeridian would be shorter, extend the final
- coordinate so that interpolating between the two endpoints will cross it. */
-void Transform::unwrapLatLng(LatLng& latLng) {
-    LatLng startLatLng = getLatLng();
-    if (std::abs(startLatLng.longitude) + std::abs(latLng.longitude) > util::LONGITUDE_MAX) {
-        if (startLatLng.longitude > 0 && latLng.longitude < 0) {
-            latLng.longitude += 360;
-        } else if (startLatLng.longitude < 0 && latLng.longitude > 0) {
-            latLng.longitude -= 360;
-        }
-    }
 }
 
 #pragma mark - Position
