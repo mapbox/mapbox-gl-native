@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.camera;
 
 import android.graphics.Point;
 import android.graphics.PointF;
@@ -6,15 +6,17 @@ import android.graphics.RectF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public class CameraUpdateFactory {
+public final class CameraUpdateFactory {
 
     /**
      * Returns a CameraUpdate that moves the camera to a specified CameraPosition.
@@ -144,7 +146,7 @@ public class CameraUpdateFactory {
     // CameraUpdate types
     //
 
-    public static class CameraPositionUpdate implements CameraUpdate {
+    static final class CameraPositionUpdate implements CameraUpdate {
 
         private final float bearing;
         private final LatLng target;
@@ -189,7 +191,7 @@ public class CameraUpdateFactory {
         }
     }
 
-    public static class CameraBoundsUpdate implements CameraUpdate {
+    static final class CameraBoundsUpdate implements CameraUpdate {
 
         private LatLngBounds bounds;
         private RectF padding;
@@ -217,39 +219,40 @@ public class CameraUpdateFactory {
 
         @Override
         public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-            MapView mapView = mapboxMap.getMapView();
+            // Get required objects
+            Projection projection = mapboxMap.getProjection();
+            UiSettings uiSettings = mapboxMap.getUiSettings();
             RectF padding = getPadding();
 
-            // Calculate the bounds of the possibly rotated shape with respect to the viewport.
+            // Calculate the bounds of the possibly rotated shape with respect to the viewport
             PointF nePixel = new PointF(-10000, -10000);
-            PointF swPixel = new PointF(1000, 10000);
-            float viewportHeight = mapView.getHeight();
+            PointF swPixel = new PointF(10000, 10000);
+            float viewportHeight = uiSettings.getHeight();
             for (LatLng latLng : getBounds().toLatLngs()) {
-                PointF pixel = mapView.toScreenLocation(latLng);
+                PointF pixel = projection.toScreenLocation(latLng);
                 swPixel.x = Math.min(swPixel.x, pixel.x);
                 nePixel.x = Math.max(nePixel.x, pixel.x);
                 swPixel.y = Math.min(swPixel.y, viewportHeight - pixel.y);
                 nePixel.y = Math.max(nePixel.y, viewportHeight - pixel.y);
             }
 
+            // Calculate wid=th/height
             float width = nePixel.x - swPixel.x;
             float height = nePixel.y - swPixel.y;
 
-            // Calculate the zoom level.
-            float scaleX = (mapView.getWidth() - padding.left - padding.right) / width;
-            float scaleY = (mapView.getHeight() - padding.top - padding.bottom) / height;
+            // Calculate the zoom level
+            float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
+            float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
             float minScale = scaleX < scaleY ? scaleX : scaleY;
-            double zoom = Math.log(mapView.getScale() * minScale) / Math.log(2);
-            zoom = MathUtils.clamp(zoom, (float) mapView.getMinZoom(), (float) mapView.getMaxZoom());
+            double zoom = projection.calculateZoom(minScale);
+            zoom = MathUtils.clamp(zoom, (float) uiSettings.getMinZoom(), (float) uiSettings.getMaxZoom());
 
-            // Calculate the center point of a virtual bounds that is extended in all directions by padding.
+            // Calculate the center point
             PointF paddedNEPixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);
             PointF paddedSWPixel = new PointF(swPixel.x - padding.left / minScale, swPixel.y - padding.bottom / minScale);
             PointF centerPixel = new PointF((paddedNEPixel.x + paddedSWPixel.x) / 2, (paddedNEPixel.y + paddedSWPixel.y) / 2);
-
             centerPixel.y = viewportHeight - centerPixel.y;
-
-            LatLng center = mapboxMap.getProjection().fromScreenLocation(centerPixel);
+            LatLng center = projection.fromScreenLocation(centerPixel);
 
             return new CameraPosition.Builder()
                     .target(center)
@@ -260,7 +263,7 @@ public class CameraUpdateFactory {
         }
     }
 
-    public static class CameraMoveUpdate implements CameraUpdate {
+    static final class CameraMoveUpdate implements CameraUpdate {
 
         private float x;
         private float y;
@@ -272,15 +275,16 @@ public class CameraUpdateFactory {
 
         @Override
         public CameraPosition getCameraPosition(@NonNull MapboxMap mapboxMap) {
-            MapView mapView = mapboxMap.getMapView();
+            UiSettings uiSettings = mapboxMap.getUiSettings();
+            Projection projection = mapboxMap.getProjection();
 
             // Calculate the new center point
-            float viewPortWidth = mapView.getWidth();
-            float viewPortHeight = mapView.getHeight();
+            float viewPortWidth = uiSettings.getWidth();
+            float viewPortHeight = uiSettings.getHeight();
             PointF targetPoint = new PointF(viewPortWidth / 2 + x, viewPortHeight / 2 + y);
 
             // Convert point to LatLng
-            LatLng latLng = mapView.fromScreenLocation(targetPoint);
+            LatLng latLng = projection.fromScreenLocation(targetPoint);
 
             CameraPosition cameraPosition = mapboxMap.getCameraPosition();
             return new CameraPosition.Builder()
@@ -292,7 +296,7 @@ public class CameraUpdateFactory {
         }
     }
 
-    public static class ZoomUpdate implements CameraUpdate {
+    static final class ZoomUpdate implements CameraUpdate {
 
         @IntDef({ZOOM_IN, ZOOM_OUT, ZOOM_BY, ZOOM_TO, ZOOM_TO_POINT})
         @Retention(RetentionPolicy.SOURCE)

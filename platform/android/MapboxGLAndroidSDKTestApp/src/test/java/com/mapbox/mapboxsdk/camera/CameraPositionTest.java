@@ -1,11 +1,8 @@
 package com.mapbox.mapboxsdk.camera;
 
-import android.hardware.Camera;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import org.junit.Test;

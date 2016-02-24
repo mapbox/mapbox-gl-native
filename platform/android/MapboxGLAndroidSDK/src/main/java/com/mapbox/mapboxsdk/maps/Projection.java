@@ -1,11 +1,13 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
@@ -55,7 +57,7 @@ public class Projection {
                 .include(bottomRight)
                 .include(bottomLeft);
 
-        return new VisibleRegion(topLeft,topRight,bottomLeft,bottomRight,builder.build());
+        return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight, builder.build());
     }
 
     /**
@@ -68,5 +70,15 @@ public class Projection {
      */
     public PointF toScreenLocation(LatLng location) {
         return mMapView.toScreenLocation(location);
+    }
+
+    /**
+     * Calculates a zoom level based on minimum scale and current scale from MapView
+     *
+     * @param minScale The minimum scale to calculate the zoom level.
+     * @return zoom level that fits the MapView.
+     */
+    public double calculateZoom(float minScale) {
+        return Math.log(mMapView.getScale() * minScale) / Math.log(2);
     }
 }

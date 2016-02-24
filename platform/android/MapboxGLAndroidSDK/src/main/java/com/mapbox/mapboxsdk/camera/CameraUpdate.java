@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.camera;
 
 import android.support.annotation.NonNull;
 
