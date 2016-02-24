@@ -38,6 +38,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all
+ * methods related to the MapView. You cannot instantiate {@link MapboxMap} object directly, rather,
+ * you must obtain one from the getMapAsync() method on a MapFragment or MapView that you have
+ * added to your application.
+ * <p>
+ * Note: Similar to a View object, a GoogleMap should only be read and modified from the main thread.
+ * </p>
+ */
 public class MapboxMap {
 
     private MapView mMapView;
@@ -300,11 +309,19 @@ public class MapboxMap {
         });
     }
 
-    // internal time layer conversion
+    /**
+     * Converts milliseconds to nanoseconds
+     *
+     * @param durationMs The time in milliseconds
+     * @return time in nanoseconds
+     */
     private long getDurationNano(long durationMs) {
         return durationMs > 0 ? TimeUnit.NANOSECONDS.convert(durationMs, TimeUnit.MILLISECONDS) : 0;
     }
 
+    /**
+     * Invalidates the current camera position by reconstructing it from mbgl
+     */
     private void invalidateCameraPosition() {
         mInvalidCameraPosition = false;
         mCameraPosition = new CameraPosition.Builder(true)
@@ -328,10 +345,6 @@ public class MapboxMap {
     public void resetNorth() {
         mMapView.resetNorth();
     }
-
-    //
-    // Manual zoom controls
-    //
 
     //
     // Debug
@@ -1373,7 +1386,7 @@ public class MapboxMap {
     }
 
     /**
-     * Interface definition for a callback to be invoked for when the camera changes position.
+     * Interface definition for a callback to be invoked when the camera changes position.
      */
     public interface OnCameraChangeListener {
         /**
@@ -1387,7 +1400,7 @@ public class MapboxMap {
     }
 
     /**
-     * Interface definition for a callback to be invoked on every frame rendered to the map view.
+     * Interface definition for a callback to be invoked when a frame is rendered to the map view.
      *
      * @see MapboxMap#setOnFpsChangedListener(OnFpsChangedListener)
      */
@@ -1459,7 +1472,7 @@ public class MapboxMap {
     }
 
     /**
-     * Callback interface for when the user long presses on a marker's info window.
+     *  Interface definition for a callback to be invoked when the user long presses on a marker's info window.
      *
      * @see MapboxMap#setOnInfoWindowClickListener(OnInfoWindowClickListener)
      */
@@ -1474,7 +1487,7 @@ public class MapboxMap {
     }
 
     /**
-     * Callback interface for close events on a marker's info window.
+     * Interface definition for a callback to be invoked when a marker's info window is closed.
      *
      * @see MapboxMap#setOnInfoWindowCloseListener(OnInfoWindowCloseListener)
      */
@@ -1552,7 +1565,7 @@ public class MapboxMap {
     }
 
     /**
-     * A callback interface for reporting when a task is complete or cancelled.
+     * Interface definition for a callback to be invoked when a task is complete or cancelled.
      */
     public interface CancelableCallback {
         /**

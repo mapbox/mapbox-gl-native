@@ -39,10 +39,8 @@ import com.mapbox.mapboxsdk.maps.Projection;
 import java.lang.ref.WeakReference;
 
 /**
- * This view shows the user's location, as determined from GPS, on the map
- * as a dot annotation.
+ * UI element overlaid on a map to show the user's location.
  */
-
 public final class UserLocationView extends View {
 
     private MapboxMap mMapboxMap;

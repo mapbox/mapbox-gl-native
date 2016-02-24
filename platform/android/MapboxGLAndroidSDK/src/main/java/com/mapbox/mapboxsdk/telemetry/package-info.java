@@ -1,4 +1,4 @@
 /**
- * This package contains the classes that manage the SDK's Telemetry services.
+ * This package contains classes that manages the map Telemetry services.
  */
 package com.mapbox.mapboxsdk.telemetry;

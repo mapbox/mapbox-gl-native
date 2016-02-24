@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
@@ -19,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * CompassView is a UI element overlaid on a map that shows the map's bearing
+ * UI element overlaid on a map to show the map's bearing
  * when it isn't true north (0.0). Tapping the compass resets the bearing to true
  * north and hides the compass.
  */
@@ -55,6 +56,10 @@ public final class CompassView extends ImageView {
         float mScreenDensity = context.getResources().getDisplayMetrics().density;
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams((int) (48 * mScreenDensity), (int) (48 * mScreenDensity));
         setLayoutParams(lp);
+    }
+
+    public void setMapboxMap(@NonNull MapboxMap mapboxMap){
+        setOnClickListener(new CompassClickListener(mapboxMap));
     }
 
     @Override
@@ -139,7 +144,7 @@ public final class CompassView extends ImageView {
         }
     }
 
-    public static class CompassClickListener implements View.OnClickListener {
+    static class CompassClickListener implements View.OnClickListener {
 
         private WeakReference<MapboxMap> mMapboxMap;
 

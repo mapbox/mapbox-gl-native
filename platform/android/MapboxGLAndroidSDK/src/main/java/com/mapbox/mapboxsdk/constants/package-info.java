@@ -1,4 +1,4 @@
 /**
- * This package provides access to several map related constants and bundled styles.
+ * This package contains multiple map related constants classes.
  */
 package com.mapbox.mapboxsdk.constants;

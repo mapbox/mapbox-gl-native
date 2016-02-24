@@ -6,6 +6,9 @@ import android.support.annotation.UiThread;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 
+/**
+ * Settings for the user location and bearing tracking of a MapboxMap.
+ */
 public class TrackingSettings {
 
     private MapView mapView;

@@ -237,7 +237,7 @@ public class MainActivityTest extends BaseTest {
     public void testMapIconContentDescription() {
         // Mapbox logo
         onView(withContentDescription(mActivity.getResources()
-                .getString(R.string.mapboxIconContentDescription)))
+                .getString(R.string.mapbox_mapboxIconContentDescription)))
                 .check(matches(isDisplayed()));
     }
 
@@ -254,7 +254,7 @@ public class MainActivityTest extends BaseTest {
     public void testMapAttributionsIconContentDescription() {
         // Attribution icon
         onView(withContentDescription(mActivity.getResources()
-                .getString(R.string.attributionsIconContentDescription)))
+                .getString(R.string.mapbox_attributionsIconContentDescription)))
                 .check(matches(isDisplayed()));
     }
 

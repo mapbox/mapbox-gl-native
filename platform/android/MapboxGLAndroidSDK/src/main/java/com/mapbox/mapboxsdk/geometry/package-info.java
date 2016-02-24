@@ -1,5 +1,4 @@
 /**
- * This package contains classes that deal with geometry and map coordinates. Many SDK functions
- * accept or return these classes.
+ * This package contains classes related to geometry and map coordinates.
  */
 package com.mapbox.mapboxsdk.geometry;

@@ -1,6 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
-public class ViewSettings {
+/**
+ * Settings for the overlain views of a MapboxMap. Used by UiSettings.
+ */
+class ViewSettings {
 
     private boolean enabled;
     private int gravity;

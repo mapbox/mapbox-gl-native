@@ -1,5 +1,4 @@
 /**
- * This package contains the {@link com.mapbox.mapboxsdk.utils.ApiAccess} class. {@code ApiAccess}
- * provides a methods to load a Mapbox access token.
+ * This package contains utility classes used by the map.
  */
 package com.mapbox.mapboxsdk.utils;

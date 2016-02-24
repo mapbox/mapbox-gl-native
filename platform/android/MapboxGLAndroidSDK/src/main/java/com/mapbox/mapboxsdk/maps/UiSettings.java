@@ -6,7 +6,6 @@ import android.support.annotation.UiThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.VideoView;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
@@ -212,7 +211,7 @@ public class UiSettings {
      */
     public void setLogoEnabled(boolean enabled) {
         logoSettings.setEnabled(enabled);
-        mapView.setLogoVisibility(enabled);
+        mapView.setLogoEnabled(enabled);
     }
 
     /**
@@ -308,7 +307,7 @@ public class UiSettings {
      */
     public void setAttributionEnabled(boolean enabled) {
         attributionSettings.setEnabled(enabled);
-        mapView.setAttributionVisibility(enabled ? View.VISIBLE : View.GONE);
+        mapView.setAttributionEnabled(enabled ? View.VISIBLE : View.GONE);
     }
 
     /**

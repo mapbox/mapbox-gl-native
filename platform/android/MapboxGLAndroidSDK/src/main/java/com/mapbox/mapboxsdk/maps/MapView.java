@@ -55,6 +55,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -64,7 +65,6 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -72,7 +72,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
@@ -84,6 +83,7 @@ import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -116,7 +116,7 @@ public class MapView extends FrameLayout {
     private static final float DIMENSION_SEVEN_DP = 7f;
     private static final float DIMENSION_TEN_DP = 10f;
     private static final float DIMENSION_SIXTEEN_DP = 16f;
-    private static final float DIMENSION_SEVENTYSIX_DP = 76f;
+    private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
 
     private MapboxMap mMapboxMap;
     private List<Icon> mIcons;
@@ -215,8 +215,10 @@ public class MapView extends FrameLayout {
 
         mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
         mUserLocationView.setMapboxMap(mMapboxMap);
+        
         mCompassView = (CompassView) view.findViewById(R.id.compassView);
-        mCompassView.setOnClickListener(new CompassView.CompassClickListener(mMapboxMap));
+        mCompassView.setMapboxMap(mMapboxMap);
+
         mLogoView = (ImageView) view.findViewById(R.id.logoView);
 
         // Setup Attributions control
@@ -278,7 +280,7 @@ public class MapView extends FrameLayout {
             // Attribution
             uiSettings.setAttributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
             uiSettings.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
-            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTYSIX_DP) * mScreenDensity)
+            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * mScreenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * mScreenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * mScreenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
@@ -540,11 +542,6 @@ public class MapView extends FrameLayout {
     // LatLng / CenterCoordinate
     //
 
-    /**
-     * Gets the current LatLng in the center of the MapView
-     *
-     * @return The center in LatLng
-     */
     LatLng getLatLng() {
         return mNativeMapView.getLatLng();
     }
@@ -553,22 +550,10 @@ public class MapView extends FrameLayout {
     // Pitch / Tilt
     //
 
-    /**
-     * Gets the current Tilt in degrees of the MapView
-     *
-     * @return tilt in degrees
-     */
     double getTilt() {
         return mNativeMapView.getPitch();
     }
 
-    /**
-     * Sets the Tilt in degrees of the MapView.
-     *
-     * @param pitch    New tilt in degrees
-     * @param duration Animation time in milliseconds.  If null then 0 is used, making the animation immediate.
-     */
-    @FloatRange(from = MapboxConstants.MINIMUM_TILT, to = MapboxConstants.MAXIMUM_TILT)
     void setTilt(Double pitch, @Nullable Long duration) {
         long actualDuration = 0;
         if (duration != null) {
@@ -581,13 +566,6 @@ public class MapView extends FrameLayout {
     // Direction
     //
 
-    /**
-     * Returns the current direction of the map relative to true north.
-     *
-     * @return The current direction measured in degrees.
-     */
-    @UiThread
-    @FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION)
     double getDirection() {
         double direction = -mNativeMapView.getBearing();
 
@@ -601,45 +579,10 @@ public class MapView extends FrameLayout {
         return direction;
     }
 
-    /**
-     * <p>
-     * Rotates the map to a new heading relative to true north immediately.
-     * </p>
-     * <ul>
-     * <li>The value 0 means that the top edge of the map view will correspond to true north.</li>
-     * <li>The value 90 means the top of the map will point due east.</li>
-     * <li>The value 180 means the top of the map will point due south.</li>
-     * <li>The value 270 means the top of the map will point due west.</li>
-     * </ul>
-     * <p>
-     * The initial heading is 0.
-     * </p>
-     * If you want to animate the change, use {@link MapView#setDirection(double, boolean)}.
-     *
-     * @param direction The new heading measured in degrees.
-     * @see MapView#setDirection(double, boolean)
-     */
-    @UiThread
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
         setDirection(direction, false);
     }
 
-    /**
-     * <p>
-     * Rotates the map to a new heading relative to true north and optionally animates the change.
-     * </p>
-     * <ul>
-     * <li>The value 0 means that the top edge of the map view will correspond to true north.</li>
-     * <li>The value 90 means the top of the map will point due east.</li>
-     * <li>The value 180 means the top of the map will point due south.</li>
-     * <li>The value 270 means the top of the map will point due west.</li>
-     * </ul>
-     * The initial heading is 0.
-     *
-     * @param direction The new heading measured in degrees from true north.
-     * @param animated  If true, animates the change. If false, immediately changes the map.
-     */
-    @UiThread
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
         long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
@@ -647,10 +590,6 @@ public class MapView extends FrameLayout {
         mNativeMapView.setBearing(-direction, duration);
     }
 
-    /**
-     * Resets the map heading to true north and animates the change.
-     */
-    @UiThread
     void resetNorth() {
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
@@ -660,38 +599,18 @@ public class MapView extends FrameLayout {
     // Content padding
     //
 
-    /**
-     * Return The current content padding left of the map view viewport.
-     *
-     * @return The current content padding left
-     */
     int getContentPaddingLeft() {
         return mContentPaddingLeft;
     }
 
-    /**
-     * Return The current content padding left of the map view viewport.
-     *
-     * @return The current content padding left
-     */
     int getContentPaddingTop() {
         return mContentPaddingTop;
     }
 
-    /**
-     * Return The current content padding left of the map view viewport.
-     *
-     * @return The current content padding right
-     */
     int getContentPaddingRight() {
         return mContentPaddingRight;
     }
 
-    /**
-     * Return The current content padding left of the map view viewport.
-     *
-     * @return The current content padding bottom
-     */
     int getContentPaddingBottom() {
         return mContentPaddingBottom;
     }
@@ -700,77 +619,26 @@ public class MapView extends FrameLayout {
     // Zoom
     //
 
-    /**
-     * Returns the current zoom level of the map view.
-     *
-     * @return The current zoom.
-     */
-    @UiThread
-    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM)
     double getZoom() {
         return mNativeMapView.getZoom();
     }
 
-    /**
-     * <p>
-     * Sets the minimum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @param minZoom The new minimum zoom level.
-     */
-    @UiThread
     void setMinZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
         mNativeMapView.setMinZoom(minZoom);
     }
 
-    /**
-     * <p>
-     * Gets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @return The minimum zoom level.
-     */
-    @UiThread
     double getMinZoom() {
         return mNativeMapView.getMinZoom();
     }
 
-    /**
-     * <p>
-     * Sets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @param maxZoom The new maximum zoom level.
-     */
-    @UiThread
     void setMaxZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
         mNativeMapView.setMaxZoom(maxZoom);
     }
 
-    /**
-     * <p>
-     * Gets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @return The maximum zoom level.
-     */
-    @UiThread
     double getMaxZoom() {
         return mNativeMapView.getMaxZoom();
     }
 
-    /**
-     * <p>
-     * Sets whether the zoom controls are enabled.
-     * If enabled, the zoom controls are a pair of buttons
-     * (one for zooming in, one for zooming out) that appear on the screen.
-     * When pressed, they cause the camera to zoom in (or out) by one zoom level.
-     * If disabled, the zoom controls are not shown.
-     * </p>
-     * By default the zoom controls are enabled if the device is only single touch capable;
-     *
-     * @param enabled If true, the zoom controls are enabled.
-     */
     void setZoomControlsEnabled(boolean enabled) {
         mZoomButtonsController.setVisible(enabled);
     }
@@ -795,81 +663,22 @@ public class MapView extends FrameLayout {
     // Debug
     //
 
-    /**
-     * Returns whether the map debug information is currently shown.
-     *
-     * @return If true, map debug information is currently shown.
-     */
-    @UiThread
     boolean isDebugActive() {
         return mNativeMapView.getDebug();
     }
 
-    /**
-     * <p>
-     * Changes whether the map debug information is shown.
-     * </p>
-     * The default value is false.
-     *
-     * @param debugActive If true, map debug information is shown.
-     */
-    @UiThread
     void setDebugActive(boolean debugActive) {
         mNativeMapView.setDebug(debugActive);
     }
 
-    /**
-     * <p>
-     * Cycles through the map debug options.
-     * </p>
-     * The value of {@link MapView#isDebugActive()} reflects whether there are
-     * any map debug options enabled or disabled.
-     *
-     * @see MapView#isDebugActive()
-     */
-    @UiThread
     void cycleDebugOptions() {
         mNativeMapView.cycleDebugOptions();
-    }
-
-    // True if map has finished loading the view
-    private boolean isFullyLoaded() {
-        return mNativeMapView.isFullyLoaded();
     }
 
     //
     // Styling
     //
 
-    /**
-     * <p>
-     * Loads a new map style from the specified URL.
-     * </p>
-     * {@code url} can take the following forms:
-     * <ul>
-     * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-     * <li>{@code mapbox://styles/<user>/<style>}:
-     * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-     * {@code user} is your username. {@code style} is the ID of your custom
-     * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-     * <li>{@code http://...} or {@code https://...}:
-     * retrieves the style over the Internet from any web server.</li>
-     * <li>{@code asset://...}:
-     * reads the style from the APK {@code assets/} directory.
-     * This is used to load a style bundled with your app.</li>
-     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-     * </ul>
-     * <p>
-     * This method is asynchronous and will return immediately before the style finishes loading.
-     * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
-     * </p>
-     * If the style fails to load or an invalid style URL is set, the map view will become blank.
-     * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
-     *
-     * @param url The URL of the map style
-     * @see Style
-     */
-    @UiThread
     void setStyleUrl(@NonNull String url) {
         mNativeMapView.setStyleUrl(url);
     }
@@ -877,35 +686,6 @@ public class MapView extends FrameLayout {
     //
     // Access token
     //
-
-    // Checks if the given token is valid
-    private void validateAccessToken(String accessToken) {
-        if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
-            throw new InvalidAccessTokenException();
-        }
-    }
-
-    // Checks that TelemetryService has been configured by developer
-    private void validateTelemetryServiceConfigured() {
-
-        try {
-            // Check Implementing app's AndroidManifest.xml
-            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), PackageManager.GET_SERVICES);
-
-            if (packageInfo.services != null) {
-
-                for (ServiceInfo service : packageInfo.services) {
-                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
-                        return;
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            Log.w(TAG, "Error checking for Telemetry Service Config: " + e);
-        }
-        throw new TelemetryServiceNotConfiguredException();
-    }
 
     /**
      * <p>
@@ -943,18 +723,35 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getAccessToken();
     }
 
+    // Checks if the given token is valid
+    private void validateAccessToken(String accessToken) {
+        if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
+            throw new InvalidAccessTokenException();
+        }
+    }
+
+    // Checks that TelemetryService has been configured by developer
+    private void validateTelemetryServiceConfigured() {
+        try {
+            // Check Implementing app's AndroidManifest.xml
+            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), PackageManager.GET_SERVICES);
+            if (packageInfo.services != null) {
+                for (ServiceInfo service : packageInfo.services) {
+                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error checking for Telemetry Service Config: " + e);
+        }
+        throw new TelemetryServiceNotConfiguredException();
+    }
+
     //
     // Projection
     //
 
-    /**
-     * Converts a point in this view's coordinate system to a map coordinate.
-     *
-     * @param point A point in this view's coordinate system.
-     * @return The converted map coordinate.
-     */
-    @UiThread
-    @NonNull
     LatLng fromScreenLocation(@NonNull PointF point) {
         float x = point.x;
         float y = point.y;
@@ -962,14 +759,6 @@ public class MapView extends FrameLayout {
         return mNativeMapView.latLngForPixel(new PointF(x / mScreenDensity, y / mScreenDensity));
     }
 
-    /**
-     * Converts a map coordinate to a point in this view's coordinate system.
-     *
-     * @param location A map coordinate.
-     * @return The converted point in this view's coordinate system.
-     */
-    @UiThread
-    @NonNull
     PointF toScreenLocation(@NonNull LatLng location) {
         PointF point = mNativeMapView.pixelForLatLng(location);
 
@@ -1031,14 +820,6 @@ public class MapView extends FrameLayout {
         }
     }
 
-    /**
-     * <p>
-     * Updates a marker on this map. Does nothing if the marker is already added.
-     * </p>
-     *
-     * @param updatedMarker An updated marker object.
-     */
-    @UiThread
     void updateMarker(@NonNull Marker updatedMarker) {
         if (updatedMarker == null) {
             Log.w(TAG, "marker was null, doing nothing");
@@ -1051,12 +832,6 @@ public class MapView extends FrameLayout {
 
         ensureIconLoaded(updatedMarker);
         mNativeMapView.updateMarker(updatedMarker);
-    }
-
-    private Marker prepareMarker(MarkerOptions markerOptions) {
-        Marker marker = markerOptions.getMarker();
-        ensureIconLoaded(marker);
-        return marker;
     }
 
     private void ensureIconLoaded(Marker marker) {
@@ -1081,7 +856,6 @@ public class MapView extends FrameLayout {
             marker.setTopOffsetPixels(getTopOffsetPixelsForIcon(icon));
         }
     }
-
 
     long addMarker(@NonNull Marker marker) {
         if (mNativeMapView == null) {
@@ -1156,22 +930,6 @@ public class MapView extends FrameLayout {
                 * mScreenDensity);
     }
 
-    /**
-     * Sets the distance from the edges of the map view’s frame to the edges of the map
-     * view’s logical viewport.
-     * <p/>
-     * When the value of this property is equal to {0,0,0,0}, viewport
-     * properties such as `centerCoordinate` assume a viewport that matches the map
-     * view’s frame. Otherwise, those properties are inset, excluding part of the
-     * frame from the viewport. For instance, if the only the top edge is inset, the
-     * map center is effectively shifted downward.
-     *
-     * @param left   The left margin in pixels.
-     * @param top    The top margin in pixels.
-     * @param right  The right margin in pixels.
-     * @param bottom The bottom margin in pixels.
-     */
-    @UiThread
     void setContentPadding(int left, int top, int right, int bottom) {
         if (left == mContentPaddingLeft && top == mContentPaddingTop && right == mContentPaddingRight && bottom == mContentPaddingBottom) {
             return;
@@ -1185,17 +943,6 @@ public class MapView extends FrameLayout {
         mNativeMapView.setContentPadding(top / mScreenDensity, left / mScreenDensity, bottom / mScreenDensity, right / mScreenDensity);
     }
 
-    /**
-     * <p>
-     * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
-     * </p>
-     * The distance between pixels decreases as the latitude approaches the poles.
-     * This relationship parallels the relationship between longitudinal coordinates at different latitudes.
-     *
-     * @param latitude The latitude for which to return the value.
-     * @return The distance measured in meters.
-     */
-    @UiThread
     double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoom()) / mScreenDensity;
     }
@@ -1204,17 +951,6 @@ public class MapView extends FrameLayout {
     // Mapbox Core GL Camera
     //
 
-    /**
-     * Change any combination of center, zoom, bearing, and pitch, without
-     * a transition. The map will retain the current values for any options
-     * not included in `options`.
-     *
-     * @param bearing Bearing in Radians
-     * @param center  Center LatLng
-     * @param pitch   Pitch in Radians
-     * @param zoom    Zoom Level
-     */
-    @UiThread
     void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
         if (mNativeMapView == null) {
             return;
@@ -1223,18 +959,6 @@ public class MapView extends FrameLayout {
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
     }
 
-    /**
-     * Change any combination of center, zoom, bearing, and pitch, with a smooth animation
-     * between old and new values. The map will retain the current values for any options
-     * not included in `options`.
-     *
-     * @param bearing  Bearing in Radians
-     * @param center   Center LatLng
-     * @param duration Animation time in Nanoseconds
-     * @param pitch    Pitch in Radians
-     * @param zoom     Zoom Level
-     */
-    @UiThread
     void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mNativeMapView == null) {
             return;
@@ -1259,16 +983,6 @@ public class MapView extends FrameLayout {
         mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
     }
 
-    /**
-     * Flying animation to a specified location/zoom/bearing with automatic curve.
-     *
-     * @param bearing  Bearing in Radians
-     * @param center   Center LatLng
-     * @param duration Animation time in Nanoseconds
-     * @param pitch    Pitch in Radians
-     * @param zoom     Zoom Level
-     */
-    @UiThread
     void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mNativeMapView == null) {
             return;
@@ -1470,7 +1184,8 @@ public class MapView extends FrameLayout {
 
     /**
      * Helper method for tracking gesture events
-     * @param gestureId Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
+     *
+     * @param gestureId   Type of Gesture See {@see MapboxEvent#GESTURE_SINGLETAP MapboxEvent#GESTURE_DOUBLETAP MapboxEvent#GESTURE_TWO_FINGER_SINGLETAP MapboxEvent#GESTURE_QUICK_ZOOM MapboxEvent#GESTURE_PAN_START MapboxEvent#GESTURE_PINCH_START MapboxEvent#GESTURE_ROTATION_START MapboxEvent#GESTURE_PITCH_START}
      * @param xCoordinate Original x screen coordinate at start of gesture
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
@@ -1851,10 +1566,10 @@ public class MapView extends FrameLayout {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             } else {
-                if(trackingSettings.isLocationTrackingDisabled()) {
+                if (trackingSettings.isLocationTrackingDisabled()) {
                     // around center map
                     mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
-                }else {
+                } else {
                     // around user location view
                     PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
                     mNativeMapView.scaleBy(detector.getScaleFactor(), centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
@@ -2395,65 +2110,18 @@ public class MapView extends FrameLayout {
     // User location
     //
 
-    boolean isPermissionsAccepted() {
-        return (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) ||
-                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * <p>
-     * Enables or disables the my-location layer.
-     * While enabled, the my-location layer continuously draws an indication of a user's current
-     * location and bearing.
-     * </p>
-     * In order to use the my-location layer feature you need to request permission for either
-     * {@link android.Manifest.permission#ACCESS_COARSE_LOCATION}
-     * or @link android.Manifest.permission#ACCESS_FINE_LOCATION.
-     *
-     * @param enabled True to enable; false to disable.
-     * @throws SecurityException if no suitable permission is present
-     */
-    @UiThread
     void setMyLocationEnabled(boolean enabled) {
         mUserLocationView.setEnabled(enabled);
     }
 
-    /**
-     * Returns the currently displayed user location, or null if there is no location data available.
-     *
-     * @return The currently displayed user location.
-     */
-    @UiThread
-    @Nullable
     Location getMyLocation() {
         return mUserLocationView.getLocation();
     }
 
-    /**
-     * Sets a callback that's invoked when the the My Location dot
-     * (which signifies the user's location) changes location.
-     *
-     * @param listener The callback that's invoked when the user clicks on a marker.
-     *                 To unset the callback, use null.
-     */
-    @UiThread
     void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mUserLocationView.setOnMyLocationChangeListener(listener);
     }
 
-    /**
-     * <p>
-     * Set the current my location tracking mode.
-     * </p>
-     * <p>
-     * Will enable my location if not active.
-     * </p>
-     * See {@link MyLocationTracking} for different values.
-     *
-     * @param myLocationTrackingMode The location tracking mode to be used.
-     * @see MyLocationTracking
-     */
-    @UiThread
     void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && !mMapboxMap.isMyLocationEnabled()) {
             mMapboxMap.setMyLocationEnabled(true);
@@ -2465,21 +2133,6 @@ public class MapView extends FrameLayout {
         }
     }
 
-    /**
-     * <p>
-     * Set the current my bearing tracking mode.
-     * </p>
-     * Shows the direction the user is heading.
-     * <p>
-     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
-     * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
-     * </p>
-     * See {@link MyBearingTracking} for different values.
-     *
-     * @param myBearingTrackingMode The bearing tracking mode to be used.
-     * @see MyBearingTracking
-     */
-    @UiThread
     void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         if (myBearingTrackingMode != MyBearingTracking.NONE && !mMapboxMap.isMyLocationEnabled()) {
             mMapboxMap.setMyLocationEnabled(true);
@@ -2489,6 +2142,11 @@ public class MapView extends FrameLayout {
         if (listener != null) {
             listener.onMyBearingTrackingModeChange(myBearingTrackingMode);
         }
+    }
+
+    boolean isPermissionsAccepted() {
+        return (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) ||
+                ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void resetTrackingModes() {
@@ -2505,57 +2163,14 @@ public class MapView extends FrameLayout {
     // Compass
     //
 
-    /**
-     * Returns whether the compass is enabled.
-     *
-     * @return True if the compass is enabled; false if the compass is disabled.
-     */
-    @UiThread
-    boolean isCompassEnabled() {
-        return mCompassView.isEnabled();
-    }
-
-    /**
-     * <p>
-     * Enables or disables the compass. The compass is an icon on the map that indicates the
-     * direction of north on the map. When a user clicks
-     * the compass, the camera orients itself to its default orientation and fades away shortly
-     * after. If disabled, the compass will never be displayed.
-     * </p>
-     * By default, the compass is enabled.
-     *
-     * @param compassEnabled True to enable the compass; false to disable the compass.
-     */
-    @UiThread
     void setCompassEnabled(boolean compassEnabled) {
         mCompassView.setEnabled(compassEnabled);
     }
 
-    /**
-     * <p>
-     * Sets the gravity of the compass view. Use this to change the corner of the map view that the
-     * compass is displayed in.
-     * </p>
-     * By default, the compass is in the top right corner.
-     *
-     * @param gravity One of the values from {@link Gravity}.
-     * @see Gravity
-     */
-    @UiThread
     void setCompassGravity(int gravity) {
         setWidgetGravity(mCompassView, gravity);
     }
 
-    /**
-     * Sets the margins of the compass view. Use this to change the distance of the compass from the
-     * map view edge.
-     *
-     * @param left   The left margin in pixels.
-     * @param top    The top margin in pixels.
-     * @param right  The right margin in pixels.
-     * @param bottom The bottom margin in pixels.
-     */
-    @UiThread
     void setCompassMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mCompassView, left, top, right, bottom);
     }
@@ -2564,45 +2179,15 @@ public class MapView extends FrameLayout {
     // Logo
     //
 
-    /**
-     * <p>
-     * Sets the gravity of the logo view. Use this to change the corner of the map view that the
-     * Mapbox logo is displayed in.
-     * </p>
-     * By default, the logo is in the bottom left corner.
-     *
-     * @param gravity One of the values from {@link Gravity}.
-     * @see Gravity
-     */
-    @UiThread
     void setLogoGravity(int gravity) {
         setWidgetGravity(mLogoView, gravity);
     }
 
-    /**
-     * Sets the margins of the logo view. Use this to change the distance of the Mapbox logo from the
-     * map view edge.
-     *
-     * @param left   The left margin in pixels.
-     * @param top    The top margin in pixels.
-     * @param right  The right margin in pixels.
-     * @param bottom The bottom margin in pixels.
-     */
-    @UiThread
     void setLogoMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mLogoView, left, top, right, bottom);
     }
 
-    /**
-     * <p>
-     * Enables or disables the Mapbox logo.
-     * </p>
-     * By default, the compass is enabled.
-     *
-     * @param visible True to enable the logo; false to disable the logo.
-     */
-    @UiThread
-    void setLogoVisibility(boolean visible) {
+    void setLogoEnabled(boolean visible) {
         mLogoView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
@@ -2610,84 +2195,18 @@ public class MapView extends FrameLayout {
     // Attribution
     //
 
-    /**
-     * <p>
-     * Sets the gravity of the attribution button view. Use this to change the corner of the map
-     * view that the attribution button is displayed in.
-     * </p>
-     * By default, the attribution button is in the bottom left corner.
-     *
-     * @param gravity One of the values from {@link Gravity}.
-     * @see Gravity
-     */
-    @UiThread
     void setAttributionGravity(int gravity) {
         setWidgetGravity(mAttributionsView, gravity);
     }
 
-    /**
-     * Sets the margins of the attribution button view. Use this to change the distance of the
-     * attribution button from the map view edge.
-     *
-     * @param left   The left margin in pixels.
-     * @param top    The top margin in pixels.
-     * @param right  The right margin in pixels.
-     * @param bottom The bottom margin in pixels.
-     */
-    @UiThread
     void setAttributionMargins(int left, int top, int right, int bottom) {
         setWidgetMargins(mAttributionsView, left, top, right, bottom);
     }
 
-    //
-    // Content padding
-    //
-
-//    /**
-//     * Sets the distance from the edges of the map view’s frame to the edges of the map
-//     * view’s logical viewport.
-//     * <p/>
-//     * When the value of this property is equal to {0,0,0,0}, viewport
-//     * properties such as `getLatLng` assume a viewport that matches the map
-//     * view’s frame. Otherwise, those properties are inset, excluding part of the
-//     * frame from the viewport. For instance, if the only the top edge is inset, the
-//     * map center is effectively shifted downward.
-//     *
-//     * @param left   The left margin in pixels.
-//     * @param top    The top margin in pixels.
-//     * @param right  The right margin in pixels.
-//     * @param bottom The bottom margin in pixels.
-//     */
-//
-//    @UiThread
-//    void setContentPadding(int left, int top, int right, int bottom) {
-//
-//        if (left == mContentPaddingLeft && top == mContentPaddingTop && right == mContentPaddingRight && bottom == mContentPaddingBottom) {
-//            return;
-//        }
-//
-//        mContentPaddingLeft = left;
-//        mContentPaddingTop = top;
-//        mContentPaddingRight = right;
-//        mContentPaddingBottom = bottom;
-//
-//        mNativeMapView.setContentPadding(top / mScreenDensity, left / mScreenDensity, bottom / mScreenDensity, right / mScreenDensity);
-//    }
-
-    /**
-     * <p>
-     * Enables or disables the attribution button. The attribution is a button with an "i" than when
-     * clicked shows a menu with copyright and legal notices. The menu also inlcudes the "Improve
-     * this map" link which user can report map errors with.
-     * </p>
-     * By default, the attribution button is enabled.
-     *
-     * @param visibility True to enable the attribution button; false to disable the attribution button.
-     */
-    @UiThread
-    void setAttributionVisibility(int visibility) {
+    void setAttributionEnabled(int visibility) {
         mAttributionsView.setVisibility(visibility);
     }
+
 
     //
     // Custom layer
@@ -2834,7 +2353,7 @@ public class MapView extends FrameLayout {
 
 
     /**
-     * Map change event types.
+     * Definition of a map change event.
      *
      * @see MapView.OnMapChangedListener#onMapChanged(int)
      */
