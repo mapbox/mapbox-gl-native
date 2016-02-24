@@ -97,7 +97,7 @@ public:
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
 
-    SpriteAtlas* spriteAtlas;
+    SpriteAtlas* spriteAtlas = nullptr;
 };
 
 } // namespace mbgl
