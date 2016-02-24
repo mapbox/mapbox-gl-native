@@ -1,7 +1,9 @@
 #import "MGLAccountManager_Private.h"
 #import "MGLMapboxEvents.h"
+#import "MGLMapView.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
+#import "NSString+MGLAdditions.h"
 
 #import "FABKitProtocol.h"
 #import "Fabric+FABKits.h"
@@ -93,6 +95,14 @@
     } else {
         NSLog(@"MGLAccountManager is used in a project that doesn't have Fabric.");
     }
+    
+    // https://github.com/mapbox/mapbox-gl-native/issues/2966
+    mgl_linkBundleCategory();
+    mgl_linkStringCategory();
+    mgl_linkProcessInfoCategory();
+    
+    // https://github.com/mapbox/mapbox-gl-native/issues/3113
+    [MGLMapView class];
 }
 
 @end

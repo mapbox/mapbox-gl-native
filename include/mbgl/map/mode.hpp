@@ -24,6 +24,7 @@ enum class GLContextMode : EnumType {
 // We can choose to constrain the map both horizontally or vertically, or only
 // vertically e.g. while panning.
 enum class ConstrainMode : EnumType {
+    None,
     HeightOnly,
     WidthAndHeight,
 };

@@ -249,7 +249,7 @@ public:
     NSString *cachePath = cacheURL ? cacheURL.path : @"";
     _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
     
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
     
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -559,19 +559,24 @@ public:
 }
 
 - (void)viewDidMoveToWindow {
-    if (self.dormant && self.window) {
+    NSWindow *window = self.window;
+    if (self.dormant && window) {
         _mbglMap->resume();
         self.dormant = NO;
     }
     
-    [self.window addObserver:self
-                  forKeyPath:@"contentLayoutRect"
-                     options:NSKeyValueObservingOptionInitial
-                     context:NULL];
-    [self.window addObserver:self
-                  forKeyPath:@"titlebarAppearsTransparent"
-                     options:NSKeyValueObservingOptionInitial
-                     context:NULL];
+    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+        _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+    }
+    
+    [window addObserver:self
+             forKeyPath:@"contentLayoutRect"
+                options:NSKeyValueObservingOptionInitial
+                context:NULL];
+    [window addObserver:self
+             forKeyPath:@"titlebarAppearsTransparent"
+                options:NSKeyValueObservingOptionInitial
+                context:NULL];
 }
 
 - (BOOL)wantsLayer {
@@ -1712,7 +1717,7 @@ public:
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
+        auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
             NSAssert(_annotationContextsByAnnotationTag.count(annotationTag) != 0, @"Unknown annotation found nearby click");
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             if (!annotation) {
@@ -1731,6 +1736,7 @@ public:
             return !!![annotationImage.image hitTestRect:hitRect withImageDestinationRect:annotationRect
                                                  context:nil hints:nil flipped:NO];
         });
+        nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
     }
     
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
@@ -1757,17 +1763,23 @@ public:
             // set of annotations as we do now. Cycle through them.
             if (_lastSelectedAnnotationTag == MGLAnnotationTagNotFound
                 || _lastSelectedAnnotationTag == _annotationsNearbyLastClick.back()) {
-                // Either an annotation from this set hasn’t been selected
-                // before or the last annotation in the set was selected. Wrap
-                // around to the first annotation in the set.
+                // Either no annotation is selected or the last annotation in
+                // the set was selected. Wrap around to the first annotation in
+                // the set.
                 hitAnnotationTag = _annotationsNearbyLastClick.front();
             } else {
-                // Step to the next annotation in the set.
                 auto result = std::find(_annotationsNearbyLastClick.begin(),
                                         _annotationsNearbyLastClick.end(),
                                         _lastSelectedAnnotationTag);
-                auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
-                hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
+                if (result == _annotationsNearbyLastClick.end()) {
+                    // An annotation from this set hasn’t been selected before.
+                    // Select the first (nearest) one.
+                    hitAnnotationTag = _annotationsNearbyLastClick.front();
+                } else {
+                    // Step to the next annotation in the set.
+                    auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
+                    hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
+                }
             }
         } else {
             // Remember the nearby annotations for the next time this method is

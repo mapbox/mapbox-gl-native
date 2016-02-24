@@ -34,6 +34,9 @@ public:
     // North Orientation
     NorthOrientation getNorthOrientation() const;
     double getNorthOrientationAngle() const;
+    
+    // Constrain mode
+    ConstrainMode getConstrainMode() const;
 
     // Position
     LatLng getLatLng() const;

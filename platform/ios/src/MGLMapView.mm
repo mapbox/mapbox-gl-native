@@ -147,6 +147,7 @@ public:
                           GLKViewDelegate,
                           CLLocationManagerDelegate,
                           UIActionSheetDelegate,
+                          SMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           UIAlertViewDelegate,
                           MGLMultiPointDelegate,
@@ -313,7 +314,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String], [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
 
     // setup mbgl map
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous);
+    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -759,7 +760,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 // This is the delegate of the GLKView object's display call.
 - (void)glkView:(__unused GLKView *)view drawInRect:(__unused CGRect)rect
 {
-    if ( ! self.isDormant)
+    if ( ! self.dormant)
     {
         CGFloat zoomFactor   = _mbglMap->getMaxZoom() - _mbglMap->getMinZoom() + 1;
         CGFloat cpuFactor    = (CGFloat)[[NSProcessInfo processInfo] processorCount];
@@ -905,7 +906,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     MGLAssertIsMainThread();
 
-    if ( ! self.isDormant)
+    if ( ! self.dormant)
     {
         [self validateDisplayLink];
         self.dormant = YES;
@@ -919,6 +920,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     BOOL isVisible = self.superview && self.window;
     if (isVisible && ! _displayLink)
     {
+        if (_mbglMap->getConstrainMode() == mbgl::ConstrainMode::None)
+        {
+            _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+        }
+        
         _displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateFromDisplayLink)];
         _displayLink.frameInterval = MGLTargetFrameInterval;
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
@@ -950,6 +956,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ( ! self.dormant)
     {
         self.dormant = YES;
+
+        [self validateLocationServices];
 
         [MGLMapboxEvents flush];
         
@@ -1000,6 +1008,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _mbglMap->resume();
         
         _displayLink.paused = NO;
+
+        [self validateLocationServices];
     }
 }
 
@@ -1480,6 +1490,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (BOOL)calloutViewShouldHighlight:(__unused MGLCompactCalloutView *)calloutView
 {
     return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
+}
+
+- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
+{
+    if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
+    {
+        [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
+    }
 }
 
 - (void)calloutViewTapped:(__unused MGLCompactCalloutView *)calloutView
@@ -2643,7 +2661,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
-        std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag)
+        auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(),
+                                  [&](const MGLAnnotationTag annotationTag)
         {
             id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
             NSAssert(annotation, @"Unknown annotation found nearby tap");
@@ -2660,6 +2679,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                   centeredAtCoordinate:annotation.coordinate];
             return !!!CGRectIntersectsRect(annotationRect, hitRect);
         });
+        nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
     }
     
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
@@ -2689,19 +2709,28 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             if (_selectedAnnotationTag == MGLAnnotationTagNotFound
                 || _selectedAnnotationTag == _annotationsNearbyLastTap.back())
             {
-                // Either an annotation from this set hasn’t been selected
-                // before or the last annotation in the set was selected. Wrap
-                // around to the first annotation in the set.
+                // Either no annotation is selected or the last annotation in
+                // the set was selected. Wrap around to the first annotation in
+                // the set.
                 hitAnnotationTag = _annotationsNearbyLastTap.front();
             }
             else
             {
-                // Step to the next annotation in the set.
                 auto result = std::find(_annotationsNearbyLastTap.begin(),
                                         _annotationsNearbyLastTap.end(),
                                         _selectedAnnotationTag);
-                auto distance = std::distance(_annotationsNearbyLastTap.begin(), result);
-                hitAnnotationTag = _annotationsNearbyLastTap[distance + 1];
+                if (result == _annotationsNearbyLastTap.end())
+                {
+                    // An annotation from this set hasn’t been selected before.
+                    // Select the first (nearest) one.
+                    hitAnnotationTag = _annotationsNearbyLastTap.front();
+                }
+                else
+                {
+                    // Step to the next annotation in the set.
+                    auto distance = std::distance(_annotationsNearbyLastTap.begin(), result);
+                    hitAnnotationTag = _annotationsNearbyLastTap[distance + 1];
+                }
             }
         }
         else
@@ -2997,6 +3026,48 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 #pragma mark - User Location -
 
+- (void)validateLocationServices
+{
+    BOOL shouldEnableLocationServices = self.showsUserLocation && !self.dormant;
+
+    if (shouldEnableLocationServices && ! self.locationManager)
+    {
+        self.locationManager = [[CLLocationManager alloc] init];
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)] && [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
+        {
+            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+            if (!hasLocationDescription)
+            {
+                [NSException raise:@"Missing Location Services usage description" format:
+                 @"In iOS 8 and above, this app must have a value for NSLocationAlwaysUsageDescription or NSLocationWhenInUseUsageDescription in its Info.plist."];
+            }
+
+            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+            {
+                [self.locationManager requestAlwaysAuthorization];
+            }
+            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
+            {
+                [self.locationManager requestWhenInUseAuthorization];
+            }
+        }
+#endif
+
+        self.locationManager.headingFilter = 5.0;
+        self.locationManager.delegate = self;
+        [self.locationManager startUpdatingLocation];
+    }
+    else if ( ! shouldEnableLocationServices && self.locationManager)
+    {
+        [self.locationManager stopUpdatingLocation];
+        [self.locationManager stopUpdatingHeading];
+        self.locationManager.delegate = nil;
+        self.locationManager = nil;
+    }
+}
+
 - (void)setShowsUserLocation:(BOOL)showsUserLocation
 {
     if (showsUserLocation == _showsUserLocation || _isTargetingInterfaceBuilder) return;
@@ -3014,42 +3085,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.userLocationAnnotationView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin |
                                                             UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
 
-        self.locationManager = [CLLocationManager new];
-
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        // enable iOS 8+ location authorization API
-        //
-        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)])
-        {
-            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"] ||
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
-            if (!hasLocationDescription)
-            {
-                [NSException raise:@"Missing Location Services usage description" format:
-                 @"In iOS 8 and above, this app must have a value for NSLocationWhenInUseUsageDescription or NSLocationAlwaysUsageDescription in its Info.plist."];
-            }
-            // request location permissions, if both keys exist ask for less permissive
-            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
-            {
-                [self.locationManager requestWhenInUseAuthorization];
-            }
-            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
-            {
-                [self.locationManager requestAlwaysAuthorization];
-            }
-        }
-#endif
-
-        self.locationManager.headingFilter = 5.0;
-        self.locationManager.delegate = self;
-        [self.locationManager startUpdatingLocation];
+        [self validateLocationServices];
     }
     else
     {
-        [self.locationManager stopUpdatingLocation];
-        [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
-        self.locationManager = nil;
+        [self validateLocationServices];
 
         if ([self.delegate respondsToSelector:@selector(mapViewDidStopLocatingUser:)])
         {

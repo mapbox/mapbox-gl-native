@@ -119,6 +119,10 @@ public:
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
+    
+    // Constrain mode
+    void setConstrainMode(ConstrainMode);
+    ConstrainMode getConstrainMode() const;
 
     // Transitions
     bool inTransition() const;

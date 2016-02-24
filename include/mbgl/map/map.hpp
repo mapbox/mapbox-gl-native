@@ -138,6 +138,10 @@ public:
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
+    
+    // Constrain mode
+    void setConstrainMode(ConstrainMode);
+    ConstrainMode getConstrainMode() const;
 
     // Size
     uint16_t getWidth() const;

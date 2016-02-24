@@ -4,7 +4,7 @@ The Mapbox iOS SDK is an open-source framework for embedding interactive map vie
 
 For more information, check out the [Mapbox iOS SDK homepage](https://www.mapbox.com/ios-sdk/) and the [full changelog](https://github.com/mapbox/mapbox-gl-native/blob/master/CHANGELOG.md) online.
 
-[![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/ios/screenshot.png)]()
+[![](https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/screenshot.png)]()
 
 ## Installation
 
@@ -42,9 +42,9 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
    - `MobileCoreServices.framework`
    - `QuartzCore.framework`
    - `SystemConfiguration.framework`
-   - `libc++.dylib`
-   - `libsqlite3.dylib`
-   - `libz.dylib`
+   - `libc++.tbd`
+   - `libsqlite3.tbd`
+   - `libz.tbd`
 
 1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
 

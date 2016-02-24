@@ -79,7 +79,7 @@ This is the recommended workflow for manually integrating the SDK into an applic
 
 1. Build from source manually per above.
 
-1. Open the project editor and select your application target. Drag `build/ios/pkg/dynamic/Mapbox.framework` into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Open the project editor and select your application target. Drag `build/ios/pkg/dynamic/Mapbox.framework` into the “Embedded Binaries” section of the General tab. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
 1. In the Build Phases tab, click the + button at the top and select “New Run Script Phase”. Enter the following code into the script text field:
 
@@ -95,7 +95,7 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
 
 1. Build from source manually per above.
 
-1. Open the project editor and select your application target. Drag `build/ios/pkg/static/Mapbox.framework` into the “Embedded Binaries” section of the General tab. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Open the project editor and select your application target. Drag `build/ios/pkg/static/Mapbox.framework` into the “Embedded Binaries” section of the General tab. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
 1. Add the following Cocoa Touch frameworks and libraries to the “Linked Frameworks and Libraries” section:
 
@@ -104,9 +104,9 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
    - `MobileCoreServices.framework`
    - `QuartzCore.framework`
    - `SystemConfiguration.framework`
-   - `libc++.dylib`
-   - `libsqlite3.dylib`
-   - `libz.dylib`
+   - `libc++.tbd`
+   - `libsqlite3.tbd`
+   - `libz.tbd`
 
 1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
 
