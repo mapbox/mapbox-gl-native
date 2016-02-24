@@ -28,15 +28,20 @@
         'cflags_cc': [
           '<@(boost_cflags)',
         ],
+        'libraries': [
+          '<@(boost_libprogram_options_static_libs)'
+        ],
       },
 
       'conditions': [
         ['OS == "mac"', {
+          'libraries': [ '<@(libraries)' ],
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
           }
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
+          'libraries': [ '<@(libraries)' ],
         }]
       ],
     },

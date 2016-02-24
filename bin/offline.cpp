@@ -1,3 +1,4 @@
+#include <mbgl/util/default_styles.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
@@ -7,20 +8,57 @@
 #include <cstdlib>
 #include <iostream>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#pragma GCC diagnostic ignored "-Wshadow"
+#include <boost/program_options.hpp>
+#pragma GCC diagnostic pop
+
+namespace po = boost::program_options;
 using namespace std::literals::chrono_literals;
 
-int main(int, char * []) {
+int main(int argc, char *argv[]) {
+    std::string style = mbgl::util::default_styles::streets.url;
+    double north = 37.2, west = -122.8, south = 38.1, east = -121.7; // Bay area
+    double minZoom = 0.0, maxZoom = 15.0, pixelRatio = 1.0;
+    std::string output = "offline.db";
+
+    const char* tokenEnv = getenv("MAPBOX_ACCESS_TOKEN");
+    std::string token = tokenEnv ? tokenEnv : std::string();
+
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("style,s", po::value(&style)->value_name("URL"), "Map stylesheet")
+        ("north", po::value(&north)->value_name("degrees")->default_value(north), "North latitude")
+        ("west", po::value(&west)->value_name("degrees")->default_value(west), "West longitude")
+        ("south", po::value(&south)->value_name("degrees")->default_value(south), "South latitude")
+        ("east", po::value(&east)->value_name("degrees")->default_value(east), "East longitude")
+        ("minZoom", po::value(&minZoom)->value_name("number")->default_value(minZoom), "Min zoom level")
+        ("maxZoom", po::value(&maxZoom)->value_name("number")->default_value(maxZoom), "Max zoom level")
+        ("pixelRatio", po::value(&pixelRatio)->value_name("number")->default_value(pixelRatio), "Pixel ratio")
+        ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
+        ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output database file name")
+    ;
+
+    try {
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    } catch(std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl << desc;
+        exit(1);
+    }
+
     using namespace mbgl;
 
-    unlink("offline.db");
-
     util::RunLoop loop;
-    DefaultFileSource fileSource("offline.db", ".");
 
-    fileSource.setAccessToken(getenv("MAPBOX_ACCESS_TOKEN"));
+    DefaultFileSource fileSource(output, ".");
+    fileSource.setAccessToken(token);
 
-    LatLngBounds bayArea = LatLngBounds::hull(LatLng(37.2, -122.8), LatLng(38.1, -121.7));
-    OfflineTilePyramidRegionDefinition definition("mapbox://styles/mapbox/streets-v8", bayArea, 0, 15, 1.0);
+    LatLngBounds boundingBox = LatLngBounds::hull(LatLng(north, west), LatLng(south, east));
+    OfflineTilePyramidRegionDefinition definition(style, boundingBox, minZoom, maxZoom, pixelRatio);
     OfflineRegionMetadata metadata;
 
     class Observer : public OfflineRegionObserver {
