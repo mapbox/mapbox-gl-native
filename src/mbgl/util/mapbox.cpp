@@ -169,7 +169,7 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     return result;
 }
 
-const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT = std::numeric_limits<uint64_t>::max();
+const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT = 512 + 256;
 
 } // end namespace mapbox
 } // end namespace util
