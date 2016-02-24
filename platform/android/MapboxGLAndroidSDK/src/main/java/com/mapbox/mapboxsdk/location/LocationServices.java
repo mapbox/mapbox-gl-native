@@ -17,11 +17,11 @@ import com.mapzen.android.lost.api.LostApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationService implements com.mapzen.android.lost.api.LocationListener {
+public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
 
-    private static final String TAG = "LocationService";
+    private static final String TAG = "LocationServices";
 
-    private static LocationService instance;
+    private static LocationServices instance;
 
     private Context context;
     private LostApiClient locationClient;
@@ -32,9 +32,9 @@ public class LocationService implements com.mapzen.android.lost.api.LocationList
     private boolean isGPSEnabled;
 
     /**
-     * Private constructor for singleton LocationService
+     * Private constructor for singleton LocationServices
      */
-    private LocationService(Context context) {
+    private LocationServices(Context context) {
         super();
         this.context = context;
         // Setup location services
@@ -43,14 +43,14 @@ public class LocationService implements com.mapzen.android.lost.api.LocationList
     }
 
     /**
-     * Primary (singleton) access method for LocationService
+     * Primary (singleton) access method for LocationServices
      *
      * @param context Context
-     * @return LocationService
+     * @return LocationServices
      */
-    public static LocationService getInstance(@NonNull final Context context) {
+    public static LocationServices getLocationServices(@NonNull final Context context) {
         if (instance == null) {
-            instance = new LocationService(context.getApplicationContext());
+            instance = new LocationServices(context.getApplicationContext());
         }
         return instance;
     }
