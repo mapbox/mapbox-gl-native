@@ -3375,17 +3375,23 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 /// Returns the edge padding to apply when moving the map to a tracked location.
 - (UIEdgeInsets)edgePaddingForFollowing
 {
-    // Center on user location unless we're already centered there (or very close).
-    CGPoint correctPoint = self.userLocationAnnotationViewCenter;
-    
-    // Shift the entire frame upward or downward to accommodate a shifted user
-    // location annotation view.
-    CGRect bounds = self.bounds;
-    CGRect boundsAroundCorrectPoint = CGRectOffset(bounds,
-                                                   correctPoint.x - CGRectGetMidX(bounds),
-                                                   correctPoint.y - CGRectGetMidY(bounds));
-    return UIEdgeInsetsMake(CGRectGetMinY(boundsAroundCorrectPoint) - CGRectGetMinY(bounds), 0,
-                            CGRectGetMaxY(bounds) - CGRectGetMaxY(boundsAroundCorrectPoint), 0);
+    UIEdgeInsets result;
+    if (self.userLocationVerticalAlignment == MGLAnnotationVerticalAlignmentCenter)
+    {
+        result = self.contentInset;
+    }
+    else
+    {
+        // Center on user location unless we're already centered there (or very close).
+        CGPoint correctPoint = self.userLocationAnnotationViewCenter;
+        
+        // Shift the entire content inset upward or downward to accommodate a shifted user
+        // location annotation view.
+        CGFloat yOffset = (self.contentCenter.y - correctPoint.y);
+        result = UIEdgeInsetsMake(self.contentInset.top - yOffset, self.contentInset.left,
+                                  self.contentInset.bottom + yOffset, self.contentInset.right);
+    }
+    return result;
 }
 
 /// Returns the edge padding to apply during bifocal course tracking.
