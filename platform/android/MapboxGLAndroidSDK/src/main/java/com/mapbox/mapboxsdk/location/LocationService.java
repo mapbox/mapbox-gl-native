@@ -9,50 +9,48 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LostApiClient;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
+public class LocationService implements com.mapzen.android.lost.api.LocationListener {
 
-    private static final String TAG = "LocationServices";
+    private static final String TAG = "LocationService";
 
-    private static LocationServices instance = null;
+    private static LocationService instance;
 
     private Context context;
-    private LostApiClient mLocationClient;
-    private LocationRequest mLocationRequest;
+    private LostApiClient locationClient;
+    private Location lastLocation;
 
-    private Location lastLocation = null;
+    private List<LocationListener> locationListeners;
 
-    private List<LocationListener> locationListeners = null;
-
-    private boolean isGPSEnabled = false;
+    private boolean isGPSEnabled;
 
     /**
-     * Private constructor for singleton LocationServices
+     * Private constructor for singleton LocationService
      */
-    private LocationServices(Context context) {
+    private LocationService(Context context) {
         super();
         this.context = context;
         // Setup location services
-        mLocationClient = new LostApiClient.Builder(context).build();
+        locationClient = new LostApiClient.Builder(context).build();
         locationListeners = new ArrayList<>();
     }
 
     /**
-     * Primary (singleton) access method for LocationServices
+     * Primary (singleton) access method for LocationService
+     *
      * @param context Context
-     * @return LocationServices
+     * @return LocationService
      */
-    public static LocationServices getLocationServices(@NonNull final Context context) {
+    public static LocationService getInstance(@NonNull final Context context) {
         if (instance == null) {
-            if (context == null) {
-                throw new NullPointerException("Context required for accessing LocationServices");
-            }
-            instance = new LocationServices(context.getApplicationContext());
+            instance = new LocationService(context.getApplicationContext());
         }
         return instance;
     }
@@ -63,56 +61,63 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      * @param enableGPS true if GPS is to be enabled, false if GPS is to be disabled
      */
     public void toggleGPS(boolean enableGPS) {
-
-        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
             Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
             return;
         }
 
-            // Disconnect
-        if (mLocationClient.isConnected()) {
+        // Disconnect
+        if (locationClient.isConnected()) {
             // Disconnect first to ensure that the new requests are GPS
             com.mapzen.android.lost.api.LocationServices.FusedLocationApi.removeLocationUpdates(this);
-            mLocationClient.disconnect();
+            locationClient.disconnect();
         }
 
         // Setup Fresh
-        mLocationClient.connect();
+        locationClient.connect();
         Location lastLocation = com.mapzen.android.lost.api.LocationServices.FusedLocationApi.getLastLocation();
         if (lastLocation != null) {
             this.lastLocation = lastLocation;
         }
 
-        if (enableGPS) {
+        LocationRequest locationRequest;
 
+        if (enableGPS) {
             // LocationRequest Tuned for GPS
-            mLocationRequest = LocationRequest.create()
+            locationRequest = LocationRequest.create()
                     .setFastestInterval(1000)
                     .setSmallestDisplacement(3.0f)
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
-
+            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
         } else {
-
             // LocationRequest Tuned for PASSIVE
-            mLocationRequest = LocationRequest.create()
+            locationRequest = LocationRequest.create()
                     .setFastestInterval(1000)
                     .setSmallestDisplacement(3.0f)
                     .setPriority(LocationRequest.PRIORITY_NO_POWER);
 
-            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(mLocationRequest, this);
-
+            com.mapzen.android.lost.api.LocationServices.FusedLocationApi.requestLocationUpdates(locationRequest, this);
         }
 
         isGPSEnabled = enableGPS;
     }
 
+    /**
+     * Returns if the GPS sensor is currently enabled
+     *
+     * @return active state of the GPS
+     */
     public boolean isGPSEnabled() {
         return isGPSEnabled;
     }
 
+    /**
+     * Called when the location has changed.
+     *
+     * @param location The updated location
+     */
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "onLocationChanged()..." + location);
@@ -131,6 +136,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     /**
      * Last known location
+     *
      * @return Last known location data
      */
     public Location getLastLocation() {
@@ -139,16 +145,18 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
 
     /**
      * Registers a LocationListener to receive location updates
+     *
      * @param locationListener LocationListener
      */
     public void addLocationListener(@NonNull LocationListener locationListener) {
-		if(!this.locationListeners.contains(locationListener)){
-			this.locationListeners.add(locationListener);
-		}
+        if (!this.locationListeners.contains(locationListener)) {
+            this.locationListeners.add(locationListener);
+        }
     }
 
     /**
      * Unregister a LocationListener to stop receiving location updates
+     *
      * @param locationListener LocationListener to remove
      * @return True if LocationListener was found and removed, False if it was not
      */
