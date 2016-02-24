@@ -319,6 +319,17 @@ public class MapboxMap {
     }
 
     //
+    //  Reset North
+    //
+
+    /**
+     *
+     */
+    public void resetNorth() {
+        mMapView.resetNorth();
+    }
+
+    //
     // Manual zoom controls
     //
 
@@ -1039,6 +1050,17 @@ public class MapboxMap {
         moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(mCameraPosition).build()));
     }
 
+    /**
+     *
+     * @return
+     */
+    public int[] getPadding() {
+        return new int[]{mMapView.getContentPaddingLeft(),
+                mMapView.getContentPaddingTop(),
+                mMapView.getContentPaddingRight(),
+                mMapView.getContentPaddingBottom()};
+    }
+
     //
     // Map events
     //
@@ -1312,6 +1334,14 @@ public class MapboxMap {
 
     MapView getMapView() {
         return mMapView;
+    }
+
+    //
+    // Invalidate
+    //
+
+    public void invalidate(){
+        mMapView.update();
     }
 
     //

@@ -1,13 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
-import android.graphics.RectF;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
-import com.mapbox.mapboxsdk.utils.MathUtils;
 
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
@@ -20,6 +19,20 @@ public class Projection {
 
     Projection(@NonNull MapView mapView) {
         this.mMapView = mapView;
+    }
+
+    /**
+     * <p>
+     * Returns the distance spanned by one pixel at the specified latitude and current zoom level.
+     * </p>
+     * The distance between pixels decreases as the latitude approaches the poles.
+     * This relationship parallels the relationship between longitudinal coordinates at different latitudes.
+     *
+     * @param latitude The latitude for which to return the value.
+     * @return The distance measured in meters.
+     */
+    public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
+        return mMapView.getMetersPerPixelAtLatitude(latitude);
     }
 
     /**

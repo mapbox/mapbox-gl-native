@@ -79,6 +79,8 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.maps.widgets.CompassView;
+import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
@@ -212,9 +214,9 @@ public class MapView extends FrameLayout {
         onConnectivityChanged(isConnected());
 
         mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
-        mUserLocationView.setMapView(this);
+        mUserLocationView.setMapboxMap(mMapboxMap);
         mCompassView = (CompassView) view.findViewById(R.id.compassView);
-        mCompassView.setOnClickListener(new CompassView.CompassClickListener(this));
+        mCompassView.setOnClickListener(new CompassView.CompassClickListener(mMapboxMap));
         mLogoView = (ImageView) view.findViewById(R.id.logoView);
 
         // Setup Attributions control
