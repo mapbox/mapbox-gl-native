@@ -18,10 +18,10 @@ struct Faded {
     Faded(const T& v) : to(v) {}
 
     T from;
-    float fromScale;
+    float fromScale = 0;
     T to;
-    float toScale;
-    float t;
+    float toScale = 0;
+    float t = 0;
 };
 
 // -------------------------------------------------------------------------------------------------

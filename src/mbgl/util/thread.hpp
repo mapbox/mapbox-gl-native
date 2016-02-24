@@ -81,8 +81,8 @@ private:
 
     std::thread thread;
 
-    Object* object;
-    RunLoop* loop;
+    Object* object = nullptr;
+    RunLoop* loop = nullptr;
 };
 
 template <class Object>

@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    sqlite3* db;
+    sqlite3* db = nullptr;
     bool locked = false;
 };
 
@@ -115,7 +115,7 @@ TEST(OfflineDatabase, SchemaVersion) {
     std::string path("test/fixtures/database/offline.db");
 
     {
-        sqlite3* db;
+        sqlite3* db = nullptr;
         sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
         sqlite3_exec(db, "PRAGMA user_version = 1", nullptr, nullptr, nullptr);
         sqlite3_close_v2(db);

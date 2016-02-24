@@ -161,9 +161,9 @@ private:
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
 
-    SpriteAtlas* spriteAtlas;
-    GlyphAtlas* glyphAtlas;
-    LineAtlas* lineAtlas;
+    SpriteAtlas* spriteAtlas = nullptr;
+    GlyphAtlas* glyphAtlas = nullptr;
+    LineAtlas* lineAtlas = nullptr;
 
     FrameHistory frameHistory;
 

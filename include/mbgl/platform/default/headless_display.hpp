@@ -11,7 +11,7 @@ public:
     ~HeadlessDisplay();
 
 #if MBGL_USE_CGL
-    CGLPixelFormatObj pixelFormat;
+    CGLPixelFormatObj pixelFormat = nullptr;
 #endif
 
 #if MBGL_USE_GLX

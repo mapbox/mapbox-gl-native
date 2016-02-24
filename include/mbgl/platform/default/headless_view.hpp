@@ -54,7 +54,7 @@ private:
     std::shared_ptr<HeadlessDisplay> display;
     const float pixelRatio;
     std::array<uint16_t, 2> dimensions;
-    bool needsResize;
+    bool needsResize = false;
 
 #if MBGL_USE_CGL
     CGLContextObj glContext = nullptr;
