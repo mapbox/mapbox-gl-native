@@ -34,14 +34,6 @@ public class MapFragment extends Fragment {
         return new MapFragment();
     }
 
-    public static MapFragment newInstance(MapboxMapOptions mapboxMapOptions) {
-        final MapFragment mapFragment = new MapFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
-        mapFragment.setArguments(bundle);
-        return mapFragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
