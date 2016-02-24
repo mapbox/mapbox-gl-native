@@ -3296,7 +3296,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (void)didUpdateLocationIncrementallyAnimated:(BOOL)animated
 {
     [self _setCenterCoordinate:self.userLocation.location.coordinate
-                   edgePadding:self.contentInset
+                   edgePadding:self.edgePaddingForFollowing
                      zoomLevel:self.zoomLevel
                      direction:self.directionByFollowingWithCourse
                       duration:animated ? MGLUserLocationAnimationDuration : 0
@@ -3323,7 +3323,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     
     __weak MGLMapView *weakSelf = self;
     [self _flyToCamera:camera
-           edgePadding:self.contentInset
+           edgePadding:self.edgePaddingForFollowing
           withDuration:animated ? -1 : 0
           peakAltitude:-1
      completionHandler:^{
