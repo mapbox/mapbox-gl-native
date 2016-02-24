@@ -309,12 +309,24 @@ TEST(OfflineDatabase, PutResource) {
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
-    response.data = std::make_shared<std::string>("data");
 
-    db.put(resource, response);
-    auto res = db.get(resource);
-    EXPECT_EQ(nullptr, res->error.get());
-    EXPECT_EQ("data", *res->data);
+    response.data = std::make_shared<std::string>("first");
+    auto insertPutResult = db.put(resource, response);
+    EXPECT_TRUE(insertPutResult.first);
+    EXPECT_EQ(5, insertPutResult.second);
+
+    auto insertGetResult = db.get(resource);
+    EXPECT_EQ(nullptr, insertGetResult->error.get());
+    EXPECT_EQ("first", *insertGetResult->data);
+
+    response.data = std::make_shared<std::string>("second");
+    auto updatePutResult = db.put(resource, response);
+    EXPECT_FALSE(updatePutResult.first);
+    EXPECT_EQ(6, updatePutResult.second);
+
+    auto updateGetResult = db.get(resource);
+    EXPECT_EQ(nullptr, updateGetResult->error.get());
+    EXPECT_EQ("second", *updateGetResult->data);
 }
 
 TEST(OfflineDatabase, PutTile) {
@@ -331,12 +343,24 @@ TEST(OfflineDatabase, PutTile) {
         0
     };
     Response response;
-    response.data = std::make_shared<std::string>("data");
 
-    db.put(resource, response);
-    auto res = db.get(resource);
-    EXPECT_EQ(nullptr, res->error.get());
-    EXPECT_EQ("data", *res->data);
+    response.data = std::make_shared<std::string>("first");
+    auto insertPutResult = db.put(resource, response);
+    EXPECT_TRUE(insertPutResult.first);
+    EXPECT_EQ(5, insertPutResult.second);
+
+    auto insertGetResult = db.get(resource);
+    EXPECT_EQ(nullptr, insertGetResult->error.get());
+    EXPECT_EQ("first", *insertGetResult->data);
+
+    response.data = std::make_shared<std::string>("second");
+    auto updatePutResult = db.put(resource, response);
+    EXPECT_FALSE(updatePutResult.first);
+    EXPECT_EQ(6, updatePutResult.second);
+
+    auto updateGetResult = db.get(resource);
+    EXPECT_EQ(nullptr, updateGetResult->error.get());
+    EXPECT_EQ("second", *updateGetResult->data);
 }
 
 TEST(OfflineDatabase, PutResourceNoContent) {
@@ -503,15 +527,15 @@ TEST(OfflineDatabase, PutReturnsSize) {
 
     Response compressible;
     compressible.data = std::make_shared<std::string>(1024, 0);
-    EXPECT_EQ(17, db.put(Resource::style("http://example.com/compressible"), compressible));
+    EXPECT_EQ(17, db.put(Resource::style("http://example.com/compressible"), compressible).second);
 
     Response incompressible;
     incompressible.data = randomString(1024);
-    EXPECT_EQ(1024, db.put(Resource::style("http://example.com/incompressible"), incompressible));
+    EXPECT_EQ(1024, db.put(Resource::style("http://example.com/incompressible"), incompressible).second);
 
     Response noContent;
     noContent.noContent = true;
-    EXPECT_EQ(0, db.put(Resource::style("http://example.com/noContent"), noContent));
+    EXPECT_EQ(0, db.put(Resource::style("http://example.com/noContent"), noContent).second);
 }
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {

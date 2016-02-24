@@ -292,6 +292,24 @@ template <> std::chrono::system_clock::time_point Statement::get(int offset) {
     return std::chrono::system_clock::from_time_t(sqlite3_column_int64(stmt, offset));
 }
 
+template <> optional<int64_t> Statement::get(int offset) {
+    assert(stmt);
+    if (sqlite3_column_type(stmt, offset) == SQLITE_NULL) {
+        return optional<int64_t>();
+    } else {
+        return get<int64_t>(offset);
+    }
+}
+
+template <> optional<double> Statement::get(int offset) {
+    assert(stmt);
+    if (sqlite3_column_type(stmt, offset) == SQLITE_NULL) {
+        return optional<double>();
+    } else {
+        return get<double>(offset);
+    }
+}
+
 template <> optional<std::string> Statement::get(int offset) {
     assert(stmt);
     if (sqlite3_column_type(stmt, offset) == SQLITE_NULL) {

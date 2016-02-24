@@ -32,7 +32,9 @@ public:
     ~OfflineDatabase();
 
     optional<Response> get(const Resource&);
-    uint64_t put(const Resource&, const Response&);
+
+    // Return value is (inserted, stored size)
+    std::pair<bool, uint64_t> put(const Resource&, const Response&);
 
     std::vector<OfflineRegion> listRegions();
 
@@ -67,14 +69,14 @@ private:
     Statement getStatement(const char *);
 
     optional<Response> getTile(const Resource::TileData&);
-    void putTile(const Resource::TileData&, const Response&,
+    bool putTile(const Resource::TileData&, const Response&,
                  const std::string&, bool compressed);
 
     optional<Response> getResource(const Resource&);
-    void putResource(const Resource&, const Response&,
+    bool putResource(const Resource&, const Response&,
                      const std::string&, bool compressed);
 
-    uint64_t putInternal(const Resource&, const Response&, bool evict);
+    std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict);
     void markUsed(int64_t regionID, const Resource&);
 
     const std::string path;

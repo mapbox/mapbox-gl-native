@@ -110,13 +110,13 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
     }
 }
 
-uint64_t OfflineDatabase::put(const Resource& resource, const Response& response) {
+std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) {
     return putInternal(resource, response, true);
 }
 
-uint64_t OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
+std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource, const Response& response, bool evict_) {
     if (response.error) {
-        return 0;
+        return { false, 0 };
     }
 
     std::string compressedData;
@@ -131,21 +131,23 @@ uint64_t OfflineDatabase::putInternal(const Resource& resource, const Response& 
 
     if (evict_ && !evict(size)) {
         Log::Warning(Event::Database, "Unable to make space for entry");
-        return 0;
+        return { false, 0 };
     }
+
+    bool inserted;
 
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        putTile(*resource.tileData, response,
+        inserted = putTile(*resource.tileData, response,
                 compressed ? compressedData : *response.data,
                 compressed);
     } else {
-        putResource(resource, response,
+        inserted = putResource(resource, response,
                 compressed ? compressedData : *response.data,
                 compressed);
     }
 
-    return size;
+    return { inserted, size };
 }
 
 optional<Response> OfflineDatabase::getResource(const Resource& resource) {
@@ -186,43 +188,78 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
     return response;
 }
 
-void OfflineDatabase::putResource(const Resource& resource,
+bool OfflineDatabase::putResource(const Resource& resource,
                                   const Response& response,
                                   const std::string& data,
                                   bool compressed) {
     if (response.notModified) {
-        Statement stmt = getStatement(
+        Statement update = getStatement(
             "UPDATE resources "
             "SET accessed = ?1, "
             "    expires  = ?2 "
             "WHERE url    = ?3 ");
 
-        stmt->bind(1, SystemClock::now());
-        stmt->bind(2, response.expires);
-        stmt->bind(3, resource.url);
-        stmt->run();
-    } else {
-        Statement stmt = getStatement(
-            "REPLACE INTO resources (url, kind, etag, expires, modified, accessed, data, compressed) "
-            "VALUES                 (?1,  ?2,   ?3,   ?4,      ?5,       ?6,       ?7,   ?8) ");
-
-        stmt->bind(1, resource.url);
-        stmt->bind(2, int(resource.kind));
-        stmt->bind(3, response.etag);
-        stmt->bind(4, response.expires);
-        stmt->bind(5, response.modified);
-        stmt->bind(6, SystemClock::now());
-
-        if (response.noContent) {
-            stmt->bind(7, nullptr);
-            stmt->bind(8, false);
-        } else {
-            stmt->bindBlob(7, data.data(), data.size(), false);
-            stmt->bind(8, compressed);
-        }
-
-        stmt->run();
+        update->bind(1, SystemClock::now());
+        update->bind(2, response.expires);
+        update->bind(3, resource.url);
+        update->run();
+        return false;
     }
+
+    // We can't use REPLACE because it would change the id value.
+
+    Statement update = getStatement(
+        "UPDATE resources "
+        "SET kind       = ?1, "
+        "    etag       = ?2, "
+        "    expires    = ?3, "
+        "    modified   = ?4, "
+        "    accessed   = ?5, "
+        "    data       = ?6, "
+        "    compressed = ?7 "
+        "WHERE url      = ?8 ");
+
+    update->bind(1, int(resource.kind));
+    update->bind(2, response.etag);
+    update->bind(3, response.expires);
+    update->bind(4, response.modified);
+    update->bind(5, SystemClock::now());
+    update->bind(8, resource.url);
+
+    if (response.noContent) {
+        update->bind(6, nullptr);
+        update->bind(7, false);
+    } else {
+        update->bindBlob(6, data.data(), data.size(), false);
+        update->bind(7, compressed);
+    }
+
+    update->run();
+    if (db->changes() != 0) {
+        return false;
+    }
+
+    Statement insert = getStatement(
+        "INSERT INTO resources (url, kind, etag, expires, modified, accessed, data, compressed) "
+        "VALUES                (?1,  ?2,   ?3,   ?4,      ?5,       ?6,       ?7,   ?8) ");
+
+    insert->bind(1, resource.url);
+    insert->bind(2, int(resource.kind));
+    insert->bind(3, response.etag);
+    insert->bind(4, response.expires);
+    insert->bind(5, response.modified);
+    insert->bind(6, SystemClock::now());
+
+    if (response.noContent) {
+        insert->bind(7, nullptr);
+        insert->bind(8, false);
+    } else {
+        insert->bindBlob(7, data.data(), data.size(), false);
+        insert->bind(8, compressed);
+    }
+
+    insert->run();
+    return true;
 }
 
 optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
@@ -281,12 +318,12 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     return response;
 }
 
-void OfflineDatabase::putTile(const Resource::TileData& tile,
+bool OfflineDatabase::putTile(const Resource::TileData& tile,
                               const Response& response,
                               const std::string& data,
                               bool compressed) {
     if (response.notModified) {
-        Statement stmt = getStatement(
+        Statement update = getStatement(
             "UPDATE tiles "
             "SET accessed       = ?1, "
             "    expires        = ?2 "
@@ -296,39 +333,80 @@ void OfflineDatabase::putTile(const Resource::TileData& tile,
             "  AND y            = ?6 "
             "  AND z            = ?7 ");
 
-        stmt->bind(1, SystemClock::now());
-        stmt->bind(2, response.expires);
-        stmt->bind(3, tile.urlTemplate);
-        stmt->bind(4, tile.pixelRatio);
-        stmt->bind(5, tile.x);
-        stmt->bind(6, tile.y);
-        stmt->bind(7, tile.z);
-        stmt->run();
-    } else {
-        Statement stmt2 = getStatement(
-            "REPLACE INTO tiles (url_template, pixel_ratio, x,  y,  z,  modified,  etag,  expires,  accessed,  data, compressed) "
-            "VALUES             (?1,           ?2,          ?3, ?4, ?5, ?6,        ?7,    ?8,       ?9,        ?10,  ?11) ");
-
-        stmt2->bind(1, tile.urlTemplate);
-        stmt2->bind(2, tile.pixelRatio);
-        stmt2->bind(3, tile.x);
-        stmt2->bind(4, tile.y);
-        stmt2->bind(5, tile.z);
-        stmt2->bind(6, response.modified);
-        stmt2->bind(7, response.etag);
-        stmt2->bind(8, response.expires);
-        stmt2->bind(9, SystemClock::now());
-
-        if (response.noContent) {
-            stmt2->bind(10, nullptr);
-            stmt2->bind(11, false);
-        } else {
-            stmt2->bindBlob(10, data.data(), data.size(), false);
-            stmt2->bind(11, compressed);
-        }
-
-        stmt2->run();
+        update->bind(1, SystemClock::now());
+        update->bind(2, response.expires);
+        update->bind(3, tile.urlTemplate);
+        update->bind(4, tile.pixelRatio);
+        update->bind(5, tile.x);
+        update->bind(6, tile.y);
+        update->bind(7, tile.z);
+        update->run();
+        return false;
     }
+
+    // We can't use REPLACE because it would change the id value.
+
+    Statement update = getStatement(
+        "UPDATE tiles "
+        "SET modified       = ?1, "
+        "    etag           = ?2, "
+        "    expires        = ?3, "
+        "    accessed       = ?4, "
+        "    data           = ?5, "
+        "    compressed     = ?6 "
+        "WHERE url_template = ?7 "
+        "  AND pixel_ratio  = ?8 "
+        "  AND x            = ?9 "
+        "  AND y            = ?10 "
+        "  AND z            = ?11 ");
+
+    update->bind(1, response.modified);
+    update->bind(2, response.etag);
+    update->bind(3, response.expires);
+    update->bind(4, SystemClock::now());
+    update->bind(7, tile.urlTemplate);
+    update->bind(8, tile.pixelRatio);
+    update->bind(9, tile.x);
+    update->bind(10, tile.y);
+    update->bind(11, tile.z);
+
+    if (response.noContent) {
+        update->bind(5, nullptr);
+        update->bind(6, false);
+    } else {
+        update->bindBlob(5, data.data(), data.size(), false);
+        update->bind(6, compressed);
+    }
+
+    update->run();
+    if (db->changes() != 0) {
+        return false;
+    }
+
+    Statement insert = getStatement(
+        "INSERT INTO tiles (url_template, pixel_ratio, x,  y,  z,  modified,  etag,  expires,  accessed,  data, compressed) "
+        "VALUES            (?1,           ?2,          ?3, ?4, ?5, ?6,        ?7,    ?8,       ?9,        ?10,  ?11) ");
+
+    insert->bind(1, tile.urlTemplate);
+    insert->bind(2, tile.pixelRatio);
+    insert->bind(3, tile.x);
+    insert->bind(4, tile.y);
+    insert->bind(5, tile.z);
+    insert->bind(6, response.modified);
+    insert->bind(7, response.etag);
+    insert->bind(8, response.expires);
+    insert->bind(9, SystemClock::now());
+
+    if (response.noContent) {
+        insert->bind(10, nullptr);
+        insert->bind(11, false);
+    } else {
+        insert->bindBlob(10, data.data(), data.size(), false);
+        insert->bind(11, compressed);
+    }
+
+    insert->run();
+    return true;
 }
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
@@ -381,16 +459,16 @@ optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Re
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
-    uint64_t result = putInternal(resource, response, false);
+    uint64_t size = putInternal(resource, response, false).second;
     markUsed(regionID, resource);
-    return result;
+    return size;
 }
 
 void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
         Statement stmt = getStatement(
-            "REPLACE INTO region_tiles (region_id, tile_id) "
-            "SELECT                     ?1,        tiles.id "
+            "INSERT OR IGNORE INTO region_tiles (region_id, tile_id) "
+            "SELECT                              ?1,        tiles.id "
             "FROM tiles "
             "WHERE url_template = ?2 "
             "  AND pixel_ratio  = ?3 "
@@ -408,8 +486,8 @@ void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
         stmt->run();
     } else {
         Statement stmt = getStatement(
-            "REPLACE INTO region_resources (region_id, resource_id) "
-            "SELECT                         ?1,        resources.id "
+            "INSERT OR IGNORE INTO region_resources (region_id, resource_id) "
+            "SELECT                                  ?1,        resources.id "
             "FROM resources "
             "WHERE resources.url = ?2 ");
 
