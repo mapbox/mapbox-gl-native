@@ -36,13 +36,13 @@ CREATE TABLE regions (
 );
 
 CREATE TABLE region_resources (
-  region_id INTEGER NOT NULL REFERENCES regions(id),
+  region_id INTEGER NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
   resource_id INTEGER NOT NULL REFERENCES resources(id),
   UNIQUE (region_id, resource_id)
 );
 
 CREATE TABLE region_tiles (
-  region_id INTEGER NOT NULL REFERENCES regions(id),
+  region_id INTEGER NOT NULL REFERENCES regions(id) ON DELETE CASCADE,
   tile_id INTEGER NOT NULL REFERENCES tiles(id),
   UNIQUE (region_id, tile_id)
 );

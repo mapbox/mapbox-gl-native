@@ -50,6 +50,7 @@ public:
     OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
 
 private:
+    void connect(int flags);
     void ensureSchema();
     void removeExisting();
 

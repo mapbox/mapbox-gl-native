@@ -39,11 +39,16 @@ OfflineDatabase::~OfflineDatabase() {
     }
 }
 
+void OfflineDatabase::connect(int flags) {
+    db = std::make_unique<Database>(path.c_str(), flags);
+    db->setBusyTimeout(Milliseconds::max());
+    db->exec("PRAGMA foreign_keys = ON");
+}
+
 void OfflineDatabase::ensureSchema() {
     if (path != ":memory:") {
         try {
-            db = std::make_unique<Database>(path.c_str(), ReadWrite);
-            db->setBusyTimeout(Milliseconds::max());
+            connect(ReadWrite);
 
             {
                 auto userVersionStmt = db->prepare("PRAGMA user_version");
@@ -57,24 +62,20 @@ void OfflineDatabase::ensureSchema() {
             }
 
             removeExisting();
-            db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
-            db->setBusyTimeout(Milliseconds::max());
+            connect(ReadWrite | Create);
         } catch (mapbox::sqlite::Exception& ex) {
             if (ex.code == SQLITE_CANTOPEN) {
-                db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
-                db->setBusyTimeout(Milliseconds::max());
+                connect(ReadWrite | Create);
             } else if (ex.code == SQLITE_NOTADB) {
                 removeExisting();
-                db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
-                db->setBusyTimeout(Milliseconds::max());
+                connect(ReadWrite | Create);
             }
         }
     }
 
     #include "offline_schema.cpp.include"
 
-    db = std::make_unique<Database>(path.c_str(), ReadWrite | Create);
-    db->setBusyTimeout(Milliseconds::max());
+    connect(ReadWrite | Create);
     db->exec(schema);
     db->exec("PRAGMA user_version = " + util::toString(schemaVersion));
 }

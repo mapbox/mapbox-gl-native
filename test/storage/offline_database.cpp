@@ -461,7 +461,15 @@ TEST(OfflineDatabase, DeleteRegion) {
     OfflineDatabase db(":memory:");
     OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
     OfflineRegionMetadata metadata {{ 1, 2, 3 }};
-    db.deleteRegion(db.createRegion(definition, metadata));
+    OfflineRegion region = db.createRegion(definition, metadata);
+
+    Response response;
+    response.noContent = true;
+
+    db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
+    db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0), response);
+
+    db.deleteRegion(std::move(region));
 
     ASSERT_EQ(0, db.listRegions().size());
 }
