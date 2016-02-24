@@ -19,6 +19,8 @@ std::string normalizeTileURL(const std::string& url, const std::string& accessTo
 // Return a "mapbox://tiles/..." URL (suitable for normalizeTileURL) for the given Mapbox tile URL.
 std::string canonicalizeTileURL(const std::string& url, SourceType, uint16_t tileSize);
 
+extern const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT;
+
 } // namespace mapbox
 } // namespace util
 } // namespace mbgl

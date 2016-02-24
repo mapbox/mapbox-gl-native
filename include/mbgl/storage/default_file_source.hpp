@@ -94,6 +94,12 @@ public:
      */
     void deleteOfflineRegion(OfflineRegion&&, std::function<void (std::exception_ptr)>);
 
+    /*
+     * Changing or bypassing this limit without permission from Mapbox is prohibited
+     * by the Mapbox Terms of Service.
+     */
+    void setOfflineMapboxTileCountLimit(uint64_t) const;
+
     // For testing only.
     void put(const Resource&, const Response&);
     void goOffline();

@@ -24,8 +24,13 @@ public:
         if (responseErrorFn) responseErrorFn(error);
     }
 
+    void mapboxTileCountLimitExceeded(uint64_t limit) override {
+        if (mapboxTileCountLimitExceededFn) mapboxTileCountLimitExceededFn(limit);
+    }
+
     std::function<void (OfflineRegionStatus)> statusChangedFn;
     std::function<void (Response::Error)> responseErrorFn;
+    std::function<void (uint64_t)> mapboxTileCountLimitExceededFn;
 };
 
 class OfflineTest {
@@ -340,6 +345,34 @@ TEST(OfflineDownload, RequestErrorsAreRetried) {
             EXPECT_EQ(1, status.completedResourceCount);
             test.loop.stop();
         }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}
+
+TEST(OfflineDownload, TileCountLimitExceeded) {
+    OfflineTest test;
+    OfflineRegion region = test.createRegion();
+    OfflineDownload download(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.db.setOfflineMapboxTileCountLimit(0);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/offline/style.json", resource.url);
+        return test.response("offline/mapbox_source.style.json");
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->mapboxTileCountLimitExceededFn = [&] (uint64_t limit) {
+        EXPECT_EQ(0, limit);
+        test.loop.stop();
     };
 
     download.setObserver(std::move(observer));

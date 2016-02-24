@@ -447,6 +447,9 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     stmt->run();
 
     evict(0);
+
+    // Ensure that the cached offlineTileCount value is recalculated.
+    offlineMapboxTileCount = {};
 }
 
 optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
@@ -461,13 +464,21 @@ optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Re
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
     uint64_t size = putInternal(resource, response, false).second;
-    markUsed(regionID, resource);
+    bool previouslyUnused = markUsed(regionID, resource);
+
+    if (offlineMapboxTileCount
+        && resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && previouslyUnused) {
+        *offlineMapboxTileCount += 1;
+    }
+
     return size;
 }
 
-void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
+bool OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
-        Statement stmt = getStatement(
+        Statement insert = getStatement(
             "INSERT OR IGNORE INTO region_tiles (region_id, tile_id) "
             "SELECT                              ?1,        tiles.id "
             "FROM tiles "
@@ -478,23 +489,61 @@ void OfflineDatabase::markUsed(int64_t regionID, const Resource& resource) {
             "  AND z            = ?6 ");
 
         const Resource::TileData& tile = *resource.tileData;
-        stmt->bind(1, regionID);
-        stmt->bind(2, tile.urlTemplate);
-        stmt->bind(3, tile.pixelRatio);
-        stmt->bind(4, tile.x);
-        stmt->bind(5, tile.y);
-        stmt->bind(6, tile.z);
-        stmt->run();
+        insert->bind(1, regionID);
+        insert->bind(2, tile.urlTemplate);
+        insert->bind(3, tile.pixelRatio);
+        insert->bind(4, tile.x);
+        insert->bind(5, tile.y);
+        insert->bind(6, tile.z);
+        insert->run();
+
+        if (db->changes() == 0) {
+            return false;
+        }
+
+        Statement select = getStatement(
+            "SELECT region_id "
+            "FROM region_tiles, tiles "
+            "WHERE region_id   != ?1 "
+            "  AND url_template = ?2 "
+            "  AND pixel_ratio  = ?3 "
+            "  AND x            = ?4 "
+            "  AND y            = ?5 "
+            "  AND z            = ?6 "
+            "LIMIT 1 ");
+
+        select->bind(1, regionID);
+        select->bind(2, tile.urlTemplate);
+        select->bind(3, tile.pixelRatio);
+        select->bind(4, tile.x);
+        select->bind(5, tile.y);
+        select->bind(6, tile.z);
+        return !select->run();
     } else {
-        Statement stmt = getStatement(
+        Statement insert = getStatement(
             "INSERT OR IGNORE INTO region_resources (region_id, resource_id) "
             "SELECT                                  ?1,        resources.id "
             "FROM resources "
             "WHERE resources.url = ?2 ");
 
-        stmt->bind(1, regionID);
-        stmt->bind(2, resource.url);
-        stmt->run();
+        insert->bind(1, regionID);
+        insert->bind(2, resource.url);
+        insert->run();
+
+        if (db->changes() == 0) {
+            return false;
+        }
+
+        Statement select = getStatement(
+            "SELECT region_id "
+            "FROM region_resources, resources "
+            "WHERE region_id    != ?1 "
+            "  AND resources.url = ?2 "
+            "LIMIT 1 ");
+
+        select->bind(1, regionID);
+        select->bind(2, resource.url);
+        return !select->run();
     }
 }
 
@@ -591,12 +640,49 @@ bool OfflineDatabase::evict(uint64_t neededFreeSize) {
         stmt2->run();
         uint64_t changes2 = db->changes();
 
+        // The cached value of offlineTileCount does not need to be updated
+        // here because only non-offline tiles can be removed by eviction.
+
         if (changes1 == 0 && changes2 == 0) {
             return false;
         }
     }
 
     return true;
+}
+
+void OfflineDatabase::setOfflineMapboxTileCountLimit(uint64_t limit) {
+    offlineMapboxTileCountLimit = limit;
+}
+
+uint64_t OfflineDatabase::getOfflineMapboxTileCountLimit() {
+    return offlineMapboxTileCountLimit;
+}
+
+bool OfflineDatabase::offlineMapboxTileCountLimitExceeded() {
+    return getOfflineMapboxTileCount() >= offlineMapboxTileCountLimit;
+}
+
+uint64_t OfflineDatabase::getOfflineMapboxTileCount() {
+    // Calculating this on every call would be much simpler than caching and
+    // manually updating the value, but it would make offline downloads an O(n²)
+    // operation, because the database query below involves an index scan of
+    // region_tiles.
+
+    if (offlineMapboxTileCount) {
+        return *offlineMapboxTileCount;
+    }
+
+    Statement stmt = getStatement(
+        "SELECT COUNT(DISTINCT id) "
+        "FROM region_tiles, tiles "
+        "WHERE tile_id = tiles.id "
+        "AND url_template LIKE 'mapbox://%' ");
+
+    stmt->run();
+
+    offlineMapboxTileCount = stmt->get<int64_t>(0);
+    return *offlineMapboxTileCount;
 }
 
 } // namespace mbgl

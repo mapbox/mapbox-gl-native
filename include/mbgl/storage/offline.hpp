@@ -150,6 +150,22 @@ public:
      * re-executes the user-provided implementation on the main thread.
      */
     virtual void responseError(Response::Error) {}
+
+    /*
+     * Implement this method to be notified when the limit on the number of Mapbox
+     * tiles stored for offline regions has been reached.
+     *
+     * Once the limit has been reached, the SDK will not download further offline
+     * tiles from Mapbox APIs until existing tiles have been removed. Contact your
+     * Mapbox sales representative to raise the limit.
+     *
+     * This limit does not apply to non-Mapbox tile sources.
+     *
+     * Note that this method will be executed on the database thread; it is the
+     * responsibility of the SDK bindings to wrap this object in an interface that
+     * re-executes the user-provided implementation on the main thread.
+     */
+    virtual void mapboxTileCountLimitExceeded(uint64_t /* limit */) {}
 };
 
 class OfflineRegion {

@@ -7,6 +7,7 @@
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <set>
 
@@ -215,6 +216,13 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
         // Not incrementing status.completedResource{Size,Count} here because previously-existing
         // resources are already accounted for by offlineDatabase.getRegionCompletedStatus();
 
+        return;
+    }
+
+    if (resource.kind == Resource::Kind::Tile
+        && util::mapbox::isMapboxURL(resource.url)
+        && offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
+        observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
         return;
     }
 

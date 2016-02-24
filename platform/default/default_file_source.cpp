@@ -113,6 +113,10 @@ public:
         tasks.erase(req);
     }
 
+    void setOfflineMapboxTileCountLimit(uint64_t limit) {
+        offlineDatabase.setOfflineMapboxTileCountLimit(limit);
+    }
+
     void put(const Resource& resource, const Response& response) {
         offlineDatabase.put(resource, response);
     }
@@ -203,6 +207,10 @@ void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, Off
 
 void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
     thread->invoke(&Impl::getRegionStatus, region.getID(), callback);
+}
+
+void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
+    thread->invokeSync(&Impl::setOfflineMapboxTileCountLimit, limit);
 }
 
 // For testing only:

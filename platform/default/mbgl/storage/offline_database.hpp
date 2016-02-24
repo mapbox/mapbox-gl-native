@@ -6,6 +6,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/mapbox.hpp>
 
 #include <unordered_map>
 #include <memory>
@@ -49,6 +50,11 @@ public:
     OfflineRegionDefinition getRegionDefinition(int64_t regionID);
     OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
 
+    void setOfflineMapboxTileCountLimit(uint64_t);
+    uint64_t getOfflineMapboxTileCountLimit();
+    bool offlineMapboxTileCountLimitExceeded();
+    uint64_t getOfflineMapboxTileCount();
+
 private:
     void connect(int flags);
     void ensureSchema();
@@ -78,7 +84,9 @@ private:
                      const std::string&, bool compressed);
 
     std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict);
-    void markUsed(int64_t regionID, const Resource&);
+
+    // Return value is true iff the resource was previously unused by any other regions.
+    bool markUsed(int64_t regionID, const Resource&);
 
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
@@ -88,6 +96,9 @@ private:
     T getPragma(const char *);
 
     uint64_t maximumCacheSize;
+
+    uint64_t offlineMapboxTileCountLimit = util::mapbox::DEFAULT_OFFLINE_TILE_COUNT_LIMIT;
+    optional<uint64_t> offlineMapboxTileCount;
 
     bool evict(uint64_t neededFreeSize);
 };

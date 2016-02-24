@@ -603,3 +603,60 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Unable to make space for entry" }));
 }
+
+TEST(OfflineDatabase, OfflineMapboxTileCount) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata;
+
+    OfflineRegion region1 = db.createRegion(definition, metadata);
+    OfflineRegion region2 = db.createRegion(definition, metadata);
+
+    Resource nonMapboxTile = Resource::tile("http://example.com/", 1.0, 0, 0, 0);
+    Resource mapboxTile1 = Resource::tile("mapbox://tiles/1", 1.0, 0, 0, 0);
+    Resource mapboxTile2 = Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 1);
+
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    // Count is initially zero.
+    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after putting a non-tile resource.
+    db.putRegionResource(region1.getID(), Resource::style("http://example.com/"), response);
+    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after putting a non-Mapbox tile.
+    db.putRegionResource(region1.getID(), nonMapboxTile, response);
+    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+
+    // Count increases after putting a Mapbox tile not used by another region.
+    db.putRegionResource(region1.getID(), mapboxTile1, response);
+    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after putting a Mapbox tile used by another region.
+    db.putRegionResource(region2.getID(), mapboxTile1, response);
+    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after putting a Mapbox tile used by the same region.
+    db.putRegionResource(region2.getID(), mapboxTile1, response);
+    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after deleting a region when the tile is still used by another region.
+    db.deleteRegion(std::move(region2));
+    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+
+    // Count stays the same after the putting a non-offline Mapbox tile.
+    db.put(mapboxTile2, response);
+    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+
+    // Count increases after putting a pre-existing, but non-offline Mapbox tile.
+    db.putRegionResource(region1.getID(), mapboxTile2, response);
+    EXPECT_EQ(2, db.getOfflineMapboxTileCount());
+
+    // Count decreases after deleting a region when the tiles are not used by other regions.
+    db.deleteRegion(std::move(region1));
+    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+}
