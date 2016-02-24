@@ -32,7 +32,7 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
-import com.mapbox.mapboxsdk.location.LocationService;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 
@@ -365,11 +365,11 @@ public final class UserLocationView extends View {
      */
     private void toggleGps(boolean enableGps) {
 
-        LocationService locationService = LocationService.getInstance(getContext());
+        LocationServices locationServices = LocationServices.getLocationServices(getContext());
 
         if (enableGps) {
             // Set an initial location if one available
-            Location lastLocation = locationService.getLastLocation();
+            Location lastLocation = locationServices.getLastLocation();
             if (lastLocation != null) {
                 setLocation(lastLocation);
             }
@@ -379,16 +379,16 @@ public final class UserLocationView extends View {
             }
 
             // Register for Location Updates
-            locationService.addLocationListener(mUserLocationListener);
+            locationServices.addLocationListener(mUserLocationListener);
         } else {
             // Disable location and user dot
             setLocation(null);
 
             // Deregister for Location Updates
-            locationService.removeLocationListener(mUserLocationListener);
+            locationServices.removeLocationListener(mUserLocationListener);
         }
 
-        locationService.toggleGPS(enableGps);
+        locationServices.toggleGPS(enableGps);
     }
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
@@ -503,7 +503,7 @@ public final class UserLocationView extends View {
 
 
         /**
-         * Callback method for receiving location updates from LocationService.
+         * Callback method for receiving location updates from LocationServices.
          *
          * @param location The new Location data
          */

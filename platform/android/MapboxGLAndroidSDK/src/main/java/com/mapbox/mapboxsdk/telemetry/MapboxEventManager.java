@@ -24,7 +24,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.location.LocationService;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -183,8 +183,8 @@ public class MapboxEventManager {
             context.startService(new Intent(context, TelemetryService.class));
 
             // Make sure Ambient Mode is started at a minimum
-            if (LocationService.getInstance(context).isGPSEnabled()) {
-                LocationService.getInstance(context).toggleGPS(false);
+            if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                LocationServices.getLocationServices(context).toggleGPS(false);
             }
 
             // Manage Timer Flush
