@@ -48,6 +48,8 @@
         '../platform/ios/src/MGLMapboxEvents.m',
         '../platform/ios/src/MGLAPIClient.h',
         '../platform/ios/src/MGLAPIClient.m',
+        '../platform/ios/src/MGLLocationManager.h',
+        '../platform/ios/src/MGLLocationManager.m',
         '../platform/ios/src/MGLMapView.mm',
         '../platform/ios/src/MGLAccountManager_Private.h',
         '../platform/ios/src/MGLAccountManager.m',

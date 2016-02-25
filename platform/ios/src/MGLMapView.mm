@@ -997,7 +997,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.dormant = NO;
 
         [self createGLView];
-        [MGLMapboxEvents validate];
 
         self.glSnapshotView.hidden = YES;
 

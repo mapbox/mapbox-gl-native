@@ -39,17 +39,13 @@ extern NSString *const MGLEventGesturePitchStart;
 typedef NS_DICTIONARY_OF(NSString *, id) MGLMapboxEventAttributes;
 typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes;
 
-@interface MGLMapboxEvents : NSObject <NSURLSessionDelegate>
+@interface MGLMapboxEvents : NSObject
 
 + (nullable instancetype)sharedManager;
 
 // You must call these methods from the main thread.
 //
-+ (void)pauseMetricsCollection;
-+ (void)resumeMetricsCollection;
 + (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
-+ (void)pushDebugEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
-+ (void)validate;
 + (void)ensureMetricsOptoutExists;
 + (void)flush;
 + (BOOL)checkPushEnabled;
