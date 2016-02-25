@@ -101,7 +101,7 @@ template <typename Container>
 bool coveredByChildren(const TileID& id, const Container& container) {
     for (const auto& child : id.children()) {
         const auto lower = container.lower_bound(child);
-        if (lower == container.end() ||
+        if (lower == container.end() || lower->first.w != child.w ||
             (lower->first != child && !coveredByChildren(child, container))) {
             return false;
         }
