@@ -233,6 +233,16 @@ public class MapboxEventManager {
     }
 
     /**
+     * Immediately attempt to send all events data in the queue to the server.
+     *
+     * NOTE: Permission set to package private to enable only telemetry code to use this.
+     */
+    void flushEventsQueueImmediately() {
+        Log.i(TAG, "flushEventsQueueImmediately() called...");
+        new FlushTheEventsTask().execute();
+    }
+
+    /**
      * Adds a Location Event to the system for processing
      * @param location Location event
      */
@@ -328,7 +338,7 @@ public class MapboxEventManager {
         events.add(event);
 
         // Send to Server Immediately
-        new FlushTheEventsTask().execute();
+        flushEventsQueueImmediately();
         Log.d(TAG, "turnstile event pushed.");
     }
 
@@ -507,10 +517,14 @@ public class MapboxEventManager {
         @Override
         protected Void doInBackground(Void... voids) {
 
-             if (events.size() < 1) {
+            Log.i(TAG, "FlushTheEventsTask.doInBackground()...");
+
+            if (events.size() < 1) {
                 Log.d(TAG, "No events in the queue to send so returning.");
                 return null;
             }
+
+            Log.i(TAG, "past events in queue check...");
 
             // Check for NetworkConnectivity
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -519,6 +533,8 @@ public class MapboxEventManager {
                 Log.w(TAG, "Not connected to network, so returning without attempting to send events");
                 return null;
             }
+
+            Log.i(TAG, "past network check...");
 
             try {
                 // Send data
@@ -582,6 +598,8 @@ public class MapboxEventManager {
                     jsonArray.put(jsonObject);
                 }
 
+                Log.i(TAG, "past json building ...");
+
                 // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
                 CertificatePinner certificatePinner = new CertificatePinner.Builder()
                         .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
@@ -601,6 +619,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
+                Log.i(TAG, "Server Response: " + response.code() + " from sending " + events.size());
 
                 // Reset Events
                 // ============
