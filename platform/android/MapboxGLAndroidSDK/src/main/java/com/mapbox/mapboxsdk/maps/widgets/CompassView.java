@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.lang.ref.WeakReference;
@@ -49,7 +48,7 @@ public final class CompassView extends ImageView {
 
         // View configuration
         setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.compass));
-        setContentDescription(getResources().getString(R.string.mapbox_compassContentDescription));
+        setContentDescription(getResources().getString(R.string.compassContentDescription));
         setEnabled(false);
 
         // Layout params

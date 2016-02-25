@@ -68,9 +68,6 @@ android {
             consumerProguardFiles 'proguard-rules.pro'
         }
     }
-
-//    resourcePrefix 'mapbox_'
-
 }
 
 configurations {

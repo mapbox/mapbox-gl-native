@@ -15,7 +15,7 @@
         android:id="@+id/logoView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/mapbox_mapboxIconContentDescription"
+        android:contentDescription="@string/mapboxIconContentDescription"
         android:src="@drawable/attribution_logo" />
 
     <ImageView
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:clickable="true"
-        android:contentDescription="@string/mapbox_attributionsIconContentDescription"
+        android:contentDescription="@string/attributionsIconContentDescription"
         android:padding="7dp"
         android:src="@drawable/ic_info_outline_24dp_selector"
         android:background="@drawable/bg_default_selector"/>

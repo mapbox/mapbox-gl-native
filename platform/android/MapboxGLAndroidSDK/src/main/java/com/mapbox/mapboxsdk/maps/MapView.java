@@ -2289,7 +2289,7 @@ public class MapView extends FrameLayout {
             Context context = v.getContext();
             String[] items = context.getResources().getStringArray(R.array.attribution_names);
             AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
-            builder.setTitle(R.string.mapbox_attributionsDialogTitle);
+            builder.setTitle(R.string.attributionsDialogTitle);
             builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
             builder.show();
         }
@@ -2306,7 +2306,7 @@ public class MapView extends FrameLayout {
                 }
                 String[] items = context.getResources().getStringArray(array);
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
-                builder.setTitle(R.string.mapbox_attributionTelemetryTitle);
+                builder.setTitle(R.string.attributionTelemetryTitle);
                 LayoutInflater factory = LayoutInflater.from(context);
                 View content = factory.inflate(R.layout.attribution_telemetry_view, null);
 
