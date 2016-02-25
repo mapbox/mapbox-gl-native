@@ -83,9 +83,9 @@ public class MapboxEventManager {
 
     private Timer timer = null;
 
-    private MapboxEventManager(@NonNull Context context) {
+    private MapboxEventManager(@NonNull Context context, String accessToken) {
         super();
-        this.accessToken = ApiAccess.getToken(context);
+        this.accessToken = accessToken;
         this.context = context;
 
         // Setup Message Digest
@@ -153,14 +153,26 @@ public class MapboxEventManager {
     }
 
     /**
+     * Internal setup of MapboxEventsManager.  It needs to be called once before @link MapboxEventManager#getMapboxEventManager
+     *
+     * This allows for a cleaner getMapboxEventManager() that doesn't require context and accessToken
+     *
+     * @param context Context
+     * @param accessToken Access Token
+     */
+    public static void configureAndStartMapboxEventManager(@NonNull Context context, @NonNull String accessToken) {
+        if (mapboxEventManager != null) {
+            Log.w(TAG, "Singleton has already been created.");
+            return;
+        }
+        mapboxEventManager = new MapboxEventManager(context.getApplicationContext(), accessToken);
+    }
+
+    /**
      * Primary Access method using Singleton pattern
-     * @param context Application Context
      * @return MapboxEventManager
      */
-    public static MapboxEventManager getMapboxEventManager(@NonNull Context context) {
-        if (mapboxEventManager == null) {
-            mapboxEventManager = new MapboxEventManager(context.getApplicationContext());
-        }
+    public static MapboxEventManager getMapboxEventManager() {
         return mapboxEventManager;
     }
 
@@ -491,7 +503,7 @@ public class MapboxEventManager {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            if (events.size() < 1) {
+             if (events.size() < 1) {
                 Log.d(TAG, "No events in the queue to send so returning.");
                 return null;
             }

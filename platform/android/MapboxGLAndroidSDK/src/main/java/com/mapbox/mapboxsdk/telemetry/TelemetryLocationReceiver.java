@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Handler;
 import android.util.Log;
 
@@ -63,7 +61,7 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
         Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         if (location != null) {
             Log.d(TAG, "location received = " + location);
-            MapboxEventManager.getMapboxEventManager(context).addLocationEvent(location);
+            MapboxEventManager.getMapboxEventManager().addLocationEvent(location);
         } else {
             Log.d(TAG, "location NOT received");
         }

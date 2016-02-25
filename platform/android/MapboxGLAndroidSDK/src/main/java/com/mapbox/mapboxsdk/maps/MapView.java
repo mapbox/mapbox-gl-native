@@ -215,7 +215,7 @@ public class MapView extends FrameLayout {
 
         mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
         mUserLocationView.setMapboxMap(mMapboxMap);
-        
+
         mCompassView = (CompassView) view.findViewById(R.id.compassView);
         mCompassView.setMapboxMap(mMapboxMap);
 
@@ -372,8 +372,11 @@ public class MapView extends FrameLayout {
             // Force a check for Telemetry
             validateTelemetryServiceConfigured();
 
+            // Force a check for an access token
+            validateAccessToken(getAccessToken());
+
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
-            MapboxEventManager.getMapboxEventManager(getContext()).isTelemetryEnabled();
+            MapboxEventManager.configureAndStartMapboxEventManager(getContext(), getAccessToken());
         }
 
         // Force a check for an access token
@@ -400,7 +403,7 @@ public class MapView extends FrameLayout {
             Hashtable<String, Object> evt = new Hashtable<>();
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
-            MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+            MapboxEventManager.getMapboxEventManager().pushEvent(evt);
         }
     }
 
@@ -1201,7 +1204,7 @@ public class MapView extends FrameLayout {
         evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
         evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
 
-        MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+        MapboxEventManager.getMapboxEventManager().pushEvent(evt);
     }
 
     /**
@@ -1220,7 +1223,7 @@ public class MapView extends FrameLayout {
         evt.put(MapboxEvent.KEY_LONGITUDE, tapLatLng.getLongitude());
         evt.put(MapboxEvent.KEY_ZOOM, mMapboxMap.getCameraPosition().zoom);
 
-        MapboxEventManager.getMapboxEventManager(getContext()).pushEvent(evt);
+        MapboxEventManager.getMapboxEventManager().pushEvent(evt);
     }
 
     // Called when user touches the screen, all positions are absolute
@@ -2301,7 +2304,7 @@ public class MapView extends FrameLayout {
             if (which == ATTRIBUTION_INDEX_TELEMETRY_SETTINGS) {
 
                 int array = R.array.attribution_telemetry_options;
-                if (MapboxEventManager.getMapboxEventManager(context).isTelemetryEnabled()) {
+                if (MapboxEventManager.getMapboxEventManager().isTelemetryEnabled()) {
                     array = R.array.attribution_telemetry_options_already_participating;
                 }
                 String[] items = context.getResources().getStringArray(array);
@@ -2328,11 +2331,11 @@ public class MapView extends FrameLayout {
                                 telemDialog.cancel();
                                 return;
                             case 1:
-                                MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(false);
+                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(false);
                                 telemDialog.cancel();
                                 return;
                             case 2:
-                                MapboxEventManager.getMapboxEventManager(context).setTelemetryEnabled(true);
+                                MapboxEventManager.getMapboxEventManager().setTelemetryEnabled(true);
                                 telemDialog.cancel();
                                 return;
                         }
