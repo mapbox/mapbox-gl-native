@@ -26,7 +26,6 @@ import android.view.WindowManager;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.security.MessageDigest;
@@ -83,6 +82,11 @@ public class MapboxEventManager {
 
     private Timer timer = null;
 
+    /**
+     * Private Constructor for configuring the single instance per app.
+     * @param context Application Context
+     * @param accessToken Access Token used in application, can be overridden by putting staging credentials in AppManifest
+     */
     private MapboxEventManager(@NonNull Context context, String accessToken) {
         super();
         this.accessToken = accessToken;
