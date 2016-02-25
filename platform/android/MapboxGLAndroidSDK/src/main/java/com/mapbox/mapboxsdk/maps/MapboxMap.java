@@ -518,6 +518,7 @@ public class MapboxMap {
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
         Marker marker = prepareMarker(markerOptions);
         long id = mMapView.addMarker(marker);
+        marker.setMapboxMap(this);
         marker.setId(id);
         mAnnotations.put(id, marker);
         return marker;

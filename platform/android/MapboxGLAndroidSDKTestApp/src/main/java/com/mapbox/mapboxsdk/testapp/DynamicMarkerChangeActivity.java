@@ -48,7 +48,7 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         mIconFactory = IconFactory.getInstance(this);
 
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setTag(true);
+        mMapView.setTag(false);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
