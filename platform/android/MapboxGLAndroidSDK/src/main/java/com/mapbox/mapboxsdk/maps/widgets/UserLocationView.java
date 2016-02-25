@@ -153,44 +153,9 @@ public final class UserLocationView extends View {
         mAccuracyPath = new Path();
         mAccuracyBounds = new RectF();
 
-        mUserLocationDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location);
-        mUserLocationDrawableBounds = new Rect(
-                -mUserLocationDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationDrawable.getIntrinsicHeight() / 2,
-                mUserLocationDrawable.getIntrinsicWidth() / 2,
-                mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawableBoundsF = new RectF(
-                -mUserLocationDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationDrawable.getIntrinsicHeight() / 2,
-                mUserLocationDrawable.getIntrinsicWidth() / 2,
-                mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
-
-        mUserLocationBearingDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_bearing);
-        mUserLocationBearingDrawableBounds = new Rect(
-                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
-                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawableBoundsF = new RectF(
-                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
-                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
-
-        mUserLocationStaleDrawable = ContextCompat.getDrawable(getContext(), R.drawable.my_location_stale);
-        mUserLocationStaleDrawableBounds = new Rect(
-                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
-                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawableBoundsF = new RectF(
-                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
-                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+        setUserLocationDrawable(ContextCompat.getDrawable(getContext(), R.drawable.my_location));
+        setUserLocationBearingDrawable(ContextCompat.getDrawable(getContext(), R.drawable.my_location_bearing));
+        setUserLocationStaleDrawable(ContextCompat.getDrawable(getContext(), R.drawable.my_location_stale));
     }
 
     public void setMapboxMap(MapboxMap mapboxMap) {
@@ -238,6 +203,70 @@ public final class UserLocationView extends View {
             }
             dotDrawable.draw(canvas);
         }
+    }
+
+    void setUserLocationDrawable(Drawable userLocationDrawable) {
+        mUserLocationDrawable = userLocationDrawable;
+
+        mUserLocationDrawableBounds = new Rect(
+                -mUserLocationDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationDrawable.getIntrinsicHeight() / 2,
+                mUserLocationDrawable.getIntrinsicWidth() / 2,
+                mUserLocationDrawable.getIntrinsicHeight() / 2);
+        mUserLocationDrawableBoundsF = new RectF(
+                -mUserLocationDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationDrawable.getIntrinsicHeight() / 2,
+                mUserLocationDrawable.getIntrinsicWidth() / 2,
+                mUserLocationDrawable.getIntrinsicHeight() / 2);
+        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
+        update();
+    }
+
+    void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
+        mUserLocationBearingDrawable = userLocationBearingDrawable;
+
+        mUserLocationBearingDrawableBounds = new Rect(
+                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
+                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
+        mUserLocationBearingDrawableBoundsF = new RectF(
+                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
+                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
+                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
+        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
+        update();
+    }
+
+    void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
+        mUserLocationStaleDrawable = userLocationStaleDrawable;
+
+        mUserLocationStaleDrawableBounds = new Rect(
+                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
+                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
+        mUserLocationStaleDrawableBoundsF = new RectF(
+                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
+                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
+                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
+        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+        update();
+    }
+
+    Drawable getUserLocationDrawable() {
+
+        return mUserLocationDrawable;
+    }
+
+    Drawable getUserLocationBearingDrawable() {
+        return mUserLocationBearingDrawable;
+    }
+
+    Drawable getUserLocationStaleDrawable() {
+        return mUserLocationStaleDrawable;
     }
 
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -479,6 +480,31 @@ public class MapboxMap {
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         mMapView.setAccessToken(accessToken);
+    }
+
+    public void setUserLocationDrawable(Drawable userLocationDrawable) {
+        mMapView.setUserLocationDrawable(userLocationDrawable);
+    }
+
+    public void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
+        mMapView.setUserLocationBearingDrawable(userLocationBearingDrawable);
+    }
+
+    public void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
+        mMapView.setUserLocationStaleDrawable(userLocationStaleDrawable);
+    }
+
+    public Drawable getUserLocationDrawable() {
+
+        return mMapView.getUserLocationDrawable();
+    }
+
+    public Drawable getUserLocationBearingDrawable() {
+        return mMapView.getUserLocationBearingDrawable();
+    }
+
+    public Drawable getUserLocationStaleDrawable() {
+        return mMapView.getUserLocationStaleDrawable();
     }
 
     /**

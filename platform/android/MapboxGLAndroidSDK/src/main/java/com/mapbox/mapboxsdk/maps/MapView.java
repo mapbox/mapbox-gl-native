@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -720,6 +721,7 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getAccessToken();
     }
 
+<<<<<<< HEAD
     // Checks if the given token is valid
     private void validateAccessToken(String accessToken) {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
@@ -743,6 +745,36 @@ public class MapView extends FrameLayout {
             Log.w(TAG, "Error checking for Telemetry Service Config: " + e);
         }
         throw new TelemetryServiceNotConfiguredException();
+    }
+
+    //
+    // User marker location drawable management
+    //
+
+
+    public void setUserLocationDrawable(Drawable userLocationDrawable) {
+        mUserLocationView.setUserLocationDrawable(userLocationDrawable);
+    }
+
+    public void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
+        mUserLocationView.setUserLocationBearingDrawable(userLocationBearingDrawable);
+    }
+
+    public void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
+        mUserLocationView.setUserLocationStaleDrawable(userLocationStaleDrawable);
+    }
+
+    public Drawable getUserLocationDrawable() {
+
+        return mUserLocationView.getUserLocationDrawable();
+    }
+
+    public Drawable getUserLocationBearingDrawable() {
+        return mUserLocationView.getUserLocationBearingDrawable();
+    }
+
+    public Drawable getUserLocationStaleDrawable() {
+        return mUserLocationView.getUserLocationStaleDrawable();
     }
 
     //
