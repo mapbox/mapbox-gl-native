@@ -147,14 +147,7 @@ public class TelemetryService extends Service {
         loc.setLatitude(44.50119);
         loc.setLongitude(-88.06220);
         MapboxEventManager.getMapboxEventManager().addLocationEvent(loc);
-        new Handler().postAtFrontOfQueue(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "Handler.run() started");
-                MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
-                Log.i(TAG, "Handler.run() end");
-            }
-        });
+        MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
 
 /*
         try {
