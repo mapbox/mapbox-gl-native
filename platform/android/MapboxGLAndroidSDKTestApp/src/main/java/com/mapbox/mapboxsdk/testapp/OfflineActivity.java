@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -22,24 +24,22 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
+import com.mapbox.mapboxsdk.offline.OfflineRegionMetadata;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
-import com.mapbox.mapboxsdk.offline.OfflineRegionMetadata;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.testapp.offline.DownloadRegionDialog;
+import com.mapbox.mapboxsdk.testapp.offline.CustomMetadata;
 import com.mapbox.mapboxsdk.testapp.offline.ListRegionsDialog;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class OfflineActivity extends AppCompatActivity
         implements DownloadRegionDialog.DownloadRegionDialogListener {
 
     private final static String LOG_TAG = "OfflineActivity";
-
-    private final static String KEY_REGION_NAME = "KEY_REGION_NAME";
 
     /*
      * UI elements
@@ -195,7 +195,7 @@ public class OfflineActivity extends AppCompatActivity
             public void onList(OfflineRegion[] offlineRegions) {
                 // Check result
                 if (offlineRegions == null || offlineRegions.length == 0) {
-                    Log.d(LOG_TAG, "You have no regions yet.");
+                    Toast.makeText(OfflineActivity.this, "You have no regions yet.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -221,14 +221,15 @@ public class OfflineActivity extends AppCompatActivity
             }
 
             private String getRegionName(OfflineRegion offlineRegion) {
-                String regionName = "Region " + offlineRegion.getID();
+                String regionName;
 
                 try {
-                    byte[] metadata = offlineRegion.getMetadata().getMetadata();
-                    HashMap<String, String> data = (HashMap<String, String>) OfflineRegionMetadata.deserialize(metadata);
-                    regionName = data.get(KEY_REGION_NAME);
-                } catch (Exception e) {
+                    String json = new String(offlineRegion.getMetadata().getMetadata(), CustomMetadata.CHARSET);
+                    CustomMetadata customMetadata = new Gson().fromJson(json, CustomMetadata.class);
+                    regionName = customMetadata.getRegionName();
+                } catch (UnsupportedEncodingException e) {
                     Log.e(LOG_TAG, "Failed to decode metadata: " + e.getMessage());
+                    regionName = "Region " + offlineRegion.getID();
                 }
 
                 return regionName;
@@ -242,29 +243,35 @@ public class OfflineActivity extends AppCompatActivity
 
     @Override
     public void onDownloadRegionDialogPositiveClick(final String regionName) {
-        Log.d(LOG_TAG, "Download started: " + regionName);
+        if (TextUtils.isEmpty(regionName)) {
+            Toast.makeText(OfflineActivity.this, "Region name cannot be empty.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Start progress bar
+        Log.d(LOG_TAG, "Download started: " + regionName);
         startProgress();
 
         // Definition
         String styleURL = mMapboxMap.getStyleUrl();
         LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-        double minZoom = 14; // Switch to dynamic once map refactor is complete
-        double maxZoom = 16; // Switch to dynamic once map refactor is complete
+        double minZoom = mMapboxMap.getCameraPosition().zoom;
+        double maxZoom = mMapboxMap.getUiSettings().getMaxZoom();
         float pixelRatio = this.getResources().getDisplayMetrics().density;
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
                 styleURL, bounds, minZoom, maxZoom, pixelRatio);
 
         // Sample way of encoding metadata
-        OfflineRegionMetadata metadata = null;
+        OfflineRegionMetadata metadata;
         try {
-            HashMap<String, String> data = new HashMap<>();
-            data.put(KEY_REGION_NAME, regionName);
-            byte[] dataEncoded = OfflineRegionMetadata.serialize(data);
-            metadata = new OfflineRegionMetadata(dataEncoded);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Metadata encoding failed: " + e.getMessage());
+            CustomMetadata customMetadata = new CustomMetadata(regionName);
+            byte[] encoded = new Gson()
+                    .toJson(customMetadata, CustomMetadata.class)
+                    .getBytes(CustomMetadata.CHARSET);
+            metadata = new OfflineRegionMetadata(encoded);
+        } catch (UnsupportedEncodingException e) {
+            Log.e(LOG_TAG, "Failed to encode metadata: " + e.getMessage());
+            metadata = null;
         }
 
         // Create region
