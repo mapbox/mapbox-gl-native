@@ -1940,8 +1940,7 @@ void JNICALL setOfflineRegionObserver(JNIEnv *env, jobject obj, jobject offlineR
             env2->SetBooleanField(jstatus, offlineRegionStatusRequiredResourceCountIsPreciseId, status.requiredResourceCountIsPrecise);
             env2->CallVoidMethod(observerCallback, offlineRegionObserveronStatusChangedId, jstatus);
 
-            // Delete global refs and detach when we're done
-            env2->DeleteGlobalRef(observerCallback);
+            // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);
         }
 
@@ -1976,8 +1975,7 @@ void JNICALL setOfflineRegionObserver(JNIEnv *env, jobject obj, jobject offlineR
             env2->SetObjectField(jerror, offlineRegionErrorMessageId, std_string_to_jstring(env2, error.message));
             env2->CallVoidMethod(observerCallback, offlineRegionObserveronErrorId, jerror);
 
-            // Delete global refs and detach when we're done
-            env2->DeleteGlobalRef(observerCallback);
+            // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);
         }
 
@@ -1989,8 +1987,7 @@ void JNICALL setOfflineRegionObserver(JNIEnv *env, jobject obj, jobject offlineR
             // Send limit
             env2->CallVoidMethod(observerCallback, offlineRegionObserveronLimitId, limit);
 
-            // Delete global refs and detach when we're done
-            env2->DeleteGlobalRef(observerCallback);
+            // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);            
         }
 
