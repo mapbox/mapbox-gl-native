@@ -14,7 +14,8 @@ public class TrackingSettings {
 
     private MapView mapView;
     private UiSettings uiSettings;
-    private boolean dismissTrackingOnGesture = true;
+    private boolean dismissLocationTrackingOnGesture = true;
+    private boolean dismissBearingTrackingOnGesture = true;
 
     @MyLocationTracking.Mode
     private int mMyLocationTrackingMode;
@@ -89,7 +90,7 @@ public class TrackingSettings {
      * @see MyBearingTracking
      */
     @UiThread
-    @MyLocationTracking.Mode
+    @MyBearingTracking.Mode
     public int getMyBearingTrackingMode() {
         return mMyBearingTrackingMode;
     }
@@ -100,7 +101,7 @@ public class TrackingSettings {
      * @return True to indicate the tracking modes will be dismissed.
      */
     public boolean isDismissTrackingOnGesture() {
-        return dismissTrackingOnGesture;
+        return dismissLocationTrackingOnGesture && dismissBearingTrackingOnGesture;
     }
 
     /**
@@ -109,27 +110,52 @@ public class TrackingSettings {
      * @param dismissTrackingOnGesture True to dismiss the tracking modes.
      */
     public void setDismissTrackingOnGesture(boolean dismissTrackingOnGesture) {
-        this.dismissTrackingOnGesture = dismissTrackingOnGesture;
+        dismissLocationTrackingOnGesture = dismissTrackingOnGesture;
+        dismissBearingTrackingOnGesture = dismissTrackingOnGesture;
         validateGesturesForTrackingModes();
     }
 
     private void validateGesturesForTrackingModes() {
-        if (!dismissTrackingOnGesture) {
-            int myLocationTrackingMode = getMyLocationTrackingMode();
-            int myBearingTrackingMode = getMyBearingTrackingMode();
+        int myLocationTrackingMode = getMyLocationTrackingMode();
+        int myBearingTrackingMode = getMyBearingTrackingMode();
 
-            // Enable/disable gestures based on tracking mode
+        if (!dismissLocationTrackingOnGesture) {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
                 uiSettings.setScrollGesturesEnabled(true);
-                uiSettings.setRotateGesturesEnabled(true);
             } else {
                 uiSettings.setScrollGesturesEnabled(false);
-                uiSettings.setRotateGesturesEnabled((myBearingTrackingMode == MyBearingTracking.NONE));
             }
-        }else{
+        } else {
             uiSettings.setScrollGesturesEnabled(true);
+        }
+
+        if (!dismissBearingTrackingOnGesture) {
+            if (myBearingTrackingMode == MyBearingTracking.NONE) {
+                uiSettings.setRotateGesturesEnabled(true);
+            } else {
+                uiSettings.setRotateGesturesEnabled(false);
+            }
+        } else {
             uiSettings.setRotateGesturesEnabled(true);
         }
+    }
+
+    public void setDismissLocationTrackingOnGesture(boolean dismissLocationTrackingOnGesture) {
+        this.dismissLocationTrackingOnGesture = dismissLocationTrackingOnGesture;
+        validateGesturesForTrackingModes();
+    }
+
+    public boolean isDismissLocationTrackingOnGesture() {
+        return dismissLocationTrackingOnGesture;
+    }
+
+    public void setDismissBearingTrackingOnGesture(boolean dismissBearingTrackingOnGesture) {
+        this.dismissBearingTrackingOnGesture = dismissBearingTrackingOnGesture;
+        validateGesturesForTrackingModes();
+    }
+
+    public boolean isDismissBearingTrackingOnGesture() {
+        return dismissBearingTrackingOnGesture;
     }
 
     /**
@@ -137,7 +163,7 @@ public class TrackingSettings {
      *
      * @return True if location tracking is disabled.
      */
-    public boolean isLocationTrackingDisabled() {
+    public boolean isLocationTrackingDisabled(){
         return mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }
