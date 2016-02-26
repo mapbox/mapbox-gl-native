@@ -12,7 +12,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK and
 
     make iproj
 
-Which will create and open an Xcode project that can build the entire library from source, as well as an Objective-C test app.
+Which will create and open an Xcode project that can build the entire library from source, as well as an Objective-C test app. Before building, use the scheme picker button in the toolbar to change the scheme from “All (ios project)” to “iosapp” and the destination from “My Mac” to one of the simulators or connected devices listed in the menu.
 
 If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
 
