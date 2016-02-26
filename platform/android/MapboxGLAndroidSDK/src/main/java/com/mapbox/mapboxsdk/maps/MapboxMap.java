@@ -482,29 +482,46 @@ public class MapboxMap {
         mMapView.setAccessToken(accessToken);
     }
 
-    public void setUserLocationDrawable(Drawable userLocationDrawable) {
-        mMapView.setUserLocationDrawable(userLocationDrawable);
+    /**
+     * Set the last known position user marker.
+     */
+    public void setUserLocationDrawable(Drawable drawable) {
+        mMapView.setUserLocationDrawable(drawable);
     }
 
-    public void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
-        mMapView.setUserLocationBearingDrawable(userLocationBearingDrawable);
+    /**
+     * Set the last known position user marker and its shadow.
+     */
+    public void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mMapView.setUserLocationDrawable(drawable, shadowDrawable);
     }
 
-    public void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
-        mMapView.setUserLocationStaleDrawable(userLocationStaleDrawable);
+    /**
+     * Set the last known position user marker.
+     */
+    public void setUserLocationBearingDrawable(Drawable drawable) {
+        mMapView.setUserLocationBearingDrawable(drawable);
     }
 
-    public Drawable getUserLocationDrawable() {
-
-        return mMapView.getUserLocationDrawable();
+    /**
+     * Set the user location bearing marker and its shadow.
+     */
+    public void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mMapView.setUserLocationBearingDrawable(drawable, shadowDrawable);
     }
 
-    public Drawable getUserLocationBearingDrawable() {
-        return mMapView.getUserLocationBearingDrawable();
+    /**
+     * Set the last known position user marker.
+     */
+    public void setUserLocationStaleDrawable(Drawable drawable) {
+        mMapView.setUserLocationStaleDrawable(drawable);
     }
 
-    public Drawable getUserLocationStaleDrawable() {
-        return mMapView.getUserLocationStaleDrawable();
+    /**
+     * Set the last known position user marker and its shadow.
+     */
+    public void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mMapView.setUserLocationStaleDrawable(drawable, shadowDrawable);
     }
 
     /**

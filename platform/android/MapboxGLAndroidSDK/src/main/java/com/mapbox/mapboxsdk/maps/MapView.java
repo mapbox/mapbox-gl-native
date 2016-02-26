@@ -752,29 +752,28 @@ public class MapView extends FrameLayout {
     //
 
 
-    public void setUserLocationDrawable(Drawable userLocationDrawable) {
-        mUserLocationView.setUserLocationDrawable(userLocationDrawable);
+    void setUserLocationDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationDrawable(drawable);
     }
 
-    public void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
-        mUserLocationView.setUserLocationBearingDrawable(userLocationBearingDrawable);
+    void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationDrawable(drawable, shadowDrawable);
     }
 
-    public void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
-        mUserLocationView.setUserLocationStaleDrawable(userLocationStaleDrawable);
+    void setUserLocationBearingDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationBearingDrawable(drawable);
     }
 
-    public Drawable getUserLocationDrawable() {
-
-        return mUserLocationView.getUserLocationDrawable();
+    void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationBearingDrawable(drawable, shadowDrawable);
     }
 
-    public Drawable getUserLocationBearingDrawable() {
-        return mUserLocationView.getUserLocationBearingDrawable();
+    void setUserLocationStaleDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationStaleDrawable(drawable);
     }
 
-    public Drawable getUserLocationStaleDrawable() {
-        return mUserLocationView.getUserLocationStaleDrawable();
+    void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationStaleDrawable(drawable, shadowDrawable);
     }
 
     //

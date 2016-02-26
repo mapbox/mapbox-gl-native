@@ -19,6 +19,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -60,16 +61,20 @@ public final class UserLocationView extends View {
     private RectF mAccuracyBounds;
 
     private Drawable mUserLocationDrawable;
-    private RectF mUserLocationDrawableBoundsF;
-    private Rect mUserLocationDrawableBounds;
+    private Drawable mUserLocationShadowDrawable;
+    private final RectF mUserLocationDrawableBoundsF = new RectF();
+    private final RectF mUserLocationShadowDrawableBoundsF = new RectF();
 
     private Drawable mUserLocationBearingDrawable;
-    private RectF mUserLocationBearingDrawableBoundsF;
-    private Rect mUserLocationBearingDrawableBounds;
+    private Drawable mUserLocationBearingShadowDrawable;
+    private final RectF mUserLocationBearingDrawableBoundsF = new RectF();
+    private final RectF mUserLocationBearingShadowDrawableBoundsF = new RectF();
 
     private Drawable mUserLocationStaleDrawable;
-    private RectF mUserLocationStaleDrawableBoundsF;
-    private Rect mUserLocationStaleDrawableBounds;
+    private Drawable mUserLocationStaleShadowDrawable;
+    private final RectF mUserLocationStaleDrawableBoundsF = new RectF();
+    private final RectF mUserLocationStaleShadowDrawableBoundsF = new RectF();
+
 
     private Rect mDirtyRect;
     private RectF mDirtyRectF;
@@ -181,7 +186,7 @@ public final class UserLocationView extends View {
         if (!mShowMarker) {
             return;
         }
-
+        canvas.save();
         canvas.concat(mMarkerScreenMatrix);
 
         Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
@@ -190,13 +195,34 @@ public final class UserLocationView extends View {
         RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
         dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
 
+        Drawable shadowDrawable = mShowDirection ? mUserLocationBearingShadowDrawable : mUserLocationShadowDrawable;
+        shadowDrawable = mStaleMarker ? mUserLocationStaleShadowDrawable : shadowDrawable;
+        // IMPORTANT also update in update()
+        RectF shadowBounds = mShowDirection ? mUserLocationBearingShadowDrawableBoundsF : mUserLocationShadowDrawableBoundsF;
+        shadowBounds = mStaleMarker ? mUserLocationStaleShadowDrawableBoundsF : shadowBounds;
+
+
         boolean willDraw = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
             willDraw = mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
         }
         willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
+        canvas.restore();
+        canvas.save();
 
+        canvas.translate(shadowBounds.width() * 0.12f, shadowBounds.height() * 0.12f);
+        canvas.concat(mMarkerScreenMatrix);
+        willDraw |= !canvas.quickReject(shadowBounds, Canvas.EdgeType.AA);
+
+        canvas.restore();
         if (willDraw) {
+            canvas.save();
+            canvas.translate(shadowBounds.width() * 0.12f, shadowBounds.height() * 0.12f);
+            canvas.concat(mMarkerScreenMatrix);
+            shadowDrawable.draw(canvas);
+
+            canvas.restore();
+            canvas.concat(mMarkerScreenMatrix);
             if (mShowAccuracy && !mStaleMarker) {
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
@@ -205,59 +231,63 @@ public final class UserLocationView extends View {
         }
     }
 
-    void setUserLocationDrawable(Drawable userLocationDrawable) {
-        mUserLocationDrawable = userLocationDrawable;
 
-        mUserLocationDrawableBounds = new Rect(
-                -mUserLocationDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationDrawable.getIntrinsicHeight() / 2,
-                mUserLocationDrawable.getIntrinsicWidth() / 2,
-                mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawableBoundsF = new RectF(
-                -mUserLocationDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationDrawable.getIntrinsicHeight() / 2,
-                mUserLocationDrawable.getIntrinsicWidth() / 2,
-                mUserLocationDrawable.getIntrinsicHeight() / 2);
-        mUserLocationDrawable.setBounds(mUserLocationDrawableBounds);
+    void setUserLocationDrawable(@NonNull Drawable drawable) {
+        setUserLocationDrawable(drawable, null);
+    }
+
+    void setUserLocationDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+        mUserLocationDrawable = drawable;
+        mUserLocationShadowDrawable = shadowDrawable;
+        setDrawable(drawable, mUserLocationDrawableBoundsF);
+        setDrawable(shadowDrawable, mUserLocationShadowDrawableBoundsF);
         update();
     }
 
-    void setUserLocationBearingDrawable(Drawable userLocationBearingDrawable) {
-        mUserLocationBearingDrawable = userLocationBearingDrawable;
+    void setUserLocationBearingDrawable(@NonNull Drawable drawable) {
+        setUserLocationBearingDrawable(drawable, null);
+    }
 
-        mUserLocationBearingDrawableBounds = new Rect(
-                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
-                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawableBoundsF = new RectF(
-                -mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationBearingDrawable.getIntrinsicHeight() / 2,
-                mUserLocationBearingDrawable.getIntrinsicWidth() / 2,
-                mUserLocationBearingDrawable.getIntrinsicHeight() / 2);
-        mUserLocationBearingDrawable.setBounds(mUserLocationBearingDrawableBounds);
+    void setUserLocationBearingDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+        mUserLocationBearingDrawable = drawable;
+        mUserLocationBearingShadowDrawable = shadowDrawable;
+        setDrawable(drawable, mUserLocationBearingDrawableBoundsF);
+        setDrawable(shadowDrawable, mUserLocationBearingShadowDrawableBoundsF);
         update();
     }
 
-    void setUserLocationStaleDrawable(Drawable userLocationStaleDrawable) {
-        mUserLocationStaleDrawable = userLocationStaleDrawable;
+    void setUserLocationStaleDrawable(@NonNull Drawable drawable) {
+        setUserLocationStaleDrawable(drawable, null);
+    }
 
-        mUserLocationStaleDrawableBounds = new Rect(
-                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
-                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawableBoundsF = new RectF(
-                -mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                -mUserLocationStaleDrawable.getIntrinsicHeight() / 2,
-                mUserLocationStaleDrawable.getIntrinsicWidth() / 2,
-                mUserLocationStaleDrawable.getIntrinsicHeight() / 2);
-        mUserLocationStaleDrawable.setBounds(mUserLocationStaleDrawableBounds);
+    void setUserLocationStaleDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+        mUserLocationStaleDrawable = drawable;
+        mUserLocationStaleShadowDrawable = shadowDrawable;
+        setDrawable(drawable, mUserLocationStaleDrawableBoundsF);
+        setDrawable(shadowDrawable, mUserLocationStaleShadowDrawableBoundsF);
         update();
+    }
+
+    private static void setDrawable(final @Nullable Drawable drawable, final @NonNull RectF bounds) {
+        if (drawable != null) {
+            int halfWidth = drawable.getIntrinsicWidth() / 2;
+            int halfHeight = drawable.getIntrinsicHeight() / 2;
+            bounds.set(
+                    -halfWidth,
+                    -halfHeight,
+                    halfWidth,
+                    halfHeight);
+            drawable.setBounds(new Rect(
+                    -halfWidth,
+                    -halfHeight,
+                    halfWidth,
+                    halfHeight));
+        } else {
+            bounds.setEmpty();
+        }
     }
 
     Drawable getUserLocationDrawable() {
-
         return mUserLocationDrawable;
     }
 
