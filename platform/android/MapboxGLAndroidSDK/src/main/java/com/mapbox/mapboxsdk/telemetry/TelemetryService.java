@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
@@ -146,13 +147,22 @@ public class TelemetryService extends Service {
         loc.setLatitude(44.50119);
         loc.setLongitude(-88.06220);
         MapboxEventManager.getMapboxEventManager().addLocationEvent(loc);
-        MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
+        new Handler().postAtFrontOfQueue(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Handler.run() started");
+                MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
+                Log.i(TAG, "Handler.run() end");
+            }
+        });
 
+/*
         try {
             Thread.sleep(1000);
         } catch (Exception e) {
             Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
         }
+*/
 
         unregisterReceiver(telemetryLocationReceiver);
         telemetryWakeLock.release();
