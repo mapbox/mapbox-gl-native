@@ -620,26 +620,11 @@ public class MapView extends FrameLayout {
     // Zoom
     //
 
-    /**
-     * Returns the current zoom level of the map view.
-     *
-     * @return The current zoom.
-     */
-    @UiThread
-    @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM)
-    public double getZoom() {
+    double getZoom() {
         return mNativeMapView.getZoom();
     }
 
-    /**
-     * <p>
-     * Sets the minimum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @param minZoom The new minimum zoom level.
-     */
-    @UiThread
-    public void setMinZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
+    void setMinZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
         mNativeMapView.setMinZoom(minZoom);
     }
 
@@ -653,22 +638,6 @@ public class MapView extends FrameLayout {
 
     double getMaxZoom() {
         return mNativeMapView.getMaxZoom();
-    }
-
-    /**
-     * <p>
-     * Sets whether the zoom controls are enabled.
-     * If enabled, the zoom controls are a pair of buttons
-     * (one for zooming in, one for zooming out) that appear on the screen.
-     * When pressed, they cause the camera to zoom in (or out) by one zoom level.
-     * If disabled, the zoom controls are not shown.
-     * </p>
-     * By default the zoom controls are enabled if the device is only single touch capable;
-     *
-     * @param enabled If true, the zoom controls are enabled.
-     */
-    public void setZoomControlsEnabled(boolean enabled) {
-        mZoomButtonsController.setVisible(enabled);
     }
 
     // Zoom in or out
