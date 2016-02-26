@@ -28,6 +28,8 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -39,6 +41,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Vector;
+
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.CertificatePinner;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -627,8 +632,18 @@ public class MapboxEventManager {
                     .header("User-Agent", userAgent)
                     .post(body)
                     .build();
-            Response response = client.newCall(request).execute();
-            Log.i(TAG, "Server Response: " + response.code() + " from sending " + events.size());
+            Log.i(TAG, "Will try to send " + events.size() + " in to the server.");
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.w(TAG, "Failure to send: " + e);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    Log.i(TAG, "Server Response: " + response.code());
+                }
+            });
 
             // Reset Events
             // ============
