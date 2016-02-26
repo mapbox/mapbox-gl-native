@@ -271,7 +271,7 @@ SystemTimePoint interpolateExpiration(const SystemTimePoint& current,
     // Assume that either the client or server clock is wrong and
     // try to interpolate a valid expiration date (from the client POV)
     // observing a minimum timeout.
-    return now + std::max<Duration>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
+    return now + std::max<SystemDuration>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
 }
 
 void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, optional<SystemTimePoint> expires) {
