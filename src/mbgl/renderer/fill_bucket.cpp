@@ -53,6 +53,7 @@ std::vector<std::vector<Ring>> classifyRings(const std::vector<Ring>& rings) {
     }
 
     std::vector<Ring> polygon;
+    bool init = false;
     bool ccw = false;
 
     for (std::size_t i = 0; i < len; i++) {
@@ -61,8 +62,10 @@ std::vector<std::vector<Ring>> classifyRings(const std::vector<Ring>& rings) {
         if (area == 0)
             continue;
 
-        if (!ccw)
+        if (!init) {
+            init = true;
             ccw = area < 0;
+        }
 
         if (ccw == (area < 0) && !polygon.empty()) {
             polygons.push_back(polygon);
