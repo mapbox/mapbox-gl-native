@@ -41,6 +41,11 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
 
+
+// The maximum distance along a line that can be stored in the buffers.
+const float MAX_LINE_DISTANCE = std::pow(2.0, 14.0);
+const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
+
 void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
     const GLsizei len = [&vertices] {
         GLsizei l = static_cast<GLsizei>(vertices.size());
@@ -154,7 +159,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             const double prevSegmentLength = util::dist<double>(currentVertex, prevVertex);
             if (prevSegmentLength > 2.0 * sharpCornerOffset) {
                 Coordinate newPrevVertex = currentVertex - (util::round(vec2<double>(currentVertex - prevVertex) * (sharpCornerOffset / prevSegmentLength)));
-                distance += util::dist<double>(newPrevVertex, prevVertex);
+                distance += util::dist<double>(newPrevVertex, prevVertex) * LINE_DISTANCE_SCALE;
                 addCurrentVertex(newPrevVertex, flip, distance, prevNormal, 0, 0, false, startVertex, triangleStore);
                 prevVertex = newPrevVertex;
             }
@@ -195,7 +200,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
         // Calculate how far along the line the currentVertex is
         if (prevVertex)
-            distance += util::dist<double>(currentVertex, prevVertex);
+            distance += util::dist<double>(currentVertex, prevVertex) * LINE_DISTANCE_SCALE;
 
         if (middleVertex && currentJoin == JoinType::Miter) {
             joinNormal = joinNormal * miterLength;
@@ -329,7 +334,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
             const double nextSegmentLength = util::dist<double>(currentVertex, nextVertex);
             if (nextSegmentLength > 2 * sharpCornerOffset) {
                 Coordinate newCurrentVertex = currentVertex + util::round(vec2<double>(nextVertex - currentVertex) * (sharpCornerOffset / nextSegmentLength));
-                distance += util::dist<double>(newCurrentVertex, currentVertex);
+                distance += util::dist<double>(newCurrentVertex, currentVertex) * LINE_DISTANCE_SCALE;
                 addCurrentVertex(newCurrentVertex, flip, distance, nextNormal, 0, 0, false, startVertex, triangleStore);
                 currentVertex = newCurrentVertex;
             }
@@ -363,7 +368,7 @@ void LineBucket::addGeometry(const std::vector<Coordinate>& vertices) {
 
 void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
                                   float flip,
-                                  double distance,
+                                  double& distance,
                                   const vec2<double>& normal,
                                   float endLeft,
                                   float endRight,
@@ -393,6 +398,14 @@ void LineBucket::addCurrentVertex(const Coordinate& currentVertex,
     }
     e1 = e2;
     e2 = e3;
+
+    // There is a maximum "distance along the line" that we can store in the buffers.
+    // When we get close to the distance, reset it to zero and add the vertex again with
+    // a distance of zero.
+    if (distance > MAX_LINE_DISTANCE / 2) {
+        distance = 0;
+        addCurrentVertex(currentVertex, flip, distance, normal, endLeft, endRight, round, startVertex, triangleStore);
+    }
 }
 
 void LineBucket::addPieSliceVertex(const Coordinate& currentVertex,
