@@ -1467,9 +1467,7 @@ public class MapView extends FrameLayout {
             }
 
             // reset tracking modes if gesture occurs
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                resetTrackingModes();
-            }
+            resetTrackingModesIfRequired();
 
             // Fling the map
             float ease = 0.25f;
@@ -1505,10 +1503,9 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
+
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -1537,10 +1534,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
@@ -1622,10 +1617,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
@@ -1703,10 +1696,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(), detector.getFocusY());
@@ -2178,11 +2169,29 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void resetTrackingModes() {
+    private void resetTrackingModesIfRequired() {
+        TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+        if (trackingSettings.isDismissLocationTrackingOnGesture()) {
+            resetLocationTrackingMode();
+        }
+        if (trackingSettings.isDismissBearingTrackingOnGesture()) {
+            resetBearingTrackingMode();
+        }
+    }
+
+    private void resetLocationTrackingMode() {
         try {
             TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
             trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
             trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
+        } catch (SecurityException ignore) {
+            // User did not accept location permissions
+        }
+    }
+
+    private void resetBearingTrackingMode() {
+        try {
+            setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }
