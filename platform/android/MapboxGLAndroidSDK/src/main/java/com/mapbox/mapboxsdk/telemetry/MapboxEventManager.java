@@ -28,8 +28,6 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -41,9 +39,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.Vector;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.CertificatePinner;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -244,7 +239,7 @@ public class MapboxEventManager {
      */
     void flushEventsQueueImmediately() {
         Log.i(TAG, "flushEventsQueueImmediately() called...");
-        sendDataToServer();
+        new FlushTheEventsTask().execute();
     }
 
     /**
@@ -343,7 +338,7 @@ public class MapboxEventManager {
         events.add(event);
 
         // Send to Server Immediately
-        new FlushTheEventsTask().execute();
+        flushEventsQueueImmediately();
         Log.d(TAG, "turnstile event pushed.");
     }
 
@@ -523,139 +518,124 @@ public class MapboxEventManager {
         protected Void doInBackground(Void... voids) {
 
             Log.i(TAG, "FlushTheEventsTask.doInBackground()...");
-            sendDataToServer();
+
+            if (events.size() < 1) {
+                Log.d(TAG, "No events in the queue to send so returning.");
+                return null;
+            }
+
+            Log.i(TAG, "past events in queue check...");
+
+            // Check for NetworkConnectivity
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                Log.w(TAG, "Not connected to network, so returning without attempting to send events");
+                return null;
+            }
+
+            Log.i(TAG, "past network check...");
+
+            try {
+                // Send data
+                // =========
+                JSONArray jsonArray = new JSONArray();
+
+                for (Hashtable<String, Object> evt : events) {
+                    JSONObject jsonObject = new JSONObject();
+
+                    // Build the JSON but only if there's a value for it in the evt
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CREATED, evt.get(MapboxEvent.ATTRIBUTE_CREATED));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY, evt.get(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SOURCE, evt.get(MapboxEvent.ATTRIBUTE_SOURCE));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SESSION_ID, evt.get(MapboxEvent.ATTRIBUTE_SESSION_ID));
+                    jsonObject.putOpt(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
+                    jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_MODEL, evt.get(MapboxEvent.ATTRIBUTE_MODEL));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_RESOLUTION, evt.get(MapboxEvent.ATTRIBUTE_RESOLUTION));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, evt.get(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, evt.get(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_PLUGGED_IN, evt.get(MapboxEvent.ATTRIBUTE_PLUGGED_IN));
+                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_WIFI, evt.get(MapboxEvent.ATTRIBUTE_WIFI));
+
+                    // Special Cases where empty string is denoting null and therefore should not be sent at all
+                    // This arises as thread safe Hashtable does not accept null values (nor keys)
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_ORIENTATION)) {
+                        String orientation =  (String)evt.get(MapboxEvent.ATTRIBUTE_ORIENTATION);
+                        if (!TextUtils.isEmpty(orientation)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ORIENTATION, orientation);
+                        }
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_CARRIER)) {
+                        String carrier =  (String)evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
+                        if (!TextUtils.isEmpty(carrier)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CARRIER, carrier);
+                        }
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_APPLICATION_STATE)) {
+                        String appState = (String)evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE);
+                        if (!TextUtils.isEmpty(appState)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
+                        }
+                    }
+
+                    // Special Cases where null has to be passed if no value exists
+                    // Requires using put() instead of putOpt()
+                    String eventType = (String)evt.get(MapboxEvent.ATTRIBUTE_EVENT);
+                    if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_CLICK)) {
+                        jsonObject.put(MapboxEvent.KEY_GESTURE_ID, evt.get(MapboxEvent.KEY_GESTURE_ID));
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE)) {
+                        String cellularNetworkType = (String)evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE);
+                        if (TextUtils.isEmpty(cellularNetworkType)) {
+                            jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, null);
+                        } else {
+                            jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE));
+                        }
+                    }
+
+                    jsonArray.put(jsonObject);
+                }
+
+                Log.i(TAG, "past json building ...");
+
+                // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
+                CertificatePinner certificatePinner = new CertificatePinner.Builder()
+                        .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
+                        .add("cloudfront-staging.tilestream.net", "sha1//KDE76PP0DQBDcTnMFBv+efp4eg=")
+                        .add("api.mapbox.com", "sha1/Uv71ooi32pyba+oLD7egnXm7/GQ=")
+                        .add("api.mapbox.com", "sha1/hOP0d37/ZTSGgCSseE3DIZ1uSg0=")
+                        .build();
+
+                OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
+                RequestBody body = RequestBody.create(JSON, jsonArray.toString());
+
+                String url = eventsURL + "/events/v2?access_token=" + accessToken;
+
+                Request request = new Request.Builder()
+                        .url(url)
+                        .header("User-Agent", userAgent)
+                        .post(body)
+                        .build();
+                Response response = client.newCall(request).execute();
+                Log.i(TAG, "Server Response: " + response.code() + " from sending " + events.size());
+
+                // Reset Events
+                // ============
+                events.removeAllElements();
+            } catch (Exception e) {
+                Log.e(TAG, "FlushTheEventsTask borked: " + e);
+            }
+
             return null;
         }
 
-    }
-
-    /**
-     * Non background thread way to send data to server.
-     */
-    private void sendDataToServer() {
-        if (events.size() < 1) {
-            Log.d(TAG, "No events in the queue to send so returning.");
-            return;
-        }
-
-        Log.i(TAG, "past events in queue check...");
-
-        // Check for NetworkConnectivity
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        if (networkInfo == null || !networkInfo.isConnected()) {
-            Log.w(TAG, "Not connected to network, so returning without attempting to send events");
-            return;
-        }
-
-        Log.i(TAG, "past network check...");
-
-        try {
-            // Send data
-            // =========
-            JSONArray jsonArray = new JSONArray();
-
-            for (Hashtable<String, Object> evt : events) {
-                JSONObject jsonObject = new JSONObject();
-
-                // Build the JSON but only if there's a value for it in the evt
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_EVENT, evt.get(MapboxEvent.ATTRIBUTE_EVENT));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CREATED, evt.get(MapboxEvent.ATTRIBUTE_CREATED));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY, evt.get(MapboxEvent.ATTRIBUTE_ENABLED_TELEMETRY));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SOURCE, evt.get(MapboxEvent.ATTRIBUTE_SOURCE));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SESSION_ID, evt.get(MapboxEvent.ATTRIBUTE_SESSION_ID));
-                jsonObject.putOpt(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
-                jsonObject.putOpt(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
-                jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
-                jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_MODEL, evt.get(MapboxEvent.ATTRIBUTE_MODEL));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_RESOLUTION, evt.get(MapboxEvent.ATTRIBUTE_RESOLUTION));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE, evt.get(MapboxEvent.ATTRIBUTE_ACCESSIBILITY_FONT_SCALE));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL, evt.get(MapboxEvent.ATTRIBUTE_BATTERY_LEVEL));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_PLUGGED_IN, evt.get(MapboxEvent.ATTRIBUTE_PLUGGED_IN));
-                jsonObject.putOpt(MapboxEvent.ATTRIBUTE_WIFI, evt.get(MapboxEvent.ATTRIBUTE_WIFI));
-
-                // Special Cases where empty string is denoting null and therefore should not be sent at all
-                // This arises as thread safe Hashtable does not accept null values (nor keys)
-                if (evt.containsKey(MapboxEvent.ATTRIBUTE_ORIENTATION)) {
-                    String orientation =  (String)evt.get(MapboxEvent.ATTRIBUTE_ORIENTATION);
-                    if (!TextUtils.isEmpty(orientation)) {
-                        jsonObject.putOpt(MapboxEvent.ATTRIBUTE_ORIENTATION, orientation);
-                    }
-                }
-                if (evt.containsKey(MapboxEvent.ATTRIBUTE_CARRIER)) {
-                    String carrier =  (String)evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
-                    if (!TextUtils.isEmpty(carrier)) {
-                        jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CARRIER, carrier);
-                    }
-                }
-                if (evt.containsKey(MapboxEvent.ATTRIBUTE_APPLICATION_STATE)) {
-                    String appState = (String)evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE);
-                    if (!TextUtils.isEmpty(appState)) {
-                        jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
-                    }
-                }
-
-                // Special Cases where null has to be passed if no value exists
-                // Requires using put() instead of putOpt()
-                String eventType = (String)evt.get(MapboxEvent.ATTRIBUTE_EVENT);
-                if (!TextUtils.isEmpty(eventType) && eventType.equalsIgnoreCase(MapboxEvent.TYPE_MAP_CLICK)) {
-                    jsonObject.put(MapboxEvent.KEY_GESTURE_ID, evt.get(MapboxEvent.KEY_GESTURE_ID));
-                }
-                if (evt.containsKey(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE)) {
-                    String cellularNetworkType = (String)evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE);
-                    if (TextUtils.isEmpty(cellularNetworkType)) {
-                        jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, null);
-                    } else {
-                        jsonObject.put(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE, evt.get(MapboxEvent.ATTRIBUTE_CELLULAR_NETWORK_TYPE));
-                    }
-                }
-
-                jsonArray.put(jsonObject);
-            }
-
-            Log.i(TAG, "past json building ...");
-
-            // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
-            CertificatePinner certificatePinner = new CertificatePinner.Builder()
-                    .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
-                    .add("cloudfront-staging.tilestream.net", "sha1//KDE76PP0DQBDcTnMFBv+efp4eg=")
-                    .add("api.mapbox.com", "sha1/Uv71ooi32pyba+oLD7egnXm7/GQ=")
-                    .add("api.mapbox.com", "sha1/hOP0d37/ZTSGgCSseE3DIZ1uSg0=")
-                    .build();
-
-            OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
-            RequestBody body = RequestBody.create(JSON, jsonArray.toString());
-
-            String url = eventsURL + "/events/v2?access_token=" + accessToken;
-
-            Request request = new Request.Builder()
-                    .url(url)
-                    .header("User-Agent", userAgent)
-                    .post(body)
-                    .build();
-            Log.i(TAG, "Will try to send " + events.size() + " in to the server.");
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.w(TAG, "Failure to send: " + e);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    Log.i(TAG, "Server Response: " + response.code());
-                }
-            });
-
-            // Reset Events
-            // ============
-            events.removeAllElements();
-        } catch (Exception e) {
-            Log.e(TAG, "FlushTheEventsTask borked: " + e);
-        }
     }
 
 

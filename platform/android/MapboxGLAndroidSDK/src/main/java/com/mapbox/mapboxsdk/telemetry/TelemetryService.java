@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
@@ -149,13 +148,11 @@ public class TelemetryService extends Service {
         MapboxEventManager.getMapboxEventManager().addLocationEvent(loc);
         MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
 
-/*
         try {
             Thread.sleep(1000);
         } catch (Exception e) {
             Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
         }
-*/
 
         unregisterReceiver(telemetryLocationReceiver);
         telemetryWakeLock.release();
