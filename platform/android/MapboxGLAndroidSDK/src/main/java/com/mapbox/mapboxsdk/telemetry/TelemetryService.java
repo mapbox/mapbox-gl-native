@@ -139,6 +139,17 @@ public class TelemetryService extends Service {
     }
 
     private void shutdownTelemetry() {
+
+        // Send Any Remaining events to the server
+        MapboxEventManager.getMapboxEventManager().flushEventsQueueImmediately();
+
+        // Undesired, but needed trick to keep app alive long enough for data to get to server
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
+        }
+
         unregisterReceiver(telemetryLocationReceiver);
         telemetryWakeLock.release();
     }

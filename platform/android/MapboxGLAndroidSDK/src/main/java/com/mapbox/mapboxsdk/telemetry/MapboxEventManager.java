@@ -233,6 +233,16 @@ public class MapboxEventManager {
     }
 
     /**
+     * Immediately attempt to send all events data in the queue to the server.
+     *
+     * NOTE: Permission set to package private to enable only telemetry code to use this.
+     */
+    void flushEventsQueueImmediately() {
+        Log.i(TAG, "flushEventsQueueImmediately() called...");
+        new FlushTheEventsTask().execute();
+    }
+
+    /**
      * Adds a Location Event to the system for processing
      * @param location Location event
      */
@@ -328,7 +338,7 @@ public class MapboxEventManager {
         events.add(event);
 
         // Send to Server Immediately
-        new FlushTheEventsTask().execute();
+        flushEventsQueueImmediately();
         Log.d(TAG, "turnstile event pushed.");
     }
 
@@ -540,7 +550,6 @@ public class MapboxEventManager {
                     jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
                     jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));
-                    jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_USERID, evt.get(MapboxEvent.ATTRIBUTE_USERID));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_MODEL, evt.get(MapboxEvent.ATTRIBUTE_MODEL));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_RESOLUTION, evt.get(MapboxEvent.ATTRIBUTE_RESOLUTION));
@@ -561,6 +570,12 @@ public class MapboxEventManager {
                         String carrier =  (String)evt.get(MapboxEvent.ATTRIBUTE_CARRIER);
                         if (!TextUtils.isEmpty(carrier)) {
                             jsonObject.putOpt(MapboxEvent.ATTRIBUTE_CARRIER, carrier);
+                        }
+                    }
+                    if (evt.containsKey(MapboxEvent.ATTRIBUTE_APPLICATION_STATE)) {
+                        String appState = (String)evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE);
+                        if (!TextUtils.isEmpty(appState)) {
+                            jsonObject.putOpt(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, evt.get(MapboxEvent.ATTRIBUTE_APPLICATION_STATE));
                         }
                     }
 
