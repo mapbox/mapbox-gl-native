@@ -49,6 +49,17 @@ Known issues:
 - Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
   - Resolved in 2.2.0
 
+## iOS master
+
+- An icon laid out along a line no longer appears if it would extend past the end of the line. Some one-way arrows no longer point the wrong way. ([#3839](https://github.com/mapbox/mapbox-gl-native/pull/3839))
+- Reduce slanted segments in dashed lines near corners. ([#3914](https://github.com/mapbox/mapbox-gl-native/pull/3914))
+- Telemetry location gathering now only occurs when the device is in motion. ([#4115](https://github.com/mapbox/mapbox-gl-native/pull/4115))
+- An account’s monthly active users metric only counts a user once a map view is displayed to that user. ([#3713](https://github.com/mapbox/mapbox-gl-native/pull/3713))
+- Updated documentation to reflect the requirement that you must embed the framework in the “Embedded Binaries” section in Xcode. ([#4011](https://github.com/mapbox/mapbox-gl-native/issues/4011))
+- Polygons and polylines now default to using the map view’s tint color. ([#4028](https://github.com/mapbox/mapbox-gl-native/pull/4028))
+- The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
+- Fixed a formatting issue in the documentation for `MGLCoordinateBoundsIsEmpty()`. ([#3958](https://github.com/mapbox/mapbox-gl-native/pull/3958))
+
 ## iOS 3.1.2
 
 - You can once again install the static framework without manually linking several framework and library dependencies. ([#4029](https://github.com/mapbox/mapbox-gl-native/pull/4029))
@@ -62,9 +73,6 @@ Known issues:
 - Fixed an issue preventing the Latitude inspectable from working when it is set before setting the Zoom Level inspectable in Interface Builder. ([#3886](https://github.com/mapbox/mapbox-gl-native/pull/3886))
 - Fixed an issue that incorrectly expanded the tappable area of an annotation and prevented the annotation’s alignment rect insets from having any effect on the tappable area. ([#3898](https://github.com/mapbox/mapbox-gl-native/pull/3898))
 - Fixed an issue preventing `-[MGLMapViewDelegate mapView:tapOnCalloutForAnnotation:]` from being called when a non-custom callout view is tapped. ([#3875](https://github.com/mapbox/mapbox-gl-native/pull/3875))
-
-- Polygons and polylines now default to using the map view's tint color. ([#4028](https://github.com/mapbox/mapbox-gl-native/pull/4028))
-- The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 
 ## iOS 3.1.0
 
