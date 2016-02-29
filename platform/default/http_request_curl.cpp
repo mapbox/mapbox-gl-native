@@ -525,11 +525,11 @@ void HTTPCURLRequest::handleResult(CURLcode code) {
         } else if (responseCode >= 500 && responseCode < 600) {
             response->error =
                 std::make_unique<Error>(Error::Reason::Server, std::string{ "HTTP status code " } +
-                                                                   std::to_string(responseCode));
+                                                                   util::toString(responseCode));
         } else {
             response->error =
                 std::make_unique<Error>(Error::Reason::Other, std::string{ "HTTP status code " } +
-                                                                  std::to_string(responseCode));
+                                                                  util::toString(responseCode));
         }
     }
 

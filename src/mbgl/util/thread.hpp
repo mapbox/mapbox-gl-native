@@ -11,6 +11,8 @@
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/platform/platform.hpp>
 
+#include <pthread.h>
+
 namespace mbgl {
 namespace util {
 
@@ -93,11 +95,13 @@ Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
     std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
 
     thread = std::thread([&] {
-        #if defined( __APPLE__)
+#if defined(__APPLE__)
         pthread_setname_np(context.name.c_str());
-        #elif defined(__linux__)
+#elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#if __GLIBC_PREREQ(2, 12)
         pthread_setname_np(pthread_self(), context.name.c_str());
-        #endif
+#endif
+#endif
 
         if (context.priority == ThreadPriority::Low) {
             platform::makeThreadLowPriority();

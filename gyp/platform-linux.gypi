@@ -32,6 +32,7 @@
 
       'variables': {
         'cflags_cc': [
+          '<@(opengl_cflags)',
           '<@(libpng_cflags)',
           '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',

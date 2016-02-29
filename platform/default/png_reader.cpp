@@ -83,8 +83,8 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     png_set_sig_bytes(png_ptr, 8);
     png_read_info(png_ptr, info_ptr);
 
-    unsigned width = 0;
-    unsigned height = 0;
+    png_uint_32 width = 0;
+    png_uint_32 height = 0;
     int bit_depth = 0;
     int color_type = 0;
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, 0, 0, 0);

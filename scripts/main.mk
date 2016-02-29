@@ -147,20 +147,20 @@ Xcode/%: Xcode/__project__
 
 Ninja/%: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) $*
+	$(QUIET)$(ENV) deps/ninja/ninja-$(BUILD) -C build/$(HOST_SLUG)/$(BUILDTYPE) $*
 
 
 Ninja/compdb: OUTPUT=build/$(HOST_SLUG)/$(BUILDTYPE)/compile_commands.json
 Ninja/compdb: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Writing to $(OUTPUT)$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) \
+	$(QUIET)$(ENV) deps/ninja/ninja-$(BUILD) -C build/$(HOST_SLUG)/$(BUILDTYPE) \
 		-t compdb cc cc_s cxx objc objcxx > $(OUTPUT)
 
 #### Tidy ######################################################################
 
 tidy: Ninja/compdb
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Generating header files...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) deps/ninja/ninja-$(HOST) -C build/$(HOST_SLUG)/$(BUILDTYPE) version shaders
+	$(QUIET)$(ENV) deps/ninja/ninja-$(BUILD) -C build/$(HOST_SLUG)/$(BUILDTYPE) version shaders
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Running tidy...$(FORMAT_END)\n"
 	@./scripts/clang-tidy.sh
 
