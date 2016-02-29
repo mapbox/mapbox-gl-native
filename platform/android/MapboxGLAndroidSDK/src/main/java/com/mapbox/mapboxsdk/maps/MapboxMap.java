@@ -526,7 +526,10 @@ public class MapboxMap {
 
 
     /**
-     * Set the offset of the user location view shadow
+     * Set the offset of the user location view shadow.
+     *
+     * @param x int x offset in pixels
+     * @param y int y offset in pixels
      */
     public void setUserLocationShadowOffset(int x, int y) {
         mMapView.setUserLocationShadowOffset(x, y);
