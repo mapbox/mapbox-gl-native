@@ -75,6 +75,8 @@ public final class UserLocationView extends View {
     private final RectF mUserLocationStaleDrawableBoundsF = new RectF();
     private final RectF mUserLocationStaleShadowDrawableBoundsF = new RectF();
 
+    private int mShadowX = 0;
+    private int mShadowY = 0;
 
     private Rect mDirtyRect;
     private RectF mDirtyRectF;
@@ -210,14 +212,14 @@ public final class UserLocationView extends View {
         canvas.restore();
         canvas.save();
 
-        canvas.translate(shadowBounds.width() * 0.12f, shadowBounds.height() * 0.12f);
+        canvas.translate(mShadowX, mShadowY);
         canvas.concat(mMarkerScreenMatrix);
         willDraw |= !canvas.quickReject(shadowBounds, Canvas.EdgeType.AA);
 
         canvas.restore();
         if (willDraw) {
             canvas.save();
-            canvas.translate(shadowBounds.width() * 0.12f, shadowBounds.height() * 0.12f);
+            canvas.translate(mShadowX, mShadowY);
             canvas.concat(mMarkerScreenMatrix);
             shadowDrawable.draw(canvas);
 
@@ -287,16 +289,11 @@ public final class UserLocationView extends View {
         }
     }
 
-    Drawable getUserLocationDrawable() {
-        return mUserLocationDrawable;
-    }
 
-    Drawable getUserLocationBearingDrawable() {
-        return mUserLocationBearingDrawable;
-    }
-
-    Drawable getUserLocationStaleDrawable() {
-        return mUserLocationStaleDrawable;
+    void setUserLocationShadowOffset(int x, int y) {
+        mShadowX = x;
+        mShadowY = y;
+        update();
     }
 
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {

@@ -483,46 +483,55 @@ public class MapboxMap {
     }
 
     /**
-     * Set the last known position user marker.
+     * Set the user location view default drawable .
      */
     public void setUserLocationDrawable(Drawable drawable) {
         mMapView.setUserLocationDrawable(drawable);
     }
 
     /**
-     * Set the last known position user marker and its shadow.
+     * Set the user location view default drawable and its shadow.
      */
     public void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
         mMapView.setUserLocationDrawable(drawable, shadowDrawable);
     }
 
     /**
-     * Set the last known position user marker.
+     * Set the user location view bearing drawable.
      */
     public void setUserLocationBearingDrawable(Drawable drawable) {
         mMapView.setUserLocationBearingDrawable(drawable);
     }
 
     /**
-     * Set the user location bearing marker and its shadow.
+     * Set the user location view bearing drawable and its shadow.
      */
     public void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
         mMapView.setUserLocationBearingDrawable(drawable, shadowDrawable);
     }
 
     /**
-     * Set the last known position user marker.
+     * Set the stale user location view drawable.
      */
     public void setUserLocationStaleDrawable(Drawable drawable) {
         mMapView.setUserLocationStaleDrawable(drawable);
     }
 
     /**
-     * Set the last known position user marker and its shadow.
+     * Set the stale user location view drawable and its shadow.
      */
     public void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
         mMapView.setUserLocationStaleDrawable(drawable, shadowDrawable);
     }
+
+
+    /**
+     * Set the offset of the user location view shadow
+     */
+    public void setUserLocationShadowOffset(int x, int y) {
+        mMapView.setUserLocationShadowOffset(x, y);
+    }
+
 
     /**
      * Returns the current Mapbox access token used to load map styles and tiles.
