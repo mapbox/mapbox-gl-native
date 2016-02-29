@@ -14,7 +14,6 @@
 namespace mbgl {
 
 class TileID;
-class TileCoordinate;
 
 class TransformState {
     friend class Transform;
@@ -38,7 +37,7 @@ public:
     ConstrainMode getConstrainMode() const;
 
     // Position
-    LatLng getLatLng() const;
+    LatLng getLatLng(LatLng::WrapMode = LatLng::Wrapped) const;
     double pixel_x() const;
     double pixel_y() const;
 
@@ -66,13 +65,7 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
-
-    TileCoordinate latLngToCoordinate(const LatLng&) const;
-    LatLng coordinateToLatLng(const TileCoordinate&) const;
-
-    ScreenCoordinate coordinateToPoint(const TileCoordinate&) const;
-    TileCoordinate pointToCoordinate(const ScreenCoordinate&) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
 
     double xLng(double x, double worldSize) const;
     double yLat(double y, double worldSize) const;

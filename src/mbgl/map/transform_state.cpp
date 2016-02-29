@@ -1,7 +1,6 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/math.hpp>
 
@@ -89,15 +88,14 @@ ConstrainMode TransformState::getConstrainMode() const {
 
 #pragma mark - Position
 
-LatLng TransformState::getLatLng() const {
-    LatLng ll;
+LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
+    LatLng ll {
+        util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI),
+        -x / Bc,
+        wrapMode
+    };
 
-    ll.longitude = -x / Bc;
-    ll.latitude  = util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI);
-
-    // adjust for world wrap
-    while (ll.longitude >  util::LONGITUDE_MAX) ll.longitude -= util::LONGITUDE_MAX;
-    while (ll.longitude < -util::LONGITUDE_MAX) ll.longitude += util::LONGITUDE_MAX;
+    if (wrapMode == LatLng::Unwrapped) return ll;
 
     // adjust for date line
     double w = util::tileSize * scale / 2;
@@ -250,46 +248,16 @@ double TransformState::worldSize() const {
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
-    return coordinateToPoint(latLngToCoordinate(latLng));
-}
-
-LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point) const {
-    return coordinateToLatLng(pointToCoordinate(point));
-}
-
-TileCoordinate TransformState::latLngToCoordinate(const LatLng& latLng) const {
-    return {
-        lngX(latLng.longitude) / util::tileSize,
-        latY(latLng.latitude) / util::tileSize,
-        getZoom()
-    };
-}
-
-LatLng TransformState::coordinateToLatLng(const TileCoordinate& coord) const {
-    const double worldSize_ = zoomScale(coord.zoom);
-    LatLng latLng = {
-        yLat(coord.row, worldSize_),
-        xLng(coord.column, worldSize_)
-    };
-    while (latLng.longitude < -util::LONGITUDE_MAX) latLng.longitude += 360.0f;
-    while (latLng.longitude > util::LONGITUDE_MAX) latLng.longitude -= 360.0f;
-    return latLng;
-}
-
-ScreenCoordinate TransformState::coordinateToPoint(const TileCoordinate& coord) const {
-    mat4 mat = coordinatePointMatrix(coord.zoom);
+    mat4 mat = coordinatePointMatrix(getZoom());
     vec4<double> p;
-    vec4<double> c = { coord.column, coord.row, 0, 1 };
+    vec4<double> c = { lngX(latLng.longitude) / util::tileSize, latY(latLng.latitude) / util::tileSize, 0, 1 };
     matrix::transformMat4(p, c, mat);
     return { p.x / p.w, height - p.y / p.w };
 }
 
-TileCoordinate TransformState::pointToCoordinate(const ScreenCoordinate& point) const {
-
+LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
     float targetZ = 0;
-    const double tileZoom = getZoom();
-
-    mat4 mat = coordinatePointMatrix(tileZoom);
+    mat4 mat = coordinatePointMatrix(getZoom());
 
     mat4 inverted;
     bool err = matrix::invert(inverted, mat);
@@ -319,8 +287,11 @@ TileCoordinate TransformState::pointToCoordinate(const ScreenCoordinate& point) 
     double z1 = coord1.z / w1;
 
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
-
-    return { util::interpolate(x0, x1, t), util::interpolate(y0, y1, t), tileZoom };
+    return {
+        yLat(util::interpolate(y0, y1, t), scale),
+        xLng(util::interpolate(x0, x1, t), scale),
+        wrapMode
+    };
 }
 
 mat4 TransformState::coordinatePointMatrix(double z) const {
@@ -367,23 +338,20 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
-    if (!latLng || !anchor) {
-        return;
-    }
-    
-    auto coord = latLngToCoordinate(latLng);
-    auto coordAtPoint = pointToCoordinate(anchor);
-    auto coordCenter = pointToCoordinate({ width / 2.0f, height / 2.0f });
-    
-    float columnDiff = coordAtPoint.column - coord.column;
-    float rowDiff = coordAtPoint.row - coord.row;
-    
-    auto newLatLng = coordinateToLatLng({
-        coordCenter.column - columnDiff,
-        coordCenter.row - rowDiff,
-        coordCenter.zoom
-    });
-    setLatLngZoom(newLatLng, coordCenter.zoom);
+    if (!latLng || !anchor) return;
+
+    auto latLngToTileCoord = [&](const LatLng& ll) -> vec2<double> {
+        return { lngX(ll.longitude) / util::tileSize, latY(ll.latitude) / util::tileSize };
+    };
+
+    auto tileCoordToLatLng = [&](const vec2<double> coord) -> LatLng {
+        return { yLat(coord.y, scale), xLng(coord.x, scale) };
+    };
+
+    auto centerCoord = latLngToTileCoord(getLatLng(LatLng::Unwrapped));
+    auto latLngCoord = latLngToTileCoord(latLng);
+    auto anchorCoord = latLngToTileCoord(screenCoordinateToLatLng(anchor, LatLng::Unwrapped));
+    setLatLngZoom(tileCoordToLatLng(centerCoord + latLngCoord - anchorCoord), getZoom());
 }
 
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {

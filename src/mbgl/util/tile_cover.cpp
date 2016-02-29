@@ -1,20 +1,40 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/vec.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/interpolate.hpp>
 #include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
+namespace {
+
+// Has floating point x/y coordinates.
+// Used for computing the tiles that need to be visible in the viewport.
+class TileCoordinate {
+public:
+    double x, y;
+
+    static TileCoordinate fromLatLng(const TransformState& state, double zoom, const LatLng& latLng) {
+        const double scale = std::pow(2, zoom - state.getZoom());
+        return {
+            state.lngX(latLng.longitude) * scale / util::tileSize,
+            state.latY(latLng.latitude) * scale / util::tileSize,
+        };
+    }
+
+    static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& point) {
+        return fromLatLng(state, zoom, state.screenCoordinateToLatLng(point, LatLng::Unwrapped));
+    }
+};
+
 // Taken from polymaps src/Layer.js
 // https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
-
 struct edge {
     double x0 = 0, y0 = 0;
     double x1 = 0, y1 = 0;
     double dx = 0, dy = 0;
 
-    edge(ScreenCoordinate a, ScreenCoordinate b) {
+    edge(TileCoordinate a, TileCoordinate b) {
         if (a.y > b.y) std::swap(a, b);
         x0 = a.x;
         y0 = a.y;
@@ -25,7 +45,7 @@ struct edge {
     }
 };
 
-typedef const std::function<void(int32_t x0, int32_t x1, int32_t y)> ScanLine;
+using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
 // scan-line conversion
 static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
@@ -52,7 +72,7 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
 }
 
 // scan-line conversion
-static void scanTriangle(const ScreenCoordinate& a, const ScreenCoordinate& b, const ScreenCoordinate& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+static void scanTriangle(const TileCoordinate& a, const TileCoordinate& b, const TileCoordinate& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
@@ -67,6 +87,8 @@ static void scanTriangle(const ScreenCoordinate& a, const ScreenCoordinate& b, c
     if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
 }
 
+} // namespace
+
 int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t tileSize) {
     zoom += std::log(util::tileSize / tileSize) / std::log(2);
     if (type == SourceType::Raster || type == SourceType::Video) {
@@ -76,16 +98,11 @@ int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t tileSize) {
     }
 }
 
-static ScreenCoordinate zoomTo(const TileCoordinate& c, double z) {
-    double scale = std::pow(2, z - c.zoom);
-    return { c.column * scale, c.row * scale };
-}
-
-std::vector<TileID> tileCover(const TileCoordinate& tl_,
-                              const TileCoordinate& tr_,
-                              const TileCoordinate& br_,
-                              const TileCoordinate& bl_,
-                              const TileCoordinate& center,
+std::vector<TileID> tileCover(const TileCoordinate& tl,
+                              const TileCoordinate& tr,
+                              const TileCoordinate& br,
+                              const TileCoordinate& bl,
+                              const TileCoordinate& c,
                               int32_t z,
                               int32_t actualZ) {
     int32_t tiles = 1 << z;
@@ -94,17 +111,11 @@ std::vector<TileID> tileCover(const TileCoordinate& tl_,
     auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
         int32_t x;
         if (y >= 0 && y <= tiles) {
-            for (x = x0; x < x1; x++) {
+            for (x = x0; x < x1; ++x) {
                 t.emplace_front(actualZ, x, y, z);
             }
         }
     };
-
-    const ScreenCoordinate tl(zoomTo(tl_, z));
-    const ScreenCoordinate tr(zoomTo(tr_, z));
-    const ScreenCoordinate br(zoomTo(br_, z));
-    const ScreenCoordinate bl(zoomTo(bl_, z));
-    const ScreenCoordinate c(zoomTo(center, z));
 
     // Divide the screen up in two triangles and scan each of them:
     // \---+
@@ -138,11 +149,11 @@ std::vector<TileID> tileCover(const LatLngBounds& bounds_, int32_t z, int32_t ac
 
     const TransformState state;
     return tileCover(
-        state.latLngToCoordinate(bounds.northwest()),
-        state.latLngToCoordinate(bounds.northeast()),
-        state.latLngToCoordinate(bounds.southeast()),
-        state.latLngToCoordinate(bounds.southwest()),
-        state.latLngToCoordinate(bounds.center()),
+        TileCoordinate::fromLatLng(state, z, bounds.northwest()),
+        TileCoordinate::fromLatLng(state, z, bounds.northeast()),
+        TileCoordinate::fromLatLng(state, z, bounds.southeast()),
+        TileCoordinate::fromLatLng(state, z, bounds.southwest()),
+        TileCoordinate::fromLatLng(state, z, bounds.center()),
         z, actualZ);
 }
 
@@ -150,11 +161,11 @@ std::vector<TileID> tileCover(const TransformState& state, int32_t z, int32_t ac
     const double w = state.getWidth();
     const double h = state.getHeight();
     return tileCover(
-        state.pointToCoordinate({ 0,   0   }),
-        state.pointToCoordinate({ w,   0   }),
-        state.pointToCoordinate({ w,   h   }),
-        state.pointToCoordinate({ 0,   h   }),
-        state.pointToCoordinate({ w/2, h/2 }),
+        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }),
+        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }),
+        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }),
+        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }),
+        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }),
         z, actualZ);
 }
 
