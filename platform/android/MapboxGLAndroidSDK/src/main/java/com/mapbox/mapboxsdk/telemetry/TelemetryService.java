@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -15,7 +14,6 @@ public class TelemetryService extends Service {
     private static final String TAG = "TelemetryService";
 
     private TelemetryLocationReceiver telemetryLocationReceiver = null;
-    private PowerManager.WakeLock telemetryWakeLock;
 
     /**
      * Return the communication channel to the service.  May return null if
@@ -130,11 +128,6 @@ public class TelemetryService extends Service {
 
         Log.i(TAG, "onStartCommand() called");
 
-        // Start WakeLock to keep Location Data working when device sleeps
-        PowerManager mgr = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        telemetryWakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "TelemetryWakeLock");
-        telemetryWakeLock.acquire();
-
         return START_NOT_STICKY;
     }
 
@@ -151,6 +144,5 @@ public class TelemetryService extends Service {
         }
 
         unregisterReceiver(telemetryLocationReceiver);
-        telemetryWakeLock.release();
     }
 }
