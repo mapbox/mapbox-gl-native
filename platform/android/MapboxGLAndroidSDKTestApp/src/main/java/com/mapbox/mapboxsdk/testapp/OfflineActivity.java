@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -24,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineRegionMetadata;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
@@ -224,8 +222,7 @@ public class OfflineActivity extends AppCompatActivity
                 String regionName;
 
                 try {
-                    String json = new String(offlineRegion.getMetadata().getMetadata(), CustomMetadata.CHARSET);
-                    CustomMetadata customMetadata = new Gson().fromJson(json, CustomMetadata.class);
+                    CustomMetadata customMetadata = CustomMetadata.decode(offlineRegion.getMetadata());
                     regionName = customMetadata.getRegionName();
                 } catch (UnsupportedEncodingException e) {
                     Log.e(LOG_TAG, "Failed to decode metadata: " + e.getMessage());
@@ -262,13 +259,10 @@ public class OfflineActivity extends AppCompatActivity
                 styleURL, bounds, minZoom, maxZoom, pixelRatio);
 
         // Sample way of encoding metadata
-        OfflineRegionMetadata metadata;
+        byte[] metadata;
         try {
             CustomMetadata customMetadata = new CustomMetadata(regionName);
-            byte[] encoded = new Gson()
-                    .toJson(customMetadata, CustomMetadata.class)
-                    .getBytes(CustomMetadata.CHARSET);
-            metadata = new OfflineRegionMetadata(encoded);
+            metadata = customMetadata.encode();
         } catch (UnsupportedEncodingException e) {
             Log.e(LOG_TAG, "Failed to encode metadata: " + e.getMessage());
             metadata = null;

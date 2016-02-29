@@ -141,10 +141,6 @@ jfieldID offlineRegionDefinitionMinZoomId = nullptr;
 jfieldID offlineRegionDefinitionMaxZoomId = nullptr;
 jfieldID offlineRegionDefinitionPixelRatioId = nullptr;
 
-jclass offlineRegionMetadataClass = nullptr;
-jmethodID offlineRegionMetadataConstructorId = nullptr;
-jfieldID offlineRegionMetadataMetadataId = nullptr;
-
 jclass createOfflineRegionCallbackClass = nullptr;
 jmethodID createOnCreateMethodId = nullptr;
 jmethodID createOnErrorMethodId = nullptr;
@@ -1779,8 +1775,7 @@ void JNICALL listOfflineRegions(JNIEnv *env, jobject obj, jlong defaultFileSourc
                 
                 // Metadata object
                 jbyteArray metadata = metadata_from_native(env2, region.getMetadata());
-                jobject jmetadata = env2->NewObject(offlineRegionMetadataClass, offlineRegionMetadataConstructorId, metadata);
-                env2->SetObjectField(jregion, offlineRegionMetadataId, jmetadata);
+                env2->SetObjectField(jregion, offlineRegionMetadataId, metadata);
 
                 // Moves the region on the stack into a heap-allocated one
                 env2->SetLongField(jregion, offlineRegionPtrId,
@@ -1801,7 +1796,7 @@ void JNICALL listOfflineRegions(JNIEnv *env, jobject obj, jlong defaultFileSourc
     });
 }
 
-void JNICALL createOfflineRegion(JNIEnv *env, jobject obj, jlong defaultFileSourcePtr, jobject definition_, jobject metadata_, jobject createCallback) {
+void JNICALL createOfflineRegion(JNIEnv *env, jobject obj, jlong defaultFileSourcePtr, jobject definition_, jbyteArray metadata_, jobject createCallback) {
     mbgl::Log::Debug(mbgl::Event::JNI, "createOfflineRegion");
 
     // Checks
@@ -1827,9 +1822,8 @@ void JNICALL createOfflineRegion(JNIEnv *env, jobject obj, jlong defaultFileSour
 
     // Metadata
     mbgl::OfflineRegionMetadata metadata;
-    jbyteArray jmetadata = (jbyteArray)env->GetObjectField(metadata_, offlineRegionMetadataMetadataId);
-    if (jmetadata != nullptr) {
-        metadata = metadata_from_java(env, jmetadata);
+    if (metadata_ != nullptr) {
+        metadata = metadata_from_java(env, metadata_);
     }
 
     // Makes sure the objects don't get GC'ed
@@ -1857,9 +1851,8 @@ void JNICALL createOfflineRegion(JNIEnv *env, jobject obj, jlong defaultFileSour
             env2->SetLongField(jregion, offlineRegionIdId, region->getID());
 
             // Metadata object
-            jbyteArray xmetadata = metadata_from_native(env2, region->getMetadata());
-            jobject xjmetadata = env2->NewObject(offlineRegionMetadataClass, offlineRegionMetadataConstructorId, xmetadata);
-            env2->SetObjectField(jregion, offlineRegionMetadataId, xjmetadata);
+            jbyteArray jmetadata = metadata_from_native(env2, region->getMetadata());
+            env2->SetObjectField(jregion, offlineRegionMetadataId, jmetadata);
 
             // Moves the region on the stack into a heap-allocated one
             env2->SetLongField(jregion, offlineRegionPtrId,
@@ -2582,7 +2575,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    offlineRegionMetadataId = env->GetFieldID(offlineRegionClass, "mMetadata", "Lcom/mapbox/mapboxsdk/offline/OfflineRegionMetadata;");
+    offlineRegionMetadataId = env->GetFieldID(offlineRegionClass, "mMetadata", "[B");
     if (offlineRegionMetadataId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
@@ -2633,24 +2626,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     offlineRegionDefinitionPixelRatioId = env->GetFieldID(offlineRegionDefinitionClass, "pixelRatio", "F");
     if (offlineRegionDefinitionPixelRatioId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    offlineRegionMetadataClass = env->FindClass("com/mapbox/mapboxsdk/offline/OfflineRegionMetadata");
-    if (offlineRegionMetadataClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    offlineRegionMetadataConstructorId = env->GetMethodID(offlineRegionMetadataClass, "<init>", "([B)V");
-    if (offlineRegionMetadataConstructorId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    offlineRegionMetadataMetadataId = env->GetFieldID(offlineRegionMetadataClass, "metadata", "[B");
-    if (offlineRegionMetadataMetadataId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -2944,7 +2919,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"setAccessToken", "(JLjava/lang/String;)V", reinterpret_cast<void *>(&setAccessToken)},
         {"getAccessToken", "(J)Ljava/lang/String;", reinterpret_cast<void *>(&getAccessToken)},
         {"listOfflineRegions", "(JLcom/mapbox/mapboxsdk/offline/OfflineManager$ListOfflineRegionsCallback;)V", reinterpret_cast<void *>(&listOfflineRegions)},
-        {"createOfflineRegion", "(JLcom/mapbox/mapboxsdk/offline/OfflineRegionDefinition;Lcom/mapbox/mapboxsdk/offline/OfflineRegionMetadata;Lcom/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback;)V", reinterpret_cast<void *>(&createOfflineRegion)},
+        {"createOfflineRegion", "(JLcom/mapbox/mapboxsdk/offline/OfflineRegionDefinition;[BLcom/mapbox/mapboxsdk/offline/OfflineManager$CreateOfflineRegionCallback;)V", reinterpret_cast<void *>(&createOfflineRegion)},
         {"setOfflineMapboxTileCountLimit", "(JJ)V", reinterpret_cast<void *>(&setOfflineMapboxTileCountLimit)}
     };
 
@@ -3223,28 +3198,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(offlineRegionClass);
     }
 
-    offlineRegionMetadataClass = reinterpret_cast<jclass>(env->NewGlobalRef(offlineRegionMetadataClass));
-    if (offlineRegionMetadataClass == nullptr) {
-        env->ExceptionDescribe();
-        env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngBoundsClass);
-        env->DeleteGlobalRef(iconClass);
-        env->DeleteGlobalRef(markerClass);
-        env->DeleteGlobalRef(polylineClass);
-        env->DeleteGlobalRef(polygonClass);
-        env->DeleteGlobalRef(runtimeExceptionClass);
-        env->DeleteGlobalRef(nullPointerExceptionClass);
-        env->DeleteGlobalRef(arrayListClass);
-        env->DeleteGlobalRef(projectedMetersClass);
-        env->DeleteGlobalRef(pointFClass);
-        env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
-        env->DeleteGlobalRef(offlineManagerClass);
-        env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
-        env->DeleteGlobalRef(offlineRegionClass);
-        env->DeleteGlobalRef(offlineRegionDefinitionClass);
-    }
-
     createOfflineRegionCallbackClass = reinterpret_cast<jclass>(env->NewGlobalRef(createOfflineRegionCallbackClass));
     if (createOfflineRegionCallbackClass == nullptr) {
         env->ExceptionDescribe();
@@ -3265,7 +3218,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
     }
 
     offlineRegionObserverClass = reinterpret_cast<jclass>(env->NewGlobalRef(offlineRegionObserverClass));
@@ -3288,7 +3240,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
         env->DeleteGlobalRef(createOfflineRegionCallbackClass);
     }
 
@@ -3312,7 +3263,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
         env->DeleteGlobalRef(createOfflineRegionCallbackClass);
         env->DeleteGlobalRef(offlineRegionObserverClass);
     }
@@ -3337,7 +3287,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
         env->DeleteGlobalRef(createOfflineRegionCallbackClass);
         env->DeleteGlobalRef(offlineRegionObserverClass);
         env->DeleteGlobalRef(offlineRegionStatusClass);
@@ -3363,7 +3312,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
         env->DeleteGlobalRef(createOfflineRegionCallbackClass);
         env->DeleteGlobalRef(offlineRegionObserverClass);
         env->DeleteGlobalRef(offlineRegionStatusClass);
@@ -3390,7 +3338,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
         env->DeleteGlobalRef(offlineRegionDefinitionClass);
-        env->DeleteGlobalRef(offlineRegionMetadataClass);
         env->DeleteGlobalRef(createOfflineRegionCallbackClass);
         env->DeleteGlobalRef(offlineRegionObserverClass);
         env->DeleteGlobalRef(offlineRegionStatusClass);
@@ -3527,10 +3474,6 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     offlineRegionDefinitionMinZoomId = nullptr;
     offlineRegionDefinitionMaxZoomId = nullptr;
     offlineRegionDefinitionPixelRatioId = nullptr;
-
-    env->DeleteGlobalRef(offlineRegionMetadataClass);
-    offlineRegionMetadataConstructorId = nullptr;
-    offlineRegionMetadataMetadataId = nullptr;
 
     env->DeleteGlobalRef(createOfflineRegionCallbackClass);
     createOnCreateMethodId = nullptr;

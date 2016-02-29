@@ -126,7 +126,7 @@ public class OfflineManager {
      */
     public void createOfflineRegion(
             @NonNull OfflineRegionDefinition definition,
-            @NonNull OfflineRegionMetadata metadata,
+            @NonNull byte[] metadata,
             @NonNull final CreateOfflineRegionCallback callback) {
 
         createOfflineRegion(mDefaultFileSourcePtr, definition, metadata, new CreateOfflineRegionCallback() {
@@ -176,7 +176,7 @@ public class OfflineManager {
 
     private native void createOfflineRegion(
             long defaultFileSourcePtr, OfflineRegionDefinition definition,
-            OfflineRegionMetadata metadata, CreateOfflineRegionCallback callback);
+            byte[] metadata, CreateOfflineRegionCallback callback);
 
     private native void setOfflineMapboxTileCountLimit(
             long defaultFileSourcePtr, long limit);

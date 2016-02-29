@@ -23,7 +23,13 @@ public class OfflineRegion {
     // Members
     private long mId = 0;
     private OfflineRegionDefinition mDefinition = null;
-    private OfflineRegionMetadata mMetadata = null;
+
+    /**
+     * Arbitrary binary region metadata. The contents are opaque to the SDK implementation;
+     * it just stores and retrieves a byte[]. Check the `OfflineActivity` in the TestApp
+     * for a sample implementation that uses JSON to store an offline region name.
+     */
+    private byte[] mMetadata = null;
 
     // Holds the pointer to JNI OfflineRegion
     private long mOfflineRegionPtr = 0;
@@ -122,7 +128,7 @@ public class OfflineRegion {
         return mDefinition;
     }
 
-    public OfflineRegionMetadata getMetadata() {
+    public byte[] getMetadata() {
         return mMetadata;
     }
 

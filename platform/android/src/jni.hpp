@@ -127,10 +127,6 @@ extern jfieldID offlineRegionDefinitionMinZoomId;
 extern jfieldID offlineRegionDefinitionMaxZoomId;
 extern jfieldID offlineRegionDefinitionPixelRatioId;
 
-extern jclass offlineRegionMetadataClass;
-extern jmethodID offlineRegionMetadataConstructorId;
-extern jfieldID offlineRegionMetadataMetadataId;
-
 extern jclass createOfflineRegionCallbackClass;
 extern jmethodID createOnCreateMethodId;
 extern jmethodID createOnErrorMethodId;
