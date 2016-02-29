@@ -18,6 +18,7 @@
       'variables': {
         'cflags_cc': [
           '<@(boost_cflags)',
+          '<@(jni.hpp_cflags)',
         ],
         'defines': [
           '-DMBGL_HTTP_ANDROID'

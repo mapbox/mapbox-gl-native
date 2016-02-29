@@ -32,7 +32,7 @@ function print_flags {
     if [ "$(type -t print_${NAME}_flags)" = 'function' ]; then
         print_${NAME}_flags
     else
-        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]-" "[:upper:]_"`
+        local VERSION=`echo "${NAME}_VERSION" | tr "[:lower:]-." "[:upper:]__"`
         if [ ! -z ${!VERSION:-} ] ; then
             mason install ${NAME} ${!VERSION}
             for FLAGS in "$@" ; do
@@ -106,6 +106,7 @@ print_flags rapidjson static_libs cflags ldflags
 print_flags gtest static_libs cflags ldflags
 print_flags pixelmatch static_libs cflags ldflags
 print_flags webp static_libs cflags ldflags
+print_flags jni.hpp static_libs cflags ldflags
 
 CONFIG+="  }
 }
