@@ -721,7 +721,6 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getAccessToken();
     }
 
-<<<<<<< HEAD
     // Checks if the given token is valid
     private void validateAccessToken(String accessToken) {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {

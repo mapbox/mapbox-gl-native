@@ -222,37 +222,37 @@ public final class UserLocationView extends View {
     }
 
 
-    void setUserLocationDrawable(@NonNull Drawable drawable) {
+    public void setUserLocationDrawable(@NonNull Drawable drawable) {
         setUserLocationDrawable(drawable, null);
     }
 
-    void setUserLocationDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+    public void setUserLocationDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
         mHolder.setDrawable(drawable);
         mHolder.setShadow(shadowDrawable);
         update();
     }
 
-    void setUserLocationBearingDrawable(@NonNull Drawable drawable) {
+    public void setUserLocationBearingDrawable(@NonNull Drawable drawable) {
         setUserLocationBearingDrawable(drawable, null);
     }
 
-    void setUserLocationBearingDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+    public void setUserLocationBearingDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
         mBearingHolder.setDrawable(drawable);
         mBearingHolder.setShadow(shadowDrawable);
         update();
     }
 
-    void setUserLocationStaleDrawable(@NonNull Drawable drawable) {
+    public void setUserLocationStaleDrawable(@NonNull Drawable drawable) {
         setUserLocationStaleDrawable(drawable, null);
     }
 
-    void setUserLocationStaleDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
+    public void setUserLocationStaleDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
         mStaleHolder.setDrawable(drawable);
         mStaleHolder.setShadow(shadowDrawable);
         update();
     }
 
-    void setUserLocationShadowOffset(int x, int y) {
+    public void setUserLocationShadowOffset(int x, int y) {
         mShadowX = x;
         mShadowY = y;
         update();
