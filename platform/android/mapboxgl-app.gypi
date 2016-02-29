@@ -22,6 +22,7 @@
       'sources': [
         './src/native_map_view.cpp',
         './src/jni.cpp',
+        './src/attach_env.cpp',
       ],
 
       'cflags_cc': [

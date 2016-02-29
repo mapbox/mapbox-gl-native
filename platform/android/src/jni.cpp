@@ -8,8 +8,6 @@
 #include <array>
 #include <vector>
 
-#include <jni.h>
-
 #include <android/native_window_jni.h>
 #include <sys/system_properties.h>
 
@@ -31,6 +29,8 @@
 
 namespace mbgl {
 namespace android {
+
+void RegisterNativeHTTPRequest(JNIEnv&);
 
 JavaVM* theJVM;
 
@@ -100,14 +100,6 @@ jfieldID rectFLeftId = nullptr;
 jfieldID rectFTopId = nullptr;
 jfieldID rectFRightId = nullptr;
 jfieldID rectFBottomId = nullptr;
-
-jclass httpContextClass = nullptr;
-jmethodID httpContextGetInstanceId = nullptr;
-jmethodID httpContextCreateRequestId = nullptr;
-
-jclass httpRequestClass = nullptr;
-jmethodID httpRequestStartId = nullptr;
-jmethodID httpRequestCancelId = nullptr;
 
 jclass customLayerClass = nullptr;
 jfieldID customLayerIdId = nullptr;
@@ -2181,6 +2173,8 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
+    mbgl::android::RegisterNativeHTTPRequest(*env);
+
     latLngClass = env->FindClass("com/mapbox/mapboxsdk/geometry/LatLng");
     if (latLngClass == nullptr) {
         env->ExceptionDescribe();
@@ -2483,42 +2477,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     rectFBottomId = env->GetFieldID(rectFClass, "bottom", "F");
     if (rectFBottomId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpContextClass = env->FindClass("com/mapbox/mapboxsdk/http/HTTPContext");
-    if (httpContextClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpContextGetInstanceId = env->GetStaticMethodID(httpContextClass, "getInstance", "()Lcom/mapbox/mapboxsdk/http/HTTPContext;");
-    if (httpContextGetInstanceId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpContextCreateRequestId = env->GetMethodID(httpContextClass, "createRequest", "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/mapbox/mapboxsdk/http/HTTPContext$HTTPRequest;");
-    if (httpContextCreateRequestId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpRequestClass = env->FindClass("com/mapbox/mapboxsdk/http/HTTPContext$HTTPRequest");
-    if (httpRequestClass == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpRequestStartId = env->GetMethodID(httpRequestClass, "start", "()V");
-    if (httpRequestStartId == nullptr) {
-        env->ExceptionDescribe();
-        return JNI_ERR;
-    }
-
-    httpRequestCancelId = env->GetMethodID(httpRequestClass, "cancel", "()V");
-    if (httpRequestCancelId == nullptr) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
@@ -3129,41 +3087,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    httpContextClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpContextClass));
-    if (httpContextClass == nullptr) {
-        env->ExceptionDescribe();
-        env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngBoundsClass);
-        env->DeleteGlobalRef(iconClass);
-        env->DeleteGlobalRef(markerClass);
-        env->DeleteGlobalRef(polylineClass);
-        env->DeleteGlobalRef(polygonClass);
-        env->DeleteGlobalRef(runtimeExceptionClass);
-        env->DeleteGlobalRef(nullPointerExceptionClass);
-        env->DeleteGlobalRef(arrayListClass);
-        env->DeleteGlobalRef(projectedMetersClass);
-        env->DeleteGlobalRef(pointFClass);
-        env->DeleteGlobalRef(rectFClass);
-    }
-
-    httpRequestClass = reinterpret_cast<jclass>(env->NewGlobalRef(httpRequestClass));
-    if (httpRequestClass == nullptr) {
-        env->ExceptionDescribe();
-        env->DeleteGlobalRef(latLngClass);
-        env->DeleteGlobalRef(latLngBoundsClass);
-        env->DeleteGlobalRef(iconClass);
-        env->DeleteGlobalRef(markerClass);
-        env->DeleteGlobalRef(polylineClass);
-        env->DeleteGlobalRef(polygonClass);
-        env->DeleteGlobalRef(runtimeExceptionClass);
-        env->DeleteGlobalRef(nullPointerExceptionClass);
-        env->DeleteGlobalRef(arrayListClass);
-        env->DeleteGlobalRef(projectedMetersClass);
-        env->DeleteGlobalRef(pointFClass);
-        env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
-    }
-
     // Offline global definitions begin
 
     offlineManagerClass = reinterpret_cast<jclass>(env->NewGlobalRef(offlineManagerClass));
@@ -3181,8 +3104,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
-        env->DeleteGlobalRef(httpRequestClass);
     }
 
     listOfflineRegionsCallbackClass = reinterpret_cast<jclass>(env->NewGlobalRef(listOfflineRegionsCallbackClass));
@@ -3200,8 +3121,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
-        env->DeleteGlobalRef(offlineManagerClass);
     }
 
     offlineRegionClass = reinterpret_cast<jclass>(env->NewGlobalRef(offlineRegionClass));
@@ -3219,8 +3138,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
-        env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
     }
 
@@ -3239,7 +3156,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3260,7 +3176,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3282,7 +3197,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3305,7 +3219,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3329,7 +3242,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3354,7 +3266,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3380,7 +3291,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         env->DeleteGlobalRef(projectedMetersClass);
         env->DeleteGlobalRef(pointFClass);
         env->DeleteGlobalRef(rectFClass);
-        env->DeleteGlobalRef(httpContextClass);
         env->DeleteGlobalRef(offlineManagerClass);
         env->DeleteGlobalRef(listOfflineRegionsCallbackClass);
         env->DeleteGlobalRef(offlineRegionClass);
@@ -3487,14 +3397,6 @@ extern "C" JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     rectFTopId = nullptr;
     rectFRightId = nullptr;
     rectFBottomId = nullptr;
-
-    env->DeleteGlobalRef(httpContextClass);
-    httpContextGetInstanceId = nullptr;
-    httpContextCreateRequestId = nullptr;
-
-    env->DeleteGlobalRef(httpRequestClass);
-    httpRequestStartId = nullptr;
-    httpRequestCancelId = nullptr;
 
     // Offline delete begins
 

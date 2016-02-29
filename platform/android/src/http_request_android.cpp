@@ -3,53 +3,47 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
-#include "jni.hpp"
 
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <jni.h>
+#include <jni/jni.hpp>
+#include "attach_env.hpp"
 
 namespace mbgl {
+namespace android {
 
-void JNICALL nativeOnFailure(JNIEnv *env, jobject obj, jlong nativePtr, jint type, jstring message);
-void JNICALL nativeOnResponse(JNIEnv *env, jobject obj, jlong nativePtr, jint code, jstring message, jstring etag, jstring modified, jstring cacheControl, jstring expires, jbyteArray body);
-
-class HTTPAndroidRequest;
-
-class HTTPAndroidContext : public HTTPContextBase {
+class HTTPContext : public HTTPContextBase {
 public:
-    explicit HTTPAndroidContext();
-    ~HTTPAndroidContext();
-
     HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) final;
-
-    JavaVM *vm = nullptr;
-    jobject obj = nullptr;
+    UniqueEnv env { android::AttachEnv() };
 };
 
-class HTTPAndroidRequest : public HTTPRequestBase {
+class HTTPRequest : public HTTPRequestBase {
 public:
-    HTTPAndroidRequest(HTTPAndroidContext*, const Resource&, Callback);
-    ~HTTPAndroidRequest();
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/HTTPRequest"; };
+
+    HTTPRequest(jni::JNIEnv&, const Resource&, Callback);
 
     void cancel() final;
 
-    void onFailure(JNIEnv*, int type, jstring message);
-    void onResponse(JNIEnv*, int code, jstring message, jstring etag, jstring modified, jstring cacheControl, jstring expires, jbyteArray body);
+    void onFailure(jni::JNIEnv&, int type, jni::String message);
+    void onResponse(jni::JNIEnv&, int code,
+                    jni::String etag, jni::String modified,
+                    jni::String cacheControl, jni::String expires,
+                    jni::Array<jni::jbyte> body);
+
+    static jni::Class<HTTPRequest> javaClass;
+    jni::UniqueObject<HTTPRequest> javaRequest;
 
 private:
     void finish();
-
-    HTTPAndroidContext *context = nullptr;
 
     bool cancelled = false;
 
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
-
-    jobject obj = nullptr;
 
     util::AsyncTask async;
 
@@ -59,59 +53,27 @@ private:
     static const int canceledError = 3;
 };
 
+jni::Class<HTTPRequest> HTTPRequest::javaClass;
+
+void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
+    HTTPRequest::javaClass = *jni::Class<HTTPRequest>::Find(env).NewGlobalRef(env).release();
+
+    #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
+
+    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "mNativePtr",
+        METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
+        METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
+}
+
 // -------------------------------------------------------------------------------------------------
 
-HTTPAndroidContext::HTTPAndroidContext()
-    : vm(mbgl::android::theJVM) {
-
-    JNIEnv *env = nullptr;
-    bool detach = mbgl::android::attach_jni_thread(vm, &env, "HTTPAndroidContext::HTTPAndroidContext()");
-
-    const std::vector<JNINativeMethod> methods = {
-        {"nativeOnFailure", "(JILjava/lang/String;)V", reinterpret_cast<void *>(&nativeOnFailure)},
-        {"nativeOnResponse",
-         "(JILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)V",
-         reinterpret_cast<void *>(&nativeOnResponse)}
-    };
-
-    if (env->RegisterNatives(mbgl::android::httpRequestClass, methods.data(), methods.size()) < 0) {
-        env->ExceptionDescribe();
-    }
-
-    obj = env->CallStaticObjectMethod(mbgl::android::httpContextClass, mbgl::android::httpContextGetInstanceId);
-    if (env->ExceptionCheck() || (obj == nullptr)) {
-        env->ExceptionDescribe();
-    }
-
-    obj = env->NewGlobalRef(obj);
-    if (obj == nullptr) {
-        env->ExceptionDescribe();
-    }
-
-    mbgl::android::detach_jni_thread(vm, &env, detach);
+HTTPRequestBase* HTTPContext::createRequest(const Resource& resource, HTTPRequestBase::Callback callback) {
+    return new HTTPRequest(*env, resource, callback);
 }
 
-HTTPAndroidContext::~HTTPAndroidContext() {
-    JNIEnv *env = nullptr;
-    bool detach = mbgl::android::attach_jni_thread(vm, &env, "HTTPAndroidContext::~HTTPAndroidContext()");
-
-    env->DeleteGlobalRef(obj);
-    obj = nullptr;
-
-    mbgl::android::detach_jni_thread(vm, &env, detach);
-
-    vm = nullptr;
-}
-
-HTTPRequestBase* HTTPAndroidContext::createRequest(const Resource& resource, HTTPRequestBase::Callback callback) {
-    return new HTTPAndroidRequest(this, resource, callback);
-}
-
-HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resource& resource_, Callback callback_)
+HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, Callback callback_)
     : HTTPRequestBase(resource_, callback_),
-      context(context_),
       async([this] { finish(); }) {
-
     std::string etagStr;
     std::string modifiedStr;
 
@@ -121,56 +83,30 @@ HTTPAndroidRequest::HTTPAndroidRequest(HTTPAndroidContext* context_, const Resou
         modifiedStr = util::rfc1123(*resource.priorModified);
     }
 
-    JNIEnv *env = nullptr;
-    bool detach = mbgl::android::attach_jni_thread(context->vm, &env, "HTTPAndroidContext::HTTPAndroidRequest()");
+    jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 10);
 
-    jstring resourceUrl = mbgl::android::std_string_to_jstring(env, resource.url);
-    jstring userAgent = mbgl::android::std_string_to_jstring(env, "MapboxGL/1.0");
-    jstring etag = mbgl::android::std_string_to_jstring(env, etagStr);
-    jstring modified = mbgl::android::std_string_to_jstring(env, modifiedStr);
-    obj = env->CallObjectMethod(context->obj, mbgl::android::httpContextCreateRequestId, reinterpret_cast<jlong>(this), resourceUrl, userAgent, etag, modified);
-    if (env->ExceptionCheck() || (obj == nullptr)) {
-      env->ExceptionDescribe();
-    }
+    static auto constructor =
+        javaClass.GetConstructor<jni::jlong, jni::String, jni::String, jni::String, jni::String>(env);
 
-    obj = env->NewGlobalRef(obj);
-    if (obj == nullptr) {
-      env->ExceptionDescribe();
-    }
-
-    env->CallVoidMethod(obj, mbgl::android::httpRequestStartId);
-    if (env->ExceptionCheck()) {
-      env->ExceptionDescribe();
-    }
-
-    mbgl::android::detach_jni_thread(context->vm, &env, detach);
+    javaRequest = javaClass.New(env, constructor,
+        reinterpret_cast<jlong>(this),
+        jni::Make<jni::String>(env, resource.url),
+        jni::Make<jni::String>(env, "MapboxGL/1.0"),
+        jni::Make<jni::String>(env, etagStr),
+        jni::Make<jni::String>(env, modifiedStr)).NewGlobalRef(env);
 }
 
-HTTPAndroidRequest::~HTTPAndroidRequest() {
-    JNIEnv *env = nullptr;
-    bool detach = mbgl::android::attach_jni_thread(context->vm, &env, "HTTPAndroidContext::~HTTPAndroidRequest()");
-
-    env->DeleteGlobalRef(obj);
-    obj = nullptr;
-
-    mbgl::android::detach_jni_thread(context->vm, &env, detach);
-}
-
-void HTTPAndroidRequest::cancel() {
+void HTTPRequest::cancel() {
     cancelled = true;
 
-    JNIEnv *env = nullptr;
-    bool detach = mbgl::android::attach_jni_thread(context->vm, &env, "HTTPAndroidContext::cancel()");
+    UniqueEnv env = android::AttachEnv();
 
-    env->CallVoidMethod(obj, mbgl::android::httpRequestCancelId);
-    if (env->ExceptionCheck()) {
-      env->ExceptionDescribe();
-    }
+    static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
-    mbgl::android::detach_jni_thread(context->vm, &env, detach);
+    javaRequest->Call(*env, cancel);
 }
 
-void HTTPAndroidRequest::finish() {
+void HTTPRequest::finish() {
     if (!cancelled) {
         assert(response);
         notify(*response);
@@ -179,31 +115,33 @@ void HTTPAndroidRequest::finish() {
     delete this;
 }
 
-void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */, jstring etag, jstring modified, jstring cacheControl, jstring expires, jbyteArray body) {
+void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
+                             jni::String etag, jni::String modified, jni::String cacheControl,
+                             jni::String expires, jni::Array<jni::jbyte> body) {
     response = std::make_unique<Response>();
     using Error = Response::Error;
 
-    if (etag != nullptr) {
-        response->etag = mbgl::android::std_string_from_jstring(env, etag);
+    if (etag) {
+        response->etag = jni::Make<std::string>(env, etag);
     }
 
-    if (modified != nullptr) {
-        response->modified = util::parseTimePoint(mbgl::android::std_string_from_jstring(env, modified).c_str());
+    if (modified) {
+        response->modified = util::parseTimePoint(jni::Make<std::string>(env, modified).c_str());
     }
 
-    if (cacheControl != nullptr) {
-        response->expires = parseCacheControl(mbgl::android::std_string_from_jstring(env, cacheControl).c_str());
+    if (cacheControl) {
+        response->expires = parseCacheControl(jni::Make<std::string>(env, cacheControl).c_str());
     }
 
-    if (expires != nullptr) {
-        response->expires = util::parseTimePoint(mbgl::android::std_string_from_jstring(env, expires).c_str());
+    if (expires) {
+        response->expires = util::parseTimePoint(jni::Make<std::string>(env, expires).c_str());
     }
 
     if (code == 200) {
-        if (body != nullptr) {
-            jbyte* bodyData = env->GetByteArrayElements(body, nullptr);
-            response->data = std::make_shared<std::string>(reinterpret_cast<char*>(bodyData), env->GetArrayLength(body));
-            env->ReleaseByteArrayElements(body, bodyData, JNI_ABORT);
+        if (body) {
+            auto data = std::make_shared<std::string>(body.Length(env), char());
+            jni::GetArrayRegion(env, *body, 0, data->size(), reinterpret_cast<jbyte*>(&(*data)[0]));
+            response->data = data;
         } else {
             response->data = std::make_shared<std::string>();
         }
@@ -222,8 +160,8 @@ void HTTPAndroidRequest::onResponse(JNIEnv* env, int code, jstring /* message */
     async.send();
 }
 
-void HTTPAndroidRequest::onFailure(JNIEnv* env, int type, jstring message) {
-    std::string messageStr = mbgl::android::std_string_from_jstring(env, message);
+void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
+    std::string messageStr = jni::Make<std::string>(env, message);
 
     response = std::make_unique<Response>();
     using Error = Response::Error;
@@ -245,24 +183,14 @@ void HTTPAndroidRequest::onFailure(JNIEnv* env, int type, jstring message) {
     async.send();
 }
 
+} // namespace android
+
 std::unique_ptr<HTTPContextBase> HTTPContextBase::createContext() {
-    return std::make_unique<HTTPAndroidContext>();
+    return std::make_unique<android::HTTPContext>();
 }
 
 uint32_t HTTPContextBase::maximumConcurrentRequests() {
     return 20;
 }
 
-void JNICALL nativeOnFailure(JNIEnv* env, jobject, jlong nativePtr, jint type, jstring message) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnFailure");
-    assert(nativePtr != 0);
-    return reinterpret_cast<HTTPAndroidRequest*>(nativePtr)->onFailure(env, type, message);
-}
-
-void JNICALL nativeOnResponse(JNIEnv* env, jobject, jlong nativePtr, jint code, jstring message, jstring etag, jstring modified, jstring cacheControl, jstring expires, jbyteArray body) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeOnResponse");
-    assert(nativePtr != 0);
-    return reinterpret_cast<HTTPAndroidRequest*>(nativePtr)->onResponse(env, code, message, etag, modified, cacheControl, expires, body);
-}
-
-}
+} // namespace mbgl

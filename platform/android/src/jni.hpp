@@ -95,14 +95,6 @@ extern jfieldID rectFTopId;
 extern jfieldID rectFRightId;
 extern jfieldID rectFBottomId;
 
-extern jclass httpContextClass;
-extern jmethodID httpContextGetInstanceId;
-extern jmethodID httpContextCreateRequestId;
-
-extern jclass httpRequestClass;
-extern jmethodID httpRequestStartId;
-extern jmethodID httpRequestCancelId;
-
 // Offline declarations start
 
 extern jclass offlineManagerClass;
