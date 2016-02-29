@@ -598,31 +598,19 @@ public class MapboxEventManager {
                 }
 
                 // Based on http://square.github.io/okhttp/3.x/okhttp/okhttp3/CertificatePinner.html
-
-                // SHA256 Values for Certs when OkHttp 3.2.0 Is Released
-                // Staging - Geotrust
-//                .add("cloudfront-staging.tilestream.net", "sha256/kR9ysyN/lzBl/ecearDERV7qO7xqSN4jt6XuQjIVL0I=")
-//                .add("cloudfront-staging.tilestream.net", "sha256/sPbNCVpVasMJxps3IqFfLTRKkVnRCLrTlZVc5kspqlkw=")
-//                .add("cloudfront-staging.tilestream.net", "sha256/h6801m+z8v3zbgkRHpq6L29Esgfzhj89C1SyUCOQmqU=")
-                // Prod - Geotrust
-//                .add("api.mapbox.com", "sha256/svaiYM/ZVIfxC+CMDe4kj1KsviQmzyZ9To8nQqUJwFI=")
-//                .add("api.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
-//                .add("api.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
-                // Prod - DigiCert
-//                .add("api.mapbox.com", "sha256/JL+uwAwpA2U1UVl/AFdZy1ZnvkZJ1P1hRfmfPaPVSLU=")
-//                .add("api.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
-//                .add("api.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
-
                 CertificatePinner certificatePinner = new CertificatePinner.Builder()
-                        // Staging - Geotrust SHA1
-                        .add("cloudfront-staging.tilestream.net", "sha1/KcdiTca54HxWTV8VuAd67x8I=")
-                        .add("cloudfront-staging.tilestream.net", "sha1//KDE76PP0DQBDcTnMFBv+efp4eg=")
-                        // Prod - Geotrust SHA1
-                        .add("api.mapbox.com", "sha1/Uv71ooi32pyba+oLD7egnXm7/GQ=")
-                        .add("api.mapbox.com", "sha1/hOP0d37/ZTSGgCSseE3DIZ1uSg0=")
-                        // Prod - DigiCert SHA1
-                        .add("api.mapbox.com", "sha1/EoBG4XgG0B1cTNYJbFJDlNuxpII=")
-                        .add("api.mapbox.com", "sha1/LHspp8BlMzJeqfRrY/MmhzxEa3Q=")
+                        // Staging - Geotrust
+                        .add("cloudfront-staging.tilestream.net", "sha256/kR9ysyN/lzBl/ecearDERV7qO7xqSN4jt6XuQjIVL0I=")
+                        .add("cloudfront-staging.tilestream.net", "sha256/sPbNCVpVasMJxps3IqFfLTRKkVnRCLrTlZVc5kspqlkw=")
+                        .add("cloudfront-staging.tilestream.net", "sha256/h6801m+z8v3zbgkRHpq6L29Esgfzhj89C1SyUCOQmqU=")
+                        // Prod - Geotrust
+                        .add("api.mapbox.com", "sha256/svaiYM/ZVIfxC+CMDe4kj1KsviQmzyZ9To8nQqUJwFI=")
+                        .add("api.mapbox.com", "sha256/owrR9U9FWDWtrFF+myoRIu75JwU4sJwzvhCNLZoY37g=")
+                        .add("api.mapbox.com", "sha256/SQVGZiOrQXi+kqxcvWWE96HhfydlLVqFr4lQTqI5qqo=")
+                        // Prod - DigiCert
+                        .add("api.mapbox.com", "sha256/JL+uwAwpA2U1UVl/AFdZy1ZnvkZJ1P1hRfmfPaPVSLU=")
+                        .add("api.mapbox.com", "sha256/RRM1dGqnDFsCJXBTHky16vi1obOlCgFFn/yOhI/y+ho=")
+                        .add("api.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
                         .build();
 
                 OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
