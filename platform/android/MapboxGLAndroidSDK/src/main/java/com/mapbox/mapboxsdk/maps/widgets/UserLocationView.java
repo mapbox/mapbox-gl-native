@@ -60,20 +60,9 @@ public final class UserLocationView extends View {
     private Path mAccuracyPath;
     private RectF mAccuracyBounds;
 
-    private Drawable mUserLocationDrawable;
-    private Drawable mUserLocationShadowDrawable;
-    private final RectF mUserLocationDrawableBoundsF = new RectF();
-    private final RectF mUserLocationShadowDrawableBoundsF = new RectF();
-
-    private Drawable mUserLocationBearingDrawable;
-    private Drawable mUserLocationBearingShadowDrawable;
-    private final RectF mUserLocationBearingDrawableBoundsF = new RectF();
-    private final RectF mUserLocationBearingShadowDrawableBoundsF = new RectF();
-
-    private Drawable mUserLocationStaleDrawable;
-    private Drawable mUserLocationStaleShadowDrawable;
-    private final RectF mUserLocationStaleDrawableBoundsF = new RectF();
-    private final RectF mUserLocationStaleShadowDrawableBoundsF = new RectF();
+    private UserLocationViewDrawableHolder mHolder = new UserLocationViewDrawableHolder();
+    private UserLocationViewDrawableHolder mBearingHolder = new UserLocationViewDrawableHolder();
+    private UserLocationViewDrawableHolder mStaleHolder = new UserLocationViewDrawableHolder();
 
     private int mShadowX = 0;
     private int mShadowY = 0;
@@ -188,49 +177,48 @@ public final class UserLocationView extends View {
         if (!mShowMarker) {
             return;
         }
+        UserLocationViewDrawableHolder holder = getCurrentDrawableHolder();
+        drawShadow(canvas, holder);
+        draw(canvas, holder);
+    }
+
+    private UserLocationViewDrawableHolder getCurrentDrawableHolder() {
+        UserLocationViewDrawableHolder holder = mShowDirection ? mBearingHolder : mHolder;
+        return mStaleMarker ? mStaleHolder : holder;
+    }
+
+    private void drawShadow(Canvas canvas, UserLocationViewDrawableHolder holder) {
+        if (!holder.hasShadow()) {
+            return;
+        }
         canvas.save();
         canvas.concat(mMarkerScreenMatrix);
+        canvas.translate(mShadowX, mShadowY);
+        boolean willDraw = !canvas.quickReject(holder.mShadowBounds, Canvas.EdgeType.AA);
 
-        Drawable dotDrawable = mShowDirection ? mUserLocationBearingDrawable : mUserLocationDrawable;
-        dotDrawable = mStaleMarker ? mUserLocationStaleDrawable : dotDrawable;
-        // IMPORTANT also update in update()
-        RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-        dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
+        if (willDraw) {
+            holder.mShadow.draw(canvas);
+        }
+        canvas.restore();
+    }
 
-        Drawable shadowDrawable = mShowDirection ? mUserLocationBearingShadowDrawable : mUserLocationShadowDrawable;
-        shadowDrawable = mStaleMarker ? mUserLocationStaleShadowDrawable : shadowDrawable;
-        // IMPORTANT also update in update()
-        RectF shadowBounds = mShowDirection ? mUserLocationBearingShadowDrawableBoundsF : mUserLocationShadowDrawableBoundsF;
-        shadowBounds = mStaleMarker ? mUserLocationStaleShadowDrawableBoundsF : shadowBounds;
-
-
+    private void draw(Canvas canvas, UserLocationViewDrawableHolder holder) {
+        canvas.save();
+        canvas.concat(mMarkerScreenMatrix);
         boolean willDraw = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN || !canvas.isHardwareAccelerated()) {
             willDraw = mShowAccuracy && !mStaleMarker && !canvas.quickReject(mAccuracyPath, Canvas.EdgeType.AA);
         }
-        willDraw |= !canvas.quickReject(dotBounds, Canvas.EdgeType.AA);
-        canvas.restore();
-        canvas.save();
+        willDraw |= !canvas.quickReject(holder.mBounds, Canvas.EdgeType.AA);
 
-        canvas.translate(mShadowX, mShadowY);
-        canvas.concat(mMarkerScreenMatrix);
-        willDraw |= !canvas.quickReject(shadowBounds, Canvas.EdgeType.AA);
-
-        canvas.restore();
         if (willDraw) {
-            canvas.save();
-            canvas.translate(mShadowX, mShadowY);
-            canvas.concat(mMarkerScreenMatrix);
-            shadowDrawable.draw(canvas);
-
-            canvas.restore();
-            canvas.concat(mMarkerScreenMatrix);
             if (mShowAccuracy && !mStaleMarker) {
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintFill);
                 canvas.drawPath(mAccuracyPath, mAccuracyPaintStroke);
             }
-            dotDrawable.draw(canvas);
+            holder.mDrawable.draw(canvas);
         }
+        canvas.restore();
     }
 
 
@@ -239,10 +227,8 @@ public final class UserLocationView extends View {
     }
 
     void setUserLocationDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
-        mUserLocationDrawable = drawable;
-        mUserLocationShadowDrawable = shadowDrawable;
-        setDrawable(drawable, mUserLocationDrawableBoundsF);
-        setDrawable(shadowDrawable, mUserLocationShadowDrawableBoundsF);
+        mHolder.setDrawable(drawable);
+        mHolder.setShadow(shadowDrawable);
         update();
     }
 
@@ -251,10 +237,8 @@ public final class UserLocationView extends View {
     }
 
     void setUserLocationBearingDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
-        mUserLocationBearingDrawable = drawable;
-        mUserLocationBearingShadowDrawable = shadowDrawable;
-        setDrawable(drawable, mUserLocationBearingDrawableBoundsF);
-        setDrawable(shadowDrawable, mUserLocationBearingShadowDrawableBoundsF);
+        mBearingHolder.setDrawable(drawable);
+        mBearingHolder.setShadow(shadowDrawable);
         update();
     }
 
@@ -263,32 +247,10 @@ public final class UserLocationView extends View {
     }
 
     void setUserLocationStaleDrawable(@NonNull Drawable drawable, @Nullable Drawable shadowDrawable) {
-        mUserLocationStaleDrawable = drawable;
-        mUserLocationStaleShadowDrawable = shadowDrawable;
-        setDrawable(drawable, mUserLocationStaleDrawableBoundsF);
-        setDrawable(shadowDrawable, mUserLocationStaleShadowDrawableBoundsF);
+        mStaleHolder.setDrawable(drawable);
+        mStaleHolder.setShadow(shadowDrawable);
         update();
     }
-
-    private static void setDrawable(final @Nullable Drawable drawable, final @NonNull RectF bounds) {
-        if (drawable != null) {
-            int halfWidth = drawable.getIntrinsicWidth() / 2;
-            int halfHeight = drawable.getIntrinsicHeight() / 2;
-            bounds.set(
-                    -halfWidth,
-                    -halfHeight,
-                    halfWidth,
-                    halfHeight);
-            drawable.setBounds(new Rect(
-                    -halfWidth,
-                    -halfHeight,
-                    halfWidth,
-                    halfHeight));
-        } else {
-            bounds.setEmpty();
-        }
-    }
-
 
     void setUserLocationShadowOffset(int x, int y) {
         mShadowX = x;
@@ -396,8 +358,10 @@ public final class UserLocationView extends View {
                 invalidate(mDirtyRect);
             }
 
-            RectF dotBounds = mShowDirection ? mUserLocationBearingDrawableBoundsF : mUserLocationDrawableBoundsF;
-            dotBounds = mStaleMarker ? mUserLocationStaleDrawableBoundsF : dotBounds;
+            UserLocationViewDrawableHolder holder = getCurrentDrawableHolder();
+
+
+            RectF dotBounds = holder.mBounds;
             RectF largerBounds = mShowAccuracy && !mStaleMarker && mAccuracyBounds.contains(dotBounds)
                     ? mAccuracyBounds : dotBounds;
             mMarkerScreenMatrix.mapRect(mDirtyRectF, largerBounds);
