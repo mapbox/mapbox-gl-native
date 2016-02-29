@@ -71,7 +71,7 @@ public:
 public:
     std::string id;
     std::string ref;
-    std::string source;
+    std::string sourceID;
     std::string sourceLayer;
     Filter filter;
     float minZoom = -std::numeric_limits<float>::infinity();

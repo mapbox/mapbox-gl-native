@@ -139,7 +139,7 @@ void TileWorker::parseLayer(const StyleLayer* layer) {
         return;
 
     // Skip this bucket if we are to not render this
-    if ((layer->source != sourceID) ||
+    if ((layer->sourceID != sourceID) ||
         (id.overscaledZ < std::floor(layer->minZoom)) ||
         (id.overscaledZ >= std::ceil(layer->maxZoom)) ||
         (layer->visibility == VisibilityType::None)) {

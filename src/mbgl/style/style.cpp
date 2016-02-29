@@ -205,7 +205,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
     for (const auto& layer : layers) {
         hasPendingTransitions |= layer->recalculate(parameters);
 
-        Source* source = getSource(layer->source);
+        Source* source = getSource(layer->sourceID);
         if (source && layer->needsRendering()) {
             source->enabled = true;
             if (!source->loaded && !source->isLoading()) {
@@ -276,7 +276,7 @@ RenderData Style::getRenderData() const {
             continue;
         }
 
-        Source* source = getSource(layer->source);
+        Source* source = getSource(layer->sourceID);
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer->id.c_str());
             continue;
