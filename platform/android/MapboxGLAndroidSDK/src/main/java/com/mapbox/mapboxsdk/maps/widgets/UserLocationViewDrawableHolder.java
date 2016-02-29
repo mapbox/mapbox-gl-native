@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
