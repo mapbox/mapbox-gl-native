@@ -39,10 +39,14 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         marker = new Marker();
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
-        String iconId = in.readString();
-        Bitmap iconBitmap = in.readParcelable(Bitmap.class.getClassLoader());
-        Icon icon = new Icon(iconId, iconBitmap);
-        icon(icon);
+
+        if(in.readByte()!=0){
+            // this means we have an icon
+            String iconId = in.readString();
+            Bitmap iconBitmap = in.readParcelable(Bitmap.class.getClassLoader());
+            Icon icon = new Icon(iconId, iconBitmap);
+            icon(icon);
+        }
         title(in.readString());
     }
 
@@ -53,15 +57,19 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
 
     @Override
     public int describeContents() {
-        return 0;
+        return hashCode();
     }
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeParcelable(getPosition(), flags);
         out.writeString(getSnippet());
-        out.writeString(getIcon().getId());
-        out.writeParcelable(getIcon().getBitmap(), flags);
+        Icon icon = getIcon();
+        out.writeByte((byte) (icon != null ? 1 : 0));
+        if (icon != null) {
+            out.writeString(getIcon().getId());
+            out.writeParcelable(getIcon().getBitmap(), flags);
+        }
         out.writeString(getTitle());
     }
 
