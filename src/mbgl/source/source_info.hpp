@@ -17,8 +17,8 @@ class TileID;
 class SourceInfo {
 public:
     std::vector<std::string> tiles;
-    uint16_t minZoom = 0;
-    uint16_t maxZoom = 22;
+    uint8_t minZoom = 0;
+    uint8_t maxZoom = 22;
     std::string attribution;
     LatLng center;
     double zoom = 0;

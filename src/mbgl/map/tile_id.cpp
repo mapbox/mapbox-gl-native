@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-TileID TileID::parent(int8_t parent_z, int8_t sourceMaxZoom) const {
+TileID TileID::parent(uint8_t parent_z, uint8_t sourceMaxZoom) const {
     assert(parent_z < z);
     auto newX = x;
     auto newY = y;
@@ -22,7 +22,7 @@ TileID TileID::parent(int8_t parent_z, int8_t sourceMaxZoom) const {
     return TileID{parent_z, newX, newY, parent_z > sourceMaxZoom ? sourceMaxZoom : parent_z};
 }
 
-std::forward_list<TileID> TileID::children(int8_t sourceMaxZoom) const {
+std::forward_list<TileID> TileID::children(uint8_t sourceMaxZoom) const {
     auto childZ = z + 1;
 
     std::forward_list<TileID> child_ids;

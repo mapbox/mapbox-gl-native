@@ -65,7 +65,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
 
         // Image fill.
         if (pass == RenderPass::Translucent && posA && posB) {
-            float factor = (util::EXTENT / util::tileSize / std::pow(2, state.getIntegerZoom() - id.z)) / id.overscaling;
+            float factor = (util::EXTENT / util::tileSize / std::pow(2, state.getIntegerZoom() - id.z)) / id.overscaling();
 
             mat3 patternMatrixA;
             matrix::identity(patternMatrixA);

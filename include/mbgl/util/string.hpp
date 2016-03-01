@@ -22,6 +22,11 @@ inline std::string toString(int8_t num) {
     return boost::lexical_cast<std::string>(int(num));
 }
 
+// boost::lexical_cast() treats this as a character, but we are using it as number types.
+inline std::string toString(uint8_t num) {
+    return boost::lexical_cast<std::string>(unsigned(num));
+}
+
 inline std::string toString(std::exception_ptr error) {
     try {
         std::rethrow_exception(error);

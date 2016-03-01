@@ -13,38 +13,42 @@ namespace mbgl {
 class TileID {
 public:
     const int16_t w = 0;
-    const int8_t z = 0;
-    const int32_t x = 0, y = 0;
-    const int8_t sourceZ;
-    const float overscaling;
+    const uint8_t z;
+    const int32_t x;
+    const int32_t y;
+    const uint8_t sourceZ;
 
-    inline explicit TileID(int8_t z_, int32_t x_, int32_t y_, int8_t sourceZ_)
+    explicit TileID(uint8_t z_, int32_t x_, int32_t y_, uint8_t sourceZ_)
         : w((x_ < 0 ? x_ - (1 << z_) + 1 : x_) / (1 << z_)), z(z_), x(x_), y(y_),
-        sourceZ(sourceZ_), overscaling(std::pow(2, z_ - sourceZ_)) {}
+        sourceZ(sourceZ_) {}
 
-    inline uint64_t to_uint64() const {
+    uint64_t to_uint64() const {
         return ((std::pow(2, z) * y + x) * 32) + z;
     }
 
-    inline bool operator==(const TileID& rhs) const {
+    float overscaling() const {
+        return std::pow(2, z - sourceZ);
+    }
+
+    bool operator==(const TileID& rhs) const {
         return w == rhs.w && z == rhs.z && x == rhs.x && y == rhs.y;
     }
 
-    inline bool operator!=(const TileID& rhs) const {
+    bool operator!=(const TileID& rhs) const {
         return !operator==(rhs);
     }
 
-    inline bool operator<(const TileID& rhs) const {
+    bool operator<(const TileID& rhs) const {
         if (w != rhs.w) return w < rhs.w;
         if (z != rhs.z) return z < rhs.z;
         if (x != rhs.x) return x < rhs.x;
         return y < rhs.y;
     }
 
-    TileID parent(int8_t z, int8_t sourceMaxZoom) const;
+    TileID parent(uint8_t z, uint8_t sourceMaxZoom) const;
     TileID normalized() const;
     std::forward_list<TileID>
-    children(int8_t sourceMaxZoom = std::numeric_limits<int8_t>::max()) const;
+    children(uint8_t sourceMaxZoom = std::numeric_limits<uint8_t>::max()) const;
     bool isChildOf(const TileID&) const;
     operator std::string() const;
 };

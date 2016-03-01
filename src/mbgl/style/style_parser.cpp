@@ -59,7 +59,7 @@ void parseTileJSONMember(const JSValue& value, std::string& target, const char* 
     target = { property.GetString(), property.GetStringLength() };
 }
 
-void parseTileJSONMember(const JSValue& value, uint16_t& target, const char* name) {
+void parseTileJSONMember(const JSValue& value, uint8_t& target, const char* name) {
     if (!value.HasMember(name)) {
         return;
     }
@@ -70,7 +70,7 @@ void parseTileJSONMember(const JSValue& value, uint16_t& target, const char* nam
     }
 
     unsigned int uint = property.GetUint();
-    if (uint > std::numeric_limits<uint16_t>::max()) {
+    if (uint > std::numeric_limits<uint8_t>::max()) {
         return;
     }
 

@@ -160,7 +160,7 @@ void Source::load(FileSource& fileSource) {
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         Tile &tile = *pair.second;
-        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<int8_t>(info->maxZoom), tile.id.z));
+        transform.matrixFor(tile.matrix, tile.id, std::min(static_cast<uint8_t>(info->maxZoom), tile.id.z));
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
