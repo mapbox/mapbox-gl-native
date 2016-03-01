@@ -218,21 +218,21 @@ bool TransformState::isGestureInProgress() const {
 #pragma mark - Projection
 
 double TransformState::lngX(double lng) const {
-    return (util::LONGITUDE_MAX + lng) * worldSize() / 360.0f;
+    return (util::LONGITUDE_MAX + lng) * worldSize() / util::DEGREES_MAX;
 }
 
 double TransformState::latY(double lat) const {
-    double y_ = util::RAD2DEG * std::log(std::tan(M_PI / 4 + lat * M_PI / 360.0f));
-    return (util::LONGITUDE_MAX - y_) * worldSize() / 360.0f;
+    double y_ = util::RAD2DEG * std::log(std::tan(M_PI / 4 + lat * M_PI / util::DEGREES_MAX));
+    return (util::LONGITUDE_MAX - y_) * worldSize() / util::DEGREES_MAX;
 }
 
 double TransformState::xLng(double x_, double worldSize_) const {
-    return x_ * 360.0f / worldSize_ - util::LONGITUDE_MAX;
+    return x_ * util::DEGREES_MAX / worldSize_ - util::LONGITUDE_MAX;
 }
 
 double TransformState::yLat(double y_, double worldSize_) const {
-    double y2 = util::LONGITUDE_MAX - y_ * 360.0f / worldSize_;
-    return 360.0f / M_PI * std::atan(std::exp(y2 * util::DEG2RAD)) - 90.0f;
+    double y2 = util::LONGITUDE_MAX - y_ * util::DEGREES_MAX / worldSize_;
+    return util::DEGREES_MAX / M_PI * std::atan(std::exp(y2 * util::DEG2RAD)) - 90.0f;
 }
 
 double TransformState::zoomScale(double zoom) const {
@@ -357,7 +357,7 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
     double newScale = zoomScale(zoom);
     const double newWorldSize = newScale * util::tileSize;
-    Bc = newWorldSize / 360;
+    Bc = newWorldSize / util::DEGREES_MAX;
     Cc = newWorldSize / util::M2PI;
     
     const double m = 1 - 1e-15;
@@ -378,7 +378,7 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     scale = constrainedScale;
     x = constrainedPoint.x;
     y = constrainedPoint.y;
-    Bc = worldSize() / 360;
+    Bc = worldSize() / util::DEGREES_MAX;
     Cc = worldSize() / util::M2PI;
 }
 

@@ -122,7 +122,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     Duration duration = animation.duration ? *animation.duration : Duration::zero();
     
     const double startWorldSize = state.worldSize();
-    state.Bc = startWorldSize / 360;
+    state.Bc = startWorldSize / util::DEGREES_MAX;
     state.Cc = startWorldSize / util::M2PI;
     
     const double startScale = state.scale;
@@ -290,7 +290,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     }
     
     const double startWorldSize = state.worldSize();
-    state.Bc = startWorldSize / 360;
+    state.Bc = startWorldSize / util::DEGREES_MAX;
     state.Cc = startWorldSize / util::M2PI;
     
     state.panning = true;

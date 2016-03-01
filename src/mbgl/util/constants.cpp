@@ -26,6 +26,7 @@ const double M2PI = 2 * M_PI;
 const double EARTH_RADIUS_M = 6378137;
 const double LATITUDE_MAX = 85.051128779806604;
 const double LONGITUDE_MAX = 180;
+const double DEGREES_MAX = 360;
 const double PITCH_MAX = M_PI / 3;
 const double MIN_ZOOM = 0.0;
 const double MAX_ZOOM = 25.5;
