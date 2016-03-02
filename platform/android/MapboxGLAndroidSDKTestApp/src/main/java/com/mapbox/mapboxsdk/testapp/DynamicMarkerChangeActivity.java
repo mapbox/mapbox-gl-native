@@ -55,7 +55,6 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
                 mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.506675, -0.128699), 10));
 
                 // Create marker

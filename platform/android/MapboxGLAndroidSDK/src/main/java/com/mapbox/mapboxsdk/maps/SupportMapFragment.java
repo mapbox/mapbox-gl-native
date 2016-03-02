@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 /**

@@ -55,6 +55,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ZoomButtonsController;
+
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
@@ -71,6 +72,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
@@ -82,6 +84,7 @@ import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -145,6 +148,10 @@ public class MapView extends FrameLayout {
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
 
+    private OnMapReadyCallback mMapReadyCallback;
+    private String mStyleUrl;
+    private boolean mInitialLoad;
+
     @UiThread
     public MapView(@NonNull Context context) {
         super(context);
@@ -164,6 +171,7 @@ public class MapView extends FrameLayout {
     }
 
     private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
+        mInitialLoad = true;
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
@@ -307,6 +315,9 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        // Force a check for an access token
+        validateAccessToken(getAccessToken());
+
         if (savedInstanceState != null && savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
 
             // Get previous camera position
@@ -370,15 +381,9 @@ public class MapView extends FrameLayout {
             // Force a check for Telemetry
             validateTelemetryServiceConfigured();
 
-            // Force a check for an access token
-            validateAccessToken(getAccessToken());
-
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
             MapboxEventManager.configureAndStartMapboxEventManager(getContext(), getAccessToken());
         }
-
-        // Force a check for an access token
-        validateAccessToken(getAccessToken());
 
         // Initialize EGL
         mNativeMapView.initializeDisplay();
@@ -392,6 +397,12 @@ public class MapView extends FrameLayout {
                     reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
+                    if (mInitialLoad) {
+                        mInitialLoad = false;
+                        if (mMapReadyCallback != null) {
+                            mMapReadyCallback.onMapReady(mMapboxMap);
+                        }
+                    }
                 }
             }
         });
@@ -417,7 +428,7 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
-        outState.putString(MapboxConstants.STATE_STYLE_URL, mMapboxMap.getStyleUrl());
+        outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleUrl);
         outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
         outState.putLong(MapboxConstants.STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
@@ -514,6 +525,11 @@ public class MapView extends FrameLayout {
         mNativeMapView.resume();
         mNativeMapView.update();
         mUserLocationView.resume();
+
+        if (mStyleUrl == null) {
+            // user has failed to supply a style url
+            setStyleUrl(Style.MAPBOX_STREETS);
+        }
     }
 
     /**
@@ -676,8 +692,70 @@ public class MapView extends FrameLayout {
     // Styling
     //
 
-    void setStyleUrl(@NonNull String url) {
+    /**
+     * <p>
+     * Loads a new map style from the specified URL.
+     * </p>
+     * {@code url} can take the following forms:
+     * <ul>
+     * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
+     * <li>{@code mapbox://styles/<user>/<style>}:
+     * retrieves the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
+     * {@code user} is your username. {@code style} is the ID of your custom
+     * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
+     * <li>{@code http://...} or {@code https://...}:
+     * retrieves the style over the Internet from any web server.</li>
+     * <li>{@code asset://...}:
+     * reads the style from the APK {@code assets/} directory.
+     * This is used to load a style bundled with your app.</li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
+     * </ul>
+     * <p>
+     * This method is asynchronous and will return immediately before the style finishes loading.
+     * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+     * </p>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
+     *
+     * @param url The URL of the map style
+     * @see Style
+     */
+    public void setStyleUrl(@NonNull String url) {
+        mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
+    }
+
+    /**
+     * <p>
+     * Loads a new map style from the specified bundled style.
+     * </p>
+     * <p>
+     * This method is asynchronous and will return immediately before the style finishes loading.
+     * If you wish to wait for the map to finish loading listen for the {@link MapView#DID_FINISH_LOADING_MAP} event.
+     * </p>
+     * If the style fails to load or an invalid style URL is set, the map view will become blank.
+     * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be sent.
+     *
+     * @param style The bundled style. Accepts one of the values from {@link Style}.
+     * @see Style
+     */
+    @UiThread
+    public void setStyle(@Style.StyleUrl String style) {
+        setStyleUrl(style);
+    }
+
+    /**
+     * <p>
+     * Returns the map style currently displayed in the map view.
+     * </p>
+     * If the default style is currently displayed, a URL will be returned instead of null.
+     *
+     * @return The URL of the map style.
+     */
+    @UiThread
+    @NonNull
+    public String getStyleUrl() {
+        return mStyleUrl;
     }
 
     //
@@ -855,9 +933,6 @@ public class MapView extends FrameLayout {
     }
 
     long addMarker(@NonNull Marker marker) {
-        if (mNativeMapView == null) {
-            return 0l;
-        }
         return mNativeMapView.addMarker(marker);
     }
 
@@ -1204,6 +1279,7 @@ public class MapView extends FrameLayout {
     /**
      * Helper method for tracking DragEnd gesture event
      * See {@see MapboxEvent#TYPE_MAP_DRAGEND}
+     *
      * @param xCoordinate Original x screen coordinate at end of drag
      * @param yCoordinate Orginal y screen coordinate at end of drag
      */
@@ -2231,14 +2307,10 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void getMapAsync(@NonNull final OnMapReadyCallback callback) {
-
-        // We need to put our callback on the message queue
-        post(new Runnable() {
-            @Override
-            public void run() {
-                callback.onMapReady(mMapboxMap);
-            }
-        });
+        if (mMapReadyCallback == null && !mInitialLoad) {
+            callback.onMapReady(mMapboxMap);
+        }
+        mMapReadyCallback = callback;
     }
 
     MapboxMap getMapboxMap() {

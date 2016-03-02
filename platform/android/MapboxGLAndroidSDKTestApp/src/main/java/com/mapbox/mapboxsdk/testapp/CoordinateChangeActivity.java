@@ -46,7 +46,6 @@ public class CoordinateChangeActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
                 mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getNextLatLng(), 16));
 
                 UiSettings uiSettings = mapboxMap.getUiSettings();

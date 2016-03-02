@@ -43,18 +43,18 @@ public class MapPaddingActivity extends AppCompatActivity {
         mMapView.setTag(true);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
+
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
-
-                moveToBangalore();
 
                 int paddingLeft = (int) getResources().getDimension(R.dimen.map_padding_left);
                 int paddingBottom = (int) getResources().getDimension(R.dimen.map_padding_bottom);
                 int paddingRight = (int) getResources().getDimension(R.dimen.map_padding_right);
                 mapboxMap.setPadding(paddingLeft, toolbar.getHeight(), paddingRight, paddingBottom);
+
+                moveToBangalore();
             }
         });
     }
@@ -123,14 +123,16 @@ public class MapPaddingActivity extends AppCompatActivity {
 
     private void moveToBangalore() {
         toggleGps(false);
+
         LatLng bangalore = new LatLng(12.9810816, 77.6368034);
-        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                new CameraPosition.Builder()
-                        .zoom(16)
-                        .target(bangalore)
-                        .bearing(40)
-                        .tilt(45)
-                        .build()));
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .zoom(16)
+                .target(bangalore)
+                .bearing(40)
+                .tilt(45)
+                .build();
+
+        mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMapboxMap.addMarker(new MarkerOptions().title("Center map").position(bangalore));
     }
 

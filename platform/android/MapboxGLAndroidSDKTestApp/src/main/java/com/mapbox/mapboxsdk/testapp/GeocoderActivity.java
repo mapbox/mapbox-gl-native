@@ -55,13 +55,11 @@ public class GeocoderActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(ApiAccess.getToken(this));
+        mapView.setStyle(Style.EMERALD);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-
-                // Style
-                mapboxMap.setStyle(Style.EMERALD);
 
                 // Camera position
                 mapboxMap.setCameraPosition(

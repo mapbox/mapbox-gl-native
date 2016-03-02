@@ -53,12 +53,11 @@ public class ScrollByActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setTag(true);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyleUrl(Style.MAPBOX_STREETS);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
-
                 UiSettings uiSettings = mapboxMap.getUiSettings();
                 uiSettings.setLogoEnabled(false);
                 uiSettings.setAttributionEnabled(false);

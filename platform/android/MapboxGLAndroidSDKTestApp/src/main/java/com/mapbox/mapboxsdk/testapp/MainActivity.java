@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mainMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        changeMapStyle(mSelectedStyle);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -229,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                changeMapStyle(mSelectedStyle);
             }
         });
     }
@@ -496,32 +496,32 @@ public class MainActivity extends AppCompatActivity {
     private boolean changeMapStyle(int id) {
         switch (id) {
             case R.id.actionStyleMapboxStreets:
-                mMapboxMap.setStyle(Style.MAPBOX_STREETS);
+                mMapView.setStyleUrl(Style.MAPBOX_STREETS);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleEmerald:
-                mMapboxMap.setStyle(Style.EMERALD);
+                mMapView.setStyleUrl(Style.EMERALD);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleLight:
-                mMapboxMap.setStyle(Style.LIGHT);
+                mMapView.setStyleUrl(Style.LIGHT);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleDark:
-                mMapboxMap.setStyle(Style.DARK);
+                mMapView.setStyleUrl(Style.DARK);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatellite:
-                mMapboxMap.setStyle(Style.SATELLITE);
+                mMapView.setStyleUrl(Style.SATELLITE);
                 mSelectedStyle = id;
                 return true;
 
             case R.id.actionStyleSatelliteStreets:
-                mMapboxMap.setStyle(Style.SATELLITE_STREETS);
+                mMapView.setStyleUrl(Style.SATELLITE_STREETS);
                 mSelectedStyle = id;
                 return true;
 

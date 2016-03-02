@@ -65,12 +65,11 @@ public class DoubleMapActivity extends AppCompatActivity {
 
             // MapView large
             mMapView = (MapView) view.findViewById(R.id.mapView);
+            mMapView.setStyleUrl(Style.DARK);
             mMapView.onCreate(savedInstanceState);
             mMapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                    mapboxMap.setStyle(Style.DARK);
-
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
                     try {
                         TrackingSettings settings = mapboxMap.getTrackingSettings();
@@ -84,11 +83,11 @@ public class DoubleMapActivity extends AppCompatActivity {
 
             // MapView mini
             mMapViewMini = (MapView) view.findViewById(R.id.mini_map);
+            mMapViewMini.setStyle(Style.LIGHT);
             mMapViewMini.onCreate(savedInstanceState);
             mMapViewMini.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                    mapboxMap.setStyle(Style.LIGHT);
                     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
 
                     UiSettings uiSettings = mapboxMap.getUiSettings();

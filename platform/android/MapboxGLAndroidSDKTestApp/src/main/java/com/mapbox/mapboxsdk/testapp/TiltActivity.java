@@ -43,14 +43,11 @@ public class TiltActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
 
                 // Move camera to Washington DC
                 CameraPosition normalCameraPosition = new CameraPosition.Builder()
                         .target(WASHINGTON_DC)
                         .zoom(11)
-                        .bearing(0)
-                        .tilt(0)
                         .build();
                 mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(normalCameraPosition));
 
@@ -58,7 +55,6 @@ public class TiltActivity extends AppCompatActivity {
                 CameraPosition tiltedCameraPosition = new CameraPosition.Builder()
                         .target(WASHINGTON_DC)
                         .zoom(11)
-                        .bearing(0)
                         .tilt(45.0f)
                         .build();
                 mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(tiltedCameraPosition), 10000);

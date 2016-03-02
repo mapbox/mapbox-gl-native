@@ -39,12 +39,12 @@ public class ManualZoomActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.manualZoomMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyleUrl(Style.SATELLITE_STREETS);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mMapboxMap.setStyle(Style.SATELLITE_STREETS);
 
                 UiSettings uiSettings = mMapboxMap.getUiSettings();
                 uiSettings.setAllGesturesEnabled(false);

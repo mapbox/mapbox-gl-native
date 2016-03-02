@@ -49,8 +49,6 @@ public class MapFragmentActivity extends AppCompatActivity {
                         new CameraPosition.Builder()
                                 .target(new LatLng(48.861431, 2.334166))
                                 .zoom(10)
-                                .bearing(0)
-                                .tilt(0)
                                 .build()));
             }
         });

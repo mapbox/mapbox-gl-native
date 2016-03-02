@@ -73,15 +73,13 @@ public class OfflineActivity extends AppCompatActivity
         // Set up map
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyle(Style.MAPBOX_STREETS);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 Log.d(LOG_TAG, "Map is ready");
                 mMapboxMap = mapboxMap;
-
-                // Set style
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
 
                 // Set initial position to UNHQ in NYC
                 mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(

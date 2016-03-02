@@ -37,24 +37,22 @@ public class MapboxMapActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyle(Style.SATELLITE_STREETS);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.setStyle(Style.SATELLITE_STREETS);
                 mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
                         new CameraPosition.Builder()
                                 .target(new LatLng(43.876550, -103.454791))
                                 .zoom(14)
-                                .bearing(0)
-                                .tilt(0)
                                 .build()));
             }
         });
 
         Snackbar.make(findViewById(android.R.id.content),
-                "Demo MapboxMap API.",
+                "Demo MapboxMap API",
                 Snackbar.LENGTH_INDEFINITE).show();
     }
 

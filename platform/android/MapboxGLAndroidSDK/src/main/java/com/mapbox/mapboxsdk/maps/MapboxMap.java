@@ -420,7 +420,6 @@ public class MapboxMap {
      */
     @UiThread
     public void setStyleUrl(@NonNull String url) {
-        mStyleUrl = url;
         mMapView.setStyleUrl(url);
     }
 
@@ -454,7 +453,7 @@ public class MapboxMap {
     @UiThread
     @NonNull
     public String getStyleUrl() {
-        return mStyleUrl;
+        return mMapView.getStyleUrl();
     }
 
     //

@@ -47,7 +47,6 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 // set a style
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
                 mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition position) {

@@ -231,22 +231,6 @@ public class MapboxMapTest {
         mMapboxMap.setOnMyLocationTrackingModeChangeListener(mMyLocationTrackingModeChangeListener);
         assertEquals("MyLocationTrackigChangeListener should match",mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
     }
-    
-    //
-    // Style
-    //
-
-    @Test
-    public void testStyleUrl() {
-        mMapboxMap.setStyleUrl("somestyle");
-        assertEquals("StyleUrl should be same", "somestyle", mMapboxMap.getStyleUrl());
-    }
-
-    @Test
-    public void testStyle() {
-        mMapboxMap.setStyle(Style.MAPBOX_STREETS);
-        assertEquals("Style should be same", Style.MAPBOX_STREETS, mMapboxMap.getStyleUrl());
-    }
 
     //
     // CameraPosition

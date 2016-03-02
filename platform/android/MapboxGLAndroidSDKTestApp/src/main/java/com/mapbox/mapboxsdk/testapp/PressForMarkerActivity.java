@@ -47,6 +47,7 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapboxM
         // Adding MapView programmatically
         mMapView = new MapView(this);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyle(Style.EMERALD);
         mMapView.onCreate(savedInstanceState);
         ((ViewGroup) findViewById(R.id.activity_container)).addView(mMapView);
 
@@ -61,15 +62,10 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapboxM
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                // select style
-                mapboxMap.setStyle(Style.EMERALD);
-
                 // set camera
                 mapboxMap.setCameraPosition(new CameraPosition.Builder()
                         .target(new LatLng(45.1855569, 5.7215506))
                         .zoom(11)
-                        .bearing(0)
-                        .tilt(0)
                         .build());
 
                 // add markers

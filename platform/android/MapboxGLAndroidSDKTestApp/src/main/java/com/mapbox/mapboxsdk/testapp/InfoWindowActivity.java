@@ -49,10 +49,13 @@ public class InfoWindowActivity extends AppCompatActivity {
                         .snippet("H St NW with 15th St NW")
                         .position(new LatLng(38.9002073, -77.03364419)));
 
-                mapboxMap.addMarker(new MarkerOptions()
+                Marker marker = mapboxMap.addMarker(new MarkerOptions()
                         .title("White House")
                         .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
                         .position(new LatLng(38.897705003219784, -77.03655168667463)));
+
+                // open InfoWindow at startup!
+                mapboxMap.selectMarker(marker);
 
                 mapboxMap.addMarker(new MarkerOptions().title("Intersection")
                         .snippet("E St NW with 17th St NW")
@@ -61,7 +64,7 @@ public class InfoWindowActivity extends AppCompatActivity {
                 mapboxMap.setOnInfoWindowCloseListener(new MapboxMap.OnInfoWindowCloseListener() {
                     @Override
                     public void onInfoWindowClose(Marker marker) {
-                        Toast.makeText(getApplicationContext(),"OnClose: "+marker.getTitle(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "OnClose: " + marker.getTitle(), Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -97,7 +100,7 @@ public class InfoWindowActivity extends AppCompatActivity {
                 mapboxMap.setOnInfoWindowLongClickListener(new MapboxMap.OnInfoWindowLongClickListener() {
                     @Override
                     public void onInfoWindowLongClick(Marker marker) {
-                        Toast.makeText(getApplicationContext(),"OnLongClick: "+marker.getTitle(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "OnLongClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
                     }
                 });
 
