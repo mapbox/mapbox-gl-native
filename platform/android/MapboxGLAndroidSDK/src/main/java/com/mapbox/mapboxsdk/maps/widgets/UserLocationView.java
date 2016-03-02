@@ -181,8 +181,8 @@ public final class UserLocationView extends View {
             return;
         }
         canvas.save();
-        canvas.concat(mMarkerScreenMatrix);
         canvas.translate(mShadowX, mShadowY);
+        canvas.concat(mMarkerScreenMatrix);
         boolean willDraw = !canvas.quickReject(holder.mShadowBounds, Canvas.EdgeType.AA);
 
         if (willDraw) {
