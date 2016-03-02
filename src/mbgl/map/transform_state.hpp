@@ -115,8 +115,8 @@ private:
     double pitch = 0.0;
 
     // cache values for spherical mercator math
-    double Bc = (scale * util::tileSize) / util::DEGREES_MAX;
-    double Cc = (scale * util::tileSize) / util::M2PI;
+    double Bc = worldSize() / util::DEGREES_MAX;
+    double Cc = worldSize() / util::M2PI;
 };
 
 } // namespace mbgl

@@ -15,7 +15,7 @@ TransformState::TransformState(ConstrainMode constrainMode_)
 
 void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
     const double tile_scale = std::pow(2, z);
-    double s = util::tileSize * scale / tile_scale;
+    double s = worldSize() / tile_scale;
 
     matrix::identity(matrix);
     matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
@@ -98,7 +98,7 @@ LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
     if (wrapMode == LatLng::Unwrapped) return ll;
 
     // adjust for date line
-    double w = util::tileSize * scale / 2;
+    double w = worldSize() / 2;
     double x_ = x;
     if (x_ > w) {
         while (x_ > w) {
@@ -124,12 +124,12 @@ LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
 }
 
 double TransformState::pixel_x() const {
-    const double center = (width - scale * util::tileSize) / 2;
+    const double center = (width - worldSize()) / 2;
     return center + x;
 }
 
 double TransformState::pixel_y() const {
-    const double center = (height - scale * util::tileSize) / 2;
+    const double center = (height - worldSize()) / 2;
     return center + y;
 }
 
@@ -297,7 +297,7 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
 mat4 TransformState::coordinatePointMatrix(double z) const {
     mat4 proj;
     getProjMatrix(proj);
-    float s = util::tileSize * scale / std::pow(2, z);
+    float s = worldSize() / std::pow(2, z);
     matrix::scale(proj, proj, s, s, 1);
     matrix::multiply(proj, getPixelMatrix(), proj);
     return proj;
