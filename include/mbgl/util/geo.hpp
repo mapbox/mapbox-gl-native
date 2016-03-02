@@ -33,7 +33,11 @@ public:
       coordinate so that interpolating between the two endpoints will cross it. */
     void unwrapForShortestPath(const LatLng& start) {
         if (std::abs(start.longitude) + std::abs(longitude) > util::LONGITUDE_MAX) {
-            longitude += (start.longitude > 0 && longitude < 0) ? util::DEGREES_MAX : -util::DEGREES_MAX;
+            if (start.longitude > 0 && longitude < 0) {
+                longitude += util::DEGREES_MAX;
+            } else if (start.longitude < 0 && longitude > 0) {
+                longitude -= util::DEGREES_MAX;
+            }
         }
     }
 
