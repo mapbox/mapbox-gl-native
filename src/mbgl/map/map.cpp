@@ -192,6 +192,7 @@ LatLng Map::getLatLng(const EdgeInsets& padding) const {
 void Map::resetPosition(const EdgeInsets& padding) {
     CameraOptions camera;
     camera.angle = 0;
+    camera.pitch = 0;
     camera.center = LatLng(0, 0);
     if (padding) {
         camera.padding = padding;
