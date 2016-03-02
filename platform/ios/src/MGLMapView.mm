@@ -450,16 +450,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _pendingLongitude = NAN;
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
 
-    // metrics: map load event
-    mbgl::LatLng latLng = _mbglMap->getLatLng(padding);
-    int zoom = round(_mbglMap->getZoom());
-
-    [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{
-        MGLEventKeyLatitude: @(latLng.latitude),
-        MGLEventKeyLongitude: @(latLng.longitude),
-        MGLEventKeyZoomLevel: @(zoom),
-        MGLEventKeyPushEnabled: @([MGLMapboxEvents checkPushEnabled])
-    }];
+    [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
 }
 
 - (void)createGLView
@@ -1321,12 +1312,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     _mbglMap->cancelTransitions();
 
-    if (doubleTap.state == UIGestureRecognizerStateBegan)
+    if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-    }
-    else if (doubleTap.state == UIGestureRecognizerStateEnded)
-    {
         CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {

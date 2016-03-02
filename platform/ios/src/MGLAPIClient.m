@@ -2,8 +2,10 @@
 #import "NSBundle+MGLAdditions.h"
 #import "MGLAccountManager.h"
 
-static NSString * const MGLAPIClientUserAgent = @"MapboxEventsiOS/1.1";
-static NSString * const MGLAPIClientBaseURL = @"https://api.tiles.mapbox.com";
+static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
+static NSString * const MGLAPIClientBaseURL = @"https://api.mapbox.com";
+static NSString * const MGLAPIClientEventsPath = @"events/v2";
+static NSString * const MGLAPIClientDomain = @"com.mapbox.mglnative";
 
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
 static NSString * const MGLAPIClientHeaderFieldContentTypeKey = @"Content-Type";
@@ -41,13 +43,24 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 #pragma mark Public API
 
 - (void)postEvents:(nonnull NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
-    NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:[self requestForEvents:events]
-                                                     completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                                                         [self.dataTasks removeObject:dataTask];
-                                                         if (completionHandler) {
-                                                             completionHandler(error);
-                                                         }
-    }];
+    __block NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:[self requestForEvents:events]
+                                                             completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+                                                                 NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                                                                 NSError *statusError = nil;
+                                                                 if (httpResponse.statusCode >= 400) {
+                                                                     NSString *description = [NSString stringWithFormat:@"The session data task failed. Original request was: %@", dataTask.originalRequest];
+                                                                     NSString *reason = [NSString stringWithFormat:@"The status code was %@", @(httpResponse.statusCode)];
+                                                                     NSDictionary *userInfo = @{NSLocalizedDescriptionKey: NSLocalizedString(description, nil),
+                                                                                                NSLocalizedFailureReasonErrorKey: NSLocalizedString(reason, nil)};
+                                                                     statusError = [[NSError alloc] initWithDomain:MGLAPIClientDomain code:1 userInfo:userInfo];
+                                                                 }
+                                                                 if (completionHandler) {
+                                                                     error = error ? error : statusError;
+                                                                     completionHandler(error);
+                                                                 }
+                                                                 [self.dataTasks removeObject:dataTask];
+                                                                 dataTask = nil;
+                                                             }];
     [dataTask resume];
     [self.dataTasks addObject:dataTask];
 }
@@ -64,7 +77,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 #pragma mark Utilities
 
 - (NSURLRequest *)requestForEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
-    NSString *url = [NSString stringWithFormat:@"%@/events/v1?access_token=%@", self.baseURL, [MGLAccountManager accessToken]];
+    NSString *url = [NSString stringWithFormat:@"%@/%@?access_token=%@", self.baseURL, MGLAPIClientEventsPath, [MGLAccountManager accessToken]];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
     [request setValue:self.userAgent forHTTPHeaderField:MGLAPIClientHeaderFieldUserAgentKey];
     [request setValue:MGLAPIClientHeaderFieldContentTypeValue forHTTPHeaderField:MGLAPIClientHeaderFieldContentTypeKey];
@@ -106,7 +119,10 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-    _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@", appName, appVersion, appBuildNumber, MGLAPIClientUserAgent];
+    NSString *semanticVersion = [NSBundle mgl_frameworkBundle].infoDictionary[@"MGLSemanticVersionString"];
+    NSString *shortVersion = [NSBundle mgl_frameworkBundle].infoDictionary[@"CFBundleShortVersionString"];
+    NSString *sdkVersion = semanticVersion ? semanticVersion : shortVersion;
+    _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@/%@", appName, appVersion, appBuildNumber, MGLAPIClientUserAgentBase, sdkVersion];
 }
 
 #pragma mark - JSON Serialization
@@ -118,7 +134,6 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 #pragma mark NSURLSessionDelegate
 
 - (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^) (NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-    
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
         
         SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];

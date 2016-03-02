@@ -4,29 +4,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Event types
 extern NSString *const MGLEventTypeAppUserTurnstile;
 extern NSString *const MGLEventTypeMapLoad;
 extern NSString *const MGLEventTypeMapTap;
 extern NSString *const MGLEventTypeMapDragEnd;
 extern NSString *const MGLEventTypeLocation;
-extern NSString *const MGLEventTypeVisit;
-extern NSString *const MGLEventTypeLocalDebug;
 
+// Event keys
 extern NSString *const MGLEventKeyLatitude;
 extern NSString *const MGLEventKeyLongitude;
 extern NSString *const MGLEventKeyZoomLevel;
-extern NSString *const MGLEventKeySpeed;
-extern NSString *const MGLEventKeyCourse;
-extern NSString *const MGLEventKeyAltitude;
-extern NSString *const MGLEventKeyHorizontalAccuracy;
-extern NSString *const MGLEventKeyVerticalAccuracy;
-extern NSString *const MGLEventKeyPushEnabled;
-extern NSString *const MGLEventKeyEmailEnabled;
 extern NSString *const MGLEventKeyGestureID;
-extern NSString *const MGLEventKeyArrivalDate;
-extern NSString *const MGLEventKeyDepartureDate;
-extern NSString *const MGLEventKeyLocalDebugDescription;
 
+// Gestures
 extern NSString *const MGLEventGestureSingleTap;
 extern NSString *const MGLEventGestureDoubleTap;
 extern NSString *const MGLEventGestureTwoFingerSingleTap;
@@ -48,7 +39,6 @@ typedef NS_MUTABLE_DICTIONARY_OF(NSString *, id) MGLMutableMapboxEventAttributes
 + (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary;
 + (void)ensureMetricsOptoutExists;
 + (void)flush;
-+ (BOOL)checkPushEnabled;
 
 @end
 
