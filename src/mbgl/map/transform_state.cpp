@@ -341,11 +341,11 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
     if (!latLng || !anchor) return;
 
     auto latLngToTileCoord = [&](const LatLng& ll) -> vec2<double> {
-        return { lngX(ll.longitude) / util::tileSize, latY(ll.latitude) / util::tileSize };
+        return { lngX(ll.longitude), latY(ll.latitude) };
     };
 
     auto tileCoordToLatLng = [&](const vec2<double> coord) -> LatLng {
-        return { yLat(coord.y, scale), xLng(coord.x, scale) };
+        return { yLat(coord.y, worldSize()), xLng(coord.x, worldSize()) };
     };
 
     auto centerCoord = latLngToTileCoord(getLatLng(LatLng::Unwrapped));
