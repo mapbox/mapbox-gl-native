@@ -1,4 +1,5 @@
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <stdexcept>
@@ -162,7 +163,7 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     std::string result = "mapbox://tiles/" + tileset + "/{z}/{x}/{y}";
 
     if (type == SourceType::Raster) {
-        result += tileSize == 512 ? "@2x" : "{ratio}";
+        result += tileSize == util::tileSize ? "@2x" : "{ratio}";
     }
 
     result += "." + extension;

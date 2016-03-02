@@ -51,7 +51,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
     color[2] *= properties.opacity;
     color[3] *= properties.opacity;
 
-    float ratio = state.getScale() / std::pow(2, id.z) / (util::EXTENT / (512.0 * id.overscaling()));
+    float ratio = state.getScale() / std::pow(2, id.z) / (util::EXTENT / (util::tileSize * id.overscaling()));
 
     mat2 antialiasingMatrix;
     matrix::identity(antialiasingMatrix);
@@ -111,7 +111,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         if (!imagePosA || !imagePosB)
             return;
 
-        float factor = util::EXTENT / (512 * id.overscaling()) / std::pow(2, state.getIntegerZoom() - id.z);
+        float factor = util::EXTENT / (util::tileSize * id.overscaling()) / std::pow(2, state.getIntegerZoom() - id.z);
 
         config.program = linepatternShader->getID();
 
