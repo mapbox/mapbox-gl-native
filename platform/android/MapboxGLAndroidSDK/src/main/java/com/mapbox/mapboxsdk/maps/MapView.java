@@ -2205,7 +2205,6 @@ public class MapView extends FrameLayout {
         try {
             TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
             trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-            trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }

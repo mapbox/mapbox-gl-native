@@ -44,7 +44,7 @@ public class TrackingSettings {
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         mMyLocationTrackingMode = myLocationTrackingMode;
         mapView.setMyLocationTrackingMode(myLocationTrackingMode);
-        validateGesturesForTrackingModes();
+        validateGesturesForLocationTrackingMode();
     }
 
     /**
@@ -79,6 +79,7 @@ public class TrackingSettings {
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         mMyBearingTrackingMode = myBearingTrackingMode;
         mapView.setMyBearingTrackingMode(myBearingTrackingMode);
+        validateGesturesForBearingTrackingMode();
     }
 
     /**
@@ -105,8 +106,12 @@ public class TrackingSettings {
     }
 
     private void validateGesturesForTrackingModes() {
+        validateGesturesForBearingTrackingMode();
+        validateGesturesForLocationTrackingMode();
+    }
+
+    private void validateGesturesForLocationTrackingMode() {
         int myLocationTrackingMode = getMyLocationTrackingMode();
-        int myBearingTrackingMode = getMyBearingTrackingMode();
 
         if (!dismissLocationTrackingOnGesture) {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
@@ -117,8 +122,10 @@ public class TrackingSettings {
         } else {
             uiSettings.setScrollGesturesEnabled(true);
         }
+    }
 
-
+    private void validateGesturesForBearingTrackingMode() {
+        int myBearingTrackingMode = getMyBearingTrackingMode();
         if (!dismissBearingTrackingOnGesture) {
             if (myBearingTrackingMode == MyBearingTracking.NONE) {
                 uiSettings.setRotateGesturesEnabled(true);
@@ -132,7 +139,7 @@ public class TrackingSettings {
 
     public void setDismissLocationTrackingOnGesture(boolean dismissLocationTrackingOnGesture) {
         this.dismissLocationTrackingOnGesture = dismissLocationTrackingOnGesture;
-        validateGesturesForTrackingModes();
+        validateGesturesForLocationTrackingMode();
     }
 
     public boolean isDismissLocationTrackingOnGesture() {
@@ -141,7 +148,7 @@ public class TrackingSettings {
 
     public void setDismissBearingTrackingOnGesture(boolean dismissBearingTrackingOnGesture) {
         this.dismissBearingTrackingOnGesture = dismissBearingTrackingOnGesture;
-        validateGesturesForTrackingModes();
+        validateGesturesForBearingTrackingMode();
     }
 
     public boolean isDismissBearingTrackingOnGesture() {
