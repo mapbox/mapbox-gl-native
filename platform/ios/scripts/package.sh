@@ -76,7 +76,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             -target everything \
             -jobs ${JOBS}
     fi
-    
+
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Building dynamic framework for iOS devices (build ${PROJ_VERSION})…"
         xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
@@ -135,13 +135,13 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
-    
+
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS devices"
         cp -r \
             gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework \
             ${OUTPUT}/dynamic/
-        
+
         step "Merging simulator dynamic library into device dynamic library…"
         lipo \
             gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
@@ -158,7 +158,7 @@ else
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
             ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
-    
+
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS Simulator…"
         cp -r \
@@ -188,7 +188,7 @@ if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     mkdir -p "${OUTPUT}/static/${NAME}.framework/Headers"
     cp -pv platform/{darwin,ios}/include/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
-    cat platform/ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
+    cat ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
     cat platform/ios/framework/Mapbox.h >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
 fi
 

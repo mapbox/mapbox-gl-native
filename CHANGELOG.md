@@ -42,9 +42,9 @@
 
 ## 2.1.0
 
-- Initial Android release. 
+- Initial Android release.
 
-Known issues: 
+Known issues:
 
 - Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
   - Resolved in 2.2.0
@@ -56,6 +56,7 @@ Known issues:
 - Telemetry location gathering now only occurs when the device is in motion. ([#4115](https://github.com/mapbox/mapbox-gl-native/pull/4115))
 - An account’s monthly active users metric only counts a user once a map view is displayed to that user. ([#3713](https://github.com/mapbox/mapbox-gl-native/pull/3713))
 - Updated documentation to reflect the requirement that you must embed the framework in the “Embedded Binaries” section in Xcode. ([#4011](https://github.com/mapbox/mapbox-gl-native/issues/4011))
+- Telemetry location gathering now only occurs when the device is in motion (https://github.com/mapbox/mapbox-gl-native/pull/4115)
 - Polygons and polylines now default to using the map view’s tint color. ([#4028](https://github.com/mapbox/mapbox-gl-native/pull/4028))
 - The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 - Fixed a formatting issue in the documentation for `MGLCoordinateBoundsIsEmpty()`. ([#3958](https://github.com/mapbox/mapbox-gl-native/pull/3958))
@@ -99,7 +100,7 @@ Known issues:
 - Made telemetry on/off setting available in-app. ([#3445](https://github.com/mapbox/mapbox-gl-native/pull/3445))
 - Fixed an issue with users not being counted by Mapbox if they had disabled telemetry. ([#3495](https://github.com/mapbox/mapbox-gl-native/pull/3495))
 - Fixed crash caused by MGLAnnotationImage with non-integer width or height ([#2198](https://github.com/mapbox/mapbox-gl-native/issues/2198))
-- Fixed “include of non-modular header” errors in Swift projects managed by CocoaPods. ([#3679](https://github.com/mapbox/mapbox-gl-native/pull/3679)) 
+- Fixed “include of non-modular header” errors in Swift projects managed by CocoaPods. ([#3679](https://github.com/mapbox/mapbox-gl-native/pull/3679))
 - Avoids triggering the blue background location status bar when user has granted "when in use" permission. ([#3671](https://github.com/mapbox/mapbox-gl-native/issues/3671))
 - Deprecated the `debugActive` property and `-toggleDebug` method on MGLMapView in favor of a new `debugMask` property that exposes individual style debugging options. ([#3742](https://github.com/mapbox/mapbox-gl-native/pull/3742))
 
@@ -163,11 +164,11 @@ Known issues:
 
 ## iOS 2.0.0
 
-Repackaging 2.0.0-pre.1 as it contained no issues. 
+Repackaging 2.0.0-pre.1 as it contained no issues.
 
 ## iOS 2.0.0-pre.1
 
-Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series. 
+Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 
 ## 0.5.1
 
@@ -186,7 +187,7 @@ Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 - Improved map render lifecycle notifications. ([#1026](https://github.com/mapbox/mapbox-gl-native/issues/1026))
 - Fixed a bug that caused annotations not to show at zoom level zero. ([#1279](https://github.com/mapbox/mapbox-gl-native/issues/1279))
 - Fixed a bug with the ordering of shape layers. ([#1866](https://github.com/mapbox/mapbox-gl-native/pull/1866))
-- Other bug fixes and performance improvements. 
+- Other bug fixes and performance improvements.
 
 ### iOS
 
@@ -230,12 +231,12 @@ Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 
 ## 0.3.1
 
-- Temporarily removed `IBDesignable` support on iOS. 
+- Temporarily removed `IBDesignable` support on iOS.
 
 ## 0.3.0
 
-- Initial iOS beta release. 
+- Initial iOS beta release.
 
-Known issues: 
+Known issues:
 
-- None. 
+- None.
