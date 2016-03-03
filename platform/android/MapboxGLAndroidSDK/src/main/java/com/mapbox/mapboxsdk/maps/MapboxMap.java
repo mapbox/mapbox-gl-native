@@ -535,6 +535,15 @@ public class MapboxMap {
         mMapView.setUserLocationShadowOffset(x, y);
     }
 
+    /**
+     * Change the accuracy circle (fill and stroke) color of the user location view
+     *
+     * @param color int real color (not a @ColorRes)
+     */
+    public void setUserLocationAccuracyColor(int color) {
+        mMapView.setUserLocationAccuracyColor(color);
+    }
+
 
     /**
      * Returns the current Mapbox access token used to load map styles and tiles.
