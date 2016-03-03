@@ -484,6 +484,18 @@ static mbgl::LatLngBounds latlngbounds_from_java(JNIEnv *env, jobject latLngBoun
     return result;
 }
 
+static jobject latlngbounds_from_native(JNIEnv *env, mbgl::LatLngBounds bounds) {
+    double northLatitude = bounds.north();
+    double eastLongitude = bounds.east();
+    double southLatitude = bounds.south();
+    double westLongitude = bounds.west();
+
+    jobject jbounds = env->NewObject(latLngBoundsClass, latLngBoundsConstructorId,
+        northLatitude, eastLongitude, southLatitude, westLongitude);
+
+    return jbounds;
+}
+
 }
 }
 
@@ -1796,6 +1808,16 @@ void JNICALL listOfflineRegions(JNIEnv *env, jobject obj, jlong defaultFileSourc
                 jobject jregion = env2->NewObject(offlineRegionClass, offlineRegionConstructorId);
                 env2->SetObjectField(jregion, offlineRegionOfflineManagerId, obj);
                 env2->SetLongField(jregion, offlineRegionIdId, region.getID());
+
+                // Definition object
+                mbgl::OfflineTilePyramidRegionDefinition definition = region.getDefinition();
+                jobject jdefinition = env2->NewObject(offlineRegionDefinitionClass, offlineRegionDefinitionConstructorId);
+                env2->SetObjectField(jdefinition, offlineRegionDefinitionStyleURLId, std_string_to_jstring(env2, definition.styleURL));
+                env2->SetObjectField(jdefinition, offlineRegionDefinitionBoundsId, latlngbounds_from_native(env2, definition.bounds));
+                env2->SetDoubleField(jdefinition, offlineRegionDefinitionMinZoomId, definition.minZoom);
+                env2->SetDoubleField(jdefinition, offlineRegionDefinitionMaxZoomId, definition.maxZoom);
+                env2->SetFloatField(jdefinition, offlineRegionDefinitionPixelRatioId, definition.pixelRatio);
+                env2->SetObjectField(jregion, offlineRegionDefinitionId, jdefinition);
                 
                 // Metadata object
                 jbyteArray metadata = metadata_from_native(env2, region.getMetadata());
