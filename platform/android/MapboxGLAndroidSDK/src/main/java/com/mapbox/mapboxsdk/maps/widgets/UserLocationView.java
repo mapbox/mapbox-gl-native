@@ -258,6 +258,7 @@ public final class UserLocationView extends View {
         mAccuracyPaintFill.setAlpha((int) (255 * 0.25f));
         mAccuracyPaintStroke.setColor(color);
         mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
+        update();
     }
 
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
