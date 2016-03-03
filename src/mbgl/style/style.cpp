@@ -176,6 +176,7 @@ void Style::recalculate(float z) {
                                           zoomHistory,
                                           data.getDefaultFadeDuration());
 
+    hasPendingTransitions = false;
     for (const auto& layer : layers) {
         hasPendingTransitions |= layer->recalculate(parameters);
 

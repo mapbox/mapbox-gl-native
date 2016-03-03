@@ -247,7 +247,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     view.afterRender();
 
     if (style->hasTransitions()) {
-        updateFlags |= Update::Classes;
+        updateFlags |= Update::Zoom;
         asyncUpdate.send();
     } else if (painter->needsAnimation()) {
         updateFlags |= Update::Repaint;
