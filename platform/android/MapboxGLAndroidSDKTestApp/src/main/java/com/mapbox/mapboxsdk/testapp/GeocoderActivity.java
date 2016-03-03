@@ -1,12 +1,18 @@
 package com.mapbox.mapboxsdk.testapp;
 
+import android.graphics.PointF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mapbox.geocoder.GeocoderCriteria;
@@ -19,6 +25,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -55,11 +62,21 @@ public class GeocoderActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(ApiAccess.getToken(this));
-        mapView.setStyle(Style.EMERALD);
+        mapView.setStyle(Style.MAPBOX_STREETS);
         mapView.onCreate(savedInstanceState);
+
+        final ImageView dropPinView = new ImageView(this);
+        dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+        dropPinView.setLayoutParams(params);
+        mapView.addView(dropPinView);
+
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+                final Projection projection = mapboxMap.getProjection();
+                final int width = mapView.getMeasuredWidth();
+                final int height = mapView.getMeasuredHeight();
 
                 // Camera position
                 mapboxMap.setCameraPosition(
@@ -75,12 +92,15 @@ public class GeocoderActivity extends AppCompatActivity {
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
+                        PointF centerPoint = new PointF(width / 2, (height + dropPinView.getHeight()) / 2);
+                        LatLng centerLatLng = new LatLng(projection.fromScreenLocation(centerPoint));
+
                         setMessage("Geocoding...");
+
                         mapboxMap.removeAnnotations();
-                        mapboxMap.addMarker(new MarkerOptions()
-                                .position(point)
-                                .title("Your finger is here"));
-                        geocode(point);
+                        mapboxMap.addMarker(new MarkerOptions().position(centerLatLng));
+
+                        geocode(centerLatLng);
                     }
                 });
             }
@@ -127,31 +147,41 @@ public class GeocoderActivity extends AppCompatActivity {
      * Forward geocoding
      */
 
-    private void geocode(LatLng point) {
-        MapboxGeocoder client = new MapboxGeocoder.Builder()
-                .setAccessToken(ApiAccess.getToken(this))
-                .setCoordinates(point.getLongitude(), point.getLatitude())
-                .setType(GeocoderCriteria.TYPE_POI)
-                .build();
-
-        client.enqueue(new Callback<GeocoderResponse>() {
-            @Override
-            public void onResponse(Response<GeocoderResponse> response, Retrofit retrofit) {
-                List<GeocoderFeature> results = response.body().getFeatures();
-                if (results.size() > 0) {
-                    String placeName = results.get(0).getPlaceName();
-                    setSuccess(placeName);
-                } else {
-                    setMessage("No results.");
-                }
-            }
+    private void geocode(final LatLng point) {
+        new AsyncTask<Void, Void, Void>() {
 
             @Override
-            public void onFailure(Throwable t) {
-                setError(t.getMessage());
-            }
-        });
+            protected Void doInBackground(Void... params) {
+                MapboxGeocoder client = new MapboxGeocoder.Builder()
+                        .setAccessToken(ApiAccess.getToken(GeocoderActivity.this))
+                        .setCoordinates(point.getLongitude(), point.getLatitude())
+                        .setType(GeocoderCriteria.TYPE_POI)
+                        .build();
 
+                client.enqueue(new Callback<GeocoderResponse>()
+
+                               {
+                                   @Override
+                                   public void onResponse(Response<GeocoderResponse> response, Retrofit retrofit) {
+                                       List<GeocoderFeature> results = response.body().getFeatures();
+                                       if (results.size() > 0) {
+                                           String placeName = results.get(0).getPlaceName();
+                                           setSuccess(placeName);
+                                       } else {
+                                           setMessage("No results.");
+                                       }
+                                   }
+
+                                   @Override
+                                   public void onFailure(Throwable t) {
+                                       setError(t.getMessage());
+                                   }
+                               }
+
+                );
+                return null;
+            }
+        }.execute();
     }
 
     /*
