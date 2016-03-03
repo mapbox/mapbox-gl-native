@@ -278,7 +278,7 @@ public final class UserLocationView extends View {
                         mMarkerScreenPoint.y);
 
             } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                float bearing;
+                double bearing;
                 if (mShowDirection) {
                     bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : mUserLocation.getBearing();
                 } else {
@@ -309,10 +309,10 @@ public final class UserLocationView extends View {
             // rotate so arrow in points to bearing
             if (mShowDirection) {
                 if (mMyBearingTrackingMode == MyBearingTracking.COMPASS && mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                    mMarkerScreenMatrix.preRotate(mCompassMarkerDirection + mMapboxMap.getCameraPosition().bearing);
+                    mMarkerScreenMatrix.preRotate((float)(mCompassMarkerDirection + mMapboxMap.getCameraPosition().bearing));
                 } else if (mMyBearingTrackingMode == MyBearingTracking.GPS) {
                     if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                        mMarkerScreenMatrix.preRotate(mGpsMarkerDirection +  mMapboxMap.getCameraPosition().bearing);
+                        mMarkerScreenMatrix.preRotate((float)(mGpsMarkerDirection +  mMapboxMap.getCameraPosition().bearing));
                     } else {
                         mMarkerScreenMatrix.preRotate(mGpsMarkerDirection);
                     }

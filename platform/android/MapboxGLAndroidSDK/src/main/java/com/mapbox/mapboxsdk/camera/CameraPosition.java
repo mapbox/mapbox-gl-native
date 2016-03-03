@@ -16,10 +16,10 @@ public final class CameraPosition implements Parcelable {
     public static final Parcelable.Creator<CameraPosition> CREATOR
             = new Parcelable.Creator<CameraPosition>() {
         public CameraPosition createFromParcel(Parcel in) {
-            float bearing = in.readFloat();
+            double bearing = in.readDouble();
             LatLng target = in.readParcelable(LatLng.class.getClassLoader());
-            float tilt = in.readFloat();
-            float zoom = in.readFloat();
+            double tilt = in.readDouble();
+            double zoom = in.readDouble();
             return new CameraPosition(target, zoom, tilt, bearing);
         }
 
@@ -32,7 +32,7 @@ public final class CameraPosition implements Parcelable {
     /**
      * Direction that the camera is pointing in, in degrees clockwise from north.
      */
-    public final float bearing;
+    public final double bearing;
 
     /**
      * The location that the camera is pointing at.
@@ -42,12 +42,12 @@ public final class CameraPosition implements Parcelable {
     /**
      * The angle, in degrees, of the camera angle from the nadir (directly facing the Earth). See tilt(float) for details of restrictions on the range of values.
      */
-    public final float tilt;
+    public final double tilt;
 
     /**
      * Zoom level near the center of the screen. See zoom(float) for the definition of the camera's zoom level.
      */
-    public final float zoom;
+    public final double zoom;
 
     /**
      * Constructs a CameraPosition.
@@ -59,7 +59,7 @@ public final class CameraPosition implements Parcelable {
      * @throws NullPointerException     if target is null
      * @throws IllegalArgumentException if tilt is outside the range of 0 to 90 degrees inclusive.
      */
-    CameraPosition(LatLng target, float zoom, float tilt, float bearing) {
+    CameraPosition(LatLng target, double zoom, double tilt, double bearing) {
         this.target = target;
         this.bearing = bearing;
         this.tilt = tilt;
@@ -73,10 +73,10 @@ public final class CameraPosition implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeFloat(bearing);
+        out.writeDouble(bearing);
         out.writeParcelable(target, flags);
-        out.writeFloat(tilt);
-        out.writeFloat(zoom);
+        out.writeDouble(tilt);
+        out.writeDouble(zoom);
     }
 
     @Override
@@ -119,10 +119,10 @@ public final class CameraPosition implements Parcelable {
      */
     public static final class Builder {
 
-        private float bearing = -1;
+        private double bearing = -1;
         private LatLng target = null;
-        private float tilt = -1;
-        private float zoom = -1;
+        private double tilt = -1;
+        private double zoom = -1;
         private boolean isRadiant;
 
         /**
@@ -201,15 +201,31 @@ public final class CameraPosition implements Parcelable {
         }
 
         /**
+         * Create Builder from an exisiting array of doubles.
+         *
+         * @param values Values containing target, bearing, tilt and zoom
+         */
+        public Builder(double[] values) {
+            super();
+            if (values != null && values.length == 5) {
+                this.target = new LatLng(values[0], values[1]);
+                this.bearing = (float) values[2];
+                this.tilt = (float) values[3];
+                this.zoom = (float) values[4];
+            }
+        }
+
+
+        /**
          * Sets the direction that the camera is pointing in, in degrees clockwise from north.
          *
          * @param bearing Bearing
          * @return Builder
          */
-        public Builder bearing(float bearing) {
-            if(isRadiant){
+        public Builder bearing(double bearing) {
+            if (isRadiant) {
                 this.bearing = bearing;
-            }else{
+            } else {
                 // converting degrees to radiant
                 this.bearing = (float) (-bearing * MathConstants.DEG2RAD);
             }
@@ -243,10 +259,10 @@ public final class CameraPosition implements Parcelable {
          * @return Builder
          */
         @FloatRange(from = 0.0, to = 60.0)
-        public Builder tilt(float tilt) {
-            if(isRadiant){
+        public Builder tilt(double tilt) {
+            if (isRadiant) {
                 this.tilt = tilt;
-            }else {
+            } else {
                 // converting degrees to radiant
                 this.tilt = (float) (MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT) * MathConstants.DEG2RAD);
             }
@@ -259,7 +275,7 @@ public final class CameraPosition implements Parcelable {
          * @param zoom Zoom value
          * @return Builder
          */
-        public Builder zoom(float zoom) {
+        public Builder zoom(double zoom) {
             this.zoom = zoom;
             return this;
         }

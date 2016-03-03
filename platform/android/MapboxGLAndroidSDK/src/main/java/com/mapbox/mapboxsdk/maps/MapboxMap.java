@@ -323,12 +323,7 @@ public class MapboxMap {
      */
     private void invalidateCameraPosition() {
         mInvalidCameraPosition = false;
-        mCameraPosition = new CameraPosition.Builder(true)
-                .bearing((float) mMapView.getBearing())
-                .target(mMapView.getLatLng())
-                .tilt((float) mMapView.getTilt())
-                .zoom((float) mMapView.getZoom())
-                .build();
+        mCameraPosition = mMapView.invalidateCameraPosition();
         if (mOnCameraChangeListener != null) {
             mOnCameraChangeListener.onCameraChange(mCameraPosition);
         }

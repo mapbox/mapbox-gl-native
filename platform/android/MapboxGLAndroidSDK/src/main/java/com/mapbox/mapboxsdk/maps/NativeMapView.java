@@ -487,6 +487,10 @@ final class NativeMapView {
         nativeRemoveCustomLayer(mNativeMapViewPtr, id);
     }
 
+    public double[] getCameraValues(){
+        return nativeGetCameraValues(mNativeMapViewPtr);
+    }
+
     //
     // Callbacks
     //
@@ -680,4 +684,6 @@ final class NativeMapView {
     private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
 
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
+
+    private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
 }

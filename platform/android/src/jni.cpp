@@ -772,6 +772,30 @@ jobject JNICALL nativeGetLatLng(JNIEnv *env, jobject obj, jlong nativeMapViewPtr
     return ret;
 }
 
+jdoubleArray JNICALL nativeGetCameraValues(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetCameraValues");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::LatLng latLng = nativeMapView->getMap().getLatLng(nativeMapView->getInsets());
+    jdoubleArray  output = env->NewDoubleArray(5);
+    jsize start = 0;
+    jsize leng = 5;
+    jdouble buf[5];
+    buf[0] = latLng.latitude;
+    buf[1] = latLng.longitude;
+    buf[2] = nativeMapView->getMap().getBearing();
+    buf[3] = nativeMapView->getMap().getPitch();
+    buf[4] = nativeMapView->getMap().getZoom();
+    env->SetDoubleArrayRegion(output, start, leng, buf);
+
+    if (output == nullptr) {
+       env->ExceptionDescribe();
+       return nullptr;
+    }
+
+    return output;
+}
+
 void JNICALL nativeResetPosition(JNIEnv *env, jobject obj, jlong nativeMapViewPtr) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeResetPosition");
     assert(nativeMapViewPtr != 0);
@@ -2830,6 +2854,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         {"nativeGetLatLng", "(J)Lcom/mapbox/mapboxsdk/geometry/LatLng;",
          reinterpret_cast<void *>(&nativeGetLatLng)},
         {"nativeResetPosition", "(J)V", reinterpret_cast<void *>(&nativeResetPosition)},
+        {"nativeGetCameraValues","(J)[D", reinterpret_cast<void *>(&nativeGetCameraValues)},
         {"nativeGetPitch", "(J)D", reinterpret_cast<void *>(&nativeGetPitch)},
         {"nativeSetPitch", "(JDJ)V", reinterpret_cast<void *>(&nativeSetPitch)},
         {"nativeScaleBy", "(JDDDJ)V", reinterpret_cast<void *>(&nativeScaleBy)},

@@ -148,12 +148,12 @@ public final class CameraUpdateFactory {
 
     static final class CameraPositionUpdate implements CameraUpdate {
 
-        private final float bearing;
+        private final double bearing;
         private final LatLng target;
-        private final float tilt;
-        private final float zoom;
+        private final double tilt;
+        private final double zoom;
 
-        CameraPositionUpdate(float bearing, LatLng target, float tilt, float zoom) {
+        CameraPositionUpdate(double bearing, LatLng target, double tilt, double zoom) {
             this.bearing = bearing;
             this.target = target;
             this.tilt = tilt;
@@ -164,15 +164,15 @@ public final class CameraUpdateFactory {
             return target;
         }
 
-        public float getBearing() {
+        public double getBearing() {
             return bearing;
         }
 
-        public float getTilt() {
+        public double getTilt() {
             return tilt;
         }
 
-        public float getZoom() {
+        public double getZoom() {
             return zoom;
         }
 
@@ -311,7 +311,7 @@ public final class CameraUpdateFactory {
 
         @Type
         private final int type;
-        private final float zoom;
+        private final double zoom;
         private float x;
         private float y;
 
@@ -332,7 +332,7 @@ public final class CameraUpdateFactory {
             this.y = y;
         }
 
-        public float getZoom() {
+        public double getZoom() {
             return zoom;
         }
 
@@ -349,7 +349,7 @@ public final class CameraUpdateFactory {
             return y;
         }
 
-        public float transformZoom(float currentZoom) {
+        public double transformZoom(double currentZoom) {
             switch (getType()) {
                 case CameraUpdateFactory.ZoomUpdate.ZOOM_IN:
                     currentZoom++;

@@ -1193,32 +1193,18 @@ public class MapView extends FrameLayout {
         }
     }
 
-    /**
-     * Get Bearing in degrees
-     *
-     * @return Bearing in degrees
-     */
+    CameraPosition invalidateCameraPosition() {
+        return new CameraPosition.Builder(mNativeMapView.getCameraValues()).build();
+    }
+
     double getBearing() {
         return mNativeMapView.getBearing();
     }
 
-    /**
-     * Set Bearing in degrees
-     *
-     * @param bearing Bearing in degrees
-     */
     void setBearing(float bearing) {
         mNativeMapView.setBearing(bearing);
     }
 
-    /**
-     * Sets Bearing in degrees
-     * <p/>
-     * NOTE: Used by UserLocationView
-     *
-     * @param bearing  Bearing in degrees
-     * @param duration Length of time to rotate
-     */
     void setBearing(float bearing, long duration) {
         mNativeMapView.setBearing(bearing, duration);
     }
