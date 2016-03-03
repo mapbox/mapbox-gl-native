@@ -360,7 +360,7 @@ final class NativeMapView {
     }
 
     public void setBearing(double degrees, double cx, double cy) {
-        nativeSetBearing(mNativeMapViewPtr, degrees, cx, cy);
+        nativeSetBearingXY(mNativeMapViewPtr, degrees, cx, cy);
     }
 
     public double getBearing() {
@@ -618,8 +618,8 @@ final class NativeMapView {
     private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
                                          long duration);
 
-    private native void nativeSetBearing(long nativeMapViewPtr, double degrees,
-                                         double cx, double cy);
+    private native void nativeSetBearingXY(long nativeMapViewPtr, double degrees,
+                                           double cx, double cy);
 
     private native double nativeGetBearing(long nativeMapViewPtr);
 
