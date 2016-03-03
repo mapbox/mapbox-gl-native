@@ -133,18 +133,13 @@ public final class UserLocationView extends View {
         mMarkerScreenPoint = new PointF();
         mMarkerScreenMatrix = new Matrix();
 
-        mAccuracyPaintFill = new Paint();
-        mAccuracyPaintFill.setAntiAlias(true);
+        mAccuracyPaintFill = new Paint(Paint.ANTI_ALIAS_FLAG);
         mAccuracyPaintFill.setStyle(Paint.Style.FILL);
-        mAccuracyPaintFill.setColor(accuracyColor);
-        mAccuracyPaintFill.setAlpha((int) (255 * 0.25f));
 
-        mAccuracyPaintStroke = new Paint();
-        mAccuracyPaintStroke.setAntiAlias(true);
+        mAccuracyPaintStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
         mAccuracyPaintStroke.setStyle(Paint.Style.STROKE);
         mAccuracyPaintStroke.setStrokeWidth(0.5f * density);
-        mAccuracyPaintStroke.setColor(accuracyColor);
-        mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
+        setUserLocationAccuracyColor(accuracyColor);
 
         mAccuracyPath = new Path();
         mAccuracyBounds = new RectF();
@@ -245,6 +240,13 @@ public final class UserLocationView extends View {
         mShadowX = x;
         mShadowY = y;
         update();
+    }
+
+    public void setUserLocationAccuracyColor(int color) {
+        mAccuracyPaintFill.setColor(color);
+        mAccuracyPaintFill.setAlpha((int) (255 * 0.25f));
+        mAccuracyPaintStroke.setColor(color);
+        mAccuracyPaintStroke.setAlpha((int) (255 * 0.5f));
     }
 
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {

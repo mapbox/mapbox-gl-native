@@ -915,6 +915,14 @@ public class MapView extends FrameLayout {
         mUserLocationView.setUserLocationShadowOffset(x, y);
     }
 
+    /**
+     * Change the accuracy color
+     * @param color int real color (not a @ColorRes)
+     */
+    void setUserLocationAccuracyColor(int color) {
+        mUserLocationView.setUserLocationAccuracyColor(color);
+    }
+
     //
     // Projection
     //
