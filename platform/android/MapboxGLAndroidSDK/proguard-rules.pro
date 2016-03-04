@@ -27,5 +27,8 @@
 # Package camera
 -keep class com.mapbox.mapboxsdk.camera.** { *; }
 
+# Package offline
+-keep class com.mapbox.mapboxsdk.offline.** { *; }
+
 # Gesture package
 -keep class almeros.android.multitouch.gesturedetectors.** { *; }
