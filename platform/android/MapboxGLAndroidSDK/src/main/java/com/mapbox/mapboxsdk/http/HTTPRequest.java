@@ -10,6 +10,7 @@ import java.io.InterruptedIOException;
 import java.net.ProtocolException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.SSLException;
 
@@ -27,7 +28,10 @@ class HTTPRequest implements Callback {
     private static final int CONNECTION_ERROR = 0;
     private static final int TEMPORARY_ERROR = 1;
     private static final int PERMANENT_ERROR = 2;
-    private static final int CANCELED_ERROR = 3;
+
+    // Reentrancy is not needed, but "Lock" is an
+    // abstract class.
+    private ReentrantLock mLock = new ReentrantLock();
 
     private long mNativePtr = 0;
 
@@ -52,6 +56,15 @@ class HTTPRequest implements Callback {
 
     public void cancel() {
         mCall.cancel();
+
+        // TODO: We need a lock here because we can try
+        // to cancel at the same time the request is getting
+        // answered on the OkHTTP thread. We could get rid of
+        // this lock by using Runnable when we move Android
+        // implementation of mbgl::RunLoop to Looper.
+        mLock.lock();
+        mNativePtr = 0;
+        mLock.unlock();
     }
 
     @Override
@@ -77,7 +90,11 @@ class HTTPRequest implements Callback {
             response.body().close();
         }
 
-        nativeOnResponse(response.code(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
+        mLock.lock();
+        if (mNativePtr != 0) {
+            nativeOnResponse(response.code(), response.header("ETag"), response.header("Last-Modified"), response.header("Cache-Control"), response.header("Expires"), body);
+        }
+        mLock.unlock();
     }
 
     @Override
@@ -89,11 +106,14 @@ class HTTPRequest implements Callback {
             type = CONNECTION_ERROR;
         } else if ((e instanceof InterruptedIOException)) {
             type = TEMPORARY_ERROR;
-        } else if (mCall.isCanceled()) {
-            type = CANCELED_ERROR;
         }
 
         String errorMessage = e.getMessage() != null ? e.getMessage() : "Error processing the request";
-        nativeOnFailure(type, errorMessage);
+
+        mLock.lock();
+        if (mNativePtr != 0) {
+            nativeOnFailure(type, errorMessage);
+        }
+        mLock.unlock();
     }
 }

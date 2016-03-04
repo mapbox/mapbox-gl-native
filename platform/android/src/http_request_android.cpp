@@ -40,8 +40,6 @@ public:
 private:
     void finish();
 
-    bool cancelled = false;
-
     std::unique_ptr<Response> response;
     const std::shared_ptr<const Response> existingResponse;
 
@@ -50,7 +48,6 @@ private:
     static const int connectionError = 0;
     static const int temporaryError = 1;
     static const int permanentError = 2;
-    static const int canceledError = 3;
 };
 
 jni::Class<HTTPRequest> HTTPRequest::javaClass;
@@ -97,20 +94,18 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, Callback c
 }
 
 void HTTPRequest::cancel() {
-    cancelled = true;
-
     UniqueEnv env = android::AttachEnv();
 
     static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
     javaRequest->Call(*env, cancel);
+
+    delete this;
 }
 
 void HTTPRequest::finish() {
-    if (!cancelled) {
-        assert(response);
-        notify(*response);
-    }
+    assert(response);
+    notify(*response);
 
     delete this;
 }
@@ -172,9 +167,6 @@ void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
             break;
         case temporaryError:
             response->error = std::make_unique<Error>(Error::Reason::Server, messageStr);
-            break;
-        case canceledError:
-            response.reset();
             break;
         default:
             response->error = std::make_unique<Error>(Error::Reason::Other, messageStr);
