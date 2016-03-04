@@ -93,6 +93,10 @@ int main(int argc, char *argv[]) {
             std::cerr << error.reason << " downloading resource: " << error.message << std::endl;
         }
 
+        void mapboxTileCountLimitExceeded(uint64_t limit) override {
+            std::cerr << "Error: reached limit of " << limit << " offline tiles" << std::endl;
+        }
+
         util::RunLoop& loop;
         SystemTimePoint start;
     };
