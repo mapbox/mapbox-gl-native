@@ -92,9 +92,7 @@ void Map::renderSync() {
 }
 
 void Map::update(Update flags) {
-    if (flags & Update::Dimensions) {
-        transform->resize(view.getSize());
-    }
+    if (flags & Update::Dimensions) transform->resize(view.getSize());
     context->invoke(&MapContext::triggerUpdate, transform->getState(), flags);
 }
 
@@ -521,29 +519,24 @@ bool Map::isFullyLoaded() const {
     return context->invokeSync<bool>(&MapContext::isLoaded);
 }
 
-void Map::addClass(const std::string& klass) {
-    if (data->addClass(klass)) {
-        update(Update::Classes);
-    }
+void Map::addClass(const std::string& className) {
+    context->invoke(&MapContext::addClass, className);
 }
 
-void Map::removeClass(const std::string& klass) {
-    if (data->removeClass(klass)) {
-        update(Update::Classes);
-    }
+void Map::removeClass(const std::string& className) {
+    context->invoke(&MapContext::removeClass, className);
 }
 
-void Map::setClasses(const std::vector<std::string>& classes) {
-    data->setClasses(classes);
-    update(Update::Classes);
+void Map::setClasses(const std::vector<std::string>& classNames) {
+    context->invoke(&MapContext::setClasses, classNames);
 }
 
-bool Map::hasClass(const std::string& klass) const {
-    return data->hasClass(klass);
+bool Map::hasClass(const std::string& className) const {
+    return context->invokeSync<bool>(&MapContext::hasClass, className);
 }
 
 std::vector<std::string> Map::getClasses() const {
-    return data->getClasses();
+    return context->invokeSync<std::vector<std::string>>(&MapContext::getClasses);
 }
 
 void Map::setDefaultFadeDuration(const Duration& duration) {

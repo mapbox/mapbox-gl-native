@@ -288,6 +288,34 @@ void MapContext::removeLayer(const std::string& id) {
     asyncUpdate.send();
 }
 
+std::vector<std::string> MapContext::getClasses() const {
+    return style->getClasses();
+}
+
+bool MapContext::hasClass(const std::string& className) const {
+    return style->hasClass(className);
+}
+
+void MapContext::addClass(const std::string& className) {
+    if (style->addClass(className)) {
+        updateFlags |= Update::Classes;
+        asyncUpdate.send();
+    }
+}
+
+void MapContext::removeClass(const std::string& className) {
+    if (style->removeClass(className)) {
+        updateFlags |= Update::Classes;
+        asyncUpdate.send();
+    }
+}
+
+void MapContext::setClasses(const std::vector<std::string>& classNames) {
+    style->setClasses(classNames);
+    updateFlags |= Update::Classes;
+    asyncUpdate.send();
+}
+
 void MapContext::setSourceTileCacheSize(size_t size) {
     assert(util::ThreadContext::currentlyOn(util::ThreadType::Map));
     if (size != sourceCacheSize) {

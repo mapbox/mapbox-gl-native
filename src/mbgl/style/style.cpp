@@ -27,6 +27,33 @@
 
 namespace mbgl {
 
+bool Style::addClass(const std::string& className) {
+    if (std::find(classes.begin(), classes.end(), className) != classes.end()) return false;
+    classes.push_back(className);
+    return true;
+}
+
+bool Style::hasClass(const std::string& className) const {
+    return std::find(classes.begin(), classes.end(), className) != classes.end();
+}
+
+bool Style::removeClass(const std::string& className) {
+    const auto it = std::find(classes.begin(), classes.end(), className);
+    if (it != classes.end()) {
+        classes.erase(it);
+        return true;
+    }
+    return false;
+}
+
+void Style::setClasses(const std::vector<std::string>& classNames) {
+    classes = classNames;
+}
+
+std::vector<std::string> Style::getClasses() const {
+    return classes;
+}
+
 Style::Style(MapData& data_, FileSource& fileSource_)
     : data(data_),
       fileSource(fileSource_),
@@ -43,6 +70,7 @@ Style::Style(MapData& data_, FileSource& fileSource_)
 void Style::setJSON(const std::string& json, const std::string&) {
     sources.clear();
     layers.clear();
+    classes.clear();
 
     StyleParser parser;
     parser.parse(json);
@@ -145,16 +173,14 @@ void Style::update(const TransformState& transform,
 }
 
 void Style::cascade() {
-    std::vector<ClassID> classes;
-
-    std::vector<std::string> classNames = data.getClasses();
-    for (auto it = classNames.rbegin(); it != classNames.rend(); it++) {
-        classes.push_back(ClassDictionary::Get().lookup(*it));
+    std::vector<ClassID> classIDs;
+    for (const auto& className : classes) {
+        classIDs.push_back(ClassDictionary::Get().lookup(className));
     }
-    classes.push_back(ClassID::Default);
-    classes.push_back(ClassID::Fallback);
+    classIDs.push_back(ClassID::Default);
+    classIDs.push_back(ClassID::Fallback);
 
-    StyleCascadeParameters parameters(classes,
+    StyleCascadeParameters parameters(classIDs,
                                       data.getAnimationTime(),
                                       PropertyTransition { data.getDefaultTransitionDuration(),
                                                            data.getDefaultTransitionDelay() });

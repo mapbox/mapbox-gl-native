@@ -3,7 +3,6 @@
 
 #include <mbgl/util/chrono.hpp>
 
-#include <string>
 #include <mutex>
 #include <atomic>
 #include <vector>
@@ -31,23 +30,6 @@ public:
         , defaultTransitionDelay(Duration::zero()) {
         assert(pixelRatio > 0);
     }
-
-    // Adds the class if it's not yet set. Returns true when it added the class, and false when it
-    // was already present.
-    bool addClass(const std::string& klass);
-
-    // Removes the class if it's present. Returns true when it remvoed the class, and false when it
-    // was not present.
-    bool removeClass(const std::string& klass);
-
-    // Returns true when class is present in the list of currently set classes.
-    bool hasClass(const std::string& klass) const;
-
-    // Changes the list of currently set classes to the new list.
-    void setClasses(const std::vector<std::string>& klasses);
-
-    // Returns a list of all currently set classes.
-    std::vector<std::string> getClasses() const;
 
 
     inline MapDebugOptions getDebug() const {
@@ -135,9 +117,6 @@ private:
     mutable std::mutex annotationManagerMutex;
     AnnotationManager annotationManager;
 
-    mutable std::mutex mtx;
-
-    std::vector<std::string> classes;
     std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultFadeDuration;

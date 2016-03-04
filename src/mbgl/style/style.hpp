@@ -100,6 +100,12 @@ public:
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
+    bool addClass(const std::string&);
+    bool removeClass(const std::string&);
+    bool hasClass(const std::string&) const;
+    void setClasses(const std::vector<std::string>&);
+    std::vector<std::string> getClasses() const;
+
     RenderData getRenderData() const;
 
     void setSourceTileCacheSize(size_t);
@@ -118,6 +124,7 @@ public:
 private:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
+    std::vector<std::string> classes;
 
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 

@@ -4,8 +4,6 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <cstdint>
-
 namespace mbgl {
 
 class PropertyTransition {
@@ -16,4 +14,4 @@ public:
 
 } // namespace mbgl
 
-#endif
+#endif // MBGL_STYLE_PROPERTY_TRANSITION
