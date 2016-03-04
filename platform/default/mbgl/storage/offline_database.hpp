@@ -44,7 +44,8 @@ public:
 
     void deleteRegion(OfflineRegion&&);
 
-    optional<Response> getRegionResource(int64_t regionID, const Resource&);
+    // Return value is (response, stored size)
+    optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
 
     OfflineRegionDefinition getRegionDefinition(int64_t regionID);
@@ -75,14 +76,15 @@ private:
 
     Statement getStatement(const char *);
 
-    optional<Response> getTile(const Resource::TileData&);
+    optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
     bool putTile(const Resource::TileData&, const Response&,
                  const std::string&, bool compressed);
 
-    optional<Response> getResource(const Resource&);
+    optional<std::pair<Response, uint64_t>> getResource(const Resource&);
     bool putResource(const Resource&, const Response&,
                      const std::string&, bool compressed);
 
+    optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     std::pair<bool, uint64_t> putInternal(const Resource&, const Response&, bool evict);
 
     // Return value is true iff the resource was previously unused by any other regions.

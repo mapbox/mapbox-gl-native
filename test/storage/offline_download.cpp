@@ -380,3 +380,78 @@ TEST(OfflineDownload, TileCountLimitExceeded) {
 
     test.loop.run();
 }
+
+TEST(OfflineDownload, WithPreviouslyExistingTile) {
+    OfflineTest test;
+    OfflineRegion region = test.createRegion();
+    OfflineDownload download(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/offline/style.json", resource.url);
+        return test.response("offline/inline_source.style.json");
+    };
+
+    test.db.put(
+        Resource::tile("http://127.0.0.1:3000/offline/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0),
+        test.response("offline/0-0-0.vector.pbf"));
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (status.complete()) {
+            EXPECT_EQ(2, status.completedResourceCount);
+            EXPECT_EQ(test.size, status.completedResourceSize);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}
+
+TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
+    OfflineTest test;
+    OfflineRegion region = test.createRegion();
+    OfflineDownload download(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/offline/style.json", resource.url);
+        return test.response("offline/inline_source.style.json");
+    };
+
+    test.db.put(
+        Resource::tile("http://127.0.0.1:3000/offline/{z}-{x}-{y}.vector.pbf", 1, 0, 0, 0),
+        test.response("offline/0-0-0.vector.pbf"));
+
+    auto observer = std::make_unique<MockObserver>();
+    bool completedOnce = false;
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (!status.complete()) {
+            return;
+        } else if (!completedOnce) {
+            completedOnce = true;
+            download.setState(OfflineRegionDownloadState::Inactive);
+            download.setState(OfflineRegionDownloadState::Active);
+        } else {
+            EXPECT_EQ(2, status.completedResourceCount);
+            EXPECT_EQ(test.size, status.completedResourceSize);
+            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
+            test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}

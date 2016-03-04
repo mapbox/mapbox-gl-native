@@ -103,6 +103,11 @@ OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
 }
 
 optional<Response> OfflineDatabase::get(const Resource& resource) {
+    auto result = getInternal(resource);
+    return result ? result->first : optional<Response>();
+}
+
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getInternal(const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
         return getTile(*resource.tileData);
@@ -151,7 +156,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     return { inserted, size };
 }
 
-optional<Response> OfflineDatabase::getResource(const Resource& resource) {
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resource& resource) {
     Statement accessedStmt = getStatement(
         "UPDATE resources SET accessed = ?1 WHERE url = ?2");
 
@@ -172,6 +177,7 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
     }
 
     Response response;
+    uint64_t size = 0;
 
     response.etag     = stmt->get<optional<std::string>>(0);
     response.expires  = stmt->get<optional<SystemTimePoint>>(1);
@@ -182,11 +188,13 @@ optional<Response> OfflineDatabase::getResource(const Resource& resource) {
         response.noContent = true;
     } else if (stmt->get<int>(4)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
+        size = data->length();
     } else {
         response.data = std::make_shared<std::string>(*data);
+        size = data->length();
     }
 
-    return response;
+    return std::make_pair(response, size);
 }
 
 bool OfflineDatabase::putResource(const Resource& resource,
@@ -263,7 +271,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     return true;
 }
 
-optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource::TileData& tile) {
     Statement accessedStmt = getStatement(
         "UPDATE tiles "
         "SET accessed       = ?1 "
@@ -302,6 +310,7 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
     }
 
     Response response;
+    uint64_t size = 0;
 
     response.etag     = stmt->get<optional<std::string>>(0);
     response.expires  = stmt->get<optional<SystemTimePoint>>(1);
@@ -312,11 +321,13 @@ optional<Response> OfflineDatabase::getTile(const Resource::TileData& tile) {
         response.noContent = true;
     } else if (stmt->get<int>(4)) {
         response.data = std::make_shared<std::string>(util::decompress(*data));
+        size = data->length();
     } else {
         response.data = std::make_shared<std::string>(*data);
+        size = data->length();
     }
 
-    return response;
+    return std::make_pair(response, size);
 }
 
 bool OfflineDatabase::putTile(const Resource::TileData& tile,
@@ -452,8 +463,8 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     offlineMapboxTileCount = {};
 }
 
-optional<Response> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
-    auto response = get(resource);
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getRegionResource(int64_t regionID, const Resource& resource) {
+    auto response = getInternal(resource);
 
     if (response) {
         markUsed(regionID, resource);

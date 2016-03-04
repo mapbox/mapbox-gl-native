@@ -134,7 +134,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 }
 
 void OfflineDownload::activateDownload() {
-    status = offlineDatabase.getRegionCompletedStatus(id);
+    status = OfflineRegionStatus();
     requiredSourceURLs.clear();
 
     ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {
@@ -188,10 +188,6 @@ void OfflineDownload::activateDownload() {
             ensureResource(resource);
         }
     });
-
-    // This will be the initial notification, after we've incremented requiredResourceCount
-    // to the reflect the extent to which required resources are already in the database.
-    observer->statusChanged(status);
 }
 
 void OfflineDownload::deactivateDownload() {
@@ -207,14 +203,15 @@ void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const Sour
 void OfflineDownload::ensureResource(const Resource& resource, std::function<void (Response)> callback) {
     status.requiredResourceCount++;
 
-    optional<Response> offlineResponse = offlineDatabase.getRegionResource(id, resource);
+    optional<std::pair<Response, uint64_t>> offlineResponse = offlineDatabase.getRegionResource(id, resource);
     if (offlineResponse) {
         if (callback) {
-            callback(*offlineResponse);
+            callback(offlineResponse->first);
         }
 
-        // Not incrementing status.completedResource{Size,Count} here because previously-existing
-        // resources are already accounted for by offlineDatabase.getRegionCompletedStatus();
+        status.completedResourceCount++;
+        status.completedResourceSize += offlineResponse->second;
+        observer->statusChanged(status);
 
         return;
     }
