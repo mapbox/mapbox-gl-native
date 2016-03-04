@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10083"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
         <!--Map View Controller-->
@@ -51,11 +52,18 @@
                                 <action selector="cycleStyles:" destination="WaX-pd-UZQ" eventType="touchUpInside" id="PnY-mb-J6m"/>
                             </connections>
                         </button>
-                        <barButtonItem key="rightBarButtonItem" image="TrackingLocationOffMask.png" id="CQ1-GP-M6x">
-                            <connections>
-                                <action selector="locateUser:" destination="WaX-pd-UZQ" id="XgF-DB-z3f"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="TrackingLocationOffMask.png" id="CQ1-GP-M6x">
+                                <connections>
+                                    <action selector="locateUser:" destination="WaX-pd-UZQ" id="XgF-DB-z3f"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="organize" id="5IK-vz-jKQ">
+                                <connections>
+                                    <segue destination="7q0-lI-zqb" kind="show" identifier="ShowDownloads" id="xjx-0t-0LD"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="mapView" destination="kNe-zV-9ha" id="VNR-WO-1q4"/>
@@ -69,6 +77,81 @@
                 </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="1366" y="350"/>
+        </scene>
+        <!--Downloads-->
+        <scene sceneID="xIg-PA-7r3">
+            <objects>
+                <tableViewController id="7q0-lI-zqb" customClass="MBXDownloadsTableViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="eeN-6b-zqe">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Inactive" editingAccessoryType="detailDisclosureButton" textLabel="JtH-Ce-MI5" detailTextLabel="tTJ-jv-U9v" style="IBUITableViewCellStyleSubtitle" id="fGu-Ys-Eh1">
+                                <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fGu-Ys-Eh1" id="sUf-bc-8xG">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Inactive Download" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JtH-Ce-MI5">
+                                            <rect key="frame" x="15" y="6" width="159" height="19.5"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="456 resources (789 MB)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tTJ-jv-U9v">
+                                            <rect key="frame" x="15" y="25.5" width="128" height="13.5"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Active" editingAccessoryType="detailDisclosureButton" textLabel="9ZK-gS-wJ4" detailTextLabel="0xK-p8-Mmh" style="IBUITableViewCellStyleSubtitle" id="mKB-tz-Zfl">
+                                <rect key="frame" x="0.0" y="136" width="600" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mKB-tz-Zfl" id="nS3-aU-nBr">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Active Download" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9ZK-gS-wJ4">
+                                            <rect key="frame" x="15" y="6" width="147.5" height="19.5"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Downloading 123 of 456 resources… (789 MB downloaded)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0xK-p8-Mmh">
+                                            <rect key="frame" x="15" y="25.5" width="310.5" height="13.5"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="7q0-lI-zqb" id="oe8-d5-Rjo"/>
+                            <outlet property="delegate" destination="7q0-lI-zqb" id="D5X-oy-DSc"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Downloads" id="UcK-PK-eQA">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="gCV-hl-Mzc">
+                            <connections>
+                                <action selector="addCurrentRegion:" destination="7q0-lI-zqb" id="G2O-3V-aEA"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Dga-Vh-IxZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2075" y="350"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="LFg-oU-zTK">

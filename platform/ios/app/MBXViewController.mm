@@ -1,5 +1,6 @@
 #import "MBXViewController.h"
 #import "MBXCustomCalloutView.h"
+#import "MBXDownloadsTableViewController.h"
 
 #import <Mapbox/Mapbox.h>
 #import "../../../include/mbgl/util/default_styles.hpp"
@@ -100,6 +101,13 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return UIInterfaceOrientationMaskAll;
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(__unused id)sender {
+    if ([segue.identifier isEqualToString:@"ShowDownloads"]) {
+        MBXDownloadsTableViewController *controller = [segue destinationViewController];
+        controller.mapView = self.mapView;
+    }
+}
+
 #pragma mark - Actions
 
 - (IBAction)showSettings:(__unused id)sender
@@ -109,33 +117,34 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:nil
-                                              otherButtonTitles:@"Reset Position",
-                                                                ((debugMask & MGLMapDebugTileBoundariesMask)
-                                                                 ? @"Hide Tile Boundaries"
-                                                                 : @"Show Tile Boundaries"),
-                                                                ((debugMask & MGLMapDebugTileInfoMask)
-                                                                 ? @"Hide Tile Info"
-                                                                 : @"Show Tile Info"),
-                                                                ((debugMask & MGLMapDebugTimestampsMask)
-                                                                 ? @"Hide Tile Timestamps"
-                                                                 : @"Show Tile Timestamps"),
-                                                                ((debugMask & MGLMapDebugCollisionBoxesMask)
-                                                                 ? @"Hide Collision Boxes"
-                                                                 : @"Show Collision Boxes"),
-                                                                @"Empty Memory",
-                                                                @"Add 100 Points",
-                                                                @"Add 1,000 Points",
-                                                                @"Add 10,000 Points",
-                                                                @"Add Test Shapes",
-                                                                @"Start World Tour",
-                                                                @"Add Custom Callout Point",
-                                                                @"Remove Annotations",
-                                                                (_isShowingCustomStyleLayer
-                                                                 ? @"Hide Custom Style Layer"
-                                                                 : @"Show Custom Style Layer"),
-                                                                @"Print Telemetry Logfile",
-                                                                @"Delete Telemetry Logfile",
-                                                                nil];
+                                              otherButtonTitles:
+                            @"Reset Position",
+                            ((debugMask & MGLMapDebugTileBoundariesMask)
+                             ? @"Hide Tile Boundaries"
+                             : @"Show Tile Boundaries"),
+                            ((debugMask & MGLMapDebugTileInfoMask)
+                             ? @"Hide Tile Info"
+                             : @"Show Tile Info"),
+                            ((debugMask & MGLMapDebugTimestampsMask)
+                             ? @"Hide Tile Timestamps"
+                             : @"Show Tile Timestamps"),
+                            ((debugMask & MGLMapDebugCollisionBoxesMask)
+                             ? @"Hide Collision Boxes"
+                             : @"Show Collision Boxes"),
+                            @"Empty Memory",
+                            @"Add 100 Points",
+                            @"Add 1,000 Points",
+                            @"Add 10,000 Points",
+                            @"Add Test Shapes",
+                            @"Start World Tour",
+                            @"Add Custom Callout Point",
+                            @"Remove Annotations",
+                            (_isShowingCustomStyleLayer
+                             ? @"Hide Custom Style Layer"
+                             : @"Show Custom Style Layer"),
+                            @"Print Telemetry Logfile",
+                            @"Delete Telemetry Logfile",
+                            nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
 }

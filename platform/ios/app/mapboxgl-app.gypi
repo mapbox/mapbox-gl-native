@@ -29,6 +29,8 @@
         'MBXAppDelegate.m',
         'MBXCustomCalloutView.h',
         'MBXCustomCalloutView.m',
+        'MBXDownloadsTableViewController.h',
+        'MBXDownloadsTableViewController.m',
         'MBXViewController.h',
         'MBXViewController.mm',
       ],
