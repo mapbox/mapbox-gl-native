@@ -11,6 +11,7 @@
       'mac_bundle': 1,
       'mac_bundle_resources': [
         '<!@(find ../platform/ios/app/img -type f)',
+        './Storyboard.storyboard',
         './points.geojson',
         './polyline.geojson',
         './threestates.geojson',

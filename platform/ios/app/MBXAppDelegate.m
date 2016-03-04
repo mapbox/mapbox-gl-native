@@ -23,10 +23,6 @@
         [MGLAccountManager setAccessToken:accessToken];
     }
 
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[MBXViewController new]];
-    [self.window makeKeyAndVisible];
-
     return YES;
 }
 
