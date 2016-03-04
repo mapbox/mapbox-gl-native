@@ -165,7 +165,7 @@ IB_DESIGNABLE
     any notices from it.
 
  @note You are additionally
-    [required](https://www.mapbox.com/help/metrics-opt-out-for-users/) to
+    [required](https://www.mapbox.com/help/telemetry-opt-out-for-users/) to
     provide users with the option to disable anonymous usage and location
     sharing (telemetry). If this view is hidden, you must implement this
     setting elsewhere in your app or via `Settings.bundle`. See our
