@@ -78,11 +78,14 @@ void MapContext::pause() {
     asyncInvalidate.send();
 }
 
-void MapContext::triggerUpdate(const TransformState& state, const Update flags) {
-    transformState = state;
+void MapContext::updateAsync(Update flags) {
     updateFlags |= flags;
-
     asyncUpdate.send();
+}
+
+void MapContext::triggerUpdate(const TransformState& state, Update flags) {
+    transformState = state;
+    updateAsync(flags);
 }
 
 void MapContext::setStyleURL(const std::string& url) {
@@ -146,8 +149,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // created but before a style is loaded
     data.loading = true;
 
-    updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
-    asyncUpdate.send();
+    updateAsync(Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations);
 }
 
 void MapContext::update() {
@@ -217,8 +219,7 @@ void MapContext::renderStill(const TransformState& state, const FrameData& frame
     transformState = state;
     frameData = frame;
 
-    updateFlags |= Update::RenderStill;
-    asyncUpdate.send();
+    updateAsync(Update::RenderStill);
 }
 
 bool MapContext::renderSync(const TransformState& state, const FrameData& frame) {
@@ -247,11 +248,9 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     view.afterRender();
 
     if (style->hasTransitions()) {
-        updateFlags |= Update::Zoom;
-        asyncUpdate.send();
+        updateAsync(Update::Zoom);
     } else if (painter->needsAnimation()) {
-        updateFlags |= Update::Repaint;
-        asyncUpdate.send();
+        updateAsync(Update::Repaint);
     }
 
     return isLoaded();
@@ -278,14 +277,12 @@ double MapContext::getTopOffsetPixelsForAnnotationIcon(const std::string& name) 
 
 void MapContext::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> after) {
     style->addLayer(std::move(layer), after);
-    updateFlags |= Update::Classes;
-    asyncUpdate.send();
+    updateAsync(Update::Classes);
 }
 
 void MapContext::removeLayer(const std::string& id) {
     style->removeLayer(id);
-    updateFlags |= Update::Classes;
-    asyncUpdate.send();
+    updateAsync(Update::Classes);
 }
 
 std::vector<std::string> MapContext::getClasses() const {
@@ -297,23 +294,16 @@ bool MapContext::hasClass(const std::string& className) const {
 }
 
 void MapContext::addClass(const std::string& className) {
-    if (style->addClass(className)) {
-        updateFlags |= Update::Classes;
-        asyncUpdate.send();
-    }
+    if (style->addClass(className)) updateAsync(Update::Classes);
 }
 
 void MapContext::removeClass(const std::string& className) {
-    if (style->removeClass(className)) {
-        updateFlags |= Update::Classes;
-        asyncUpdate.send();
-    }
+    if (style->removeClass(className)) updateAsync(Update::Classes);
 }
 
 void MapContext::setClasses(const std::vector<std::string>& classNames) {
     style->setClasses(classNames);
-    updateFlags |= Update::Classes;
-    asyncUpdate.send();
+    updateAsync(Update::Classes);
 }
 
 void MapContext::setSourceTileCacheSize(size_t size) {
@@ -334,8 +324,7 @@ void MapContext::onLowMemory() {
 }
 
 void MapContext::onResourceLoaded() {
-    updateFlags |= Update::Repaint;
-    asyncUpdate.send();
+    updateAsync(Update::Repaint);
 }
 
 void MapContext::onResourceError(std::exception_ptr error) {

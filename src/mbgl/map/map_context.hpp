@@ -80,6 +80,9 @@ private:
     // Update the state indicated by the accumulated Update flags, then render.
     void update();
 
+    // Helper function for triggering asynchronous updates.
+    void updateAsync(Update);
+
     // Loads the actual JSON object an creates a new Style object.
     void loadStyleJSON(const std::string& json, const std::string& base);
 
