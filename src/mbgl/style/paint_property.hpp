@@ -65,8 +65,8 @@ public:
     }
 
     void cascade(const StyleCascadeParameters& parameters) {
-        Duration delay = *parameters.defaultTransition.delay;
-        Duration duration = *parameters.defaultTransition.duration;
+        Duration delay = *parameters.userDefinedTransition.delay;
+        Duration duration = *parameters.userDefinedTransition.duration;
 
         for (auto classID : parameters.classes) {
             if (values.find(classID) == values.end())

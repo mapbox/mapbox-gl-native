@@ -180,10 +180,11 @@ void Style::cascade() {
     classIDs.push_back(ClassID::Default);
     classIDs.push_back(ClassID::Fallback);
 
-    StyleCascadeParameters parameters(classIDs,
-                                      data.getAnimationTime(),
-                                      PropertyTransition { data.getDefaultTransitionDuration(),
-                                                           data.getDefaultTransitionDelay() });
+    const StyleCascadeParameters parameters {
+        classIDs,
+        data.getAnimationTime(),
+        PropertyTransition { data.getDefaultTransitionDuration(), Duration::zero() }
+    };
 
     for (const auto& layer : layers) {
         layer->cascade(parameters);

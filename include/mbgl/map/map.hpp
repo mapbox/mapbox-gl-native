@@ -76,9 +76,6 @@ public:
     void setDefaultTransitionDuration(const Duration&);
     Duration getDefaultTransitionDuration() const;
 
-    void setDefaultTransitionDelay(const Duration&);
-    Duration getDefaultTransitionDelay() const;
-
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleURL() const;

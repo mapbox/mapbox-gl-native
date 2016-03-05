@@ -12,16 +12,9 @@ class PropertyTransition;
 
 class StyleCascadeParameters {
 public:
-    StyleCascadeParameters(const std::vector<ClassID>& classes_,
-                           const TimePoint& now_,
-                           const PropertyTransition& defaultTransition_)
-        : classes(classes_),
-          now(now_),
-          defaultTransition(defaultTransition_) {}
-
     std::vector<ClassID> classes;
     TimePoint now;
-    PropertyTransition defaultTransition;
+    PropertyTransition userDefinedTransition;
 };
 
 } // namespace mbgl

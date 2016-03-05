@@ -26,8 +26,7 @@ public:
         , annotationManager(pixelRatio)
         , animationTime(Duration::zero())
         , defaultFadeDuration(mode_ == MapMode::Continuous ? Milliseconds(300) : Duration::zero())
-        , defaultTransitionDuration(Duration::zero())
-        , defaultTransitionDelay(Duration::zero()) {
+        , defaultTransitionDuration(Duration::zero()) {
         assert(pixelRatio > 0);
     }
 
@@ -90,18 +89,6 @@ public:
         defaultTransitionDuration = duration;
     }
 
-    inline Duration getDefaultTransitionDelay() const {
-        return defaultTransitionDelay;
-    }
-
-    inline void setDefaultTransitionDelay(const Duration& delay) {
-        if (mode == MapMode::Still) {
-            return;
-        }
-
-        defaultTransitionDelay = delay;
-    }
-
     util::exclusive<AnnotationManager> getAnnotationManager() {
         return util::exclusive<AnnotationManager>(
             &annotationManager,
@@ -121,7 +108,6 @@ private:
     std::atomic<Duration> animationTime;
     std::atomic<Duration> defaultFadeDuration;
     std::atomic<Duration> defaultTransitionDuration;
-    std::atomic<Duration> defaultTransitionDelay;
 
 // TODO: make private
 public:
