@@ -1469,6 +1469,15 @@ void setOfflineMapboxTileCountLimit(JNIEnv *env, jni::jobject* obj, jlong defaul
     defaultFileSource->setOfflineMapboxTileCountLimit(limit);
 }
 
+mbgl::OfflineRegion* getOfflineRegionPeer(JNIEnv *env, jni::jobject* offlineRegion_) {
+    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
+    if (!offlineRegionPtr) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "java/lang/IllegalStateException"),
+            "Use of OfflineRegion after OfflineRegion.delete");
+    }
+    return reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+}
+
 void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_) {
     mbgl::Log::Debug(mbgl::Event::JNI, "destroyOfflineRegion");
 
@@ -1494,8 +1503,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
     mbgl::Log::Debug(mbgl::Event::JNI, "setOfflineRegionObserver");
 
     // Offline region
-    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
-    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+    mbgl::OfflineRegion* offlineRegion = getOfflineRegionPeer(env, offlineRegion_);
 
     // File source
     jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
@@ -1617,8 +1625,7 @@ void setOfflineRegionDownloadState(JNIEnv *env, jni::jobject* offlineRegion_, ji
     }
 
     // Offline region
-    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
-    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+    mbgl::OfflineRegion* offlineRegion = getOfflineRegionPeer(env, offlineRegion_);
 
     // File source
     jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
@@ -1633,8 +1640,7 @@ void getOfflineRegionStatus(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobj
     mbgl::Log::Debug(mbgl::Event::JNI, "getOfflineRegionStatus");
 
     // Offline region
-    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
-    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+    mbgl::OfflineRegion* offlineRegion = getOfflineRegionPeer(env, offlineRegion_);
 
     // File source
     jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
@@ -1689,8 +1695,7 @@ void deleteOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject
     mbgl::Log::Debug(mbgl::Event::JNI, "deleteOfflineRegion");
 
     // Offline region
-    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
-    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+    mbgl::OfflineRegion* offlineRegion = getOfflineRegionPeer(env, offlineRegion_);
 
     // File source
     jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
