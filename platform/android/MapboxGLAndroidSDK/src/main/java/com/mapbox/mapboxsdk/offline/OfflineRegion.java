@@ -222,6 +222,8 @@ public class OfflineRegion {
      *
      * When the operation is complete or encounters an error, the given callback will be
      * executed on the main thread.
+     *
+     * After you call this method, you may not call any additional methods on this object.
      */
     public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
         deleteOfflineRegion(this, new OfflineRegionDeleteCallback() {

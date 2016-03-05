@@ -1474,16 +1474,18 @@ void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jlong) {
 
     // Offline region
     jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
-    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+    if (!offlineRegionPtr) {
+        return; // Already deleted
+    }
 
     // File source
     jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
     jlong defaultFileSourcePtr = jni::GetField<jlong>(*env, jmanager, *offlineManagerClassPtrId);
     mbgl::DefaultFileSource *defaultFileSource = reinterpret_cast<mbgl::DefaultFileSource *>(defaultFileSourcePtr);
 
-    // Release the observer
+    // Release the observer and delete the region
+    mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
     defaultFileSource->setOfflineRegionObserver(*offlineRegion, nullptr);
-
     delete offlineRegion;
 }
 
@@ -1698,6 +1700,7 @@ void deleteOfflineRegion(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRe
     deleteCallback = jni::NewGlobalRef(*env, deleteCallback).release();
 
     // Set new state
+    jni::SetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId, 0);
     defaultFileSource->deleteOfflineRegion(std::move(*offlineRegion), [deleteCallback](std::exception_ptr error) mutable {
 
         // Reattach, the callback comes from a different thread
