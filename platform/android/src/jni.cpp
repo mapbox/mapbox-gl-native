@@ -1711,7 +1711,6 @@ void deleteOfflineRegion(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRe
             std::string message = mbgl::util::toString(error);
             jni::CallMethod<void>(*env2, deleteCallback, *offlineRegionDeleteOnErrorId, std_string_to_jstring(env2, message));
         } else {
-            std::string message = mbgl::util::toString(error);
             jni::CallMethod<void>(*env2, deleteCallback, *offlineRegionDeleteOnDeleteId);
         }
 
