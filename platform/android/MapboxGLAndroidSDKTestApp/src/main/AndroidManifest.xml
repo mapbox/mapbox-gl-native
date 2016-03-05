@@ -108,6 +108,10 @@
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
 
+        <activity
+            android:name=".AnimatedMarkerActivity"
+            android:label="@string/title_activity_animated_marker" />
+
     </application>
 
 </manifest>

@@ -58,6 +58,7 @@
     <string name="action_dynamic_marker">Dynamic Marker</string>
     <string name="action_map_padding">Map Padding</string>
     <string name="action_offline">Offline Map</string>
+    <string name="action_animated_marker">Animated Marker</string>
 
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
@@ -102,5 +103,6 @@
     <string name="scrollby_y_value">Y: %1$d</string>
     <string name="button_download_region">Download region</string>
     <string name="button_list_regions">List regions</string>
+    <string name="title_activity_animated_marker">AnimatedMarkerActivity</string>
 
 </resources>

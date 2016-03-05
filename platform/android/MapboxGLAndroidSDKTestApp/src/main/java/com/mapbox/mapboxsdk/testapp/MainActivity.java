@@ -24,26 +24,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -467,13 +467,17 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.action_dynamic_marker:
                                 startActivity(new Intent(getApplicationContext(), DynamicMarkerChangeActivity.class));
                                 return true;
-                            
+
                             case R.id.action_map_padding:
-                                startActivity(new Intent(getApplicationContext(),MapPaddingActivity.class));
+                                startActivity(new Intent(getApplicationContext(), MapPaddingActivity.class));
                                 return true;
 
                             case R.id.action_offline:
                                 startActivity(new Intent(getApplicationContext(), OfflineActivity.class));
+                                return true;
+
+                            case R.id.action_animated_marker:
+                                startActivity(new Intent(getApplicationContext(), AnimatedMarkerActivity.class));
                                 return true;
 
                             default:

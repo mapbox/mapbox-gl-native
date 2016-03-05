@@ -209,7 +209,13 @@
                 android:checkable="false"
                 android:icon="@drawable/ic_map_padding"
                 android:title="@string/action_map_padding" />
-            
+
+            <item
+                android:id="@+id/action_animated_marker"
+                android:checkable="false"
+                android:icon="@drawable/ic_compare_arrows_black_24dp"
+                android:title="@string/action_animated_marker" />
+
         </menu>
     </item>
 </menu>
