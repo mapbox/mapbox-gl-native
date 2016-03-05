@@ -1469,12 +1469,22 @@ void setOfflineMapboxTileCountLimit(JNIEnv *env, jni::jobject* obj, jlong defaul
     defaultFileSource->setOfflineMapboxTileCountLimit(limit);
 }
 
-void destroyOfflineRegion(JNIEnv *env, jni::jobject* obj, jlong offlineRegionPtr) {
+void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jlong) {
     mbgl::Log::Debug(mbgl::Event::JNI, "destroyOfflineRegion");
-    assert(offlineRegionPtr != 0);
+
+    // Offline region
+    jlong offlineRegionPtr = jni::GetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId);
     mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
+
+    // File source
+    jni::jobject* jmanager = jni::GetField<jni::jobject*>(*env, offlineRegion_, *offlineRegionOfflineManagerId);
+    jlong defaultFileSourcePtr = jni::GetField<jlong>(*env, jmanager, *offlineManagerClassPtrId);
+    mbgl::DefaultFileSource *defaultFileSource = reinterpret_cast<mbgl::DefaultFileSource *>(defaultFileSourcePtr);
+
+    // Release the observer
+    defaultFileSource->setOfflineRegionObserver(*offlineRegion, nullptr);
+
     delete offlineRegion;
-    offlineRegion = nullptr;
 }
 
 void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jni::jobject* observerCallback) {
@@ -1492,8 +1502,17 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offl
     // Define the observer
     class Observer : public mbgl::OfflineRegionObserver {
     public:
-        Observer(jni::jobject* observerCallback_)
-            : observerCallback(observerCallback_) {
+        Observer(jni::UniqueGlobalRef<jni::jobject>&& observerCallback_)
+            : observerCallback(std::move(observerCallback_)) {
+        }
+
+        ~Observer() override {
+            mbgl::Log::Debug(mbgl::Event::JNI, "~Observer()");
+            // Env
+            JNIEnv* env2;
+            jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
+            jni::DeleteGlobalRef(*env2, std::move(observerCallback));
+            detach_jni_thread(theJVM, &env2, renderDetach);
         }
 
         void statusChanged(mbgl::OfflineRegionStatus status) override {
@@ -1519,7 +1538,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offl
             jni::SetField<jlong>(*env2, jstatus, *offlineRegionStatusCompletedResourceSizeId, status.completedResourceSize);
             jni::SetField<jlong>(*env2, jstatus, *offlineRegionStatusRequiredResourceCountId, status.requiredResourceCount);
             jni::SetField<jboolean>(*env2, jstatus, *offlineRegionStatusRequiredResourceCountIsPreciseId, status.requiredResourceCountIsPrecise);
-            jni::CallMethod<void>(*env2, observerCallback, *offlineRegionObserveronStatusChangedId, jstatus);
+            jni::CallMethod<void>(*env2, observerCallback.get(), *offlineRegionObserveronStatusChangedId, jstatus);
 
             // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);
@@ -1554,7 +1573,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offl
             jni::jobject* jerror = &jni::NewObject(*env2, *offlineRegionErrorClass, *offlineRegionErrorConstructorId);
             jni::SetField<jni::jobject*>(*env2, jerror, *offlineRegionErrorReasonId, std_string_to_jstring(env2, errorReason));
             jni::SetField<jni::jobject*>(*env2, jerror, *offlineRegionErrorMessageId, std_string_to_jstring(env2, error.message));
-            jni::CallMethod<void>(*env2, observerCallback, *offlineRegionObserveronErrorId, jerror);
+            jni::CallMethod<void>(*env2, observerCallback.get(), *offlineRegionObserveronErrorId, jerror);
 
             // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);
@@ -1566,20 +1585,18 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offl
             jboolean renderDetach = attach_jni_thread(theJVM, &env2, "Offline Thread");
 
             // Send limit
-            jni::CallMethod<void>(*env2, observerCallback, *offlineRegionObserveronLimitId, jlong(limit));
+            jni::CallMethod<void>(*env2, observerCallback.get(), *offlineRegionObserveronLimitId, jlong(limit));
 
             // Detach when we're done
             detach_jni_thread(theJVM, &env2, renderDetach);
         }
 
-        jni::jobject* observerCallback;
+        jni::UniqueGlobalRef<jni::jobject> observerCallback;
     };
 
-    // Makes sure the callback doesn't get GC'ed
-    observerCallback = jni::NewGlobalRef(*env, observerCallback).release();
-
     // Set the observer
-    defaultFileSource->setOfflineRegionObserver(*offlineRegion, std::make_unique<Observer>(observerCallback));
+    defaultFileSource->setOfflineRegionObserver(*offlineRegion,
+        std::make_unique<Observer>(jni::NewGlobalRef(*env, observerCallback)));
 }
 
 void setOfflineRegionDownloadState(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jint offlineRegionDownloadState) {
