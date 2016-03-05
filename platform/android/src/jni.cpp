@@ -1469,7 +1469,7 @@ void setOfflineMapboxTileCountLimit(JNIEnv *env, jni::jobject* obj, jlong defaul
     defaultFileSource->setOfflineMapboxTileCountLimit(limit);
 }
 
-void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jlong) {
+void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_) {
     mbgl::Log::Debug(mbgl::Event::JNI, "destroyOfflineRegion");
 
     // Offline region
@@ -1486,10 +1486,11 @@ void destroyOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jlong) {
     // Release the observer and delete the region
     mbgl::OfflineRegion *offlineRegion = reinterpret_cast<mbgl::OfflineRegion *>(offlineRegionPtr);
     defaultFileSource->setOfflineRegionObserver(*offlineRegion, nullptr);
+    jni::SetField<jlong>(*env, offlineRegion_, *offlineRegionPtrId, 0);
     delete offlineRegion;
 }
 
-void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jni::jobject* observerCallback) {
+void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject* observerCallback) {
     mbgl::Log::Debug(mbgl::Event::JNI, "setOfflineRegionObserver");
 
     // Offline region
@@ -1601,7 +1602,7 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* obj, jni::jobject* offl
         std::make_unique<Observer>(jni::NewGlobalRef(*env, observerCallback)));
 }
 
-void setOfflineRegionDownloadState(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jint offlineRegionDownloadState) {
+void setOfflineRegionDownloadState(JNIEnv *env, jni::jobject* offlineRegion_, jint offlineRegionDownloadState) {
     mbgl::Log::Debug(mbgl::Event::JNI, "setOfflineRegionDownloadState");
 
     // State
@@ -1628,7 +1629,7 @@ void setOfflineRegionDownloadState(JNIEnv *env, jni::jobject* obj, jni::jobject*
     defaultFileSource->setOfflineRegionDownloadState(*offlineRegion, state);
 }
 
-void getOfflineRegionStatus(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jni::jobject* statusCallback) {
+void getOfflineRegionStatus(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject* statusCallback) {
     mbgl::Log::Debug(mbgl::Event::JNI, "getOfflineRegionStatus");
 
     // Offline region
@@ -1684,7 +1685,7 @@ void getOfflineRegionStatus(JNIEnv *env, jni::jobject* obj, jni::jobject* offlin
     });
 }
 
-void deleteOfflineRegion(JNIEnv *env, jni::jobject* obj, jni::jobject* offlineRegion_, jni::jobject* deleteCallback) {
+void deleteOfflineRegion(JNIEnv *env, jni::jobject* offlineRegion_, jni::jobject* deleteCallback) {
     mbgl::Log::Debug(mbgl::Event::JNI, "deleteOfflineRegion");
 
     // Offline region
@@ -1948,11 +1949,11 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     offlineRegionPtrId = &jni::GetFieldID(env, *offlineRegionClass, "mOfflineRegionPtr", "J");
 
     jni::RegisterNatives(env, *offlineRegionClass,
-        MAKE_NATIVE_METHOD(destroyOfflineRegion, "(J)V"),
-        MAKE_NATIVE_METHOD(setOfflineRegionObserver, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion;Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionObserver;)V"),
-        MAKE_NATIVE_METHOD(setOfflineRegionDownloadState, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion;I)V"),
-        MAKE_NATIVE_METHOD(getOfflineRegionStatus, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion;Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionStatusCallback;)V"),
-        MAKE_NATIVE_METHOD(deleteOfflineRegion, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion;Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionDeleteCallback;)V")
+        MAKE_NATIVE_METHOD(destroyOfflineRegion, "()V"),
+        MAKE_NATIVE_METHOD(setOfflineRegionObserver, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionObserver;)V"),
+        MAKE_NATIVE_METHOD(setOfflineRegionDownloadState, "(I)V"),
+        MAKE_NATIVE_METHOD(getOfflineRegionStatus, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionStatusCallback;)V"),
+        MAKE_NATIVE_METHOD(deleteOfflineRegion, "(Lcom/mapbox/mapboxsdk/offline/OfflineRegion$OfflineRegionDeleteCallback;)V")
     );
 
     // This needs to be updated once we support more than one type of region definition

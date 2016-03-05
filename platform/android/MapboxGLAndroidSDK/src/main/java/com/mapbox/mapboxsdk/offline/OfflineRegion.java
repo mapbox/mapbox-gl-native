@@ -144,7 +144,7 @@ public class OfflineRegion {
      * Register an observer to be notified when the state of the region changes.
      */
     public void setObserver(@NonNull final OfflineRegionObserver observer) {
-        setOfflineRegionObserver(this, new OfflineRegionObserver() {
+        setOfflineRegionObserver(new OfflineRegionObserver() {
             @Override
             public void onStatusChanged(final OfflineRegionStatus status) {
                 getHandler().post(new Runnable() {
@@ -181,7 +181,7 @@ public class OfflineRegion {
      * Pause or resume downloading of regional resources.
      */
     public void setDownloadState(@DownloadState int state) {
-        setOfflineRegionDownloadState(this, state);
+        setOfflineRegionDownloadState(state);
     }
 
     /**
@@ -190,7 +190,7 @@ public class OfflineRegion {
      * executed on the main thread.
      */
     public void getStatus(@NonNull final OfflineRegionStatusCallback callback) {
-        getOfflineRegionStatus(this, new OfflineRegionStatusCallback() {
+        getOfflineRegionStatus(new OfflineRegionStatusCallback() {
             @Override
             public void onStatus(final OfflineRegionStatus status) {
                 getHandler().post(new Runnable() {
@@ -226,7 +226,7 @@ public class OfflineRegion {
      * After you call this method, you may not call any additional methods on this object.
      */
     public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
-        deleteOfflineRegion(this, new OfflineRegionDeleteCallback() {
+        deleteOfflineRegion(new OfflineRegionDeleteCallback() {
             @Override
             public void onDelete() {
                 getHandler().post(new Runnable() {
@@ -254,8 +254,7 @@ public class OfflineRegion {
     protected void finalize() {
         try {
             super.finalize();
-            destroyOfflineRegion(mOfflineRegionPtr);
-            mOfflineRegionPtr = 0;
+            destroyOfflineRegion();
         } catch (Throwable throwable) {
             Log.e(LOG_TAG, "Failed to finalize OfflineRegion: " + throwable.getMessage());
         }
@@ -265,22 +264,18 @@ public class OfflineRegion {
      * Native methods
      */
 
-    private native void destroyOfflineRegion(long offlineRegionPtr);
+    private native void destroyOfflineRegion();
 
     private native void setOfflineRegionObserver(
-            OfflineRegion offlineRegion,
             OfflineRegionObserver observerCallback);
 
     private native void setOfflineRegionDownloadState(
-            OfflineRegion offlineRegion,
             @DownloadState int offlineRegionDownloadState);
 
     private native void getOfflineRegionStatus(
-            OfflineRegion offlineRegion,
             OfflineRegionStatusCallback statusCallback);
 
     private native void deleteOfflineRegion(
-            OfflineRegion offlineRegion,
             OfflineRegionDeleteCallback deleteCallback);
 
 }
