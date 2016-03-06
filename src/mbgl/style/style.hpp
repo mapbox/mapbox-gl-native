@@ -2,6 +2,7 @@
 #define MBGL_STYLE_STYLE
 
 #include <mbgl/style/zoom_history.hpp>
+#include <mbgl/style/property_transition.hpp>
 
 #include <mbgl/source/source.hpp>
 #include <mbgl/text/glyph_store.hpp>
@@ -100,10 +101,10 @@ public:
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
-    bool addClass(const std::string&);
-    bool removeClass(const std::string&);
+    bool addClass(const std::string&, const PropertyTransition& = {});
+    bool removeClass(const std::string&, const PropertyTransition& = {});
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&);
+    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData() const;
@@ -125,6 +126,7 @@ private:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<StyleLayer>> layers;
     std::vector<std::string> classes;
+    optional<PropertyTransition> transitionProperties;
 
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 

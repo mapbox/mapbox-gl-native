@@ -21,6 +21,7 @@ class MapData;
 class Painter;
 class SpriteImage;
 class FileRequest;
+class PropertyTransition;
 
 namespace gl { class TexturePool; }
 
@@ -61,10 +62,10 @@ public:
                   const optional<std::string> before);
     void removeLayer(const std::string& id);
 
-    void addClass(const std::string&);
-    void removeClass(const std::string&);
+    void addClass(const std::string&, const PropertyTransition&);
+    void removeClass(const std::string&, const PropertyTransition&);
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&);
+    void setClasses(const std::vector<std::string>&, const PropertyTransition&);
     std::vector<std::string> getClasses() const;
 
     void setSourceTileCacheSize(size_t size);

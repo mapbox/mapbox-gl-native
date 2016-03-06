@@ -2,6 +2,7 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_values.hpp>
 #include <mbgl/gl/gl_helper.hpp>
@@ -148,11 +149,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_R:
             if (!mods) {
-                view->map->setDefaultTransitionDuration(mbgl::Milliseconds(300));
+                static const mbgl::PropertyTransition transition { { mbgl::Milliseconds(300) } };
                 if (view->map->hasClass("night")) {
-                    view->map->removeClass("night");
+                    view->map->removeClass("night", transition);
                 } else {
-                    view->map->addClass("night");
+                    view->map->addClass("night", transition);
                 }
             }
             break;

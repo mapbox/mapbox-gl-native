@@ -27,9 +27,10 @@
 
 namespace mbgl {
 
-bool Style::addClass(const std::string& className) {
+bool Style::addClass(const std::string& className, const PropertyTransition& properties) {
     if (std::find(classes.begin(), classes.end(), className) != classes.end()) return false;
     classes.push_back(className);
+    transitionProperties = properties;
     return true;
 }
 
@@ -37,17 +38,19 @@ bool Style::hasClass(const std::string& className) const {
     return std::find(classes.begin(), classes.end(), className) != classes.end();
 }
 
-bool Style::removeClass(const std::string& className) {
+bool Style::removeClass(const std::string& className, const PropertyTransition& properties) {
     const auto it = std::find(classes.begin(), classes.end(), className);
     if (it != classes.end()) {
         classes.erase(it);
+        transitionProperties = properties;
         return true;
     }
     return false;
 }
 
-void Style::setClasses(const std::vector<std::string>& classNames) {
+void Style::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
     classes = classNames;
+    transitionProperties = properties;
 }
 
 std::vector<std::string> Style::getClasses() const {
@@ -173,6 +176,10 @@ void Style::update(const TransformState& transform,
 }
 
 void Style::cascade() {
+    // When in continuous mode, we can either have user- or style-defined
+    // transitions. Still mode is always immediate.
+    static const PropertyTransition immediateTransition;
+
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
         classIDs.push_back(ClassDictionary::Get().lookup(className));
@@ -183,8 +190,10 @@ void Style::cascade() {
     const StyleCascadeParameters parameters {
         classIDs,
         data.getAnimationTime(),
-        PropertyTransition { data.getDefaultTransitionDuration(), Duration::zero() }
+        data.mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
     };
+
+    transitionProperties = {};
 
     for (const auto& layer : layers) {
         layer->cascade(parameters);

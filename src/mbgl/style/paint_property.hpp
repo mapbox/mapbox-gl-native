@@ -64,23 +64,24 @@ public:
         }
     }
 
-    void cascade(const StyleCascadeParameters& parameters) {
-        Duration delay = *parameters.userDefinedTransition.delay;
-        Duration duration = *parameters.userDefinedTransition.duration;
+    void cascade(const StyleCascadeParameters& params) {
+        const bool overrideTransition = !params.transition.delay && !params.transition.duration;
+        Duration delay = params.transition.delay.value_or(Duration::zero());
+        Duration duration = params.transition.duration.value_or(Duration::zero());
 
-        for (auto classID : parameters.classes) {
+        for (const auto classID : params.classes) {
             if (values.find(classID) == values.end())
                 continue;
 
-            if (transitions.find(classID) != transitions.end()) {
+            if (overrideTransition && transitions.find(classID) != transitions.end()) {
                 const PropertyTransition& transition = transitions[classID];
                 if (transition.delay) delay = *transition.delay;
                 if (transition.duration) duration = *transition.duration;
             }
 
             cascaded = std::make_unique<CascadedValue>(std::move(cascaded),
-                                                       parameters.now + delay,
-                                                       parameters.now + delay + duration,
+                                                       params.now + delay,
+                                                       params.now + delay + duration,
                                                        values.at(classID));
 
             break;

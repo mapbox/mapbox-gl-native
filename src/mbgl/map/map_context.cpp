@@ -12,6 +12,7 @@
 
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/property_transition.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
@@ -293,16 +294,16 @@ bool MapContext::hasClass(const std::string& className) const {
     return style->hasClass(className);
 }
 
-void MapContext::addClass(const std::string& className) {
-    if (style->addClass(className)) updateAsync(Update::Classes);
+void MapContext::addClass(const std::string& className, const PropertyTransition& properties) {
+    if (style->addClass(className, properties)) updateAsync(Update::Classes);
 }
 
-void MapContext::removeClass(const std::string& className) {
-    if (style->removeClass(className)) updateAsync(Update::Classes);
+void MapContext::removeClass(const std::string& className, const PropertyTransition& properties) {
+    if (style->removeClass(className, properties)) updateAsync(Update::Classes);
 }
 
-void MapContext::setClasses(const std::vector<std::string>& classNames) {
-    style->setClasses(classNames);
+void MapContext::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+    style->setClasses(classNames, properties);
     updateAsync(Update::Classes);
 }
 

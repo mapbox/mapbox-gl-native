@@ -11,6 +11,7 @@
 #include <mbgl/util/vec.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/property_transition.hpp>
 
 #include <cstdint>
 #include <string>
@@ -64,10 +65,11 @@ public:
     void update(Update update);
 
     // Styling
-    void addClass(const std::string&);
-    void removeClass(const std::string&);
+    void addClass(const std::string&, const PropertyTransition& = {});
+    void removeClass(const std::string&, const PropertyTransition& = {});
+    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
+
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&);
     std::vector<std::string> getClasses() const;
 
     void setDefaultFadeDuration(const Duration&);

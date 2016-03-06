@@ -8,6 +8,7 @@
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/layer/custom_layer.hpp>
 
 #include <mbgl/util/projection.hpp>
@@ -519,16 +520,16 @@ bool Map::isFullyLoaded() const {
     return context->invokeSync<bool>(&MapContext::isLoaded);
 }
 
-void Map::addClass(const std::string& className) {
-    context->invoke(&MapContext::addClass, className);
+void Map::addClass(const std::string& className, const PropertyTransition& properties) {
+    context->invoke(&MapContext::addClass, className, properties);
 }
 
-void Map::removeClass(const std::string& className) {
-    context->invoke(&MapContext::removeClass, className);
+void Map::removeClass(const std::string& className, const PropertyTransition& properties) {
+    context->invoke(&MapContext::removeClass, className, properties);
 }
 
-void Map::setClasses(const std::vector<std::string>& classNames) {
-    context->invoke(&MapContext::setClasses, classNames);
+void Map::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+    context->invoke(&MapContext::setClasses, classNames, properties);
 }
 
 bool Map::hasClass(const std::string& className) const {
