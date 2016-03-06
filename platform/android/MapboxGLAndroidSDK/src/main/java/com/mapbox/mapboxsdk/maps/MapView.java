@@ -151,6 +151,7 @@ public class MapView extends FrameLayout {
     private OnMapReadyCallback mMapReadyCallback;
     private String mStyleUrl;
     private boolean mInitialLoad;
+    private boolean mDestroyed;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -477,6 +478,7 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void onDestroy() {
+        mDestroyed = true;
         mNativeMapView.terminateContext();
         mNativeMapView.terminateDisplay();
         mNativeMapView.destroySurface();
@@ -597,10 +599,16 @@ public class MapView extends FrameLayout {
     }
 
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
+        if (mDestroyed) {
+            return;
+        }
         setDirection(direction, false);
     }
 
     void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
+        if (mDestroyed) {
+            return;
+        }
         long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
         mNativeMapView.cancelTransitions();
         // Out of range directions are normalised in setBearing
@@ -608,6 +616,9 @@ public class MapView extends FrameLayout {
     }
 
     void resetNorth() {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
     }
@@ -637,22 +648,37 @@ public class MapView extends FrameLayout {
     //
 
     double getZoom() {
+        if (mDestroyed) {
+            return 0;
+        }
         return mNativeMapView.getZoom();
     }
 
     void setMinZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.setMinZoom(minZoom);
     }
 
     double getMinZoom() {
+        if (mDestroyed) {
+            return 0;
+        }
         return mNativeMapView.getMinZoom();
     }
 
     void setMaxZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.setMaxZoom(maxZoom);
     }
 
     double getMaxZoom() {
+        if (mDestroyed) {
+            return 0;
+        }
         return mNativeMapView.getMaxZoom();
     }
 
@@ -677,14 +703,23 @@ public class MapView extends FrameLayout {
     //
 
     boolean isDebugActive() {
+        if (mDestroyed) {
+            return false;
+        }
         return mNativeMapView.getDebug();
     }
 
     void setDebugActive(boolean debugActive) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.setDebug(debugActive);
     }
 
     void cycleDebugOptions() {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.cycleDebugOptions();
     }
 
@@ -721,6 +756,9 @@ public class MapView extends FrameLayout {
      * @see Style
      */
     public void setStyleUrl(@NonNull String url) {
+        if (mDestroyed) {
+            return;
+        }
         mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
@@ -779,6 +817,9 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
+        if (mDestroyed) {
+            return;
+        }
         // validateAccessToken does the null check
         if (!TextUtils.isEmpty(accessToken)) {
             accessToken = accessToken.trim();
@@ -795,6 +836,9 @@ public class MapView extends FrameLayout {
     @UiThread
     @Nullable
     public String getAccessToken() {
+        if (mDestroyed) {
+            return "";
+        }
         return mNativeMapView.getAccessToken();
     }
 
@@ -828,6 +872,9 @@ public class MapView extends FrameLayout {
     //
 
     LatLng fromScreenLocation(@NonNull PointF point) {
+        if (mDestroyed) {
+            return new LatLng();
+        }
         float x = point.x;
         float y = point.y;
 
@@ -835,6 +882,9 @@ public class MapView extends FrameLayout {
     }
 
     PointF toScreenLocation(@NonNull LatLng location) {
+        if (mDestroyed) {
+            return new PointF();
+        }
         PointF point = mNativeMapView.pixelForLatLng(location);
 
         float x = point.x * mScreenDensity;
@@ -866,6 +916,9 @@ public class MapView extends FrameLayout {
     }
 
     void loadIcon(Icon icon) {
+        if (mDestroyed) {
+            return;
+        }
         Bitmap bitmap = icon.getBitmap();
         String id = icon.getId();
         if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
@@ -896,6 +949,9 @@ public class MapView extends FrameLayout {
     }
 
     void updateMarker(@NonNull Marker updatedMarker) {
+        if (mDestroyed) {
+            return;
+        }
         if (updatedMarker == null) {
             Log.w(TAG, "marker was null, doing nothing");
             return;
@@ -937,34 +993,59 @@ public class MapView extends FrameLayout {
     }
 
     long[] addMarkers(@NonNull List<Marker> markerList) {
+        if (mDestroyed) {
+            return new long[]{};
+        }
         return mNativeMapView.addMarkers(markerList);
     }
 
     long addPolyline(@NonNull Polyline polyline) {
+        if (mDestroyed) {
+            return 0l;
+        }
         return mNativeMapView.addPolyline(polyline);
     }
 
     long[] addPolylines(@NonNull List<Polyline> polylines) {
+        if (mDestroyed) {
+            return new long[]{};
+        }
         return mNativeMapView.addPolylines(polylines);
     }
 
     long addPolygon(@NonNull Polygon polygon) {
+        if (mDestroyed) {
+            return 0l;
+        }
         return mNativeMapView.addPolygon(polygon);
     }
 
     long[] addPolygons(@NonNull List<Polygon> polygons) {
+        if (mDestroyed) {
+            return new long[]{};
+        }
         return mNativeMapView.addPolygons(polygons);
     }
 
     void removeAnnotation(long id) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.removeAnnotation(id);
     }
 
     void removeAnnotations(@NonNull long[] ids) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.removeAnnotations(ids);
     }
 
     private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
+        if (mDestroyed) {
+            return new ArrayList<>();
+        }
+
         if (bbox == null) {
             Log.w(TAG, "bbox was null, so just returning null");
             return null;
@@ -994,7 +1075,7 @@ public class MapView extends FrameLayout {
     int getTopOffsetPixelsForIcon(Icon icon) {
         // This method will dead lock if map paused. Causes a freeze if you add a marker in an
         // activity's onCreate()
-        if (mNativeMapView.isPaused()) {
+        if (mDestroyed || mNativeMapView.isPaused()) {
             return 0;
         }
 
@@ -1003,6 +1084,10 @@ public class MapView extends FrameLayout {
     }
 
     void setContentPadding(int left, int top, int right, int bottom) {
+        if (mDestroyed) {
+            return;
+        }
+
         if (left == mContentPaddingLeft && top == mContentPaddingTop && right == mContentPaddingRight && bottom == mContentPaddingBottom) {
             return;
         }
@@ -1016,6 +1101,10 @@ public class MapView extends FrameLayout {
     }
 
     double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
+        if (mDestroyed) {
+            return 0;
+        }
+
         return mNativeMapView.getMetersPerPixelAtLatitude(latitude, getZoom()) / mScreenDensity;
     }
 
@@ -1024,7 +1113,7 @@ public class MapView extends FrameLayout {
     //
 
     void jumpTo(double bearing, LatLng center, double pitch, double zoom) {
-        if (mNativeMapView == null) {
+        if (mDestroyed) {
             return;
         }
         mNativeMapView.cancelTransitions();
@@ -1032,7 +1121,7 @@ public class MapView extends FrameLayout {
     }
 
     void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
-        if (mNativeMapView == null) {
+        if (mDestroyed) {
             return;
         }
         mNativeMapView.cancelTransitions();
@@ -1056,7 +1145,7 @@ public class MapView extends FrameLayout {
     }
 
     void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
-        if (mNativeMapView == null) {
+        if (mDestroyed) {
             return;
         }
         mNativeMapView.cancelTransitions();
@@ -1100,6 +1189,9 @@ public class MapView extends FrameLayout {
     }
 
     private void reloadMarkers() {
+        if (mDestroyed) {
+            return;
+        }
         List<Annotation> annotations = mMapboxMap.getAnnotations();
         int count = annotations.size();
         for (int i = 0; i < count; i++) {
@@ -1130,19 +1222,29 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        if (!mNativeMapView.isPaused()) {
-            mNativeMapView.renderSync();
+        if (mDestroyed || mNativeMapView.isPaused()) {
+            return;
         }
+
+        mNativeMapView.renderSync();
     }
 
     @Override
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
+        if (mDestroyed) {
+            return;
+        }
+
         if (!isInEditMode()) {
             mNativeMapView.resizeView((int) (width / mScreenDensity), (int) (height / mScreenDensity));
         }
     }
 
     double getScale() {
+        if (mDestroyed) {
+            return 0;
+        }
+
         return mNativeMapView.getScale();
     }
 
@@ -1188,24 +1290,38 @@ public class MapView extends FrameLayout {
 
     // Used by UserLocationView
     void update() {
-        if (mNativeMapView != null) {
-            mNativeMapView.update();
+        if (mDestroyed) {
+            return;
         }
+
+        mNativeMapView.update();
     }
 
     CameraPosition invalidateCameraPosition() {
+        if (mDestroyed) {
+            return new CameraPosition.Builder().build();
+        }
         return new CameraPosition.Builder(mNativeMapView.getCameraValues()).build();
     }
 
     double getBearing() {
+        if (mDestroyed) {
+            return 0;
+        }
         return mNativeMapView.getBearing();
     }
 
     void setBearing(float bearing) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.setBearing(bearing);
     }
 
     void setBearing(float bearing, long duration) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.setBearing(bearing, duration);
     }
 
@@ -1248,7 +1364,6 @@ public class MapView extends FrameLayout {
      * @param yCoordinate Original y screen cooridnate at start of gesture
      */
     private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
-
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
         Hashtable<String, Object> evt = new Hashtable<>();
@@ -1286,6 +1401,9 @@ public class MapView extends FrameLayout {
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
         // Check and ignore non touch or left clicks
+        if (mDestroyed) {
+            return super.onTouchEvent(event);
+        }
 
         if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
@@ -1368,7 +1486,7 @@ public class MapView extends FrameLayout {
         // Called for double taps
         @Override
         public boolean onDoubleTapEvent(MotionEvent e) {
-            if (!mMapboxMap.getUiSettings().isZoomGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isZoomGesturesEnabled()) {
                 return false;
             }
 
@@ -1403,6 +1521,9 @@ public class MapView extends FrameLayout {
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
+            if (mDestroyed) {
+                return false;
+            }
             // Cancel any animation
             mNativeMapView.cancelTransitions();
             return true;
@@ -1474,7 +1595,6 @@ public class MapView extends FrameLayout {
             }
 
             trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, e.getX(), e.getY());
-
             return true;
         }
 
@@ -1490,9 +1610,8 @@ public class MapView extends FrameLayout {
 
         // Called for flings
         @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                               float velocityY) {
-            if (!mMapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isScrollGesturesEnabled()) {
                 return false;
             }
 
@@ -1531,7 +1650,7 @@ public class MapView extends FrameLayout {
             if (!mScrollInProgress) {
                 mScrollInProgress = true;
             }
-            if (!mMapboxMap.getUiSettings().isScrollGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isScrollGesturesEnabled()) {
                 return false;
             }
 
@@ -1563,7 +1682,7 @@ public class MapView extends FrameLayout {
         // Called when two fingers first touch the screen
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
-            if (!mMapboxMap.getUiSettings().isZoomGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isZoomGesturesEnabled()) {
                 return false;
             }
 
@@ -1590,8 +1709,8 @@ public class MapView extends FrameLayout {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             UiSettings uiSettings = mMapboxMap.getUiSettings();
-            if (!uiSettings.isZoomGesturesEnabled()) {
-                return false;
+            if (mDestroyed || !uiSettings.isZoomGesturesEnabled()) {
+                return super.onScale(detector);
             }
 
             // If scale is large enough ignore a tap
@@ -1648,7 +1767,7 @@ public class MapView extends FrameLayout {
         // Called when two fingers first touch the screen
         @Override
         public boolean onRotateBegin(RotateGestureDetector detector) {
-            if (!mMapboxMap.getUiSettings().isRotateGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isRotateGesturesEnabled()) {
                 return false;
             }
 
@@ -1674,7 +1793,7 @@ public class MapView extends FrameLayout {
         // Called for rotation
         @Override
         public boolean onRotate(RotateGestureDetector detector) {
-            if (!mMapboxMap.getUiSettings().isRotateGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isRotateGesturesEnabled()) {
                 return false;
             }
 
@@ -1752,7 +1871,7 @@ public class MapView extends FrameLayout {
 
         @Override
         public boolean onShove(ShoveGestureDetector detector) {
-            if (!mMapboxMap.getUiSettings().isTiltGesturesEnabled()) {
+            if (mDestroyed || !mMapboxMap.getUiSettings().isTiltGesturesEnabled()) {
                 return false;
             }
 
@@ -1818,6 +1937,10 @@ public class MapView extends FrameLayout {
     // down
     @Override
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
+        if (mDestroyed) {
+            return super.onKeyDown(keyCode, event);
+        }
+
         // If the user has held the scroll key down for a while then accelerate
         // the scroll speed
         double scrollDist = event.getRepeatCount() >= 5 ? 50.0 : 10.0;
@@ -1941,6 +2064,9 @@ public class MapView extends FrameLayout {
     // units
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
+        if (mDestroyed) {
+            return false;
+        }
         // Choose the action
         switch (event.getActionMasked()) {
             // The trackball was rotated
@@ -2031,6 +2157,9 @@ public class MapView extends FrameLayout {
     // such as mouse scroll events, mouse moves, joystick, trackpad
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
+        if (mDestroyed) {
+            return false;
+        }
         // Mouse events
         //if (event.isFromSource(InputDevice.SOURCE_CLASS_POINTER)) { // this is not available before API 18
         if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) == InputDevice.SOURCE_CLASS_POINTER) {
@@ -2107,8 +2236,8 @@ public class MapView extends FrameLayout {
 
     // Called when MapView is being created
     private boolean isConnected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getApplicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        Context appContext = getContext().getApplicationContext();
+        ConnectivityManager connectivityManager = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         return (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
     }
@@ -2273,16 +2402,25 @@ public class MapView extends FrameLayout {
 
     @UiThread
     void addCustomLayer(CustomLayer customLayer, String before) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.addCustomLayer(customLayer, before);
     }
 
     @UiThread
     void removeCustomLayer(String id) {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.removeCustomLayer(id);
     }
 
     @UiThread
     void invalidateCustomLayers() {
+        if (mDestroyed) {
+            return;
+        }
         mNativeMapView.update();
     }
 
@@ -2405,7 +2543,6 @@ public class MapView extends FrameLayout {
             context.startActivity(intent);
         }
     }
-
 
     /**
      * Definition of a map change event.
@@ -2576,7 +2713,6 @@ public class MapView extends FrameLayout {
      */
     public static final int DID_FINISH_RENDERING_MAP_FULLY_RENDERED = 13;
 
-
     /**
      * Interface definition for a callback to be invoked when the displayed map view changes.
      *
@@ -2604,6 +2740,5 @@ public class MapView extends FrameLayout {
          */
         void onMapChanged(@MapChange int change);
     }
-
 
 }
