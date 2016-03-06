@@ -5,19 +5,18 @@
 
 namespace mbgl {
 
-enum class Update : uint32_t {
+enum class Update : uint8_t {
     Nothing                   = 0,
     Dimensions                = 1 << 1,
-    DefaultTransition         = 1 << 2,
-    Classes                   = 1 << 3,
-    RecalculateStyle          = 1 << 4,
-    RenderStill               = 1 << 5,
-    Repaint                   = 1 << 6,
-    Annotations               = 1 << 7,
+    Classes                   = 1 << 2,
+    RecalculateStyle          = 1 << 3,
+    RenderStill               = 1 << 4,
+    Repaint                   = 1 << 5,
+    Annotations               = 1 << 6,
 };
 
 inline Update operator| (const Update& lhs, const Update& rhs) {
-    return Update(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+    return Update(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
 }
 
 inline Update& operator|=(Update& lhs, const Update& rhs) {
@@ -26,7 +25,7 @@ inline Update& operator|=(Update& lhs, const Update& rhs) {
 }
 
 inline bool operator& (const Update& lhs, const Update& rhs) {
-    return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
+    return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
 }
 
 } // namespace mbgl

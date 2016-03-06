@@ -549,15 +549,6 @@ Duration Map::getDefaultFadeDuration() const {
     return data->getDefaultFadeDuration();
 }
 
-void Map::setDefaultTransitionDuration(const Duration& duration) {
-    data->setDefaultTransitionDuration(duration);
-    update(Update::DefaultTransition);
-}
-
-Duration Map::getDefaultTransitionDuration() const {
-    return data->getDefaultTransitionDuration();
-}
-
 void Map::setSourceTileCacheSize(size_t size) {
     context->invoke(&MapContext::setSourceTileCacheSize, size);
 }

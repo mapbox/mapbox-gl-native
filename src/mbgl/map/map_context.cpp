@@ -150,7 +150,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // created but before a style is loaded
     data.loading = true;
 
-    updateAsync(Update::DefaultTransition | Update::Classes | Update::RecalculateStyle | Update::Annotations);
+    updateAsync(Update::Classes | Update::RecalculateStyle | Update::Annotations);
 }
 
 void MapContext::update() {
