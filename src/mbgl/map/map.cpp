@@ -540,15 +540,6 @@ std::vector<std::string> Map::getClasses() const {
     return context->invokeSync<std::vector<std::string>>(&MapContext::getClasses);
 }
 
-void Map::setDefaultFadeDuration(const Duration& duration) {
-    data->setDefaultFadeDuration(duration);
-    update(Update::Classes);
-}
-
-Duration Map::getDefaultFadeDuration() const {
-    return data->getDefaultFadeDuration();
-}
-
 void Map::setSourceTileCacheSize(size_t size) {
     context->invoke(&MapContext::setSourceTileCacheSize, size);
 }

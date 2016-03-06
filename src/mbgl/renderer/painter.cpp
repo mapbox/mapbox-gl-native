@@ -72,7 +72,7 @@ Painter::Painter(MapData& data_, TransformState& state_, gl::GLObjectStore& glOb
 Painter::~Painter() = default;
 
 bool Painter::needsAnimation() const {
-    return frameHistory.needsAnimation(data.getDefaultFadeDuration());
+    return frameHistory.needsAnimation(util::DEFAULT_FADE_DURATION);
 }
 
 void Painter::prepareTile(const Tile& tile) {

@@ -207,10 +207,12 @@ void Style::recalculate(float z) {
 
     zoomHistory.update(z, data.getAnimationTime());
 
-    StyleCalculationParameters parameters(z,
-                                          data.getAnimationTime(),
-                                          zoomHistory,
-                                          data.getDefaultFadeDuration());
+    const StyleCalculationParameters parameters {
+        z,
+        data.getAnimationTime(),
+        zoomHistory,
+        data.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
+    };
 
     hasPendingTransitions = false;
     for (const auto& layer : layers) {

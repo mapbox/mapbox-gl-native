@@ -62,7 +62,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
     if (data.mode == MapMode::Continuous) {
-        FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), data.getDefaultFadeDuration());
+        FadeProperties f = frameHistory.getFadeProperties(data.getAnimationTime(), util::DEFAULT_FADE_DURATION);
         sdfShader.u_fadedist = f.fadedist * 10;
         sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
         sdfShader.u_maxfadezoom = std::floor(f.maxfadezoom * 10);

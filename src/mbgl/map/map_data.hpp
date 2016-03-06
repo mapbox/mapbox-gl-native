@@ -24,8 +24,7 @@ public:
         , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
         , annotationManager(pixelRatio)
-        , animationTime(Duration::zero())
-        , defaultFadeDuration(mode_ == MapMode::Continuous ? Milliseconds(300) : Duration::zero()) {
+        , animationTime(Duration::zero()) {
         assert(pixelRatio > 0);
     }
 
@@ -63,18 +62,6 @@ public:
         animationTime = timePoint.time_since_epoch();
     };
 
-    inline Duration getDefaultFadeDuration() const {
-        return defaultFadeDuration;
-    }
-
-    inline void setDefaultFadeDuration(const Duration& duration) {
-        if (mode == MapMode::Still) {
-            return;
-        }
-
-        defaultFadeDuration = duration;
-    }
-
     util::exclusive<AnnotationManager> getAnnotationManager() {
         return util::exclusive<AnnotationManager>(
             &annotationManager,
@@ -92,7 +79,6 @@ private:
 
     std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
     std::atomic<Duration> animationTime;
-    std::atomic<Duration> defaultFadeDuration;
 
 // TODO: make private
 public:

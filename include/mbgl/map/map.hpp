@@ -72,9 +72,6 @@ public:
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
-    void setDefaultFadeDuration(const Duration&);
-    Duration getDefaultFadeDuration() const;
-
     void setStyleURL(const std::string& url);
     void setStyleJSON(const std::string& json, const std::string& base = "");
     std::string getStyleURL() const;
