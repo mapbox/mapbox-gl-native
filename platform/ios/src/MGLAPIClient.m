@@ -44,22 +44,22 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 - (void)postEvents:(nonnull NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events completionHandler:(nullable void (^)(NSError * _Nullable error))completionHandler {
     __block NSURLSessionDataTask *dataTask = [self.session dataTaskWithRequest:[self requestForEvents:events]
                                                              completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-                                                                 NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-                                                                 NSError *statusError = nil;
-                                                                 if (httpResponse.statusCode >= 400) {
-                                                                     NSString *description = [NSString stringWithFormat:@"The session data task failed. Original request was: %@", dataTask.originalRequest];
-                                                                     NSString *reason = [NSString stringWithFormat:@"The status code was %@", @(httpResponse.statusCode)];
-                                                                     NSDictionary *userInfo = @{NSLocalizedDescriptionKey: NSLocalizedString(description, nil),
-                                                                                                NSLocalizedFailureReasonErrorKey: NSLocalizedString(reason, nil)};
-                                                                     statusError = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
-                                                                 }
-                                                                 if (completionHandler) {
-                                                                     error = error ? error : statusError;
-                                                                     completionHandler(error);
-                                                                 }
-                                                                 [self.dataTasks removeObject:dataTask];
-                                                                 dataTask = nil;
-                                                             }];
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+        NSError *statusError = nil;
+        if (httpResponse.statusCode >= 400) {
+            NSString *description = [NSString stringWithFormat:NSLocalizedString(@"The session data task failed. Original request was: %@", nil), dataTask.originalRequest];
+            NSString *reason = [NSString stringWithFormat:NSLocalizedString(@"The status code was %ld", nil), (long)httpResponse.statusCode];
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description,
+                                       NSLocalizedFailureReasonErrorKey: reason};
+            statusError = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
+        }
+        if (completionHandler) {
+            error = error ? error : statusError;
+            completionHandler(error);
+        }
+        [self.dataTasks removeObject:dataTask];
+        dataTask = nil;
+    }];
     [dataTask resume];
     [self.dataTasks addObject:dataTask];
 }
