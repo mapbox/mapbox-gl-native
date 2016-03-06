@@ -496,22 +496,6 @@ jni::jobject* nativeGetClasses(JNIEnv *env, jni::jobject* obj, jlong nativeMapVi
     return std_vector_string_to_jobject(env, nativeMapView->getMap().getClasses());
 }
 
-void nativeSetDefaultTransitionDuration(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr,
-                                                jlong duration) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetDefaultTransitionDuration");
-    assert(nativeMapViewPtr != 0);
-    assert(duration >= 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setDefaultTransitionDuration(mbgl::Milliseconds(duration));
-}
-
-jlong nativeGetDefaultTransitionDuration(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
-    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetDefaultTransitionDuration");
-    assert(nativeMapViewPtr != 0);
-    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    return std::chrono::duration_cast<mbgl::Milliseconds>(nativeMapView->getMap().getDefaultTransitionDuration()).count();
-}
-
 void nativeSetStyleUrl(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* url) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleURL");
     assert(nativeMapViewPtr != 0);
@@ -1843,8 +1827,6 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeHasClass, "(JLjava/lang/String;)Z"),
         MAKE_NATIVE_METHOD(nativeSetClasses, "(JLjava/util/List;)V"),
         MAKE_NATIVE_METHOD(nativeGetClasses, "(J)Ljava/util/List;"),
-        MAKE_NATIVE_METHOD(nativeSetDefaultTransitionDuration, "(JJ)V"),
-        MAKE_NATIVE_METHOD(nativeGetDefaultTransitionDuration, "(J)J"),
         MAKE_NATIVE_METHOD(nativeSetStyleUrl, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetStyleJson, "(JLjava/lang/String;Ljava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeGetStyleJson, "(J)Ljava/lang/String;"),

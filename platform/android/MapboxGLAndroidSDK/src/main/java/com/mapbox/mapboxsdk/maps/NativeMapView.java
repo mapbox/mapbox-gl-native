@@ -196,24 +196,6 @@ final class NativeMapView {
         return nativeGetClasses(mNativeMapViewPtr);
     }
 
-    public void setDefaultTransitionDuration() {
-        setDefaultTransitionDuration(0);
-    }
-
-    public long getDefaultTransitionDuration() {
-        return nativeGetDefaultTransitionDuration(mNativeMapViewPtr);
-    }
-
-    public void setDefaultTransitionDuration(long milliseconds) {
-        if (milliseconds < 0) {
-            throw new IllegalArgumentException(
-                    "milliseconds cannot be negative.");
-        }
-
-        nativeSetDefaultTransitionDuration(mNativeMapViewPtr,
-                milliseconds);
-    }
-
     public void setStyleUrl(String url) {
         nativeSetStyleUrl(mNativeMapViewPtr, url);
     }
@@ -552,11 +534,6 @@ final class NativeMapView {
                                          List<String> classes);
 
     private native List<String> nativeGetClasses(long nativeMapViewPtr);
-
-    private native void nativeSetDefaultTransitionDuration(
-            long nativeMapViewPtr, long duration);
-
-    private native long nativeGetDefaultTransitionDuration(long nativeMapViewPtr);
 
     private native void nativeSetStyleUrl(long nativeMapViewPtr, String url);
 

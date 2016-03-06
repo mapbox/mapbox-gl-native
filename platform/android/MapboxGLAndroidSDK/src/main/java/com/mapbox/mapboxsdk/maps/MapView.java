@@ -355,8 +355,6 @@ public class MapView extends FrameLayout {
             mMapboxMap.setDebugActive(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
             mMapboxMap.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
             setAccessToken(savedInstanceState.getString(MapboxConstants.STATE_ACCESS_TOKEN));
-            mNativeMapView.setDefaultTransitionDuration(
-                    savedInstanceState.getLong(MapboxConstants.STATE_DEFAULT_TRANSITION_DURATION));
 
             // User location
             try {
@@ -430,7 +428,6 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
         outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleUrl);
         outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
-        outState.putLong(MapboxConstants.STATE_DEFAULT_TRANSITION_DURATION, mNativeMapView.getDefaultTransitionDuration());
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
 
         // TrackingSettings
