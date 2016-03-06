@@ -150,7 +150,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     // created but before a style is loaded
     data.loading = true;
 
-    updateAsync(Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations);
+    updateAsync(Update::DefaultTransition | Update::Classes | Update::RecalculateStyle | Update::Annotations);
 }
 
 void MapContext::update() {
@@ -175,7 +175,7 @@ void MapContext::update() {
         style->cascade();
     }
 
-    if (updateFlags & Update::Classes || updateFlags & Update::Zoom) {
+    if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
         style->recalculate(transformState.getZoom());
     }
 
@@ -249,7 +249,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     view.afterRender();
 
     if (style->hasTransitions()) {
-        updateAsync(Update::Zoom);
+        updateAsync(Update::RecalculateStyle);
     } else if (painter->needsAnimation()) {
         updateAsync(Update::Repaint);
     }

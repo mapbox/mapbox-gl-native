@@ -10,7 +10,7 @@ enum class Update : uint32_t {
     Dimensions                = 1 << 1,
     DefaultTransition         = 1 << 2,
     Classes                   = 1 << 3,
-    Zoom                      = 1 << 4,
+    RecalculateStyle          = 1 << 4,
     RenderStill               = 1 << 5,
     Repaint                   = 1 << 6,
     Annotations               = 1 << 7,

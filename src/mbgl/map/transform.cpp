@@ -114,7 +114,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     const double scale = state.zoomScale(zoom);
     pitch = util::clamp(pitch, 0., util::PITCH_MAX);
     
-    Update update = state.getZoom() == zoom ? Update::Repaint : Update::Zoom;
+    Update update = state.getZoom() == zoom ? Update::Repaint : Update::RecalculateStyle;
     
     // Minimize rotation by taking the shorter path around the circle.
     angle = _normalizeAngle(angle, state.angle);
@@ -325,7 +325,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         if (padding) {
             state.moveLatLng(frameLatLng, center);
         }
-        return Update::Zoom;
+        return Update::RecalculateStyle;
     }, duration);
 }
 
