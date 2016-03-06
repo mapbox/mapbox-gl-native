@@ -18,6 +18,7 @@
 #include <mbgl/platform/darwin/reachability.h>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/style/property_transition.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
@@ -2297,8 +2298,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         newAppliedClasses.insert(newAppliedClasses.end(), [appliedClass UTF8String]);
     }
 
-    _mbglMap->setDefaultTransitionDuration(MGLDurationInSeconds(transitionDuration));
-    _mbglMap->setClasses(newAppliedClasses);
+    mbgl::PropertyTransition transition { { MGLDurationInSeconds(transitionDuration) } };
+    _mbglMap->setClasses(newAppliedClasses, transition);
 }
 
 - (BOOL)hasStyleClass:(NSString *)styleClass
