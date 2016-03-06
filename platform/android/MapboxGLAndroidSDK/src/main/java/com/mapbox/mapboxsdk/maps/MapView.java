@@ -1285,8 +1285,11 @@ public class MapView extends FrameLayout {
     // Called when user touches the screen, all positions are absolute
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-        // Check and ignore non touch or left clicks
+        if (mNativeMapView == null) {
+            return false;
+        }
 
+        // Check and ignore non touch or left clicks
         if ((event.getButtonState() != 0) && (event.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
             return false;
         }
