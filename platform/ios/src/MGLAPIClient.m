@@ -5,7 +5,6 @@
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 static NSString * const MGLAPIClientBaseURL = @"https://api.mapbox.com";
 static NSString * const MGLAPIClientEventsPath = @"events/v2";
-static NSString * const MGLAPIClientDomain = @"com.mapbox.mglnative";
 
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
 static NSString * const MGLAPIClientHeaderFieldContentTypeKey = @"Content-Type";
@@ -52,7 +51,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
                                                                      NSString *reason = [NSString stringWithFormat:@"The status code was %@", @(httpResponse.statusCode)];
                                                                      NSDictionary *userInfo = @{NSLocalizedDescriptionKey: NSLocalizedString(description, nil),
                                                                                                 NSLocalizedFailureReasonErrorKey: NSLocalizedString(reason, nil)};
-                                                                     statusError = [[NSError alloc] initWithDomain:MGLAPIClientDomain code:1 userInfo:userInfo];
+                                                                     statusError = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
                                                                  }
                                                                  if (completionHandler) {
                                                                      error = error ? error : statusError;
