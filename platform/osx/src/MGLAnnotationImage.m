@@ -1,4 +1,4 @@
-#import <MGLAnnotationImage.h>
+#import "MGLAnnotationImage.h"
 
 @interface MGLAnnotationImage ()
 

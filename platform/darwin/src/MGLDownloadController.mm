@@ -29,9 +29,25 @@
 
 - (instancetype)initWithFileName:(NSString *)fileName {
     if (self = [super init]) {
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *fileCachePath = [paths.firstObject stringByAppendingPathComponent:fileName];
-        _mbglFileSource = new mbgl::DefaultFileSource(fileCachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
+        NSString *cachePath = [paths.firstObject stringByAppendingPathComponent:fileName];
+#elif TARGET_OS_MAC
+        NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
+                                                                          inDomain:NSUserDomainMask
+                                                                 appropriateForURL:nil
+                                                                            create:YES
+                                                                             error:nil];
+        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:
+                             [NSBundle mainBundle].bundleIdentifier];
+        [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
+                                 withIntermediateDirectories:YES
+                                                  attributes:nil
+                                                       error:nil];
+        NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:fileName];
+        NSString *cachePath = cacheURL ? cacheURL.path : @"";
+#endif
+        _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
         
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self

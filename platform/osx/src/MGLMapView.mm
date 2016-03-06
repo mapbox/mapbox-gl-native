@@ -1,18 +1,18 @@
 #import "MGLMapView_Private.h"
-#import "MGLAccountManager_Private.h"
 #import "MGLAttributionButton.h"
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
 
+#import "../../darwin/src/MGLAccountManager_Private.h"
 #import "../../darwin/src/MGLGeometry_Private.h"
 #import "../../darwin/src/MGLMultiPoint_Private.h"
 
-#import <MGLMapCamera.h>
-#import <MGLPolygon.h>
-#import <MGLPolyline.h>
-#import <MGLAnnotationImage.h>
-#import <MGLMapViewDelegate.h>
+#import "MGLMapCamera.h"
+#import "MGLPolygon.h"
+#import "MGLPolyline.h"
+#import "MGLAnnotationImage.h"
+#import "MGLMapViewDelegate.h"
 
 #import <mbgl/mbgl.hpp>
 #import <mbgl/annotation/point_annotation.hpp>
@@ -30,8 +30,8 @@
 #import <map>
 #import <unordered_set>
 
-#import "NSBundle+MGLAdditions.h"
-#import "NSProcessInfo+MGLAdditions.h"
+#import "../../darwin/src/NSBundle+MGLAdditions.h"
+#import "../../darwin/src/NSProcessInfo+MGLAdditions.h"
 #import "../../darwin/src/NSException+MGLAdditions.h"
 #import "../../darwin/src/NSString+MGLAdditions.h"
 

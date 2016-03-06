@@ -1,4 +1,4 @@
-#import <MGLMapView.h>
+#import "MGLMapView.h"
 
 void mgl_linkMapViewIBCategory();
 

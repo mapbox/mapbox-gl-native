@@ -19,6 +19,8 @@ static void InitializeMapbox() {
     
     [MGLAccountManager class];
     [MGLAnnotationImage class];
+    [MGLDownloadable class];
+    [MGLDownloadController class];
     [MGLMapCamera class];
     [MGLMapView class];
     [MGLMultiPoint class];
@@ -27,4 +29,5 @@ static void InitializeMapbox() {
     [MGLPolyline class];
     [MGLShape class];
     [MGLStyle class];
+    [MGLTilePyramidDownloadRegion class];
 }

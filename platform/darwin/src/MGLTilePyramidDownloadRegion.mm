@@ -1,5 +1,9 @@
 #import "MGLTilePyramidDownloadRegion.h"
 
+#if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
+    #import <Cocoa/Cocoa.h>
+#endif
+
 #import "MGLDownloadRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"

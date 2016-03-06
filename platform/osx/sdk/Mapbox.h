@@ -9,6 +9,9 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import <Mapbox/MGLAccountManager.h>
 #import <Mapbox/MGLAnnotation.h>
 #import <Mapbox/MGLAnnotationImage.h>
+#import <Mapbox/MGLDownloadable.h>
+#import <Mapbox/MGLDownloadRegion.h>
+#import <Mapbox/MGLDownloadController.h>
 #import <Mapbox/MGLGeometry.h>
 #import <Mapbox/MGLMapCamera.h>
 #import <Mapbox/MGLMapView.h>
@@ -21,4 +24,5 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import <Mapbox/MGLPolyline.h>
 #import <Mapbox/MGLShape.h>
 #import <Mapbox/MGLStyle.h>
+#import <Mapbox/MGLTilePyramidDownloadRegion.h>
 #import <Mapbox/MGLTypes.h>

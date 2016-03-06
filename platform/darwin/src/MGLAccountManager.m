@@ -1,18 +1,27 @@
 #import "MGLAccountManager_Private.h"
-#import "MGLMapboxEvents.h"
 #import "MGLMapView.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+#import "MGLMapboxEvents.h"
+
 #import "FABKitProtocol.h"
 #import "Fabric+FABKits.h"
 
-@interface MGLAccountManager() <FABKit>
+@interface MGLAccountManager () <FABKit>
 
 @property (atomic) NSString *accessToken;
 
 @end
+#else
+@interface MGLAccountManager ()
+
+@property (atomic) NSString *accessToken;
+
+@end
+#endif
 
 @implementation MGLAccountManager
 
@@ -26,9 +35,7 @@
     }
 }
 
-// Can be called from any thread.
-//
-+ (instancetype) sharedManager {
++ (instancetype)sharedManager {
     if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
         return nil;
     }
@@ -39,36 +46,42 @@
             _sharedManager = [[self alloc] init];
         });
     };
-    if ( ! [[NSThread currentThread] isMainThread]) {
+    if (![[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             setupBlock();
         });
-    }
-    else {
+    } else {
         setupBlock();
     }
     return _sharedManager;
 }
 
-+ (BOOL) mapboxMetricsEnabledSettingShownInApp {
++ (BOOL)mapboxMetricsEnabledSettingShownInApp {
     NSLog(@"mapboxMetricsEnabledSettingShownInApp is no longer necessary; the Mapbox iOS SDK has changed to always provide a telemetry setting in-app.");
+    return YES;
 }
 
-+ (void) setAccessToken:(NSString *) accessToken {
++ (void)setAccessToken:(NSString *)accessToken {
     accessToken = [accessToken stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if ( ! [accessToken length]) return;
+    if (!accessToken.length) {
+        return;
+    }
     
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
     // Update MGLMapboxEvents
     // NOTE: This is (likely) the initial setup of MGLMapboxEvents
     [MGLMapboxEvents sharedManager];
+#endif
 }
 
-+ (NSString *) accessToken {
++ (NSString *)accessToken {
     return [MGLAccountManager sharedManager].accessToken;
 }
+
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 
 #pragma mark - Fabric
 
@@ -85,15 +98,15 @@
 
     if (fabric) {
         NSDictionary *configuration = [fabric configurationDictionaryForKitClass:[MGLAccountManager class]];
-        if ( ! configuration || ! configuration[@"accessToken"]) {
-            NSLog(@"Configuration dictionary returned by Fabric was nil or doesn't have accessToken. Can't initialize MGLAccountManager.");
+        if (!configuration || !configuration[@"accessToken"]) {
+            NSLog(@"Configuration dictionary returned by Fabric was nil or doesn’t have accessToken. Can’t initialize MGLAccountManager.");
             return;
         }
         [self setAccessToken:configuration[@"accessToken"]];
         MGLAccountManager *sharedAccountManager = [self sharedManager];
         NSLog(@"MGLAccountManager was initialized with access token: %@", sharedAccountManager.accessToken);
     } else {
-        NSLog(@"MGLAccountManager is used in a project that doesn't have Fabric.");
+        NSLog(@"MGLAccountManager is used in a project that doesn’t have Fabric.");
     }
     
     // https://github.com/mapbox/mapbox-gl-native/issues/2966
@@ -104,5 +117,7 @@
     // https://github.com/mapbox/mapbox-gl-native/issues/3113
     [MGLMapView class];
 }
+
+#endif
 
 @end
