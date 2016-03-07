@@ -8,11 +8,15 @@
 #include <mbgl/util/string.hpp>
 
 #define MGLAssertOfflineTaskIsValid() \
-    [NSException raise:@"Invalid offline task" \
-                format: \
-     @"-[MGLOfflineStorage removeTask:withCompletionHandler:] has been called " \
-     @"on this instance of MGLOfflineTask, rendering it invalid. It is an " \
-     @"error to send any message to this task."]
+    do { \
+        if (_state == MGLOfflineTaskStateInvalid) { \
+            [NSException raise:@"Invalid offline task" \
+                        format: \
+             @"-[MGLOfflineStorage removeTask:withCompletionHandler:] has been called " \
+             @"on this instance of MGLOfflineTask, rendering it invalid. It is an " \
+             @"error to send any message to this task."]; \
+        } \
+    } while (NO);
 
 class MBGLOfflineRegionObserver;
 
