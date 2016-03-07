@@ -429,6 +429,11 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
             oldDisplay = display;
         }
 
+        if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL,"eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+            throw new std::runtime_error("eglMakeCurrent() failed");
+        }
+
         if (!eglMakeCurrent(oldDisplay, oldDrawSurface, oldReadSurface, oldContext)) {
             mbgl::Log::Error(mbgl::Event::OpenGL,
                              "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
