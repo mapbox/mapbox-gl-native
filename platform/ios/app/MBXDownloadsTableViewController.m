@@ -2,26 +2,26 @@
 
 #import <Mapbox/Mapbox.h>
 
-static NSString * const MBXDownloadContextNameKey = @"Name";
+static NSString * const MBXOfflineTaskContextNameKey = @"Name";
 
 static NSString * const MBXDownloadsTableViewInactiveCellReuseIdentifier = @"Inactive";
 static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Active";
 
-@implementation MGLDownloadable (MBXAdditions)
+@implementation MGLOfflineTask (MBXAdditions)
 
 - (NSString *)name {
     NSDictionary *userInfo = [NSKeyedUnarchiver unarchiveObjectWithData:self.context];
-    NSAssert([userInfo isKindOfClass:[NSDictionary class]], @"Context of downloadable isn’t a dictionary.");
-    NSString *name = userInfo[MBXDownloadContextNameKey];
-    NSAssert([name isKindOfClass:[NSString class]], @"Name of downloadable isn’t a string.");
+    NSAssert([userInfo isKindOfClass:[NSDictionary class]], @"Context of offline task isn’t a dictionary.");
+    NSString *name = userInfo[MBXOfflineTaskContextNameKey];
+    NSAssert([name isKindOfClass:[NSString class]], @"Name of offline task isn’t a string.");
     return name;
 }
 
 @end
 
-@interface MBXDownloadsTableViewController () <MGLDownloadableDelegate>
+@interface MBXDownloadsTableViewController () <MGLOfflineTaskDelegate>
 
-@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLDownloadable *) *downloadables;
+@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLOfflineTask *) *offlineTasks;
 
 @end
 
@@ -33,14 +33,14 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
     [super viewDidLoad];
     
     __weak MBXDownloadsTableViewController *weakSelf = self;
-    [[MGLDownloadController sharedController] requestDownloadablesWithCompletionHandler:^(NS_ARRAY_OF(MGLDownloadable *) *downloadables, NSError *error) {
+    [[MGLOfflineStorage sharedOfflineStorage] getTasksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflineTask *) *tasks, NSError *error) {
         MBXDownloadsTableViewController *strongSelf = weakSelf;
-        strongSelf.downloadables = downloadables.mutableCopy;
+        strongSelf.offlineTasks = tasks.mutableCopy;
         [strongSelf.tableView reloadData];
         
-        for (MGLDownloadable *downloadable in strongSelf.downloadables) {
-            downloadable.delegate = strongSelf;
-            [downloadable requestProgress];
+        for (MGLOfflineTask *task in strongSelf.offlineTasks) {
+            task.delegate = strongSelf;
+            [task requestProgress];
         }
         
         if (error) {
@@ -67,13 +67,13 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
             name = [NSString stringWithFormat:@"Untitled %lu", (unsigned long)++_untitledRegionCount];
         }
         
-        MGLTilePyramidDownloadRegion *region = [[MGLTilePyramidDownloadRegion alloc] initWithStyleURL:mapView.styleURL bounds:mapView.visibleCoordinateBounds fromZoomLevel:mapView.zoomLevel toZoomLevel:mapView.maximumZoomLevel];
+        MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:mapView.styleURL bounds:mapView.visibleCoordinateBounds fromZoomLevel:mapView.zoomLevel toZoomLevel:mapView.maximumZoomLevel];
         NSData *context = [NSKeyedArchiver archivedDataWithRootObject:@{
-            MBXDownloadContextNameKey: name,
+            MBXOfflineTaskContextNameKey: name,
         }];
         
         __weak MBXDownloadsTableViewController *weakSelf = self;
-        [[MGLDownloadController sharedController] addDownloadableForRegion:region withContext:context completionHandler:^(MGLDownloadable *downloadable, NSError *error) {
+        [[MGLOfflineStorage sharedOfflineStorage] addTaskForRegion:region withContext:context completionHandler:^(MGLOfflineTask *task, NSError *error) {
             MBXDownloadsTableViewController *strongSelf = weakSelf;
             if (error) {
                 NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the download “%@”.", name];
@@ -81,11 +81,11 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
                 [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
                 [self presentViewController:alertController animated:YES completion:nil];
             } else {
-                downloadable.delegate = strongSelf;
-                [downloadable resume];
+                task.delegate = strongSelf;
+                [task resume];
                 
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:strongSelf.downloadables.count inSection:0];
-                [strongSelf.downloadables addObject:downloadable];
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:strongSelf.offlineTasks.count inSection:0];
+                [strongSelf.offlineTasks addObject:task];
                 [strongSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             }
         }];
@@ -99,16 +99,16 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.downloadables.count;
+    return self.offlineTasks.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    MGLDownloadable *downloadable = self.downloadables[indexPath.row];
+    MGLOfflineTask *task = self.offlineTasks[indexPath.row];
     
-    NSString *reuseIdentifier = downloadable.state == MGLDownloadableStateActive ? MBXDownloadsTableViewActiveCellReuseIdentifier : MBXDownloadsTableViewInactiveCellReuseIdentifier;
+    NSString *reuseIdentifier = task.state == MGLOfflineTaskStateActive ? MBXDownloadsTableViewActiveCellReuseIdentifier : MBXDownloadsTableViewInactiveCellReuseIdentifier;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
-    cell.textLabel.text = downloadable.name;
-    MGLDownloadableProgress progress = downloadable.progress;
+    cell.textLabel.text = task.name;
+    MGLOfflineTaskProgress progress = task.progress;
     NSString *completedString = [NSNumberFormatter localizedStringFromNumber:@(progress.countOfResourcesCompleted)
                                                                  numberStyle:NSNumberFormatterDecimalStyle];
     NSString *expectedString = [NSNumberFormatter localizedStringFromNumber:@(progress.countOfResourcesExpected)
@@ -116,14 +116,14 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
     NSString *byteCountString = [NSByteCountFormatter stringFromByteCount:progress.countOfBytesCompleted
                                                                countStyle:NSByteCountFormatterCountStyleFile];
     NSString *statusString;
-    switch (downloadable.state) {
-        case MGLDownloadableStateInactive:
-        case MGLDownloadableStateComplete:
+    switch (task.state) {
+        case MGLOfflineTaskStateInactive:
+        case MGLOfflineTaskStateComplete:
             statusString = [NSString stringWithFormat:@"%@ of %@ resources (%@)",
                             completedString, expectedString, byteCountString];
             break;
             
-        case MGLDownloadableStateActive:
+        case MGLOfflineTaskStateActive:
             if (progress.countOfResourcesExpected) {
                 completedString = [NSNumberFormatter localizedStringFromNumber:@(progress.countOfResourcesCompleted + 1)
                                                                    numberStyle:NSNumberFormatterDecimalStyle];
@@ -142,20 +142,20 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        MGLDownloadable *downloadable = self.downloadables[indexPath.row];
+        MGLOfflineTask *task = self.offlineTasks[indexPath.row];
         __weak MBXDownloadsTableViewController *weakSelf = self;
-        [[MGLDownloadController sharedController] removeDownloadable:downloadable withCompletionHandler:^(NSError *error) {
+        [[MGLOfflineStorage sharedOfflineStorage] removeTask:task withCompletionHandler:^(NSError *error) {
             MBXDownloadsTableViewController *strongSelf = weakSelf;
-            [strongSelf.downloadables removeObjectAtIndex:indexPath.row];
+            [strongSelf.offlineTasks removeObjectAtIndex:indexPath.row];
             [strongSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         }];
     }
 }
 
-#pragma mark - Downloadable delegate
+#pragma mark - Offline task delegate
 
-- (void)downloadable:(MGLDownloadable *)downloadable progressDidChange:(MGLDownloadableProgress)progress {
-    NSUInteger index = [self.downloadables indexOfObject:downloadable];
+- (void)offlineTask:(MGLOfflineTask *)task progressDidChange:(MGLOfflineTaskProgress)progress {
+    NSUInteger index = [self.offlineTasks indexOfObject:task];
     if (index == NSNotFound) {
         return;
     }
@@ -164,12 +164,12 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
-- (void)downloadable:(MGLDownloadable *)downloadable didReceiveError:(NSError *)error {
-    NSLog(@"Downloadable “%@” received error: %@", downloadable.name, error.localizedFailureReason);
+- (void)offlineTask:(MGLOfflineTask *)task didReceiveError:(NSError *)error {
+    NSLog(@"Offline task “%@” received error: %@", task.name, error.localizedFailureReason);
 }
 
-- (void)downloadable:(MGLDownloadable *)downloadable didReceiveMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
-    NSLog(@"Downloadable “%@” reached limit of %llu tiles.", downloadable.name, maximumCount);
+- (void)offlineTask:(MGLOfflineTask *)task didReceiveMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
+    NSLog(@"Offline task “%@” reached limit of %llu tiles.", task.name, maximumCount);
 }
 
 @end

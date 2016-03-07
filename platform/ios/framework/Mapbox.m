@@ -17,16 +17,16 @@ static void InitializeMapbox() {
     
     [MGLAccountManager class];
     [MGLAnnotationImage class];
-    [MGLDownloadable class];
-    [MGLDownloadController class];
     [MGLMapCamera class];
     [MGLMapView class];
     [MGLMultiPoint class];
+    [MGLOfflineStorage class];
+    [MGLOfflineTask class];
     [MGLPointAnnotation class];
     [MGLPolygon class];
     [MGLPolyline class];
     [MGLShape class];
     [MGLStyle class];
-    [MGLTilePyramidDownloadRegion class];
+    [MGLTilePyramidOfflineRegion class];
     [MGLUserLocation class];
 }

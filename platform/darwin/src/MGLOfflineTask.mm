@@ -1,40 +1,40 @@
-#import "MGLDownloadable_Private.h"
+#import "MGLOfflineTask_Private.h"
 
-#import "MGLDownloadController_Private.h"
-#import "MGLDownloadRegion_Private.h"
-#import "MGLTilePyramidDownloadRegion.h"
+#import "MGLOfflineStorage_Private.h"
+#import "MGLOfflineRegion_Private.h"
+#import "MGLTilePyramidOfflineRegion.h"
 
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/string.hpp>
 
 class MBGLOfflineRegionObserver;
 
-@interface MGLDownloadable ()
+@interface MGLOfflineTask ()
 
 @property (nonatomic, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
 @property (nonatomic, readwrite) MBGLOfflineRegionObserver *mbglOfflineRegionObserver;
-@property (nonatomic, readwrite) MGLDownloadableState state;
-@property (nonatomic, readwrite) MGLDownloadableProgress progress;
+@property (nonatomic, readwrite) MGLOfflineTaskState state;
+@property (nonatomic, readwrite) MGLOfflineTaskProgress progress;
 
 @end
 
-@implementation MGLDownloadable
+@implementation MGLOfflineTask
 
 - (instancetype)init {
     [NSException raise:@"Method unavailable"
                 format:
-     @"-[MGLDownloadable init] is unavailable. "
-     @"Use +[MGLDownloadController addDownloadRegion:context:completionHandler:] instead."];
+     @"-[MGLOfflineTask init] is unavailable. "
+     @"Use +[MGLOfflineStorage addTaskForRegion:withContext:completionHandler:] instead."];
     return nil;
 }
 
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region {
     if (self = [super init]) {
         _mbglOfflineRegion = region;
-        _state = MGLDownloadableStateInactive;
+        _state = MGLOfflineTaskStateInactive;
         _mbglOfflineRegionObserver = new MBGLOfflineRegionObserver(self);
         
-        mbgl::DefaultFileSource *mbglFileSource = [[MGLDownloadController sharedController] mbglFileSource];
+        mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(*_mbglOfflineRegionObserver));
     }
     return self;
@@ -45,10 +45,10 @@ class MBGLOfflineRegionObserver;
     _mbglOfflineRegionObserver = nullptr;
 }
 
-- (id <MGLDownloadRegion>)region {
+- (id <MGLOfflineRegion>)region {
     const mbgl::OfflineRegionDefinition &regionDefinition = _mbglOfflineRegion->getDefinition();
-    NSAssert([MGLTilePyramidDownloadRegion conformsToProtocol:@protocol(MGLDownloadRegion_Private)], @"MGLTilePyramidDownloadRegion should conform to MGLDownloadRegion_Private.");
-    return [(id <MGLDownloadRegion_Private>)[MGLTilePyramidDownloadRegion alloc] initWithOfflineRegionDefinition:regionDefinition];
+    NSAssert([MGLTilePyramidOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLTilePyramidOfflineRegion should conform to MGLOfflineRegion_Private.");
+    return [(id <MGLOfflineRegion_Private>)[MGLTilePyramidOfflineRegion alloc] initWithOfflineRegionDefinition:regionDefinition];
 }
 
 - (NSData *)context {
@@ -57,26 +57,26 @@ class MBGLOfflineRegionObserver;
 }
 
 - (void)resume {
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLDownloadController sharedController] mbglFileSource];
+    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
-    self.state = MGLDownloadableStateActive;
+    self.state = MGLOfflineTaskStateActive;
 }
 
 - (void)suspend {
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLDownloadController sharedController] mbglFileSource];
+    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
-    self.state = MGLDownloadableStateInactive;
+    self.state = MGLOfflineTaskStateInactive;
 }
 
 - (void)requestProgress {
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLDownloadController sharedController] mbglFileSource];
+    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     
-    __weak MGLDownloadable *weakSelf = self;
+    __weak MGLOfflineTask *weakSelf = self;
     mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](__unused std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegionStatus> status) {
         if (status) {
             mbgl::OfflineRegionStatus checkedStatus = *status;
             dispatch_async(dispatch_get_main_queue(), ^{
-                MGLDownloadable *strongSelf = weakSelf;
+                MGLOfflineTask *strongSelf = weakSelf;
                 [strongSelf offlineRegionStatusDidChange:checkedStatus];
             });
         }
@@ -86,23 +86,23 @@ class MBGLOfflineRegionObserver;
 - (void)offlineRegionStatusDidChange:(mbgl::OfflineRegionStatus)status {
     switch (status.downloadState) {
         case mbgl::OfflineRegionDownloadState::Inactive:
-            self.state = status.complete() ? MGLDownloadableStateComplete : MGLDownloadableStateInactive;
+            self.state = status.complete() ? MGLOfflineTaskStateComplete : MGLOfflineTaskStateInactive;
             break;
             
         case mbgl::OfflineRegionDownloadState::Active:
-            self.state = MGLDownloadableStateActive;
+            self.state = MGLOfflineTaskStateActive;
             break;
     }
     
-    MGLDownloadableProgress progress;
+    MGLOfflineTaskProgress progress;
     progress.countOfResourcesCompleted = status.completedResourceCount;
     progress.countOfBytesCompleted = status.completedResourceSize;
     progress.countOfResourcesExpected = status.requiredResourceCount;
     progress.maximumResourcesExpected = status.requiredResourceCountIsPrecise ? status.requiredResourceCount : UINT64_MAX;
     self.progress = progress;
     
-    if ([self.delegate respondsToSelector:@selector(downloadable:progressDidChange:)]) {
-        [self.delegate downloadable:self progressDidChange:progress];
+    if ([self.delegate respondsToSelector:@selector(offlineTask:progressDidChange:)]) {
+        [self.delegate offlineTask:self progressDidChange:progress];
     }
 }
 
@@ -131,28 +131,28 @@ NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
 
 void MBGLOfflineRegionObserver::statusChanged(mbgl::OfflineRegionStatus status) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(downloadable, @"MBGLOfflineRegionObserver is dangling without an associated MGLDownloadable.");
+        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
         
-        [downloadable offlineRegionStatusDidChange:status];
+        [offlineTask offlineRegionStatusDidChange:status];
     });
 }
 
 void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(downloadable, @"MBGLOfflineRegionObserver is dangling without an associated MGLDownloadable.");
+        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
         
-        if ([downloadable.delegate respondsToSelector:@selector(downloadable:didReceiveError:)]) {
-            [downloadable.delegate downloadable:downloadable didReceiveError:MGLErrorFromResponseError(error)];
+        if ([offlineTask.delegate respondsToSelector:@selector(offlineTask:didReceiveError:)]) {
+            [offlineTask.delegate offlineTask:offlineTask didReceiveError:MGLErrorFromResponseError(error)];
         }
     });
 }
 
 void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(downloadable, @"MBGLOfflineRegionObserver is dangling without an associated MGLDownloadable.");
+        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
         
-        if ([downloadable.delegate respondsToSelector:@selector(downloadable:didReceiveMaximumAllowedMapboxTiles:)]) {
-            [downloadable.delegate downloadable:downloadable didReceiveMaximumAllowedMapboxTiles:limit];
+        if ([offlineTask.delegate respondsToSelector:@selector(offlineTask:didReceiveMaximumAllowedMapboxTiles:)]) {
+            [offlineTask.delegate offlineTask:offlineTask didReceiveMaximumAllowedMapboxTiles:limit];
         }
     });
 }

@@ -1,14 +1,14 @@
-#import "MGLDownloadController_Private.h"
+#import "MGLOfflineStorage_Private.h"
 
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
-#import "MGLDownloadable_Private.h"
-#import "MGLDownloadRegion_Private.h"
-#import "MGLTilePyramidDownloadRegion.h"
+#import "MGLOfflineTask_Private.h"
+#import "MGLOfflineRegion_Private.h"
+#import "MGLTilePyramidOfflineRegion.h"
 
 #include <mbgl/util/string.hpp>
 
-@interface MGLDownloadController ()
+@interface MGLOfflineStorage ()
 
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
 
@@ -16,15 +16,15 @@
 
 @end
 
-@implementation MGLDownloadController
+@implementation MGLOfflineStorage
 
-+ (instancetype)sharedController {
++ (instancetype)sharedOfflineStorage {
     static dispatch_once_t onceToken;
-    static MGLDownloadController *sharedController;
+    static MGLOfflineStorage *sharedOfflineStorage;
     dispatch_once(&onceToken, ^{
-        sharedController = [[self alloc] initWithFileName:@"offline.db"];
+        sharedOfflineStorage = [[self alloc] initWithFileName:@"offline.db"];
     });
-    return sharedController;
+    return sharedOfflineStorage;
 }
 
 - (instancetype)initWithFileName:(NSString *)fileName {
@@ -76,17 +76,17 @@
     }
 }
 
-- (void)addDownloadableForRegion:(id <MGLDownloadRegion>)downloadRegion withContext:(NSData *)context completionHandler:(MGLDownloadableRegistrationCompletionHandler)completion {
-    if (![downloadRegion conformsToProtocol:@protocol(MGLDownloadRegion_Private)]) {
+- (void)addTaskForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflineTaskRegistrationCompletionHandler)completion {
+    if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
         [NSException raise:@"Unsupported region type" format:
-         @"Regions of type %@ are unsupported.", NSStringFromClass([downloadRegion class])];
+         @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
         return;
     }
     
-    const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLDownloadRegion_Private>)downloadRegion offlineRegionDefinition];
+    const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
-    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegion> region) {
+    self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegion> mbglOfflineRegion) {
         NSError *error;
         if (exception) {
             NSString *errorDescription = @(mbgl::util::toString(exception).c_str());
@@ -95,16 +95,16 @@
             } : nil];
         }
         if (completion) {
-            MGLDownloadable *downloadable = [[MGLDownloadable alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*region))];
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error, downloadable](void) {
-                completion(downloadable, error);
+            MGLOfflineTask *task = [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))];
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, task](void) {
+                completion(task, error);
             });
         }
     });
 }
 
-- (void)removeDownloadable:(MGLDownloadable *)downloadable withCompletionHandler:(MGLDownloadableRemovalCompletionHandler)completion {
-    self.mbglFileSource->deleteOfflineRegion(std::move(*downloadable.mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
+- (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion {
+    self.mbglFileSource->deleteOfflineRegion(std::move(*task.mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
@@ -119,7 +119,7 @@
     });
 }
 
-- (void)requestDownloadablesWithCompletionHandler:(MGLDownloadablesRequestCompletionHandler)completion {
+- (void)getTasksWithCompletionHandler:(MGLOfflineTasksRetrievalCompletionHandler)completion {
     self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
         NSError *error;
         if (exception) {
@@ -127,17 +127,17 @@
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
-        NSMutableArray *downloadables;
+        NSMutableArray *tasks;
         if (regions) {
-            downloadables = [NSMutableArray arrayWithCapacity:regions->size()];
+            tasks = [NSMutableArray arrayWithCapacity:regions->size()];
             for (mbgl::OfflineRegion &region : *regions) {
-                MGLDownloadable *downloadable = [[MGLDownloadable alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
-                [downloadables addObject:downloadable];
+                MGLOfflineTask *task = [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                [tasks addObject:task];
             }
         }
         if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error, downloadables](void) {
-                completion(downloadables, error);
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, tasks](void) {
+                completion(tasks, error);
             });
         }
     });

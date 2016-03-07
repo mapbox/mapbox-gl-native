@@ -1,11 +1,11 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLDownloadRegion.h"
+#import "MGLOfflineRegion.h"
 #import "MGLGeometry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLTilePyramidDownloadRegion : NSObject <MGLDownloadRegion>
+@interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion>
 
 @property (nonatomic, readonly) MGLCoordinateBounds bounds;
 @property (nonatomic, readonly) double minimumZoomLevel;

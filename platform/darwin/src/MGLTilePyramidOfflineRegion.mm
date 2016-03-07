@@ -1,18 +1,18 @@
-#import "MGLTilePyramidDownloadRegion.h"
+#import "MGLTilePyramidOfflineRegion.h"
 
 #if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
     #import <Cocoa/Cocoa.h>
 #endif
 
-#import "MGLDownloadRegion_Private.h"
+#import "MGLOfflineRegion_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLStyle.h"
 
-@interface MGLTilePyramidDownloadRegion () <MGLDownloadRegion_Private>
+@interface MGLTilePyramidOfflineRegion () <MGLOfflineRegion_Private>
 
 @end
 
-@implementation MGLTilePyramidDownloadRegion {
+@implementation MGLTilePyramidOfflineRegion {
     NSURL *_styleURL;
 }
 
@@ -21,7 +21,7 @@
 - (instancetype)init {
     [NSException raise:@"Method unavailable"
                 format:
-     @"-[MGLTilePyramidDownloadRegion init] is unavailable. "
+     @"-[MGLTilePyramidOfflineRegion init] is unavailable. "
      @"Use -initWithStyleURL:bounds:fromZoomLevel:toZoomLevel: instead."];
     return nil;
 }

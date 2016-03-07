@@ -4,7 +4,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MGLDownloadRegion <NSObject>
+@protocol MGLOfflineRegion <NSObject>
 
 @property (nonatomic, readonly) NSURL *styleURL;
 

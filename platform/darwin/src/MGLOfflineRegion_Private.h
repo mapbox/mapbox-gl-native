@@ -1,12 +1,12 @@
 #import <Foundation/Foundation.h>
 
-#import "MGLDownloadRegion.h"
+#import "MGLOfflineRegion.h"
 
 #include <mbgl/storage/offline.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MGLDownloadRegion_Private <MGLDownloadRegion>
+@protocol MGLOfflineRegion_Private <MGLOfflineRegion>
 
 - (instancetype)initWithOfflineRegionDefinition:(const mbgl::OfflineRegionDefinition &)definition;
 
