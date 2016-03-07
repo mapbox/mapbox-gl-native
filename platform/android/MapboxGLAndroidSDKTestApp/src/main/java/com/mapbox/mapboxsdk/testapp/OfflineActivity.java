@@ -300,7 +300,7 @@ public class OfflineActivity extends AppCompatActivity
                         (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) :
                         0.0;
 
-                if (status.isComplete() || percentage >= 98.0 /* Known issue */) {
+                if (status.isComplete()) {
                     // Download complete
                     endProgress("Region downloaded successfully.");
                     return;
