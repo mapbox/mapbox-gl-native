@@ -25,6 +25,14 @@ typedef QList<PointAnnotation> PointAnnotations;
 typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
 typedef QList<ShapeAnnotation> ShapeAnnotations;
 
+enum NetworkMode {
+    Online, // Default
+    Offline,
+};
+
+Q_DECL_EXPORT NetworkMode networkMode();
+Q_DECL_EXPORT void setNetworkMode(NetworkMode);
+
 }
 
 #endif // QMAPBOX_H

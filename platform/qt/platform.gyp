@@ -52,6 +52,7 @@
         'src/http_request.cpp',
         'src/http_request.hpp',
         'src/image.cpp',
+        'src/qmapbox.cpp',
         'src/qmapboxgl.cpp',
         'src/qmapboxgl_p.hpp',
         'src/run_loop.cpp',
