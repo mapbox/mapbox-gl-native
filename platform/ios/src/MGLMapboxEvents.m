@@ -3,7 +3,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import "MGLAccountManager.h"
 #import "NSProcessInfo+MGLAdditions.h"
-#import "NSBundle+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
 #import "MGLAPIClient.h"
 #import "MGLLocationManager.h"
@@ -167,7 +166,6 @@ const NSTimeInterval MGLFlushInterval = 180;
         _locationManager.delegate = self;
         _paused = YES;
         [self resumeMetricsCollection];
-        NSBundle *resourceBundle = [NSBundle mgl_frameworkBundle];
 
         // Events Control
         _eventQueue = [[NSMutableArray alloc] init];

@@ -3828,7 +3828,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
     NSBundle *bundle = [NSBundle mgl_frameworkBundle];
     NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
-                                      ofType:extension];
+                                      ofType:extension
+                                 inDirectory:bundle.mgl_resourcesDirectory];
     if ( ! path)
     {
         [NSException raise:@"Resource not found" format:

@@ -55,6 +55,7 @@ ipackage: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DE
 ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO ./platform/ios/scripts/package.sh
 ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
 iframework: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
+ifabric: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES ./platform/ios/scripts/package.sh
 itest: ipackage-sim ; ./platform/ios/scripts/test.sh
 idocument: ; OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 

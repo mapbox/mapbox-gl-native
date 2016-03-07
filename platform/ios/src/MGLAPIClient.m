@@ -107,8 +107,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 }
 
 - (void)loadCertificate:(NSData **)certificate withResource:(NSString *)resource {
-    NSBundle *resourceBundle = [NSBundle mgl_frameworkBundle];
-    NSString *cerPath = [resourceBundle pathForResource:resource ofType:@"der"];
+    NSBundle *frameworkBundle = [NSBundle mgl_frameworkBundle];
+    NSString *cerPath = [frameworkBundle pathForResource:resource ofType:@"der" inDirectory:frameworkBundle.mgl_resourcesDirectory];
     if (cerPath != nil) {
         *certificate = [NSData dataWithContentsOfFile:cerPath];
     }
@@ -118,8 +118,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSString *appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
-    NSString *semanticVersion = [NSBundle mgl_frameworkBundle].infoDictionary[@"MGLSemanticVersionString"];
-    NSString *shortVersion = [NSBundle mgl_frameworkBundle].infoDictionary[@"CFBundleShortVersionString"];
+    NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
+    NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
     NSString *sdkVersion = semanticVersion ? semanticVersion : shortVersion;
     _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@/%@", appName, appVersion, appBuildNumber, MGLAPIClientUserAgentBase, sdkVersion];
 }

@@ -21,13 +21,19 @@ elif [[ ${FORMAT} == "dynamic" ]]; then
     BUILD_STATIC=false
 fi
 
+BUNDLE_RESOURCES=${BUNDLE_RESOURCES:-}
+BUNDLE_PATH=
+if [[ ${BUNDLE_RESOURCES} ]]; then
+    BUNDLE_PATH="/${NAME}.bundle"
+fi
+
 SDK=iphonesimulator
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     SDK=iphoneos
 fi
 IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
-echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${GCC_GENERATE_DEBUGGING_SYMBOLS}; Bitcode: ${ENABLE_BITCODE}"
+echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${GCC_GENERATE_DEBUGGING_SYMBOLS}; Bitcode: ${ENABLE_BITCODE}; Mapbox.bundle: ${BUNDLE_RESOURCES}"
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -188,25 +194,35 @@ if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     mkdir -p "${OUTPUT}/static/${NAME}.framework/Headers"
     cp -pv platform/{darwin,ios}/include/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
-    cat ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
+    cat platform/ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
     cat platform/ios/framework/Mapbox.h >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
 fi
 
 step "Copying library resources…"
 SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
-cp -pv LICENSE.md "${OUTPUT}"
-cp -rv platform/ios/app/Settings.bundle "${OUTPUT}"
+if [[ ${BUNDLE_RESOURCES} ]]; then
+    cp -pv LICENSE.md "${OUTPUT}/static/${NAME}.framework"
+    cp -rv platform/ios/app/Settings.bundle "${OUTPUT}/static/${NAME}.framework"
+else
+    cp -pv LICENSE.md "${OUTPUT}"
+    cp -rv platform/ios/app/Settings.bundle "${OUTPUT}"
+fi
 if [[ ${BUILD_STATIC} == true ]]; then
-    cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.framework"
-    cp -pv platform/ios/framework/Info.plist "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace CFBundleExecutable -string ${NAME} "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace CFBundleIdentifier -string com.mapbox.sdk.ios "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace CFBundleName -string ${NAME} "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace CFBundleVersion -string ${PROJ_VERSION} "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace MGLSemanticVersionString -string "${SEM_VERSION}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
-    plutil -replace MGLCommitHash -string "${HASH}" "${OUTPUT}/static/${NAME}.framework/Info.plist"
+    mkdir -p "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}"
+    cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}"
+    INFO_PLIST_PATH="${OUTPUT}/static/${NAME}.framework/Info.plist"
+    cp -pv platform/ios/framework/Info.plist "${INFO_PLIST_PATH}"
+    plutil -replace CFBundleExecutable -string ${NAME} "${INFO_PLIST_PATH}"
+    plutil -replace CFBundleIdentifier -string com.mapbox.sdk.ios "${INFO_PLIST_PATH}"
+    plutil -replace CFBundleName -string ${NAME} "${INFO_PLIST_PATH}"
+    plutil -replace CFBundleShortVersionString -string "${SHORT_VERSION}" "${INFO_PLIST_PATH}"
+    plutil -replace CFBundleVersion -string ${PROJ_VERSION} "${INFO_PLIST_PATH}"
+    plutil -replace MGLSemanticVersionString -string "${SEM_VERSION}" "${INFO_PLIST_PATH}"
+    plutil -replace MGLCommitHash -string "${HASH}" "${INFO_PLIST_PATH}"
+    if [[ ${BUNDLE_RESOURCES} ]]; then
+        cp -pv "${INFO_PLIST_PATH}" "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}/Info.plist"
+    fi
     mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
     cp -pv platform/ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
 fi
