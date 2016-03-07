@@ -7,6 +7,13 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/string.hpp>
 
+#define MGLAssertOfflineTaskIsValid() \
+    [NSException raise:@"Invalid offline task" \
+                format: \
+     @"-[MGLOfflineStorage removeTask:withCompletionHandler:] has been called " \
+     @"on this instance of MGLOfflineTask, rendering it invalid. It is an " \
+     @"error to send any message to this task."]
+
 class MBGLOfflineRegionObserver;
 
 @interface MGLOfflineTask ()
@@ -46,29 +53,45 @@ class MBGLOfflineRegionObserver;
 }
 
 - (id <MGLOfflineRegion>)region {
+    MGLAssertOfflineTaskIsValid();
+    
     const mbgl::OfflineRegionDefinition &regionDefinition = _mbglOfflineRegion->getDefinition();
     NSAssert([MGLTilePyramidOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLTilePyramidOfflineRegion should conform to MGLOfflineRegion_Private.");
     return [(id <MGLOfflineRegion_Private>)[MGLTilePyramidOfflineRegion alloc] initWithOfflineRegionDefinition:regionDefinition];
 }
 
 - (NSData *)context {
+    MGLAssertOfflineTaskIsValid();
+    
     const mbgl::OfflineRegionMetadata &metadata = _mbglOfflineRegion->getMetadata();
     return [NSData dataWithBytes:&metadata[0] length:metadata.size()];
 }
 
 - (void)resume {
+    MGLAssertOfflineTaskIsValid();
+    
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
     self.state = MGLOfflineTaskStateActive;
 }
 
 - (void)suspend {
+    MGLAssertOfflineTaskIsValid();
+    
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
     self.state = MGLOfflineTaskStateInactive;
 }
 
+- (void)invalidate {
+    MGLAssertOfflineTaskIsValid();
+    
+    self.state = MGLOfflineTaskStateInvalid;
+}
+
 - (void)requestProgress {
+    MGLAssertOfflineTaskIsValid();
+    
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     
     __weak MGLOfflineTask *weakSelf = self;
@@ -84,6 +107,8 @@ class MBGLOfflineRegionObserver;
 }
 
 - (void)offlineRegionStatusDidChange:(mbgl::OfflineRegionStatus)status {
+    MGLAssertOfflineTaskIsValid();
+    
     switch (status.downloadState) {
         case mbgl::OfflineRegionDownloadState::Inactive:
             self.state = status.complete() ? MGLOfflineTaskStateComplete : MGLOfflineTaskStateInactive;

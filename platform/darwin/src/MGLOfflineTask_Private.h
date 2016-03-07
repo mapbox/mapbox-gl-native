@@ -11,6 +11,8 @@ class MBGLOfflineRegionObserver;
 
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region;
 
+- (void)invalidate;
+
 @end
 
 class MBGLOfflineRegionObserver : public mbgl::OfflineRegionObserver {

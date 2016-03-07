@@ -147,6 +147,10 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
             statusString = [NSString stringWithFormat:@"Downloading %@ of %@ resources (%@ so far)…",
                             completedString, expectedString, byteCountString];
             break;
+            
+        case MGLOfflineTaskStateInvalid:
+            NSAssert(NO, @"Invalid offline task at index path %@", indexPath);
+            break;
     }
     cell.detailTextLabel.text = statusString;
     
@@ -187,6 +191,10 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
         case MGLOfflineTaskStateActive:
             [task suspend];
             [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            break;
+            
+        case MGLOfflineTaskStateInvalid:
+            NSAssert(NO, @"Invalid offline task at index path %@", indexPath);
             break;
     }
 }

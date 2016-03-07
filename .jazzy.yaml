@@ -37,6 +37,18 @@ custom_categories:
       - MGLOverlay
       - MGLShape
       - MGLUserLocation
+  - name: Offline Viewing
+    children:
+      - MGLOfflineRegion
+      - MGLOfflineStorage
+      - MGLOfflineTask
+      - MGLOfflineTaskAdditionCompletionHandler
+      - MGLOfflineTaskDelegate
+      - MGLOfflineTaskListingCompletionHandler
+      - MGLOfflineTaskProgress
+      - MGLOfflineTaskRemovalCompletionHandler
+      - MGLOfflineTaskState
+      - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
       - MGLCoordinateBounds

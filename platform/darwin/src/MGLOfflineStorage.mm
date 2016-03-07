@@ -76,7 +76,7 @@
     }
 }
 
-- (void)addTaskForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflineTaskRegistrationCompletionHandler)completion {
+- (void)addTaskForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflineTaskAdditionCompletionHandler)completion {
     if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
         [NSException raise:@"Unsupported region type" format:
          @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
@@ -95,7 +95,7 @@
             } : nil];
         }
         if (completion) {
-            MGLOfflineTask *task = [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))];
+            MGLOfflineTask *task = mbglOfflineRegion ? [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))] : nil;
             dispatch_async(dispatch_get_main_queue(), [&, completion, error, task](void) {
                 completion(task, error);
             });
@@ -104,7 +104,7 @@
 }
 
 - (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion {
-    self.mbglFileSource->deleteOfflineRegion(std::move(*task.mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
+    self.mbglFileSource->deleteOfflineRegion(std::move(*task.mbglOfflineRegion), [&, task, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
@@ -112,14 +112,15 @@
             }];
         }
         if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
+            dispatch_async(dispatch_get_main_queue(), [&, task, completion, error](void) {
+                [task invalidate];
                 completion(error);
             });
         }
     });
 }
 
-- (void)getTasksWithCompletionHandler:(MGLOfflineTasksRetrievalCompletionHandler)completion {
+- (void)getTasksWithCompletionHandler:(MGLOfflineTaskListingCompletionHandler)completion {
     self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
         NSError *error;
         if (exception) {
