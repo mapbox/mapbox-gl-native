@@ -23,21 +23,25 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
-import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.testapp.offline.DownloadRegionDialog;
-import com.mapbox.mapboxsdk.testapp.offline.CustomMetadata;
 import com.mapbox.mapboxsdk.testapp.offline.ListRegionsDialog;
 import com.mapbox.mapboxsdk.utils.ApiAccess;
 
-import java.io.UnsupportedEncodingException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class OfflineActivity extends AppCompatActivity
         implements DownloadRegionDialog.DownloadRegionDialogListener {
 
     private final static String LOG_TAG = "OfflineActivity";
+
+    // JSON encoding/decoding
+    public final static String JSON_CHARSET = "UTF-8";
+    public final static String JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME";
 
     /*
      * UI elements
@@ -220,9 +224,11 @@ public class OfflineActivity extends AppCompatActivity
                 String regionName;
 
                 try {
-                    CustomMetadata customMetadata = CustomMetadata.decode(offlineRegion.getMetadata());
-                    regionName = customMetadata.getRegionName();
-                } catch (UnsupportedEncodingException e) {
+                    byte[] metadata = offlineRegion.getMetadata();
+                    String json = new String(metadata, JSON_CHARSET);
+                    JSONObject jsonObject = new JSONObject(json);
+                    regionName = jsonObject.getString(JSON_FIELD_REGION_NAME);
+                } catch (Exception e) {
                     Log.e(LOG_TAG, "Failed to decode metadata: " + e.getMessage());
                     regionName = "Region " + offlineRegion.getID();
                 }
@@ -256,12 +262,14 @@ public class OfflineActivity extends AppCompatActivity
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
                 styleURL, bounds, minZoom, maxZoom, pixelRatio);
 
-        // Sample way of encoding metadata
+        // Sample way of encoding metadata from a JSONObject
         byte[] metadata;
         try {
-            CustomMetadata customMetadata = new CustomMetadata(regionName);
-            metadata = customMetadata.encode();
-        } catch (UnsupportedEncodingException e) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
+            String json = jsonObject.toString();
+            metadata = json.getBytes(JSON_CHARSET);
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to encode metadata: " + e.getMessage());
             metadata = null;
         }
