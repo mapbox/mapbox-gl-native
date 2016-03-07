@@ -23,7 +23,7 @@ public:
     }
 
     static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& point) {
-        return fromLatLng(state, zoom, state.screenCoordinateToLatLng(point, LatLng::Unwrapped));
+        return fromLatLng(state, zoom, state.screenCoordinateToLatLng(point));
     }
 };
 

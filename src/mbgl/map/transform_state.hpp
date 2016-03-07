@@ -37,7 +37,7 @@ public:
     ConstrainMode getConstrainMode() const;
 
     // Position
-    LatLng getLatLng(LatLng::WrapMode = LatLng::Wrapped) const;
+    LatLng getLatLng(LatLng::WrapMode = LatLng::Unwrapped) const;
     double pixel_x() const;
     double pixel_y() const;
 
@@ -65,7 +65,7 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
-    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Wrapped) const;
+    LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
 
     double xLng(double x, double worldSize) const;
     double yLat(double y, double worldSize) const;

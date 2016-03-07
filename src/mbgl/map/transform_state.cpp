@@ -89,38 +89,11 @@ ConstrainMode TransformState::getConstrainMode() const {
 #pragma mark - Position
 
 LatLng TransformState::getLatLng(LatLng::WrapMode wrapMode) const {
-    LatLng ll {
+    return {
         util::RAD2DEG * (2 * std::atan(std::exp(y / Cc)) - 0.5 * M_PI),
         -x / Bc,
         wrapMode
     };
-
-    if (wrapMode == LatLng::Unwrapped) return ll;
-
-    // adjust for date line
-    double w = worldSize() / 2;
-    double x_ = x;
-    if (x_ > w) {
-        while (x_ > w) {
-            x_ -= w;
-            if (ll.longitude < 0) {
-                ll.longitude += util::LONGITUDE_MAX;
-            } else if (ll.longitude > 0) {
-                ll.longitude -= util::LONGITUDE_MAX;
-            }
-        }
-    } else if (x_ < -w) {
-        while (x_ < -w) {
-            x_ += w;
-            if (ll.longitude < 0) {
-                ll.longitude -= util::LONGITUDE_MAX;
-            } else if (ll.longitude > 0) {
-                ll.longitude -= util::LONGITUDE_MAX;
-            }
-        }
-    }
-
-    return ll;
 }
 
 double TransformState::pixel_x() const {
@@ -350,7 +323,7 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
 
     auto centerCoord = latLngToTileCoord(getLatLng(LatLng::Unwrapped));
     auto latLngCoord = latLngToTileCoord(latLng);
-    auto anchorCoord = latLngToTileCoord(screenCoordinateToLatLng(anchor, LatLng::Unwrapped));
+    auto anchorCoord = latLngToTileCoord(screenCoordinateToLatLng(anchor));
     setLatLngZoom(tileCoordToLatLng(centerCoord + latLngCoord - anchorCoord), getZoom());
 }
 

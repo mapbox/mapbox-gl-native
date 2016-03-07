@@ -158,13 +158,17 @@ TEST(Transform, UnwrappedLatLng) {
     ASSERT_NEAR(fromScreenCoordinate.latitude,   37.999999999999829, 0.0001); // 1.71E-13
     ASSERT_NEAR(fromScreenCoordinate.longitude, -76.999999999999773, 0.0001); // 2.27E-13
 
-    LatLng wrappedForwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, 283, LatLng::Wrapped }));
+    LatLng wrappedForwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, 283 }));
     ASSERT_NEAR(wrappedForwards.latitude, 37.999999999999716, 0.0001); // 2.84E-13
-    ASSERT_DOUBLE_EQ(wrappedForwards.longitude, fromScreenCoordinate.longitude);
+    ASSERT_NEAR(wrappedForwards.longitude, 282.99999999988751, 0.0001); // 1.1249E-11
+    wrappedForwards.wrap();
+    ASSERT_NEAR(wrappedForwards.longitude, -77.000000000112493, 0.001); // 1.1249E-11
 
-    LatLng wrappedBackwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, -437, LatLng::Wrapped }));
-    ASSERT_DOUBLE_EQ(wrappedBackwards.latitude, wrappedForwards.latitude);
-    ASSERT_DOUBLE_EQ(wrappedBackwards.longitude, fromScreenCoordinate.longitude);
+    LatLng wrappedBackwards = state.screenCoordinateToLatLng(state.latLngToScreenCoordinate({ 38, -437 }));
+    ASSERT_NEAR(wrappedBackwards.latitude, wrappedForwards.latitude, 0.001);
+    ASSERT_NEAR(wrappedBackwards.longitude, -436.99999999988728, 0.001); // 1.1272E-11
+    wrappedBackwards.wrap();
+    ASSERT_NEAR(wrappedBackwards.longitude, -76.99999999988728, 0.001); // 1.1272E-11
 }
 
 TEST(Transform, ConstrainHeightOnly) {

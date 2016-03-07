@@ -95,12 +95,17 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     if (camera.padding) {
         padding = *camera.padding;
     }
-    const LatLng startLatLng = getLatLng(padding);
+
+    LatLng startLatLng = getLatLng(padding);
+    startLatLng.unwrapForShortestPath(latLng);
+
+    // Make sure the end coordinate always remains valid.
+    latLng.wrap();
+
     const ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
-    latLng.unwrapForShortestPath(getLatLng());
     const ScreenCoordinate endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
@@ -136,7 +141,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         ScreenCoordinate framePoint = util::interpolate(startPoint, endPoint, t);
         LatLng frameLatLng = {
             state.yLat(framePoint.y, startWorldSize),
-            state.xLng(framePoint.x, startWorldSize),
+            state.xLng(framePoint.x, startWorldSize)
         };
         double frameScale = util::interpolate(startScale, scale, t);
         state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
@@ -178,12 +183,17 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     if (camera.padding) {
         padding = *camera.padding;
     }
-    const LatLng startLatLng = getLatLng(padding);
+
+    LatLng startLatLng = getLatLng(padding);
+    startLatLng.unwrapForShortestPath(latLng);
+
+    // Make sure the end coordinate always remains valid.
+    latLng.wrap();
+
     const ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
         state.latY(startLatLng.latitude),
     };
-    latLng.unwrapForShortestPath(getLatLng());
     const ScreenCoordinate endPoint = {
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),

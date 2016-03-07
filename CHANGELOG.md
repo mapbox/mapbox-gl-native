@@ -51,6 +51,7 @@ Known issues:
 
 ## iOS master
 
+- Fixed a bounce-back effect when panning the map. ([#4214](https://github.com/mapbox/mapbox-gl-native/pull/4214))
 - An icon laid out along a line no longer appears if it would extend past the end of the line. Some one-way arrows no longer point the wrong way. ([#3839](https://github.com/mapbox/mapbox-gl-native/pull/3839))
 - Reduce slanted segments in dashed lines near corners. ([#3914](https://github.com/mapbox/mapbox-gl-native/pull/3914))
 - Telemetry location gathering now only occurs when the device is in motion. ([#4115](https://github.com/mapbox/mapbox-gl-native/pull/4115))

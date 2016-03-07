@@ -105,6 +105,34 @@ TEST(LatLng, FromTileID) {
     }
 }
 
+TEST(LatLng, Boundaries) {
+    LatLng coordinate;
+    ASSERT_DOUBLE_EQ(0, coordinate.latitude);
+    ASSERT_DOUBLE_EQ(0, coordinate.longitude);
+
+    coordinate.longitude = -180.1;
+    ASSERT_DOUBLE_EQ(-180.1, coordinate.longitude);
+
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(179.90000000000001, coordinate.longitude); // 1E-14
+
+    coordinate.longitude = 180.9;
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(-179.09999999999999, coordinate.longitude);
+
+    coordinate.longitude = -360.5;
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(-0.5, coordinate.longitude);
+
+    coordinate.longitude = 360.5;
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude);
+
+    coordinate.longitude = 360000.5;
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(0.5, coordinate.longitude);
+}
+
 TEST(LatLngBounds, FromTileID) {
     {
         const LatLngBounds bounds{ TileID(0, 0, 0, 0) };
