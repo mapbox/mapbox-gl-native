@@ -505,6 +505,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return filePath;
 }
 
+- (IBAction)unwindToMapViewController:(__unused UIStoryboardSegue *)sender {
+}
+
 #pragma mark - Destruction
 
 - (void)dealloc

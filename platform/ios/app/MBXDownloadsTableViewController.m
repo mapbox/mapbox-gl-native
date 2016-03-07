@@ -19,6 +19,15 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 
 @end
 
+@implementation MGLTilePyramidOfflineRegion (MBXAdditions)
+
+- (void)applyToMapView:(MGLMapView *)mapView {
+    mapView.styleURL = self.styleURL;
+    [mapView setVisibleCoordinateBounds:self.bounds];
+}
+
+@end
+
 @interface MBXDownloadsTableViewController () <MGLOfflineTaskDelegate>
 
 @property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLOfflineTask *) *offlineTasks;
@@ -118,9 +127,13 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
     NSString *statusString;
     switch (task.state) {
         case MGLOfflineTaskStateInactive:
-        case MGLOfflineTaskStateComplete:
             statusString = [NSString stringWithFormat:@"%@ of %@ resources (%@)",
                             completedString, expectedString, byteCountString];
+            break;
+            
+        case MGLOfflineTaskStateComplete:
+            statusString = [NSString stringWithFormat:@"%@ resources (%@)",
+                            completedString, byteCountString];
             break;
             
         case MGLOfflineTaskStateActive:
@@ -149,6 +162,32 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
             [strongSelf.offlineTasks removeObjectAtIndex:indexPath.row];
             [strongSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         }];
+    }
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    MGLOfflineTask *task = self.offlineTasks[indexPath.row];
+    switch (task.state) {
+        case MGLOfflineTaskStateComplete:
+            if ([task.region respondsToSelector:@selector(applyToMapView:)]) {
+                [task.region performSelector:@selector(applyToMapView:) withObject:self.mapView];
+            }
+            [self performSegueWithIdentifier:@"ReturnToMap" sender:self];
+            break;
+            
+        case MGLOfflineTaskStateInactive:
+            [task resume];
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            break;
+            
+        case MGLOfflineTaskStateActive:
+            [task suspend];
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            break;
     }
 }
 

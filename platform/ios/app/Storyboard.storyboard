@@ -148,8 +148,12 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <segue destination="x2D-ga-sM5" kind="unwind" identifier="ReturnToMap" unwindAction="unwindToMapViewController:" id="6MZ-Ed-tu2"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dga-Vh-IxZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="x2D-ga-sM5" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2075" y="350"/>
         </scene>
