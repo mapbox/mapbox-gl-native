@@ -92,7 +92,7 @@ typedef std::map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotationContextMap
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
-                                                             ofType:@"pdf"];
+                                                              ofType:@"pdf"];
     return [[NSImage alloc] initWithContentsOfFile:path];
 }
 

@@ -73,11 +73,11 @@
 #pragma mark - Fabric
 
 + (NSString *)bundleIdentifier {
-    return [NSBundle mgl_frameworkBundle].bundleIdentifier;
+    return [NSBundle mgl_frameworkBundleIdentifier];
 }
 
 + (NSString *)kitDisplayVersion {
-    return [NSBundle mgl_frameworkBundle].infoDictionary[@"CFBundleShortVersionString"];
+    return [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
 }
 
 + (void)initializeIfNeeded {

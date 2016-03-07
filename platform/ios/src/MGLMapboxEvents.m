@@ -220,20 +220,20 @@ const NSTimeInterval MGLFlushInterval = 60;
 
         _paused = YES;
         [self resumeMetricsCollection];
-        NSBundle *resourceBundle = [NSBundle mgl_frameworkBundle];
+        NSBundle *frameworkBundle = [NSBundle mgl_frameworkBundle];
 
         // Load Local Copy of Server's Public Key
         NSString *cerPath = nil;
-        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-geotrust" ofType:@"der"];
+        cerPath = [frameworkBundle pathForResource:@"api_mapbox_com-geotrust" ofType:@"der" inDirectory:frameworkBundle.mgl_resourcesDirectory];
         if (cerPath != nil) {
             _geoTrustCert = [NSData dataWithContentsOfFile:cerPath];
         }
 
-        cerPath = [resourceBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der"];
+        cerPath = [frameworkBundle pathForResource:@"api_mapbox_com-digicert" ofType:@"der" inDirectory:frameworkBundle.mgl_resourcesDirectory];
         if (cerPath != nil) {
             _digicertCert = [NSData dataWithContentsOfFile:cerPath];
         }
-        cerPath = [resourceBundle pathForResource:@"star_tilestream_net" ofType:@"der"];
+        cerPath = [frameworkBundle pathForResource:@"star_tilestream_net" ofType:@"der" inDirectory:frameworkBundle.mgl_resourcesDirectory];
         if (cerPath != nil) {
             _testServerCert = [NSData dataWithContentsOfFile:cerPath];
         }
