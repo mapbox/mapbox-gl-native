@@ -175,6 +175,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                                                  : @"Show Custom Style Layer"),
                                                                 @"Print Telemetry Logfile",
                                                                 @"Delete Telemetry Logfile",
+                            @"test",
                                                                 nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
@@ -325,6 +326,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                 NSLog(@"Error deleting telemetry log: %@", error.localizedDescription);
             }
         }
+    }
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 16)
+    {
+        self.mapView.contentInset = UIEdgeInsetsMake(64.0, 0.0, 0.0, 50.0);
     }
 }
 

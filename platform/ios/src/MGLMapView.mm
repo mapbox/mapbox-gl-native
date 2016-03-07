@@ -156,6 +156,7 @@ public:
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
 @property (nonatomic, readwrite) UIImageView *compassView;
+@property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *compassViewConstraints;
 @property (nonatomic, readwrite) UIImageView *logoView;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
@@ -374,10 +375,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
-    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
-    [container addSubview:_compassView];
-    container.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:container];
+    _compassView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:_compassView];
+    _compassViewConstraints = [NSMutableArray array];
 
     // setup interaction
     //
@@ -542,6 +542,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [EAGLContext setCurrentContext:nil];
     }
 
+    [self.compassViewConstraints removeAllObjects];
+    self.compassViewConstraints = nil;
     [self.logoViewConstraints removeAllObjects];
     self.logoViewConstraints = nil;
     [self.attributionButtonConstraints removeAllObjects];
@@ -623,41 +625,40 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // compass
     //
-    UIView *compassContainer = self.compassView.superview;
-    [compassContainer removeConstraints:compassContainer.constraints];
+    [constraintParentView removeConstraints:self.compassViewConstraints];
+    [self.compassViewConstraints removeAllObjects];
 
-    NSMutableArray *compassContainerConstraints = [NSMutableArray array];
     if (viewController)
     {
-        [compassContainerConstraints addObject:
-         [NSLayoutConstraint constraintWithItem:compassContainer
+        [self.compassViewConstraints addObject:
+         [NSLayoutConstraint constraintWithItem:self.compassView
                                       attribute:NSLayoutAttributeTop
                                       relatedBy:NSLayoutRelationGreaterThanOrEqual
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1
-                                       constant:5]];
+                                       constant:self.contentInset.top + 5]];
     }
-    [compassContainerConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+    [self.compassViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeTop
                                   relatedBy:NSLayoutRelationGreaterThanOrEqual
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1
-                                   constant:5]];
+                                   constant:self.contentInset.top + 5]];
 
-    [compassContainerConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:self
+    [self.compassViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeTrailing
                                   relatedBy:NSLayoutRelationEqual
-                                     toItem:compassContainer
+                                     toItem:self
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:5]];
+                                   constant:-(self.contentInset.right + 5)]];
 
-    [compassContainerConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+    [self.compassViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeWidth
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:nil
@@ -665,15 +666,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                  multiplier:1
                                    constant:self.compassView.image.size.width]];
 
-    [compassContainerConstraints addObject:
-     [NSLayoutConstraint constraintWithItem:compassContainer
+    [self.compassViewConstraints addObject:
+     [NSLayoutConstraint constraintWithItem:self.compassView
                                   attribute:NSLayoutAttributeHeight
                                   relatedBy:NSLayoutRelationEqual
                                      toItem:nil
                                   attribute:NSLayoutAttributeNotAnAttribute
                                  multiplier:1
                                    constant:self.compassView.image.size.height]];
-    [constraintParentView addConstraints:compassContainerConstraints];
+    [constraintParentView addConstraints:self.compassViewConstraints];
 
     // logo bug
     //
@@ -865,6 +866,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self didUpdateLocationWithUserTrackingAnimated:animated];
     }
+    
+    [self updateConstraints];
 }
 
 /// Returns the frame of inset content within the map view.
