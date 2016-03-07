@@ -14,8 +14,8 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
 
     mbgl::ScreenCoordinate projected = point.position.project();
     projected *= 1 << tileID.z;
-    projected.x -= int16_t(projected.x);
-    projected.y -= int16_t(projected.y);
+    projected.x = std::fmod(projected.x, 1);
+    projected.y = std::fmod(projected.y, 1);
     projected *= GeometryTileFeature::defaultExtent;
 
     layer.features.emplace_back(
