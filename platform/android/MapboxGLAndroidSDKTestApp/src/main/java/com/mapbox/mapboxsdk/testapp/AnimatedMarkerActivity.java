@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
 
-    private MapboxMap mMapboxMap;
     private MapView mMapView;
 
     @Override
@@ -46,13 +45,11 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mMapboxMap = mapboxMap;
-
                 LatLng brussels = new LatLng(50.900446, 4.485251);
                 LatLng washington = new LatLng(38.897108, -77.036716);
 
                 final Marker marker = mapboxMap.addMarker(new MarkerOptions().position(brussels));
-                ValueAnimator markerAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), new LatLng[]{brussels, washington});
+                ValueAnimator markerAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), (Object[]) new LatLng[]{brussels, washington});
                 markerAnimator.setDuration(5000);
                 markerAnimator.setRepeatCount(ValueAnimator.INFINITE);
                 markerAnimator.setRepeatMode(ValueAnimator.REVERSE);
