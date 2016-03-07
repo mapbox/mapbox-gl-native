@@ -624,7 +624,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.i(TAG, "response code = " + response.code() + " for events " + events.size());
+                Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
                 // Reset Events
                 // ============
