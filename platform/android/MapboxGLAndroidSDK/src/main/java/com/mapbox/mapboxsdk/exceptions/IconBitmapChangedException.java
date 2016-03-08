@@ -20,8 +20,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 public class IconBitmapChangedException extends RuntimeException {
 
     public IconBitmapChangedException() {
-        super("The added Marker has a Icon with a Bitmap that has been modified. You cannot modufy" +
-                "a Icon after it has been added in a Marker.");
+        super("The added Marker has an Icon with a bitmap that has been modified. An Icon cannot be modified" +
+                "after it has been added to the map in a Marker.");
     }
 
 }
