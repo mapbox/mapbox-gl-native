@@ -423,7 +423,7 @@ ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const
 #pragma mark - Zoom
 
 void Transform::scaleBy(double ds, const ScreenCoordinate& center, const Duration& duration) {
-    if (std::isnan(ds)) {
+    if (std::isnan(ds) || !center) {
         return;
     }
 
@@ -463,10 +463,12 @@ void Transform::setScale(double scale, const EdgeInsets& padding, const Duration
 }
 
 void Transform::setMinZoom(const double minZoom) {
+    if (std::isnan(minZoom)) return;
     state.setMinZoom(minZoom);
 }
 
 void Transform::setMaxZoom(const double maxZoom) {
+    if (std::isnan(maxZoom)) return;
     state.setMaxZoom(maxZoom);
 }
 
@@ -657,12 +659,14 @@ void Transform::setGestureInProgress(bool inProgress) {
 #pragma mark Conversion and projection
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
+    if (!latLng) return {};
     ScreenCoordinate point = state.latLngToScreenCoordinate(latLng);
     point.y = state.height - point.y;
     return point;
 }
 
 LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point) const {
+    if (!point) return {};
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.height - flippedPoint.y;
     return state.screenCoordinateToLatLng(flippedPoint);
