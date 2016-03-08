@@ -26,8 +26,8 @@ public:
         return ((std::pow(2, z) * y + x) * 32) + z;
     }
 
-    float overscaling() const {
-        return std::pow(2, z - sourceZ);
+    uint32_t overscaleFactor() const {
+        return static_cast<uint32_t>(1) << (z - sourceZ);
     }
 
     bool operator==(const TileID& rhs) const {

@@ -56,7 +56,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
 
 
-SymbolBucket::SymbolBucket(float overscaling_, float zoom_, const MapMode mode_)
+SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_)
     : overscaling(overscaling_),
       zoom(zoom_),
       tileSize(util::tileSize * overscaling_),

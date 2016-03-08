@@ -13,7 +13,7 @@
 
 using namespace mbgl;
 
-LineBucket::LineBucket(float overscaling_) : overscaling(overscaling_) {
+LineBucket::LineBucket(uint32_t overscaling_) : overscaling(overscaling_) {
 }
 
 LineBucket::~LineBucket() {

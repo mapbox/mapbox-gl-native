@@ -67,7 +67,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(float overscaling, float zoom, const MapMode);
+    SymbolBucket(uint32_t overscaling, float zoom, const MapMode);
     ~SymbolBucket() override;
 
     void upload(gl::GLObjectStore&) override;
@@ -117,7 +117,7 @@ private:
 
     const float overscaling;
     const float zoom;
-    const float tileSize;
+    const uint32_t tileSize;
     const float tilePixelRatio;
     const MapMode mode;
 

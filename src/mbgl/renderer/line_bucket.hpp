@@ -24,7 +24,7 @@ class LineBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    LineBucket(float overscaling);
+    LineBucket(uint32_t overscaling);
     ~LineBucket() override;
 
     void upload(gl::GLObjectStore&) override;
@@ -63,7 +63,7 @@ private:
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
 
-    const float overscaling;
+    const uint32_t overscaling;
 };
 
 } // namespace mbgl

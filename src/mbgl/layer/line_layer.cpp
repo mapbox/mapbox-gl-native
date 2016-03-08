@@ -69,7 +69,7 @@ bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
 }
 
 std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameters) const {
-    auto bucket = std::make_unique<LineBucket>(parameters.tileID.overscaling());
+    auto bucket = std::make_unique<LineBucket>(parameters.tileID.overscaleFactor());
 
     bucket->layout = layout;
 
