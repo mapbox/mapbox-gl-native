@@ -1505,7 +1505,6 @@ public class MapView extends FrameLayout {
                     if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
-                        trackGestureEvent(MapboxEvent.GESTURE_QUICK_ZOOM, e.getX(), e.getY());
                     } else {
                         // Zoom in on user location view
                         PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
@@ -1752,6 +1751,7 @@ public class MapView extends FrameLayout {
                     PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
                     mNativeMapView.scaleBy(detector.getScaleFactor(), centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
                 }
+                trackGestureEvent(MapboxEvent.GESTURE_QUICK_ZOOM, detector.getFocusX(), detector.getFocusY());
             }
             return true;
         }
