@@ -1,5 +1,6 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
@@ -39,7 +40,7 @@ public:
                 callback(*offlineResponse);
             }
 
-            if (!impl->offline) {
+            if (NetworkStatus::Get() == NetworkStatus::Status::Online) {
                 onlineRequest = impl->onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
                     impl->offlineDatabase.put(revalidation, onlineResponse);
                     callback(onlineResponse);
@@ -121,10 +122,6 @@ public:
         offlineDatabase.put(resource, response);
     }
 
-    void goOffline() {
-        offline = true;
-    }
-
 private:
     OfflineDownload& getDownload(int64_t regionID) {
         auto it = downloads.find(regionID);
@@ -139,7 +136,6 @@ private:
     OnlineFileSource onlineFileSource;
     std::unordered_map<FileRequest*, std::unique_ptr<Task>> tasks;
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
-    bool offline = false;
 };
 
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
@@ -217,10 +213,6 @@ void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
 
 void DefaultFileSource::put(const Resource& resource, const Response& response) {
     thread->invokeSync(&Impl::put, resource, response);
-}
-
-void DefaultFileSource::goOffline() {
-    thread->invokeSync(&Impl::goOffline);
 }
 
 } // namespace mbgl

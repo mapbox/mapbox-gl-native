@@ -18,8 +18,8 @@ public:
         Offline,
     };
 
-    Status Get();
-    void Set(Status);
+    static Status Get();
+    static void Set(Status);
 
     static void Reachable();
 
