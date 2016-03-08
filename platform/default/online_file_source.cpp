@@ -289,6 +289,15 @@ void OnlineFileRequestImpl::schedule(OnlineFileSource::Impl& impl, optional<Syst
         return;
     }
 
+    // Emulate a Connection error when the Offline mode is forced with
+    // a really long timeout. The request will get re-triggered when
+    // the NetworkStatus is set back to Online.
+    if (NetworkStatus::Get() == NetworkStatus::Status::Offline) {
+        failedRequestReason = Response::Error::Reason::Connection;
+        failedRequests = 1;
+        timeout = Duration::max();
+    }
+
     timer.start(timeout, Duration::zero(), [&] {
         impl.activateOrQueueRequest(this);
     });
