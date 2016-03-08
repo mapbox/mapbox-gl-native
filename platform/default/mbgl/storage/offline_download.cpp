@@ -42,6 +42,8 @@ void OfflineDownload::setState(OfflineRegionDownloadState state) {
     } else {
         deactivateDownload();
     }
+
+    observer->statusChanged(status);
 }
 
 std::vector<Resource> OfflineDownload::spriteResources(const StyleParser& parser) const {
@@ -135,6 +137,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
 void OfflineDownload::activateDownload() {
     status = OfflineRegionStatus();
+    status.downloadState = OfflineRegionDownloadState::Active;
+
     requiredSourceURLs.clear();
 
     ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {

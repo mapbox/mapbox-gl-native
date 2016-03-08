@@ -73,6 +73,7 @@ TEST(OfflineDownload, NoSubresources) {
 
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
+            EXPECT_EQ(OfflineRegionDownloadState::Active, status.downloadState);
             EXPECT_EQ(1, status.completedResourceCount);
             EXPECT_EQ(test.size, status.completedResourceSize);
             EXPECT_TRUE(status.requiredResourceCountIsPrecise);
@@ -212,6 +213,7 @@ TEST(OfflineDownload, Activate) {
 
             download.setState(OfflineRegionDownloadState::Inactive);
             OfflineRegionStatus computedStatus = download.getStatus();
+            EXPECT_EQ(OfflineRegionDownloadState::Inactive, computedStatus.downloadState);
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
@@ -447,6 +449,35 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
             EXPECT_EQ(test.size, status.completedResourceSize);
             EXPECT_TRUE(status.requiredResourceCountIsPrecise);
             test.loop.stop();
+        }
+    };
+
+    download.setObserver(std::move(observer));
+    download.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+}
+
+TEST(OfflineDownload, Deactivate) {
+    OfflineTest test;
+    OfflineRegion region = test.createRegion();
+    OfflineDownload download(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    test.fileSource.styleResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("http://127.0.0.1:3000/offline/style.json", resource.url);
+        return test.response("offline/mapbox_source.style.json");
+    };
+
+    auto observer = std::make_unique<MockObserver>();
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        if (status.downloadState == OfflineRegionDownloadState::Inactive) {
+            test.loop.stop();
+        } else {
+            download.setState(OfflineRegionDownloadState::Inactive);
         }
     };
 
