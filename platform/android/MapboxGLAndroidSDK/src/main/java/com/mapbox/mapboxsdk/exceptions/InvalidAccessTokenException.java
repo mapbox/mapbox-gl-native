@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 public class InvalidAccessTokenException extends RuntimeException {
 
     public InvalidAccessTokenException() {
-        super("Using MapView requires setting a valid access token. See the INSTALL.md");
+        super("\nUsing MapView requires setting a valid access token. Please see https://www.mapbox.com/help/create-api-access-token/ to learn how to create one.\n     Lastly, follow the steps in this guide https://www.mapbox.com/help/first-steps-android-sdk/#access-tokens in order to include the access token in your app.");
     }
 
 }
