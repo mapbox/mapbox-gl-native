@@ -35,10 +35,6 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-inline bool _validPoint(const ScreenCoordinate& point) {
-    return !std::isnan(point.x) && !std::isnan(point.y);
-}
-
 Transform::Transform(View &view_, ConstrainMode constrainMode)
     : view(view_)
     , state(constrainMode)
@@ -341,9 +337,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 #pragma mark - Position
 
 void Transform::moveBy(const ScreenCoordinate& offset, const Duration& duration) {
-    if (!_validPoint(offset)) {
-        return;
-    }
+    if (!offset) return;
 
     ScreenCoordinate centerOffset = {
         offset.x,
@@ -583,7 +577,7 @@ void Transform::startTransition(const CameraOptions& camera,
     // Associate the anchor, if given, with a coordinate.
     ScreenCoordinate anchor = camera.anchor ? *camera.anchor : ScreenCoordinate(NAN, NAN);
     LatLng anchorLatLng;
-    if (_validPoint(anchor)) {
+    if (anchor) {
         anchor.y = state.getHeight() - anchor.y;
         anchorLatLng = state.screenCoordinateToLatLng(anchor);
     }
@@ -601,9 +595,7 @@ void Transform::startTransition(const CameraOptions& camera,
             result = frame(ease.solve(t, 0.001));
         }
         
-        if (_validPoint(anchor)) {
-            state.moveLatLng(anchorLatLng, anchor);
-        }
+        if (anchor) state.moveLatLng(anchorLatLng, anchor);
         
         // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
         if (t < 1.0) {
