@@ -2,7 +2,7 @@ HEADLESS ?= none
 PLATFORM ?= android
 ASSET ?= zip
 HTTP ?= android
-LOOP ?= uv
+LOOP ?= android
 
 GYP_FLAVOR_SUFFIX=-android
 

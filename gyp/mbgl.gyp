@@ -28,6 +28,14 @@
           ],
         }],
 
+        ['loop_lib == "android"', {
+          'sources': [
+            '../platform/android/src/async_task.cpp',
+            '../platform/android/src/run_loop.cpp',
+            '../platform/android/src/timer.cpp',
+          ],
+        }],
+
         ['loop_lib == "uv"', {
           'sources': [
             '../platform/default/async_task.cpp',
