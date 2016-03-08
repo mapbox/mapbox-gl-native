@@ -8,6 +8,7 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <set>
 
@@ -195,7 +196,8 @@ void OfflineDownload::activateDownload() {
 }
 
 void OfflineDownload::deactivateDownload() {
-    requests.clear();
+    workRequests.clear();
+    fileRequests.clear();
 }
 
 void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const SourceInfo& info) {
@@ -207,43 +209,48 @@ void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const Sour
 void OfflineDownload::ensureResource(const Resource& resource, std::function<void (Response)> callback) {
     status.requiredResourceCount++;
 
-    optional<std::pair<Response, uint64_t>> offlineResponse = offlineDatabase.getRegionResource(id, resource);
-    if (offlineResponse) {
-        if (callback) {
-            callback(offlineResponse->first);
-        }
+    auto workRequestsIt = workRequests.insert(workRequests.begin(), nullptr);
+    *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=] () {
+        workRequests.erase(workRequestsIt);
 
-        status.completedResourceCount++;
-        status.completedResourceSize += offlineResponse->second;
-        observer->statusChanged(status);
+        optional<std::pair<Response, uint64_t>> offlineResponse = offlineDatabase.getRegionResource(id, resource);
+        if (offlineResponse) {
+            if (callback) {
+                callback(offlineResponse->first);
+            }
 
-        return;
-    }
+            status.completedResourceCount++;
+            status.completedResourceSize += offlineResponse->second;
+            observer->statusChanged(status);
 
-    if (resource.kind == Resource::Kind::Tile
-        && util::mapbox::isMapboxURL(resource.url)
-        && offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
-        observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
-        return;
-    }
-
-    auto it = requests.insert(requests.begin(), nullptr);
-    *it = onlineFileSource.request(resource, [=] (Response onlineResponse) {
-        if (onlineResponse.error) {
-            observer->responseError(*onlineResponse.error);
             return;
         }
 
-        requests.erase(it);
-
-        if (callback) {
-            callback(onlineResponse);
+        if (resource.kind == Resource::Kind::Tile
+            && util::mapbox::isMapboxURL(resource.url)
+            && offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
+            observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
+            return;
         }
 
-        status.completedResourceCount++;
-        status.completedResourceSize += offlineDatabase.putRegionResource(id, resource, onlineResponse);
+        auto fileRequestsIt = fileRequests.insert(fileRequests.begin(), nullptr);
+        *fileRequestsIt = onlineFileSource.request(resource, [=] (Response onlineResponse) {
+            if (onlineResponse.error) {
+                observer->responseError(*onlineResponse.error);
+                return;
+            }
 
-        observer->statusChanged(status);
+            fileRequests.erase(fileRequestsIt);
+
+            if (callback) {
+                callback(onlineResponse);
+            }
+
+            status.completedResourceCount++;
+            status.completedResourceSize += offlineDatabase.putRegionResource(id, resource, onlineResponse);
+
+            observer->statusChanged(status);
+        });
     });
 }
 

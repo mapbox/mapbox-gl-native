@@ -435,19 +435,8 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
         test.response("offline/0-0-0.vector.pbf"));
 
     auto observer = std::make_unique<MockObserver>();
-    bool completedOnce = false;
-
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
-        if (!status.complete()) {
-            return;
-        } else if (!completedOnce) {
-            completedOnce = true;
-            download.setState(OfflineRegionDownloadState::Inactive);
-            download.setState(OfflineRegionDownloadState::Active);
-        } else {
-            EXPECT_EQ(2, status.completedResourceCount);
-            EXPECT_EQ(test.size, status.completedResourceSize);
-            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
+        if (status.complete()) {
             test.loop.stop();
         }
     };
@@ -456,6 +445,43 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
     download.setState(OfflineRegionDownloadState::Active);
 
     test.loop.run();
+
+    OfflineDownload redownload(
+        region.getID(),
+        OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/offline/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
+        test.db, test.fileSource);
+
+    std::vector<OfflineRegionStatus> statusesAfterReactivate;
+
+    observer = std::make_unique<MockObserver>();
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        statusesAfterReactivate.push_back(status);
+        if (status.complete()) {
+            test.loop.stop();
+        }
+    };
+
+    redownload.setObserver(std::move(observer));
+    redownload.setState(OfflineRegionDownloadState::Active);
+
+    test.loop.run();
+
+    ASSERT_EQ(3, statusesAfterReactivate.size());
+
+    EXPECT_EQ(OfflineRegionDownloadState::Active, statusesAfterReactivate[0].downloadState);
+    EXPECT_FALSE(statusesAfterReactivate[0].requiredResourceCountIsPrecise);
+    EXPECT_EQ(1, statusesAfterReactivate[0].requiredResourceCount);
+    EXPECT_EQ(0, statusesAfterReactivate[0].completedResourceCount);
+
+    EXPECT_EQ(OfflineRegionDownloadState::Active, statusesAfterReactivate[1].downloadState);
+    EXPECT_TRUE(statusesAfterReactivate[1].requiredResourceCountIsPrecise);
+    EXPECT_EQ(2, statusesAfterReactivate[1].requiredResourceCount);
+    EXPECT_EQ(1, statusesAfterReactivate[1].completedResourceCount);
+
+    EXPECT_EQ(OfflineRegionDownloadState::Active, statusesAfterReactivate[2].downloadState);
+    EXPECT_TRUE(statusesAfterReactivate[2].requiredResourceCountIsPrecise);
+    EXPECT_EQ(2, statusesAfterReactivate[2].requiredResourceCount);
+    EXPECT_EQ(2, statusesAfterReactivate[2].completedResourceCount);
 }
 
 TEST(OfflineDownload, Deactivate) {
