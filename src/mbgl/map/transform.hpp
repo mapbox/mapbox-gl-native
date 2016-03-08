@@ -48,6 +48,7 @@ public:
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const Duration& = Duration::zero());
     LatLng getLatLng(const EdgeInsets& = {}) const;
+    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
 
     // Zoom
 

@@ -106,7 +106,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
-    ScreenCoordinate center = padding.getCenter(state.width, state.height);
+    ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
     
     // Constrain camera options.
@@ -194,7 +194,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         state.lngX(latLng.longitude),
         state.latY(latLng.latitude),
     };
-    ScreenCoordinate center = padding.getCenter(state.width, state.height);
+    ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
     
     // Constrain camera options.
@@ -211,8 +211,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = std::max(state.width - padding.left - padding.right,
-                         state.height - padding.top - padding.bottom);
+    double w0 = padding ? std::max(state.width, state.height)
+                        : std::max(state.width - padding.left - padding.right,
+                                   state.height - padding.top - padding.bottom);
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);
@@ -343,7 +344,7 @@ void Transform::moveBy(const ScreenCoordinate& offset, const Duration& duration)
         offset.x,
         -offset.y,
     };
-    ScreenCoordinate centerPoint = state.latLngToScreenCoordinate(state.getLatLng()) - centerOffset;
+    ScreenCoordinate centerPoint = getScreenCoordinate() - centerOffset;
 
     CameraOptions camera;
     camera.center = state.screenCoordinateToLatLng(centerPoint);
@@ -410,6 +411,14 @@ LatLng Transform::getLatLng(const EdgeInsets& padding) const {
     }
 }
 
+ScreenCoordinate Transform::getScreenCoordinate(const EdgeInsets& padding) const {
+    if (padding) {
+        return padding.getCenter(state.width, state.height);
+    } else {
+        return { state.width / 2., state.height / 2. };
+    }
+}
+
 
 #pragma mark - Zoom
 
@@ -451,8 +460,7 @@ void Transform::setScale(double scale, const ScreenCoordinate& anchor, const Dur
 }
 
 void Transform::setScale(double scale, const EdgeInsets& padding, const Duration& duration) {
-    const ScreenCoordinate center = padding.getCenter(state.width, state.height);
-    setScale(scale, center, duration);
+    setScale(scale, getScreenCoordinate(padding), duration);
 }
 
 void Transform::setMinZoom(const double minZoom) {
@@ -470,9 +478,7 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
         return;
     }
 
-    ScreenCoordinate center(state.width, state.height);
-    center /= 2;
-
+    ScreenCoordinate center = getScreenCoordinate();
     const ScreenCoordinate offset = first - center;
     const double distance = std::sqrt(std::pow(2, offset.x) + std::pow(2, offset.y));
 
@@ -505,13 +511,12 @@ void Transform::setAngle(double angle, const ScreenCoordinate& anchor, const Dur
     
     CameraOptions camera;
     camera.angle = angle;
-    camera.anchor = anchor;
+    if (anchor) camera.anchor = anchor;
     easeTo(camera, duration);
 }
 
 void Transform::setAngle(double angle, const EdgeInsets& padding, const Duration& duration) {
-    const ScreenCoordinate center = padding.getCenter(state.width, state.height);
-    setAngle(angle, center, duration);
+    setAngle(angle, getScreenCoordinate(padding), duration);
 }
 
 double Transform::getAngle() const {
