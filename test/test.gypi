@@ -50,6 +50,8 @@
         'math/minmax.cpp',
         'math/clamp.cpp',
 
+        'tile/tile_id.cpp',
+
         'storage/offline.cpp',
         'storage/offline_database.cpp',
         'storage/offline_download.cpp',
