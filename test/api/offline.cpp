@@ -2,6 +2,7 @@
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
+#include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 
@@ -38,7 +39,7 @@ TEST(API, Offline) {
     fileSource.put(Resource::spriteImage(prefix + "/offline/sprite", 1.0), expiredItem("offline/sprite.png"));
     fileSource.put(Resource::tile(prefix + "/offline/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0), expiredItem("offline/0-0-0.vector.pbf"));
     fileSource.put(Resource::glyphs(prefix + "/offline/{fontstack}/{range}.pbf", "Helvetica", {0, 255}), expiredItem("offline/glyph.pbf"));
-    fileSource.goOffline();
+    NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleURL(prefix + "/offline/style.json");
@@ -47,4 +48,6 @@ TEST(API, Offline) {
                      test::render(map),
                      0.0015,
                      0.1);
+
+    NetworkStatus::Set(NetworkStatus::Status::Online);
 }

@@ -102,7 +102,6 @@ public:
 
     // For testing only.
     void put(const Resource&, const Response&);
-    void goOffline();
 
     class Impl;
 
