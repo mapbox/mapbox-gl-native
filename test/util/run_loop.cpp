@@ -29,3 +29,24 @@ TEST(RunLoop, MultipleStop) {
 
     loop.run();
 }
+
+TEST(RunLoop, MultipleRun) {
+    RunLoop loop(RunLoop::Type::New);
+
+    Timer timer;
+    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] {
+        loop.stop();
+    });
+
+    loop.run();
+
+    bool secondTimeout = false;
+    timer.start(mbgl::Duration::zero(), mbgl::Duration::zero(), [&] {
+        secondTimeout = true;
+        loop.stop();
+    });
+
+    loop.run();
+
+    EXPECT_TRUE(secondTimeout);
+}

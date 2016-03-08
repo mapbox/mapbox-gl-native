@@ -151,6 +151,7 @@ void RunLoop::push(std::shared_ptr<WorkTask> task) {
 void RunLoop::run() {
     MBGL_VERIFY_THREAD(tid);
 
+    uv_ref(impl->holderHandle());
     uv_run(impl->loop, UV_RUN_DEFAULT);
 }
 
