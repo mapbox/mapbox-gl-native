@@ -15,6 +15,10 @@
 
 namespace mbgl {
 
+::std::ostream& operator<<(::std::ostream& os, const ClipID& rhs) {
+    return os << "mask=" << rhs.mask << ",ref=" << rhs.reference;
+}
+
 ClipIDGenerator::Leaf::Leaf(TileID id_, ClipID& clip_) : id(id_), clip(clip_) {}
 
 void ClipIDGenerator::Leaf::add(const TileID &p) {

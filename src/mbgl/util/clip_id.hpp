@@ -9,6 +9,7 @@
 #include <set>
 #include <vector>
 #include <forward_list>
+#include <iosfwd>
 #include <map>
 
 namespace mbgl {
@@ -32,6 +33,8 @@ struct ClipID {
         return *this;
     }
 };
+
+::std::ostream& operator<<(::std::ostream& os, const ClipID& rhs);
 
 class ClipIDGenerator {
 private:
