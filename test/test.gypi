@@ -34,6 +34,8 @@
         'util/token.cpp',
         'util/work_queue.cpp',
 
+        'algorithm/covered_by_children.cpp',
+
         'api/annotations.cpp',
         'api/api_misuse.cpp',
         'api/repeated_render.cpp',
