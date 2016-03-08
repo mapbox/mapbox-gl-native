@@ -75,8 +75,8 @@ private:
     std::string apiKey;
 
     bool firstTime = false;
-
     bool fpsEnabled = false;
+    bool sizeChanged = false;
     double fps = 0.0;
 
     int width = 0;

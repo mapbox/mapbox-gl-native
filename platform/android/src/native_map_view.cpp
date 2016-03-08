@@ -191,10 +191,11 @@ void NativeMapView::invalidate() {
 
 void NativeMapView::beforeRender() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::beforeRender()");
-    // this fixes the viewport resizing issue,
-    // but we are calling it every time.
-    // we should only call this when the resizeView / resizeFramebuffer is called.
-    glViewport(0,0,fbWidth,fbHeight);
+
+    if(sizeChanged){
+        sizeChanged = false;
+        glViewport(0, 0, fbWidth, fbHeight);
+    }
 }
 
 void NativeMapView::afterRender() {
@@ -751,6 +752,7 @@ void NativeMapView::updateFps() {
 void NativeMapView::resizeView(int w, int h) {
     width = w;
     height = h;
+    sizeChanged = true;
     map->update(mbgl::Update::Dimensions);
 }
 
