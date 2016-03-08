@@ -1,5 +1,5 @@
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/tile_id.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/math.hpp>
@@ -14,12 +14,14 @@ TransformState::TransformState(ConstrainMode constrainMode_)
 
 #pragma mark - Matrix
 
-void TransformState::matrixFor(mat4& matrix, const TileID& id, const int8_t z) const {
-    const double tile_scale = std::pow(2, z);
-    double s = worldSize() / tile_scale;
+void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) const {
+    const uint64_t tileScale = 1ull << tileID.canonical.z;
+    const double s = worldSize() / tileScale;
 
     matrix::identity(matrix);
-    matrix::translate(matrix, matrix, id.x * s, id.y * s, 0);
+    matrix::translate(matrix, matrix,
+                      static_cast<int64_t>(tileID.canonical.x + tileID.wrap * tileScale) * s,
+                      static_cast<int64_t>(tileID.canonical.y) * s, 0);
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 

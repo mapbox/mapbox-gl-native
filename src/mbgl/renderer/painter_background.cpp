@@ -59,7 +59,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
     for (auto &id: tileIDs) {
         mat4 vtxMatrix;
-        state.matrixFor(vtxMatrix, id, id.z);
+        const UnwrappedTileID tileID(id.z, id.x, id.y);
+        state.matrixFor(vtxMatrix, tileID);
         matrix::multiply(vtxMatrix, projMatrix, vtxMatrix);
 
         if (isPatterned) {

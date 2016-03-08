@@ -36,28 +36,6 @@ struct ClipID {
 
 ::std::ostream& operator<<(::std::ostream& os, const ClipID& rhs);
 
-class ClipIDGenerator {
-private:
-    struct Leaf {
-        Leaf(TileID, ClipID&);
-        void add(const TileID &p);
-        bool operator==(const Leaf &other) const;
-
-        const TileID id;
-        std::forward_list<TileID> children;
-        ClipID& clip;
-    };
-
-    uint8_t bit_offset = 0;
-    std::vector<Leaf> pool;
-
-public:
-    void update(std::forward_list<Tile *> tiles);
-
-    std::map<TileID, ClipID> getStencils() const;
-};
-
-
 } // namespace mbgl
 
 #endif

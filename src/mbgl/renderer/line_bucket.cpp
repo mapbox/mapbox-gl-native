@@ -445,9 +445,9 @@ void LineBucket::upload(gl::GLObjectStore& glObjectStore) {
 
 void LineBucket::render(Painter& painter,
                         const StyleLayer& layer,
-                        const TileID& id,
+                        const UnwrappedTileID& tileID,
                         const mat4& matrix) {
-    painter.renderLine(*this, *layer.as<LineLayer>(), id, matrix);
+    painter.renderLine(*this, *layer.as<LineLayer>(), tileID, matrix);
 }
 
 bool LineBucket::hasData() const {

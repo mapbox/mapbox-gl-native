@@ -6,7 +6,10 @@
 
 using namespace mbgl;
 
-void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const TileID&, const mat4& matrix) {
+void Painter::renderRaster(RasterBucket& bucket,
+                           const RasterLayer& layer,
+                           const UnwrappedTileID&,
+                           const mat4& matrix) {
     if (pass != RenderPass::Translucent) return;
 
     const RasterPaintProperties& properties = layer.paint;

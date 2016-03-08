@@ -15,7 +15,7 @@ namespace mbgl {
 
 class Painter;
 class StyleLayer;
-class TileID;
+class UnwrappedTileID;
 class CollisionTile;
 
 namespace gl {
@@ -32,7 +32,7 @@ public:
 
     // Every time this bucket is getting rendered, this function is called. This happens either
     // once or twice (for Opaque and Transparent render passes).
-    virtual void render(Painter&, const StyleLayer&, const TileID&, const mat4&) = 0;
+    virtual void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) = 0;
 
     virtual ~Bucket() = default;
 

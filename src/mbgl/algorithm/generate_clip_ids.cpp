@@ -32,9 +32,6 @@ bool ClipIDGenerator::Leaf::operator==(const Leaf& other) const {
     return children == other.children;
 }
 
-// Instantiate the function for Tile& refs.
-template void ClipIDGenerator::update(std::map<UnwrappedTileID, Tile&>&);
-
 std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getStencils() const {
     std::map<UnwrappedTileID, ClipID> stencils;
 

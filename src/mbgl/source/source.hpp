@@ -1,9 +1,11 @@
 #ifndef MBGL_MAP_SOURCE
 #define MBGL_MAP_SOURCE
 
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/source/source_info.hpp>
+#include <mbgl/renderer/renderable.hpp>
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -70,7 +72,7 @@ public:
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void finishRender(Painter &painter);
 
-    std::forward_list<Tile *> getLoadedTiles() const;
+    std::map<UnwrappedTileID, Renderable> getRenderables() const;
     const std::vector<Tile*>& getTiles() const;
 
     std::unordered_map<std::string, std::vector<Feature>> queryRenderedFeatures(

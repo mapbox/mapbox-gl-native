@@ -20,7 +20,6 @@
       'sources': [
         'util/assert.cpp',
         'util/async_task.cpp',
-        'util/clip_ids.cpp',
         'util/geo.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',

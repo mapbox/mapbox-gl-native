@@ -2,12 +2,13 @@
 #include <mbgl/source/source.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/clip_id.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 using namespace mbgl;
 
 
-void Painter::drawClippingMasks(const std::map<TileID, ClipID>& stencils) {
+void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencils) {
     MBGL_DEBUG_GROUP("clipping masks");
 
     mat4 matrix;
@@ -27,8 +28,8 @@ void Painter::drawClippingMasks(const std::map<TileID, ClipID>& stencils) {
         const auto& id = stencil.first;
         const auto& clip = stencil.second;
 
-        MBGL_DEBUG_GROUP(std::string{ "mask: " } + std::string(id));
-        state.matrixFor(matrix, id, id.z);
+        MBGL_DEBUG_GROUP(std::string{ "mask: " } + util::toString(id));
+        state.matrixFor(matrix, id);
         matrix::multiply(matrix, projMatrix, matrix);
         plainShader->u_matrix = matrix;
 
