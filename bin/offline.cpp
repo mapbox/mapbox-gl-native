@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <csignal>
+#include <atomic>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
@@ -54,7 +56,16 @@ int main(int argc, char *argv[]) {
 
     util::RunLoop loop;
 
-    DefaultFileSource fileSource(output, ".");
+    static DefaultFileSource fileSource(output, ".");
+    static std::unique_ptr<OfflineRegion> region;
+
+    std::signal(SIGINT, [] (int) {
+        if (region) {
+            std::cout << "Stopping download... ";
+            fileSource.setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Inactive);
+        }
+    });
+
     fileSource.setAccessToken(token);
 
     LatLngBounds boundingBox = LatLngBounds::hull(LatLng(north, west), LatLng(south, east));
@@ -63,12 +74,20 @@ int main(int argc, char *argv[]) {
 
     class Observer : public OfflineRegionObserver {
     public:
-        Observer(util::RunLoop& loop_)
-            : loop(loop_),
+        Observer(OfflineRegion& region_, DefaultFileSource& fileSource_, util::RunLoop& loop_)
+            : region(region_),
+              fileSource(fileSource_),
+              loop(loop_),
               start(SystemClock::now()) {
         }
 
         void statusChanged(OfflineRegionStatus status) override {
+            if (status.downloadState == OfflineRegionDownloadState::Inactive) {
+                std::cout << "stopped" << std::endl;
+                loop.stop();
+                return;
+            }
+
             std::string bytesPerSecond = "-";
 
             auto elapsedSeconds = (SystemClock::now() - start) / 1s;
@@ -97,18 +116,21 @@ int main(int argc, char *argv[]) {
             std::cerr << "Error: reached limit of " << limit << " offline tiles" << std::endl;
         }
 
+        OfflineRegion& region;
+        DefaultFileSource& fileSource;
         util::RunLoop& loop;
         SystemTimePoint start;
     };
 
-    fileSource.createOfflineRegion(definition, metadata, [&] (std::exception_ptr error, optional<OfflineRegion> region) {
+    fileSource.createOfflineRegion(definition, metadata, [&] (std::exception_ptr error, optional<OfflineRegion> region_) {
         if (error) {
             std::cerr << "Error creating region: " << util::toString(error) << std::endl;
             loop.stop();
             exit(1);
         } else {
-            assert(region);
-            fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(loop));
+            assert(region_);
+            region = std::make_unique<OfflineRegion>(std::move(*region_));
+            fileSource.setOfflineRegionObserver(*region, std::make_unique<Observer>(*region, fileSource, loop));
             fileSource.setOfflineRegionDownloadState(*region, OfflineRegionDownloadState::Active);
         }
     });
