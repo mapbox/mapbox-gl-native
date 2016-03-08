@@ -1,6 +1,5 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
-#include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
@@ -40,12 +39,10 @@ public:
                 callback(*offlineResponse);
             }
 
-            if (NetworkStatus::Get() == NetworkStatus::Status::Online) {
-                onlineRequest = impl->onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
-                    impl->offlineDatabase.put(revalidation, onlineResponse);
-                    callback(onlineResponse);
-                });
-            }
+            onlineRequest = impl->onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
+                impl->offlineDatabase.put(revalidation, onlineResponse);
+                callback(onlineResponse);
+            });
         }
 
         std::unique_ptr<FileRequest> onlineRequest;
