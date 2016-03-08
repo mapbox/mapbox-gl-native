@@ -199,9 +199,10 @@ public:
         : top(t), left(l), bottom(b), right(r) {}
     
     explicit operator bool() const {
-        return top || left || bottom || right;
+        return !(std::isnan(top) || std::isnan(left) || std::isnan(bottom) || std::isnan(right))
+            && (top || left || bottom || right);
     }
-    
+
     void operator+=(const EdgeInsets& o) {
         top += o.top;
         left += o.left;

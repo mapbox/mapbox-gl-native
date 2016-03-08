@@ -182,7 +182,7 @@ TEST(Transform, ConstrainHeightOnly) {
     transform.setLatLng(LatLngBounds::world().southwest());
     loc = transform.getLatLng();
     ASSERT_NEAR(-util::LATITUDE_MAX, loc.latitude, 0.001);
-    ASSERT_NEAR(-util::LONGITUDE_MAX, loc.longitude, 0.001);
+    ASSERT_NEAR(util::LONGITUDE_MAX, std::abs(loc.longitude), 0.001);
 
     transform.setLatLng(LatLngBounds::world().northeast());
     loc = transform.getLatLng();
@@ -253,8 +253,14 @@ TEST(Transform, Padding) {
     });
     
     EdgeInsets padding;
+
+    padding.top = 0;
+    ASSERT_FALSE(bool(padding));
+
+    padding.top = NAN;
+    ASSERT_FALSE(bool(padding));
+
     padding.top = 1000.0 / 2.0;
-    ASSERT_GT(padding.top, 0);
     ASSERT_TRUE(bool(padding));
     
     const LatLng shiftedCenter = transform.getLatLng(padding);
@@ -262,4 +268,32 @@ TEST(Transform, Padding) {
     ASSERT_DOUBLE_EQ(trueCenter.longitude, shiftedCenter.longitude);
     ASSERT_DOUBLE_EQ(manualShiftedCenter.latitude, shiftedCenter.latitude);
     ASSERT_DOUBLE_EQ(manualShiftedCenter.longitude, shiftedCenter.longitude);
+}
+
+TEST(Transform, MoveBy) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
+    transform.setLatLngZoom({ 0, 0 }, 10);
+
+    LatLng trueCenter = transform.getLatLng();
+    ASSERT_DOUBLE_EQ(0, trueCenter.latitude);
+    ASSERT_DOUBLE_EQ(0, trueCenter.longitude);
+    ASSERT_DOUBLE_EQ(10, transform.getZoom());
+
+    for (uint8_t x = 0; x < 20; ++x) {
+        bool odd = x % 2;
+        bool forward = x % 10;
+
+        LatLng coordinate = transform.screenCoordinateToLatLng({ odd ? 400. : 600., forward ? 400. : 600 });
+        transform.moveBy({ odd ? 100. : -100., forward ? 100. : -100 });
+
+        trueCenter = transform.getLatLng();
+        ASSERT_NEAR(coordinate.latitude, trueCenter.latitude, 0.0001);
+        ASSERT_NEAR(coordinate.longitude, trueCenter.longitude, 0.0001);
+    }
+
+    // We have ~1.1 precision loss for each coordinate for 20 rounds of moveBy.
+    ASSERT_NEAR(0, trueCenter.latitude, 1.1);
+    ASSERT_NEAR(0, trueCenter.longitude, 1.1);
 }

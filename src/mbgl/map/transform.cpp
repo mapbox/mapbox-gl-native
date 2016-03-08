@@ -381,7 +381,7 @@ void Transform::setLatLng(const LatLng& latLng, const ScreenCoordinate& point, c
     padding.left = point.x;
     padding.bottom = state.height - point.y;
     padding.right = state.width - point.x;
-    camera.padding = padding;
+    if (padding) camera.padding = padding;
     easeTo(camera, duration);
 }
 
@@ -436,8 +436,7 @@ void Transform::setZoom(double zoom, const ScreenCoordinate& anchor, const Durat
 }
 
 void Transform::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
-    const ScreenCoordinate center = padding.getCenter(state.width, state.height);
-    setZoom(zoom, center, duration);
+    setScale(state.zoomScale(zoom), padding, duration);
 }
 
 double Transform::getZoom() const {
@@ -455,7 +454,7 @@ void Transform::setScale(double scale, const ScreenCoordinate& anchor, const Dur
     
     CameraOptions camera;
     camera.zoom = state.scaleZoom(scale);
-    camera.anchor = anchor;
+    if (anchor) camera.anchor = anchor;
     easeTo(camera, duration);
 }
 
@@ -501,7 +500,7 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
 }
 
 void Transform::setAngle(double angle, const Duration& duration) {
-    setAngle(angle, {NAN, NAN}, duration);
+    setAngle(angle, ScreenCoordinate {}, duration);
 }
 
 void Transform::setAngle(double angle, const ScreenCoordinate& anchor, const Duration& duration) {
@@ -526,7 +525,7 @@ double Transform::getAngle() const {
 #pragma mark - Pitch
 
 void Transform::setPitch(double pitch, const Duration& duration) {
-    setPitch(pitch, {NAN, NAN}, duration);
+    setPitch(pitch, ScreenCoordinate {}, duration);
 }
 
 void Transform::setPitch(double pitch, const ScreenCoordinate& anchor, const Duration& duration) {
@@ -536,7 +535,7 @@ void Transform::setPitch(double pitch, const ScreenCoordinate& anchor, const Dur
 
     CameraOptions camera;
     camera.pitch = pitch;
-    camera.anchor = anchor;
+    if (anchor) camera.anchor = anchor;
     easeTo(camera, duration);
 }
 
@@ -580,11 +579,11 @@ void Transform::startTransition(const CameraOptions& camera,
     view.notifyMapChange(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
     
     // Associate the anchor, if given, with a coordinate.
-    ScreenCoordinate anchor = camera.anchor ? *camera.anchor : ScreenCoordinate(NAN, NAN);
+    optional<ScreenCoordinate> anchor = camera.anchor;
     LatLng anchorLatLng;
-    if (anchor) {
-        anchor.y = state.getHeight() - anchor.y;
-        anchorLatLng = state.screenCoordinateToLatLng(anchor);
+    if (anchor && *anchor) {
+        anchor->y = state.getHeight() - anchor->y;
+        anchorLatLng = state.screenCoordinateToLatLng(*anchor);
     }
 
     transitionStart = Clock::now();
@@ -600,7 +599,7 @@ void Transform::startTransition(const CameraOptions& camera,
             result = frame(ease.solve(t, 0.001));
         }
         
-        if (anchor) state.moveLatLng(anchorLatLng, anchor);
+        if (anchor && *anchor) state.moveLatLng(anchorLatLng, *anchor);
         
         // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
         if (t < 1.0) {
