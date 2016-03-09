@@ -371,10 +371,22 @@ TEST(OfflineDownload, TileCountLimitExceeded) {
     };
 
     auto observer = std::make_unique<MockObserver>();
+    bool mapboxTileCountLimitExceededCalled = false;
 
     observer->mapboxTileCountLimitExceededFn = [&] (uint64_t limit) {
+        EXPECT_FALSE(mapboxTileCountLimitExceededCalled);
         EXPECT_EQ(0, limit);
-        test.loop.stop();
+        mapboxTileCountLimitExceededCalled = true;
+    };
+
+    observer->statusChangedFn = [&] (OfflineRegionStatus status) {
+        EXPECT_FALSE(status.complete());
+        if (!mapboxTileCountLimitExceededCalled) {
+            EXPECT_EQ(OfflineRegionDownloadState::Active, status.downloadState);
+        } else {
+            EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
+            test.loop.stop();
+        }
     };
 
     download.setObserver(std::move(observer));

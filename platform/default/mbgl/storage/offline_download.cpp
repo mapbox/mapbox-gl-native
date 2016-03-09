@@ -230,6 +230,7 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
             && util::mapbox::isMapboxURL(resource.url)
             && offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
             observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
+            setState(OfflineRegionDownloadState::Inactive);
             return;
         }
 
