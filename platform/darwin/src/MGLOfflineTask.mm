@@ -7,6 +7,12 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/string.hpp>
 
+/**
+ Assert that the current offline task is valid.
+ 
+ This macro should be used at the beginning of any public-facing instance method
+ of `MGLOfflineTask`. For private methods, an assertion is more appropriate.
+ */
 #define MGLAssertOfflineTaskIsValid() \
     do { \
         if (_state == MGLOfflineTaskStateInvalid) { \
@@ -32,7 +38,7 @@ private:
 
 @interface MGLOfflineTask ()
 
-@property (nonatomic, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
+@property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
 @property (nonatomic, readwrite) MGLOfflineTaskState state;
 @property (nonatomic, readwrite) MGLOfflineTaskProgress progress;
 
@@ -54,8 +60,7 @@ private:
         _state = MGLOfflineTaskStateUnknown;
         
         mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-        MBGLOfflineRegionObserver *mbglObserver = new MBGLOfflineRegionObserver(self);
-        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(*mbglObserver));
+        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
     }
     return self;
 }
@@ -85,7 +90,6 @@ private:
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
-    self.state = MGLOfflineTaskStateActive;
 }
 
 - (void)suspend {
@@ -93,13 +97,27 @@ private:
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
-    self.state = MGLOfflineTaskStateInactive;
 }
 
 - (void)invalidate {
-    MGLAssertOfflineTaskIsValid();
+    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot invalidate an already invalid offline task.");
     
     self.state = MGLOfflineTaskStateInvalid;
+    self.mbglOfflineRegion = nil;
+}
+
+- (void)setState:(MGLOfflineTaskState)state {
+    if (!self.mbglOfflineRegion) {
+        // A progress update has arrived after the call to
+        // -[MGLOfflineStorage removeTask:withCompletionHandler:] but before the
+        // removal is complete and the completion handler is called.
+        NSAssert(_state == MGLOfflineTaskStateInvalid, @"A valid MGLOfflineTask has no mbgl::OfflineRegion.");
+        return;
+    }
+    
+    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot change the state of an invalid offline task.");
+    
+    _state = state;
 }
 
 - (void)requestProgress {
@@ -120,7 +138,7 @@ private:
 }
 
 - (void)offlineRegionStatusDidChange:(mbgl::OfflineRegionStatus)status {
-    MGLAssertOfflineTaskIsValid();
+    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot change update progress of an invalid offline task.");
     
     switch (status.downloadState) {
         case mbgl::OfflineRegionDownloadState::Inactive:

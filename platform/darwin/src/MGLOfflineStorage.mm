@@ -104,8 +104,9 @@
 }
 
 - (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion {
+    mbgl::OfflineRegion *mbglOfflineRegion = task.mbglOfflineRegion;
     [task invalidate];
-    self.mbglFileSource->deleteOfflineRegion(std::move(*task.mbglOfflineRegion), [&, task, completion](std::exception_ptr exception) {
+    self.mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
             error = [NSError errorWithDomain:MGLErrorDomain code:-1 userInfo:@{
@@ -113,7 +114,7 @@
             }];
         }
         if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, task, completion, error](void) {
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error](void) {
                 completion(error);
             });
         }

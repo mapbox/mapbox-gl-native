@@ -33,8 +33,12 @@
         }
         
         if (!styleURL.scheme) {
-            // Assume a relative path into the application bundle.
-            styleURL = [NSURL URLWithString:[@"asset://" stringByAppendingString:styleURL.absoluteString]];
+            [NSException raise:@"Invalid style URL" format:
+             @"%@ does not support setting a relative file URL as the style URL. "
+             @"To download the online resources required by this style, "
+             @"specify a URL to an online copy of this style. "
+             @"For Mapbox-hosted styles, use the mapbox: scheme.",
+             NSStringFromClass([self class])];
         }
         
         _styleURL = styleURL;
