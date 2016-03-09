@@ -4,6 +4,7 @@
     <string name="app_name">Mapbox GL</string>
 
     <!-- Test Activities -->
+    <string name="activity_mapboxmap">MapboxMap</string>
     <string name="activity_tilt">Map Tilt</string>
     <string name="activity_infowindow_adapter">InfoWindow Adapter</string>
     <string name="activity_map_fragment_suport">Support Map Fragment Activity</string>
@@ -37,6 +38,7 @@
     <string name="action_custom_layer">Custom Layer</string>
     <string name="action_debug">Cycle map debug options</string>
     <string name="action_point_annotations">Toggle point annotations</string>
+    <string name="action_mapboxmap">MapboxMap</string>
     <string name="action_info_window_adapter">InfoWindow Adapter</string>
     <string name="action_tilt">Tilt</string>
     <string name="action_map_fragment">MapFragment</string>

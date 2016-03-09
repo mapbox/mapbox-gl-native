@@ -40,9 +40,28 @@ public class MapFragmentActivity extends AppCompatActivity {
 
             MapboxMapOptions options = new MapboxMapOptions();
             options.accessToken(ApiAccess.getToken(this));
-            options.styleUrl(Style.SATELLITE);
+            options.styleUrl(Style.SATELLITE_STREETS);
 
-            transaction.add(R.id.fragment_container, mapFragment = MapFragment.newInstance(options), "com.mapbox.map");
+            options.scrollGesturesEnabled(false);
+            options.zoomGesturesEnabled(false);
+            options.tiltGesturesEnabled(false);
+            options.rotateGesturesEnabled(false);
+
+            options.debugActive(false);
+            options.compassEnabled(false);
+            options.attributionEnabled(false);
+            options.logoEnabled(false);
+
+            options.minZoom(9);
+            options.maxZoom(11);
+            options.camera(new CameraPosition.Builder()
+                    .target(new LatLng(48.861431, 2.334166))
+                    .zoom(9)
+                    .build());
+
+            mapFragment = MapFragment.newInstance(options);
+
+            transaction.add(R.id.fragment_container, mapFragment, "com.mapbox.map");
             transaction.commit();
         } else {
             mapFragment = (MapFragment) getFragmentManager().findFragmentByTag("com.mapbox.map");
@@ -51,11 +70,7 @@ public class MapFragmentActivity extends AppCompatActivity {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder()
-                                .target(new LatLng(48.861431, 2.334166))
-                                .zoom(10)
-                                .build()));
+                mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(2), 3500);
             }
         });
     }

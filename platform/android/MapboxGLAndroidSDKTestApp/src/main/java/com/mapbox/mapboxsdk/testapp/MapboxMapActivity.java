@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,19 +10,21 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
+import com.mapbox.mapboxsdk.maps.MapView;
 
-public class TiltActivity extends AppCompatActivity {
+public class MapboxMapActivity extends AppCompatActivity {
 
     private MapView mMapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tilt);
+        setContentView(R.layout.activity_mapboxmap);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -32,17 +35,25 @@ public class TiltActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.tiltMapView);
+        mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
+        mMapView.setStyle(Style.SATELLITE_STREETS);
         mMapView.onCreate(savedInstanceState);
+
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                // initial position has been set in R.layout.activity_tilt
-                CameraPosition tiltedCameraPosition = new CameraPosition.Builder().tilt(45.0f).build();
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(tiltedCameraPosition), 10000);
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                        new CameraPosition.Builder()
+                                .target(new LatLng(43.876550, -103.454791))
+                                .zoom(14)
+                                .build()));
             }
         });
+
+        Snackbar.make(findViewById(android.R.id.content),
+                "Demo MapboxMap API",
+                Snackbar.LENGTH_INDEFINITE).show();
     }
 
     @Override
@@ -52,9 +63,9 @@ public class TiltActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
+    public void onResume() {
+        super.onResume();
+        mMapView.onResume();
     }
 
     @Override
@@ -64,9 +75,15 @@ public class TiltActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mMapView.onResume();
+    protected void onStop() {
+        super.onStop();
+        mMapView.onStop();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mMapView.onSaveInstanceState(outState);
     }
 
     @Override
@@ -76,9 +93,9 @@ public class TiltActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+    public void onLowMemory() {
+        super.onLowMemory();
+        mMapView.onLowMemory();
     }
 
     @Override

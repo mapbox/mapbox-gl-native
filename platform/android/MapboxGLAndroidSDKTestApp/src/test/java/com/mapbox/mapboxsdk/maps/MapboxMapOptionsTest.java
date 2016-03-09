@@ -26,6 +26,13 @@ public class MapboxMapOptionsTest {
     }
 
     @Test
+    public void testDebugEnabled() {
+        assertFalse(new MapboxMapOptions().getDebugActive());
+        assertTrue(new MapboxMapOptions().debugActive(true).getDebugActive());
+        assertFalse(new MapboxMapOptions().debugActive(false).getDebugActive());
+    }
+
+    @Test
     public void testCompassEnabled() {
         assertTrue(new MapboxMapOptions().compassEnabled(true).getCompassEnabled());
         assertFalse(new MapboxMapOptions().compassEnabled(false).getCompassEnabled());
@@ -45,6 +52,44 @@ public class MapboxMapOptionsTest {
     }
 
     @Test
+    public void testLogoEnabled() {
+        assertTrue(new MapboxMapOptions().logoEnabled(true).getLogoEnabled());
+        assertFalse(new MapboxMapOptions().logoEnabled(false).getLogoEnabled());
+    }
+
+    @Test
+    public void testLogoGravity() {
+        assertEquals(Gravity.BOTTOM | Gravity.START, new MapboxMapOptions().getLogoGravity());
+        assertEquals(Gravity.BOTTOM, new MapboxMapOptions().logoGravity(Gravity.BOTTOM).getLogoGravity());
+        assertNotEquals(Gravity.START, new MapboxMapOptions().logoGravity(Gravity.BOTTOM).getLogoGravity());
+    }
+
+    @Test
+    public void testLogoMargins() {
+        assertTrue(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[]{0, 1, 2, 3}).getLogoMargins()));
+        assertFalse(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[]{0, 0, 0, 0}).getLogoMargins()));
+    }
+
+    @Test
+    public void testAttributionEnabled() {
+        assertTrue(new MapboxMapOptions().attributionEnabled(true).getAttributionEnabled());
+        assertFalse(new MapboxMapOptions().attributionEnabled(false).getAttributionEnabled());
+    }
+
+    @Test
+    public void testAttributionGravity() {
+        assertEquals(Gravity.BOTTOM, new MapboxMapOptions().getAttributionGravity());
+        assertEquals(Gravity.BOTTOM, new MapboxMapOptions().attributionGravity(Gravity.BOTTOM).getAttributionGravity());
+        assertNotEquals(Gravity.START, new MapboxMapOptions().attributionGravity(Gravity.BOTTOM).getAttributionGravity());
+    }
+
+    @Test
+    public void testAttributionMargins() {
+        assertTrue(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(new int[]{0, 1, 2, 3}).getAttributionMargins()));
+        assertFalse(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().attributionMargins(new int[]{0, 0, 0, 0}).getAttributionMargins()));
+    }
+
+    @Test
     public void testMinZoom() {
         assertEquals(MapboxConstants.MINIMUM_ZOOM, new MapboxMapOptions().getMinZoom());
         assertEquals(5.0f, new MapboxMapOptions().minZoom(5.0f).getMinZoom());
@@ -59,31 +104,43 @@ public class MapboxMapOptionsTest {
     }
 
     @Test
+    public void testLocationEnabled() {
+        assertFalse(new MapboxMapOptions().getLocationEnabled());
+        assertTrue(new MapboxMapOptions().locationEnabled(true).getLocationEnabled());
+        assertFalse(new MapboxMapOptions().locationEnabled(false).getLocationEnabled());
+    }
+
+    @Test
     public void testTiltGesturesEnabled() {
-        assertTrue(new MapboxMapOptions().tiltGesturesEnabled(true).getTitltGesturesEnabeld());
-        assertFalse(new MapboxMapOptions().tiltGesturesEnabled(false).getTitltGesturesEnabeld());
+        assertTrue(new MapboxMapOptions().getTiltGesturesEnabled());
+        assertTrue(new MapboxMapOptions().tiltGesturesEnabled(true).getTiltGesturesEnabled());
+        assertFalse(new MapboxMapOptions().tiltGesturesEnabled(false).getTiltGesturesEnabled());
     }
 
     @Test
     public void testScrollGesturesEnabled() {
+        assertTrue(new MapboxMapOptions().getScrollGesturesEnabled());
         assertTrue(new MapboxMapOptions().scrollGesturesEnabled(true).getScrollGesturesEnabled());
         assertFalse(new MapboxMapOptions().scrollGesturesEnabled(false).getScrollGesturesEnabled());
     }
 
     @Test
     public void testZoomGesturesEnabled() {
+        assertTrue(new MapboxMapOptions().getZoomGesturesEnabled());
         assertTrue(new MapboxMapOptions().zoomGesturesEnabled(true).getZoomGesturesEnabled());
         assertFalse(new MapboxMapOptions().zoomGesturesEnabled(false).getZoomGesturesEnabled());
     }
 
     @Test
     public void testRotateGesturesEnabled() {
+        assertTrue(new MapboxMapOptions().getRotateGesturesEnabled());
         assertTrue(new MapboxMapOptions().rotateGesturesEnabled(true).getRotateGesturesEnabled());
         assertFalse(new MapboxMapOptions().rotateGesturesEnabled(false).getRotateGesturesEnabled());
     }
 
     @Test
     public void testZoomControlsEnabled() {
+        assertFalse(new MapboxMapOptions().getZoomControlsEnabled());
         assertTrue(new MapboxMapOptions().zoomControlsEnabled(true).getZoomControlsEnabled());
         assertFalse(new MapboxMapOptions().zoomControlsEnabled(false).getZoomControlsEnabled());
     }
@@ -109,6 +166,5 @@ public class MapboxMapOptionsTest {
         assertEquals("test", new MapboxMapOptions().accessToken("test").getAccessToken());
         assertNotEquals("nottest", new MapboxMapOptions().accessToken("test").getStyle());
     }
-
 }
 

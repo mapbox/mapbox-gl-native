@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 
@@ -27,11 +29,11 @@ public class MapboxMapOptions implements Parcelable {
     private int compassMargins[];
 
     private boolean logoEnabled = true;
-    private int logoGravity;
+    private int logoGravity = Gravity.BOTTOM | Gravity.START;
     private int logoMargins[];
 
     private boolean attributionEnabled = true;
-    private int attributionGravity;
+    private int attributionGravity = Gravity.BOTTOM;
     private int attributionMargins[];
 
     private float minZoom = MapboxConstants.MINIMUM_ZOOM;
@@ -40,8 +42,8 @@ public class MapboxMapOptions implements Parcelable {
     private boolean rotateGesturesEnabled = true;
     private boolean scrollGesturesEnabled = true;
     private boolean tiltGesturesEnabled = true;
-    private boolean zoomControlsEnabled = true;
     private boolean zoomGesturesEnabled = true;
+    private boolean zoomControlsEnabled = false;
 
     private boolean locationEnabled;
 
@@ -54,17 +56,35 @@ public class MapboxMapOptions implements Parcelable {
     private MapboxMapOptions(Parcel in) {
         cameraPosition = in.readParcelable(CameraPosition.class.getClassLoader());
         debugActive = in.readByte() != 0;
+
         compassEnabled = in.readByte() != 0;
+        compassGravity = in.readInt();
+        compassMargins = in.createIntArray();
+
+        logoEnabled = in.readByte() != 0;
+        logoGravity = in.readInt();
+        logoMargins = in.createIntArray();
+
+        attributionEnabled = in.readByte() != 0;
+        attributionGravity = in.readInt();
+        attributionMargins = in.createIntArray();
+
+        minZoom = in.readFloat();
+        maxZoom = in.readFloat();
+
         rotateGesturesEnabled = in.readByte() != 0;
         scrollGesturesEnabled = in.readByte() != 0;
         tiltGesturesEnabled = in.readByte() != 0;
         zoomControlsEnabled = in.readByte() != 0;
         zoomGesturesEnabled = in.readByte() != 0;
+
+        locationEnabled = in.readByte() != 0;
+
         style = in.readString();
         accessToken = in.readString();
     }
 
-    public static MapboxMapOptions createFromAttributes(Context context, AttributeSet attrs) {
+    public static MapboxMapOptions createFromAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
         float screenDensity = context.getResources().getDisplayMetrics().density;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
@@ -91,30 +111,25 @@ public class MapboxMapOptions implements Parcelable {
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP * screenDensity))
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * screenDensity))
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * screenDensity))});
-//
-//            // Logo
-            uiSettings.setLogoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
-            uiSettings.setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
-            uiSettings.setLogoMargins((int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * mScreenDensity));
-//
-//            // Attribution
-//            uiSettings.setAttributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
-//            uiSettings.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
-//            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * mScreenDensity)
-//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * mScreenDensity)
-//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * mScreenDensity)
-//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
-//
-//            // User location
-//            mMapboxMap.setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
+
+            mapboxMapOptions.logoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
+            mapboxMapOptions.logoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
+            mapboxMapOptions.logoMargins(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * screenDensity)});
+
+            mapboxMapOptions.attributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
+            mapboxMapOptions.attributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
+            mapboxMapOptions.attributionMargins(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * screenDensity)
+                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * screenDensity)});
+
+            mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
         } finally {
             typedArray.recycle();
         }
-
-
         return mapboxMapOptions;
     }
 
@@ -163,18 +178,33 @@ public class MapboxMapOptions implements Parcelable {
         return this;
     }
 
-    public MapboxMapOptions logoEnabled(boolean enabled){
-        logoEnabled  = enabled;
-        return this
+    public MapboxMapOptions logoEnabled(boolean enabled) {
+        logoEnabled = enabled;
+        return this;
     }
 
-    public MapboxMapOptions logoGravity(int gravity){
+    public MapboxMapOptions logoGravity(int gravity) {
         logoGravity = gravity;
         return this;
     }
 
-    public MapboxMapOptions logoMargins(int[]margins){
+    public MapboxMapOptions logoMargins(int[] margins) {
         logoMargins = margins;
+        return this;
+    }
+
+    public MapboxMapOptions attributionEnabled(boolean enabled) {
+        attributionEnabled = enabled;
+        return this;
+    }
+
+    public MapboxMapOptions attributionGravity(int gravity) {
+        attributionGravity = gravity;
+        return this;
+    }
+
+    public MapboxMapOptions attributionMargins(int[] margins) {
+        attributionMargins = margins;
         return this;
     }
 
@@ -200,6 +230,11 @@ public class MapboxMapOptions implements Parcelable {
 
     public MapboxMapOptions zoomGesturesEnabled(boolean enabled) {
         zoomGesturesEnabled = enabled;
+        return this;
+    }
+
+    public MapboxMapOptions locationEnabled(boolean locationEnabled) {
+        this.locationEnabled = locationEnabled;
         return this;
     }
 
@@ -255,7 +290,7 @@ public class MapboxMapOptions implements Parcelable {
         return scrollGesturesEnabled;
     }
 
-    public boolean getTitltGesturesEnabeld() {
+    public boolean getTiltGesturesEnabled() {
         return tiltGesturesEnabled;
     }
 
@@ -265,6 +300,26 @@ public class MapboxMapOptions implements Parcelable {
 
     public boolean getZoomGesturesEnabled() {
         return zoomGesturesEnabled;
+    }
+
+    public boolean getAttributionEnabled() {
+        return attributionEnabled;
+    }
+
+    public int getAttributionGravity() {
+        return attributionGravity;
+    }
+
+    public int[] getAttributionMargins() {
+        return attributionMargins;
+    }
+
+    public boolean getLocationEnabled() {
+        return locationEnabled;
+    }
+
+    public boolean getDebugActive() {
+        return debugActive;
     }
 
     public static final Parcelable.Creator<MapboxMapOptions> CREATOR
@@ -287,12 +342,30 @@ public class MapboxMapOptions implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(cameraPosition, flags);
         dest.writeByte((byte) (debugActive ? 1 : 0));
+
         dest.writeByte((byte) (compassEnabled ? 1 : 0));
+        dest.writeInt(compassGravity);
+        dest.writeIntArray(compassMargins);
+
+        dest.writeByte((byte) (logoEnabled ? 1 : 0));
+        dest.writeInt(logoGravity);
+        dest.writeIntArray(logoMargins);
+
+        dest.writeByte((byte) (attributionEnabled ? 1 : 0));
+        dest.writeInt(attributionGravity);
+        dest.writeIntArray(attributionMargins);
+
+        dest.writeFloat(minZoom);
+        dest.writeFloat(maxZoom);
+
         dest.writeByte((byte) (rotateGesturesEnabled ? 1 : 0));
         dest.writeByte((byte) (scrollGesturesEnabled ? 1 : 0));
         dest.writeByte((byte) (tiltGesturesEnabled ? 1 : 0));
         dest.writeByte((byte) (zoomControlsEnabled ? 1 : 0));
         dest.writeByte((byte) (zoomGesturesEnabled ? 1 : 0));
+
+        dest.writeByte((byte) (locationEnabled ? 1 : 0));
+
         dest.writeString(style);
         dest.writeString(accessToken);
     }

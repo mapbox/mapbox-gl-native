@@ -79,6 +79,12 @@
                 android:title="@string/action_offline" />
 
             <item
+                android:id="@+id/action_mapboxmap"
+                android:checkable="false"
+                android:icon="@drawable/ic_mapboxmap"
+                android:title="@string/action_mapboxmap" />
+
+            <item
                 android:id="@+id/action_tilt"
                 android:checkable="false"
                 android:icon="@drawable/ic_tilt"
