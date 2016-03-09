@@ -18,12 +18,21 @@
         } \
     } while (NO);
 
-class MBGLOfflineRegionObserver;
+class MBGLOfflineRegionObserver : public mbgl::OfflineRegionObserver {
+public:
+    MBGLOfflineRegionObserver(MGLOfflineTask *offlineTask_) : offlineTask(offlineTask_) {}
+    
+    void statusChanged(mbgl::OfflineRegionStatus status) override;
+    void responseError(mbgl::Response::Error error) override;
+    void mapboxTileCountLimitExceeded(uint64_t limit) override;
+    
+private:
+    __weak MGLOfflineTask *offlineTask = nullptr;
+};
 
 @interface MGLOfflineTask ()
 
 @property (nonatomic, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
-@property (nonatomic, readwrite) MBGLOfflineRegionObserver *mbglOfflineRegionObserver;
 @property (nonatomic, readwrite) MGLOfflineTaskState state;
 @property (nonatomic, readwrite) MGLOfflineTaskProgress progress;
 
@@ -43,17 +52,17 @@ class MBGLOfflineRegionObserver;
     if (self = [super init]) {
         _mbglOfflineRegion = region;
         _state = MGLOfflineTaskStateInactive;
-        _mbglOfflineRegionObserver = new MBGLOfflineRegionObserver(self);
         
         mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(*_mbglOfflineRegionObserver));
+        MBGLOfflineRegionObserver *mbglObserver = new MBGLOfflineRegionObserver(self);
+        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(*mbglObserver));
     }
     return self;
 }
 
 - (void)dealloc {
-    delete _mbglOfflineRegionObserver;
-    _mbglOfflineRegionObserver = nullptr;
+    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+    mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, nullptr);
 }
 
 - (id <MGLOfflineRegion>)region {
