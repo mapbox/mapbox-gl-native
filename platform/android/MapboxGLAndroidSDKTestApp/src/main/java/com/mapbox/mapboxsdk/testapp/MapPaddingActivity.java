@@ -11,14 +11,13 @@ import android.view.MenuItem;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 public class MapPaddingActivity extends AppCompatActivity {
 

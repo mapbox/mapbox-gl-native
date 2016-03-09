@@ -28,7 +28,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.testapp.offline.DownloadRegionDialog;
 import com.mapbox.mapboxsdk.testapp.offline.ListRegionsDialog;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 import org.json.JSONObject;
 

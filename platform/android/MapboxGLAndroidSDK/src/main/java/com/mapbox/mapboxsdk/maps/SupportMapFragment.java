@@ -1,16 +1,14 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**
  * Support Fragment wrapper around a map view.
@@ -30,17 +28,25 @@ public class SupportMapFragment extends Fragment {
 
     private MapView mMap;
 
-    public static SupportMapFragment newInstance() {
-        return new SupportMapFragment();
+    public static MapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
+        MapFragment mapFragment = new MapFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
+        mapFragment.setArguments(bundle);
+        return mapFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        mMap = (MapView) inflater.inflate(R.layout.fragment_mapview, container, false);
-        mMap.setAccessToken(ApiAccess.getToken(inflater.getContext()));
+        MapboxMapOptions options = getArguments().getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
+        return mMap = new MapView(inflater.getContext(), options);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         mMap.onCreate(savedInstanceState);
-        return mMap;
     }
 
     @Override
@@ -63,8 +69,8 @@ public class SupportMapFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        mMap.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
+        mMap.onSaveInstanceState(outState);
     }
 
     @Override
@@ -75,8 +81,8 @@ public class SupportMapFragment extends Fragment {
 
     @Override
     public void onLowMemory() {
-        mMap.onLowMemory();
         super.onLowMemory();
+        mMap.onLowMemory();
     }
 
     @Override
@@ -86,13 +92,7 @@ public class SupportMapFragment extends Fragment {
         mMap = null;
     }
 
-    @NonNull
     public void getMapAsync(@NonNull final OnMapReadyCallback onMapReadyCallback) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                mMap.getMapAsync(onMapReadyCallback);
-            }
-        });
+        mMap.getMapAsync(onMapReadyCallback);
     }
 }

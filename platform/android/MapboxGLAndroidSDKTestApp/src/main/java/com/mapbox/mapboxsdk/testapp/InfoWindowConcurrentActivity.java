@@ -9,10 +9,10 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
-import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 public class InfoWindowConcurrentActivity extends AppCompatActivity {
 
@@ -35,7 +35,6 @@ public class InfoWindowConcurrentActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.infoWindowConcurrentMapView);
         mMapView.setAccessToken(ApiAccess.getToken(this));
         mMapView.onCreate(savedInstanceState);
-
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {

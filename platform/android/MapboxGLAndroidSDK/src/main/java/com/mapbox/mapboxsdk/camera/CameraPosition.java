@@ -95,7 +95,7 @@ public final class CameraPosition implements Parcelable {
         }
 
         CameraPosition cameraPosition = (CameraPosition) o;
-        if (!target.equals(cameraPosition.target)) {
+        if (target != null && !target.equals(cameraPosition.target)) {
             return false;
         } else if (zoom != cameraPosition.zoom) {
             return false;

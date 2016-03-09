@@ -11,12 +11,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
 public class CoordinateChangeActivity extends AppCompatActivity {

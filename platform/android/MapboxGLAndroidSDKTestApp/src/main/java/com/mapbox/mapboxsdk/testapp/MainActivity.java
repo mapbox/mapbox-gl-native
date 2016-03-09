@@ -43,7 +43,7 @@ import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.layers.ExampleCustomLayer;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

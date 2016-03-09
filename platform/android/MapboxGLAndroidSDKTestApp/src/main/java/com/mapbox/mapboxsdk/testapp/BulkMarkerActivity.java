@@ -22,7 +22,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
 import org.json.JSONException;

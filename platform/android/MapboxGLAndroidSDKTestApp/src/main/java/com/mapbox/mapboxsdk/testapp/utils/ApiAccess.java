@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.utils;
+package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;

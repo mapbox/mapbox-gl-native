@@ -21,7 +21,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.annotations.CityStateMarker;
 import com.mapbox.mapboxsdk.testapp.annotations.CityStateMarkerOptions;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
+import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
 public class InfoWindowAdapterActivity extends AppCompatActivity {

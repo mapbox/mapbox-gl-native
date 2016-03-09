@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.content.Context;
 import android.location.Location;
-import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,7 +29,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +51,6 @@ public class MapboxMap {
     private Projection mProjection;
     private CameraPosition mCameraPosition;
     private boolean mInvalidCameraPosition;
-    private String mStyleUrl;
     private LongSparseArray<Annotation> mAnnotations;
     private List<Marker> mSelectedMarkers;
     private List<InfoWindow> mInfoWindows;
@@ -459,16 +455,9 @@ public class MapboxMap {
      * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
-     * <p>
-     * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
-     * or an exception will be thrown.
-     * </p>
-     * You can use {@link ApiAccess#getToken(Context)} to load an access token from your
-     * application's manifest.
      *
      * @param accessToken Your public Mapbox access token.
-     * @see MapView#onCreate(Bundle)
-     * @see ApiAccess#getToken(Context)
+     * @see MapView#setAccessToken(String)
      */
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
@@ -1058,7 +1047,6 @@ public class MapboxMap {
     }
 
     /**
-     *
      * @return
      */
     public int[] getPadding() {
@@ -1347,7 +1335,7 @@ public class MapboxMap {
     // Invalidate
     //
 
-    public void invalidate(){
+    public void invalidate() {
         mMapView.update();
     }
 
@@ -1466,7 +1454,7 @@ public class MapboxMap {
     }
 
     /**
-     *  Interface definition for a callback to be invoked when the user long presses on a marker's info window.
+     * Interface definition for a callback to be invoked when the user long presses on a marker's info window.
      *
      * @see MapboxMap#setOnInfoWindowClickListener(OnInfoWindowClickListener)
      */

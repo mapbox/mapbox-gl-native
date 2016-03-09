@@ -35,25 +35,25 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
         SupportMapFragment mapFragment;
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.fragment_container, mapFragment = SupportMapFragment.newInstance(), "com.mapbox.map");
+//            transaction.add(R.id.fragment_container, mapFragment = SupportMapFragment.newInstance(), "com.mapbox.map");
             transaction.commit();
         } else {
             mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
 
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder()
-                                .target(new LatLng(48.861431, 2.334166))
-                                .zoom(10)
-                                .bearing(0)
-                                .tilt(0)
-                                .build()));
-            }
-        });
+//        mapFragment.getMapAsync(new OnMapReadyCallback() {
+//            @Override
+//            public void onMapReady(@NonNull MapboxMap mapboxMap) {
+//                mapboxMap.setStyleUrl(Style.SATELLITE_STREETS);
+//                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+//                        new CameraPosition.Builder()
+//                                .target(new LatLng(48.861431, 2.334166))
+//                                .zoom(10)
+//                                .bearing(0)
+//                                .tilt(0)
+//                                .build()));
+//            }
+//        });
     }
 
     @Override

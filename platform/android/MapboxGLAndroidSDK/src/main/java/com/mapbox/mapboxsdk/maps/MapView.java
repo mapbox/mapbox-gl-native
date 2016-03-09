@@ -83,7 +83,6 @@ import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
-import com.mapbox.mapboxsdk.utils.ApiAccess;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -114,10 +113,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MapView extends FrameLayout {
 
     private static final String TAG = "MapView";
-    private static final float DIMENSION_SEVEN_DP = 7f;
-    private static final float DIMENSION_TEN_DP = 10f;
-    private static final float DIMENSION_SIXTEEN_DP = 16f;
-    private static final float DIMENSION_SEVENTY_SIX_DP = 76f;
 
     private MapboxMap mMapboxMap;
     private List<Icon> mIcons;
@@ -162,16 +157,22 @@ public class MapView extends FrameLayout {
     @UiThread
     public MapView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initialize(context, attrs);
+        initialize(context, MapboxMapOptions.createFromAttributes(context, attrs));
     }
 
     @UiThread
     public MapView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize(context, attrs);
+        initialize(context, MapboxMapOptions.createFromAttributes(context, attrs));
     }
 
-    private void initialize(@NonNull Context context, @Nullable AttributeSet attrs) {
+    @UiThread
+    public MapView(@NonNull Context context, @Nullable MapboxMapOptions options) {
+        super(context);
+        initialize(context, options);
+    }
+
+    private void initialize(@NonNull Context context, @Nullable MapboxMapOptions options) {
         mInitialLoad = true;
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
@@ -234,69 +235,69 @@ public class MapView extends FrameLayout {
 
         mScreenDensity = context.getResources().getDisplayMetrics().density;
 
-        // Load the attributes
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
-        try {
-            // Debug mode
-            mMapboxMap.setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
-
-            // Move camera
-            CameraPosition cameraPosition = new CameraPosition.Builder(typedArray).build();
-            mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            // Access token
-            String accessToken = typedArray.getString(R.styleable.MapView_access_token);
-            if (accessToken != null) {
-                setAccessToken(typedArray.getString(R.styleable.MapView_access_token));
-            }
-
-            // Style url
-            String styleUrl = typedArray.getString(R.styleable.MapView_style_url);
-            if (styleUrl != null) {
-                mMapboxMap.setStyleUrl(styleUrl);
-            }
-
-            // Enable gestures
-            UiSettings uiSettings = mMapboxMap.getUiSettings();
-            uiSettings.setZoomGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
-            uiSettings.setScrollGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
-            uiSettings.setRotateGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
-            uiSettings.setTiltGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
-            uiSettings.setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, false));
-
-            // Zoom
-            uiSettings.setMaxZoom(typedArray.getFloat(R.styleable.MapView_zoom_max, (float) MapboxConstants.MAXIMUM_ZOOM));
-            uiSettings.setMinZoom(typedArray.getFloat(R.styleable.MapView_zoom_min, (float) MapboxConstants.MINIMUM_ZOOM));
-
-            // Compass
-            uiSettings.setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
-            uiSettings.setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
-            uiSettings.setCompassMargins((int) (typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP) * mScreenDensity)
-                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP * mScreenDensity))
-                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * mScreenDensity))
-                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * mScreenDensity)));
-
-            // Logo
-            uiSettings.setLogoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
-            uiSettings.setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
-            uiSettings.setLogoMargins((int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * mScreenDensity));
-
-            // Attribution
-            uiSettings.setAttributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
-            uiSettings.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
-            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * mScreenDensity)
-                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
-
-            // User location
-            mMapboxMap.setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
-        } finally {
-            typedArray.recycle();
-        }
+//        // Load the attributes
+//        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MapView, 0, 0);
+//        try {
+//            // Debug mode
+//            mMapboxMap.setDebugActive(typedArray.getBoolean(R.styleable.MapView_debug_active, false));
+//
+//            // Move camera
+//            CameraPosition cameraPosition = new CameraPosition.Builder(typedArray).build();
+//            mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//            // Access token
+//            String accessToken = typedArray.getString(R.styleable.MapView_access_token);
+//            if (accessToken != null) {
+//                setAccessToken(typedArray.getString(R.styleable.MapView_access_token));
+//            }
+//
+//            // Style url
+//            String styleUrl = typedArray.getString(R.styleable.MapView_style_url);
+//            if (styleUrl != null) {
+//                mMapboxMap.setStyleUrl(styleUrl);
+//            }
+//
+//            // Enable gestures
+//            UiSettings uiSettings = mMapboxMap.getUiSettings();
+//            uiSettings.setZoomGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_enabled, true));
+//            uiSettings.setScrollGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_scroll_enabled, true));
+//            uiSettings.setRotateGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_rotate_enabled, true));
+//            uiSettings.setTiltGesturesEnabled(typedArray.getBoolean(R.styleable.MapView_tilt_enabled, true));
+//            uiSettings.setZoomControlsEnabled(typedArray.getBoolean(R.styleable.MapView_zoom_controls_enabled, false));
+//
+//            // Zoom
+//            uiSettings.setMaxZoom(typedArray.getFloat(R.styleable.MapView_zoom_max, (float) MapboxConstants.MAXIMUM_ZOOM));
+//            uiSettings.setMinZoom(typedArray.getFloat(R.styleable.MapView_zoom_min, (float) MapboxConstants.MINIMUM_ZOOM));
+//
+//            // Compass
+//            uiSettings.setCompassEnabled(typedArray.getBoolean(R.styleable.MapView_compass_enabled, true));
+//            uiSettings.setCompassGravity(typedArray.getInt(R.styleable.MapView_compass_gravity, Gravity.TOP | Gravity.END));
+//            uiSettings.setCompassMargins((int) (typedArray.getDimension(R.styleable.MapView_compass_margin_left, DIMENSION_TEN_DP) * mScreenDensity)
+//                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_top, DIMENSION_TEN_DP * mScreenDensity))
+//                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * mScreenDensity))
+//                    , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * mScreenDensity)));
+//
+//            // Logo
+//            uiSettings.setLogoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
+//            uiSettings.setLogoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
+//            uiSettings.setLogoMargins((int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * mScreenDensity));
+//
+//            // Attribution
+//            uiSettings.setAttributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
+//            uiSettings.setAttributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
+//            uiSettings.setAttributionMargins((int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_right, DIMENSION_SEVEN_DP) * mScreenDensity)
+//                    , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * mScreenDensity));
+//
+//            // User location
+//            mMapboxMap.setMyLocationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
+//        } finally {
+//            typedArray.recycle();
+//        }
     }
 
     //
@@ -1497,6 +1498,7 @@ public class MapView extends FrameLayout {
                     break;
                 case MotionEvent.ACTION_UP:
                     if (mQuickZoom) {
+                        // insert here?
                         mQuickZoom = false;
                         break;
                     }
