@@ -563,12 +563,10 @@ void Transform::startTransition(const CameraOptions& camera,
                                 const AnimationOptions& animation,
                                 std::function<Update(double)> frame,
                                 const Duration& duration) {
-    if (transitionFinishFn) {
+    bool isAnimated = duration != Duration::zero();
+    if (isAnimated && transitionFinishFn) {
         transitionFinishFn();
     }
-    
-    bool isAnimated = duration != Duration::zero();
-    view.notifyMapChange(isAnimated ? MapChangeRegionWillChangeAnimated : MapChangeRegionWillChange);
     
     // Associate the anchor, if given, with a coordinate.
     ScreenCoordinate anchor = camera.anchor ? *camera.anchor : ScreenCoordinate(NAN, NAN);
@@ -577,12 +575,8 @@ void Transform::startTransition(const CameraOptions& camera,
         anchor.y = state.getHeight() - anchor.y;
         anchorLatLng = state.screenCoordinateToLatLng(anchor);
     }
-
-    transitionStart = Clock::now();
-    transitionDuration = duration;
-
-    transitionFrameFn = [isAnimated, animation, frame, anchor, anchorLatLng, this](const TimePoint now) {
-        float t = isAnimated ? (std::chrono::duration<float>(now - transitionStart) / transitionDuration) : 1.0;
+    
+    auto frameFn = [animation, frame, anchor, anchorLatLng, this](double t) {
         Update result;
         if (t >= 1.0) {
             result = frame(1.0);
@@ -594,6 +588,24 @@ void Transform::startTransition(const CameraOptions& camera,
         if (_validPoint(anchor)) {
             state.moveLatLng(anchorLatLng, anchor);
         }
+        return result;
+    };
+    
+    if (!isAnimated) {
+        view.notifyMapChange(MapChangeRegionWillChange);
+        frameFn(1.0);
+        view.notifyMapChange(MapChangeRegionDidChange);
+        return;
+    }
+    
+    view.notifyMapChange(MapChangeRegionWillChangeAnimated);
+
+    transitionStart = Clock::now();
+    transitionDuration = duration;
+
+    transitionFrameFn = [isAnimated, animation, frame, anchor, anchorLatLng, frameFn, this](const TimePoint now) {
+        float t = isAnimated ? (std::chrono::duration<float>(now - transitionStart) / transitionDuration) : 1.0;
+        Update result = frameFn(t);
         
         // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
         if (t < 1.0) {
@@ -621,10 +633,6 @@ void Transform::startTransition(const CameraOptions& camera,
         }
         view.notifyMapChange(isAnimated ? MapChangeRegionDidChangeAnimated : MapChangeRegionDidChange);
     };
-    
-    if (!isAnimated) {
-        transitionFrameFn(Clock::now());
-    }
 }
 
 bool Transform::inTransition() const {
