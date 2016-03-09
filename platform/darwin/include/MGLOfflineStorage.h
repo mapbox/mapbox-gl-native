@@ -70,8 +70,13 @@ typedef void (^MGLOfflineTaskListingCompletionHandler)(NS_ARRAY_OF(MGLOfflineTas
 
 /**
  Unregisters the given offline task and frees any resources that are no longer
- required by any remaining tasks. After this task is removed, it is invalid; any
- attempt to interact with it will result in an exception being thrown.
+ required by any remaining tasks.
+ 
+ As soon as this method is called on a task, the task becomes invalid; any
+ attempt to send it a message will result in an exception being thrown. If an
+ error occurs and the task cannot be removed, do not attempt to reuse the task
+ object. Instead, use the `-getTasksWithCompletionHandler:` method to obtain a
+ valid pointer to the task object.
  
  @param task The offline task to remove.
  @param completion The completion handler to call once the task has been

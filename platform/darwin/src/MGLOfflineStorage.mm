@@ -104,6 +104,7 @@
 }
 
 - (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion {
+    [task invalidate];
     self.mbglFileSource->deleteOfflineRegion(std::move(*task.mbglOfflineRegion), [&, task, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
@@ -113,7 +114,6 @@
         }
         if (completion) {
             dispatch_async(dispatch_get_main_queue(), [&, task, completion, error](void) {
-                [task invalidate];
                 completion(error);
             });
         }
