@@ -11,27 +11,44 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_ENUM (NSInteger, MGLOfflineTaskState) {
     /**
-     The task is incomplete and is not currently downloading. This is the
-     initial state of a task that is added using the
-     `-[MGLOfflineStorage addTaskForRegion:withContext:completionHandler:]`
-     method.
+     It is unknown whether the task is inactive, active, or complete.
+     
+     This is the initial state of a task that is obtained using the
+     `-[MGLOfflineStorage getTasksWithCompletionHandler:]` method. The state
+     becomes known by the time the task’s delegate receives its first progress
+     update. For inactive tasks, you must explicitly request a progress update
+     using the `-[MGLOfflineTask requestProgress]` method.
+     
+     An invalid task always has a state of `MGLOfflineTaskStateInvalid`, never
+     `MGLOfflineTaskStateUnknown`.
      */
-    MGLOfflineTaskStateInactive = 0,
+    MGLOfflineTaskStateUnknown = 0,
     /**
-     The task is incomplete and is currently downloading. This is the state of a
-     task after the `-[MGLOfflineTask resume]` method is called.
+     The task is incomplete and is not currently downloading.
+     
+     This is the initial state of a task that is created using the
+     `-[MGLOfflineTask addTaskForRegion:withContext:completionHandler:]` method,
+     as well as after the `-[MGLOfflineTask suspend]` method is
+     called.
      */
-    MGLOfflineTaskStateActive = 1,
+    MGLOfflineTaskStateInactive = 1,
+    /**
+     The task is incomplete and is currently downloading.
+     
+     This is the state of a task after the `-[MGLOfflineTask resume]` method is
+     called.
+     */
+    MGLOfflineTaskStateActive = 2,
     /**
      The task has downloaded to completion.
      */
-    MGLOfflineTaskStateComplete = 2,
+    MGLOfflineTaskStateComplete = 3,
     /**
      The task has been removed using the
-     `-[MGLOfflineStorage removeTask:withCompletionHandler:]` method. Any
-     messages sent to the task will raise an exception.
+     `-[MGLOfflineStorage removeTask:withCompletionHandler:]` method. Sending
+     any message to the task will raise an exception.
      */
-    MGLOfflineTaskStateInvalid = 3,
+    MGLOfflineTaskStateInvalid = 4,
 };
 
 /**
@@ -91,7 +108,7 @@ typedef struct MGLOfflineTaskProgress {
  The task’s current state.
  
  The state of an inactive or completed task is computed lazily and is set to
- `MGLOfflineTaskStateInactive` by default. If you need the state of a task
+ `MGLOfflineTaskStateUnknown` by default. If you need the state of a task
  inside an `MGLOfflineTaskListingCompletionHandler`, set the `delegate` property
  then call the `-requestProgress` method.
  */

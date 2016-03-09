@@ -126,6 +126,10 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
                                                                countStyle:NSByteCountFormatterCountStyleFile];
     NSString *statusString;
     switch (task.state) {
+        case MGLOfflineTaskStateUnknown:
+            statusString = @"Calculating progress…";
+            break;
+            
         case MGLOfflineTaskStateInactive:
             statusString = [NSString stringWithFormat:@"%@ of %@ resources (%@)",
                             completedString, expectedString, byteCountString];
@@ -176,6 +180,9 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
     
     MGLOfflineTask *task = self.offlineTasks[indexPath.row];
     switch (task.state) {
+        case MGLOfflineTaskStateUnknown:
+            break;
+            
         case MGLOfflineTaskStateComplete:
             if ([task.region respondsToSelector:@selector(applyToMapView:)]) {
                 [task.region performSelector:@selector(applyToMapView:) withObject:self.mapView];

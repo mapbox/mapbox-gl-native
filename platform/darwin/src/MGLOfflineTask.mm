@@ -51,7 +51,7 @@ private:
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region {
     if (self = [super init]) {
         _mbglOfflineRegion = region;
-        _state = MGLOfflineTaskStateInactive;
+        _state = MGLOfflineTaskStateUnknown;
         
         mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         MBGLOfflineRegionObserver *mbglObserver = new MBGLOfflineRegionObserver(self);
