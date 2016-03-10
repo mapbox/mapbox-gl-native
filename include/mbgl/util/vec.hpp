@@ -85,12 +85,12 @@ struct vec2 {
     }
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return !std::isnan(x) && !std::isnan(y);
     }
 
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return x != std::numeric_limits<T>::min() && y != std::numeric_limits<T>::min();
     }
 };
@@ -107,12 +107,12 @@ struct vec3 {
     }
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return !std::isnan(x) && !std::isnan(y) && !std::isnan(z);
     }
 
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return x != std::numeric_limits<T>::min()
             && y != std::numeric_limits<T>::min()
             && z != std::numeric_limits<T>::min();
@@ -131,12 +131,12 @@ struct vec4 {
     }
 
     template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return !std::isnan(x) && !std::isnan(y) && !std::isnan(z) && !std::isnan(w);
     }
 
     template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    inline operator bool() const {
+    explicit operator bool() const {
         return x != std::numeric_limits<T>::min()
             && y != std::numeric_limits<T>::min()
             && z != std::numeric_limits<T>::min()

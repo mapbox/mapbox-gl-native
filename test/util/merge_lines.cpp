@@ -28,7 +28,7 @@ TEST(MergeLines, SameText) {
     mbgl::util::mergeLines(input1);
 
     for (int i = 0; i < 6; i++) {
-        EXPECT_EQ(input1[i].geometry, expected1[i].geometry);
+        EXPECT_TRUE(input1[i].geometry == expected1[i].geometry);
     }
 }
 
@@ -49,7 +49,7 @@ TEST(MergeLines, BothEnds) {
     mbgl::util::mergeLines(input2);
 
     for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(input2[i].geometry, expected2[i].geometry);
+        EXPECT_TRUE(input2[i].geometry == expected2[i].geometry);
     }
 }
 
@@ -70,6 +70,6 @@ TEST(MergeLines, CircularLines) {
     mbgl::util::mergeLines(input3);
 
     for (int i = 0; i < 3; i++) {
-        EXPECT_EQ(input3[i].geometry, expected3[i].geometry);
+        EXPECT_TRUE(input3[i].geometry == expected3[i].geometry);
     }
 }
