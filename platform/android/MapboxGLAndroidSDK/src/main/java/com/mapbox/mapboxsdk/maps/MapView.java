@@ -139,8 +139,9 @@ public class MapView extends FrameLayout {
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
 
-    private OnMapReadyCallback mMapReadyCallback;
     private String mStyleUrl;
+
+    private List<OnMapReadyCallback> mOnMapReadyCallbackList;
     private boolean mInitialLoad;
     private boolean mDestroyed;
 
@@ -170,6 +171,7 @@ public class MapView extends FrameLayout {
 
     private void initialize(@NonNull Context context, @NonNull MapboxMapOptions options) {
         mInitialLoad = true;
+        mOnMapReadyCallbackList = new ArrayList<>();
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
@@ -391,8 +393,13 @@ public class MapView extends FrameLayout {
                     adjustTopOffsetPixels();
                     if (mInitialLoad) {
                         mInitialLoad = false;
-                        if (mMapReadyCallback != null) {
-                            mMapReadyCallback.onMapReady(mMapboxMap);
+                        if (mOnMapReadyCallbackList.size() > 0) {
+                            Iterator<OnMapReadyCallback> iterator = mOnMapReadyCallbackList.iterator();
+                            while (iterator.hasNext()) {
+                                OnMapReadyCallback callback = iterator.next();
+                                callback.onMapReady(mMapboxMap);
+                                iterator.remove();
+                            }
                         }
                     }
                 }
@@ -2418,10 +2425,11 @@ public class MapView extends FrameLayout {
      */
     @UiThread
     public void getMapAsync(@NonNull final OnMapReadyCallback callback) {
-        if (mMapReadyCallback == null && !mInitialLoad) {
+        if (!mInitialLoad) {
             callback.onMapReady(mMapboxMap);
+        } else {
+            mOnMapReadyCallbackList.add(callback);
         }
-        mMapReadyCallback = callback;
     }
 
     MapboxMap getMapboxMap() {
