@@ -71,4 +71,16 @@ NS_ASSUME_NONNULL_END
     return (_title ? _title : @"You Are Here");
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; location = %f, %f; updating = %@; altitude = %.0fm; heading = %.0f°; title = %@; subtitle = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.location.coordinate.latitude, self.location.coordinate.longitude,
+            self.updating ? @"yes" : @"no",
+            self.location.altitude,
+            self.heading.trueHeading,
+            self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
+            self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle];
+}
+
 @end

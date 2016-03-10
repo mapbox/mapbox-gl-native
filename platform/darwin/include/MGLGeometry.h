@@ -80,7 +80,7 @@ NS_INLINE BOOL MGLCoordinateBoundsIsEmpty(MGLCoordinateBounds bounds) {
 
 /** Returns a formatted string for the given coordinate bounds. */
 NS_INLINE NSString *MGLStringFromCoordinateBounds(MGLCoordinateBounds bounds) {
-    return [NSString stringWithFormat:@"{{%.1f, %.1f}, {%.1f, %.1f}}",
+    return [NSString stringWithFormat:@"{ sw = {%.1f, %.1f}, ne = {%.1f, %.1f}}",
             bounds.sw.latitude, bounds.sw.longitude,
             bounds.ne.latitude, bounds.ne.longitude];
 }

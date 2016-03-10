@@ -128,4 +128,10 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     return mbgl::ShapeAnnotation::Properties();
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; count = %lu; bounds = %@>",
+            NSStringFromClass([self class]), (void *)self, (unsigned long)_count, MGLStringFromCoordinateBounds(_bounds)];
+}
+
 @end
