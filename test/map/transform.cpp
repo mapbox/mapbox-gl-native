@@ -297,3 +297,25 @@ TEST(Transform, MoveBy) {
     ASSERT_NEAR(0, trueCenter.latitude, 1.1);
     ASSERT_NEAR(0, trueCenter.longitude, 1.1);
 }
+
+TEST(Transform, Antimeridian) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
+    transform.setLatLngZoom({ 0, 0 }, 1);
+
+    const LatLng coordinateSanFrancisco { 37.7833, -122.4167 };
+    ScreenCoordinate pixelSF = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
+    ASSERT_DOUBLE_EQ(151.79409149185352, pixelSF.x);
+    ASSERT_DOUBLE_EQ(383.76774094913071, pixelSF.y);
+
+    transform.setLatLng({ 0, -181 });
+    ScreenCoordinate pixelSFBackwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
+    ASSERT_DOUBLE_EQ(666.63617954008976, pixelSFBackwards.x);
+    ASSERT_DOUBLE_EQ(pixelSF.y, pixelSFBackwards.y);
+
+    transform.setLatLng({ 0, 179 });
+    ScreenCoordinate pixelSFForwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
+    ASSERT_DOUBLE_EQ(pixelSFBackwards.x, pixelSFForwards.x);
+    ASSERT_DOUBLE_EQ(pixelSFBackwards.y, pixelSFForwards.y);
+}

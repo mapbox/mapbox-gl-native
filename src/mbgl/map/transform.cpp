@@ -660,7 +660,21 @@ void Transform::setGestureInProgress(bool inProgress) {
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
     if (!latLng) return {};
-    ScreenCoordinate point = state.latLngToScreenCoordinate(latLng);
+
+    // If the center and point coordinates are not in the same side of the
+    // antimeridian, we need to unwrap the point longitude to make sure it can
+    // still be seen from the visible side of the antimeridian that is opposite
+    // to the center side.
+    double longitude = latLng.longitude;
+    const double centerLng = getLatLng().longitude;
+    if (centerLng - latLng.longitude > util::LONGITUDE_MAX) {
+        if (centerLng > 0 && latLng.longitude < 0) {
+            longitude += util::DEGREES_MAX;
+        } else if (centerLng < 0 && latLng.longitude > 0) {
+            longitude -= util::DEGREES_MAX;
+        }
+    }
+    ScreenCoordinate point = state.latLngToScreenCoordinate({ latLng.latitude, longitude });
     point.y = state.height - point.y;
     return point;
 }
