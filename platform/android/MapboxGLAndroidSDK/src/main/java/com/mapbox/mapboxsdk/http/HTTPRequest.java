@@ -43,15 +43,20 @@ class HTTPRequest implements Callback {
 
     private HTTPRequest(long nativePtr, String resourceUrl, String userAgent, String etag, String modified) {
         mNativePtr = nativePtr;
-        Request.Builder builder = new Request.Builder().url(resourceUrl).tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE)).addHeader("User-Agent", userAgent);
-        if (etag.length() > 0) {
-            builder = builder.addHeader("If-None-Match", etag);
-        } else if (modified.length() > 0) {
-            builder = builder.addHeader("If-Modified-Since", modified);
+
+        try {
+            Request.Builder builder = new Request.Builder().url(resourceUrl).tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE)).addHeader("User-Agent", userAgent);
+            if (etag.length() > 0) {
+                builder = builder.addHeader("If-None-Match", etag);
+            } else if (modified.length() > 0) {
+                builder = builder.addHeader("If-Modified-Since", modified);
+            }
+            mRequest = builder.build();
+            mCall = mClient.newCall(mRequest);
+            mCall.enqueue(this);
+        } catch (Exception e) {
+            onFailure(e);
         }
-        mRequest = builder.build();
-        mCall = mClient.newCall(mRequest);
-        mCall.enqueue(this);
     }
 
     public void cancel() {
@@ -83,7 +88,7 @@ class HTTPRequest implements Callback {
         try {
             body = response.body().bytes();
         } catch (IOException e) {
-            onFailure(null, e);
+            onFailure(e);
             //throw e;
             return;
         } finally {
@@ -99,6 +104,10 @@ class HTTPRequest implements Callback {
 
     @Override
     public void onFailure(Call call, IOException e) {
+        onFailure(e);
+    }
+
+    private void onFailure(Exception e) {
         Log.w(LOG_TAG, String.format("[HTTP] Request could not be executed: %s", e.getMessage()));
 
         int type = PERMANENT_ERROR;
