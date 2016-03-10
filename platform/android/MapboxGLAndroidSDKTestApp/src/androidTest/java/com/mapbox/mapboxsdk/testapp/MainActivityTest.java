@@ -13,10 +13,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.doubleClick;
 import static android.support.test.espresso.action.ViewActions.longClick;
-import static android.support.test.espresso.action.ViewActions.swipeDown;
-import static android.support.test.espresso.action.ViewActions.swipeLeft;
-import static android.support.test.espresso.action.ViewActions.swipeRight;
-import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -237,7 +233,7 @@ public class MainActivityTest extends BaseTest {
     public void testMapIconContentDescription() {
         // Mapbox logo
         onView(withContentDescription(mActivity.getResources()
-                .getString(R.string.mapbox_mapboxIconContentDescription)))
+                .getString(R.string.mapboxIconContentDescription)))
                 .check(matches(isDisplayed()));
     }
 
@@ -254,7 +250,7 @@ public class MainActivityTest extends BaseTest {
     public void testMapAttributionsIconContentDescription() {
         // Attribution icon
         onView(withContentDescription(mActivity.getResources()
-                .getString(R.string.mapbox_attributionsIconContentDescription)))
+                .getString(R.string.attributionsIconContentDescription)))
                 .check(matches(isDisplayed()));
     }
 
