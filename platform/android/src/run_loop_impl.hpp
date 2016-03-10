@@ -1,5 +1,7 @@
 #pragma once
 
+#include "jni.hpp"
+
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -33,6 +35,9 @@ public:
 
 private:
     friend RunLoop;
+
+    JNIEnv *env = nullptr;
+    bool detach = false;
 
     ALooper* loop = nullptr;
     std::atomic<bool> running;

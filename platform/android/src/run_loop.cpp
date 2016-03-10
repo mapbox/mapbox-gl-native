@@ -1,5 +1,6 @@
 #include "run_loop_impl.hpp"
 
+#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
 
 #include <android/looper.h>
@@ -74,6 +75,9 @@ RunLoop* RunLoop::Get() {
 }
 
 RunLoop::RunLoop(Type) : impl(std::make_unique<Impl>()) {
+    using namespace mbgl::android;
+    impl->detach = attach_jni_thread(theJVM, &impl->env, ThreadContext::getName());
+
     impl->loop = ALooper_prepare(0);
     assert(impl->loop);
 
@@ -86,6 +90,9 @@ RunLoop::~RunLoop() {
     current.set(nullptr);
 
     ALooper_release(impl->loop);
+
+    using namespace mbgl::android;
+    detach_jni_thread(theJVM, &impl->env, impl->detach);
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {
