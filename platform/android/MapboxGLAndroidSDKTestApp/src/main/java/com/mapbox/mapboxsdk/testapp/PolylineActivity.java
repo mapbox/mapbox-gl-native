@@ -13,10 +13,10 @@ import android.view.View;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,18 +71,20 @@ public class PolylineActivity extends AppCompatActivity {
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mMapboxMap != null && mPolylines != null && mPolylines.size() > 0) {
-                    if (mPolylines.size() == 1) {
-                        // test for removing annotation
-                        mMapboxMap.removeAnnotation(mPolylines.get(0));
-                    } else {
-                        // test for removing annotations
-                        mMapboxMap.removeAnnotations(mPolylines);
+                if (mMapboxMap != null) {
+                    if (mPolylines != null && mPolylines.size() > 0) {
+                        if (mPolylines.size() == 1) {
+                            // test for removing annotation
+                            mMapboxMap.removeAnnotation(mPolylines.get(0));
+                        } else {
+                            // test for removing annotations
+                            mMapboxMap.removeAnnotations(mPolylines);
+                        }
                     }
+                    mPolylineOptions.clear();
+                    mPolylineOptions.addAll(getRandomLine());
+                    mPolylines = mMapboxMap.addPolylines(mPolylineOptions);
                 }
-                mPolylineOptions.clear();
-                mPolylineOptions.addAll(getRandomLine());
-                mPolylines = mMapboxMap.addPolylines(mPolylineOptions);
             }
         });
     }
