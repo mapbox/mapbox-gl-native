@@ -376,7 +376,8 @@ public class MapView extends FrameLayout {
             validateTelemetryServiceConfigured();
 
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
-            MapboxEventManager.configureAndStartMapboxEventManager(getContext(), getAccessToken());
+            MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
+            eventManager.initialise(getContext(), getAccessToken());
         }
 
         // Initialize EGL

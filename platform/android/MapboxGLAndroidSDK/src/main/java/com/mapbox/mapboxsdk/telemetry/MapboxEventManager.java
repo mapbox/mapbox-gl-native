@@ -84,13 +84,22 @@ public class MapboxEventManager {
 
     /**
      * Private Constructor for configuring the single instance per app.
-     * @param context Application Context
-     * @param accessToken Access Token used in application, can be overridden by putting staging credentials in AppManifest
      */
-    private MapboxEventManager(@NonNull Context context, String accessToken) {
-        super();
+    private MapboxEventManager() {
+
+    }
+
+    /**
+     * Internal setup of MapboxEventsManager.  It needs to be called once before @link MapboxEventManager#getMapboxEventManager
+     * <p/>
+     * This allows for a cleaner getMapboxEventManager() that doesn't require context and accessToken
+     *
+     * @param context     The context associated with MapView
+     * @param accessToken The accessToken to load MapView
+     */
+    public void initialise(@NonNull Context context, @NonNull String accessToken) {
+        this.context = context.getApplicationContext();
         this.accessToken = accessToken;
-        this.context = context;
 
         // Setup Message Digest
         try {
@@ -157,26 +166,14 @@ public class MapboxEventManager {
     }
 
     /**
-     * Internal setup of MapboxEventsManager.  It needs to be called once before @link MapboxEventManager#getMapboxEventManager
-     *
-     * This allows for a cleaner getMapboxEventManager() that doesn't require context and accessToken
-     *
-     * @param context Context
-     * @param accessToken Access Token
-     */
-    public static void configureAndStartMapboxEventManager(@NonNull Context context, @NonNull String accessToken) {
-        if (mapboxEventManager != null) {
-            Log.w(TAG, "Singleton has already been created.");
-            return;
-        }
-        mapboxEventManager = new MapboxEventManager(context.getApplicationContext(), accessToken);
-    }
-
-    /**
      * Primary Access method using Singleton pattern
+     *
      * @return MapboxEventManager
      */
     public static MapboxEventManager getMapboxEventManager() {
+        if (mapboxEventManager == null) {
+            mapboxEventManager = new MapboxEventManager();
+        }
         return mapboxEventManager;
     }
 
@@ -266,15 +263,19 @@ public class MapboxEventManager {
 
     /**
      * Push Interactive Events to the system for processing
+     *
      * @param eventWithAttributes Event with attributes
      */
     public void pushEvent(Hashtable<String, Object> eventWithAttributes) {
+        if (context == null || accessToken == null) {
+            return;
+        }
 
         if (eventWithAttributes == null) {
             return;
         }
 
-        String eventType = (String)eventWithAttributes.get(MapboxEvent.ATTRIBUTE_EVENT);
+        String eventType = (String) eventWithAttributes.get(MapboxEvent.ATTRIBUTE_EVENT);
         if (TextUtils.isEmpty(eventType)) {
             return;
         }
