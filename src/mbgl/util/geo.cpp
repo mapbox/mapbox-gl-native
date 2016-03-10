@@ -1,3 +1,4 @@
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/map/tile_id.hpp>
@@ -13,8 +14,8 @@ LatLng::LatLng(const TileID& id) {
 }
 
 ScreenCoordinate LatLng::project() const {
-    // Clamp to the latitude limits of Mercator.
-    const double constrainedLatitude = ::fmin(::fmax(latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
+    // Clamp to the latitude limits of Web Mercator.
+    const double constrainedLatitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
 
     // Project a coordinate into unit space in a square map.
     const double sine = std::sin(constrainedLatitude * util::DEG2RAD);

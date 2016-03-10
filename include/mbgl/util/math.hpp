@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <array>
+#include <limits>
 
 #include <mbgl/util/vec.hpp>
 
@@ -11,33 +12,33 @@ namespace util {
 
 
 template <typename T>
-inline T max(T a, T b) {
-    return b > a ? b : a;
+typename std::enable_if_t<std::is_integral<T>::value, T> max(T a, T b) {
+    return std::max(a, b);
 }
 
 template <typename T>
-inline T max(T a, T b, T c) {
-    return max(max(a, b), c);
+typename std::enable_if_t<std::is_floating_point<T>::value, T> max(T a, T b) {
+    return std::fmax(a, b);
+}
+
+template <typename T, typename... Ts>
+typename std::enable_if_t<std::is_arithmetic<T>::value, T> max(T a, T b, Ts... args) {
+    return max(a, max(b, args...));
 }
 
 template <typename T>
-inline T max(T a, T b, T c, T d) {
-    return max(max(a, b), max(c, d));
+typename std::enable_if_t<std::is_integral<T>::value, T> min(T a, T b) {
+    return std::min(a, b);
 }
 
 template <typename T>
-inline T min(T a, T b) {
-    return b < a ? b : a;
+typename std::enable_if_t<std::is_floating_point<T>::value, T> min(T a, T b) {
+    return std::fmin(a, b);
 }
 
-template <typename T>
-inline T min(T a, T b, T c) {
-    return min(min(a, b), c);
-}
-
-template <typename T>
-inline T min(T a, T b, T c, T d) {
-    return min(min(a, b), min(c, d));
+template <typename T, typename... Ts>
+typename std::enable_if_t<std::is_arithmetic<T>::value, T> min(T a, T b, Ts... args) {
+    return min(a, min(b, args...));
 }
 
 // Find the angle of the two vectors, solving the formula for the cross product
@@ -113,8 +114,8 @@ inline S unit(const S& a) {
 }
 
 template <typename T>
-T clamp(T value, T min, T max) {
-    return value < min ? min : (value > max ? max : value);
+T clamp(T value, T min_, T max_) {
+    return max(min_, min(max_, value));
 }
 
 // Constrains n to the given range (including min, excluding max) via modular

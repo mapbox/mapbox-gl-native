@@ -410,6 +410,7 @@ void Transform::scaleBy(double ds, const Duration& duration) {
 }
 
 void Transform::scaleBy(double ds, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    if (std::isnan(ds)) return;
     double scale = util::clamp(state.scale * ds, state.min_scale, state.max_scale);
     setScale(scale, anchor, duration);
 }

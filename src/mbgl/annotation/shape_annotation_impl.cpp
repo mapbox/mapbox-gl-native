@@ -4,6 +4,7 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/layer/line_layer.hpp>
@@ -90,8 +91,8 @@ void ShapeAnnotationImpl::updateTile(const TileID& tileID, AnnotationTile& tile)
         std::vector<geojsonvt::LonLat> points;
 
         for (size_t i = 0; i < shape.segments[0].size(); ++i) { // first segment for now (no holes)
-            const double constraintedLatitude = ::fmin(::fmax(shape.segments[0][i].latitude, -util::LATITUDE_MAX), util::LATITUDE_MAX);
-            points.push_back(geojsonvt::LonLat(shape.segments[0][i].longitude, constraintedLatitude));
+            const double constrainedLatitude = util::clamp(shape.segments[0][i].latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
+            points.push_back(geojsonvt::LonLat(shape.segments[0][i].longitude, constrainedLatitude));
         }
 
         if (type == geojsonvt::ProjectedFeatureType::Polygon &&

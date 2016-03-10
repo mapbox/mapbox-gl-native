@@ -42,6 +42,7 @@
         'util/geo.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',
+        'util/math.cpp',
         'util/merge_lines.cpp',
         'util/run_loop.cpp',
         'util/text_conversions.cpp',
