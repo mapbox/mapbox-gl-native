@@ -1,6 +1,6 @@
 #import "MBXViewController.h"
 #import "MBXCustomCalloutView.h"
-#import "MBXDownloadsTableViewController.h"
+#import "MBXOfflinePacksTableViewController.h"
 
 #import <Mapbox/Mapbox.h>
 #import "../../../include/mbgl/util/default_styles.hpp"
@@ -102,8 +102,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(__unused id)sender {
-    if ([segue.identifier isEqualToString:@"ShowDownloads"]) {
-        MBXDownloadsTableViewController *controller = [segue destinationViewController];
+    if ([segue.identifier isEqualToString:@"ShowOfflinePacks"]) {
+        MBXOfflinePacksTableViewController *controller = [segue destinationViewController];
         controller.mapView = self.mapView;
     }
 }

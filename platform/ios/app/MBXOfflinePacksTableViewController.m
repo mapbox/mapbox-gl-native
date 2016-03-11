@@ -1,11 +1,11 @@
-#import "MBXDownloadsTableViewController.h"
+#import "MBXOfflinePacksTableViewController.h"
 
 #import <Mapbox/Mapbox.h>
 
 static NSString * const MBXOfflinePackContextNameKey = @"Name";
 
-static NSString * const MBXDownloadsTableViewInactiveCellReuseIdentifier = @"Inactive";
-static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Active";
+static NSString * const MBXOfflinePacksTableViewInactiveCellReuseIdentifier = @"Inactive";
+static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Active";
 
 @implementation MGLOfflinePack (MBXAdditions)
 
@@ -28,22 +28,22 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 
 @end
 
-@interface MBXDownloadsTableViewController () <MGLOfflinePackDelegate>
+@interface MBXOfflinePacksTableViewController () <MGLOfflinePackDelegate>
 
 @property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *offlinePacks;
 
 @end
 
-@implementation MBXDownloadsTableViewController {
+@implementation MBXOfflinePacksTableViewController {
     NSUInteger _untitledRegionCount;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    __weak MBXDownloadsTableViewController *weakSelf = self;
+    __weak MBXOfflinePacksTableViewController *weakSelf = self;
     [[MGLOfflineStorage sharedOfflineStorage] getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError *error) {
-        MBXDownloadsTableViewController *strongSelf = weakSelf;
+        MBXOfflinePacksTableViewController *strongSelf = weakSelf;
         strongSelf.offlinePacks = packs.mutableCopy;
         [strongSelf.tableView reloadData];
         
@@ -53,7 +53,7 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
         }
         
         if (error) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Find Downloads" message:@"Mapbox GL was unable to find the existing downloads." preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Find Offline Packs" message:@"Mapbox GL was unable to find the existing offline packs." preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
             [self presentViewController:alertController animated:YES completion:^{
                 [strongSelf dismissViewControllerAnimated:YES completion:nil];
@@ -63,7 +63,7 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 }
 
 - (IBAction)addCurrentRegion:(id)sender {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add Download" message:@"Choose a name for the download:" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add Offline Pack" message:@"Choose a name for the pack:" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:nil];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     
@@ -81,12 +81,12 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
             MBXOfflinePackContextNameKey: name,
         }];
         
-        __weak MBXDownloadsTableViewController *weakSelf = self;
+        __weak MBXOfflinePacksTableViewController *weakSelf = self;
         [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack *pack, NSError *error) {
-            MBXDownloadsTableViewController *strongSelf = weakSelf;
+            MBXOfflinePacksTableViewController *strongSelf = weakSelf;
             if (error) {
-                NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the download “%@”.", name];
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Download" message:message preferredStyle:UIAlertControllerStyleAlert];
+                NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the offline pack “%@”.", name];
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
                 [self presentViewController:alertController animated:YES completion:nil];
             } else {
@@ -114,7 +114,7 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
     
-    NSString *reuseIdentifier = pack.state == MGLOfflinePackStateActive ? MBXDownloadsTableViewActiveCellReuseIdentifier : MBXDownloadsTableViewInactiveCellReuseIdentifier;
+    NSString *reuseIdentifier = pack.state == MGLOfflinePackStateActive ? MBXOfflinePacksTableViewActiveCellReuseIdentifier : MBXOfflinePacksTableViewInactiveCellReuseIdentifier;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
     cell.textLabel.text = pack.name;
     MGLOfflinePackProgress progress = pack.progress;
@@ -164,9 +164,9 @@ static NSString * const MBXDownloadsTableViewActiveCellReuseIdentifier = @"Activ
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
-        __weak MBXDownloadsTableViewController *weakSelf = self;
+        __weak MBXOfflinePacksTableViewController *weakSelf = self;
         [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError *error) {
-            MBXDownloadsTableViewController *strongSelf = weakSelf;
+            MBXOfflinePacksTableViewController *strongSelf = weakSelf;
             [strongSelf.offlinePacks removeObjectAtIndex:indexPath.row];
             [strongSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         }];

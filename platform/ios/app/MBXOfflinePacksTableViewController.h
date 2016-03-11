@@ -2,7 +2,7 @@
 
 @class MGLMapView;
 
-@interface MBXDownloadsTableViewController : UITableViewController
+@interface MBXOfflinePacksTableViewController : UITableViewController
 
 @property (nonatomic, weak) MGLMapView *mapView;
 
