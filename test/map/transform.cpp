@@ -212,24 +212,29 @@ TEST(Transform, ConstrainWidthAndHeight) {
 TEST(Transform, Anchor) {
     MockView view;
     Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
 
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(1, transform.getScale());
+    const LatLng latLng { 10, -100 };
+    transform.setLatLngZoom(latLng, 10);
 
-    transform.setLatLngZoom({ 10, -100 }, 10);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(-100, transform.getLatLng().longitude);
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const ScreenCoordinate anchorPoint = {0, 0};
-    const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
-    transform.setAngle(M_PI_4, anchorPoint);
-
+    transform.setAngle(M_PI_4);
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
-    ASSERT_NE(anchorLatLng, transform.getLatLng());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
+    const ScreenCoordinate anchorPoint = { 150, 150 };
+    const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
+    transform.setAngle(-45 * util::DEG2RAD, anchorPoint);
+    ASSERT_NEAR(-45 / util::RAD2DEG, transform.getAngle(), 0.000001);
+    ASSERT_NE(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_NE(latLng.longitude, transform.getLatLng().longitude);
+    ASSERT_NEAR(anchorLatLng.latitude, transform.getLatLng().latitude, 1);
+    ASSERT_NEAR(anchorLatLng.longitude, transform.getLatLng().longitude, 1);
 }
 
 TEST(Transform, Padding) {

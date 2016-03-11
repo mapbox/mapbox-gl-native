@@ -502,7 +502,7 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
 }
 
 void Transform::setAngle(double angle, const Duration& duration) {
-    setAngle(angle, ScreenCoordinate {}, duration);
+    setAngle(angle, ScreenCoordinate { NAN, NAN }, duration);
 }
 
 void Transform::setAngle(double angle, const ScreenCoordinate& anchor, const Duration& duration) {
