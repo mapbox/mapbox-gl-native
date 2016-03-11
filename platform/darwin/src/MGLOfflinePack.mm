@@ -1,4 +1,4 @@
-#import "MGLOfflineTask_Private.h"
+#import "MGLOfflinePack_Private.h"
 
 #import "MGLOfflineStorage_Private.h"
 #import "MGLOfflineRegion_Private.h"
@@ -8,56 +8,56 @@
 #include <mbgl/util/string.hpp>
 
 /**
- Assert that the current offline task is valid.
+ Assert that the current offline pack is valid.
  
  This macro should be used at the beginning of any public-facing instance method
- of `MGLOfflineTask`. For private methods, an assertion is more appropriate.
+ of `MGLOfflinePack`. For private methods, an assertion is more appropriate.
  */
-#define MGLAssertOfflineTaskIsValid() \
+#define MGLAssertOfflinePackIsValid() \
     do { \
-        if (_state == MGLOfflineTaskStateInvalid) { \
-            [NSException raise:@"Invalid offline task" \
+        if (_state == MGLOfflinePackStateInvalid) { \
+            [NSException raise:@"Invalid offline pack" \
                         format: \
-             @"-[MGLOfflineStorage removeTask:withCompletionHandler:] has been called " \
-             @"on this instance of MGLOfflineTask, rendering it invalid. It is an " \
-             @"error to send any message to this task."]; \
+             @"-[MGLOfflineStorage removePack:withCompletionHandler:] has been called " \
+             @"on this instance of MGLOfflinePack, rendering it invalid. It is an " \
+             @"error to send any message to this pack."]; \
         } \
     } while (NO);
 
 class MBGLOfflineRegionObserver : public mbgl::OfflineRegionObserver {
 public:
-    MBGLOfflineRegionObserver(MGLOfflineTask *offlineTask_) : offlineTask(offlineTask_) {}
+    MBGLOfflineRegionObserver(MGLOfflinePack *pack_) : pack(pack_) {}
     
     void statusChanged(mbgl::OfflineRegionStatus status) override;
     void responseError(mbgl::Response::Error error) override;
     void mapboxTileCountLimitExceeded(uint64_t limit) override;
     
 private:
-    __weak MGLOfflineTask *offlineTask = nullptr;
+    __weak MGLOfflinePack *pack = nullptr;
 };
 
-@interface MGLOfflineTask ()
+@interface MGLOfflinePack ()
 
 @property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
-@property (nonatomic, readwrite) MGLOfflineTaskState state;
-@property (nonatomic, readwrite) MGLOfflineTaskProgress progress;
+@property (nonatomic, readwrite) MGLOfflinePackState state;
+@property (nonatomic, readwrite) MGLOfflinePackProgress progress;
 
 @end
 
-@implementation MGLOfflineTask
+@implementation MGLOfflinePack
 
 - (instancetype)init {
     [NSException raise:@"Method unavailable"
                 format:
-     @"-[MGLOfflineTask init] is unavailable. "
-     @"Use +[MGLOfflineStorage addTaskForRegion:withContext:completionHandler:] instead."];
+     @"-[MGLOfflinePack init] is unavailable. "
+     @"Use +[MGLOfflineStorage addPackForRegion:withContext:completionHandler:] instead."];
     return nil;
 }
 
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region {
     if (self = [super init]) {
         _mbglOfflineRegion = region;
-        _state = MGLOfflineTaskStateUnknown;
+        _state = MGLOfflinePackStateUnknown;
         
         mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, std::make_unique<MBGLOfflineRegionObserver>(self));
@@ -66,14 +66,14 @@ private:
 }
 
 - (void)dealloc {
-    if (_mbglOfflineRegion && _state != MGLOfflineTaskStateInvalid) {
+    if (_mbglOfflineRegion && _state != MGLOfflinePackStateInvalid) {
         mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
         mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, nullptr);
     }
 }
 
 - (id <MGLOfflineRegion>)region {
-    MGLAssertOfflineTaskIsValid();
+    MGLAssertOfflinePackIsValid();
     
     const mbgl::OfflineRegionDefinition &regionDefinition = _mbglOfflineRegion->getDefinition();
     NSAssert([MGLTilePyramidOfflineRegion conformsToProtocol:@protocol(MGLOfflineRegion_Private)], @"MGLTilePyramidOfflineRegion should conform to MGLOfflineRegion_Private.");
@@ -81,58 +81,58 @@ private:
 }
 
 - (NSData *)context {
-    MGLAssertOfflineTaskIsValid();
+    MGLAssertOfflinePackIsValid();
     
     const mbgl::OfflineRegionMetadata &metadata = _mbglOfflineRegion->getMetadata();
     return [NSData dataWithBytes:&metadata[0] length:metadata.size()];
 }
 
 - (void)resume {
-    MGLAssertOfflineTaskIsValid();
+    MGLAssertOfflinePackIsValid();
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Active);
 }
 
 - (void)suspend {
-    MGLAssertOfflineTaskIsValid();
+    MGLAssertOfflinePackIsValid();
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     mbglFileSource->setOfflineRegionDownloadState(*_mbglOfflineRegion, mbgl::OfflineRegionDownloadState::Inactive);
 }
 
 - (void)invalidate {
-    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot invalidate an already invalid offline task.");
+    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot invalidate an already invalid offline pack.");
     
-    self.state = MGLOfflineTaskStateInvalid;
+    self.state = MGLOfflinePackStateInvalid;
     self.mbglOfflineRegion = nil;
 }
 
-- (void)setState:(MGLOfflineTaskState)state {
+- (void)setState:(MGLOfflinePackState)state {
     if (!self.mbglOfflineRegion) {
         // A progress update has arrived after the call to
-        // -[MGLOfflineStorage removeTask:withCompletionHandler:] but before the
+        // -[MGLOfflineStorage removePack:withCompletionHandler:] but before the
         // removal is complete and the completion handler is called.
-        NSAssert(_state == MGLOfflineTaskStateInvalid, @"A valid MGLOfflineTask has no mbgl::OfflineRegion.");
+        NSAssert(_state == MGLOfflinePackStateInvalid, @"A valid MGLOfflinePack has no mbgl::OfflineRegion.");
         return;
     }
     
-    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot change the state of an invalid offline task.");
+    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change the state of an invalid offline pack.");
     
     _state = state;
 }
 
 - (void)requestProgress {
-    MGLAssertOfflineTaskIsValid();
+    MGLAssertOfflinePackIsValid();
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     
-    __weak MGLOfflineTask *weakSelf = self;
+    __weak MGLOfflinePack *weakSelf = self;
     mbglFileSource->getOfflineRegionStatus(*_mbglOfflineRegion, [&, weakSelf](__unused std::exception_ptr exception, mbgl::optional<mbgl::OfflineRegionStatus> status) {
         if (status) {
             mbgl::OfflineRegionStatus checkedStatus = *status;
             dispatch_async(dispatch_get_main_queue(), ^{
-                MGLOfflineTask *strongSelf = weakSelf;
+                MGLOfflinePack *strongSelf = weakSelf;
                 [strongSelf offlineRegionStatusDidChange:checkedStatus];
             });
         }
@@ -140,27 +140,27 @@ private:
 }
 
 - (void)offlineRegionStatusDidChange:(mbgl::OfflineRegionStatus)status {
-    NSAssert(_state != MGLOfflineTaskStateInvalid, @"Cannot change update progress of an invalid offline task.");
+    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot change update progress of an invalid offline pack.");
     
     switch (status.downloadState) {
         case mbgl::OfflineRegionDownloadState::Inactive:
-            self.state = status.complete() ? MGLOfflineTaskStateComplete : MGLOfflineTaskStateInactive;
+            self.state = status.complete() ? MGLOfflinePackStateComplete : MGLOfflinePackStateInactive;
             break;
             
         case mbgl::OfflineRegionDownloadState::Active:
-            self.state = MGLOfflineTaskStateActive;
+            self.state = MGLOfflinePackStateActive;
             break;
     }
     
-    MGLOfflineTaskProgress progress;
+    MGLOfflinePackProgress progress;
     progress.countOfResourcesCompleted = status.completedResourceCount;
     progress.countOfBytesCompleted = status.completedResourceSize;
     progress.countOfResourcesExpected = status.requiredResourceCount;
     progress.maximumResourcesExpected = status.requiredResourceCountIsPrecise ? status.requiredResourceCount : UINT64_MAX;
     self.progress = progress;
     
-    if ([self.delegate respondsToSelector:@selector(offlineTask:progressDidChange:)]) {
-        [self.delegate offlineTask:self progressDidChange:progress];
+    if ([self.delegate respondsToSelector:@selector(offlinePack:progressDidChange:)]) {
+        [self.delegate offlinePack:self progressDidChange:progress];
     }
 }
 
@@ -189,28 +189,28 @@ NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
 
 void MBGLOfflineRegionObserver::statusChanged(mbgl::OfflineRegionStatus status) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
+        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
         
-        [offlineTask offlineRegionStatusDidChange:status];
+        [pack offlineRegionStatusDidChange:status];
     });
 }
 
 void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
+        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
         
-        if ([offlineTask.delegate respondsToSelector:@selector(offlineTask:didReceiveError:)]) {
-            [offlineTask.delegate offlineTask:offlineTask didReceiveError:MGLErrorFromResponseError(error)];
+        if ([pack.delegate respondsToSelector:@selector(offlinePack:didReceiveError:)]) {
+            [pack.delegate offlinePack:pack didReceiveError:MGLErrorFromResponseError(error)];
         }
     });
 }
 
 void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(offlineTask, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflineTask.");
+        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
         
-        if ([offlineTask.delegate respondsToSelector:@selector(offlineTask:didReceiveMaximumAllowedMapboxTiles:)]) {
-            [offlineTask.delegate offlineTask:offlineTask didReceiveMaximumAllowedMapboxTiles:limit];
+        if ([pack.delegate respondsToSelector:@selector(offlinePack:didReceiveMaximumAllowedMapboxTiles:)]) {
+            [pack.delegate offlinePack:pack didReceiveMaximumAllowedMapboxTiles:limit];
         }
     });
 }

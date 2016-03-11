@@ -22,8 +22,8 @@ static void InitializeMapbox() {
     [MGLMapCamera class];
     [MGLMapView class];
     [MGLMultiPoint class];
+    [MGLOfflinePack class];
     [MGLOfflineStorage class];
-    [MGLOfflineTask class];
     [MGLPointAnnotation class];
     [MGLPolygon class];
     [MGLPolyline class];

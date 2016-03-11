@@ -4,43 +4,43 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class MGLOfflineTask;
+@class MGLOfflinePack;
 @protocol MGLOfflineRegion;
 
 /**
- A block to be called once an offline task has been completely created and
+ A block to be called once an offline pack has been completely created and
  added.
  
- @param task Contains a pointer to the newly added task, or `nil` if there was
-    an error creating or adding the task.
+ @param pack Contains a pointer to the newly added pack, or `nil` if there was
+    an error creating or adding the pack.
  @param error Contains a pointer to an error object (if any) indicating why the
-    task could not be created or added. For a list of possible error codes, see
+    pack could not be created or added. For a list of possible error codes, see
     `MGLErrorCode`.
  */
-typedef void (^MGLOfflineTaskAdditionCompletionHandler)(MGLOfflineTask * _Nullable task, NSError * _Nullable error);
+typedef void (^MGLOfflinePackAdditionCompletionHandler)(MGLOfflinePack * _Nullable pack, NSError * _Nullable error);
 
 /**
- A block to be called once an offline task has been completely invalidated and
+ A block to be called once an offline pack has been completely invalidated and
  removed.
  
  @param error Contains a pointer to an error object (if any) indicating why the
-    task could not be invalidated or removed.
+    pack could not be invalidated or removed.
  */
-typedef void (^MGLOfflineTaskRemovalCompletionHandler)(NSError * _Nullable error);
+typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error);
 
 /**
- A block to be called with a complete list of offline tasks.
+ A block to be called with a complete list of offline packs.
  
- @param task Contains a pointer an array of tasks, or `nil` if there was an
-    error obtaining the tasks.
+ @param pack Contains a pointer an array of packs, or `nil` if there was an
+    error obtaining the packs.
  @param error Contains a pointer to an error object (if any) indicating why the
-    list of tasks could not be obtained.
+    list of packs could not be obtained.
  */
-typedef void (^MGLOfflineTaskListingCompletionHandler)(NS_ARRAY_OF(MGLOfflineTask *) *tasks, NSError * _Nullable error);
+typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error);
 
 /**
  MGLOfflineStorage implements a singleton (shared object) that manages offline
- tasks. All of this class’s instance methods are asynchronous, reflecting the
+ packs. All of this class’s instance methods are asynchronous, reflecting the
  fact that offline resources are stored in a database.
  */
 @interface MGLOfflineStorage : NSObject
@@ -53,53 +53,53 @@ typedef void (^MGLOfflineTaskListingCompletionHandler)(NS_ARRAY_OF(MGLOfflineTas
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- Creates and registers an offline task that downloads the resources needed to
+ Creates and registers an offline pack that downloads the resources needed to
  use the given region offline.
  
- The resulting task starts out with a state of `MGLOfflineTaskStateInactive`. To
- begin downloading resources, call `-[MGLOfflineTask resume]`. To monitor
- download progress, set the task’s `delegate` property to an object that
- conforms to the `MGLOfflineTaskDelegate` protocol.
+ The resulting pack starts out with a state of `MGLOfflinePackStateInactive`. To
+ begin downloading resources, call `-[MGLOfflinePack resume]`. To monitor
+ download progress, set the pack’s `delegate` property to an object that
+ conforms to the `MGLOfflinePackDelegate` protocol.
  
  @param region A region to download.
  @param context Arbitrary data to store alongside the downloaded resources.
- @param completion The completion handler to call once the task has been added.
+ @param completion The completion handler to call once the pack has been added.
     This handler is executed asynchronously on the main queue.
  */
-- (void)addTaskForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflineTaskAdditionCompletionHandler)completion;
+- (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion;
 
 /**
- Unregisters the given offline task and frees any resources that are no longer
- required by any remaining tasks.
+ Unregisters the given offline pack and frees any resources that are no longer
+ required by any remaining packs.
  
- As soon as this method is called on a task, the task becomes invalid; any
+ As soon as this method is called on a pack, the pack becomes invalid; any
  attempt to send it a message will result in an exception being thrown. If an
- error occurs and the task cannot be removed, do not attempt to reuse the task
- object. Instead, use the `-getTasksWithCompletionHandler:` method to obtain a
- valid pointer to the task object.
+ error occurs and the pack cannot be removed, do not attempt to reuse the pack
+ object. Instead, use the `-getPacksWithCompletionHandler:` method to obtain a
+ valid pointer to the pack object.
  
- @param task The offline task to remove.
- @param completion The completion handler to call once the task has been
+ @param pack The offline pack to remove.
+ @param completion The completion handler to call once the pack has been
     removed. This handler is executed asynchronously on the main queue.
  */
-- (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion;
+- (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion;
 
 /**
- Asynchronously calls a completion callback with all existing offline tasks.
+ Asynchronously calls a completion callback with all existing offline packs.
  
- @param completion The completion handler to call with the list of tasks. This
+ @param completion The completion handler to call with the list of packs. This
      handler is executed asynchronously on the main queue.
  */
-- (void)getTasksWithCompletionHandler:(MGLOfflineTaskListingCompletionHandler)completion;
+- (void)getPacksWithCompletionHandler:(MGLOfflinePackListingCompletionHandler)completion;
 
 /**
  Sets the maximum number of Mapbox-hosted tiles that may be downloaded and
  stored on the current device.
  
  Once this limit is reached,
- `-[MGLOfflineTaskDelegate offlineTask:didReceiveMaximumAllowedMapboxTiles:]` is
- called on every delegate of `MGLOfflineTask` until already downloaded tiles are
- removed by calling the `-removeTask:withCompletionHandler:` method.
+ `-[MGLOfflinePackDelegate offlinePack:didReceiveMaximumAllowedMapboxTiles:]` is
+ called on every delegate of `MGLOfflinePack` until already downloaded tiles are
+ removed by calling the `-removePack:withCompletionHandler:` method.
  
  @note The [Mapbox Terms of Service](https://www.mapbox.com/tos/) prohibits
     changing or bypassing this limit without permission from Mapbox. Contact

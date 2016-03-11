@@ -2,7 +2,7 @@
 
 #import "MGLAccountManager_Private.h"
 #import "MGLGeometry_Private.h"
-#import "MGLOfflineTask_Private.h"
+#import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
 
@@ -76,7 +76,7 @@
     }
 }
 
-- (void)addTaskForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflineTaskAdditionCompletionHandler)completion {
+- (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
         [NSException raise:@"Unsupported region type" format:
          @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
@@ -95,17 +95,17 @@
             } : nil];
         }
         if (completion) {
-            MGLOfflineTask *task = mbglOfflineRegion ? [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))] : nil;
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error, task](void) {
-                completion(task, error);
+            MGLOfflinePack *pack = mbglOfflineRegion ? [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(*mbglOfflineRegion))] : nil;
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, pack](void) {
+                completion(pack, error);
             });
         }
     });
 }
 
-- (void)removeTask:(MGLOfflineTask *)task withCompletionHandler:(MGLOfflineTaskRemovalCompletionHandler)completion {
-    mbgl::OfflineRegion *mbglOfflineRegion = task.mbglOfflineRegion;
-    [task invalidate];
+- (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
+    mbgl::OfflineRegion *mbglOfflineRegion = pack.mbglOfflineRegion;
+    [pack invalidate];
     self.mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {
@@ -121,7 +121,7 @@
     });
 }
 
-- (void)getTasksWithCompletionHandler:(MGLOfflineTaskListingCompletionHandler)completion {
+- (void)getPacksWithCompletionHandler:(MGLOfflinePackListingCompletionHandler)completion {
     self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
         NSError *error;
         if (exception) {
@@ -129,17 +129,17 @@
                 NSLocalizedDescriptionKey: @(mbgl::util::toString(exception).c_str()),
             }];
         }
-        NSMutableArray *tasks;
+        NSMutableArray *packs;
         if (regions) {
-            tasks = [NSMutableArray arrayWithCapacity:regions->size()];
+            packs = [NSMutableArray arrayWithCapacity:regions->size()];
             for (mbgl::OfflineRegion &region : *regions) {
-                MGLOfflineTask *task = [[MGLOfflineTask alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
-                [tasks addObject:task];
+                MGLOfflinePack *pack = [[MGLOfflinePack alloc] initWithMBGLRegion:new mbgl::OfflineRegion(std::move(region))];
+                [packs addObject:pack];
             }
         }
         if (completion) {
-            dispatch_async(dispatch_get_main_queue(), [&, completion, error, tasks](void) {
-                completion(tasks, error);
+            dispatch_async(dispatch_get_main_queue(), [&, completion, error, packs](void) {
+                completion(packs, error);
             });
         }
     });
