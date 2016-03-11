@@ -52,11 +52,11 @@ Known issues:
 ## iOS master
 
 - Offline packs can now be downloaded to allow users to view specific regions of the map offline. A new MGLOfflineStorage class provides APIs for managing MGLOfflinePacks. ([#4221](https://github.com/mapbox/mapbox-gl-native/pull/4221))
-- Fixed screen coordinates for LatLng coordinates accross the antimeridian. ([#4155](https://github.com/mapbox/mapbox-gl-native/issues/4155))
-- Fixed a bounce-back effect when panning the map. ([#4214](https://github.com/mapbox/mapbox-gl-native/pull/4214))
+- The user dot no longer disappears after panning the map across the antimeridian at low zoom levels. ([#4275](https://github.com/mapbox/mapbox-gl-native/pull/4275))
+- The map no longer recoils when panning quickly at low zoom levels. ([#4214](https://github.com/mapbox/mapbox-gl-native/pull/4214))
 - An icon laid out along a line no longer appears if it would extend past the end of the line. Some one-way arrows no longer point the wrong way. ([#3839](https://github.com/mapbox/mapbox-gl-native/pull/3839))
-- Reduce slanted segments in dashed lines near corners. ([#3914](https://github.com/mapbox/mapbox-gl-native/pull/3914))
-- Telemetry location gathering now only occurs when the device is in motion. ([#4115](https://github.com/mapbox/mapbox-gl-native/pull/4115))
+- Fixed warping of dashed lines near sharp corners. ([#3914](https://github.com/mapbox/mapbox-gl-native/pull/3914))
+- Telemetry location gathering now occurs only when the device is in motion. ([#4115](https://github.com/mapbox/mapbox-gl-native/pull/4115))
 - An account’s monthly active users metric only counts a user once a map view is displayed to that user. ([#3713](https://github.com/mapbox/mapbox-gl-native/pull/3713))
 - Updated documentation to reflect the requirement that you must embed the framework in the “Embedded Binaries” section in Xcode. ([#4011](https://github.com/mapbox/mapbox-gl-native/issues/4011))
 - Polygons and polylines now default to using the map view’s tint color. ([#4028](https://github.com/mapbox/mapbox-gl-native/pull/4028))
