@@ -41,13 +41,13 @@ custom_categories:
     children:
       - MGLOfflineRegion
       - MGLOfflineStorage
-      - MGLOfflineTask
-      - MGLOfflineTaskAdditionCompletionHandler
-      - MGLOfflineTaskDelegate
-      - MGLOfflineTaskListingCompletionHandler
-      - MGLOfflineTaskProgress
-      - MGLOfflineTaskRemovalCompletionHandler
-      - MGLOfflineTaskState
+      - MGLOfflinePack
+      - MGLOfflinePackAdditionCompletionHandler
+      - MGLOfflinePackDelegate
+      - MGLOfflinePackListingCompletionHandler
+      - MGLOfflinePackProgress
+      - MGLOfflinePackRemovalCompletionHandler
+      - MGLOfflinePackState
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:
