@@ -1,4 +1,4 @@
 /**
- * This package contains classes to add and manage annotations on your map.
+ * Contains the Mapbox Maps Android Annotation API classes.
  */
 package com.mapbox.mapboxsdk.annotations;

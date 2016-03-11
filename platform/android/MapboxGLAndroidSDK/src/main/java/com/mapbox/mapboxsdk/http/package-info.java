@@ -1,4 +1,4 @@
 /**
- * Do not use this package. Used internally by the SDK.
+ * Do not use this package. Internal use only.
  */
 package com.mapbox.mapboxsdk.http;

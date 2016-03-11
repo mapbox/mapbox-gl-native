@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An immutable class representing a latitude/longitude aligned rectangle.
+ * A geographical area representing a latitude/longitude aligned rectangle.
  */
 public class LatLngBounds implements Parcelable {
 
@@ -132,8 +132,8 @@ public class LatLngBounds implements Parcelable {
         return new LatLngBounds(maxLat, maxLon, minLat, minLon);
     }
 
-    public LatLng[] toLatLngs(){
-        return new LatLng[]{new LatLng(mLatNorth,mLonEast),new LatLng(mLatSouth,mLonWest)};
+    public LatLng[] toLatLngs() {
+        return new LatLng[]{new LatLng(mLatNorth, mLonEast), new LatLng(mLatSouth, mLonWest)};
     }
 
     /**
@@ -221,9 +221,9 @@ public class LatLngBounds implements Parcelable {
      * Returns a new LatLngBounds that is the intersection of this with another LatLngBounds
      *
      * @param northLatitude Northern Longitude
-     * @param eastLongitude   Eastern Latitude
+     * @param eastLongitude Eastern Latitude
      * @param southLatitude Southern Longitude
-     * @param westLongitude   Western Latitude
+     * @param westLongitude Western Latitude
      * @return LatLngBounds
      */
     public LatLngBounds intersect(double northLatitude, double eastLongitude, double southLatitude, double westLongitude) {
@@ -272,6 +272,9 @@ public class LatLngBounds implements Parcelable {
         return new LatLngBounds(lonNorth, latEast, lonSouth, latWest);
     }
 
+    /**
+     * Builder for composing LatLngBounds objects.
+     */
     public static final class Builder {
 
         private List<LatLng> mLatLngList;

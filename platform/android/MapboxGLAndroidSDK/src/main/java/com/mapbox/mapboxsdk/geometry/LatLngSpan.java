@@ -12,28 +12,54 @@ public class LatLngSpan implements Parcelable {
     private double mLatitudeSpan;
     private double mLongitudeSpan;
 
-    public LatLngSpan(@NonNull Parcel in){
+    private LatLngSpan(@NonNull Parcel in) {
         mLatitudeSpan = in.readDouble();
         mLongitudeSpan = in.readDouble();
     }
 
+    /**
+     * Creates a LatLgnSpan.
+     *
+     * @param latitudeSpan  The span used for latitude.
+     * @param longitudeSpan The span used for longitude.
+     */
     public LatLngSpan(double latitudeSpan, double longitudeSpan) {
         mLatitudeSpan = latitudeSpan;
         mLongitudeSpan = longitudeSpan;
     }
 
+    /**
+     * Returns the latitude span.
+     *
+     * @return The latitude span.
+     */
     public double getLatitudeSpan() {
         return mLatitudeSpan;
     }
 
+    /**
+     * Sets the latitude span.
+     *
+     * @param latitudeSpan The latitude span to set.
+     */
     public void setLatitudeSpan(double latitudeSpan) {
         mLatitudeSpan = latitudeSpan;
     }
 
+    /**
+     * Returns to longitude span.
+     *
+     * @return The longitude span.
+     */
     public double getLongitudeSpan() {
         return mLongitudeSpan;
     }
 
+    /**
+     * Sets the longitude span.
+     *
+     * @param longitudeSpan The longitude span to set.
+     */
     public void setLongitudeSpan(double longitudeSpan) {
         mLongitudeSpan = longitudeSpan;
     }

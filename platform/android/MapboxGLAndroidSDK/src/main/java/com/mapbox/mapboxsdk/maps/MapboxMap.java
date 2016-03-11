@@ -330,7 +330,7 @@ public class MapboxMap {
     //
 
     /**
-     *
+     * Resets the map view to face north.
      */
     public void resetNorth() {
         mMapView.resetNorth();
@@ -495,6 +495,16 @@ public class MapboxMap {
         return addMarker((BaseMarkerOptions) markerOptions);
     }
 
+    /**
+     * <p>
+     * Adds a marker to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions A marker options object that defines how to render the marker.
+     * @return The {@code Marker} that was added to the map.
+     */
     @UiThread
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
@@ -1047,7 +1057,9 @@ public class MapboxMap {
     }
 
     /**
-     * @return
+     * Returns the current configured content padding on map view.
+     *
+     * @return An array with length 4 in the LTRB order.
      */
     public int[] getPadding() {
         return new int[]{mMapView.getContentPaddingLeft(),
@@ -1265,7 +1277,7 @@ public class MapboxMap {
     }
 
     /**
-     * Sets a callback that's invoked when the the My Location dot
+     * Sets a callback that's invoked when the the My Location view
      * (which signifies the user's location) changes location.
      *
      * @param listener The callback that's invoked when the user clicks on a marker.
@@ -1312,16 +1324,25 @@ public class MapboxMap {
     // Custom layer
     //
 
+    /**
+     * Do not use this method, experimental feature.
+     */
     @UiThread
     public void addCustomLayer(CustomLayer customLayer, String before) {
         mMapView.addCustomLayer(customLayer, before);
     }
 
+    /**
+     * Do not use this method, experimental feature.
+     */
     @UiThread
     public void removeCustomLayer(String id) {
         mMapView.removeCustomLayer(id);
     }
 
+    /**
+     * Do not use this method, experimental feature.
+     */
     @UiThread
     public void invalidateCustomLayers() {
         mMapView.invalidateCustomLayers();
@@ -1335,6 +1356,9 @@ public class MapboxMap {
     // Invalidate
     //
 
+    /**
+     * Triggers an invalidation of the map view.
+     */
     public void invalidate() {
         mMapView.update();
     }
@@ -1501,17 +1525,16 @@ public class MapboxMap {
     }
 
     /**
-     * Interface definition for a callback to be invoked when the the My Location dot
-     * (which signifies the user's location) changes location.
+     * Interface definition for a callback to be invoked when the the My Location view changes location.
      *
      * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
      */
     public interface OnMyLocationChangeListener {
         /**
-         * Called when the location of the My Location dot has changed
+         * Called when the location of the My Location view has changed
          * (be it latitude/longitude, bearing or accuracy).
          *
-         * @param location The current location of the My Location dot The type of map change event.
+         * @param location The current location of the My Location view The type of map change event.
          */
         void onMyLocationChange(@Nullable Location location);
     }

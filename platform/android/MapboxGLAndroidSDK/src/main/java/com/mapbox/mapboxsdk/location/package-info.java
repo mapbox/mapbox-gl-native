@@ -1,4 +1,4 @@
 /**
- * This package contains classes that manages the map Location services.
+ * Contains the Mapbox Maps Android Location API classes.
  */
 package com.mapbox.mapboxsdk.location;

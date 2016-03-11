@@ -13,6 +13,14 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
+/**
+ * Defines configuration MapboxMapMapOptions for a MapboxMap. These options can be used when adding a
+ * map to your application programmatically (as opposed to via XML). If you are using a MapFragment,
+ * you can pass these options in using the static factory method newInstance(MapboxMapOptions).
+ * If you are using a MapView, you can pass these options in using the constructor
+ * MapView(Context, MapboxMapOptions). If you add a map using XML, then you can apply these options
+ * using custom XML tags.
+ */
 public class MapboxMapOptions implements Parcelable {
 
     private static final float DIMENSION_SEVEN_DP = 7f;
@@ -50,6 +58,9 @@ public class MapboxMapOptions implements Parcelable {
     private String style;
     private String accessToken;
 
+    /**
+     * Creates a new MapboxMapOptions object.
+     */
     public MapboxMapOptions() {
     }
 
@@ -84,6 +95,13 @@ public class MapboxMapOptions implements Parcelable {
         accessToken = in.readString();
     }
 
+    /**
+     * Creates a GoogleMapsOptions from the attribute set
+     *
+     * @param context Context related to a map view.
+     * @param attrs   Attributeset containing configuration
+     * @return
+     */
     public static MapboxMapOptions createFromAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
         float screenDensity = context.getResources().getDisplayMetrics().density;
@@ -133,191 +151,422 @@ public class MapboxMapOptions implements Parcelable {
         return mapboxMapOptions;
     }
 
+    /**
+     * Specifies a the initial camera position for the map view.
+     *
+     * @param cameraPosition Inital camera position
+     * @return This
+     */
     public MapboxMapOptions camera(CameraPosition cameraPosition) {
         this.cameraPosition = cameraPosition;
         return this;
     }
 
+    /**
+     * Specifies the accesstoken associated with a map view.
+     *
+     * @param accessToken Token to be used to access the service
+     * @return This
+     */
     public MapboxMapOptions accessToken(String accessToken) {
         this.accessToken = accessToken;
         return this;
     }
 
+    /**
+     * Specifies the style url associated with a map view.
+     *
+     * @param styleUrl Url to be used to load a style
+     * @return This
+     */
     public MapboxMapOptions styleUrl(String styleUrl) {
         style = styleUrl;
         return this;
     }
 
+    /**
+     * Specifies the used debug type for a map view.
+     *
+     * @param enabled True is debug is enabled
+     * @return This
+     */
     public MapboxMapOptions debugActive(boolean enabled) {
         debugActive = enabled;
         return this;
     }
 
+    /**
+     * Specifies the used minimum zoom level for a map view.
+     *
+     * @param minZoom Zoom level to be used
+     * @return This
+     */
     public MapboxMapOptions minZoom(float minZoom) {
         this.minZoom = minZoom;
         return this;
     }
 
+    /**
+     * Specifies the used maximum zoom level for a map view.
+     *
+     * @param maxZoom Zoom level to be used
+     * @return This
+     */
     public MapboxMapOptions maxZoom(float maxZoom) {
         this.maxZoom = maxZoom;
         return this;
     }
 
+    /**
+     * Specifies the visibility state of a compass for a map view.
+     *
+     * @param enabled True and compass is shown
+     * @return This
+     */
     public MapboxMapOptions compassEnabled(boolean enabled) {
         compassEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies the gravity state of compass for a map view.
+     *
+     * @param gravity see {@link android.view.Gravity}
+     * @return This
+     */
     public MapboxMapOptions compassGravity(int gravity) {
         compassGravity = gravity;
         return this;
     }
 
+    /**
+     * Specifies the margin state of compass for a map view
+     *
+     * @param margins 4 long array for LTRB margins
+     * @return This
+     */
     public MapboxMapOptions compassMargins(int[] margins) {
         compassMargins = margins;
         return this;
     }
 
+    /**
+     * Specifies the visibility state of a logo for a map view.
+     *
+     * @param enabled True and logo is shown
+     * @return This
+     */
     public MapboxMapOptions logoEnabled(boolean enabled) {
         logoEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies the gravity state of logo for a map view.
+     *
+     * @param gravity see {@link android.view.Gravity}
+     * @return This
+     */
     public MapboxMapOptions logoGravity(int gravity) {
         logoGravity = gravity;
         return this;
     }
 
+    /**
+     * Specifies the margin state of logo for a map view
+     *
+     * @param margins 4 long array for LTRB margins
+     * @return This
+     */
     public MapboxMapOptions logoMargins(int[] margins) {
         logoMargins = margins;
         return this;
     }
 
+    /**
+     * Specifies the visibility state of a attribution for a map view.
+     *
+     * @param enabled True and attribution is shown
+     * @return This
+     */
     public MapboxMapOptions attributionEnabled(boolean enabled) {
         attributionEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies the gravity state of attribution for a map view.
+     *
+     * @param gravity see {@link android.view.Gravity}
+     * @return This
+     */
     public MapboxMapOptions attributionGravity(int gravity) {
         attributionGravity = gravity;
         return this;
     }
 
+    /**
+     * Specifies the margin state of attribution for a map view
+     *
+     * @param margins 4 long array for LTRB margins
+     * @return This
+     */
     public MapboxMapOptions attributionMargins(int[] margins) {
         attributionMargins = margins;
         return this;
     }
 
+    /**
+     * Specifies if the rotate gesture is enabled for a map view.
+     *
+     * @param enabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions rotateGesturesEnabled(boolean enabled) {
         rotateGesturesEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies if the scroll gesture is enabled for a map view.
+     *
+     * @param enabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions scrollGesturesEnabled(boolean enabled) {
         scrollGesturesEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies if the tilt gesture is enabled for a map view.
+     *
+     * @param enabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions tiltGesturesEnabled(boolean enabled) {
         tiltGesturesEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies if the zoom controls are enabled for a map view.
+     *
+     * @param enabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions zoomControlsEnabled(boolean enabled) {
         zoomControlsEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies if the zoom gesture is enabled for a map view.
+     *
+     * @param enabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions zoomGesturesEnabled(boolean enabled) {
         zoomGesturesEnabled = enabled;
         return this;
     }
 
+    /**
+     * Specifies if the user location view is enabled for a map view.
+     *
+     * @param locationEnabled True and gesture will be enabled
+     * @return This
+     */
     public MapboxMapOptions locationEnabled(boolean locationEnabled) {
         this.locationEnabled = locationEnabled;
         return this;
     }
 
+    /**
+     * Get the current configured initial camera position for a map view.
+     *
+     * @return CameraPosition to be initially used.
+     */
     public CameraPosition getCamera() {
         return cameraPosition;
     }
 
+    /**
+     * Get the current configured min zoom for a map view.
+     *
+     * @return Mininum zoom level to be used.
+     */
     public float getMinZoom() {
         return minZoom;
     }
 
+    /**
+     * Get the current configured maximum zoom for a map view.
+     *
+     * @return Maximum zoom to be used.
+     */
     public float getMaxZoom() {
         return maxZoom;
     }
 
+    /**
+     * Get the current configured visibility state for compass for a map view.
+     *
+     * @return Visibility state of the compass
+     */
     public boolean getCompassEnabled() {
         return compassEnabled;
     }
 
+    /**
+     * Get the current configured gravity state for compass for a map view.
+     *
+     * @return Gravity state of the compass
+     */
     public int getCompassGravity() {
         return compassGravity;
     }
 
+    /**
+     * Get the current configured margins for compass for a map view.
+     *
+     * @return Margins state of the compass
+     */
     public int[] getCompassMargins() {
         return compassMargins;
     }
 
+    /**
+     * Get the current configured visibility state for compass for a map view.
+     *
+     * @return Visibility state of the compass
+     */
     public boolean getLogoEnabled() {
         return logoEnabled;
     }
 
+    /**
+     * Get the current configured gravity state for logo for a map view.
+     *
+     * @return Gravity state of the logo
+     */
     public int getLogoGravity() {
         return logoGravity;
     }
 
+    /**
+     * Get the current configured margins for logo for a map view.
+     *
+     * @return Margins state of the logo
+     */
     public int[] getLogoMargins() {
         return logoMargins;
     }
 
+    /**
+     * Get the current configured access token for a map view.
+     *
+     * @return Access token to be used.
+     */
     public String getAccessToken() {
         return accessToken;
     }
 
+    /**
+     * Get the current configured style url for a map view.
+     *
+     * @return Style url to be used.
+     */
     public String getStyle() {
         return style;
     }
 
+    /**
+     * Get the current configured rotate gesture state for a map view.
+     *
+     * @return True indicates gesture is enabled
+     */
     public boolean getRotateGesturesEnabled() {
         return rotateGesturesEnabled;
     }
 
+    /**
+     * Get the current configured scroll gesture state for a map view.
+     *
+     * @return True indicates gesture is enabled
+     */
     public boolean getScrollGesturesEnabled() {
         return scrollGesturesEnabled;
     }
 
+    /**
+     * Get the current configured tilt gesture state for a map view.
+     *
+     * @return True indicates gesture is enabled
+     */
     public boolean getTiltGesturesEnabled() {
         return tiltGesturesEnabled;
     }
 
+    /**
+     * Get the current configured zoom controls state for a map view.
+     *
+     * @return True indicates gesture is enabled
+     */
     public boolean getZoomControlsEnabled() {
         return zoomControlsEnabled;
     }
 
+    /**
+     * Get the current configured zoom gesture state for a map view.
+     *
+     * @return True indicates gesture is enabled
+     */
     public boolean getZoomGesturesEnabled() {
         return zoomGesturesEnabled;
     }
 
+    /**
+     * Get the current configured visibility state for attribution for a map view.
+     *
+     * @return Visibility state of the attribution
+     */
     public boolean getAttributionEnabled() {
         return attributionEnabled;
     }
 
+    /**
+     * Get the current configured gravity state for attribution for a map view.
+     *
+     * @return Gravity state of the logo
+     */
     public int getAttributionGravity() {
         return attributionGravity;
     }
 
+    /**
+     * Get the current configured margins for attribution for a map view.
+     *
+     * @return Margins state of the logo
+     */
     public int[] getAttributionMargins() {
         return attributionMargins;
     }
 
+    /**
+     * Get the current configured user location view state for a map view.
+     *
+     * @return True and user location will be shown
+     */
     public boolean getLocationEnabled() {
         return locationEnabled;
     }
 
+    /**
+     * Get the current configured debug state for a map view.
+     *
+     * @return True indicates debug is enabled.
+     */
     public boolean getDebugActive() {
         return debugActive;
     }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
- * A {@code InvalidAccessTokenException} is thrown by {@link MapView} when there is either no access
+ * A {@code InvalidAccessTokenException} is thrown by {@link com.mapbox.mapboxsdk.maps.MapboxMap} when there is either no access
  * token set before {@link MapView#onCreate(Bundle)} or an invalid access token is set in {@link MapView#setAccessToken(String)}
  *
  * @see MapView#onCreate(Bundle)

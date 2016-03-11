@@ -17,6 +17,9 @@ import com.mapzen.android.lost.api.LostApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages locational updates. Contains methods to register and unregister location listeners.
+ */
 public class LocationServices implements com.mapzen.android.lost.api.LocationListener {
 
     private static final String TAG = "LocationServices";

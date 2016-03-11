@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,10 +12,10 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 public class SupportMapFragmentActivity extends AppCompatActivity {
@@ -33,9 +34,9 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        MapFragment mapFragment;
+        SupportMapFragment mapFragment;
         if (savedInstanceState == null) {
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             MapboxMapOptions options = new MapboxMapOptions();
             options.accessToken(ApiAccess.getToken(this));
@@ -58,12 +59,12 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
                     .zoom(9)
                     .build());
 
-            mapFragment = MapFragment.newInstance(options);
+            mapFragment = SupportMapFragment.newInstance(options);
 
             transaction.add(R.id.fragment_container, mapFragment, "com.mapbox.map");
             transaction.commit();
         } else {
-            mapFragment = (MapFragment) getFragmentManager().findFragmentByTag("com.mapbox.map");
+            mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
         }
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {

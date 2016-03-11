@@ -1,4 +1,4 @@
 /**
- * This package contains the Camera API classes which are used to control the user's viewpoint of the map.
+ * Contains the Mapbox Maps Android Camera API classes.
  */
 package com.mapbox.mapboxsdk.camera;

@@ -11,6 +11,9 @@ import com.mapbox.mapboxsdk.constants.MathConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
+/**
+ * Resembles the position, angle, zoom and tilt of the user's viewpoint.
+ */
 public final class CameraPosition implements Parcelable {
 
     public static final Parcelable.Creator<CameraPosition> CREATOR
@@ -27,7 +30,6 @@ public final class CameraPosition implements Parcelable {
             return new CameraPosition[size];
         }
     };
-
 
     /**
      * Direction that the camera is pointing in, in degrees clockwise from north.
@@ -68,7 +70,7 @@ public final class CameraPosition implements Parcelable {
 
     @Override
     public int describeContents() {
-        return 0;
+        return hashCode();
     }
 
     @Override
@@ -115,7 +117,7 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Builds camera position.
+     * Builder for composing {@link CameraPosition} objects.
      */
     public static final class Builder {
 
@@ -214,7 +216,6 @@ public final class CameraPosition implements Parcelable {
                 this.zoom = (float) values[4];
             }
         }
-
 
         /**
          * Sets the direction that the camera is pointing in, in degrees clockwise from north.

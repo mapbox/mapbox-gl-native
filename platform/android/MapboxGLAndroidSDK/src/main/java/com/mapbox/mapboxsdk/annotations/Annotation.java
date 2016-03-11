@@ -6,7 +6,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * Annotation is a overlay on top of a {@link MapView},
+ * Annotation is an overlay on top of a {@link MapView},
  * from which {@link Polygon}, {@link Polyline} and {@link Marker} are derived.
  * <p>
  * it manages attachment to a map and identification, but does not require
@@ -55,10 +55,15 @@ public abstract class Annotation implements Comparable<Annotation> {
     /**
      * Do not use this method. Used internally by the SDK.
      */
-    public void setMapboxMap(MapboxMap mapView) {
-        this.mapboxMap = mapView;
+    public void setMapboxMap(MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
     }
 
+    /**
+     * Gets the associated MapboxMap
+     *
+     * @return The MapboxMap
+     */
     protected MapboxMap getMapboxMap() {
         return mapboxMap;
     }

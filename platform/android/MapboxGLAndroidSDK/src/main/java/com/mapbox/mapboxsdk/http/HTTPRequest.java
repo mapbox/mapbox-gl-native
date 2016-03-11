@@ -16,12 +16,12 @@ import javax.net.ssl.SSLException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 class HTTPRequest implements Callback {
+    
     private static OkHttpClient mClient = new OkHttpClient();
     private final String LOG_TAG = HTTPRequest.class.getName();
 
@@ -39,6 +39,7 @@ class HTTPRequest implements Callback {
     private Request mRequest;
 
     private native void nativeOnFailure(int type, String message);
+
     private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires, byte[] body);
 
     private HTTPRequest(long nativePtr, String resourceUrl, String userAgent, String etag, String modified) {

@@ -10,7 +10,7 @@ import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
- * the surface of the Earth (LatLng). Screen location is in screen pixels (not display pixels)
+ * the surface of the Earth. Screen location is in screen pixels (not display pixels)
  * with respect to the top left corner of the map (and not necessarily of the whole screen).
  */
 public class Projection {

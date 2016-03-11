@@ -16,13 +16,16 @@ import com.mapbox.mapboxsdk.utils.MathUtils;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Factory for creating {@link CameraUpdate} objects.
+ */
 public final class CameraUpdateFactory {
 
     /**
      * Returns a CameraUpdate that moves the camera to a specified CameraPosition.
      *
      * @param cameraPosition Camera Position to change to
-     * @return CameraUpdate Final Camera Position data
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate newCameraPosition(@NonNull CameraPosition cameraPosition) {
         return new CameraPositionUpdate(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
@@ -32,8 +35,8 @@ public final class CameraUpdateFactory {
      * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude
      * specified by a LatLng object. This centers the camera on the LatLng object.
      *
-     * @param latLng
-     * @return
+     * @param latLng Target location to change to
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate newLatLng(@NonNull LatLng latLng) {
         return new CameraPositionUpdate(-1, latLng, -1, -1);
@@ -45,9 +48,9 @@ public final class CameraUpdateFactory {
      * You can specify padding, in order to inset the bounding box from the map view's edges.
      * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
      *
-     * @param bounds
-     * @param padding
-     * @return
+     * @param bounds  Bounds to match Camera position with
+     * @param padding Padding added to the bounds
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, int padding) {
         return newLatLngBounds(bounds, padding, padding, padding, padding);
@@ -60,34 +63,36 @@ public final class CameraUpdateFactory {
      * You can specify padding, in order to inset the bounding box from the map view's edges.
      * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
      *
-     * @param bounds
-     * @param paddingLeft
-     * @param paddingTop
-     * @param paddingRight
-     * @param paddingBottom
-     * @return
+     * @param bounds        Bounds to base the Camera position out of
+     * @param paddingLeft   Padding left of the bounds
+     * @param paddingTop    Padding top of the bounds
+     * @param paddingRight  Padding right of the bounds
+     * @param paddingBottom Padding bottom of the bounds
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate newLatLngBounds(@NonNull LatLngBounds bounds, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
         return new CameraBoundsUpdate(bounds, paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 
     /**
-     * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude specified by a LatLng object, and moves to the given zoom level.
+     * Returns a CameraUpdate that moves the center of the screen to a latitude and longitude specified by a LatLng object,
+     * and moves to the given zoom level.
      *
-     * @param latLng
-     * @param zoom
-     * @return
+     * @param latLng Target location to change to
+     * @param zoom   Zoom level to change to
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate newLatLngZoom(@NonNull LatLng latLng, float zoom) {
         return new CameraPositionUpdate(-1, latLng, -1, zoom);
     }
 
     /**
-     * Returns a CameraUpdate that scrolls the camera over the map, shifting the center of view by the specified number of pixels in the x and y directions.
+     * Returns a CameraUpdate that scrolls the camera over the map,
+     * shifting the center of view by the specified number of pixels in the x and y directions.
      *
-     * @param xPixel
-     * @param yPixel
-     * @return
+     * @param xPixel Amount of pixels to scroll to in x direction
+     * @param yPixel Amount of pixels to scroll to in y direction
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate scrollBy(float xPixel, float yPixel) {
         return new CameraMoveUpdate(xPixel, yPixel);
@@ -96,9 +101,9 @@ public final class CameraUpdateFactory {
     /**
      * Returns a CameraUpdate that shifts the zoom level of the current camera viewpoint.
      *
-     * @param amount
-     * @param focus
-     * @return
+     * @param amount Amount of zoom level to change with
+     * @param focus  Focus point of zoom
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate zoomBy(float amount, Point focus) {
         return new ZoomUpdate(amount, focus.x, focus.y);
@@ -107,8 +112,8 @@ public final class CameraUpdateFactory {
     /**
      * Returns a CameraUpdate that shifts the zoom level of the current camera viewpoint.
      *
-     * @param amount
-     * @return
+     * @param amount Amount of zoom level to change with
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate zoomBy(float amount) {
         return new ZoomUpdate(ZoomUpdate.ZOOM_BY, amount);
@@ -117,7 +122,7 @@ public final class CameraUpdateFactory {
     /**
      * Returns a CameraUpdate that zooms in on the map by moving the viewpoint's height closer to the Earth's surface. The zoom increment is 1.0.
      *
-     * @return
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate zoomIn() {
         return new ZoomUpdate(ZoomUpdate.ZOOM_IN);
@@ -126,7 +131,7 @@ public final class CameraUpdateFactory {
     /**
      * Returns a CameraUpdate that zooms out on the map by moving the viewpoint's height farther away from the Earth's surface. The zoom increment is -1.0.
      *
-     * @return
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate zoomOut() {
         return new ZoomUpdate(ZoomUpdate.ZOOM_OUT);
@@ -135,8 +140,8 @@ public final class CameraUpdateFactory {
     /**
      * Returns a CameraUpdate that moves the camera viewpoint to a particular zoom level.
      *
-     * @param zoom
-     * @return
+     * @param zoom Zoom level to change to
+     * @return CameraUpdate Final Camera Position
      */
     public static CameraUpdate zoomTo(float zoom) {
         return new ZoomUpdate(ZoomUpdate.ZOOM_TO, zoom);

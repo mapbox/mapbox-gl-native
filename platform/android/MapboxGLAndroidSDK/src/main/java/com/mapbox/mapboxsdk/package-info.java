@@ -1,4 +1,4 @@
 /**
- * This package is the base package of the Mapbox GL SDK for Android
+ * Contains the Mapbox Maps Android API classes.
  */
 package com.mapbox.mapboxsdk;

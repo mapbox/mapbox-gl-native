@@ -5,6 +5,7 @@ import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
+import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 
 /**
  * Settings for the user location and bearing tracking of a MapboxMap.
@@ -93,10 +94,20 @@ public class TrackingSettings {
         return mMyBearingTrackingMode;
     }
 
+    /**
+     * Returns if the tracking modes will be dismissed when a gesture occurs.
+     *
+     * @return True to indicate the tracking modes will be dismissed.
+     */
     public boolean isDismissTrackingOnGesture() {
         return dismissTrackingOnGesture;
     }
 
+    /**
+     * Set the dismissal of the tracking modes if a gesture occurs.
+     *
+     * @param dismissTrackingOnGesture True to dismiss the tracking modes.
+     */
     public void setDismissTrackingOnGesture(boolean dismissTrackingOnGesture) {
         this.dismissTrackingOnGesture = dismissTrackingOnGesture;
         validateGesturesForTrackingModes();
@@ -118,7 +129,12 @@ public class TrackingSettings {
         }
     }
 
-    public boolean isLocationTrackingDisabled(){
+    /**
+     * Return if location tracking is disabled
+     *
+     * @return True if location tracking is disabled.
+     */
+    public boolean isLocationTrackingDisabled() {
         return mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }

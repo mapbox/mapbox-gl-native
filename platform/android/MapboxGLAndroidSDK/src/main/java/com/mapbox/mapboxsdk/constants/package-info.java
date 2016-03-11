@@ -1,4 +1,4 @@
 /**
- * This package contains multiple map related constants classes.
+ * Contains the Mapbox Maps Android Constant API classes.
  */
 package com.mapbox.mapboxsdk.constants;

@@ -1,4 +1,4 @@
 /**
- * This package contains classes to add and manage layers of the map.
+ * Do not use this package. Experimental feature.
  */
 package com.mapbox.mapboxsdk.layers;

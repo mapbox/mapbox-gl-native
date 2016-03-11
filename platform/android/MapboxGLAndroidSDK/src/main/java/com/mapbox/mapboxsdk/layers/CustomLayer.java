@@ -1,6 +1,13 @@
 package com.mapbox.mapboxsdk.layers;
 
 public class CustomLayer {
+
+    public String mID;
+    public long mContext;
+    public long mInitializeFunction;
+    public long mRenderFunction;
+    public long mDeinitializeFunction;
+
     public CustomLayer(String id,
                        long context,
                        long initializeFunction,
@@ -13,9 +20,4 @@ public class CustomLayer {
         this.mDeinitializeFunction = deinitializeFunction;
     }
 
-    public String mID;
-    public long mContext;
-    public long mInitializeFunction;
-    public long mRenderFunction;
-    public long mDeinitializeFunction;
 }

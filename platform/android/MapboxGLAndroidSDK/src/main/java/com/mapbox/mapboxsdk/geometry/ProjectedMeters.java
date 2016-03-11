@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.geometry;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
-
 /**
  * ProjectedMeters is a projection of longitude, latitude points in Mercator meters.
  * <p>
@@ -28,26 +26,47 @@ public class ProjectedMeters implements IProjectedMeters, Parcelable {
     private double northing;
     private double easting;
 
+    /**
+     * Creates a ProjectedMeters based on projected meters in north and east direction
+     *
+     * @param northing
+     * @param easting
+     */
     public ProjectedMeters(double northing, double easting) {
         this.northing = northing;
         this.easting = easting;
     }
 
-    public ProjectedMeters(ProjectedMeters aProjectedMeters) {
-        this.northing = aProjectedMeters.northing;
-        this.easting = aProjectedMeters.easting;
+    /**
+     * Creates a ProjecteMeters based on another set of projected meters.
+     *
+     * @param projectedMeters The projected meters to be based on.
+     */
+    public ProjectedMeters(ProjectedMeters projectedMeters) {
+        this.northing = projectedMeters.northing;
+        this.easting = projectedMeters.easting;
     }
 
-    protected ProjectedMeters(Parcel in) {
+    private ProjectedMeters(Parcel in) {
         northing = in.readDouble();
         easting = in.readDouble();
     }
 
+    /**
+     * Get projected meters in north direction.
+     *
+     * @return Projected meters in north.
+     */
     @Override
     public double getNorthing() {
         return northing;
     }
 
+    /**
+     * Get projected meters in east direction.
+     *
+     * @return Projected meters in east.
+     */
     @Override
     public double getEasting() {
         return easting;

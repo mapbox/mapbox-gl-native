@@ -659,18 +659,12 @@ public final class UserLocationView extends View {
         mMapboxMap.invalidate();
     }
 
-    /**
-     * Called from MapView.onPause()
-     */
-    public void pause() {
+    public void onPause() {
         mPaused = true;
         toggleGps(false);
     }
 
-    /**
-     * Called from MapView.onResume()
-     */
-    public void resume() {
+    public void onResume() {
         mPaused = false;
         if (isEnabled()) {
             toggleGps(true);

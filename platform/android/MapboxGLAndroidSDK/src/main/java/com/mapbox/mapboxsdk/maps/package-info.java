@@ -1,4 +1,4 @@
 /**
- * This package contains the Mapbox Maps Android API classes.
+ * Contains the Mapbox Maps Android Maps API classes.
  */
 package com.mapbox.mapboxsdk.maps;

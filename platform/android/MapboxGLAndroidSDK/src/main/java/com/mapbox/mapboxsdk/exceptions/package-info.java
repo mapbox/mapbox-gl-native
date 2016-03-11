@@ -1,4 +1,4 @@
 /**
- * This package contains map specific exception classes.
+ * Contains the Mapbox Maps Android Exception API classes.
  */
 package com.mapbox.mapboxsdk.exceptions;
