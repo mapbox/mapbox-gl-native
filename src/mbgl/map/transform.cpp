@@ -667,7 +667,7 @@ ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const
     // to the center side.
     double longitude = latLng.longitude;
     const double centerLng = getLatLng().longitude;
-    if (centerLng - latLng.longitude > util::LONGITUDE_MAX) {
+    if (std::abs(centerLng - latLng.longitude) > std::abs(util::LONGITUDE_MAX)) {
         if (centerLng > 0 && latLng.longitude < 0) {
             longitude += util::DEGREES_MAX;
         } else if (centerLng < 0 && latLng.longitude > 0) {

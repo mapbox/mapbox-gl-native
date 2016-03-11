@@ -318,4 +318,20 @@ TEST(Transform, Antimeridian) {
     ScreenCoordinate pixelSFForwards = transform.latLngToScreenCoordinate(coordinateSanFrancisco);
     ASSERT_DOUBLE_EQ(pixelSFBackwards.x, pixelSFForwards.x);
     ASSERT_DOUBLE_EQ(pixelSFBackwards.y, pixelSFForwards.y);
+
+    const LatLng coordinateWaikiri{ -16.9310, 179.9787 };
+    transform.setLatLngZoom(coordinateWaikiri, 10);
+    ScreenCoordinate pixelWaikiri = transform.latLngToScreenCoordinate(coordinateWaikiri);
+    ASSERT_DOUBLE_EQ(500.00000000007759, pixelWaikiri.x);
+    ASSERT_DOUBLE_EQ(500, pixelWaikiri.y);
+
+    transform.setLatLng({ coordinateWaikiri.latitude, 180.0213 });
+    ScreenCoordinate pixelWaikiriForwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
+    ASSERT_DOUBLE_EQ(437.95953728819512, pixelWaikiriForwards.x);
+    ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriForwards.y);
+
+    transform.setLatLng({ coordinateWaikiri.latitude, -179.9787 });
+    ScreenCoordinate pixelWaikiriBackwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
+    ASSERT_DOUBLE_EQ(pixelWaikiriForwards.x, pixelWaikiriBackwards.x);
+    ASSERT_DOUBLE_EQ(pixelWaikiriForwards.y, pixelWaikiriBackwards.y);
 }
