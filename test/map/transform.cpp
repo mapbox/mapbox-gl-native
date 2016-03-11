@@ -222,17 +222,90 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
+    const ScreenCoordinate invalidAnchorPoint = ScreenCoordinate::null();
+    const ScreenCoordinate anchorPoint = { 150, 150 };
+
+    const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
+    ASSERT_NE(latLng.latitude, anchorLatLng.latitude);
+    ASSERT_NE(latLng.longitude, anchorLatLng.longitude);
+
+    transform.setLatLngZoom(latLng, 2);
+    transform.scaleBy(1);
+    ASSERT_DOUBLE_EQ(4, transform.getScale());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.scaleBy(1.5, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(6, transform.getScale());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.scaleBy(2, anchorPoint);
+    ASSERT_DOUBLE_EQ(12, transform.getScale());
+    ASSERT_NE(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_NE(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.setLatLngZoom(latLng, 10);
+    transform.setScale(2 << 2);
+    ASSERT_DOUBLE_EQ(2 << 2, transform.getScale());
+    ASSERT_NEAR(latLng.latitude, transform.getLatLng().latitude, 0.000001);
+    ASSERT_NEAR(latLng.longitude, transform.getLatLng().longitude, 0.000001);
+
+    transform.setScale(2 << 4, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(2 << 4, transform.getScale());
+    ASSERT_NEAR(latLng.latitude, transform.getLatLng().latitude, 0.000001);
+    ASSERT_NEAR(latLng.longitude, transform.getLatLng().longitude, 0.000001);
+
+    transform.setScale(2 << 6, anchorPoint);
+    ASSERT_DOUBLE_EQ(2 << 6, transform.getScale());
+    ASSERT_NE(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_NE(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.setLatLngZoom(latLng, 10);
+    transform.setZoom(2);
+    ASSERT_DOUBLE_EQ(2, transform.getZoom());
+    ASSERT_NEAR(latLng.latitude, transform.getLatLng().latitude, 0.000001);
+    ASSERT_NEAR(latLng.longitude, transform.getLatLng().longitude, 0.000001);
+
+    transform.setZoom(4, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(4, transform.getZoom());
+    ASSERT_NEAR(latLng.latitude, transform.getLatLng().latitude, 0.000001);
+    ASSERT_NEAR(latLng.longitude, transform.getLatLng().longitude, 0.000001);
+
+    transform.setZoom(8, anchorPoint);
+    ASSERT_DOUBLE_EQ(8, transform.getZoom());
+    ASSERT_NE(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_NE(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.setLatLngZoom(latLng, 10);
     transform.setAngle(M_PI_4);
     ASSERT_NEAR(M_PI_4, transform.getAngle(), 0.000001);
     ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
 
-    const ScreenCoordinate anchorPoint = { 150, 150 };
-    const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
+    transform.setAngle(0, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(0, transform.getAngle());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
     transform.setAngle(-45 * util::DEG2RAD, anchorPoint);
     ASSERT_NEAR(-45 / util::RAD2DEG, transform.getAngle(), 0.000001);
-    ASSERT_NE(latLng.latitude, transform.getLatLng().latitude);
-    ASSERT_NE(latLng.longitude, transform.getLatLng().longitude);
+    ASSERT_NEAR(anchorLatLng.latitude, transform.getLatLng().latitude, 1);
+    ASSERT_NEAR(anchorLatLng.longitude, transform.getLatLng().longitude, 1);
+
+    transform.setLatLngZoom(latLng, 10);
+    transform.setPitch(10 * util::DEG2RAD);
+    ASSERT_DOUBLE_EQ(10 / util::RAD2DEG, transform.getPitch());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.setPitch(15 * util::DEG2RAD, invalidAnchorPoint);
+    ASSERT_DOUBLE_EQ(15 / util::RAD2DEG, transform.getPitch());
+    ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
+
+    transform.setPitch(20 * util::DEG2RAD, anchorPoint);
+    ASSERT_DOUBLE_EQ(20 / util::RAD2DEG, transform.getPitch());
     ASSERT_NEAR(anchorLatLng.latitude, transform.getLatLng().latitude, 1);
     ASSERT_NEAR(anchorLatLng.longitude, transform.getLatLng().longitude, 1);
 }

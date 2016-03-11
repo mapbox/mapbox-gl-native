@@ -1,6 +1,7 @@
 #ifndef MBGL_MAP_MAP
 #define MBGL_MAP_MAP
 
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/map/update.hpp>
@@ -98,23 +99,23 @@ public:
 
     // Position
     void moveBy(const ScreenCoordinate&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const ScreenCoordinate&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
-    LatLng getLatLng(const EdgeInsets& = {}) const;
-    void resetPosition(const EdgeInsets& = {});
+    LatLng getLatLng(optional<EdgeInsets> = {}) const;
+    void resetPosition(optional<EdgeInsets> = {});
 
     // Scale
-    void scaleBy(double ds, const ScreenCoordinate& = { NAN, NAN }, const Duration& = Duration::zero());
-    void setScale(double scale, const ScreenCoordinate& = { NAN, NAN }, const Duration& = Duration::zero());
+    void scaleBy(double ds, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
+    void setScale(double scale, optional<ScreenCoordinate> = {}, const Duration& = Duration::zero());
     double getScale() const;
     void setZoom(double zoom, const Duration& = Duration::zero());
-    void setZoom(double zoom, const EdgeInsets&, const Duration& = Duration::zero());
+    void setZoom(double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const Duration& = Duration::zero());
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&);
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&);
+    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>);
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>);
     void resetZoom();
     void setMinZoom(const double minZoom);
     double getMinZoom() const;
@@ -124,15 +125,15 @@ public:
     // Rotation
     void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
     void setBearing(double degrees, const Duration& = Duration::zero());
-    void setBearing(double degrees, const ScreenCoordinate&, const Duration& = Duration::zero());
-    void setBearing(double degrees, const EdgeInsets&, const Duration& = Duration::zero());
+    void setBearing(double degrees, optional<ScreenCoordinate>, const Duration& = Duration::zero());
+    void setBearing(double degrees, optional<EdgeInsets>, const Duration& = Duration::zero());
     double getBearing() const;
     void resetNorth(const Duration& = Milliseconds(500));
-    void resetNorth(const EdgeInsets&, const Duration& = Milliseconds(500));
+    void resetNorth(optional<EdgeInsets>, const Duration& = Milliseconds(500));
 
     // Pitch
     void setPitch(double pitch, const Duration& = Duration::zero());
-    void setPitch(double pitch, const ScreenCoordinate&, const Duration& = Duration::zero());
+    void setPitch(double pitch, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation

@@ -8,6 +8,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -43,38 +44,47 @@ public:
             top to bottom and from left to right. */
     void moveBy(const ScreenCoordinate& offset, const Duration& = Duration::zero());
     void setLatLng(const LatLng&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const EdgeInsets&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const ScreenCoordinate&, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
+    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const Duration& = Duration::zero());
-    LatLng getLatLng(const EdgeInsets& = {}) const;
-    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
+    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
+    LatLng getLatLng(optional<EdgeInsets> = {}) const;
+    ScreenCoordinate getScreenCoordinate(optional<EdgeInsets> = {}) const;
 
     // Zoom
 
     /** Scales the map, keeping the given point fixed within the view.
+        @param ds The difference in scale factors to scale the map by. */
+    void scaleBy(double ds, const Duration& = Duration::zero());
+    /** Scales the map, keeping the given point fixed within the view.
         @param ds The difference in scale factors to scale the map by.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void scaleBy(double ds, const ScreenCoordinate& anchor = {}, const Duration& = Duration::zero());
+    void scaleBy(double ds, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    /** Sets the scale factor, keeping the given point fixed within the view.
+        @param scale The new scale factor. */
+    void setScale(double scale, const Duration& = Duration::zero());
     /** Sets the scale factor, keeping the given point fixed within the view.
         @param scale The new scale factor.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setScale(double scale, const ScreenCoordinate& anchor = {}, const Duration& = Duration::zero());
+    void setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the scale factor, keeping the center point fixed within the inset view.
         @param scale The new scale factor.
         @param padding The viewport padding that affects the fixed center point. */
-    void setScale(double scale, const EdgeInsets& padding, const Duration& = Duration::zero());
+    void setScale(double scale, optional<EdgeInsets> padding, const Duration& = Duration::zero());
+    /** Sets the zoom level, keeping the given point fixed within the view.
+        @param zoom The new zoom level. */
+    void setZoom(double zoom, const Duration& = Duration::zero());
     /** Sets the zoom level, keeping the given point fixed within the view.
         @param zoom The new zoom level.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, const ScreenCoordinate& anchor = {}, const Duration& = Duration::zero());
+    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the zoom level, keeping the center point fixed within the inset view.
         @param zoom The new zoom level.
         @param padding The viewport padding that affects the fixed center point. */
-    void setZoom(double zoom, const EdgeInsets& padding, const Duration& = Duration::zero());
+    void setZoom(double zoom, optional<EdgeInsets> padding, const Duration& = Duration::zero());
     /** Returns the zoom level. */
     double getZoom() const;
     /** Returns the scale factor. */
@@ -94,12 +104,12 @@ public:
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, const ScreenCoordinate& anchor, const Duration& = Duration::zero());
+    void setAngle(double angle, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     /** Sets the angle of rotation, keeping the center point fixed within the inset view.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param padding The viewport padding that affects the fixed center point. */
-    void setAngle(double angle, const EdgeInsets& padding, const Duration& = Duration::zero());
+    void setAngle(double angle, optional<EdgeInsets> padding, const Duration& = Duration::zero());
     /** Returns the angle of rotation.
         @return The angle of rotation, measured in radians counterclockwise from
             true north. */
@@ -114,7 +124,7 @@ public:
         @param angle The new pitch angle, measured in radians toward the
             horizon.
         @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, const ScreenCoordinate& anchor, const Duration& = Duration::zero());
+    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
     double getPitch() const;
 
     // North Orientation

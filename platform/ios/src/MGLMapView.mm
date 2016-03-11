@@ -1146,7 +1146,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if (log2(newScale) < _mbglMap->getMinZoom()) return;
         
-        _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y });
+        _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1183,7 +1183,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if (velocity)
         {
-            _mbglMap->setScale(newScale, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
+            _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
         }
 
         [self notifyGestureDidEndWithDrift:velocity];
@@ -1229,7 +1229,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             newDegrees = fmaxf(newDegrees, -30);
         }
         
-        _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y });
+        _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1244,7 +1244,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             CGFloat newRadians = radians + velocity * duration * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
+            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
 
             [self notifyGestureDidEndWithDrift:YES];
 
@@ -1395,7 +1395,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             centerPoint = self.userLocationAnnotationViewCenter;
         }
         _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(),
-                          { centerPoint.x, centerPoint.y });
+                          mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1430,7 +1430,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             centerPoint = self.userLocationAnnotationViewCenter;
         }
-        _mbglMap->setPitch(pitchNew, centerPoint);
+        _mbglMap->setPitch(pitchNew, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
     }
@@ -1992,7 +1992,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else
     {
         CGPoint centerPoint = self.userLocationAnnotationViewCenter;
-        _mbglMap->setBearing(direction, { centerPoint.x, centerPoint.y },
+        _mbglMap->setBearing(direction, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y },
                              MGLDurationInSeconds(duration));
     }
 }

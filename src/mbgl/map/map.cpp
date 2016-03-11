@@ -172,31 +172,29 @@ void Map::moveBy(const ScreenCoordinate& point, const Duration& duration) {
 }
 
 void Map::setLatLng(const LatLng& latLng, const Duration& duration) {
-    setLatLng(latLng, EdgeInsets(), duration);
+    setLatLng(latLng, ScreenCoordinate {}, duration);
 }
 
-void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const Duration& duration) {
+void Map::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const Duration& duration) {
     transform->setLatLng(latLng, padding, duration);
     update(Update::Repaint);
 }
 
-void Map::setLatLng(const LatLng& latLng, const ScreenCoordinate& point, const Duration& duration) {
-    transform->setLatLng(latLng, point, duration);
+void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    transform->setLatLng(latLng, anchor, duration);
     update(Update::Repaint);
 }
 
-LatLng Map::getLatLng(const EdgeInsets& padding) const {
+LatLng Map::getLatLng(optional<EdgeInsets> padding) const {
     return transform->getLatLng(padding);
 }
 
-void Map::resetPosition(const EdgeInsets& padding) {
+void Map::resetPosition(optional<EdgeInsets> padding) {
     CameraOptions camera;
     camera.angle = 0;
     camera.pitch = 0;
     camera.center = LatLng(0, 0);
-    if (padding) {
-        camera.padding = padding;
-    }
+    camera.padding = padding;
     camera.zoom = 0;
     transform->jumpTo(camera);
     update(Update::Zoom);
@@ -205,13 +203,13 @@ void Map::resetPosition(const EdgeInsets& padding) {
 
 #pragma mark - Scale
 
-void Map::scaleBy(double ds, const ScreenCoordinate& point, const Duration& duration) {
-    transform->scaleBy(ds, point, duration);
+void Map::scaleBy(double ds, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    transform->scaleBy(ds, anchor, duration);
     update(Update::Zoom);
 }
 
-void Map::setScale(double scale, const ScreenCoordinate& point, const Duration& duration) {
-    transform->setScale(scale, point, duration);
+void Map::setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    transform->setScale(scale, anchor, duration);
     update(Update::Zoom);
 }
 
@@ -223,7 +221,7 @@ void Map::setZoom(double zoom, const Duration& duration) {
     setZoom(zoom, {}, duration);
 }
 
-void Map::setZoom(double zoom, const EdgeInsets& padding, const Duration& duration) {
+void Map::setZoom(double zoom, optional<EdgeInsets> padding, const Duration& duration) {
     transform->setZoom(zoom, padding, duration);
     update(Update::Zoom);
 }
@@ -236,12 +234,12 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const Duration& durat
     setLatLngZoom(latLng, zoom, {}, duration);
 }
 
-void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const Duration& duration) {
+void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const Duration& duration) {
     transform->setLatLngZoom(latLng, zoom, padding, duration);
     update(Update::Zoom);
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) {
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) {
     AnnotationSegment segment = {
         bounds.northwest(),
         bounds.southwest(),
@@ -251,7 +249,7 @@ CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeI
     return cameraForLatLngs(segment, padding);
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding) {
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;
@@ -272,26 +270,31 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     double height = nePixel.y - swPixel.y;
 
     // Calculate the zoom level.
-    double scaleX = (getWidth() - padding.left - padding.right) / width;
-    double scaleY = (getHeight() - padding.top - padding.bottom) / height;
+    double scaleX = getWidth() / width;
+    double scaleY = getHeight() / height;
+    if (padding && *padding) {
+        scaleX -= (padding->left + padding->right) / width;
+        scaleY -= (padding->top + padding->bottom) / height;
+    }
     double minScale = ::fmin(scaleX, scaleY);
     double zoom = ::log2(getScale() * minScale);
     zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
-    ScreenCoordinate paddedNEPixel = {
-        nePixel.x + padding.right / minScale,
-        nePixel.y + padding.top / minScale,
-    };
-    ScreenCoordinate paddedSWPixel = {
-        swPixel.x - padding.left / minScale,
-        swPixel.y - padding.bottom / minScale,
-    };
-    ScreenCoordinate centerPixel = {
-        (paddedNEPixel.x + paddedSWPixel.x) / 2,
-        (paddedNEPixel.y + paddedSWPixel.y) / 2,
-    };
-    
+    ScreenCoordinate centerPixel = nePixel + swPixel;
+    if (padding && *padding) {
+        ScreenCoordinate paddedNEPixel = {
+            padding->right / minScale,
+            padding->top / minScale,
+        };
+        ScreenCoordinate paddedSWPixel = {
+            padding->left / minScale,
+            padding->bottom / minScale,
+        };
+        centerPixel = centerPixel - paddedNEPixel - paddedSWPixel;
+    }
+    centerPixel /= 2;
+
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;
 
@@ -349,12 +352,12 @@ void Map::setBearing(double degrees, const Duration& duration) {
     setBearing(degrees, EdgeInsets(), duration);
 }
 
-void Map::setBearing(double degrees, const ScreenCoordinate& center, const Duration& duration) {
-    transform->setAngle(-degrees * util::DEG2RAD, center, duration);
+void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const Duration& duration) {
+    transform->setAngle(-degrees * util::DEG2RAD, anchor, duration);
     update(Update::Repaint);
 }
 
-void Map::setBearing(double degrees, const EdgeInsets& padding, const Duration& duration) {
+void Map::setBearing(double degrees, optional<EdgeInsets> padding, const Duration& duration) {
     transform->setAngle(-degrees * util::DEG2RAD, padding, duration);
     update(Update::Repaint);
 }
@@ -372,10 +375,10 @@ void Map::resetNorth(const Duration& duration) {
 #pragma mark - Pitch
 
 void Map::setPitch(double pitch, const Duration& duration) {
-    setPitch(pitch, {NAN, NAN}, duration);
+    setPitch(pitch, {}, duration);
 }
 
-void Map::setPitch(double pitch, const ScreenCoordinate& anchor, const Duration& duration) {
+void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& duration) {
     transform->setPitch(pitch * util::DEG2RAD, anchor, duration);
     update(Update::Repaint);
 }
