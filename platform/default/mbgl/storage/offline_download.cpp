@@ -222,6 +222,10 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
             status.completedResourceCount++;
             status.completedResourceSize += offlineResponse->second;
             observer->statusChanged(status);
+            
+            if (status.complete()) {
+                setState(OfflineRegionDownloadState::Inactive);
+            }
 
             return;
         }
@@ -251,6 +255,10 @@ void OfflineDownload::ensureResource(const Resource& resource, std::function<voi
             status.completedResourceSize += offlineDatabase.putRegionResource(id, resource, onlineResponse);
 
             observer->statusChanged(status);
+            
+            if (status.complete()) {
+                setState(OfflineRegionDownloadState::Inactive);
+            }
         });
     });
 }

@@ -71,13 +71,22 @@ TEST(OfflineDownload, NoSubresources) {
 
     auto observer = std::make_unique<MockObserver>();
 
+    bool expectsInactiveStatus = false;
     observer->statusChangedFn = [&] (OfflineRegionStatus status) {
         if (status.complete()) {
-            EXPECT_EQ(OfflineRegionDownloadState::Active, status.downloadState);
-            EXPECT_EQ(1, status.completedResourceCount);
-            EXPECT_EQ(test.size, status.completedResourceSize);
-            EXPECT_TRUE(status.requiredResourceCountIsPrecise);
-            test.loop.stop();
+            if (!expectsInactiveStatus) {
+                expectsInactiveStatus = true;
+                EXPECT_EQ(OfflineRegionDownloadState::Active, status.downloadState);
+                EXPECT_EQ(1, status.completedResourceCount);
+                EXPECT_EQ(test.size, status.completedResourceSize);
+                EXPECT_TRUE(status.requiredResourceCountIsPrecise);
+            } else {
+                EXPECT_EQ(OfflineRegionDownloadState::Inactive, status.downloadState);
+                EXPECT_EQ(1, status.completedResourceCount);
+                EXPECT_EQ(test.size, status.completedResourceSize);
+                EXPECT_TRUE(status.requiredResourceCountIsPrecise);
+                test.loop.stop();
+            }
         }
     };
 
@@ -478,7 +487,7 @@ TEST(OfflineDownload, ReactivatePreviouslyCompletedDownload) {
 
     test.loop.run();
 
-    ASSERT_EQ(3, statusesAfterReactivate.size());
+    ASSERT_EQ(4, statusesAfterReactivate.size());
 
     EXPECT_EQ(OfflineRegionDownloadState::Active, statusesAfterReactivate[0].downloadState);
     EXPECT_FALSE(statusesAfterReactivate[0].requiredResourceCountIsPrecise);
