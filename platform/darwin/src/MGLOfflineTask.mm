@@ -66,8 +66,10 @@ private:
 }
 
 - (void)dealloc {
-    mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
-    mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, nullptr);
+    if (_mbglOfflineRegion && _state != MGLOfflineTaskStateInvalid) {
+        mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
+        mbglFileSource->setOfflineRegionObserver(*_mbglOfflineRegion, nullptr);
+    }
 }
 
 - (id <MGLOfflineRegion>)region {
