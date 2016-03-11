@@ -1246,11 +1246,13 @@ public class MapView extends FrameLayout {
     // This class handles TextureView callbacks
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
 
+        private Surface mSurface;
+
         // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            mNativeMapView.createSurface(new Surface(surface));
+            mNativeMapView.createSurface(mSurface = new Surface(surface));
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
@@ -1261,6 +1263,7 @@ public class MapView extends FrameLayout {
             if (mNativeMapView != null) {
                 mNativeMapView.destroySurface();
             }
+            mSurface.release();
             return true;
         }
 
