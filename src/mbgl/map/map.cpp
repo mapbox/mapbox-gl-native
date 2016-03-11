@@ -56,7 +56,7 @@ void Map::resume() {
 
 void Map::renderStill(StillImageCallback callback) {
     context->invoke(&MapContext::renderStill, transform->getState(),
-                    FrameData{ view.getFramebufferSize() }, callback);
+                    FrameData { view.getFramebufferSize(), Clock::now() }, callback);
 }
 
 void Map::renderSync() {
@@ -68,7 +68,7 @@ void Map::renderSync() {
 
     const Update flags = transform->updateTransitions(Clock::now());
     const bool fullyLoaded = context->invokeSync<bool>(
-            &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize() });
+            &MapContext::renderSync, transform->getState(), FrameData { view.getFramebufferSize(), Clock::now() });
 
     view.notifyMapChange(fullyLoaded ?
         MapChangeDidFinishRenderingFrameFullyRendered :

@@ -16,9 +16,11 @@ TEST(Style, UnusedSource) {
     StubFileSource fileSource;
     Style style { data, fileSource };
 
+    auto now = Clock::now();
+
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"), "");
-    style.cascade();
-    style.recalculate(0);
+    style.cascade(now);
+    style.recalculate(0, now);
 
     Source *usedSource = style.getSource("usedsource");
     EXPECT_TRUE(usedSource);
@@ -42,8 +44,10 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
     EXPECT_TRUE(style.addClass("visible"));
     EXPECT_TRUE(style.hasClass("visible"));
 
-    style.cascade();
-    style.recalculate(0);
+    auto now = Clock::now();
+
+    style.cascade(now);
+    style.recalculate(0, now);
 
     Source *unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);
@@ -53,8 +57,10 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"), "");
     EXPECT_FALSE(style.hasClass("visible"));
 
-    style.cascade();
-    style.recalculate(0);
+    now = Clock::now();
+
+    style.cascade(now);
+    style.recalculate(0, now);
 
     unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);

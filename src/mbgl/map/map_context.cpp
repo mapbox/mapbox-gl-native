@@ -144,7 +144,7 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
     styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
-    style->cascade();
+    style->cascade(Clock::now());
 
     // set loading here so we don't get a false loaded event as soon as map is
     // created but before a style is loaded
@@ -164,27 +164,29 @@ void MapContext::update() {
         return;
     }
 
-    data.setAnimationTime(Clock::now());
-
     if (style->loaded && updateFlags & Update::Annotations) {
         data.getAnnotationManager()->updateStyle(*style);
         updateFlags |= Update::Classes;
     }
 
     if (updateFlags & Update::Classes) {
-        style->cascade();
+        style->cascade(frameData.timePoint);
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transformState.getZoom());
+        style->recalculate(transformState.getZoom(), frameData.timePoint);
     }
 
-    style->update(transformState, *texturePool);
+    style->update(transformState, frameData.timePoint, *texturePool);
 
     if (data.mode == MapMode::Continuous) {
         asyncInvalidate.send();
-    } else if (callback && style->isLoaded()) {
-        renderSync(transformState, frameData);
+    } else {
+        // Update time point so style sources can check they are loaded.
+        frameData.timePoint = Clock::now();
+        if (callback && style->isLoaded()) {
+            renderSync(transformState, frameData);
+        }
     }
 
     updateFlags = Update::Nothing;
@@ -234,6 +236,7 @@ bool MapContext::renderSync(const TransformState& state, const FrameData& frame)
     view.beforeRender();
 
     transformState = state;
+    frameData = frame;
 
     if (!painter) painter = std::make_unique<Painter>(data, transformState, glObjectStore);
     painter->render(*style, frame, data.getAnnotationManager()->getSpriteAtlas());

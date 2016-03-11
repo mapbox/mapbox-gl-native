@@ -147,12 +147,12 @@ void Style::removeLayer(const std::string& id) {
     layers.erase(it);
 }
 
-void Style::update(const TransformState& transform,
+void Style::update(const TransformState& transform, const TimePoint& timePoint,
                    gl::TexturePool& texturePool) {
     bool allTilesUpdated = true;
     StyleUpdateParameters parameters(data.pixelRatio,
                                      data.getDebug(),
-                                     data.getAnimationTime(),
+                                     timePoint,
                                      transform,
                                      workers,
                                      fileSource,
@@ -175,7 +175,7 @@ void Style::update(const TransformState& transform,
     }
 }
 
-void Style::cascade() {
+void Style::cascade(const TimePoint& timePoint) {
     // When in continuous mode, we can either have user- or style-defined
     // transitions. Still mode is always immediate.
     static const PropertyTransition immediateTransition;
@@ -189,7 +189,7 @@ void Style::cascade() {
 
     const StyleCascadeParameters parameters {
         classIDs,
-        data.getAnimationTime(),
+        timePoint,
         data.mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
     };
 
@@ -200,16 +200,16 @@ void Style::cascade() {
     }
 }
 
-void Style::recalculate(float z) {
+void Style::recalculate(float z, const TimePoint& timePoint) {
     for (const auto& source : sources) {
         source->enabled = false;
     }
 
-    zoomHistory.update(z, data.getAnimationTime());
+    zoomHistory.update(z, timePoint);
 
     const StyleCalculationParameters parameters {
         z,
-        data.getAnimationTime(),
+        timePoint,
         zoomHistory,
         data.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };

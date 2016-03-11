@@ -27,6 +27,7 @@ namespace gl { class TexturePool; }
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
+    TimePoint timePoint;
 };
 
 class MapContext : public Style::Observer {

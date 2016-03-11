@@ -81,10 +81,10 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const TransformState&, gl::TexturePool&);
+    void update(const TransformState&, const TimePoint&, gl::TexturePool&);
 
-    void cascade();
-    void recalculate(float z);
+    void cascade(const TimePoint&);
+    void recalculate(float z, const TimePoint&);
 
     bool hasTransitions() const;
 

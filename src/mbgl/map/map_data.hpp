@@ -1,8 +1,6 @@
 #ifndef MBGL_MAP_MAP_DATA
 #define MBGL_MAP_MAP_DATA
 
-#include <mbgl/util/chrono.hpp>
-
 #include <mutex>
 #include <atomic>
 #include <vector>
@@ -23,8 +21,7 @@ public:
         : mode(mode_)
         , contextMode(contextMode_)
         , pixelRatio(pixelRatio_)
-        , annotationManager(pixelRatio)
-        , animationTime(Duration::zero()) {
+        , annotationManager(pixelRatio) {
         assert(pixelRatio > 0);
     }
 
@@ -49,19 +46,6 @@ public:
         debugOptions = debugOptions_;
     }
 
-    inline TimePoint getAnimationTime() const {
-        // We're casting the TimePoint to and from a Duration because libstdc++
-        // has a bug that doesn't allow TimePoints to be atomic.
-        return mode == MapMode::Continuous ? TimePoint(animationTime) : Clock::now();
-    }
-    inline void setAnimationTime(const TimePoint& timePoint) {
-        if (mode == MapMode::Still) {
-            return;
-        }
-
-        animationTime = timePoint.time_since_epoch();
-    };
-
     util::exclusive<AnnotationManager> getAnnotationManager() {
         return util::exclusive<AnnotationManager>(
             &annotationManager,
@@ -78,7 +62,6 @@ private:
     AnnotationManager annotationManager;
 
     std::atomic<MapDebugOptions> debugOptions { MapDebugOptions::NoDebug };
-    std::atomic<Duration> animationTime;
 
 // TODO: make private
 public:
