@@ -137,12 +137,12 @@ void Painter::renderFill(FillBucket& bucket,
                 outlinePatternShader->u_mix = properties.fillPattern.value.t;
 
                 outlinePatternShader->u_patternscale_a = {{
-                    1.0f / id.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
-                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
+                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
+                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
                 }};
                 outlinePatternShader->u_patternscale_b = {{
-                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
-                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
+                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
+                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
                 }};
 
                 outlinePatternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};

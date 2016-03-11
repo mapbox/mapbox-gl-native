@@ -251,12 +251,12 @@ void Painter::renderPass(RenderPass pass_,
             layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
-            MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->id));
+            assert(item.tile->data);
+            MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->data->id));
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }
-            const UnwrappedTileID tileID{ item.tile->id.sourceZ, item.tile->id.x, item.tile->id.y };
-            item.bucket->render(*this, layer, tileID, item.tile->matrix);
+            item.bucket->render(*this, layer, item.tile->id, item.tile->matrix);
         }
     }
 

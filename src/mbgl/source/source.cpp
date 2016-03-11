@@ -163,7 +163,7 @@ void Source::load(FileSource& fileSource) {
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
     for (const auto& pair : tiles) {
         auto& tile = *pair.second;
-        transform.matrixFor(tile.matrix, UnwrappedTileID{ tile.id.sourceZ, tile.id.x, tile.id.y });
+        transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
     }
 }
@@ -180,8 +180,7 @@ std::map<UnwrappedTileID, Renderable> Source::getRenderables() const {
     for (const auto& pair : tiles) {
         auto& tile = *pair.second;
         if (tile.data->isReady() && tile.data->hasData()) {
-            renderables.emplace(UnwrappedTileID{ tile.id.sourceZ, tile.id.x, tile.id.y },
-                                Renderable{ tile.clip });
+            renderables.emplace(tile.id, Renderable{ tile.clip });
         }
     }
     return renderables;
@@ -195,7 +194,7 @@ TileData::State Source::hasTile(const TileID& tileID) {
     auto it = tiles.find(tileID);
     if (it != tiles.end()) {
         Tile& tile = *it->second;
-        if (tile.id == tileID && tile.data) {
+        if (it->first == tileID && tile.data) {
             return tile.data->getState();
         }
     }
@@ -227,7 +226,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
         return state;
     }
 
-    auto newTile = std::make_unique<Tile>(tileID);
+    auto newTile = std::make_unique<Tile>(UnwrappedTileID{ tileID.sourceZ, tileID.x, tileID.y });
 
     // We couldn't find the tile in the list. Create a new one.
     // Try to find the associated TileData object.
@@ -426,15 +425,16 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     // the required list.
     std::set<TileID> retain_data;
     util::erase_if(tiles, [this, &retain, &retain_data, &tileCache](std::pair<const TileID, std::unique_ptr<Tile>> &pair) {
+        const auto& tileID = pair.first;
         Tile &tile = *pair.second;
-        bool obsolete = std::find(retain.begin(), retain.end(), tile.id) == retain.end();
+        bool obsolete = std::find(retain.begin(), retain.end(), tileID) == retain.end();
         if (!obsolete) {
             retain_data.insert(tile.data->id);
         } else if (type != SourceType::Raster && tile.data->getState() == TileData::State::parsed) {
             // Partially parsed tiles are never added to the cache because otherwise
             // they never get updated if the go out from the viewport and the pending
             // resources arrive.
-            tileCache.add(tile.id.normalized().to_uint64(), tile.data);
+            tileCache.add(tileID.normalized().to_uint64(), tile.data);
         }
         return obsolete;
     });
@@ -523,10 +523,11 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
 
     for (auto& tilePtr : tilePtrs) {
         auto& tile = *tilePtr;
-        uint64_t integerID = tile.id.to_uint64();
+        const TileID& tileID = tile.data->id;
+        const auto integerID = tileID.to_uint64();
 
-        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id, { minX, minY, z });
-        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id, { maxX, maxY, z });
+        auto tileSpaceBoundsMin = coordinateToTilePoint(tileID, { minX, minY, z });
+        auto tileSpaceBoundsMax = coordinateToTilePoint(tileID, { maxX, maxY, z });
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
@@ -534,7 +535,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         GeometryCoordinates tileSpaceQueryGeometry;
 
         for (auto& c : queryGeometry) {
-            tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id, c));
+            tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tileID, c));
         }
 
         auto it = tileQueries.find(integerID);
@@ -544,8 +545,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
             tileQueries.emplace(integerID, TileQuery{
                     tilePtr,
                     { tileSpaceQueryGeometry },
-                    util::tileSize * std::pow(2, tile.id.z - tile.id.sourceZ),
-                    std::pow(2, zoom - tile.id.z)
+                    util::tileSize * std::pow(2, tileID.z - tileID.sourceZ),
+                    std::pow(2, zoom - tileID.z)
                 });
         }
     }

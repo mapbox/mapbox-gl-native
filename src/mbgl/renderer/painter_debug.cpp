@@ -9,7 +9,7 @@
 using namespace mbgl;
 
 void Painter::renderTileDebug(const Tile& tile) {
-    MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
+    MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(tile.id));
     assert(tile.data);
     if (frame.debugOptions != MapDebugOptions::NoDebug) {
         setClipping(tile.clip);
