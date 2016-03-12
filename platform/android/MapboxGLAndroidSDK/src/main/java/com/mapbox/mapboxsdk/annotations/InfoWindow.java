@@ -4,15 +4,14 @@ import android.content.res.Resources;
 import android.graphics.PointF;
 import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.lang.ref.WeakReference;
 
@@ -189,13 +188,21 @@ public class InfoWindow {
      * @return this info window
      */
     InfoWindow close() {
-        if (mIsVisible) {
+        MapboxMap mapboxMap = mMapboxMap.get();
+        if (mIsVisible && mapboxMap != null) {
             mIsVisible = false;
             View view = mView.get();
             if (view != null && view.getParent() != null) {
                 ((ViewGroup) view.getParent()).removeView(view);
             }
-            onClose();
+
+            Marker marker = getBoundMarker();
+            MapboxMap.OnInfoWindowCloseListener listener = mapboxMap.getOnInfoWindowCloseListener();
+            if (listener != null) {
+                listener.onInfoWindowClose(marker);
+            }
+
+            setBoundMarker(null);
         }
         return this;
     }
@@ -217,18 +224,6 @@ public class InfoWindow {
         ((TextView) view.findViewById(R.id.infowindow_title)).setText(title);
         String snippet = overlayItem.getSnippet();
         ((TextView) view.findViewById(R.id.infowindow_description)).setText(snippet);
-    }
-
-    private void onClose() {
-        MapboxMap mapboxMap = mMapboxMap.get();
-        if (mapboxMap != null) {
-            MapboxMap.OnInfoWindowCloseListener listener = mapboxMap.getOnInfoWindowCloseListener();
-            if (listener != null) {
-                listener.onInfoWindowClose(getBoundMarker());
-            }
-            mapboxMap.deselectMarker(getBoundMarker());
-            setBoundMarker(null);
-        }
     }
 
     InfoWindow setBoundMarker(Marker boundMarker) {
