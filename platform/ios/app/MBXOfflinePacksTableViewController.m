@@ -164,12 +164,9 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
-        __weak MBXOfflinePacksTableViewController *weakSelf = self;
-        [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError *error) {
-            MBXOfflinePacksTableViewController *strongSelf = weakSelf;
-            [strongSelf.offlinePacks removeObjectAtIndex:indexPath.row];
-            [strongSelf.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        }];
+        [self.offlinePacks removeObjectAtIndex:indexPath.row];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:nil];
     }
 }
 
