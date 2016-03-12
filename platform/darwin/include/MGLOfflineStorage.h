@@ -66,7 +66,7 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
  @param completion The completion handler to call once the pack has been added.
     This handler is executed asynchronously on the main queue.
  */
-- (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion;
+- (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(nullable MGLOfflinePackAdditionCompletionHandler)completion;
 
 /**
  Unregisters the given offline pack and frees any resources that are no longer
@@ -82,7 +82,7 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
  @param completion The completion handler to call once the pack has been
     removed. This handler is executed asynchronously on the main queue.
  */
-- (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion;
+- (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
 
 /**
  Asynchronously calls a completion callback with all existing offline packs.
