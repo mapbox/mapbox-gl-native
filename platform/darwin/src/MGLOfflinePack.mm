@@ -189,16 +189,12 @@ NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
 
 void MBGLOfflineRegionObserver::statusChanged(mbgl::OfflineRegionStatus status) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
-        
         [pack offlineRegionStatusDidChange:status];
     });
 }
 
 void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
-        
         if ([pack.delegate respondsToSelector:@selector(offlinePack:didReceiveError:)]) {
             [pack.delegate offlinePack:pack didReceiveError:MGLErrorFromResponseError(error)];
         }
@@ -207,8 +203,6 @@ void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
 
 void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSCAssert(pack, @"MBGLOfflineRegionObserver is dangling without an associated MGLOfflinePack.");
-        
         if ([pack.delegate respondsToSelector:@selector(offlinePack:didReceiveMaximumAllowedMapboxTiles:)]) {
             [pack.delegate offlinePack:pack didReceiveMaximumAllowedMapboxTiles:limit];
         }
