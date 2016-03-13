@@ -291,8 +291,8 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(latLng.latitude, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(latLng.longitude, transform.getLatLng().longitude);
 
-    transform.setAngle(-45 * util::DEG2RAD, anchorPoint);
-    ASSERT_NEAR(-45 / util::RAD2DEG, transform.getAngle(), 0.000001);
+    transform.setAngle(45 * util::DEG2RAD, anchorPoint);
+    ASSERT_NEAR(45 / util::RAD2DEG, transform.getAngle(), 0.000001);
     ASSERT_NEAR(anchorLatLng.latitude, transform.getLatLng().latitude, 1);
     ASSERT_NEAR(anchorLatLng.longitude, transform.getLatLng().longitude, 1);
 
@@ -415,4 +415,72 @@ TEST(Transform, Antimeridian) {
     ScreenCoordinate pixelWaikiriBackwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_DOUBLE_EQ(pixelWaikiriForwards.x, pixelWaikiriBackwards.x);
     ASSERT_DOUBLE_EQ(pixelWaikiriForwards.y, pixelWaikiriBackwards.y);
+}
+
+TEST(Transform, Camera) {
+    MockView view;
+    Transform transform(view, ConstrainMode::HeightOnly);
+    transform.resize({{ 1000, 1000 }});
+
+    const LatLng latLng1 { 45, 135 };
+    CameraOptions cameraOptions1;
+    cameraOptions1.zoom = 20;
+    cameraOptions1.center = latLng1;
+    transform.jumpTo(cameraOptions1);
+
+    ASSERT_DOUBLE_EQ(latLng1.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng1.longitude, transform.getLatLng().longitude);
+    ASSERT_DOUBLE_EQ(20, transform.getZoom());
+
+    const LatLng latLng2 { -45, -135 };
+    CameraOptions cameraOptions2;
+    cameraOptions2.zoom = 10;
+    cameraOptions2.center = latLng2;
+
+    transform.jumpTo(cameraOptions2);
+    ASSERT_DOUBLE_EQ(latLng2.latitude, transform.getLatLng().latitude);
+    ASSERT_DOUBLE_EQ(latLng2.longitude, transform.getLatLng().longitude);
+    ASSERT_DOUBLE_EQ(10, transform.getZoom());
+
+    AnimationOptions easeOptions(Seconds(1));
+    easeOptions.transitionFrameFn = [&](double t) {
+        ASSERT_TRUE(t >= 0 && t <= 1);
+        ASSERT_GE(latLng1.latitude, transform.getLatLng().latitude);
+        ASSERT_LE(latLng1.longitude, transform.getLatLng().longitude);
+    };
+    easeOptions.transitionFinishFn = [&]() {
+        ASSERT_NEAR(latLng1.latitude, transform.getLatLng().latitude, 0.000001);
+        ASSERT_NEAR(latLng1.longitude, transform.getLatLng().longitude, 0.000001);
+        ASSERT_NEAR(20, transform.getZoom(), 0.000001);
+    };
+
+    transform.easeTo(cameraOptions1, easeOptions);
+    ASSERT_TRUE(transform.inTransition());
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+    ASSERT_FALSE(transform.inTransition());
+
+    AnimationOptions flyOptions(Seconds(1));
+    flyOptions.transitionFrameFn = [&](double t) {
+        ASSERT_TRUE(t >= 0 && t <= 1);
+        ASSERT_LE(latLng2.latitude, transform.getLatLng().latitude);
+        ASSERT_GE(latLng2.longitude, transform.getLatLng().longitude);
+    };
+    flyOptions.transitionFinishFn = [&]() {
+        // XXX Fix precision loss in flyTo:
+        // https://github.com/mapbox/mapbox-gl-native/issues/4298
+        ASSERT_NEAR(latLng2.latitude, transform.getLatLng().latitude, 0.001);
+        ASSERT_NEAR(latLng2.longitude, transform.getLatLng().longitude, 0.001);
+        ASSERT_NEAR(10, transform.getZoom(), 0.00001);
+    };
+
+    transform.flyTo(cameraOptions2, flyOptions);
+    ASSERT_TRUE(transform.inTransition());
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(250));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(500));
+    transform.updateTransitions(transform.getTransitionStart() + Milliseconds(750));
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+    ASSERT_FALSE(transform.inTransition());
 }

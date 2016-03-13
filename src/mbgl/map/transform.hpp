@@ -138,6 +138,8 @@ public:
     // Transitions
     bool inTransition() const;
     Update updateTransitions(const TimePoint& now);
+    TimePoint getTransitionStart() const { return transitionStart; }
+    Duration getTransitionDuration() const { return transitionDuration; }
     void cancelTransitions();
 
     // Gesture

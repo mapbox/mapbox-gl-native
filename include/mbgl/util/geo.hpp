@@ -1,6 +1,7 @@
 #ifndef MBGL_UTIL_GEO
 #define MBGL_UTIL_GEO
 
+#include <mbgl/util/math.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -29,18 +30,16 @@ public:
     LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
 
     void wrap() {
-        if (longitude < -util::LONGITUDE_MAX) longitude = util::LONGITUDE_MAX + std::fmod(longitude + util::LONGITUDE_MAX, util::DEGREES_MAX);
-        if (longitude > util::LONGITUDE_MAX) longitude = -util::LONGITUDE_MAX + std::fmod(longitude + util::LONGITUDE_MAX, util::DEGREES_MAX);
+        longitude = util::wrap(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
     }
 
-    // If we pass through the antimeridian, we update the start coordinate to make sure
-    // the end coordinate is always wrapped.
+    // If the distance from start to end longitudes is between half and full
+    // world, unwrap the start longitude to ensure the shortest path is taken.
     void unwrapForShortestPath(const LatLng& end) {
-        if (end.longitude < -util::LONGITUDE_MAX) {
-            longitude += util::DEGREES_MAX;
-        } else if (end.longitude > util::LONGITUDE_MAX) {
-            longitude -= util::DEGREES_MAX;
-        }
+        const double delta = std::abs(end.longitude - longitude);
+        if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
+        if (longitude > 0 && end.longitude < 0) longitude -= util::DEGREES_MAX;
+        else if (longitude < 0 && end.longitude > 0) longitude += util::DEGREES_MAX;
     }
 
     explicit operator bool() const {

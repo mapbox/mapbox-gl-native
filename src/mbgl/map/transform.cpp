@@ -77,26 +77,20 @@ void Transform::jumpTo(const CameraOptions& camera) {
  * not included in `options`.
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
-    LatLng latLng = camera.center ? *camera.center : getLatLng();
-    double zoom = camera.zoom ? *camera.zoom : getZoom();
-    double angle = camera.angle ? *camera.angle : getAngle();
-    double pitch = camera.pitch ? *camera.pitch : getPitch();
-    
+    const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
+    double zoom = camera.zoom.value_or(getZoom());
+    double angle = camera.angle.value_or(getAngle());
+    double pitch = camera.pitch.value_or(getPitch());
+
     if (!latLng || std::isnan(zoom)) {
         return;
     }
-    
+
     // Determine endpoints.
     EdgeInsets padding;
-    if (camera.padding) {
-        padding = *camera.padding;
-    }
-
-    LatLng startLatLng = getLatLng(padding);
+    if (camera.padding) padding = *camera.padding;
+    LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
-
-    // Make sure the end coordinate always remains valid.
-    latLng.wrap();
 
     const ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
@@ -165,10 +159,10 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     Where applicable, local variable documentation begins with the associated
     variable or function in van Wijk (2003). */
 void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &animation) {
-    LatLng latLng = camera.center ? *camera.center : getLatLng();
-    double zoom = camera.zoom ? *camera.zoom : getZoom();
-    double angle = camera.angle ? *camera.angle : getAngle();
-    double pitch = camera.pitch ? *camera.pitch : getPitch();
+    const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
+    double zoom = camera.zoom.value_or(getZoom());
+    double angle = camera.angle.value_or(getAngle());
+    double pitch = camera.pitch.value_or(getPitch());
 
     if (!latLng || std::isnan(zoom)) {
         return;
@@ -176,15 +170,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     
     // Determine endpoints.
     EdgeInsets padding;
-    if (camera.padding) {
-        padding = *camera.padding;
-    }
-
-    LatLng startLatLng = getLatLng(padding);
+    if (camera.padding) padding = *camera.padding;
+    LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
-
-    // Make sure the end coordinate always remains valid.
-    latLng.wrap();
 
     const ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
@@ -653,20 +641,12 @@ void Transform::setGestureInProgress(bool inProgress) {
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
     if (!latLng) return ScreenCoordinate::null();
 
-    // If the center and point coordinates are not in the same side of the
-    // antimeridian, we need to unwrap the point longitude to make sure it can
-    // still be seen from the visible side of the antimeridian that is opposite
-    // to the center side.
-    double longitude = latLng.longitude;
-    const double centerLng = getLatLng().longitude;
-    if (std::abs(centerLng - latLng.longitude) > std::abs(util::LONGITUDE_MAX)) {
-        if (centerLng > 0 && latLng.longitude < 0) {
-            longitude += util::DEGREES_MAX;
-        } else if (centerLng < 0 && latLng.longitude > 0) {
-            longitude -= util::DEGREES_MAX;
-        }
-    }
-    ScreenCoordinate point = state.latLngToScreenCoordinate({ latLng.latitude, longitude });
+    // If the center and point longitudes are not in the same side of the
+    // antimeridian, we unwrap the point longitude so it would be seen if
+    // e.g. the next antimeridian side is visible.
+    LatLng unwrappedLatLng = latLng.wrapped();
+    unwrappedLatLng.unwrapForShortestPath(getLatLng());
+    ScreenCoordinate point = state.latLngToScreenCoordinate(unwrappedLatLng);
     point.y = state.height - point.y;
     return point;
 }
