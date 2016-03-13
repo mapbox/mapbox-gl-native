@@ -9,6 +9,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/map/camera.hpp>
 
 #include <cassert>
 #include <cstdlib>
@@ -94,6 +95,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `N` to reset north\n");
     printf("- Press `R` to toggle any available `night` style class\n");
     printf("- Press `Z` to cycle through north orientations\n");
+    printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");
     printf("- Press `7` through `0` to add increasing numbers of shape annotations for testing\n");
@@ -166,6 +168,26 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_P: {
             view->addRandomCustomPointAnnotations(1);
+        } break;
+        case GLFW_KEY_A: {
+            // XXX Fix precision loss in flyTo:
+            // https://github.com/mapbox/mapbox-gl-native/issues/4298
+            static const std::vector<mbgl::LatLng> places = {
+                mbgl::LatLng { -16.796665, -179.999983 },   // Dateline monument
+                mbgl::LatLng { 12.9810542, 77.6345551 },    // Mapbox Bengaluru, India
+                mbgl::LatLng { -13.15607,-74.21773 },       // Mapbox Peru
+                mbgl::LatLng { 37.77572, -122.4158818 },    // Mapbox SF, USA
+                mbgl::LatLng { 38.91318,-77.03255 },        // Mapbox DC, USA
+            };
+            static size_t nextPlace = 0;
+            mbgl::CameraOptions cameraOptions;
+            cameraOptions.center = places[nextPlace++];
+            cameraOptions.zoom = 20;
+            cameraOptions.pitch = 30;
+
+            mbgl::AnimationOptions animationOptions(mbgl::Seconds(10));
+            view->map->flyTo(cameraOptions, animationOptions);
+            nextPlace = nextPlace % places.size();
         } break;
         }
     }
