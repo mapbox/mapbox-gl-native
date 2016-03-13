@@ -651,7 +651,7 @@ void Transform::setGestureInProgress(bool inProgress) {
 #pragma mark Conversion and projection
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
-    if (!latLng) return {};
+    if (!latLng) return ScreenCoordinate::null();
 
     // If the center and point coordinates are not in the same side of the
     // antimeridian, we need to unwrap the point longitude to make sure it can
@@ -672,7 +672,8 @@ ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const
 }
 
 LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point) const {
-    if (!point) return {};
+    if (!point) return LatLng::null();
+
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.height - flippedPoint.y;
     return state.screenCoordinateToLatLng(flippedPoint);

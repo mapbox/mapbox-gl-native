@@ -14,10 +14,14 @@ using ScreenCoordinate = vec2<double>;
 
 class LatLng {
 public:
+    struct null {};
+
     double latitude;
     double longitude;
 
     enum WrapMode : bool { Unwrapped, Wrapped };
+
+    LatLng(null) : latitude(std::numeric_limits<double>::quiet_NaN()), longitude(latitude) {}
 
     LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
         : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }

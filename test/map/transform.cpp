@@ -79,6 +79,9 @@ TEST(Transform, InvalidLatLng) {
     ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
     ASSERT_DOUBLE_EQ(4, transform.getScale());
+
+    ASSERT_FALSE(transform.latLngToScreenCoordinate(LatLng::null()));
+    ASSERT_FALSE(transform.screenCoordinateToLatLng(ScreenCoordinate::null()));
 }
 
 
