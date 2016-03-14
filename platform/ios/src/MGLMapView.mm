@@ -50,6 +50,10 @@
 class MBGLView;
 class MGLAnnotationContext;
 
+const CGFloat MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
+const CGFloat MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
+const CGFloat MGLMapViewDecelerationRateImmediate = 0.0;
+
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
@@ -420,6 +424,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [_twoFingerDrag requireGestureRecognizerToFail:_pan];
     [self addGestureRecognizer:_twoFingerDrag];
     _pitchEnabled = YES;
+
+    _decelerationRate = MGLMapViewDecelerationRateNormal;
 
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
@@ -1099,18 +1105,17 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
-        if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        if (self.decelerationRate == MGLMapViewDecelerationRateImmediate || sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
         {
             // Not enough velocity to overcome friction
             velocity = CGPointZero;
         }
 
-        NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
         BOOL drift = ! CGPointEqualToPoint(velocity, CGPointZero);
         if (drift)
         {
-            CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSeconds(duration));
+            CGPoint offset = CGPointMake(velocity.x * self.decelerationRate / 4, velocity.y * self.decelerationRate / 4);
+            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSeconds(self.decelerationRate));
         }
 
         [self notifyGestureDidEndWithDrift:drift];
