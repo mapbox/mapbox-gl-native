@@ -100,7 +100,9 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         }];
     }];
     [alertController addAction:downloadAction];
-    alertController.preferredAction = downloadAction;
+    if ([alertController respondsToSelector:@selector(setPreferredAction:)]) {
+        alertController.preferredAction = downloadAction;
+    }
     
     [self presentViewController:alertController animated:YES completion:nil];
 }
