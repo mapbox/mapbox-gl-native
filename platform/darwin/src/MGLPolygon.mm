@@ -20,7 +20,11 @@
     fillProperties.outlineColor = [delegate strokeColorForShapeAnnotation:self];
     fillProperties.color = [delegate fillColorForPolygonAnnotation:self];
     
-    shapeProperties.set<mbgl::FillAnnotationProperties>(fillProperties);
+    if(self.style) {
+        shapeProperties.set<std::string>([self.style UTF8String]);
+    } else {
+        shapeProperties.set<mbgl::FillAnnotationProperties>(fillProperties);
+    }
     
     return shapeProperties;
 }

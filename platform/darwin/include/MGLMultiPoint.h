@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** The number of points associated with the shape. (read-only) */
 @property (nonatomic, readonly) NSUInteger pointCount;
+@property (nonatomic, copy, nullable) NSString *style;
 
 /**
  Retrieves one or more coordinates associated with the shape.

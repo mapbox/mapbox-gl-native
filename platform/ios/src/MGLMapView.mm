@@ -2403,12 +2403,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         else
         {
+            MGLPointAnnotation *point = (MGLPointAnnotation *)annotation;
             MGLAnnotationImage *annotationImage = delegateImplementsImageForPoint ? [self.delegate mapView:self imageForAnnotation:annotation] : nil;
-            if ( ! annotationImage)
+            if ( ! annotationImage && [point.text isEqual: @" "])
             {
                 annotationImage = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
-            if ( ! annotationImage)
+            if ( ! annotationImage && [point.text isEqual: @" "])
             {
                 // Create a default annotation image that depicts a round pin
                 // rising from the center, with a shadow slightly below center.
@@ -2420,16 +2421,24 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                                                reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
             
-            if ( ! self.annotationImagesByIdentifier[annotationImage.reuseIdentifier])
-            {
-                self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
-                [self installAnnotationImage:annotationImage];
-                annotationImage.delegate = self;
+            NSString *symbolName = nil;
+            if(annotationImage) {
+                if ( ! self.annotationImagesByIdentifier[annotationImage.reuseIdentifier])
+                {
+                    self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
+                    [self installAnnotationImage:annotationImage];
+                    annotationImage.delegate = self;
+                }
+                
+                symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+            }
+            
+            NSString *text = @"";
+            if (point.text) {
+                text = point.text;
             }
 
-            NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
-
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
+            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "", [text UTF8String]);
         }
     }
 

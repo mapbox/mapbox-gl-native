@@ -20,7 +20,11 @@
     lineProperties.color = [delegate strokeColorForShapeAnnotation:self];
     lineProperties.width = [delegate lineWidthForPolylineAnnotation:self];
     
-    shapeProperties.set<mbgl::LineAnnotationProperties>(lineProperties);
+    if(self.style) {
+        shapeProperties.set<std::string>([self.style UTF8String]);
+    } else {
+        shapeProperties.set<mbgl::LineAnnotationProperties>(lineProperties);
+    }
     
     return shapeProperties;
 }

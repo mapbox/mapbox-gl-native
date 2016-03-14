@@ -10,7 +10,20 @@ PointAnnotationImpl::PointAnnotationImpl(const AnnotationID id_, const PointAnno
 
 void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
-    featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
+//    featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
+    if(point.text.empty() && point.icon.empty()) {
+        featureProperties.emplace("sprite", std::string("default_marker"));
+        
+    } else if(point.text.empty() && !point.icon.empty()) {
+        featureProperties.emplace("sprite", point.icon);
+        
+    } else if(!point.text.empty() && point.icon.empty()) {
+        featureProperties.emplace("text", point.text);
+        
+    } else {
+        featureProperties.emplace("sprite", point.icon);
+        featureProperties.emplace("text", point.text);
+    }
 
     mbgl::ScreenCoordinate projected = point.position.project();
     projected *= 1 << tileID.z;

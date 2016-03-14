@@ -57,6 +57,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
     [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
+    
+    self.mapView.styleURL = [NSURL URLWithString:@"mapbox://styles/trueflow/cilru0odx00b1c7luiieu5mk5"];
 
     [self restoreState:nil];
 }
@@ -199,7 +201,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         };
 
         MGLPolygon *triangle = [MGLPolygon polygonWithCoordinates:triangleCoordinates count:3];
-
+        triangle.style = @"facility_stand";
         [self.mapView addAnnotation:triangle];
 
         // Orcas Island hike
@@ -248,7 +250,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             }
 
             MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
-
+            polygon.style = @"facility_building";
             [self.mapView addAnnotation:polygon];
 
             free(polygonCoordinates);
@@ -322,6 +324,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                 MGLPointAnnotation *annotation = [MGLPointAnnotation new];
                 annotation.coordinate = coordinate;
                 annotation.title = title;
+                annotation.text = @" ";
 
                 [annotations addObject:annotation];
 
@@ -521,6 +524,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
+    return nil;
     if ([annotation.title isEqualToString:@"Dropped Marker"]
         || [annotation.title isEqualToString:kCustomCalloutTitle])
     {

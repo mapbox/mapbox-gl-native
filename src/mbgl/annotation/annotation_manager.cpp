@@ -118,7 +118,12 @@ void AnnotationManager::updateStyle(Style& style) {
         layer->sourceLayer = PointLayerID;
         layer->layout.icon.image = std::string("{sprite}");
         layer->layout.icon.allowOverlap = true;
+        layer->layout.icon.offset = {{0.0f,-8.0f}};
         layer->spriteAtlas = &spriteAtlas;
+        
+        layer->layout.text.field = std::string("{text}");
+        layer->layout.text.font = std::string("Arial Unicode MS Regular");
+        layer->layout.text.offset = {{0.0f,0.6f}};
 
         style.addLayer(std::move(layer));
     }
