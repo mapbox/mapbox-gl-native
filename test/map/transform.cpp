@@ -410,11 +410,17 @@ TEST(Transform, Antimeridian) {
     ScreenCoordinate pixelWaikiriForwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_DOUBLE_EQ(437.95953728819512, pixelWaikiriForwards.x);
     ASSERT_DOUBLE_EQ(pixelWaikiri.y, pixelWaikiriForwards.y);
+    LatLng coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriForwards);
+    ASSERT_NEAR(coordinateWaikiri.latitude, coordinateFromPixel.latitude, 0.000001);
+    ASSERT_NEAR(coordinateWaikiri.longitude, coordinateFromPixel.longitude, 0.000001);
 
     transform.setLatLng({ coordinateWaikiri.latitude, -179.9787 });
     ScreenCoordinate pixelWaikiriBackwards = transform.latLngToScreenCoordinate(coordinateWaikiri);
     ASSERT_DOUBLE_EQ(pixelWaikiriForwards.x, pixelWaikiriBackwards.x);
     ASSERT_DOUBLE_EQ(pixelWaikiriForwards.y, pixelWaikiriBackwards.y);
+    coordinateFromPixel = transform.screenCoordinateToLatLng(pixelWaikiriBackwards);
+    ASSERT_NEAR(coordinateWaikiri.latitude, coordinateFromPixel.latitude, 0.000001);
+    ASSERT_NEAR(coordinateWaikiri.longitude, coordinateFromPixel.longitude, 0.000001);
 }
 
 TEST(Transform, Camera) {

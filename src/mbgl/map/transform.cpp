@@ -662,5 +662,5 @@ LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point) const 
 
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.height - flippedPoint.y;
-    return state.screenCoordinateToLatLng(flippedPoint);
+    return state.screenCoordinateToLatLng(flippedPoint).wrapped();
 }
