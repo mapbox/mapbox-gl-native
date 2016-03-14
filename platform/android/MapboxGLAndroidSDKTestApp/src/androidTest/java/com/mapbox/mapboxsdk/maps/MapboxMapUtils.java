@@ -11,8 +11,18 @@ public class MapboxMapUtils {
      * @param mapView
      * @return
      */
-    public static MapboxMap getMapboxMap(MapView mapView){
+    public static MapboxMap getMapboxMap(MapView mapView) {
         return mapView.getMapboxMap();
+    }
+
+    /**
+     * Set the direction of the user
+     *
+     * @param mapView
+     * @param direction
+     */
+    public static void setDirection(MapView mapView, double direction) {
+        mapView.setDirection(direction);
     }
 
 }
