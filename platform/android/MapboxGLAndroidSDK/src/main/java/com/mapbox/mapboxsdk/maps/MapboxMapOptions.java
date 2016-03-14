@@ -130,14 +130,14 @@ public class MapboxMapOptions implements Parcelable {
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_right, DIMENSION_TEN_DP * screenDensity))
                     , ((int) typedArray.getDimension(R.styleable.MapView_compass_margin_bottom, DIMENSION_TEN_DP * screenDensity))});
 
-            mapboxMapOptions.logoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_visibility, true));
+            mapboxMapOptions.logoEnabled(typedArray.getBoolean(R.styleable.MapView_logo_enabled, true));
             mapboxMapOptions.logoGravity(typedArray.getInt(R.styleable.MapView_logo_gravity, Gravity.BOTTOM | Gravity.START));
             mapboxMapOptions.logoMargins(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_logo_margin_left, DIMENSION_SIXTEEN_DP) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_top, DIMENSION_SIXTEEN_DP) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * screenDensity)});
 
-            mapboxMapOptions.attributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_visibility, true));
+            mapboxMapOptions.attributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_enabled, true));
             mapboxMapOptions.attributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
             mapboxMapOptions.attributionMargins(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_top, DIMENSION_SEVEN_DP) * screenDensity)
