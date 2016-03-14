@@ -141,6 +141,7 @@ private:
     const mat4 identityMatrix = []{
         mat4 identity;
         matrix::identity(identity);
+        matrix::translate(identity, identity, 0, 0, 1);
         return identity;
     }();
 
