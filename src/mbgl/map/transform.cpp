@@ -77,7 +77,8 @@ void Transform::jumpTo(const CameraOptions& camera) {
  * not included in `options`.
  */
 void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
-    const LatLng latLng = camera.center.value_or(getLatLng()).wrapped();
+    const LatLng unwrappedLatLng = camera.center.value_or(getLatLng());
+    const LatLng latLng = unwrappedLatLng.wrapped();
     double zoom = camera.zoom.value_or(getZoom());
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
@@ -89,8 +90,13 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Determine endpoints.
     EdgeInsets padding;
     if (camera.padding) padding = *camera.padding;
-    LatLng startLatLng = getLatLng(padding).wrapped();
-    startLatLng.unwrapForShortestPath(latLng);
+    LatLng startLatLng = getLatLng(padding);
+    // If gesture in progress, we transfer the world rounds from the end
+    // longitude into start, so we can guarantee the "scroll effect" of rounding
+    // the world while assuring the end longitude remains wrapped.
+    if (isGestureInProgress()) startLatLng.longitude -= unwrappedLatLng.longitude - latLng.longitude;
+    // Find the shortest path otherwise.
+    else startLatLng.unwrapForShortestPath(latLng);
 
     const ScreenCoordinate startPoint = {
         state.lngX(startLatLng.longitude),
