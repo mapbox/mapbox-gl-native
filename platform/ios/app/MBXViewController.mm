@@ -324,7 +324,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                 MGLPointAnnotation *annotation = [MGLPointAnnotation new];
                 annotation.coordinate = coordinate;
                 annotation.title = title;
-                annotation.text = @" ";
+                annotation.text = title;
 
                 [annotations addObject:annotation];
 
@@ -524,7 +524,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-    return nil;
+//    return nil;
     if ([annotation.title isEqualToString:@"Dropped Marker"]
         || [annotation.title isEqualToString:kCustomCalloutTitle])
     {
