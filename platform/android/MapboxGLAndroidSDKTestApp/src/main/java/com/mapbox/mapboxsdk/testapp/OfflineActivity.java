@@ -257,7 +257,7 @@ public class OfflineActivity extends AppCompatActivity
         String styleURL = mMapboxMap.getStyleUrl();
         LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
         double minZoom = mMapboxMap.getCameraPosition().zoom;
-        double maxZoom = mMapboxMap.getUiSettings().getMaxZoom();
+        double maxZoom = mMapboxMap.getMaxZoom();
         float pixelRatio = this.getResources().getDisplayMetrics().density;
         OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
                 styleURL, bounds, minZoom, maxZoom, pixelRatio);
@@ -346,6 +346,7 @@ public class OfflineActivity extends AppCompatActivity
         mProgressBar.setIndeterminate(true);
         mProgressBar.setVisibility(View.VISIBLE);
     }
+
     private void setPercentage(final int percentage) {
         mProgressBar.setIndeterminate(false);
         mProgressBar.setProgress(percentage);

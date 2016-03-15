@@ -265,8 +265,8 @@ public class MapView extends FrameLayout {
         uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
 
         // Zoom
-        uiSettings.setMaxZoom(options.getMaxZoom());
-        uiSettings.setMinZoom(options.getMinZoom());
+        mMapboxMap.setMaxZoom(options.getMaxZoom());
+        mMapboxMap.setMinZoom(options.getMinZoom());
 
         // Compass
         uiSettings.setCompassEnabled(options.getCompassEnabled());

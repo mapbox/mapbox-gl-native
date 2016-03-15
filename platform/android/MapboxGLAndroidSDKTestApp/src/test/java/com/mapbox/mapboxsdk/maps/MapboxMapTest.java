@@ -10,9 +10,7 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Before;
@@ -26,11 +24,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.matches;
-import static org.mockito.Mockito.mock;
-
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,6 +102,30 @@ public class MapboxMapTest {
     @Test
     public void testUiSettings() {
         assertNotNull("UiSettings should not be null", mMapboxMap.getUiSettings());
+    }
+
+    //
+    // MinZoomLevel
+    //
+
+    @Test
+    public void testMinZoom() {
+        double zoom = 10;
+        mMapboxMap.setMinZoom(zoom);
+        assertEquals("MinZoom should match", zoom, mMapboxMap.getMinZoom(), 0);
+    }
+
+    @Test
+    public void testMaxZoom() {
+        double zoom = 10;
+        mMapboxMap.setMaxZoom(zoom);
+        assertEquals("MaxZoom should match", zoom, mMapboxMap.getMaxZoom(), 0);
+    }
+
+    @Test
+    public void testInitialZoomLevels() {
+        assertEquals("MaxZoom should match", 0, mMapboxMap.getMaxZoom(), 0);
+        assertEquals("MinZoom should match", 0, mMapboxMap.getMinZoom(), 0);
     }
 
     //
@@ -221,15 +241,15 @@ public class MapboxMapTest {
     }
 
     @Test
-    public void testOnBearingTrackingModeChangeListener(){
+    public void testOnBearingTrackingModeChangeListener() {
         mMapboxMap.setOnMyBearingTrackingModeChangeListener(mMyBearingTrackingModeChangeListener);
-        assertEquals("MyBearingTrackingChangeListerner should match",mMyBearingTrackingModeChangeListener, mMapboxMap.getOnMyBearingTrackingModeChangeListener());
+        assertEquals("MyBearingTrackingChangeListerner should match", mMyBearingTrackingModeChangeListener, mMapboxMap.getOnMyBearingTrackingModeChangeListener());
     }
 
     @Test
-    public void testOnLocationTrackingModeChangeListener(){
+    public void testOnLocationTrackingModeChangeListener() {
         mMapboxMap.setOnMyLocationTrackingModeChangeListener(mMyLocationTrackingModeChangeListener);
-        assertEquals("MyLocationTrackigChangeListener should match",mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
+        assertEquals("MyLocationTrackigChangeListener should match", mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
     }
 
     //
@@ -708,7 +728,6 @@ public class MapboxMapTest {
         mMapboxMap.deselectMarkers();
         assertTrue("Selected markers should be empty", mMapboxMap.getSelectedMarkers().isEmpty());
     }
-
 
     //
     // OnMarkerClick interface

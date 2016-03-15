@@ -26,78 +26,11 @@ public class UiSettings {
     private boolean zoomControlsEnabled;
     private boolean scrollGesturesEnabled;
 
-    private double maxZoomLevel = -1;
-    private double minZoomLevel = -1;
-
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
         this.compassSettings = new ViewSettings();
         this.logoSettings = new ViewSettings();
         this.attributionSettings = new ViewSettings();
-    }
-
-    /**
-     * <p>
-     * Sets the minimum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @param minZoom The new minimum zoom level.
-     */
-    @UiThread
-    public void setMinZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
-        if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.e(MapboxConstants.TAG, "Not setting minZoom, value is in unsupported range: " + minZoom);
-            return;
-        }
-        minZoomLevel = minZoom;
-        mapView.setMinZoom(minZoom);
-    }
-
-    /**
-     * <p>
-     * Gets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @return The minimum zoom level.
-     */
-    @UiThread
-    public double getMinZoom() {
-        if (minZoomLevel == -1) {
-            return minZoomLevel = mapView.getMinZoom();
-        }
-        return minZoomLevel;
-    }
-
-    /**
-     * <p>
-     * Sets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @param maxZoom The new maximum zoom level.
-     */
-    @UiThread
-    public void setMaxZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
-        if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-            Log.e(MapboxConstants.TAG, "Not setting maxZoom, value is in unsupported range: " + maxZoom);
-            return;
-        }
-        maxZoomLevel = maxZoom;
-        mapView.setMaxZoom(maxZoom);
-    }
-
-    /**
-     * <p>
-     * Gets the maximum zoom level the map can be displayed at.
-     * </p>
-     *
-     * @return The maximum zoom level.
-     */
-    @UiThread
-    public double getMaxZoom() {
-        if (maxZoomLevel == -1) {
-            return maxZoomLevel = mapView.getMaxZoom();
-        }
-        return maxZoomLevel;
     }
 
     /**

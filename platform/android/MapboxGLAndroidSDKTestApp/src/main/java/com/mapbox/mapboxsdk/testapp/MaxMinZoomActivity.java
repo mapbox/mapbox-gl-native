@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 
 public class MaxMinZoomActivity extends AppCompatActivity {
@@ -45,10 +44,8 @@ public class MaxMinZoomActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-
-                UiSettings uiSettings = mapboxMap.getUiSettings();
-                uiSettings.setMinZoom(3);
-                uiSettings.setMaxZoom(5);
+                mMapboxMap.setMinZoom(3);
+                mMapboxMap.setMaxZoom(5);
 
                 mMapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(-1.063510, 32.895425)));
             }
