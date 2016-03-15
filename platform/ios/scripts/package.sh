@@ -210,7 +210,7 @@ else
 fi
 if [[ ${BUILD_STATIC} == true ]]; then
     mkdir -p "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}"
-    cp -pv platform/ios/resources/* "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}"
+    cp -pv platform/{default,ios}/resources/* "${OUTPUT}/static/${NAME}.framework${BUNDLE_PATH}"
     INFO_PLIST_PATH="${OUTPUT}/static/${NAME}.framework/Info.plist"
     cp -pv platform/ios/framework/Info.plist "${INFO_PLIST_PATH}"
     plutil -replace CFBundleExecutable -string ${NAME} "${INFO_PLIST_PATH}"
