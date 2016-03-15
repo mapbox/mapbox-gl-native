@@ -147,7 +147,10 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         // Update all clipping IDs.
         ClipIDGenerator generator;
         for (const auto& source : sources) {
-            generator.update(source->getLoadedTiles());
+            if (source->type == SourceType::Vector || source->type == SourceType::GeoJSON ||
+                source->type == SourceType::Annotations) {
+                generator.update(source->getLoadedTiles());
+            }
             source->updateMatrices(projMatrix, state);
         }
 
