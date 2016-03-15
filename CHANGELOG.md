@@ -2,6 +2,14 @@
 
 ## Android
 
+## 4.0.0-beta.1
+
+Mapbox Android 4.0.0 is the most ambitious Android release to date with 3 major new features being released. To help us produce the highest quality SDK possible we're releasing an official Beta release first so that everyone has time to explore it and help hardened it before the official 4.0.0 Final Release.
+
+* MapboxMap API Change ([#3145](https://github.com/mapbox/mapbox-gl-native/issues/3145)
+* Offline Maps ([#3891](https://github.com/mapbox/mapbox-gl-native/issues/3891)
+* Telemetry ([#2421](https://github.com/mapbox/mapbox-gl-native/issues/2421)
+
 ## 3.2.0
 
 * Fixed crash caused by annotation image with non-integer width or height ([#3031](https://github.com/mapbox/mapbox-gl-native/issues/3031))
