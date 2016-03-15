@@ -31,6 +31,10 @@ bool CircleBucket::hasData() const {
     return !triangleGroups_.empty();
 }
 
+bool CircleBucket::needsClipping() const {
+    return true;
+}
+
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {

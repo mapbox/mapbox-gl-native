@@ -17,6 +17,7 @@ public:
     void upload(gl::GLObjectStore&) override;
     void render(Painter&, const StyleLayer&, const TileID&, const mat4&) override;
     bool hasData() const override;
+    bool needsClipping() const override;
 
     void setImage(PremultipliedImage);
 

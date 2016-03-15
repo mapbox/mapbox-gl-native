@@ -13,7 +13,7 @@ void Painter::renderTileDebug(const Tile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
     if (data.getDebug() != MapDebugOptions::NoDebug) {
-        prepareTile(tile);
+        setClipping(tile.clip);
         if (data.getDebug() & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
             renderDebugText(*tile.data, tile.matrix);
         }

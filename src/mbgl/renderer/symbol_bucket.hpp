@@ -76,6 +76,7 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
+    bool needsClipping() const override;
 
     void addFeatures(uintptr_t tileUID,
                      SpriteAtlas&,

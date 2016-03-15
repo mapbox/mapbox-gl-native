@@ -38,6 +38,8 @@ public:
 
     virtual bool hasData() const = 0;
 
+    virtual bool needsClipping() const = 0;
+
     inline bool needsUpload() const {
         return !uploaded;
     }

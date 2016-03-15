@@ -111,7 +111,7 @@ private:
                     Iterator it, Iterator end,
                     GLsizei i, int8_t increment);
 
-    void prepareTile(const Tile& tile);
+    void setClipping(const ClipID&);
 
     template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,

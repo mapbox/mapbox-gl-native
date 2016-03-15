@@ -206,6 +206,10 @@ bool FillBucket::hasData() const {
     return !triangleGroups.empty() || !lineGroups.empty();
 }
 
+bool FillBucket::needsClipping() const {
+    return true;
+}
+
 void FillBucket::drawElements(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);

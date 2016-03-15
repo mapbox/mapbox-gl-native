@@ -452,6 +452,10 @@ bool LineBucket::hasData() const {
     return !triangleGroups.empty();
 }
 
+bool LineBucket::needsClipping() const {
+    return true;
+}
+
 void LineBucket::drawLines(LineShader& shader, gl::GLObjectStore& glObjectStore) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);

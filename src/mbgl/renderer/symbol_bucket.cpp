@@ -95,6 +95,10 @@ bool SymbolBucket::hasIconData() const { return renderData && !renderData->icon.
 
 bool SymbolBucket::hasCollisionBoxData() const { return renderData && !renderData->collisionBox.groups.empty(); }
 
+bool SymbolBucket::needsClipping() const {
+    return mode == MapMode::Still;
+}
+
 void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
                                  const FilterExpression& filter) {
     const bool has_text = !layout.text.field.value.empty() && !layout.text.font.value.empty();

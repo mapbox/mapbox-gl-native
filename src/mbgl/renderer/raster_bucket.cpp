@@ -37,3 +37,7 @@ void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices
 bool RasterBucket::hasData() const {
     return raster.isLoaded();
 }
+
+bool RasterBucket::needsClipping() const {
+    return false;
+}
