@@ -14,9 +14,6 @@ namespace mbgl {
 
 using namespace mapbox::sqlite;
 
-// If you change the schema you must write a migration from the previous version.
-static const uint32_t schemaVersion = 2;
-
 OfflineDatabase::Statement::~Statement() {
     stmt.reset();
     stmt.clearBindings();
@@ -50,15 +47,12 @@ void OfflineDatabase::ensureSchema() {
         try {
             connect(ReadWrite);
 
-            {
-                auto userVersionStmt = db->prepare("PRAGMA user_version");
-                userVersionStmt.run();
-                switch (userVersionStmt.get<int>(0)) {
-                case 0: break; // cache-only database; ok to delete
-                case 1: break; // cache-only database; ok to delete
-                case 2: return;
-                default: throw std::runtime_error("unknown schema version");
-                }
+            switch (userVersion()) {
+            case 0: break; // cache-only database; ok to delete
+            case 1: break; // cache-only database; ok to delete
+            case 2: migrateToVersion3(); // fall through
+            case 3: return;
+            default: throw std::runtime_error("unknown schema version");
             }
 
             removeExisting();
@@ -76,8 +70,17 @@ void OfflineDatabase::ensureSchema() {
     #include "offline_schema.cpp.include"
 
     connect(ReadWrite | Create);
+
+    // If you change the schema you must write a migration from the previous version.
+    db->exec("PRAGMA auto_vacuum = INCREMENTAL");
     db->exec(schema);
-    db->exec("PRAGMA user_version = " + util::toString(schemaVersion));
+    db->exec("PRAGMA user_version = 3");
+}
+
+int OfflineDatabase::userVersion() {
+    auto stmt = db->prepare("PRAGMA user_version");
+    stmt.run();
+    return stmt.get<int>(0);
 }
 
 void OfflineDatabase::removeExisting() {
@@ -90,6 +93,11 @@ void OfflineDatabase::removeExisting() {
     } catch (util::IOException& ex) {
         Log::Error(Event::Database, ex.code, ex.what());
     }
+}
+
+void OfflineDatabase::migrateToVersion3() {
+    db->exec("PRAGMA auto_vacuum = INCREMENTAL");
+    db->exec("VACUUM");
 }
 
 OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
@@ -458,6 +466,7 @@ void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
     stmt->run();
 
     evict(0);
+    db->exec("PRAGMA incremental_vacuum");
 
     // Ensure that the cached offlineTileCount value is recalculated.
     offlineMapboxTileCount = {};
@@ -613,10 +622,6 @@ T OfflineDatabase::getPragma(const char * sql) {
 bool OfflineDatabase::evict(uint64_t neededFreeSize) {
     uint64_t pageSize = getPragma<int64_t>("PRAGMA page_size");
     uint64_t pageCount = getPragma<int64_t>("PRAGMA page_count");
-
-    if (pageSize * pageCount > maximumCacheSize) {
-        Log::Warning(mbgl::Event::Database, "Current size is larger than the maximum size. Database won't get truncated.");
-    }
 
     auto usedSize = [&] {
         return pageSize * (pageCount - getPragma<int64_t>("PRAGMA freelist_count"));
