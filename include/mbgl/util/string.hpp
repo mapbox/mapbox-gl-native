@@ -28,6 +28,12 @@ inline std::string toString(uint8_t num) {
 }
 
 inline std::string toString(std::exception_ptr error) {
+    assert(error);
+
+    if (!error) {
+        return "(null)";
+    }
+
     try {
         std::rethrow_exception(error);
     } catch (const std::exception& ex) {
