@@ -180,4 +180,8 @@ void VectorTileData::cancel() {
     workRequest.reset();
 }
 
+bool VectorTileData::hasData() const {
+    return !buckets.empty();
+}
+
 } // namespace mbgl

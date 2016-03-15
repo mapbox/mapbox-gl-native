@@ -24,6 +24,7 @@ public:
 
     void cancel() override;
     Bucket* getBucket(StyleLayer const &layer_desc) override;
+    bool hasData() const override;
 
 private:
     gl::TexturePool& texturePool;

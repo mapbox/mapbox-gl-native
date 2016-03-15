@@ -179,8 +179,9 @@ std::forward_list<Tile*> Source::getLoadedTiles() const {
     std::forward_list<Tile*> ptrs;
     auto it = ptrs.before_begin();
     for (const auto& pair : tiles) {
-        if (pair.second->data->isReady()) {
-            it = ptrs.insert_after(it, pair.second.get());
+        auto tile = pair.second.get();
+        if (tile->data->isReady() && tile->data->hasData()) {
+            it = ptrs.insert_after(it, tile);
         }
     }
     return ptrs;
