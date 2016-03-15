@@ -54,6 +54,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
     self.styleIndex = 0;
+    self.mapView.styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].url)];
 
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
     [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
