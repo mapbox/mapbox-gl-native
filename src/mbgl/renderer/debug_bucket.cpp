@@ -31,11 +31,15 @@ DebugBucket::DebugBucket(const TileID id, const TileData::State state_, optional
 }
 
 void DebugBucket::drawLines(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
-    MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
+    if (!fontBuffer.empty()) {
+        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
+    }
 }
 
 void DebugBucket::drawPoints(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
-    array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
-    MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
+    if (!fontBuffer.empty()) {
+        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
+    }
 }
