@@ -32,17 +32,42 @@ public class OfflineManager {
     // This object is implemented as a singleton
     private static OfflineManager instance;
 
-    /*
-     * Callbacks
+    /**
+     * This callback receives an asynchronous response containing a list of all
+     * {@link OfflineRegion} in the database, or an error message otherwise.
      */
-
     public interface ListOfflineRegionsCallback {
+        /**
+         * Receives the list of offline regions
+         *
+         * @param offlineRegions
+         */
         void onList(OfflineRegion[] offlineRegions);
+
+        /**
+         * Receives the error message
+         *
+         * @param error
+         */
         void onError(String error);
     }
 
+    /**
+     * This callback receives an asynchronous response containing the newly created
+     * {@link OfflineRegion} in the database, or an error message otherwise.
+     */
     public interface CreateOfflineRegionCallback {
+        /**
+         * Receives the newly created offline region
+         * @param offlineRegion
+         */
         void onCreate(OfflineRegion offlineRegion);
+
+        /**
+         * Receives the error message
+         *
+         * @param error
+         */
         void onError(String error);
     }
 
