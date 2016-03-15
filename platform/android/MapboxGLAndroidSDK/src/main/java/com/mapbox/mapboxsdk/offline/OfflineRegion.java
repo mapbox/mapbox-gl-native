@@ -10,8 +10,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * To use offline maps on mobile, you will first have to create an offline region.
- * Use OfflineManager.createOfflineRegion() to create a new offline region.
+ * An offline region is the basic building block for offline mobile maps.
+ * Use {@link com.mapbox.mapboxsdk.offline.OfflineManager.CreateOfflineRegionCallback}
+ * to create a new offline region.
  */
 public class OfflineRegion {
 
@@ -84,17 +85,41 @@ public class OfflineRegion {
         void mapboxTileCountLimitExceeded(long limit);
     }
 
-    /*
-     * Callbacks
+    /**
+     * This callback receives an asynchronous response containing the {@link OfflineRegionStatus}
+     * of the offline region, or a {@link String} error message otherwise.
      */
-
     public interface OfflineRegionStatusCallback {
+        /**
+         * Receives the status
+         *
+         * @param status
+         */
         void onStatus(OfflineRegionStatus status);
+
+        /**
+         * Receives the error message
+         *
+         * @param error
+         */
         void onError(String error);
     }
 
+    /**
+     * This callback receives an asynchronous response containing a notification when
+     * an offline region has been deleted, or a {@link String} error message otherwise.
+     */
     public interface OfflineRegionDeleteCallback {
+        /**
+         * Receives the delete notification
+         */
         void onDelete();
+
+        /**
+         * Receives the error message
+         *
+         * @param error
+         */
         void onError(String error);
     }
 
