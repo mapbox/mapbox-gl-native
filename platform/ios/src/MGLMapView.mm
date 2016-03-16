@@ -2405,11 +2405,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             MGLPointAnnotation *point = (MGLPointAnnotation *)annotation;
             MGLAnnotationImage *annotationImage = delegateImplementsImageForPoint ? [self.delegate mapView:self imageForAnnotation:annotation] : nil;
-            if ( ! annotationImage && [point.text isEqual: @" "])
+            if ( ! annotationImage)
             {
                 annotationImage = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
-            if ( ! annotationImage && [point.text isEqual: @" "])
+            if ( ! annotationImage)
             {
                 // Create a default annotation image that depicts a round pin
                 // rising from the center, with a shadow slightly below center.
@@ -2434,8 +2434,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             }
             
             NSString *text = @"";
-            if (point.text) {
-                text = point.text;
+            if (point.emplacedText) {
+                text = point.emplacedText;
             }
 
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "", [text UTF8String]);

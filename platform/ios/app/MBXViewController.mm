@@ -251,7 +251,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
             MGLPolygon *polygon = [MGLPolygon polygonWithCoordinates:polygonCoordinates count:[stateCoordinatePairs count]];
             polygon.style = @"facility_building";
-            [self.mapView addAnnotation:polygon];
+            [self.mapView addAnnotations: [NSArray arrayWithObjects:polygon, nil]];
 
             free(polygonCoordinates);
         }
@@ -324,7 +324,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                 MGLPointAnnotation *annotation = [MGLPointAnnotation new];
                 annotation.coordinate = coordinate;
                 annotation.title = title;
-                annotation.text = title;
+                annotation.emplacedText = title;
 
                 [annotations addObject:annotation];
 
@@ -524,7 +524,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-//    return nil;
+    return nil;
     if ([annotation.title isEqualToString:@"Dropped Marker"]
         || [annotation.title isEqualToString:kCustomCalloutTitle])
     {
@@ -545,7 +545,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
 
     MGLAnnotationImage *image = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
-
     if ( ! image)
     {
         CGRect rect = CGRectMake(0, 0, 20, 15);
