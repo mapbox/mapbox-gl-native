@@ -36,25 +36,20 @@ TEST(Projection, MetersPerPixelAtLatitude) {
 }
 
 TEST(Projection, ProjectedMeters) {
-    const auto southWest = LatLng { -util::LATITUDE_MAX, -util::LONGITUDE_MAX };
-    const auto northEast = LatLng { util::LATITUDE_MAX, util::LONGITUDE_MAX };
-
     auto latLng = LatLng {};
     auto projectedMeters = Projection::projectedMetersForLatLng(latLng);
     EXPECT_EQ(projectedMeters.northing, projectedMeters.easting);
     EXPECT_EQ(latLng, Projection::latLngForProjectedMeters(projectedMeters));
 
-    latLng = LatLng { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
-    projectedMeters = Projection::projectedMetersForLatLng(latLng);
-    EXPECT_EQ(projectedMeters, Projection::projectedMetersForLatLng(southWest));
+    const auto southWest = LatLng { -util::LATITUDE_MAX, -util::LONGITUDE_MAX };
+    projectedMeters = Projection::projectedMetersForLatLng(southWest);
     EXPECT_DOUBLE_EQ(projectedMeters.northing, -20037508.342789274);
     EXPECT_DOUBLE_EQ(projectedMeters.easting, -20037508.342789244);
 
-    latLng = LatLng { std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
-    projectedMeters = Projection::projectedMetersForLatLng(latLng);
-    EXPECT_EQ(projectedMeters, Projection::projectedMetersForLatLng(northEast));
-    EXPECT_DOUBLE_EQ(projectedMeters.northing, -Projection::projectedMetersForLatLng(southWest).northing);
-    EXPECT_DOUBLE_EQ(projectedMeters.easting, -Projection::projectedMetersForLatLng(southWest).easting);
+    const auto northEast = LatLng { util::LATITUDE_MAX, util::LONGITUDE_MAX };
+    projectedMeters = Projection::projectedMetersForLatLng(northEast);
+    EXPECT_DOUBLE_EQ(projectedMeters.northing, 20037508.342789274);
+    EXPECT_DOUBLE_EQ(projectedMeters.easting, 20037508.342789244);
 
     projectedMeters = ProjectedMeters { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
     latLng = Projection::latLngForProjectedMeters(projectedMeters);

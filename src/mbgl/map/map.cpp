@@ -616,7 +616,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     if (width > 0 || height > 0) {
         double scaleX = double(getSize().width) / width;
         double scaleY = double(getSize().height) / height;
-        if (padding && *padding) {
+        if (padding) {
             scaleX -= (padding->left + padding->right) / width;
             scaleY -= (padding->top + padding->bottom) / height;
         }
@@ -627,7 +627,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
-    if (padding && *padding) {
+    if (padding) {
         ScreenCoordinate paddedNEPixel = {
             padding->right / minScale,
             padding->top / minScale,
