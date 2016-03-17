@@ -4,10 +4,11 @@
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
 
-#import "../../darwin/src/MGLAccountManager_Private.h"
 #import "../../darwin/src/MGLGeometry_Private.h"
 #import "../../darwin/src/MGLMultiPoint_Private.h"
+#import "../../darwin/src/MGLOfflineStorage_Private.h"
 
+#import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
 #import "MGLPolygon.h"
 #import "MGLPolyline.h"
@@ -151,7 +152,6 @@ public:
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
     MGLMapViewImpl *_mbglView;
-    mbgl::DefaultFileSource *_mbglFileSource;
     
     NSPanGestureRecognizer *_panGestureRecognizer;
     NSMagnificationGestureRecognizer *_magnificationGestureRecognizer;
@@ -232,35 +232,24 @@ public:
     // Set up cross-platform controllers and resources.
     _mbglView = new MGLMapViewImpl(self, [NSScreen mainScreen].backingScaleFactor);
     
-    // Place the cache in a location that can be shared among all the
-    // applications that embed the Mapbox OS X SDK.
-    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
-                                                                      inDomain:NSUserDomainMask
-                                                             appropriateForURL:nil
-                                                                        create:YES
-                                                                         error:nil];
-    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:
-                         [[NSBundle mgl_frameworkBundle] bundleIdentifier]];
-    [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
-                             withIntermediateDirectories:YES
-                                              attributes:nil
-                                                   error:nil];
-    NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
-    NSString *cachePath = cacheURL ? cacheURL.path : @"";
-    _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
+    // Delete the pre-offline ambient cache at
+    // ~/Library/Caches/com.mapbox.sdk.ios/cache.db.
+    NSURL *cachesDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
+                                                                       inDomain:NSUserDomainMask
+                                                              appropriateForURL:nil
+                                                                         create:NO
+                                                                          error:nil];
+    cachesDirectoryURL = [cachesDirectoryURL URLByAppendingPathComponent:
+                          [NSBundle mgl_frameworkBundle].bundleIdentifier];
+    NSURL *legacyCacheURL = [cachesDirectoryURL URLByAppendingPathComponent:@"cache.db"];
+    [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
     
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
+    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
     
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
     self.layer = _isTargetingInterfaceBuilder ? [CALayer layer] : [MGLOpenGLLayer layer];
-    
-    // Observe for changes to the global access token (and find out the current one).
-    [[MGLAccountManager sharedManager] addObserver:self
-                                        forKeyPath:@"accessToken"
-                                           options:(NSKeyValueObservingOptionInitial |
-                                                    NSKeyValueObservingOptionNew)
-                                           context:NULL];
     
     // Notify map object when network reachability status changes.
     MGLReachability *reachability = [MGLReachability reachabilityForInternetConnection];
@@ -443,7 +432,6 @@ public:
 }
 
 - (void)dealloc {
-    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
     [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
     [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
     
@@ -455,25 +443,15 @@ public:
         delete _mbglMap;
         _mbglMap = nullptr;
     }
-    if (_mbglFileSource) {
-        delete _mbglFileSource;
-        _mbglFileSource = nullptr;
-    }
     if (_mbglView) {
         delete _mbglView;
         _mbglView = nullptr;
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context {
-    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
-    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager]) {
-        NSString *accessToken = change[NSKeyValueChangeNewKey];
-        if (![accessToken isKindOfClass:[NSNull class]]) {
-            _mbglFileSource->setAccessToken((std::string)accessToken.UTF8String);
-        }
-    } else if ([keyPath isEqualToString:@"contentLayoutRect"] ||
-               [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(__unused id)object change:(__unused NSDictionary *)change context:(__unused void *)context {
+    if ([keyPath isEqualToString:@"contentLayoutRect"] ||
+        [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
         [self adjustContentInsets];
     }
 }

@@ -30,6 +30,7 @@
 #import "Mapbox.h"
 #import "../../darwin/src/MGLGeometry_Private.h"
 #import "../../darwin/src/MGLMultiPoint_Private.h"
+#import "../../darwin/src/MGLOfflineStorage_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -37,7 +38,6 @@
 #import "NSException+MGLAdditions.h"
 #import "MGLUserLocationAnnotationView.h"
 #import "MGLUserLocation_Private.h"
-#import "MGLAccountManager_Private.h"
 #import "MGLAnnotationImage_Private.h"
 #import "MGLMapboxEvents.h"
 #import "MGLCompactCalloutView.h"
@@ -187,7 +187,6 @@ public:
 {
     mbgl::Map *_mbglMap;
     MBGLView *_mbglView;
-    mbgl::DefaultFileSource *_mbglFileSource;
     
     BOOL _opaque;
 
@@ -303,31 +302,21 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup mbgl view
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglView = new MBGLView(self, scaleFactor);
-
-    // setup mbgl cache & file source
-    NSString *fileCachePath = @"";
+    
+    // Delete the pre-offline ambient cache at ~/Library/Caches/cache.db.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    if ([paths count] != 0) {
-        NSString *libraryDirectory = [paths objectAtIndex:0];
-        fileCachePath = [libraryDirectory stringByAppendingPathComponent:@"cache.db"];
-    }
-    _mbglFileSource = new mbgl::DefaultFileSource([fileCachePath UTF8String], [[[[NSBundle mainBundle] resourceURL] path] UTF8String]);
+    NSString *fileCachePath = [paths.firstObject stringByAppendingPathComponent:@"cache.db"];
+    [[NSFileManager defaultManager] removeItemAtPath:fileCachePath error:NULL];
 
     // setup mbgl map
-    _mbglMap = new mbgl::Map(*_mbglView, *_mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
+    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
+    _mbglMap = new mbgl::Map(*_mbglView, *mbglFileSource, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
         self.dormant = YES;
         _mbglMap->pause();
     }
-
-    // Observe for changes to the global access token (and find out the current one).
-    [[MGLAccountManager sharedManager] addObserver:self
-                                        forKeyPath:@"accessToken"
-                                           options:(NSKeyValueObservingOptionInitial |
-                                                    NSKeyValueObservingOptionNew)
-                                           context:NULL];
 
     // Notify map object when network reachability status changes.
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -506,7 +495,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
     
     [self validateDisplayLink];
@@ -515,12 +503,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         delete _mbglMap;
         _mbglMap = nullptr;
-    }
-
-    if (_mbglFileSource)
-    {
-        delete _mbglFileSource;
-        _mbglFileSource = nullptr;
     }
 
     if (_mbglView)
@@ -1606,15 +1588,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(__unused void *)context
 {
-    // Synchronize mbgl::Map’s access token with the global one in MGLAccountManager.
-    if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager])
-    {
-        NSString *accessToken = change[NSKeyValueChangeNewKey];
-        if (![accessToken isKindOfClass:[NSNull class]]) {
-            _mbglFileSource->setAccessToken((std::string)[accessToken UTF8String]);
-        }
-    }
-    else if ([keyPath isEqualToString:@"hidden"] && object == _attributionButton)
+    if ([keyPath isEqualToString:@"hidden"] && object == _attributionButton)
     {
         NSNumber *hiddenNumber = change[NSKeyValueChangeNewKey];
         BOOL attributionButtonWasHidden = [hiddenNumber boolValue];
