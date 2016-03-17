@@ -68,3 +68,38 @@ TEST_F(Storage, HTTPRetryOnClockSkew) {
 
     HTTPRetryOnClockSkew.finish();
 }
+
+TEST_F(Storage, HTTPRespectPriorExpires) {
+    SCOPED_TEST(HTTPRespectPriorExpires)
+
+    using namespace mbgl;
+
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    // Very long expiration time, should never arrive.
+    Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+    resource1.priorExpires = SystemClock::now() + Seconds(100000);
+
+    std::unique_ptr<FileRequest> req1 = fs.request(resource1, [&](Response) {
+        FAIL() << "Should never be called";
+    });
+
+    // No expiration time, should be requested immediately.
+    Resource resource2{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+
+    std::unique_ptr<FileRequest> req2 = fs.request(resource2, [&](Response) {
+        HTTPRespectPriorExpires.finish();
+        loop.stop();
+    });
+
+    // Very long expiration time, should never arrive.
+    Resource resource3{ Resource::Unknown, "http://127.0.0.1:3000/test" };
+    resource3.priorExpires = SystemClock::now() + Seconds(100000);
+
+    std::unique_ptr<FileRequest> req3 = fs.request(resource3, [&](Response) {
+        FAIL() << "Should never be called";
+    });
+
+    loop.run();
+}
