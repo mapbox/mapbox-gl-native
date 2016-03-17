@@ -141,6 +141,8 @@ public:
     QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
     QMapbox::AnnotationIDs addShapeAnnotations(const QMapbox::ShapeAnnotations &);
 
+    void updatePointAnnotation(QMapbox::AnnotationID, const QMapbox::PointAnnotation &);
+
     void removeAnnotation(QMapbox::AnnotationID);
     void removeAnnotations(const QMapbox::AnnotationIDs &);
 
