@@ -125,6 +125,8 @@ public:
     void setCoordinate(const QMapbox::Coordinate &);
     void setCoordinateZoom(const QMapbox::Coordinate &, double zoom);
 
+    void jumpTo(const QMapbox::CameraOptions&);
+
     void setGestureInProgress(bool inProgress);
 
     void addClass(const QString &);

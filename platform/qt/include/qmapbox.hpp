@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QPair>
+#include <QVariant>
 #include <QString>
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
@@ -30,9 +31,19 @@ enum NetworkMode {
     Offline,
 };
 
+struct Q_DECL_EXPORT CameraOptions {
+    QVariant center;  // Coordinate
+    QVariant anchor;  // QPointF
+    QVariant zoom;    // double
+    QVariant angle;   // double
+    QVariant pitch;   // double
+};
+
 Q_DECL_EXPORT NetworkMode networkMode();
 Q_DECL_EXPORT void setNetworkMode(NetworkMode);
 
 }
+
+Q_DECLARE_METATYPE(QMapbox::Coordinate);
 
 #endif // QMAPBOX_H
