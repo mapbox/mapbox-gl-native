@@ -10,7 +10,6 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/traits.hpp>
-#include <mbgl/util/vec.hpp>
 
 #include <QCoreApplication>
 #include <QImage>
@@ -497,7 +496,7 @@ void QMapboxGL::addAnnotationIcon(const QString &name, const QImage &sprite)
 
 QPointF QMapboxGL::pixelForCoordinate(const Coordinate &coordinate_) const
 {
-    const mbgl::vec2<double> pixel =
+    const mbgl::ScreenCoordinate pixel =
         d_ptr->mapObj->pixelForLatLng(mbgl::LatLng { coordinate_.first, coordinate_.second });
 
     return QPointF(pixel.x, pixel.y);

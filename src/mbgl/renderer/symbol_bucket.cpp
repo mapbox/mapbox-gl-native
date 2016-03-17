@@ -38,8 +38,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
         const GlyphPositions& face, const IndexedSubfeature& indexedFeature) :
-    x(anchor.x),
-    y(anchor.y),
+    point(anchor.point),
     index(index_),
     hasText(shapedText),
     hasIcon(shapedIcon),
@@ -265,7 +264,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
                 /* spacing: ems */ layout.textLetterSpacing * 24,
-                /* translate */ vec2<float>(layout.textOffset.value[0], layout.textOffset.value[1]));
+                /* translate */ Point<float>(layout.textOffset.value[0], layout.textOffset.value[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
@@ -346,7 +345,7 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
                 }
             }
 
-            const bool inside = !(anchor.x < 0 || anchor.x > util::EXTENT || anchor.y < 0 || anchor.y > util::EXTENT);
+            const bool inside = !(anchor.point.x < 0 || anchor.point.x > util::EXTENT || anchor.point.y < 0 || anchor.point.y > util::EXTENT);
 
             if (avoidEdges && !inside) continue;
 
@@ -377,7 +376,7 @@ bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repe
     } else {
         auto otherAnchors = compareText.find(text)->second;
         for (Anchor &otherAnchor : otherAnchors) {
-            if (util::dist<float>(anchor, otherAnchor) < repeatDistance) {
+            if (util::dist<float>(anchor.point, otherAnchor.point) < repeatDistance) {
                 return true;
             }
         }
@@ -412,8 +411,8 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         const float cos = std::cos(collisionTile.config.angle);
 
         std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
-            const int32_t aRotated = sin * a.x + cos * a.y;
-            const int32_t bRotated = sin * b.x + cos * b.y;
+            const int32_t aRotated = sin * a.point.x + cos * a.point.y;
+            const int32_t bRotated = sin * b.point.x + cos * b.point.y;
             return aRotated != bRotated ?
                 aRotated < bRotated :
                 a.index > b.index;
@@ -557,14 +556,14 @@ void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
-                vec2<float> tl{box.x1, box.y1 * yStretch};
-                vec2<float> tr{box.x2, box.y1 * yStretch};
-                vec2<float> bl{box.x1, box.y2 * yStretch};
-                vec2<float> br{box.x2, box.y2 * yStretch};
-                tl = tl.matMul(matrix);
-                tr = tr.matMul(matrix);
-                bl = bl.matMul(matrix);
-                br = br.matMul(matrix);
+                Point<float> tl{box.x1, box.y1 * yStretch};
+                Point<float> tr{box.x2, box.y1 * yStretch};
+                Point<float> bl{box.x1, box.y2 * yStretch};
+                Point<float> br{box.x2, box.y2 * yStretch};
+                tl = util::matrixMultiply(matrix, tl);
+                tr = util::matrixMultiply(matrix, tr);
+                bl = util::matrixMultiply(matrix, bl);
+                br = util::matrixMultiply(matrix, br);
 
                 const float maxZoom = util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.maxScale) / log(2))));
                 const float placementZoom= util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.placementScale) / log(2))));

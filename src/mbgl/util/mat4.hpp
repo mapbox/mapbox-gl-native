@@ -23,12 +23,11 @@
 #ifndef MBGL_UTIL_MAT4
 #define MBGL_UTIL_MAT4
 
-#include <mbgl/util/vec.hpp>
-
 #include <array>
 
 namespace mbgl {
 
+using vec4 = std::array<double, 4>;
 using mat4 = std::array<double, 16>;
 
 namespace matrix {
@@ -45,7 +44,7 @@ void rotate_z(mat4& out, const mat4& a, double rad);
 void scale(mat4& out, const mat4& a, double x, double y, double z);
 void multiply(mat4& out, const mat4& a, const mat4& b);
 
-void transformMat4(vec4<double>& out, vec4<double>& a, mat4& m);
+void transformMat4(vec4& out, const vec4& a, const mat4& m);
 
 } // namespace matrix
 } // namespace mbgl

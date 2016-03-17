@@ -21,15 +21,15 @@ void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer&
     const double x = point.position.longitude / util::DEGREES_MAX + 0.5;
     const double y = 0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI;
 
-    vec2<double> projected(x, y);
+    Point<double> projected(x, y);
     projected *= std::pow(2, tileID.z);
     projected.x = std::fmod(projected.x, 1);
     projected.y = std::fmod(projected.y, 1);
-    projected *= GeometryTileFeature::defaultExtent;
+    projected *= double(GeometryTileFeature::defaultExtent);
 
     layer.features.emplace_back(
         std::make_shared<const AnnotationTileFeature>(FeatureType::Point,
-                                                      GeometryCollection {{ {{ GeometryCoordinate { projected } }} }},
+                                                      GeometryCollection {{ {{ convertPoint<int16_t>(projected) }} }},
                                                       featureProperties));
 }
 

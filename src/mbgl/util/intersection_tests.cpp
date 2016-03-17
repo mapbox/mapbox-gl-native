@@ -31,7 +31,7 @@ float distToSegmentSquared(const GeometryCoordinate& p, const GeometryCoordinate
     const float t = float((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
     if (t < 0) return util::distSqr<float>(p, v);
     if (t > 1) return util::distSqr<float>(p, w);
-    return util::distSqr<float>(p, vec2<float>(w - v) * t + v);
+    return util::distSqr<float>(p, convertPoint<float>(w - v) * t + convertPoint<float>(v));
 }
 
 bool pointIntersectsBufferedLine(const GeometryCoordinate& p, const GeometryCoordinates& line, const float radius) {

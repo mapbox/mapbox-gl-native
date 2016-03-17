@@ -1,21 +1,22 @@
 #ifndef MBGL_GEOMETRY_ANCHOR
 #define MBGL_GEOMETRY_ANCHOR
 
+#include <mbgl/util/geometry.hpp>
+
 #include <vector>
 
 namespace mbgl {
 
 struct Anchor {
-    float x = 0.0f;
-    float y = 0.0f;
+    Point<float> point;
     float angle = 0.0f;
     float scale = 0.0f;
     int segment = -1;
 
     explicit Anchor(float x_, float y_, float angle_, float scale_)
-        : x(x_), y(y_), angle(angle_), scale(scale_) {}
+        : point(x_, y_), angle(angle_), scale(scale_) {}
     explicit Anchor(float x_, float y_, float angle_, float scale_, int segment_)
-        : x(x_), y(y_), angle(angle_), scale(scale_), segment(segment_) {}
+        : point(x_, y_), angle(angle_), scale(scale_), segment(segment_) {}
 
 };
 

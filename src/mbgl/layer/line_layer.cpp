@@ -102,30 +102,30 @@ float LineLayer::getLineWidth() const {
     }
 }
 
-optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const float offset) {
+optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
     if (offset == 0) return {};
 
     GeometryCollection newRings;
-    vec2<double> zero(0, 0);
-    for (auto& ring : rings) {
+    Point<double> zero(0, 0);
+    for (const auto& ring : rings) {
         newRings.emplace_back();
         auto& newRing = newRings.back();
 
         for (auto i = ring.begin(); i != ring.end(); i++) {
             auto& p = *i;
 
-            auto aToB = i == ring.begin() ?
+            Point<double> aToB = i == ring.begin() ?
                 zero :
-                util::perp(util::unit(vec2<double>(p - *(i - 1))));
-            auto bToC = i + 1 == ring.end() ?
+                util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
+            Point<double> bToC = i + 1 == ring.end() ?
                 zero :
-                util::perp(util::unit(vec2<double>(*(i + 1) - p)));
-            auto extrude = util::unit(aToB + bToC);
+                util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
+            Point<double> extrude = util::unit(aToB + bToC);
 
             const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
             extrude *= (1.0 / cosHalfAngle);
 
-            newRing.push_back((extrude * offset) + p);
+            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
         }
     }
 

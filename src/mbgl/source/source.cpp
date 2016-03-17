@@ -479,7 +479,7 @@ void Source::updateTilePtrs() {
     }
 }
 
-vec2<int16_t> coordinateToTilePoint(const TileID& tileID, const TileCoordinate& coord) {
+static Point<int16_t> coordinateToTilePoint(const TileID& tileID, const TileCoordinate& coord) {
     auto zoomedCoord = coord.zoomTo(tileID.sourceZ);
     return {
         int16_t(util::clamp<int64_t>((zoomedCoord.x - (tileID.x + tileID.w * std::pow(2, tileID.sourceZ))) * util::EXTENT,

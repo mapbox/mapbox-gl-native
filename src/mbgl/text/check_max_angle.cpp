@@ -19,7 +19,7 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
     // horizontal labels always pass
     if (anchor.segment < 0) return true;
 
-    GeometryCoordinate anchorPoint = { (int16_t)anchor.x, (int16_t)anchor.y };
+    GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
     GeometryCoordinate &p = anchorPoint;
     int index = anchor.segment + 1;
     float anchorDistance = 0;

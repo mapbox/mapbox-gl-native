@@ -5,7 +5,7 @@
 #include <array>
 #include <limits>
 
-#include <mbgl/util/vec.hpp>
+#include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
 namespace util {
@@ -15,17 +15,12 @@ namespace util {
 // Find the angle of the two vectors, solving the formula for the cross product
 // a x b = |a||b|sin(θ) for θ.
 template <typename T = double, typename S>
-inline T angle_between(S ax, S ay, S bx, S by) {
-    return std::atan2((ax * by - ay * bx), ax * bx + ay * by);
+inline T angle_between(const Point<S>& a, const Point<S>& b) {
+    return std::atan2((a.x * b.y - a.y * b.x), a.x * b.x + a.y * b.y);
 }
 
 template <typename T = double, typename S>
-inline T angle_between(const vec2<S>& a, const vec2<S>& b) {
-    return angle_between(a.x, a.y, b.x, b.y);
-}
-
-template <typename T = double, typename S>
-inline T angle_to(const vec2<S>& a, const vec2<S>& b) {
+inline T angle_to(const Point<S>& a, const Point<S>& b) {
     return std::atan2(a.y - b.y, a.x - b.x);
 }
 
@@ -39,7 +34,7 @@ inline std::array<T, 2> flip(const std::array<T, 2>& c) {
 }
 
 template <typename T, typename S1, typename S2>
-inline vec2<T> normal(const S1& a, const S2& b) {
+inline Point<T> normal(const S1& a, const S2& b) {
     T dx = b.x - a.x;
     T dy = b.y - a.y;
     T c = std::sqrt(dx * dx + dy * dy);
@@ -99,6 +94,11 @@ inline T rotate(const T& a, S angle) {
     S x = cos * a.x - sin * a.y;
     S y = sin * a.x + cos * a.y;
     return T(x, y);
+}
+
+template <typename T>
+inline Point<T> matrixMultiply(const std::array<T, 4>& m, const Point<T>& p) {
+    return Point<T>(m[0] * p.x + m[1] * p.y, m[2] * p.x + m[3] * p.y);
 }
 
 template <typename T>

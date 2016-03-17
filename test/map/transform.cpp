@@ -79,9 +79,6 @@ TEST(Transform, InvalidLatLng) {
     ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
     ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    ASSERT_FALSE(transform.latLngToScreenCoordinate(LatLng::null()));
-    ASSERT_FALSE(transform.screenCoordinateToLatLng(ScreenCoordinate::null()));
 }
 
 
@@ -225,7 +222,7 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const ScreenCoordinate invalidAnchorPoint = ScreenCoordinate::null();
+    const optional<ScreenCoordinate> invalidAnchorPoint {};
     const ScreenCoordinate anchorPoint = { 150, 150 };
 
     const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
