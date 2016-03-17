@@ -311,8 +311,6 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
-    if (!latLng || !anchor) return;
-
     auto latLngToTileCoord = [&](const LatLng& ll) -> vec2<double> {
         return { lngX(ll.longitude), latY(ll.latitude) };
     };

@@ -46,44 +46,6 @@ TEST(Transform, InvalidScale) {
     ASSERT_DOUBLE_EQ(2, transform.getScale());
 }
 
-TEST(Transform, InvalidLatLng) {
-    MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
-
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(1, transform.getScale());
-
-    transform.setScale(2 << 0);
-    transform.setLatLng({ 8, 10 });
-
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
-
-    transform.setLatLngZoom({ 10, 8 }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    const double invalid = std::nan("");
-    transform.setLatLngZoom({ invalid, 8 }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    transform.setLatLngZoom({ 10, invalid }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    ASSERT_FALSE(transform.latLngToScreenCoordinate(LatLng::null()));
-    ASSERT_FALSE(transform.screenCoordinateToLatLng(ScreenCoordinate::null()));
-}
-
 
 TEST(Transform, InvalidBearing) {
     MockView view;
@@ -225,7 +187,7 @@ TEST(Transform, Anchor) {
     ASSERT_DOUBLE_EQ(10, transform.getZoom());
     ASSERT_DOUBLE_EQ(0, transform.getAngle());
 
-    const ScreenCoordinate invalidAnchorPoint = ScreenCoordinate::null();
+    const optional<ScreenCoordinate> invalidAnchorPoint {};
     const ScreenCoordinate anchorPoint = { 150, 150 };
 
     const LatLng anchorLatLng = transform.getState().screenCoordinateToLatLng(anchorPoint);
@@ -332,18 +294,8 @@ TEST(Transform, Padding) {
         1000.0 / 2.0,
         1000.0 / 4.0,
     });
-    
-    EdgeInsets padding;
 
-    padding.top = 0;
-    ASSERT_FALSE(bool(padding));
-
-    padding.top = NAN;
-    ASSERT_FALSE(bool(padding));
-
-    padding.top = 1000.0 / 2.0;
-    ASSERT_TRUE(bool(padding));
-    
+    EdgeInsets padding(1000.0 / 2.0, 0, 0, 0);
     const LatLng shiftedCenter = transform.getLatLng(padding);
     ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);
     ASSERT_DOUBLE_EQ(trueCenter.longitude, shiftedCenter.longitude);

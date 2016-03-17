@@ -15,17 +15,19 @@ using ScreenCoordinate = vec2<double>;
 
 class LatLng {
 public:
-    struct null {};
-
     double latitude;
     double longitude;
 
     enum WrapMode : bool { Unwrapped, Wrapped };
 
-    LatLng(null) : latitude(std::numeric_limits<double>::quiet_NaN()), longitude(latitude) {}
-
     LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
-        : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }
+        : latitude(lat), longitude(lon) {
+        if (std::isnan(lat)) throw std::domain_error("latitude must not be NaN");
+        if (std::isnan(lon)) throw std::domain_error("longitude must not be NaN");
+        if (!std::isfinite(lat)) throw std::domain_error("latitude must not be infinite");
+        if (!std::isfinite(lon)) throw std::domain_error("longitude must not be infinite");
+        if (mode == Wrapped) wrap();
+    }
 
     LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
 
@@ -40,10 +42,6 @@ public:
         if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
         if (longitude > 0 && end.longitude < 0) longitude -= util::DEGREES_MAX;
         else if (longitude < 0 && end.longitude > 0) longitude += util::DEGREES_MAX;
-    }
-
-    explicit operator bool() const {
-        return !(std::isnan(latitude) || std::isnan(longitude));
     }
 
     // Constructs a LatLng object with the top left position of the specified tile.
@@ -65,12 +63,8 @@ public:
     double northing = 0;
     double easting = 0;
 
-    ProjectedMeters(double n = 0, double e = 0)
+    ProjectedMeters(double n, double e)
         : northing(n), easting(e) {}
-
-    explicit operator bool() const {
-        return !(std::isnan(northing) || std::isnan(easting));
-    }
 };
 
 class LatLngBounds {
@@ -174,10 +168,6 @@ public:
 
     MetersBounds(const ProjectedMeters& sw_, const ProjectedMeters& ne_)
         : sw(sw_), ne(ne_) {}
-
-    explicit operator bool() const {
-        return sw && ne;
-    }
 };
 
 // Determines the orientation of the map.
@@ -196,16 +186,9 @@ public:
     double bottom = 0;  ///< Number of pixels inset from the bottom edge.
     double right = 0;   ///< Number of pixels inset from the right edge.
     
-    EdgeInsets() {}
-    
     EdgeInsets(const double t, const double l, const double b, const double r)
         : top(t), left(l), bottom(b), right(r) {}
     
-    explicit operator bool() const {
-        return !(std::isnan(top) || std::isnan(left) || std::isnan(bottom) || std::isnan(right))
-            && (top || left || bottom || right);
-    }
-
     void operator+=(const EdgeInsets& o) {
         top += o.top;
         left += o.left;
