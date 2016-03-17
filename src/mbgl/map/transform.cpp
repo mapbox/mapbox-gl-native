@@ -93,13 +93,12 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (!latLng || std::isnan(zoom)) {
+    if (std::isnan(zoom)) {
         return;
     }
 
     // Determine endpoints.
-    EdgeInsets padding;
-    if (camera.padding) padding = *camera.padding;
+    optional<EdgeInsets> padding = camera.padding;
     LatLng startLatLng = getLatLng(padding);
     // If gesture in progress, we transfer the world rounds from the end
     // longitude into start, so we can guarantee the "scroll effect" of rounding
@@ -168,13 +167,12 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (!latLng || std::isnan(zoom)) {
+    if (std::isnan(zoom)) {
         return;
     }
 
     // Determine endpoints.
-    EdgeInsets padding;
-    if (camera.padding) padding = *camera.padding;
+    optional<EdgeInsets> padding = camera.padding;
     LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
 
@@ -198,9 +196,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 
     /// w₀: Initial visible span, measured in pixels at the initial scale.
     /// Known henceforth as a <i>screenful</i>.
-    double w0 = padding ? std::max(state.size.width, state.size.height)
-                        : std::max(state.size.width - padding.left - padding.right,
-                                   state.size.height - padding.top - padding.bottom);
+    double w0 = padding ? std::max(state.size.width - padding->left - padding->right,
+                                   state.size.height - padding->top - padding->bottom)
+                        : std::max(state.size.width, state.size.height);
     /// w₁: Final visible span, measured in pixels with respect to the initial
     /// scale.
     double w1 = w0 / state.zoomScale(zoom - startZoom);
@@ -335,7 +333,6 @@ void Transform::setLatLng(const LatLng& latLng, const AnimationOptions& animatio
 }
 
 void Transform::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const AnimationOptions& animation) {
-    if (!latLng) return;
     CameraOptions camera;
     camera.center = latLng;
     camera.padding = padding;
@@ -343,26 +340,20 @@ void Transform::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, co
 }
 
 void Transform::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
-    if (!latLng) return;
     CameraOptions camera;
     camera.center = latLng;
     if (anchor) {
-        EdgeInsets padding;
-        padding.top = anchor->y;
-        padding.left = anchor->x;
-        padding.bottom = state.size.height - anchor->y;
-        padding.right = state.size.width - anchor->x;
-        if (padding) camera.padding = padding;
+        camera.padding = EdgeInsets(anchor->y, anchor->x, state.size.height - anchor->y, state.size.width - anchor->x);
     }
     easeTo(camera, animation);
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOptions& animation) {
-    setLatLngZoom(latLng, zoom, EdgeInsets {}, animation);
+    setLatLngZoom(latLng, zoom, optional<EdgeInsets> {}, animation);
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const AnimationOptions& animation) {
-    if (!latLng || std::isnan(zoom)) return;
+    if (std::isnan(zoom)) return;
 
     CameraOptions camera;
     camera.center = latLng;
@@ -372,7 +363,7 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeIn
 }
 
 LatLng Transform::getLatLng(optional<EdgeInsets> padding) const {
-    if (padding && *padding) {
+    if (padding) {
         return screenCoordinateToLatLng(padding->getCenter(state.size.width, state.size.height));
     } else {
         return state.getLatLng();
@@ -380,7 +371,7 @@ LatLng Transform::getLatLng(optional<EdgeInsets> padding) const {
 }
 
 ScreenCoordinate Transform::getScreenCoordinate(optional<EdgeInsets> padding) const {
-    if (padding && *padding) {
+    if (padding) {
         return padding->getCenter(state.size.width, state.size.height);
     } else {
         return { state.size.width / 2., state.size.height / 2. };
@@ -483,7 +474,7 @@ void Transform::setAngle(double angle, optional<ScreenCoordinate> anchor, const 
 
 void Transform::setAngle(double angle, optional<EdgeInsets> padding, const AnimationOptions& animation) {
     optional<ScreenCoordinate> anchor;
-    if (padding && *padding) anchor = getScreenCoordinate(padding);
+    if (padding) anchor = getScreenCoordinate(padding);
     setAngle(angle, anchor, animation);
 }
 

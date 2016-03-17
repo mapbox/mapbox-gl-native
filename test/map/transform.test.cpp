@@ -44,40 +44,6 @@ TEST(Transform, InvalidScale) {
     ASSERT_DOUBLE_EQ(2, transform.getScale());
 }
 
-TEST(Transform, InvalidLatLng) {
-    Transform transform;
-
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(1, transform.getScale());
-
-    transform.setScale(2 << 0);
-    transform.setLatLng({ 8, 10 });
-
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(2, transform.getScale());
-
-    transform.setLatLngZoom({ 10, 8 }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    const double invalid = std::nan("");
-    transform.setLatLngZoom({ invalid, 8 }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-
-    transform.setLatLngZoom({ 10, invalid }, 2);
-
-    ASSERT_DOUBLE_EQ(10, transform.getLatLng().latitude);
-    ASSERT_DOUBLE_EQ(8, transform.getLatLng().longitude);
-    ASSERT_DOUBLE_EQ(4, transform.getScale());
-}
-
 
 TEST(Transform, InvalidBearing) {
     Transform transform;
@@ -349,17 +315,7 @@ TEST(Transform, Padding) {
         1000.0 / 4.0,
     });
 
-    EdgeInsets padding;
-
-    padding.top = 0;
-    ASSERT_FALSE(bool(padding));
-
-    padding.top = NAN;
-    ASSERT_FALSE(bool(padding));
-
-    padding.top = 1000.0 / 2.0;
-    ASSERT_TRUE(bool(padding));
-
+    EdgeInsets padding(1000.0 / 2.0, 0, 0, 0);
     const LatLng shiftedCenter = transform.getLatLng(padding);
     ASSERT_NE(trueCenter.latitude, shiftedCenter.latitude);
     ASSERT_NEAR(trueCenter.longitude, shiftedCenter.longitude, 1e-9);
