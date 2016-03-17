@@ -94,7 +94,7 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (!latLng || std::isnan(zoom)) {
+    if (std::isnan(zoom)) {
         return;
     }
 
@@ -181,7 +181,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (!latLng || std::isnan(zoom)) {
+    if (std::isnan(zoom)) {
         return;
     }
     
@@ -343,8 +343,6 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
 #pragma mark - Position
 
 void Transform::moveBy(const ScreenCoordinate& offset, const Duration& duration) {
-    if (!offset) return;
-
     ScreenCoordinate centerOffset = {
         offset.x,
         -offset.y,
@@ -361,7 +359,6 @@ void Transform::setLatLng(const LatLng& latLng, const Duration& duration) {
 }
 
 void Transform::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, const Duration& duration) {
-    if (!latLng) return;
     CameraOptions camera;
     camera.center = latLng;
     camera.padding = padding;
@@ -369,7 +366,6 @@ void Transform::setLatLng(const LatLng& latLng, optional<EdgeInsets> padding, co
 }
 
 void Transform::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const Duration& duration) {
-    if (!latLng) return;
     CameraOptions camera;
     camera.center = latLng;
     if (anchor) {
@@ -388,7 +384,7 @@ void Transform::setLatLngZoom(const LatLng& latLng, double zoom, const Duration&
 }
 
 void Transform::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> padding, const Duration& duration) {
-    if (!latLng || std::isnan(zoom)) return;
+    if (std::isnan(zoom)) return;
 
     CameraOptions camera;
     camera.center = latLng;
@@ -477,10 +473,6 @@ void Transform::setMaxZoom(const double maxZoom) {
 #pragma mark - Angle
 
 void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& duration) {
-    if (!first || !second) {
-        return;
-    }
-
     ScreenCoordinate center = getScreenCoordinate();
     const ScreenCoordinate offset = first - center;
     const double distance = std::sqrt(std::pow(2, offset.x) + std::pow(2, offset.y));
@@ -493,13 +485,9 @@ void Transform::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& 
         center.x = first.x + std::cos(rotateAngle) * heightOffset;
         center.y = first.y + std::sin(rotateAngle) * heightOffset;
     }
-
-    const ScreenCoordinate newFirst = first - center;
-    const ScreenCoordinate newSecond = second - center;
-    const double ang = state.angle + util::angle_between(newFirst.x, newFirst.y, newSecond.x, newSecond.y);
     
     CameraOptions camera;
-    camera.angle = ang;
+    camera.angle = state.angle + util::angle_between(first - center, second - center);
     easeTo(camera, duration);
 }
 
@@ -581,7 +569,7 @@ void Transform::startTransition(const CameraOptions& camera,
     // Associate the anchor, if given, with a coordinate.
     optional<ScreenCoordinate> anchor = camera.anchor;
     LatLng anchorLatLng;
-    if (anchor && *anchor) {
+    if (anchor) {
         anchor->y = state.getHeight() - anchor->y;
         anchorLatLng = state.screenCoordinateToLatLng(*anchor);
     }
@@ -599,7 +587,7 @@ void Transform::startTransition(const CameraOptions& camera,
             result = frame(ease.solve(t, 0.001));
         }
         
-        if (anchor && *anchor) state.moveLatLng(anchorLatLng, *anchor);
+        if (anchor) state.moveLatLng(anchorLatLng, *anchor);
         
         // At t = 1.0, a DidChangeAnimated notification should be sent from finish().
         if (t < 1.0) {
@@ -657,8 +645,6 @@ void Transform::setGestureInProgress(bool inProgress) {
 #pragma mark Conversion and projection
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
-    if (!latLng) return ScreenCoordinate::null();
-
     // If the center and point longitudes are not in the same side of the
     // antimeridian, we unwrap the point longitude so it would be seen if
     // e.g. the next antimeridian side is visible.
@@ -670,8 +656,6 @@ ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const
 }
 
 LatLng Transform::screenCoordinateToLatLng(const ScreenCoordinate& point) const {
-    if (!point) return LatLng::null();
-
     ScreenCoordinate flippedPoint = point;
     flippedPoint.y = state.height - flippedPoint.y;
     return state.screenCoordinateToLatLng(flippedPoint).wrapped();

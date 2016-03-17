@@ -525,7 +525,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
         };
         centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
     }
-    centerPixel /= 2;
+    centerPixel /= 2.0;
 
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;

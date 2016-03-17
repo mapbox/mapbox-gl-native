@@ -223,10 +223,10 @@ double TransformState::worldSize() const {
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
     mat4 mat = coordinatePointMatrix(getZoom());
-    vec4<double> p;
-    vec4<double> c = { lngX(latLng.longitude) / util::tileSize, latY(latLng.latitude) / util::tileSize, 0, 1 };
+    vec4 p;
+    vec4 c = {{ lngX(latLng.longitude) / util::tileSize, latY(latLng.latitude) / util::tileSize, 0, 1 }};
     matrix::transformMat4(p, c, mat);
-    return { p.x / p.w, height - p.y / p.w };
+    return { p[0] / p[3], height - p[1] / p[3] };
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
@@ -244,21 +244,21 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
     // unproject two points to get a line and then find the point on that
     // line with z=0
 
-    vec4<double> coord0;
-    vec4<double> coord1;
-    vec4<double> point0 = { point.x, flippedY, 0, 1 };
-    vec4<double> point1 = { point.x, flippedY, 1, 1 };
+    vec4 coord0;
+    vec4 coord1;
+    vec4 point0 = {{ point.x, flippedY, 0, 1 }};
+    vec4 point1 = {{ point.x, flippedY, 1, 1 }};
     matrix::transformMat4(coord0, point0, inverted);
     matrix::transformMat4(coord1, point1, inverted);
 
-    double w0 = coord0.w;
-    double w1 = coord1.w;
-    double x0 = coord0.x / w0;
-    double x1 = coord1.x / w1;
-    double y0 = coord0.y / w0;
-    double y1 = coord1.y / w1;
-    double z0 = coord0.z / w0;
-    double z1 = coord1.z / w1;
+    double w0 = coord0[3];
+    double w1 = coord1[3];
+    double x0 = coord0[0] / w0;
+    double x1 = coord1[0] / w1;
+    double y0 = coord0[1] / w0;
+    double y1 = coord1[1] / w1;
+    double z0 = coord0[2] / w0;
+    double z1 = coord1[2] / w1;
 
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
     return {
@@ -312,13 +312,11 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
-    if (!latLng || !anchor) return;
-
-    auto latLngToTileCoord = [&](const LatLng& ll) -> vec2<double> {
+    auto latLngToTileCoord = [&](const LatLng& ll) -> Point<double> {
         return { lngX(ll.longitude), latY(ll.latitude) };
     };
 
-    auto tileCoordToLatLng = [&](const vec2<double> coord) -> LatLng {
+    auto tileCoordToLatLng = [&](const Point<double> coord) -> LatLng {
         return { yLat(coord.y, worldSize()), xLng(coord.x, worldSize()) };
     };
 

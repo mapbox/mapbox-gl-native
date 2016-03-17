@@ -2,30 +2,35 @@
 #define MBGL_UTIL_GEO
 
 #include <mbgl/math/wrap.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <mapbox/geometry/point.hpp>
+#include <mapbox/geometry/point_arithmetic.hpp>
+
 #include <cmath>
+#include <stdexcept>
 
 namespace mbgl {
 
 class TileID;
 
-using ScreenCoordinate = vec2<double>;
+using ScreenCoordinate = mapbox::geometry::point<double>;
 
 class LatLng {
 public:
-    struct null {};
-
     double latitude;
     double longitude;
 
     enum WrapMode : bool { Unwrapped, Wrapped };
 
-    LatLng(null) : latitude(std::numeric_limits<double>::quiet_NaN()), longitude(latitude) {}
-
     LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
-        : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }
+        : latitude(lat), longitude(lon) {
+        if (std::isnan(lat)) throw std::domain_error("latitude must not be NaN");
+        if (std::isnan(lon)) throw std::domain_error("longitude must not be NaN");
+        if (!std::isfinite(lat)) throw std::domain_error("latitude must not be infinite");
+        if (!std::isfinite(lon)) throw std::domain_error("longitude must not be infinite");
+        if (mode == Wrapped) wrap();
+    }
 
     LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
 
@@ -40,10 +45,6 @@ public:
         if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
         if (longitude > 0 && end.longitude < 0) longitude -= util::DEGREES_MAX;
         else if (longitude < 0 && end.longitude > 0) longitude += util::DEGREES_MAX;
-    }
-
-    explicit operator bool() const {
-        return !(std::isnan(latitude) || std::isnan(longitude));
     }
 
     // Constructs a LatLng object with the top left position of the specified tile.

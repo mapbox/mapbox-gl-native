@@ -33,7 +33,7 @@ const std::map<uint32_t, SDFGlyph> &GlyphSet::getSDFs() const {
 const Shaping GlyphSet::getShaping(const std::u32string &string, const float maxWidth,
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
-                                    const float spacing, const vec2<float> &translate) const {
+                                    const float spacing, const Point<float> &translate) const {
     Shaping shaping(translate.x * 24, translate.y * 24, string);
 
     // the y offset *should* be part of the font metadata
@@ -61,7 +61,7 @@ const Shaping GlyphSet::getShaping(const std::u32string &string, const float max
 
 void align(Shaping &shaping, const float justify, const float horizontalAlign,
            const float verticalAlign, const uint32_t maxLineLength, const float lineHeight,
-           const uint32_t line, const vec2<float> &translate) {
+           const uint32_t line, const Point<float> &translate) {
     const float shiftX = (justify - horizontalAlign) * maxLineLength + ::round(translate.x * 24/* one em */);
     const float shiftY = (-verticalAlign * (line + 1) + 0.5) * lineHeight + ::round(translate.y * 24/* one em */);
 
@@ -87,7 +87,7 @@ void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<
 
 void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
                          const float horizontalAlign, const float verticalAlign,
-                         const float justify, const vec2<float> &translate) const {
+                         const float justify, const Point<float> &translate) const {
     uint32_t lastSafeBreak = 0;
 
     uint32_t lengthBeforeCurrentLine = 0;

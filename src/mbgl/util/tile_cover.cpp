@@ -1,5 +1,4 @@
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/map/transform_state.hpp>
