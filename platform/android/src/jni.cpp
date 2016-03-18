@@ -168,12 +168,12 @@ bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
     if (ret != JNI_OK) {
         if (ret != JNI_EDETACHED) {
             mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
-            throw new std::runtime_error("GetEnv() failed");
+            throw std::runtime_error("GetEnv() failed");
         } else {
             ret = vm->AttachCurrentThread(env, &args);
             if (ret != JNI_OK) {
                 mbgl::Log::Error(mbgl::Event::JNI, "AttachCurrentThread() failed with %i", ret);
-                throw new std::runtime_error("AttachCurrentThread() failed");
+                throw std::runtime_error("AttachCurrentThread() failed");
             }
             detach = true;
         }
@@ -190,7 +190,7 @@ void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach) {
         jint ret;
         if ((ret = vm->DetachCurrentThread()) != JNI_OK) {
             mbgl::Log::Error(mbgl::Event::JNI, "DetachCurrentThread() failed with %i", ret);
-            throw new std::runtime_error("DetachCurrentThread() failed");
+            throw std::runtime_error("DetachCurrentThread() failed");
         }
     }
     *env = nullptr;
