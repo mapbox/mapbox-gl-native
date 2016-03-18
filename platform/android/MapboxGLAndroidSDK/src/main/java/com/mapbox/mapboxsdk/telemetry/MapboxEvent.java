@@ -2,6 +2,9 @@ package com.mapbox.mapboxsdk.telemetry;
 
 import java.io.Serializable;
 
+/**
+ * Constants for Telemetry Metadata
+ */
 public class MapboxEvent implements Serializable {
     public static final int VERSION_NUMBER = 2;
     public static final String MAPBOX_EVENTS_BASE_URL = "https://api.mapbox.com";
