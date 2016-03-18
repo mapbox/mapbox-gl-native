@@ -58,23 +58,36 @@ void OfflineDatabase::ensureSchema() {
             removeExisting();
             connect(ReadWrite | Create);
         } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code == SQLITE_CANTOPEN) {
+            if (ex.code != SQLITE_CANTOPEN && ex.code != SQLITE_NOTADB) {
+                Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
+                throw;
+            }
+
+            try {
+                if (ex.code == SQLITE_NOTADB) {
+                    removeExisting();
+                }
                 connect(ReadWrite | Create);
-            } else if (ex.code == SQLITE_NOTADB) {
-                removeExisting();
-                connect(ReadWrite | Create);
+            } catch (...) {
+                Log::Error(Event::Database, "Unexpected error creating database: %s", util::toString(std::current_exception()).c_str());
+                throw;
             }
         }
     }
 
-    #include "offline_schema.cpp.include"
+    try {
+        #include "offline_schema.cpp.include"
 
-    connect(ReadWrite | Create);
+        connect(ReadWrite | Create);
 
-    // If you change the schema you must write a migration from the previous version.
-    db->exec("PRAGMA auto_vacuum = INCREMENTAL");
-    db->exec(schema);
-    db->exec("PRAGMA user_version = 3");
+        // If you change the schema you must write a migration from the previous version.
+        db->exec("PRAGMA auto_vacuum = INCREMENTAL");
+        db->exec(schema);
+        db->exec("PRAGMA user_version = 3");
+    } catch (...) {
+        Log::Error(Event::Database, "Unexpected error creating database schema: %s", util::toString(std::current_exception()).c_str());
+        throw;
+    }
 }
 
 int OfflineDatabase::userVersion() {
