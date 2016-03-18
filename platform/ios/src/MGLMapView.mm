@@ -439,7 +439,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _pendingLongitude = NAN;
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
 
-    [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+        [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
+    }
 }
 
 - (void)createGLView
@@ -982,6 +984,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _displayLink.paused = NO;
 
         [self validateLocationServices];
+        
+        [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
     }
 }
 
