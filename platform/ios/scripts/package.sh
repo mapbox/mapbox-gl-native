@@ -147,6 +147,8 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         cp -r \
             gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework \
             ${OUTPUT}/dynamic/
+        cp -r gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
+            ${OUTPUT}/dynamic/
 
         step "Merging simulator dynamic library into device dynamic library…"
         lipo \
@@ -170,6 +172,8 @@ else
         cp -r \
             gyp/build/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
             ${OUTPUT}/dynamic/${NAME}.framework
+        cp -r gyp/build/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
+            ${OUTPUT}/dynamic/
     fi
 fi
 
