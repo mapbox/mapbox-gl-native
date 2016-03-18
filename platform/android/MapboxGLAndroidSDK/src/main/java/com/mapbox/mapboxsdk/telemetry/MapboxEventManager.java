@@ -101,7 +101,7 @@ public class MapboxEventManager {
      * @param context     The context associated with MapView
      * @param accessToken The accessToken to load MapView
      */
-    public void initialise(@NonNull Context context, @NonNull String accessToken) {
+    public void initialize(@NonNull Context context, @NonNull String accessToken) {
         this.context = context.getApplicationContext();
         this.accessToken = accessToken;
 
