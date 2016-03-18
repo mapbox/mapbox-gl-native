@@ -1,4 +1,5 @@
 package com.mapbox.mapboxsdk.telemetry;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+/**
+ * Manages Startup and Shutdown of Telemetry resources
+ */
 public class TelemetryService extends Service {
 
     private static final String TAG = "TelemetryService";
