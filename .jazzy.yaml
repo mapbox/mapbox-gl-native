@@ -37,7 +37,7 @@ custom_categories:
       - MGLOverlay
       - MGLShape
       - MGLUserLocation
-  - name: Offline Viewing
+  - name: Offline Storage
     children:
       - MGLOfflineRegion
       - MGLOfflineStorage
