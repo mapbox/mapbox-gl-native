@@ -9,14 +9,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 public class ManualZoomActivity extends AppCompatActivity {
 
@@ -37,9 +39,12 @@ public class ManualZoomActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.manualZoomMapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(Style.SATELLITE_STREETS);
+        MapboxMapOptions options = new MapboxMapOptions();
+        options.styleUrl(Style.SATELLITE_STREETS);
+        options.accessToken(ApiAccess.getToken(this));
+
+        ViewGroup parentViewGroup = (ViewGroup) findViewById(R.id.parent_viewgroup);
+        parentViewGroup.addView(mMapView = new MapView(this, options));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
