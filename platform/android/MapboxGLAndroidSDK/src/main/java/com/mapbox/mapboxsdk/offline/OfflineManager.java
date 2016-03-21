@@ -16,6 +16,14 @@ public class OfflineManager {
 
     private final static String LOG_TAG = "OfflineManager";
 
+    //
+    // Static methods
+    //
+
+    static {
+        System.loadLibrary("mapbox-gl");
+    }
+
     // Default database name
     private final static String DATABASE_NAME = "mbgl-offline.db";
 
