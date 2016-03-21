@@ -694,6 +694,9 @@ public class MapView extends FrameLayout {
         } else {
             mNativeMapView.scaleBy(0.5, x / mScreenDensity, y / mScreenDensity, MapboxConstants.ANIMATION_DURATION);
         }
+
+        // work around to invalidate camera position
+        postDelayed(new ZoomInvalidator(mMapboxMap), MapboxConstants.ANIMATION_DURATION);
     }
 
     //
@@ -2540,6 +2543,21 @@ public class MapView extends FrameLayout {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
             context.startActivity(intent);
+        }
+    }
+
+    private static class ZoomInvalidator implements Runnable{
+
+        private MapboxMap mapboxMap;
+
+        public ZoomInvalidator(MapboxMap mapboxMap) {
+            this.mapboxMap = mapboxMap;
+        }
+
+        @Override
+        public void run() {
+            // invalidate camera position
+            mapboxMap.getCameraPosition();
         }
     }
 
