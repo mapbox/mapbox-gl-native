@@ -22,26 +22,14 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
-    - select-xcode-version:
-        title: Select Xcode version
-        run_if: '{{enveq "SKIPCI" "false"}}'
     - script:
-        title: Install Homebrew dependencies
+        title: Run build
         run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
 
-            brew install pkgconfig
-            brew install automake
-            gem install jazzy
-    - script:
-        title: Run make ipackage-sim
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - content: |-
-            #!/bin/bash
-
+            gem install jazzy --no-rdoc --no-ri
             make ipackage-sim
         - is_debug: 'yes'
     - xcode-test:
