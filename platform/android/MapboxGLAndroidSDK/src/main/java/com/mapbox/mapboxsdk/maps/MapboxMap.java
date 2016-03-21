@@ -245,14 +245,15 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
-        mCameraPosition = update.getCameraPosition(this);
-        mMapView.jumpTo(mCameraPosition.bearing, mCameraPosition.target, mCameraPosition.tilt, mCameraPosition.zoom);
+        CameraPosition position = update.getCameraPosition(this);
+        mMapView.jumpTo(position.bearing, position.target, position.tilt, position.zoom);
         if (mOnCameraChangeListener != null) {
             mOnCameraChangeListener.onCameraChange(mCameraPosition);
         }
         if (callback != null) {
             callback.onFinish();
         }
+        invalidateCameraPosition();
     }
 
     /**
@@ -288,24 +289,22 @@ public class MapboxMap {
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        mCameraPosition = update.getCameraPosition(this);
-        mMapView.easeTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, new CancelableCallback() {
+        CameraPosition position = update.getCameraPosition(this);
+        mMapView.easeTo(position.bearing, position.target, getDurationNano(durationMs), position.tilt, position.zoom, new CancelableCallback() {
             @Override
             public void onCancel() {
                 if (callback != null) {
                     callback.onCancel();
                 }
+                invalidateCameraPosition();
             }
 
             @Override
             public void onFinish() {
-                if (mOnCameraChangeListener != null) {
-                    mOnCameraChangeListener.onCameraChange(mCameraPosition);
-                }
-
                 if (callback != null) {
                     callback.onFinish();
                 }
+                invalidateCameraPosition();
             }
         });
     }
@@ -358,13 +357,14 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        mCameraPosition = update.getCameraPosition(this);
-        mMapView.flyTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, new CancelableCallback() {
+        CameraPosition cameraPosition = update.getCameraPosition(this);
+        mMapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt, cameraPosition.zoom, new CancelableCallback() {
             @Override
             public void onCancel() {
                 if (callback != null) {
                     callback.onCancel();
                 }
+                invalidateCameraPosition();
             }
 
             @Override
@@ -376,6 +376,7 @@ public class MapboxMap {
                 if (callback != null) {
                     callback.onFinish();
                 }
+                invalidateCameraPosition();
             }
         });
     }
