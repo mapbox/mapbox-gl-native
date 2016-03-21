@@ -572,6 +572,7 @@ void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
 void SymbolBucket::swapRenderData() {
     if (renderDataInProgress) {
         renderData = std::move(renderDataInProgress);
+        uploaded = false;
     }
 }
 
