@@ -156,7 +156,7 @@ public class MapboxEventManager {
             }
 
             // Build User Agent
-            if (!TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
+            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
                 userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
             }
 
