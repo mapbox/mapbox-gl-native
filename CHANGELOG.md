@@ -2,13 +2,22 @@
 
 ## Android
 
+## 4.0.0-beta.2
+
+* arm64 ABI Support ([#3128](https://github.com/mapbox/mapbox-gl-native/issues/3128))
+* Unify Offline And Cache Databases ([#4362](https://github.com/mapbox/mapbox-gl-native/issues/4362))
+* Offline Database Vacuuming ([#4342](https://github.com/mapbox/mapbox-gl-native/pull/4342))
+* Telemetry User Agent Fix ([#4328](https://github.com/mapbox/mapbox-gl-native/issues/4328))
+* OnCameraChange Bug Fix ([#4327](https://github.com/mapbox/mapbox-gl-native/issues/4327))
+* OnCameraChangeListener vs getCameraPosition ([#4326](https://github.com/mapbox/mapbox-gl-native/issues/4326))
+
 ## 4.0.0-beta.1
 
 Mapbox Android 4.0.0 is the most ambitious Android release to date with 3 major new features being released. To help us produce the highest quality SDK possible we're releasing an official Beta release first so that everyone has time to explore it and help hardened it before the official 4.0.0 Final Release.
 
-* MapboxMap API Change ([#3145](https://github.com/mapbox/mapbox-gl-native/issues/3145)
-* Offline Maps ([#3891](https://github.com/mapbox/mapbox-gl-native/issues/3891)
-* Telemetry ([#2421](https://github.com/mapbox/mapbox-gl-native/issues/2421)
+* MapboxMap API Change ([#3145](https://github.com/mapbox/mapbox-gl-native/issues/3145))
+* Offline Maps ([#3891](https://github.com/mapbox/mapbox-gl-native/issues/3891))
+* Telemetry ([#2421](https://github.com/mapbox/mapbox-gl-native/issues/2421))
 
 ## 3.2.0
 
