@@ -245,11 +245,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void moveCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
-        CameraPosition position = update.getCameraPosition(this);
-        mMapView.jumpTo(position.bearing, position.target, position.tilt, position.zoom);
-        if (mOnCameraChangeListener != null) {
-            mOnCameraChangeListener.onCameraChange(mCameraPosition);
-        }
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.jumpTo(mCameraPosition.bearing, mCameraPosition.target, mCameraPosition.tilt, mCameraPosition.zoom);
         if (callback != null) {
             callback.onFinish();
         }
@@ -289,8 +286,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        CameraPosition position = update.getCameraPosition(this);
-        mMapView.easeTo(position.bearing, position.target, getDurationNano(durationMs), position.tilt, position.zoom, new CancelableCallback() {
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.easeTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, new CancelableCallback() {
             @Override
             public void onCancel() {
                 if (callback != null) {
@@ -357,8 +354,8 @@ public class MapboxMap {
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
-        CameraPosition cameraPosition = update.getCameraPosition(this);
-        mMapView.flyTo(cameraPosition.bearing, cameraPosition.target, getDurationNano(durationMs), cameraPosition.tilt, cameraPosition.zoom, new CancelableCallback() {
+        mCameraPosition = update.getCameraPosition(this);
+        mMapView.flyTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, new CancelableCallback() {
             @Override
             public void onCancel() {
                 if (callback != null) {
@@ -396,7 +393,12 @@ public class MapboxMap {
      */
     private void invalidateCameraPosition() {
         mInvalidCameraPosition = false;
-        mCameraPosition = mMapView.invalidateCameraPosition();
+
+        CameraPosition cameraPosition = mMapView.invalidateCameraPosition();
+        if (cameraPosition != null) {
+            mCameraPosition = cameraPosition;
+        }
+
         if (mOnCameraChangeListener != null) {
             mOnCameraChangeListener.onCameraChange(mCameraPosition);
         }
