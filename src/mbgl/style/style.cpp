@@ -27,7 +27,7 @@
 
 namespace mbgl {
 
-bool Style::addClass(const std::string& className, const PropertyTransition& properties) {
+bool Style::addClass(const std::string& className, optional<PropertyTransition> properties) {
     if (std::find(classes.begin(), classes.end(), className) != classes.end()) return false;
     classes.push_back(className);
     transitionProperties = properties;
@@ -38,7 +38,7 @@ bool Style::hasClass(const std::string& className) const {
     return std::find(classes.begin(), classes.end(), className) != classes.end();
 }
 
-bool Style::removeClass(const std::string& className, const PropertyTransition& properties) {
+bool Style::removeClass(const std::string& className, optional<PropertyTransition> properties) {
     const auto it = std::find(classes.begin(), classes.end(), className);
     if (it != classes.end()) {
         classes.erase(it);
@@ -48,7 +48,7 @@ bool Style::removeClass(const std::string& className, const PropertyTransition& 
     return false;
 }
 
-void Style::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+void Style::setClasses(const std::vector<std::string>& classNames, optional<PropertyTransition> properties) {
     classes = classNames;
     transitionProperties = properties;
 }

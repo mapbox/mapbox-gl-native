@@ -101,10 +101,10 @@ public:
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
-    bool addClass(const std::string&, const PropertyTransition& = {});
-    bool removeClass(const std::string&, const PropertyTransition& = {});
+    bool addClass(const std::string&, optional<PropertyTransition>);
+    bool removeClass(const std::string&, optional<PropertyTransition>);
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
+    void setClasses(const std::vector<std::string>&, optional<PropertyTransition>);
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData() const;

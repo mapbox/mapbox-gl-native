@@ -520,15 +520,15 @@ bool Map::isFullyLoaded() const {
     return context->invokeSync<bool>(&MapContext::isLoaded);
 }
 
-void Map::addClass(const std::string& className, const PropertyTransition& properties) {
+void Map::addClass(const std::string& className, optional<PropertyTransition> properties) {
     context->invoke(&MapContext::addClass, className, properties);
 }
 
-void Map::removeClass(const std::string& className, const PropertyTransition& properties) {
+void Map::removeClass(const std::string& className, optional<PropertyTransition> properties) {
     context->invoke(&MapContext::removeClass, className, properties);
 }
 
-void Map::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+void Map::setClasses(const std::vector<std::string>& classNames, optional<PropertyTransition> properties) {
     context->invoke(&MapContext::setClasses, classNames, properties);
 }
 
