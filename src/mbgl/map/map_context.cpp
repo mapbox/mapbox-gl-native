@@ -297,15 +297,15 @@ bool MapContext::hasClass(const std::string& className) const {
     return style->hasClass(className);
 }
 
-void MapContext::addClass(const std::string& className, const PropertyTransition& properties) {
+void MapContext::addClass(const std::string& className, optional<PropertyTransition> properties) {
     if (style->addClass(className, properties)) updateAsync(Update::Classes);
 }
 
-void MapContext::removeClass(const std::string& className, const PropertyTransition& properties) {
+void MapContext::removeClass(const std::string& className, optional<PropertyTransition> properties) {
     if (style->removeClass(className, properties)) updateAsync(Update::Classes);
 }
 
-void MapContext::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+void MapContext::setClasses(const std::vector<std::string>& classNames, optional<PropertyTransition> properties) {
     style->setClasses(classNames, properties);
     updateAsync(Update::Classes);
 }

@@ -63,10 +63,10 @@ public:
                   const optional<std::string> before);
     void removeLayer(const std::string& id);
 
-    void addClass(const std::string&, const PropertyTransition&);
-    void removeClass(const std::string&, const PropertyTransition&);
+    void addClass(const std::string&, optional<PropertyTransition>);
+    void removeClass(const std::string&, optional<PropertyTransition>);
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&, const PropertyTransition&);
+    void setClasses(const std::vector<std::string>&, optional<PropertyTransition>);
     std::vector<std::string> getClasses() const;
 
     void setSourceTileCacheSize(size_t size);
