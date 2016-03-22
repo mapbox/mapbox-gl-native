@@ -112,3 +112,11 @@ workflows:
 
             cd platform/android
             ./gradlew uploadArchives
+    - script:
+        title: Upload Downloadable APK To AWS S3
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            echo "Upload Downloadable APK To AWS S3"
+            aws s3 cp platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-release-unsigned.apk s3://mapbox-android-sdk/
