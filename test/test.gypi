@@ -136,8 +136,7 @@
           },
           'copies': [
             { 'destination': '<(PRODUCT_DIR)/$(WRAPPER_NAME)/test',
-              # Hack: When a filename begins with a $, gyp doesn't prepend $(SRCROOT)
-              'files': [ '$()../test/fixtures' ],
+              'files': [ '../test/fixtures' ],
             },
           ]
         }, {
