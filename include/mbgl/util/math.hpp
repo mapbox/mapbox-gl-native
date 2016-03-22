@@ -18,7 +18,7 @@ typename std::enable_if_t<std::is_integral<T>::value, T> max(T a, T b) {
 
 template <typename T>
 typename std::enable_if_t<std::is_floating_point<T>::value, T> max(T a, T b) {
-    return std::fmax(a, b);
+    return ::fmax(a, b);
 }
 
 template <typename T, typename... Ts>
@@ -33,7 +33,7 @@ typename std::enable_if_t<std::is_integral<T>::value, T> min(T a, T b) {
 
 template <typename T>
 typename std::enable_if_t<std::is_floating_point<T>::value, T> min(T a, T b) {
-    return std::fmin(a, b);
+    return ::fmin(a, b);
 }
 
 template <typename T, typename... Ts>
