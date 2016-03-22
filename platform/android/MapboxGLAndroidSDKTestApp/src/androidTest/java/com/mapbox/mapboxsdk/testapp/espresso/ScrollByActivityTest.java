@@ -5,7 +5,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.ScrollByActivity;
+import com.mapbox.mapboxsdk.testapp.activity.ScrollByActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

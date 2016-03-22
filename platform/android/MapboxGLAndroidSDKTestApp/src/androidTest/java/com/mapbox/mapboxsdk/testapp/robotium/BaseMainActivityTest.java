@@ -5,20 +5,20 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapUtils;
-import com.mapbox.mapboxsdk.testapp.MainActivity;
+import com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.robotium.solo.Solo;
 
 import org.junit.Test;
 
-public abstract class BaseMainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public abstract class BaseMainActivityTest extends ActivityInstrumentationTestCase2<FeatureOverviewActivity> {
 
     protected Solo solo;
     protected MapView mapView;
     protected MapboxMap mapboxMap;
 
     public BaseMainActivityTest() {
-        super(MainActivity.class);
+        super(FeatureOverviewActivity.class);
     }
 
     @Override

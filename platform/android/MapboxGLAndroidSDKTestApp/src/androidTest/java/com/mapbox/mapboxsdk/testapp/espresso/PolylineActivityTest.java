@@ -4,7 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.PolylineActivity;
+import com.mapbox.mapboxsdk.testapp.activity.PolylineActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import org.junit.Before;

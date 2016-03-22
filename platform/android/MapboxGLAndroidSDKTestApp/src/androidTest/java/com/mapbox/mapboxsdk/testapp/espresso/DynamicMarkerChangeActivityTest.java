@@ -4,7 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.DynamicMarkerChangeActivity;
+import com.mapbox.mapboxsdk.testapp.activity.DynamicMarkerChangeActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.espresso.utils.ViewUtils;
 

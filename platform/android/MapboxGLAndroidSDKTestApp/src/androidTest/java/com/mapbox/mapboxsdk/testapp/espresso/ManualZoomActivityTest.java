@@ -5,7 +5,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.ManualZoomActivity;
+import com.mapbox.mapboxsdk.testapp.activity.ManualZoomActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import org.junit.Before;

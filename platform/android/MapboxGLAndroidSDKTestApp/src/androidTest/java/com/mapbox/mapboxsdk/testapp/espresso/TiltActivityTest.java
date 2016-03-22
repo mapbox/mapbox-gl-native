@@ -3,7 +3,7 @@ package com.mapbox.mapboxsdk.testapp.espresso;
 import android.support.test.rule.ActivityTestRule;
 
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.TiltActivity;
+import com.mapbox.mapboxsdk.testapp.activity.TiltActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

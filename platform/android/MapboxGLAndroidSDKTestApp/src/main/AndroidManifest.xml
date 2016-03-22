@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".FeatureOverviewActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,79 +24,200 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MapboxMapActivity"
-            android:label="@string/action_mapboxmap" />
+            android:name=".activity.MapboxMapActivity"
+            android:description="@string/description_mapboxmap"
+            android:label="@string/activity_mapboxmap">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".LatLngBoundsActivity"
-            android:label="@string/activity_visible_coordinate_bounds" />
+            android:name=".activity.LatLngBoundsActivity"
+            android:description="@string/description_visible_bounds"
+            android:label="@string/activity_visible_coordinate_bounds">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".InfoWindowAdapterActivity"
-            android:label="@string/activity_infowindow_adapter" />
+            android:name=".activity.InfoWindowAdapterActivity"
+            android:description="@string/description_info_window_adapter"
+            android:label="@string/activity_infowindow_adapter">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_infowindow" />
+        </activity>
         <activity
-            android:name=".InfoWindowActivity"
-            android:label="@string/activity_info_window" />
+            android:name=".activity.InfoWindowActivity"
+            android:description="@string/description_info_window"
+            android:label="@string/activity_info_window">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_infowindow" />
+        </activity>
+
         <activity
-            android:name=".InfoWindowConcurrentActivity"
-            android:label="@string/activity_info_window_concurrent" />
+            android:name=".activity.InfoWindowConcurrentActivity"
+            android:description="@string/description_info_window_concurrent"
+            android:label="@string/activity_info_window_concurrent">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_infowindow" />
+        </activity>
         <activity
-            android:name=".BulkMarkerActivity"
+            android:name=".activity.BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/activity_add_bulk_markers" />
+            android:description="@string/description_add_bulk_markers"
+            android:label="@string/activity_add_bulk_markers">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_marker" />
+        </activity>
         <activity
-            android:name=".CameraActivity"
-            android:label="@string/activity_camera" />
+            android:name=".activity.CameraActivity"
+            android:description="@string/description_camera"
+            android:label="@string/activity_camera">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
         <activity
-            android:name=".TiltActivity"
-            android:label="@string/activity_tilt" />
+            android:name=".activity.TiltActivity"
+            android:description="@string/description_tilt"
+            android:label="@string/activity_tilt">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
         <activity
-            android:name=".MapFragmentActivity"
-            android:label="@string/activity_map_fragment" />
+            android:name=".activity.MapFragmentActivity"
+            android:description="@string/description_map_fragment"
+            android:label="@string/activity_map_fragment">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_fragment" />
+        </activity>
         <activity
-            android:name=".SupportMapFragmentActivity"
-            android:label="@string/activity_map_fragment_suport" />
+            android:name=".activity.SupportMapFragmentActivity"
+            android:description="@string/description_map_fragment_support"
+            android:label="@string/activity_map_fragment_suport">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_fragment" />
+        </activity>
         <activity
-            android:name=".PressForMarkerActivity"
-            android:label="@string/activity_press_for_marker" />
+            android:name=".activity.PressForMarkerActivity"
+            android:description="@string/description_press_for_marker"
+            android:label="@string/activity_press_for_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_marker" />
+        </activity>
         <activity
-            android:name=".ManualZoomActivity"
-            android:label="@string/action_manual_zoom" />
+            android:name=".activity.ManualZoomActivity"
+            android:description="@string/description_manual_zoom"
+            android:label="@string/activity_manual_zoom">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
         <activity
-            android:name=".MaxMinZoomActivity"
-            android:label="@string/action_minmax_zoom" />
+            android:name=".activity.MaxMinZoomActivity"
+            android:description="@string/description_minmax_zoom"
+            android:label="@string/activity_minmax_zoom">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".MyLocationTrackingModeActivity"
-            android:label="@string/activity_user_tracking_mode" />
+            android:name=".activity.MyLocationTrackingModeActivity"
+            android:description="@string/description_user_location_tracking"
+            android:label="@string/activity_user_tracking_mode">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".PolylineActivity"
-            android:label="@string/activity_polyline" />
+            android:name=".activity.PolylineActivity"
+            android:description="@string/description_polyline"
+            android:label="@string/activity_polyline">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_marker" />
+        </activity>
         <activity
-            android:name=".CoordinateChangeActivity"
-            android:label="@string/activity_animate_coordinate_change" />
+            android:name=".activity.CoordinateChangeActivity"
+            android:description="@string/description_animate_coordinate_change"
+            android:label="@string/activity_animate_coordinate_change">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
         <activity
-            android:name=".DirectionsActivity"
-            android:label="@string/activity_directions" />
+            android:name=".activity.DirectionsActivity"
+            android:description="@string/description_directions"
+            android:label="@string/activity_directions">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_api" />
+        </activity>
         <activity
-            android:name=".GeocoderActivity"
-            android:label="@string/activity_geocoder" />
+            android:name=".activity.GeocoderActivity"
+            android:description="@string/description_geocoder"
+            android:label="@string/activity_geocoder">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_api" />
+        </activity>
         <activity
-            android:name=".DoubleMapActivity"
-            android:label="@string/activity_double_map" />
+            android:name=".activity.DoubleMapActivity"
+            android:description="@string/description_double_mapview"
+            android:label="@string/activity_double_map">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".ScrollByActivity"
-            android:label="@string/activity_scroll_by" />
+            android:name=".activity.ScrollByActivity"
+            android:description="@string/description_scroll_by"
+            android:label="@string/activity_scroll_by">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
         <activity
-            android:name=".DynamicMarkerChangeActivity"
-            android:label="@string/activity_dynamic_marker" />
+            android:name=".activity.DynamicMarkerChangeActivity"
+            android:description="@string/description_dynamic_marker"
+            android:label="@string/activity_dynamic_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_marker" />
+        </activity>
         <activity
-            android:name=".MapPaddingActivity"
+            android:name=".activity.MapPaddingActivity"
+            android:description="@string/description_map_padding"
             android:label="@string/activity_map_padding"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".OfflineActivity"
-            android:label="@string/activity_offline" />
+            android:name=".activity.OfflineActivity"
+            android:description="@string/description_offline"
+            android:label="@string/activity_offline">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_other" />
+        </activity>
         <activity
-            android:name=".AnimatedMarkerActivity"
-            android:label="@string/title_activity_animated_marker" />
+            android:name=".activity.AnimatedMarkerActivity"
+            android:description="@string/description_animated_marker"
+            android:label="@string/activity_animated_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_marker" />
+        </activity>
 
         <!-- Configuration Settings -->
         <meta-data
@@ -111,7 +232,6 @@
             android:value="sk.eyJ1IjoiYmxlZWdlIiwiYSI6InNpcml1c2x5In0.KyT-boMyC_xZYTYojTc8zg" />
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
-
 
     </application>
 

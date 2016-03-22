@@ -4,7 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.MainActivity;
+import com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.espresso.utils.DrawerUtils;
 import com.mapbox.mapboxsdk.testapp.espresso.utils.GestureUtils;
@@ -17,17 +17,17 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
- * Tests on MainActivity with screenshots
+ * Tests on FeatureOverviewActivity with screenshots
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityScreenTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
-            MainActivity.class);
+    public ActivityTestRule<FeatureOverviewActivity> mActivityRule = new ActivityTestRule<>(
+            FeatureOverviewActivity.class);
 
-    private MainActivity mActivity = null;
+    private FeatureOverviewActivity mActivity = null;
 
     @Before
     public void setActivity() {

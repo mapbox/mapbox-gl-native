@@ -4,7 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.MainActivity;
+import com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import org.junit.Before;
@@ -24,17 +24,17 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.not;
 
 /**
- * Tests on MainActivity
+ * Tests on FeatureOverviewActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
-            MainActivity.class);
+    public ActivityTestRule<FeatureOverviewActivity> mActivityRule = new ActivityTestRule<>(
+            FeatureOverviewActivity.class);
 
-    private MainActivity mActivity = null;
+    private FeatureOverviewActivity mActivity = null;
 
     @Before
     public void setActivity() {
