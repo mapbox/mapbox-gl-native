@@ -42,6 +42,22 @@ struct Q_DECL_EXPORT CameraOptions {
 Q_DECL_EXPORT NetworkMode networkMode();
 Q_DECL_EXPORT void setNetworkMode(NetworkMode);
 
+// This struct is a 1:1 copy of mbgl::CustomLayerRenderParameters.
+struct Q_DECL_EXPORT CustomLayerRenderParameters {
+    double width;
+    double height;
+    double latitude;
+    double longitude;
+    double zoom;
+    double bearing;
+    double pitch;
+    double altitude;
+};
+
+typedef void (*CustomLayerInitializeFunction)(void* context) ;
+typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
+typedef void (*CustomLayerDeinitializeFunction)(void* context);
+
 }
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);

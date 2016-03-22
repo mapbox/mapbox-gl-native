@@ -542,6 +542,29 @@ QMargins QMapboxGL::margins() const
     );
 }
 
+void QMapboxGL::addCustomLayer(const QString &id,
+        QMapbox::CustomLayerInitializeFunction initFn,
+        QMapbox::CustomLayerRenderFunction renderFn,
+        QMapbox::CustomLayerDeinitializeFunction deinitFn,
+        void *context_,
+        char *before)
+{
+    d_ptr->mapObj->addCustomLayer(
+            id.toStdString(),
+            reinterpret_cast<mbgl::CustomLayerInitializeFunction>(initFn),
+            // This cast is safe as long as both mbgl:: and QMapbox::
+            // CustomLayerRenderParameters members remains the same.
+            (mbgl::CustomLayerRenderFunction)renderFn,
+            reinterpret_cast<mbgl::CustomLayerDeinitializeFunction>(deinitFn),
+            context_,
+            before == NULL ? nullptr : before);
+}
+
+void QMapboxGL::removeCustomLayer(const QString& id)
+{
+    d_ptr->mapObj->removeCustomLayer(id.toStdString());
+}
+
 void QMapboxGL::render()
 {
     d_ptr->mapObj->render();
