@@ -596,6 +596,10 @@ public class MapView extends FrameLayout {
     //
 
     double getDirection() {
+        if(mDestroyed){
+            return 0;
+        }
+
         double direction = -mNativeMapView.getBearing();
 
         while (direction > 360) {
@@ -1286,6 +1290,10 @@ public class MapView extends FrameLayout {
         // Must handle window resizing here.
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            if(mDestroyed){
+                return;
+            }
+
             mNativeMapView.resizeFramebuffer(width, height);
         }
 
@@ -1293,6 +1301,10 @@ public class MapView extends FrameLayout {
         // Must sync with UI here
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+            if(mDestroyed){
+                return;
+            }
+
             mCompassView.update(getDirection());
             mUserLocationView.update();
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
