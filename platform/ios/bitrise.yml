@@ -31,16 +31,8 @@ workflows:
 
             gem install jazzy --no-rdoc --no-ri
             make ipackage-sim
+            make itest
         - is_debug: 'yes'
-    - xcode-test:
-        title: Run Xcode Tests
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - project_path: "./platform/ios/test/ios-tests.xcodeproj"
-        - scheme: Mapbox GL Tests
-        - simulator_device: iPhone 6
-          opts:
-            is_expand: false
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
