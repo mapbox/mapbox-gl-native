@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.telemetry;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -528,10 +530,15 @@ public class MapboxEventManager {
             }
 
             // Check for NetworkConnectivity
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-            if (networkInfo == null || !networkInfo.isConnected()) {
-                Log.w(TAG, "Not connected to network, so returning without attempting to send events");
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) {
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+                if (networkInfo == null || !networkInfo.isConnected()) {
+                    Log.w(TAG, "Not connected to network, so returning without attempting to send events");
+                    return null;
+                }
+            } else {
+                Log.w(TAG, "No network state permission, so returning without attempting to send events");
                 return null;
             }
 
