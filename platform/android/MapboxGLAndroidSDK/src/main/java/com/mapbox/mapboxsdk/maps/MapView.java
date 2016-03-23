@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PointF;
@@ -274,6 +275,9 @@ public class MapView extends FrameLayout {
         int[] compassMargins = options.getCompassMargins();
         if (compassMargins != null) {
             uiSettings.setCompassMargins(compassMargins[0], compassMargins[1], compassMargins[2], compassMargins[3]);
+        } else {
+            int tenDp = (int) getResources().getDimension(R.dimen.ten_dp);
+            uiSettings.setCompassMargins(tenDp, tenDp, tenDp, tenDp);
         }
 
         // Logo
@@ -282,6 +286,9 @@ public class MapView extends FrameLayout {
         int[] logoMargins = options.getLogoMargins();
         if (logoMargins != null) {
             uiSettings.setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
+        } else {
+            int sixteenDp = (int) getResources().getDimension(R.dimen.sixteen_dp);
+            uiSettings.setLogoMargins(sixteenDp, sixteenDp, sixteenDp, sixteenDp);
         }
 
         // Attribution
@@ -290,6 +297,11 @@ public class MapView extends FrameLayout {
         int[] attributionMargins = options.getAttributionMargins();
         if (attributionMargins != null) {
             uiSettings.setAttributionMargins(attributionMargins[0], attributionMargins[1], attributionMargins[2], attributionMargins[3]);
+        } else {
+            Resources resources = getResources();
+            int sevenDp = (int) resources.getDimension(R.dimen.seven_dp);
+            int seventySixDp = (int) resources.getDimension(R.dimen.seventy_six_dp);
+            uiSettings.setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
         }
     }
 
@@ -2546,7 +2558,7 @@ public class MapView extends FrameLayout {
         }
     }
 
-    private static class ZoomInvalidator implements Runnable{
+    private static class ZoomInvalidator implements Runnable {
 
         private MapboxMap mapboxMap;
 
