@@ -6,7 +6,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 
-TEST_F(Storage, HTTPRetryDelayOnExpiredTile) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRetryDelayOnExpiredTile)) {
     SCOPED_TEST(HTTPRetryDelayOnExpiredTile)
 
     using namespace mbgl;
@@ -35,7 +35,7 @@ TEST_F(Storage, HTTPRetryDelayOnExpiredTile) {
     HTTPRetryDelayOnExpiredTile.finish();
 }
 
-TEST_F(Storage, HTTPRetryOnClockSkew) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRetryOnClockSkew)) {
     SCOPED_TEST(HTTPRetryOnClockSkew)
 
     using namespace mbgl;
@@ -69,7 +69,7 @@ TEST_F(Storage, HTTPRetryOnClockSkew) {
     HTTPRetryOnClockSkew.finish();
 }
 
-TEST_F(Storage, HTTPRespectPriorExpires) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRespectPriorExpires)) {
     SCOPED_TEST(HTTPRespectPriorExpires)
 
     using namespace mbgl;

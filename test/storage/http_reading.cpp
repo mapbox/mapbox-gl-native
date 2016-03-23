@@ -84,7 +84,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPTile404)) {
     loop.run();
 }
 
-TEST_F(Storage, HTTP200EmptyData) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     SCOPED_TEST(HTTP200EmptyData)
 
     using namespace mbgl;

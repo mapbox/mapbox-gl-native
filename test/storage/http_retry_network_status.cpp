@@ -102,7 +102,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPNetworkStatusChangePreempt)) {
     loop.run();
 }
 
-TEST_F(Storage, HTTPNetworkStatusOnlineOffline) {
+TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPNetworkStatusOnlineOffline)) {
     SCOPED_TEST(HTTPNetworkStatusOnlineOffline)
 
     using namespace mbgl;
