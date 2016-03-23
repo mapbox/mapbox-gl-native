@@ -27,12 +27,6 @@ matrix:
     - os: linux
   include:
 
-    # OS X/Node.js 4 - Xcode 7
-    - os: osx
-      osx_image: xcode7
-      compiler: clang
-      env: FLAVOR=node NODE_VERSION=4
-
     # Linux/Node.js 4 - Clang 3.5 - Release
     - os: linux
       compiler: ": node4-clang35-release"
