@@ -27,17 +27,6 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
-    - select-xcode-version:
-        title: Select Xcode version
-        run_if: '{{enveq "SKIPCI" "false"}}'
-    - script:
-        title: Install Homebrew dependencies
-        run_if: '{{enveq "SKIPCI" "false"}}'
-        inputs:
-        - content: |-
-            #!/bin/bash
-            brew install pkgconfig
-            brew install automake
     - script:
         title: Run SDK unit tests
         run_if: '{{enveq "SKIPCI" "false"}}'
