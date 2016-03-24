@@ -2160,7 +2160,7 @@ public:
         convertedPoint.x,
         // mbgl origin is at the top-left corner.
         NSHeight(self.bounds) - convertedPoint.y,
-    });
+    }).wrapped();
 }
 
 - (NSRect)convertCoordinateBounds:(MGLCoordinateBounds)bounds toRectToView:(nullable NSView *)view {
