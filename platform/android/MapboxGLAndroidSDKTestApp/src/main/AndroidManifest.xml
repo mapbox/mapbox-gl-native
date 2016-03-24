@@ -24,14 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MapboxMapActivity"
-            android:description="@string/description_mapboxmap"
-            android:label="@string/activity_mapboxmap">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_other" />
-        </activity>
-        <activity
             android:name=".activity.LatLngBoundsActivity"
             android:description="@string/description_visible_bounds"
             android:label="@string/activity_visible_coordinate_bounds">

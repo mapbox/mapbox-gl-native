@@ -39,7 +39,6 @@ import retrofit.Retrofit;
 public class GeocoderActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "GeocoderActivity";
-    private static final LatLng DC_DUPONT_CIRCLE = new LatLng(38.90962, -77.04341);
 
     private MapView mapView;
     private TextView textView;
@@ -78,16 +77,6 @@ public class GeocoderActivity extends AppCompatActivity {
                 final Projection projection = mapboxMap.getProjection();
                 final int width = mapView.getMeasuredWidth();
                 final int height = mapView.getMeasuredHeight();
-
-                // Camera position
-                mapboxMap.setCameraPosition(
-                        new CameraPosition.Builder()
-                                .target(DC_DUPONT_CIRCLE)
-                                .zoom(15)
-                                .bearing(0)
-                                .tilt(0)
-                                .build()
-                );
 
                 // Click listener
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {

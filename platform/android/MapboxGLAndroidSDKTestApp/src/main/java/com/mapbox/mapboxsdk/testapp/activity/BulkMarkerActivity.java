@@ -60,18 +60,14 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                        new CameraPosition.Builder()
-                                .target(new LatLng(38.87031, -77.00897))
-                                .zoom(10)
-                                .build()
-                ));
 
-                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
-                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                Spinner spinner = (Spinner) findViewById(R.id.spinner);
-                spinner.setAdapter(spinnerAdapter);
-                spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
+                if (actionBar != null) {
+                    ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
+                    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    Spinner spinner = (Spinner) findViewById(R.id.spinner);
+                    spinner.setAdapter(spinnerAdapter);
+                    spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
+                }
             }
         });
 

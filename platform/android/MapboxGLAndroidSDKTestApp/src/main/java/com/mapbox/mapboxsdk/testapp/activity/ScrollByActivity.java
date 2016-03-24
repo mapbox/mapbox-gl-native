@@ -53,8 +53,6 @@ public class ScrollByActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setTag(true);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(Style.MAPBOX_STREETS);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -62,9 +60,6 @@ public class ScrollByActivity extends AppCompatActivity {
                 UiSettings uiSettings = mapboxMap.getUiSettings();
                 uiSettings.setLogoEnabled(false);
                 uiSettings.setAttributionEnabled(false);
-
-                LatLng grenada = new LatLng(37.176546, -3.599007);
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(grenada, 16));
 
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
                 fab.setColorFilter(ContextCompat.getColor(ScrollByActivity.this, R.color.primary));

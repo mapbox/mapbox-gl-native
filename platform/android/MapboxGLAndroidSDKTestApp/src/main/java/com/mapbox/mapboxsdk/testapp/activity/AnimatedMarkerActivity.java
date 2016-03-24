@@ -40,8 +40,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.setStyleUrl(Style.LIGHT);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

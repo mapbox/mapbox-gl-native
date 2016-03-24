@@ -49,7 +49,6 @@ public class LatLngBoundsActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mapboxMap.setStyle(Style.DARK);
 
                 UiSettings uiSettings = mapboxMap.getUiSettings();
                 uiSettings.setAllGesturesEnabled(false);
@@ -74,7 +73,7 @@ public class LatLngBoundsActivity extends AppCompatActivity {
                 int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
 
                 // Move camera to the bounds with padding
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
 
                 // Call mapboxMap.getProjection().getVisibleRegion().latLngBounds to retrieve the bounds
                 Log.v(MapboxConstants.TAG, mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
