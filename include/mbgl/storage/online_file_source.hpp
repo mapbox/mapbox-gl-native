@@ -5,10 +5,6 @@
 
 namespace mbgl {
 
-namespace util {
-template <typename T> class Thread;
-} // namespace util
-
 class OnlineFileSource : public FileSource {
 public:
     OnlineFileSource();
@@ -20,10 +16,10 @@ public:
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
-    friend class OnlineFileRequestImpl;
+    friend class OnlineFileRequest;
 
     class Impl;
-    const std::unique_ptr<util::Thread<Impl>> thread;
+    const std::unique_ptr<Impl> impl;
     std::string accessToken;
 };
 
