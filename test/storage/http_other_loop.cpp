@@ -13,7 +13,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPOtherLoop)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);

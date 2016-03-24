@@ -124,7 +124,7 @@ void GeoJSONTileMonitor::update() {
     }
 }
 
-std::unique_ptr<FileRequest>
+std::unique_ptr<AsyncRequest>
 GeoJSONTileMonitor::monitorTile(const GeometryTileMonitor::Callback& cb) {
     callback = cb;
     update();

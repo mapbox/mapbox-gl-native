@@ -2,7 +2,7 @@
 #define MBGL_UTIL_WORK_QUEUE
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/work_request.hpp>
+#include <mbgl/util/async_request.hpp>
 
 #include <functional>
 #include <memory>
@@ -31,7 +31,7 @@ public:
 private:
     void pop(const std::function<void()>&);
 
-    std::queue<std::unique_ptr<WorkRequest>> queue;
+    std::queue<std::unique_ptr<AsyncRequest>> queue;
     std::mutex queueMutex;
 
     RunLoop* runLoop;

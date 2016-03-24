@@ -26,14 +26,14 @@ class OnlineFileRequestImpl : public util::noncopyable {
 public:
     using Callback = std::function<void (Response)>;
 
-    OnlineFileRequestImpl(FileRequest*, const Resource&, Callback, OnlineFileSource::Impl&);
+    OnlineFileRequestImpl(AsyncRequest*, const Resource&, Callback, OnlineFileSource::Impl&);
     ~OnlineFileRequestImpl();
 
     void networkIsReachableAgain(OnlineFileSource::Impl&);
     void schedule(OnlineFileSource::Impl&, optional<SystemTimePoint> expires);
     void completed(OnlineFileSource::Impl&, Response);
 
-    FileRequest* key;
+    AsyncRequest* key;
     Resource resource;
     HTTPRequestBase* request = nullptr;
     util::Timer timer;
@@ -61,11 +61,11 @@ public:
         NetworkStatus::Unsubscribe(&reachability);
     }
 
-    void request(FileRequest* key, Resource resource, Callback callback) {
+    void request(AsyncRequest* key, Resource resource, Callback callback) {
         allRequests[key] = std::make_unique<OnlineFileRequestImpl>(key, resource, callback, *this);
     }
 
-    void cancel(FileRequest* key) {
+    void cancel(AsyncRequest* key) {
         allRequests.erase(key);
         if (activeRequests.erase(key)) {
             activatePendingRequest();
@@ -110,7 +110,7 @@ public:
             return;
         }
 
-        FileRequest* key = pendingRequestsList.front();
+        AsyncRequest* key = pendingRequestsList.front();
         pendingRequestsList.pop_front();
 
         pendingRequestsMap.erase(key);
@@ -138,10 +138,10 @@ private:
      * Requests in any state are in `allRequests`. Requests in the pending state are in
      * `pendingRequests`. Requests in the active state are in `activeRequests`.
      */
-    std::unordered_map<FileRequest*, std::unique_ptr<OnlineFileRequestImpl>> allRequests;
-    std::list<FileRequest*> pendingRequestsList;
-    std::unordered_map<FileRequest*, std::list<FileRequest*>::iterator> pendingRequestsMap;
-    std::unordered_set<FileRequest*> activeRequests;
+    std::unordered_map<AsyncRequest*, std::unique_ptr<OnlineFileRequestImpl>> allRequests;
+    std::list<AsyncRequest*> pendingRequestsList;
+    std::unordered_map<AsyncRequest*, std::list<AsyncRequest*>::iterator> pendingRequestsMap;
+    std::unordered_set<AsyncRequest*> activeRequests;
 
     const std::unique_ptr<HTTPContextBase> httpContext { HTTPContextBase::createContext() };
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
@@ -154,7 +154,7 @@ OnlineFileSource::OnlineFileSource()
 
 OnlineFileSource::~OnlineFileSource() = default;
 
-std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource, Callback callback) {
     Resource res = resource;
 
     switch (resource.kind) {
@@ -183,25 +183,25 @@ std::unique_ptr<FileRequest> OnlineFileSource::request(const Resource& resource,
         break;
     }
 
-    class OnlineFileRequest : public FileRequest {
+    class OnlineFileRequest : public AsyncRequest {
     public:
         OnlineFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<OnlineFileSource::Impl>& thread_)
             : thread(thread_),
               workRequest(thread.invokeWithCallback(&OnlineFileSource::Impl::request, callback_, this, resource_)) {
         }
 
-        ~OnlineFileRequest() {
+        ~OnlineFileRequest() override {
             thread.invoke(&OnlineFileSource::Impl::cancel, this);
         }
 
         util::Thread<OnlineFileSource::Impl>& thread;
-        std::unique_ptr<WorkRequest> workRequest;
+        std::unique_ptr<AsyncRequest> workRequest;
     };
 
     return std::make_unique<OnlineFileRequest>(res, callback, *thread);
 }
 
-OnlineFileRequestImpl::OnlineFileRequestImpl(FileRequest* key_, const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
+OnlineFileRequestImpl::OnlineFileRequestImpl(AsyncRequest* key_, const Resource& resource_, Callback callback_, OnlineFileSource::Impl& impl)
     : key(key_),
       resource(resource_),
       callback(std::move(callback_)) {

@@ -20,7 +20,7 @@ class View;
 class MapData;
 class Painter;
 class SpriteImage;
-class FileRequest;
+class AsyncRequest;
 class PropertyTransition;
 
 namespace gl { class TexturePool; }
@@ -106,7 +106,7 @@ private:
     std::string styleURL;
     std::string styleJSON;
 
-    std::unique_ptr<FileRequest> styleRequest;
+    std::unique_ptr<AsyncRequest> styleRequest;
 
     Map::StillImageCallback callback;
     size_t sourceCacheSize;

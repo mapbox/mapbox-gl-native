@@ -37,7 +37,7 @@ AnnotationTileMonitor::~AnnotationTileMonitor() {
     data.getAnnotationManager()->removeTileMonitor(*this);
 }
 
-std::unique_ptr<FileRequest> AnnotationTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback_) {
+std::unique_ptr<AsyncRequest> AnnotationTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback_) {
     callback = callback_;
     data.getAnnotationManager()->addTileMonitor(*this);
     return nullptr;

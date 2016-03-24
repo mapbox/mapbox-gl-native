@@ -30,7 +30,7 @@ public:
     void setAccessToken(const std::string&);
     std::string getAccessToken() const;
 
-    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
+    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
     /*
      * Retrieve all regions in the offline database.

@@ -17,7 +17,7 @@ public:
     void setAccessToken(const std::string& t) { accessToken = t; }
     std::string getAccessToken() const { return accessToken; }
 
-    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
+    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
     friend class OnlineFileRequestImpl;

@@ -11,8 +11,7 @@ namespace mbgl {
 
 class OfflineDatabase;
 class FileSource;
-class WorkRequest;
-class FileRequest;
+class AsyncRequest;
 class Resource;
 class Response;
 class SourceInfo;
@@ -56,8 +55,7 @@ private:
     FileSource& onlineFileSource;
     OfflineRegionStatus status;
     std::unique_ptr<OfflineRegionObserver> observer;
-    std::list<std::unique_ptr<WorkRequest>> workRequests;
-    std::list<std::unique_ptr<FileRequest>> fileRequests;
+    std::list<std::unique_ptr<AsyncRequest>> requests;
     std::set<std::string> requiredSourceURLs;
 };
 

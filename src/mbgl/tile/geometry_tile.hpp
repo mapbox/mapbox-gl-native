@@ -55,7 +55,7 @@ public:
     virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
-class FileRequest;
+class AsyncRequest;
 
 class GeometryTileMonitor : private util::noncopyable {
 public:
@@ -73,7 +73,7 @@ public:
      *
      * To cease monitoring, release the returned Request.
      */
-    virtual std::unique_ptr<FileRequest> monitorTile(const Callback&) = 0;
+    virtual std::unique_ptr<AsyncRequest> monitorTile(const Callback&) = 0;
 };
 
 class GeometryTileFeatureExtractor {

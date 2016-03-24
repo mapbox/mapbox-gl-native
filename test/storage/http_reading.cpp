@@ -16,7 +16,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPTest)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
+    std::unique_ptr<AsyncRequest> req1 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" },
                [&](Response res) {
         req1.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
@@ -41,7 +41,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTP404)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
+    std::unique_ptr<AsyncRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" },
                [&](Response res) {
         req2.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
@@ -67,7 +67,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPTile404)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Tile, "http://127.0.0.1:3000/doesnotexist" },
+    std::unique_ptr<AsyncRequest> req2 = fs.request({ Resource::Tile, "http://127.0.0.1:3000/doesnotexist" },
                [&](Response res) {
         req2.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
@@ -92,7 +92,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/empty-data" },
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/empty-data" },
                [&](Response res) {
         req.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
@@ -117,7 +117,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTP204)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/no-content" },
+    std::unique_ptr<AsyncRequest> req2 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/no-content" },
                [&](Response res) {
         req2.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));
@@ -142,7 +142,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTP500)) {
     util::RunLoop loop;
     OnlineFileSource fs;
 
-    std::unique_ptr<FileRequest> req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
+    std::unique_ptr<AsyncRequest> req3 = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" },
                [&](Response res) {
         req3.reset();
         EXPECT_TRUE(util::ThreadContext::currentlyOn(util::ThreadType::Main));

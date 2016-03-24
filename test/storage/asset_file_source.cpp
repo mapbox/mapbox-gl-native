@@ -44,7 +44,7 @@ private:
     unsigned numRequests = 1000;
 
     mbgl::AssetFileSource* fs;
-    std::unique_ptr<mbgl::FileRequest> request;
+    std::unique_ptr<mbgl::AsyncRequest> request;
 
     std::function<void(mbgl::Response)> requestCallback;
 };
@@ -74,7 +74,7 @@ TEST_F(Storage, AssetStress) {
     };
 
     std::vector<std::unique_ptr<util::Thread<TestWorker>>> threads;
-    std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
+    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
     util::ThreadContext context = { "Test", util::ThreadType::Map, util::ThreadPriority::Regular };
 
     for (unsigned i = 0; i < numThreads; ++i) {
@@ -101,7 +101,7 @@ TEST_F(Storage, AssetEmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -122,7 +122,7 @@ TEST_F(Storage, AssetNonEmptyFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
@@ -143,7 +143,7 @@ TEST_F(Storage, AssetNonExistentFile) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
@@ -165,7 +165,7 @@ TEST_F(Storage, AssetReadDirectory) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
@@ -187,7 +187,7 @@ TEST_F(Storage, AssetURLEncoding) {
 
     AssetFileSource fs(getFileSourceRoot());
 
-    std::unique_ptr<FileRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());

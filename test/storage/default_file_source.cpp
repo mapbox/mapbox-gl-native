@@ -16,8 +16,8 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheResponse)) {
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/cache" };
     Response response;
 
-    std::unique_ptr<FileRequest> req1;
-    std::unique_ptr<FileRequest> req2;
+    std::unique_ptr<AsyncRequest> req1;
+    std::unique_ptr<AsyncRequest> req2;
 
     req1 = fs.request(resource, [&](Response res) {
         req1.reset();
@@ -57,8 +57,8 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     DefaultFileSource fs(":memory:", ".");
 
     const Resource revalidateSame { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
-    std::unique_ptr<FileRequest> req1;
-    std::unique_ptr<FileRequest> req2;
+    std::unique_ptr<AsyncRequest> req1;
+    std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
 
     // First request causes the response to get cached.
@@ -107,8 +107,8 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
 
     const Resource revalidateModified{ Resource::Unknown,
                                        "http://127.0.0.1:3000/revalidate-modified" };
-    std::unique_ptr<FileRequest> req1;
-    std::unique_ptr<FileRequest> req2;
+    std::unique_ptr<AsyncRequest> req1;
+    std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
 
     // First request causes the response to get cached.
@@ -155,8 +155,8 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     DefaultFileSource fs(":memory:", ".");
 
     const Resource revalidateEtag { Resource::Unknown, "http://127.0.0.1:3000/revalidate-etag" };
-    std::unique_ptr<FileRequest> req1;
-    std::unique_ptr<FileRequest> req2;
+    std::unique_ptr<AsyncRequest> req1;
+    std::unique_ptr<AsyncRequest> req2;
     uint16_t counter = 0;
 
     // First request causes the response to get cached.

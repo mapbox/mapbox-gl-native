@@ -14,7 +14,7 @@ public:
     AssetFileSource(const std::string& assetRoot);
     ~AssetFileSource() override;
 
-    std::unique_ptr<FileRequest> request(const Resource&, Callback) override;
+    std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
     class Impl;

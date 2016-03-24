@@ -47,7 +47,7 @@ public:
     ~AnnotationTileMonitor();
 
     void update(std::unique_ptr<GeometryTile>);
-    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
+    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
     TileID tileID;
 

@@ -23,7 +23,7 @@ namespace mbgl {
 class StyleUpdateParameters;
 class Painter;
 class FileSource;
-class FileRequest;
+class AsyncRequest;
 class TransformState;
 class Tile;
 struct ClipID;
@@ -107,7 +107,7 @@ private:
     std::map<TileID, std::weak_ptr<TileData>> tileDataMap;
     TileCache cache;
 
-    std::unique_ptr<FileRequest> req;
+    std::unique_ptr<AsyncRequest> req;
 
     Observer nullObserver;
     Observer* observer = &nullObserver;

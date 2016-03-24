@@ -45,7 +45,7 @@ public:
             });
         }
 
-        std::unique_ptr<FileRequest> onlineRequest;
+        std::unique_ptr<AsyncRequest> onlineRequest;
     };
 
     Impl(const std::string& cachePath, uint64_t maximumCacheSize)
@@ -103,11 +103,11 @@ public:
         getDownload(regionID).setState(state);
     }
 
-    void request(FileRequest* req, Resource resource, Callback callback) {
+    void request(AsyncRequest* req, Resource resource, Callback callback) {
         tasks[req] = std::make_unique<Task>(resource, callback, this);
     }
 
-    void cancel(FileRequest* req) {
+    void cancel(AsyncRequest* req) {
         tasks.erase(req);
     }
 
@@ -131,7 +131,7 @@ private:
 
     OfflineDatabase offlineDatabase;
     OnlineFileSource onlineFileSource;
-    std::unordered_map<FileRequest*, std::unique_ptr<Task>> tasks;
+    std::unordered_map<AsyncRequest*, std::unique_ptr<Task>> tasks;
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
@@ -153,20 +153,20 @@ std::string DefaultFileSource::getAccessToken() const {
     return thread->invokeSync<std::string>(&Impl::getAccessToken);
 }
 
-std::unique_ptr<FileRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
-    class DefaultFileRequest : public FileRequest {
+std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
+    class DefaultFileRequest : public AsyncRequest {
     public:
         DefaultFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<DefaultFileSource::Impl>& thread_)
             : thread(thread_),
               workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, callback_, this, resource_)) {
         }
 
-        ~DefaultFileRequest() {
+        ~DefaultFileRequest() override {
             thread.invoke(&DefaultFileSource::Impl::cancel, this);
         }
 
         util::Thread<DefaultFileSource::Impl>& thread;
-        std::unique_ptr<WorkRequest> workRequest;
+        std::unique_ptr<AsyncRequest> workRequest;
     };
 
     if (isAssetURL(resource.url)) {

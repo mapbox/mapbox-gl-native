@@ -12,7 +12,7 @@ WorkQueue::WorkQueue() : runLoop(RunLoop::Get()) {
 WorkQueue::~WorkQueue() {
     assert(runLoop == RunLoop::Get());
 
-    // Cancel all pending WorkRequests.
+    // Cancel all pending AsyncRequests.
     while (!queue.empty()) {
         queue.pop();
     }

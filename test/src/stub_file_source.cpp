@@ -4,7 +4,7 @@ namespace mbgl {
 
 using namespace std::chrono_literals;
 
-class StubFileRequest : public FileRequest {
+class StubFileRequest : public AsyncRequest {
 public:
     StubFileRequest(StubFileSource& fileSource_)
         : fileSource(fileSource_) {
@@ -32,7 +32,7 @@ StubFileSource::StubFileSource() {
 
 StubFileSource::~StubFileSource() = default;
 
-std::unique_ptr<FileRequest> StubFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> StubFileSource::request(const Resource& resource, Callback callback) {
     auto req = std::make_unique<StubFileRequest>(*this);
     pending.emplace(req.get(), std::make_tuple(resource, response, callback));
     return std::move(req);

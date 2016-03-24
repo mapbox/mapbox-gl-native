@@ -12,15 +12,6 @@
 
 namespace mbgl {
 
-class AssetFileRequest : public FileRequest {
-public:
-    AssetFileRequest(std::unique_ptr<WorkRequest> workRequest_)
-        : workRequest(std::move(workRequest_)) {
-    }
-
-    std::unique_ptr<WorkRequest> workRequest;
-};
-
 class AssetFileSource::Impl {
 public:
     Impl(const std::string& root_)
@@ -72,8 +63,8 @@ AssetFileSource::AssetFileSource(const std::string& root)
 
 AssetFileSource::~AssetFileSource() = default;
 
-std::unique_ptr<FileRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
-    return std::make_unique<AssetFileRequest>(thread->invokeWithCallback(&Impl::request, callback, resource.url));
+std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+    return thread->invokeWithCallback(&Impl::request, callback, resource.url);
 }
 
 } // namespace mbgl

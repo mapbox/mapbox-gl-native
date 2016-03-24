@@ -58,7 +58,7 @@ public:
     GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT*, const TileID&);
     virtual ~GeoJSONTileMonitor();
 
-    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
+    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
     void setGeoJSONVT(mapbox::geojsonvt::GeoJSONVT*);
 

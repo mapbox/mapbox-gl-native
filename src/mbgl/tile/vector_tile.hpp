@@ -65,7 +65,7 @@ class VectorTileMonitor : public GeometryTileMonitor {
 public:
     VectorTileMonitor(const TileID&, float pixelRatio, const std::string& urlTemplate, FileSource&);
 
-    std::unique_ptr<FileRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
+    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
 
 private:
     TileID tileID;

@@ -12,8 +12,7 @@
 namespace mbgl {
 
 class Style;
-class WorkRequest;
-class FileRequest;
+class AsyncRequest;
 class GeometryTileMonitor;
 
 class VectorTileData : public TileData {
@@ -42,8 +41,8 @@ private:
     TileWorker tileWorker;
 
     std::unique_ptr<GeometryTileMonitor> monitor;
-    std::unique_ptr<FileRequest> tileRequest;
-    std::unique_ptr<WorkRequest> workRequest;
+    std::unique_ptr<AsyncRequest> tileRequest;
+    std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

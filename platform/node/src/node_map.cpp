@@ -474,17 +474,10 @@ NodeMap::~NodeMap() {
     if (valid) release();
 }
 
-class NodeFileSourceRequest : public mbgl::FileRequest {
-public:
-    std::unique_ptr<mbgl::WorkRequest> workRequest;
-};
-
-std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resource, Callback cb1) {
-    auto req = std::make_unique<NodeFileSourceRequest>();
-
+std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback cb1) {
     // This function can be called from any thread. Make sure we're executing the
     // JS implementation in the node event loop.
-    req->workRequest = NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
+    return NodeRunLoop().invokeWithCallback([this] (mbgl::Resource res, Callback cb2) {
         Nan::HandleScope scope;
 
         auto requestHandle = NodeRequest::Create(res, cb2)->ToObject();
@@ -493,8 +486,6 @@ std::unique_ptr<mbgl::FileRequest> NodeMap::request(const mbgl::Resource& resour
         v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
         Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
     }, cb1, resource);
-
-    return std::move(req);
 }
 
 }

@@ -68,7 +68,7 @@ Worker::Worker(std::size_t count) {
 
 Worker::~Worker() = default;
 
-std::unique_ptr<WorkRequest>
+std::unique_ptr<AsyncRequest>
 Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                         const std::shared_ptr<const std::string> data,
                         std::function<void(RasterTileParseResult)> callback) {
@@ -77,7 +77,7 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                                                 data);
 }
 
-std::unique_ptr<WorkRequest>
+std::unique_ptr<AsyncRequest>
 Worker::parseGeometryTile(TileWorker& worker,
                           std::vector<std::unique_ptr<StyleLayer>> layers,
                           std::unique_ptr<GeometryTile> tile,
@@ -88,7 +88,7 @@ Worker::parseGeometryTile(TileWorker& worker,
                                                 std::move(layers), std::move(tile), config);
 }
 
-std::unique_ptr<WorkRequest>
+std::unique_ptr<AsyncRequest>
 Worker::parsePendingGeometryTileLayers(TileWorker& worker,
                                        PlacementConfig config,
                                        std::function<void(TileParseResult)> callback) {
@@ -97,7 +97,7 @@ Worker::parsePendingGeometryTileLayers(TileWorker& worker,
                                                 callback, &worker, config);
 }
 
-std::unique_ptr<WorkRequest>
+std::unique_ptr<AsyncRequest>
 Worker::redoPlacement(TileWorker& worker,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,

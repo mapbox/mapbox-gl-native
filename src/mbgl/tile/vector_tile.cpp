@@ -188,7 +188,7 @@ VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, c
       fileSource(fileSource_) {
 }
 
-std::unique_ptr<FileRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
+std::unique_ptr<AsyncRequest> VectorTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback) {
     const Resource resource = Resource::tile(urlTemplate, pixelRatio, tileID.x, tileID.y, tileID.sourceZ);
     return fileSource.request(resource, [callback, this](Response res) {
         if (res.error) {

@@ -14,8 +14,8 @@ namespace mbgl {
 struct SpriteStore::Loader {
     std::shared_ptr<const std::string> image;
     std::shared_ptr<const std::string> json;
-    std::unique_ptr<FileRequest> jsonRequest;
-    std::unique_ptr<FileRequest> spriteRequest;
+    std::unique_ptr<AsyncRequest> jsonRequest;
+    std::unique_ptr<AsyncRequest> spriteRequest;
 };
 
 SpriteStore::SpriteStore(float pixelRatio_)

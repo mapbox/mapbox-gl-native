@@ -105,7 +105,7 @@ TEST(AsyncTask, ThreadSafety) {
     };
 
     std::vector<std::unique_ptr<Thread<TestWorker>>> threads;
-    std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
+    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
     ThreadContext context = {"Test", ThreadType::Map, ThreadPriority::Regular};
 
     for (unsigned i = 0; i < numThreads; ++i) {

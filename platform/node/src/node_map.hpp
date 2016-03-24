@@ -42,7 +42,7 @@ public:
     NodeMap(v8::Local<v8::Object>);
     ~NodeMap();
 
-    std::unique_ptr<mbgl::FileRequest> request(const mbgl::Resource&, Callback);
+    std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, Callback);
 
     mbgl::HeadlessView view;
     std::unique_ptr<mbgl::Map> map;

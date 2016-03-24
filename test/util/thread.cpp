@@ -67,7 +67,7 @@ TEST(Thread, invoke) {
     const std::thread::id tid = std::this_thread::get_id();
 
     RunLoop loop;
-    std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
+    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
 
     loop.invoke([&] {
         EXPECT_EQ(tid, std::this_thread::get_id());
@@ -123,7 +123,7 @@ TEST(Thread, context) {
     const std::thread::id tid = std::this_thread::get_id();
 
     RunLoop loop;
-    std::vector<std::unique_ptr<mbgl::WorkRequest>> requests;
+    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
 
     loop.invoke([&] {
         Thread<TestObject> thread({"Test", ThreadType::Worker, ThreadPriority::Low}, tid);

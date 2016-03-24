@@ -37,7 +37,7 @@ public:
 
     // Invoke object->fn(args...) in the runloop thread, then invoke callback(result) in the current thread.
     template <typename Fn, class Cb, class... Args>
-    std::unique_ptr<WorkRequest>
+    std::unique_ptr<AsyncRequest>
     invokeWithCallback(Fn fn, Cb&& callback, Args&&... args) {
         return loop->invokeWithCallback(bind(fn), callback, std::forward<Args>(args)...);
     }

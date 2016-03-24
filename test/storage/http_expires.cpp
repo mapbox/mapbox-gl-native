@@ -17,7 +17,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRetryDelayOnExpiredTile)) {
     int counter = 0;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?expires=10000" };
-    std::unique_ptr<FileRequest> req = fs.request(resource, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
         EXPECT_GT(SystemClock::now(), res.expires);
@@ -46,7 +46,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRetryOnClockSkew)) {
     int counter = 0;
 
     const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/clockskew" };
-    std::unique_ptr<FileRequest> req1 = fs.request(resource, [&](Response res) {
+    std::unique_ptr<AsyncRequest> req1 = fs.request(resource, [&](Response res) {
         switch (counter++) {
         case 0: {
             EXPECT_EQ(nullptr, res.error);
@@ -81,14 +81,14 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRespectPriorExpires)) {
     Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
     resource1.priorExpires = SystemClock::now() + Seconds(100000);
 
-    std::unique_ptr<FileRequest> req1 = fs.request(resource1, [&](Response) {
+    std::unique_ptr<AsyncRequest> req1 = fs.request(resource1, [&](Response) {
         FAIL() << "Should never be called";
     });
 
     // No expiration time, should be requested immediately.
     Resource resource2{ Resource::Unknown, "http://127.0.0.1:3000/test" };
 
-    std::unique_ptr<FileRequest> req2 = fs.request(resource2, [&](Response) {
+    std::unique_ptr<AsyncRequest> req2 = fs.request(resource2, [&](Response) {
         HTTPRespectPriorExpires.finish();
         loop.stop();
     });
@@ -97,7 +97,7 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPRespectPriorExpires)) {
     Resource resource3{ Resource::Unknown, "http://127.0.0.1:3000/test" };
     resource3.priorExpires = SystemClock::now() + Seconds(100000);
 
-    std::unique_ptr<FileRequest> req3 = fs.request(resource3, [&](Response) {
+    std::unique_ptr<AsyncRequest> req3 = fs.request(resource3, [&](Response) {
         FAIL() << "Should never be called";
     });
 

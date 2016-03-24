@@ -13,7 +13,7 @@
 namespace mbgl {
 
 class FontStack;
-class FileRequest;
+class AsyncRequest;
 class FileSource;
 
 class GlyphPBF : private util::noncopyable {
@@ -31,7 +31,7 @@ public:
 
 private:
     std::atomic<bool> parsed;
-    std::unique_ptr<FileRequest> req;
+    std::unique_ptr<AsyncRequest> req;
     GlyphStore::Observer* observer = nullptr;
 };
 
