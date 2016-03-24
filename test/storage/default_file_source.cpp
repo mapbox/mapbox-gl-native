@@ -1,15 +1,10 @@
-#include "storage.hpp"
-
+#include <mbgl/test/util.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-class DefaultFileSourceTest : public Storage {};
+using namespace mbgl;
 
-TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheResponse)) {
-    SCOPED_TEST(CacheResponse);
-
-    using namespace mbgl;
-
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -41,18 +36,13 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheResponse)) {
             EXPECT_EQ(response.etag, res2.etag);
 
             loop.stop();
-            CacheResponse.finish();
         });
     });
 
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
-    SCOPED_TEST(CacheRevalidateSame)
-
-    using namespace mbgl;
-
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -89,7 +79,6 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
                 EXPECT_EQ("snowfall", *res2.etag);
 
                 loop.stop();
-                CacheRevalidateSame.finish();
             }
         });
     });
@@ -97,11 +86,7 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
-    SCOPED_TEST(CacheRevalidateModified)
-
-    using namespace mbgl;
-
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -138,7 +123,6 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 EXPECT_FALSE(res2.etag);
 
                 loop.stop();
-                CacheRevalidateModified.finish();
             }
         });
     });
@@ -146,11 +130,7 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
     loop.run();
 }
 
-TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
-    SCOPED_TEST(CacheRevalidateEtag)
-
-    using namespace mbgl;
-
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
@@ -187,9 +167,43 @@ TEST_F(DefaultFileSourceTest, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
                 EXPECT_EQ("response-2", *res2.etag);
 
                 loop.stop();
-                CacheRevalidateEtag.finish();
             }
         });
+    });
+
+    loop.run();
+}
+
+// Test for https://github.com/mapbox/mapbox-gl-native/issue/1369
+//
+// A request for http://example.com is made. This triggers a cache get. While the cache get is
+// pending, the request is canceled. This removes it from pending. Then, still while the cache get
+// is pending, a second request is made for the same resource. This adds an entry back to pending
+// and queues another cache request, even though the first one is still pending. Now both cache
+// requests resolve to misses, resulting in two HTTP requests for the same resource. The first one
+// will notify as expected, the second one will have bound a DefaultFileRequest* in the lambda that
+// gets invalidated by the first notify's pending.erase, and when it gets notified, the crash
+// occurs.
+
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test" };
+
+    auto req = fs.request(resource, [&](Response) {
+        ADD_FAILURE() << "Callback should not be called";
+    });
+    req.reset();
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Hello World!", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
     });
 
     loop.run();

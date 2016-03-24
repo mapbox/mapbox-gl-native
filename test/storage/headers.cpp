@@ -1,9 +1,7 @@
-#include "storage.hpp"
 #include <mbgl/test/util.hpp>
-
 #include <mbgl/util/http_header.hpp>
 
-TEST_F(Storage, HTTPHeaderParsing) {
+TEST(HTTPHeader, Parsing) {
     using namespace mbgl;
 
     http::CacheControl cc;

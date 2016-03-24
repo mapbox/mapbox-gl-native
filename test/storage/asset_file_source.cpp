@@ -1,10 +1,10 @@
-#include "storage.hpp"
-
 #include <mbgl/storage/asset_file_source.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
+
+#include <gtest/gtest.h>
 
 namespace {
 
@@ -17,45 +17,11 @@ std::string getFileSourceRoot() {
 #endif
 }
 
-class TestWorker {
-public:
-    TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
-
-    void run(std::function<void()> endCallback) {
-        const std::string asset("asset://nonempty");
-
-        requestCallback = [this, asset, endCallback](mbgl::Response res) {
-            EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("content is here\n", *res.data);
-
-            if (!--numRequests) {
-                endCallback();
-                request.reset();
-            } else {
-                request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
-            }
-        };
-
-        request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
-    }
-
-private:
-    unsigned numRequests = 1000;
-
-    mbgl::AssetFileSource* fs;
-    std::unique_ptr<mbgl::AsyncRequest> request;
-
-    std::function<void(mbgl::Response)> requestCallback;
-};
-
 } // namespace
 
-TEST_F(Storage, AssetStress) {
-    SCOPED_TEST(AssetStress)
+using namespace mbgl;
 
-    using namespace mbgl;
-
+TEST(AssetFileSource, Stress) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -73,6 +39,38 @@ TEST_F(Storage, AssetStress) {
         }
     };
 
+    class TestWorker {
+    public:
+        TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
+
+        void run(std::function<void()> endCallback) {
+            const std::string asset("asset://nonempty");
+
+            requestCallback = [this, asset, endCallback](mbgl::Response res) {
+                EXPECT_EQ(nullptr, res.error);
+                ASSERT_TRUE(res.data.get());
+                EXPECT_EQ("content is here\n", *res.data);
+
+                if (!--numRequests) {
+                    endCallback();
+                    request.reset();
+                } else {
+                    request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+                }
+            };
+
+            request = fs->request({ mbgl::Resource::Unknown, asset }, requestCallback);
+        }
+
+    private:
+        unsigned numRequests = 1000;
+
+        mbgl::AssetFileSource* fs;
+        std::unique_ptr<mbgl::AsyncRequest> request;
+
+        std::function<void(mbgl::Response)> requestCallback;
+    };
+
     std::vector<std::unique_ptr<util::Thread<TestWorker>>> threads;
     std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
     util::ThreadContext context = { "Test", util::ThreadType::Map, util::ThreadPriority::Regular };
@@ -88,15 +86,9 @@ TEST_F(Storage, AssetStress) {
     }
 
     loop.run();
-
-    AssetStress.finish();
 }
 
-TEST_F(Storage, AssetEmptyFile) {
-    SCOPED_TEST(EmptyFile)
-
-    using namespace mbgl;
-
+TEST(AssetFileSource, EmptyFile) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -107,17 +99,12 @@ TEST_F(Storage, AssetEmptyFile) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("", *res.data);
         loop.stop();
-        EmptyFile.finish();
     });
 
     loop.run();
 }
 
-TEST_F(Storage, AssetNonEmptyFile) {
-    SCOPED_TEST(NonEmptyFile)
-
-    using namespace mbgl;
-
+TEST(AssetFileSource, NonEmptyFile) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -128,17 +115,12 @@ TEST_F(Storage, AssetNonEmptyFile) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
         loop.stop();
-        NonEmptyFile.finish();
     });
 
     loop.run();
 }
 
-TEST_F(Storage, AssetNonExistentFile) {
-    SCOPED_TEST(NonExistentFile)
-
-    using namespace mbgl;
-
+TEST(AssetFileSource, NonExistentFile) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -150,17 +132,12 @@ TEST_F(Storage, AssetNonExistentFile) {
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
-        NonExistentFile.finish();
     });
 
     loop.run();
 }
 
-TEST_F(Storage, AssetReadDirectory) {
-    SCOPED_TEST(ReadDirectory)
-
-    using namespace mbgl;
-
+TEST(AssetFileSource, ReadDirectory) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -172,17 +149,12 @@ TEST_F(Storage, AssetReadDirectory) {
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
         loop.stop();
-        ReadDirectory.finish();
     });
 
     loop.run();
 }
 
-TEST_F(Storage, AssetURLEncoding) {
-    SCOPED_TEST(NonEmptyFile)
-
-    using namespace mbgl;
-
+TEST(AssetFileSource, URLEncoding) {
     util::RunLoop loop;
 
     AssetFileSource fs(getFileSourceRoot());
@@ -193,7 +165,6 @@ TEST_F(Storage, AssetURLEncoding) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("content is here\n", *res.data);
         loop.stop();
-        NonEmptyFile.finish();
     });
 
     loop.run();
