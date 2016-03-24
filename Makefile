@@ -164,6 +164,7 @@ clean: clear_sqlite_cache clear_xcode_cache
 	-rm -rf ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/jniLibs \
+	        ./platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/obj.target \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
 
