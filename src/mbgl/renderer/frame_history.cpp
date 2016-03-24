@@ -1,9 +1,10 @@
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/util/math.hpp>
 
 using namespace mbgl;
 
 // Record frame history that will be used to calculate fading params
-void FrameHistory::record(const TimePoint now, float zoom) {
+void FrameHistory::record(const TimePoint& now, float zoom) {
     // first frame ever
     if (history.empty()) {
         history.emplace_back(FrameSnapshot{TimePoint::min(), zoom});
@@ -47,7 +48,7 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     return false;
 }
 
-FadeProperties FrameHistory::getFadeProperties(const TimePoint now, const Duration& duration) {
+FadeProperties FrameHistory::getFadeProperties(const TimePoint& now, const Duration& duration) {
     // Remove frames until only one is outside the duration, or until there are only three
     while (history.size() > 3 && history[1].now + duration < now) {
         history.pop_front();
@@ -61,8 +62,8 @@ FadeProperties FrameHistory::getFadeProperties(const TimePoint now, const Durati
     float startingZ = history.front().z;
     const FrameSnapshot lastFrame = history.back();
     float endingZ = lastFrame.z;
-    float lowZ = ::fmin(startingZ, endingZ);
-    float highZ = ::fmax(startingZ, endingZ);
+    float lowZ = util::min(startingZ, endingZ);
+    float highZ = util::max(startingZ, endingZ);
 
     // Calculate the speed of zooming, and how far it would zoom in terms of zoom levels in one
     // duration

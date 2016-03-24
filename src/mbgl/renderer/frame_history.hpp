@@ -11,7 +11,6 @@
 namespace mbgl {
 
 struct FrameSnapshot {
-    explicit inline FrameSnapshot(TimePoint now_, float z_) : now(now_), z(z_) {}
     const TimePoint now;
     float z;
 };
@@ -26,12 +25,12 @@ struct FadeProperties {
 class FrameHistory {
 public:
     // Record frame history that will be used to calculate fading params
-    void record(TimePoint now, float zoom);
+    void record(const TimePoint&, float zoom);
 
-    bool needsAnimation(const Duration& duration) const;
-    FadeProperties getFadeProperties(TimePoint now, const Duration& duration);
+    bool needsAnimation(const Duration&) const;
+    FadeProperties getFadeProperties(const TimePoint&, const Duration&);
 
-public:
+private:
     std::deque<FrameSnapshot> history;
 };
 
