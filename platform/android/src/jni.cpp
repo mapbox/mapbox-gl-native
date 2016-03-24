@@ -1176,7 +1176,7 @@ jni::jobject* nativeLatLngForPixel(JNIEnv *env, jni::jobject* obj, jlong nativeM
     jfloat x = jni::GetField<jfloat>(*env, pixel, *pointFXId);
     jfloat y = jni::GetField<jfloat>(*env, pixel, *pointFYId);
 
-    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::ScreenCoordinate(x, y));
+    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::ScreenCoordinate(x, y)).wrapped();
     return &jni::NewObject(*env, *latLngClass, *latLngConstructorId, latLng.latitude, latLng.longitude);
 }
 

@@ -147,7 +147,7 @@ public class LatLng implements ILatLng, Parcelable {
 
     @Override
     public String toString() {
-        return "LatLng [longitude=" + longitude + ", latitude=" + latitude + ", altitude=" + altitude + "]";
+        return "LatLng [latitude=" + latitude + ", longitude=" + longitude + ", altitude=" + altitude + "]";
     }
 
     @Override
