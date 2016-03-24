@@ -164,6 +164,11 @@ void MapContext::update() {
         return;
     }
 
+    // This time point is used to:
+    // - Calculate style property transitions;
+    // - Hint style sources to notify when all its tiles are loaded;
+    frameData.timePoint = Clock::now();
+
     if (style->loaded && updateFlags & Update::Annotations) {
         data.getAnnotationManager()->updateStyle(*style);
         updateFlags |= Update::Classes;
@@ -181,12 +186,8 @@ void MapContext::update() {
 
     if (data.mode == MapMode::Continuous) {
         asyncInvalidate.send();
-    } else {
-        // Update time point so style sources can check they are loaded.
-        frameData.timePoint = Clock::now();
-        if (callback && style->isLoaded()) {
-            renderSync(transformState, frameData);
-        }
+    } else if (callback && isLoaded()) {
+        renderSync(transformState, frameData);
     }
 
     updateFlags = Update::Nothing;
