@@ -17,6 +17,7 @@ function warn { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 
 if [ -e "`pwd`/.git" ]; then
     info "This build is within a git repository"
+    git submodule update --init
     export MASON_DIR="`pwd`/.mason"
     export PATH="${MASON_DIR}:${PATH}"
 else
