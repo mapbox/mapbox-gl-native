@@ -8,6 +8,8 @@
     #define nullable
     #define nonnull
     #define null_resettable
+    #define _Nullable
+    #define _Nonnull
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
