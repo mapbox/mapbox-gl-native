@@ -39,12 +39,12 @@ TEST(Token, replaceTokens) {
         if (token == "dashed-property") return "dashed";
         return "";
     }));
-    EXPECT_EQ("150 m", mbgl::util::replaceTokens("{HØYDE} m", [](const std::string& token) -> std::string {
-        if (token == "HØYDE") return "150";
+    EXPECT_EQ("colonized", mbgl::util::replaceTokens("{colon:property}", [](const std::string& token) -> std::string {
+        if (token == "colon:property") return "colonized";
         return "";
     }));
-    EXPECT_EQ("reserved {for:future} use", mbgl::util::replaceTokens("reserved {for:future} use", [](const std::string& token) -> std::string {
-        if (token == "for:future") return "unknown";
+    EXPECT_EQ("150 m", mbgl::util::replaceTokens("{HØYDE} m", [](const std::string& token) -> std::string {
+        if (token == "HØYDE") return "150";
         return "";
     }));
 }

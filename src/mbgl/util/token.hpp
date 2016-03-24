@@ -8,7 +8,7 @@
 namespace mbgl {
 namespace util {
 
-const static std::string tokenReservedChars = "{}()[]<>$=:;.,^";
+const static std::string tokenReservedChars = "{}";
 
 // Replaces {tokens} in a string by calling the lookup function.
 template <typename Lookup>
