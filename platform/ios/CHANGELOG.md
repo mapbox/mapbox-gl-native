@@ -20,6 +20,8 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 - The user dot no longer lags when panning the map. ([#3683](https://github.com/mapbox/mapbox-gl-native/pull/3683))
 - The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 - Fixed a formatting issue in the documentation for `MGLCoordinateBoundsIsEmpty()`. ([#3958](https://github.com/mapbox/mapbox-gl-native/pull/3958))
+- The maximum maximum zoom level is now 21. ([#4417](https://github.com/mapbox/mapbox-gl-native/pull/4417))
+- Fixed issues with configuration and documentation that caused problems when installing apps built with the static binary to devices. This change also fixed App Store submission problems when uploading an app built with the static binary. ([#4455](https://github.com/mapbox/mapbox-gl-native/pull/4455))
 
 ## 3.1.2
 
