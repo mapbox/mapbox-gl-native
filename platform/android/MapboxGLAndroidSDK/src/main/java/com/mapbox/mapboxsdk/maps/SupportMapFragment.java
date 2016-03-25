@@ -1,9 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +57,26 @@ public class SupportMapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        MapboxMapOptions options = getArguments().getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
+        MapboxMapOptions options = null;
+
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            options = bundle.getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
+        }
+
+        if (options == null) {
+            try {
+                PackageManager packageManager = getActivity().getPackageManager();
+                ApplicationInfo appInfo = packageManager.getApplicationInfo(getActivity().getPackageName(), PackageManager.GET_META_DATA);
+                String token = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_MANIFEST);
+                if (TextUtils.isEmpty(token)) {
+                    throw new IllegalArgumentException();
+                }
+                options = new MapboxMapOptions().accessToken(token);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return mMap = new MapView(inflater.getContext(), options);
     }
 
