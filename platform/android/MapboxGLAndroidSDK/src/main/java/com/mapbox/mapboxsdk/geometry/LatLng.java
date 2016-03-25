@@ -126,7 +126,10 @@ public class LatLng implements ILatLng, Parcelable {
      */
     public LatLng wrap(){
         LatLng wrappedVersion = new LatLng(this);
-        wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+        double lon = wrappedVersion.getLongitude();
+        if (lon < GeoConstants.MIN_LONGITUDE || lon > GeoConstants.MAX_LONGITUDE) {
+            wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+        }
         return wrappedVersion;
     }
 
