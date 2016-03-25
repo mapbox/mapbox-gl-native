@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 import java.io.Serializable;
 
@@ -116,6 +117,17 @@ public class LatLng implements ILatLng, Parcelable {
     @Override
     public double getAltitude() {
         return altitude;
+    }
+
+    /**
+     * Return a new LatLng object with a wrapped Longitude.  This allows original data object
+     * to remain unchanged.
+     * @return New LatLng object with wrapped Longitude
+     */
+    public LatLng wrap(){
+        LatLng wrappedVersion = new LatLng(this);
+        wrappedVersion.setLongitude(MathUtils.wrap(wrappedVersion.getLongitude(), GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+        return wrappedVersion;
     }
 
     @Override

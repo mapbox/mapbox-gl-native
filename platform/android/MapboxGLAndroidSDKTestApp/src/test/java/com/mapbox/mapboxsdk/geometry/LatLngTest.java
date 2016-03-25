@@ -2,19 +2,17 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.location.Location;
 import android.os.Parcel;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Test;
-
 import java.util.Objects;
-
+import dalvik.annotation.TestTargetClass;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -202,4 +200,11 @@ public class LatLngTest {
         assertEquals("contents should be 0", 0, latLng.describeContents(), DELTA);
     }
 
+    @Test
+    public void testWrapped() {
+        LatLng latLng = new LatLng(45.0, -185.0);
+        LatLng wrapped = latLng.wrap();
+        assertTrue(!latLng.equals(wrapped));
+        assertTrue(wrapped.getLongitude() == 175.0);
+    }
 }

@@ -24,4 +24,23 @@ public class MathUtils {
         return Math.max(min, Math.min(max, value));
     }
 
+    /**
+     * Constrains n to the given range (including min, excluding max) via modular arithmetic.
+     *
+     * Same formula as used in Core GL (math.hpp)
+     * std::fmod((std::fmod((value - min), d) + d), d) + min;
+     *
+     * @param value Value to wrap
+     * @param min Minimum value
+     * @param max Maximum value
+     * @return Wrapped value
+     */
+    public static double wrap(double value, double min, double max) {
+        double delta = max - min;
+
+        double firstMod = (value - min) % delta;
+        double secondMod = (firstMod + delta) % delta;
+
+        return secondMod + min;
+    }
 }
