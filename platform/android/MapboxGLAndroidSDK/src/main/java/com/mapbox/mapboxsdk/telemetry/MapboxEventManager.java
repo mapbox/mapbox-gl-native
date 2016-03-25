@@ -24,8 +24,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.mapbox.mapboxsdk.BuildConfig;
+import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.security.MessageDigest;
@@ -551,7 +553,16 @@ public class MapboxEventManager {
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SOURCE, evt.get(MapboxEvent.ATTRIBUTE_SOURCE));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SESSION_ID, evt.get(MapboxEvent.ATTRIBUTE_SESSION_ID));
                     jsonObject.putOpt(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
-                    jsonObject.putOpt(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
+
+                    // Make sure Longitude Is Wrapped
+                    if (evt.containsKey(MapboxEvent.KEY_LONGITUDE)) {
+                        double lon = (double)evt.get(MapboxEvent.KEY_LONGITUDE);
+                        Log.i(TAG, "Original Lon = " + lon);
+                        lon = MathUtils.wrap(lon, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
+                        Log.i(TAG, "Wrapped Lon = " + lon);
+                        jsonObject.put(MapboxEvent.KEY_LONGITUDE, lon);
+                    }
+
                     jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
                     jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));
