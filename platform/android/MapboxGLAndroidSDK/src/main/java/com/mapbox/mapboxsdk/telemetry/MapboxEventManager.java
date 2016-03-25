@@ -557,10 +557,8 @@ public class MapboxEventManager {
                     // Make sure Longitude Is Wrapped
                     if (evt.containsKey(MapboxEvent.KEY_LONGITUDE)) {
                         double lon = (double)evt.get(MapboxEvent.KEY_LONGITUDE);
-                        Log.i(TAG, "Original Lon = " + lon);
                         if ((lon < GeoConstants.MIN_LONGITUDE) || (lon > GeoConstants.MAX_LONGITUDE)) {
                             lon = MathUtils.wrap(lon, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
-                            Log.i(TAG, "Wrapped Lon = " + lon);
                         }
                         jsonObject.put(MapboxEvent.KEY_LONGITUDE, lon);
                     }
@@ -642,7 +640,7 @@ public class MapboxEventManager {
                         .post(body)
                         .build();
                 Response response = client.newCall(request).execute();
-                Log.i(TAG, "response code = " + response.code() + " for events " + events.size());
+                Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
                 // Reset Events
                 // ============
