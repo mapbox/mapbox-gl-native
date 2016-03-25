@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -73,7 +73,7 @@ TEST(CustomLayer, Basic) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
+    StubFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");

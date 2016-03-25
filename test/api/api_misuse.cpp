@@ -1,9 +1,9 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -21,7 +21,7 @@ TEST(API, RenderWithoutCallback) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    OnlineFileSource fileSource;
+    StubFileSource fileSource;
 
     std::unique_ptr<Map> map = std::make_unique<Map>(view, fileSource, MapMode::Still);
     map->renderStill(nullptr);
@@ -45,7 +45,7 @@ TEST(API, RenderWithoutStyle) {
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
     view.resize(128, 512);
-    OnlineFileSource fileSource;
+    StubFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
 

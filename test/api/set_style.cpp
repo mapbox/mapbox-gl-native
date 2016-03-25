@@ -1,10 +1,10 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 
@@ -15,7 +15,7 @@ TEST(API, SetStyle) {
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
     HeadlessView view(display, 1);
-    OnlineFileSource fileSource;
+    StubFileSource fileSource;
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

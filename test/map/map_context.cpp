@@ -1,10 +1,10 @@
 #include <mbgl/test/util.hpp>
+#include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/map/map_data.hpp>
 #include <mbgl/map/map_context.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
-#include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/run_loop.hpp>
 
@@ -15,7 +15,7 @@ TEST(MapContext, DoubleStyleLoad) {
 
     std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
     HeadlessView view(display, 1, 512, 512);
-    OnlineFileSource fileSource;
+    StubFileSource fileSource;
 
     util::Thread<MapContext> context({"Map", util::ThreadType::Map, util::ThreadPriority::Regular},
         view, fileSource, MapMode::Continuous, GLContextMode::Unique, view.getPixelRatio());
