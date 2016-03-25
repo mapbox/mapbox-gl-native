@@ -151,7 +151,7 @@ public class LatLngTest {
         LatLng latLng = new LatLng(latitude, longitude, altitude);
         assertEquals("string should match",
                 latLng.toString(),
-                "LatLng [longitude=3.4, latitude=1.2, altitude=5.6]");
+                "LatLng [latitude=1.2, longitude=3.4, altitude=5.6]");
     }
 
     @Test
