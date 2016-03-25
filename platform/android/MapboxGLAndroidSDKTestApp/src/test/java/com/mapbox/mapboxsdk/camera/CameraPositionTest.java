@@ -23,7 +23,7 @@ public class CameraPositionTest {
     public void testToString() {
         LatLng latLng = new LatLng(1, 2);
         CameraPosition cameraPosition = new CameraPosition(latLng, 3, 4, 5);
-        assertEquals("toString should match", "Target: LatLng [longitude=2.0, latitude=1.0, altitude=0.0], Zoom:3.0, Bearing:5.0, Tilt:4.0", cameraPosition.toString());
+        assertEquals("toString should match", "Target: LatLng [latitude=1.0, longitude=2.0, altitude=0.0], Zoom:3.0, Bearing:5.0, Tilt:4.0", cameraPosition.toString());
     }
 
     @Test
