@@ -25,7 +25,7 @@ public class MathUtils {
     }
 
     /**
-     * Constrains n to the given range (including min, excluding max) via modular arithmetic.
+     * Constrains value to the given range (including min, excluding max) via modular arithmetic.
      *
      * Same formula as used in Core GL (math.hpp)
      * std::fmod((std::fmod((value - min), d) + d), d) + min;

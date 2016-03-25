@@ -6,11 +6,11 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 import org.junit.Test;
 import java.util.Objects;
-import dalvik.annotation.TestTargetClass;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -204,7 +204,15 @@ public class LatLngTest {
     public void testWrapped() {
         LatLng latLng = new LatLng(45.0, -185.0);
         LatLng wrapped = latLng.wrap();
-        assertTrue(!latLng.equals(wrapped));
-        assertTrue(wrapped.getLongitude() == 175.0);
+        assertNotSame(latLng, wrapped);
+        assertEquals("longitude wrapped value", wrapped.getLongitude(), 175.0, DELTA);
+    }
+
+    @Test
+    public void testUnnecessaryWrapped() {
+        LatLng latLng = new LatLng(45.0, 50.0);
+        LatLng wrapped = latLng.wrap();
+        assertNotSame(latLng, wrapped);
+        assertEquals("longitude wrapped value", wrapped.getLongitude(), 50.0, DELTA);
     }
 }
