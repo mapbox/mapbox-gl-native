@@ -48,11 +48,11 @@ private:
 @implementation MGLOfflinePack
 
 - (instancetype)init {
-    [NSException raise:@"Method unavailable"
-                format:
-     @"-[MGLOfflinePack init] is unavailable. "
-     @"Use +[MGLOfflineStorage addPackForRegion:withContext:completionHandler:] instead."];
-    return nil;
+    if (self = [super init]) {
+        _state = MGLOfflinePackStateInvalid;
+        NSLog(@"%s called; did you mean to call +[MGLOfflineStorage addPackForRegion:withContext:completionHandler:] instead?", __PRETTY_FUNCTION__);
+    }
+    return self;
 }
 
 - (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region {
@@ -123,7 +123,7 @@ private:
 }
 
 - (void)requestProgress {
-    MGLAssertOfflinePackIsValid();
+    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot request progress from an invalid offline pack.");
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     

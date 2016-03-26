@@ -178,6 +178,11 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 - (void)_removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
     mbgl::OfflineRegion *mbglOfflineRegion = pack.mbglOfflineRegion;
     [pack invalidate];
+    if (!mbglOfflineRegion) {
+        completion(nil);
+        return;
+    }
+    
     self.mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
         NSError *error;
         if (exception) {

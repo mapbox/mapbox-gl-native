@@ -83,6 +83,10 @@ typedef struct MGLOfflinePackProgress {
 /**
  An `MGLOfflinePack` represents a collection of resources necessary for viewing
  a region offline to a local database.
+ 
+ To create an instance of `MGLOfflinePack`, use the
+ `+[MGLOfflineStorage addPackForRegion:withContext:completionHandler:]` method.
+ A pack created using `-[MGLOfflinePack init]` is immediately invalid.
  */
 @interface MGLOfflinePack : NSObject
 
@@ -122,8 +126,6 @@ typedef struct MGLOfflinePackProgress {
  default notification center.
  */
 @property (nonatomic, readonly) MGLOfflinePackProgress progress;
-
-- (instancetype)init NS_UNAVAILABLE;
 
 /**
  Resumes downloading if the pack is inactive.
