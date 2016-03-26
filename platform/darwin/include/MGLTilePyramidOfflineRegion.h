@@ -17,9 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  In addition to the JSON stylesheet, different styles may require different font
  glyphs, sprite sheets, and other resources.
  
- The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
- map ID (`mapbox://styles/{user}/{style}`), or a path to a local file
- relative to the application’s resource path.
+ The URL may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s
+ map ID (`mapbox://styles/{user}/{style}`).
  */
 @property (nonatomic, readonly) NSURL *styleURL;
 
@@ -52,9 +51,11 @@ NS_ASSUME_NONNULL_BEGIN
  This is the designated initializer for `MGLTilePyramidOfflineRegion`.
  
  @param styleURL URL of the map style for which to download resources. The URL
-    may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s map ID
-    (`mapbox://styles/{user}/{style}`), or a path to a local file relative to
-    the application’s resource path. Specify `nil` for the default style.
+    may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map
+    ID (`mapbox://styles/{user}/{style}`). Specify `nil` for the default style.
+    Relative file URLs cannot be used as offline style URLs. To download the
+    online resources required by a local style, specify a URL to an online copy
+    of the style.
  @param bounds The coordinate bounds for the geographic region to be covered by
     the downloaded tiles.
  @param minimumZoomLevel The minimum zoom level to be covered by the downloaded
