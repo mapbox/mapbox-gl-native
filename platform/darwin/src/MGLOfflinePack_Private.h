@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Invalidates the pack and ensures that no future progress update can ever
- revalidate it.
+ revalidate it. This method must be called before the pack is deallocated.
  */
 - (void)invalidate;
 

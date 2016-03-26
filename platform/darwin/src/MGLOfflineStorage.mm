@@ -195,6 +195,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
 - (void)reloadPacks {
     [self getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, __unused NSError * _Nullable error) {
+        for (MGLOfflinePack *pack in self.packs) {
+            [pack invalidate];
+        }
         self.packs = [packs mutableCopy];
         
         for (MGLOfflinePack *pack in packs) {
