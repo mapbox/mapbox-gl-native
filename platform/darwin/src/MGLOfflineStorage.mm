@@ -8,11 +8,30 @@
 
 #include <mbgl/util/string.hpp>
 
-@interface MGLOfflineStorage ()
+static NSString * const MGLOfflineStorageFileName = @"cache.db";
+static NSString * const MGLOfflineStorageFileName3_2_0_beta_1 = @"offline.db";
 
+NSString * const MGLOfflinePackProgressChangedNotification = @"MGLOfflinePackProgressChanged";
+NSString * const MGLOfflinePackErrorNotification = @"MGLOfflinePackError";
+NSString * const MGLOfflinePackMaximumMapboxTilesReachedNotification = @"MGLOfflinePackMaximumMapboxTilesReached";
+
+NSString * const MGLOfflinePackErrorUserInfoKey = @"Error";
+NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
+
+/**
+ A block to be called with a complete list of offline packs.
+ 
+ @param pack Contains a pointer an array of packs, or `nil` if there was an
+    error obtaining the packs.
+ @param error Contains a pointer to an error object (if any) indicating why the
+    list of packs could not be obtained.
+ */
+typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error);
+
+@interface MGLOfflineStorage () <MGLOfflinePackDelegate>
+
+@property (nonatomic, copy, readwrite) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *packs;
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
-
-- (instancetype)initWithFileName:(NSString *)fileName NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -22,14 +41,20 @@
     static dispatch_once_t onceToken;
     static MGLOfflineStorage *sharedOfflineStorage;
     dispatch_once(&onceToken, ^{
-        sharedOfflineStorage = [[self alloc] initWithFileName:@"cache.db"];
+        sharedOfflineStorage = [[self alloc] init];
+        [sharedOfflineStorage getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, __unused NSError *error) {
+            sharedOfflineStorage.packs = [packs mutableCopy];
+            
+            for (MGLOfflinePack *pack in packs) {
+                pack.delegate = sharedOfflineStorage;
+                [pack requestProgress];
+            }
+        }];
     });
     return sharedOfflineStorage;
 }
 
-// This method can’t be called -init, because that selector has been marked
-// unavailable in MGLOfflineStorage.h.
-- (instancetype)initWithFileName:(NSString *)fileName {
+- (instancetype)init {
     if (self = [super init]) {
         // Place the cache in a location specific to the application, so that
         // packs downloaded by other applications don’t count toward this
@@ -46,7 +71,7 @@
                                  withIntermediateDirectories:YES
                                                   attributes:nil
                                                        error:nil];
-        NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:fileName];
+        NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName];
         NSString *cachePath = cacheURL ? cacheURL.path : @"";
         
         // Avoid backing up the offline cache onto iCloud, because it can be
@@ -57,11 +82,10 @@
         
         // Move the offline cache from v3.2.0-beta.1 to a location that can also
         // be used for ambient caching.
-        NSString *legacyCacheFileName = @"offline.db";
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
         // ~/Documents/offline.db
         NSArray *legacyPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:legacyCacheFileName];
+        NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
         // ~/Library/Caches/tld.app.bundle.id/offline.db
         NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
@@ -75,7 +99,7 @@
                                  withIntermediateDirectories:YES
                                                   attributes:nil
                                                        error:nil];
-        NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:legacyCacheFileName];
+        NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageLegacyFileName];
         NSString *legacyCachePath = legacyCacheURL ? legacyCacheURL.path : @"";
 #endif
         if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
@@ -101,17 +125,52 @@
     _mbglFileSource = nullptr;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(__unused void *)context {
+#pragma mark KVO methods
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
     // Synchronize the file source’s access token with the global one in MGLAccountManager.
     if ([keyPath isEqualToString:@"accessToken"] && object == [MGLAccountManager sharedManager]) {
         NSString *accessToken = change[NSKeyValueChangeNewKey];
         if (![accessToken isKindOfClass:[NSNull class]]) {
             self.mbglFileSource->setAccessToken(accessToken.UTF8String);
         }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 
+- (void)insertPacks:(NSArray *)packs atIndexes:(NSIndexSet *)indices {
+    [(NSMutableArray *)self.packs insertObjects:packs atIndexes:indices];
+}
+
+- (void)addPacksObject:(MGLOfflinePack *)pack {
+    [(NSMutableArray *)self.packs addObject:pack];
+}
+
+- (void)removePacksAtIndexes:(NSIndexSet *)indices {
+    [(NSMutableArray *)self.packs removeObjectsAtIndexes:indices];
+}
+
+- (void)removePacksObject:(MGLOfflinePack *)pack {
+    [(NSMutableArray *)self.packs removeObject:pack];
+}
+
+#pragma mark Pack management methods
+
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
+    __weak MGLOfflineStorage *weakSelf = self;
+    [self _addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+        MGLOfflineStorage *strongSelf = weakSelf;
+        [strongSelf addPacksObject:pack];
+        pack.delegate = strongSelf;
+        [pack requestProgress];
+        if (completion) {
+            completion(pack, error);
+        }
+    }];
+}
+
+- (void)_addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     if (![region conformsToProtocol:@protocol(MGLOfflineRegion_Private)]) {
         [NSException raise:@"Unsupported region type" format:
          @"Regions of type %@ are unsupported.", NSStringFromClass([region class])];
@@ -139,6 +198,15 @@
 }
 
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
+    [self removePacksObject:pack];
+    [self _removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+        if (completion) {
+            completion(error);
+        }
+    }];
+}
+
+- (void)_removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
     mbgl::OfflineRegion *mbglOfflineRegion = pack.mbglOfflineRegion;
     [pack invalidate];
     self.mbglFileSource->deleteOfflineRegion(std::move(*mbglOfflineRegion), [&, completion](std::exception_ptr exception) {
@@ -182,6 +250,24 @@
 
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
+}
+
+#pragma mark MGLOfflinePackDelegate methods
+
+- (void)offlinePack:(MGLOfflinePack *)pack progressDidChange:(__unused MGLOfflinePackProgress)progress {
+    [[NSNotificationCenter defaultCenter] postNotificationName:MGLOfflinePackProgressChangedNotification object:pack];
+}
+
+- (void)offlinePack:(MGLOfflinePack *)pack didReceiveError:(NSError *)error {
+    [[NSNotificationCenter defaultCenter] postNotificationName:MGLOfflinePackErrorNotification object:pack userInfo:@{
+        MGLOfflinePackErrorUserInfoKey: error,
+    }];
+}
+
+- (void)offlinePack:(MGLOfflinePack *)pack didReceiveMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
+    [[NSNotificationCenter defaultCenter] postNotificationName:MGLOfflinePackMaximumMapboxTilesReachedNotification object:pack userInfo:@{
+        MGLOfflinePackMaximumCountUserInfoKey: @(maximumCount),
+    }];
 }
 
 @end

@@ -7,6 +7,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLOfflinePack;
 @protocol MGLOfflineRegion;
 
+extern NSString * const MGLOfflinePackProgressChangedNotification;
+extern NSString * const MGLOfflinePackErrorNotification;
+extern NSString * const MGLOfflinePackMaximumMapboxTilesReachedNotification;
+
+extern NSString * const MGLOfflinePackErrorUserInfoKey;
+extern NSString * const MGLOfflinePackMaximumCountUserInfoKey;
+
 /**
  A block to be called once an offline pack has been completely created and
  added.
@@ -29,16 +36,6 @@ typedef void (^MGLOfflinePackAdditionCompletionHandler)(MGLOfflinePack * _Nullab
 typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error);
 
 /**
- A block to be called with a complete list of offline packs.
- 
- @param pack Contains a pointer an array of packs, or `nil` if there was an
-    error obtaining the packs.
- @param error Contains a pointer to an error object (if any) indicating why the
-    list of packs could not be obtained.
- */
-typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error);
-
-/**
  MGLOfflineStorage implements a singleton (shared object) that manages offline
  packs. All of this class’s instance methods are asynchronous, reflecting the
  fact that offline resources are stored in a database.
@@ -50,7 +47,16 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
  */
 + (instancetype)sharedOfflineStorage;
 
-- (instancetype)init NS_UNAVAILABLE;
+/**
+ An array of all known offline packs.
+ 
+ This property is set to `nil`, indicating that the receiver does not yet know
+ the existing packs, for an undefined amount of time starting from the moment
+ the shared offline storage object is initialized until the packs are fetched
+ from the database. After that point, this property is always non-nil, but it
+ may be empty to indicate that no packs are present.
+ */
+@property (nonatomic, copy, readonly, nullable) NS_ARRAY_OF(MGLOfflinePack *) *packs;
 
 /**
  Creates and registers an offline pack that downloads the resources needed to
@@ -83,14 +89,6 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
     removed. This handler is executed asynchronously on the main queue.
  */
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(nullable MGLOfflinePackRemovalCompletionHandler)completion;
-
-/**
- Asynchronously calls a completion callback with all existing offline packs.
- 
- @param completion The completion handler to call with the list of packs. This
-     handler is executed asynchronously on the main queue.
- */
-- (void)getPacksWithCompletionHandler:(MGLOfflinePackListingCompletionHandler)completion;
 
 /**
  Sets the maximum number of Mapbox-hosted tiles that may be downloaded and

@@ -28,12 +28,6 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 @end
 
-@interface MBXOfflinePacksTableViewController () <MGLOfflinePackDelegate>
-
-@property (nonatomic, strong) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *offlinePacks;
-
-@end
-
 @implementation MBXOfflinePacksTableViewController {
     NSUInteger _untitledRegionCount;
 }
@@ -41,25 +35,48 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    __weak MBXOfflinePacksTableViewController *weakSelf = self;
-    [[MGLOfflineStorage sharedOfflineStorage] getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError *error) {
-        MBXOfflinePacksTableViewController *strongSelf = weakSelf;
-        strongSelf.offlinePacks = packs.mutableCopy;
-        [strongSelf.tableView reloadData];
-        
-        for (MGLOfflinePack *pack in strongSelf.offlinePacks) {
-            pack.delegate = strongSelf;
-            [pack requestProgress];
-        }
-        
-        if (error) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Find Offline Packs" message:@"Mapbox GL was unable to find the existing offline packs." preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-            [self presentViewController:alertController animated:YES completion:^{
-                [strongSelf dismissViewControllerAnimated:YES completion:nil];
+    [[MGLOfflineStorage sharedOfflineStorage] addObserver:self forKeyPath:@"packs" options:NSKeyValueObservingOptionInitial context:NULL];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackProgressDidChange:) name:MGLOfflinePackProgressChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveError:) name:MGLOfflinePackErrorNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(offlinePackDidReceiveMaximumAllowedMapboxTiles:) name:MGLOfflinePackMaximumMapboxTilesReachedNotification object:nil];
+}
+
+- (void)dealloc {
+    [[MGLOfflineStorage sharedOfflineStorage] removeObserver:self forKeyPath:@"packs"];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"packs"]) {
+        NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
+        NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
+        NSMutableArray *indexPaths;
+        if (indices) {
+            indexPaths = [NSMutableArray arrayWithCapacity:indices.count];
+            [indices enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+                [indexPaths addObject:[NSIndexPath indexPathForRow:idx inSection:0]];
             }];
         }
-    }];
+        switch (changeKind) {
+            case NSKeyValueChangeInsertion:
+                [self.tableView insertRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                break;
+                
+            case NSKeyValueChangeRemoval:
+                [self.tableView deleteRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                break;
+                
+            case NSKeyValueChangeReplacement:
+                [self.tableView reloadRowsAtIndexPaths:indexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                break;
+                
+            default:
+                [self.tableView reloadData];
+                break;
+        }
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 - (IBAction)addCurrentRegion:(id)sender {
@@ -89,13 +106,6 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
                 [self presentViewController:alertController animated:YES completion:nil];
-            } else {
-                pack.delegate = strongSelf;
-                [pack resume];
-                
-                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:strongSelf.offlinePacks.count inSection:0];
-                [strongSelf.offlinePacks addObject:pack];
-                [strongSelf.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             }
         }];
     }];
@@ -110,11 +120,11 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.offlinePacks.count;
+    return [MGLOfflineStorage sharedOfflineStorage].packs.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
+    MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs[indexPath.row];
     
     NSString *reuseIdentifier = pack.state == MGLOfflinePackStateActive ? MBXOfflinePacksTableViewActiveCellReuseIdentifier : MBXOfflinePacksTableViewInactiveCellReuseIdentifier;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
@@ -165,9 +175,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
-        [self.offlinePacks removeObjectAtIndex:indexPath.row];
-        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs[indexPath.row];
         [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:nil];
     }
 }
@@ -177,7 +185,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    MGLOfflinePack *pack = self.offlinePacks[indexPath.row];
+    MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs[indexPath.row];
     switch (pack.state) {
         case MGLOfflinePackStateUnknown:
             break;
@@ -207,8 +215,11 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 #pragma mark - Offline pack delegate
 
-- (void)offlinePack:(MGLOfflinePack *)pack progressDidChange:(MGLOfflinePackProgress)progress {
-    NSUInteger index = [self.offlinePacks indexOfObject:pack];
+- (void)offlinePackProgressDidChange:(NSNotification *)notification {
+    MGLOfflinePack *pack = notification.object;
+    NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
+    
+    NSUInteger index = [[MGLOfflineStorage sharedOfflineStorage].packs indexOfObject:pack];
     if (index == NSNotFound) {
         return;
     }
@@ -217,11 +228,28 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
-- (void)offlinePack:(MGLOfflinePack *)pack didReceiveError:(NSError *)error {
-    NSLog(@"Offline pack “%@” received error: %@", pack.name, error.localizedFailureReason);
+- (void)offlinePackDidReceiveError:(NSNotification *)notification {
+    MGLOfflinePack *pack = notification.object;
+    NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
+    
+    NSError *error = notification.userInfo[MGLOfflinePackErrorUserInfoKey];
+    NSAssert([error isKindOfClass:[NSError class]], @"MGLOfflineStorage notification has a non-error error.");
+    
+    NSString *message = [NSString stringWithFormat:@"iosapp encountered an error while downloading the offline pack “%@”: %@", pack.name, error.localizedFailureReason];
+    if (error.code == MGLErrorCodeConnectionFailed) {
+        NSLog(@"%@", message);
+    } else {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error Downloading Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
 }
 
-- (void)offlinePack:(MGLOfflinePack *)pack didReceiveMaximumAllowedMapboxTiles:(uint64_t)maximumCount {
+- (void)offlinePackDidReceiveMaximumAllowedMapboxTiles:(NSNotification *)notification {
+    MGLOfflinePack *pack = notification.object;
+    NSAssert([pack isKindOfClass:[MGLOfflinePack class]], @"MGLOfflineStorage notification has a non-pack object.");
+    
+    uint64_t maximumCount = [notification.userInfo[MGLOfflinePackMaximumCountUserInfoKey] unsignedLongLongValue];
     NSLog(@"Offline pack “%@” reached limit of %llu tiles.", pack.name, maximumCount);
 }
 

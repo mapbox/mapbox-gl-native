@@ -148,16 +148,6 @@ typedef struct MGLOfflinePackProgress {
  */
 - (void)suspend;
 
-/**
- Request an asynchronous update to the pack’s `state` and `progress` properties.
- 
- The state and progress of an inactive or completed pack are computed lazily. If
- you need the state or progress of a pack inside an
- `MGLOfflinePackListingCompletionHandler`, set the `delegate` property then call
- this method.
- */
-- (void)requestProgress;
-
 @end
 
 /**
