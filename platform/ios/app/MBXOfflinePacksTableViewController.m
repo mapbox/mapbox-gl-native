@@ -28,9 +28,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 @end
 
-@implementation MBXOfflinePacksTableViewController {
-    NSUInteger _untitledRegionCount;
-}
+@implementation MBXOfflinePacksTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -81,16 +79,19 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 
 - (IBAction)addCurrentRegion:(id)sender {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add Offline Pack" message:@"Choose a name for the pack:" preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addTextFieldWithConfigurationHandler:nil];
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = [NSString stringWithFormat:@"%@", MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds)];
+    }];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     
     UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         MGLMapView *mapView = self.mapView;
         NSAssert(mapView, @"No map view to get the current region from.");
         
-        NSString *name = alertController.textFields.firstObject.text;
+        UITextField *nameField = alertController.textFields.firstObject;
+        NSString *name = nameField.text;
         if (!name.length) {
-            name = [NSString stringWithFormat:@"Untitled %lu", (unsigned long)++_untitledRegionCount];
+            name = nameField.placeholder;
         }
         
         MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:mapView.styleURL bounds:mapView.visibleCoordinateBounds fromZoomLevel:mapView.zoomLevel toZoomLevel:mapView.maximumZoomLevel];
@@ -98,14 +99,14 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
             MBXOfflinePackContextNameKey: name,
         }];
         
-        __weak MBXOfflinePacksTableViewController *weakSelf = self;
         [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack *pack, NSError *error) {
-            MBXOfflinePacksTableViewController *strongSelf = weakSelf;
             if (error) {
                 NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the offline pack “%@”.", name];
                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
                 [self presentViewController:alertController animated:YES completion:nil];
+            } else {
+                [pack resume];
             }
         }];
     }];
@@ -128,6 +129,12 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     
     NSString *reuseIdentifier = pack.state == MGLOfflinePackStateActive ? MBXOfflinePacksTableViewActiveCellReuseIdentifier : MBXOfflinePacksTableViewInactiveCellReuseIdentifier;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
+    [self updateTableViewCell:cell atIndexPath:indexPath forPack:pack];
+    
+    return cell;
+}
+
+- (void)updateTableViewCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath forPack:(MGLOfflinePack *)pack {
     cell.textLabel.text = pack.name;
     MGLOfflinePackProgress progress = pack.progress;
     NSString *completedString = [NSNumberFormatter localizedStringFromNumber:@(progress.countOfResourcesCompleted)
@@ -169,8 +176,6 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
             break;
     }
     cell.detailTextLabel.text = statusString;
-    
-    return cell;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -199,12 +204,10 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
             
         case MGLOfflinePackStateInactive:
             [pack resume];
-            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             break;
             
         case MGLOfflinePackStateActive:
             [pack suspend];
-            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             break;
             
         case MGLOfflinePackStateInvalid:
@@ -225,7 +228,8 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     }
     
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
-    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    [self updateTableViewCell:cell atIndexPath:indexPath forPack:pack];
 }
 
 - (void)offlinePackDidReceiveError:(NSNotification *)notification {

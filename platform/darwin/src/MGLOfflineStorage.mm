@@ -18,19 +18,9 @@ NSString * const MGLOfflinePackMaximumMapboxTilesReachedNotification = @"MGLOffl
 NSString * const MGLOfflinePackErrorUserInfoKey = @"Error";
 NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
-/**
- A block to be called with a complete list of offline packs.
- 
- @param pack Contains a pointer an array of packs, or `nil` if there was an
-    error obtaining the packs.
- @param error Contains a pointer to an error object (if any) indicating why the
-    list of packs could not be obtained.
- */
-typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error);
-
 @interface MGLOfflineStorage () <MGLOfflinePackDelegate>
 
-@property (nonatomic, copy, readwrite) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *packs;
+@property (nonatomic, strong, readwrite) NS_MUTABLE_ARRAY_OF(MGLOfflinePack *) *packs;
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
 
 @end
@@ -42,14 +32,7 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
     static MGLOfflineStorage *sharedOfflineStorage;
     dispatch_once(&onceToken, ^{
         sharedOfflineStorage = [[self alloc] init];
-        [sharedOfflineStorage getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, __unused NSError *error) {
-            sharedOfflineStorage.packs = [packs mutableCopy];
-            
-            for (MGLOfflinePack *pack in packs) {
-                pack.delegate = sharedOfflineStorage;
-                [pack requestProgress];
-            }
-        }];
+        [sharedOfflineStorage reloadPacks];
     });
     return sharedOfflineStorage;
 }
@@ -121,11 +104,13 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
 - (void)dealloc {
     [[MGLAccountManager sharedManager] removeObserver:self forKeyPath:@"accessToken"];
     
+    for (MGLOfflinePack *pack in self.packs) {
+        [pack invalidate];
+    }
+    
     delete _mbglFileSource;
     _mbglFileSource = nullptr;
 }
-
-#pragma mark KVO methods
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
     // Synchronize the file source’s access token with the global one in MGLAccountManager.
@@ -139,29 +124,13 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
     }
 }
 
-- (void)insertPacks:(NSArray *)packs atIndexes:(NSIndexSet *)indices {
-    [(NSMutableArray *)self.packs insertObjects:packs atIndexes:indices];
-}
-
-- (void)addPacksObject:(MGLOfflinePack *)pack {
-    [(NSMutableArray *)self.packs addObject:pack];
-}
-
-- (void)removePacksAtIndexes:(NSIndexSet *)indices {
-    [(NSMutableArray *)self.packs removeObjectsAtIndexes:indices];
-}
-
-- (void)removePacksObject:(MGLOfflinePack *)pack {
-    [(NSMutableArray *)self.packs removeObject:pack];
-}
-
 #pragma mark Pack management methods
 
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     __weak MGLOfflineStorage *weakSelf = self;
     [self _addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
         MGLOfflineStorage *strongSelf = weakSelf;
-        [strongSelf addPacksObject:pack];
+        [[strongSelf mutableArrayValueForKey:@"packs"] addObject:pack];
         pack.delegate = strongSelf;
         [pack requestProgress];
         if (completion) {
@@ -198,7 +167,7 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
 }
 
 - (void)removePack:(MGLOfflinePack *)pack withCompletionHandler:(MGLOfflinePackRemovalCompletionHandler)completion {
-    [self removePacksObject:pack];
+    [[self mutableArrayValueForKey:@"packs"] removeObject:pack];
     [self _removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
         if (completion) {
             completion(error);
@@ -224,7 +193,18 @@ typedef void (^MGLOfflinePackListingCompletionHandler)(NS_ARRAY_OF(MGLOfflinePac
     });
 }
 
-- (void)getPacksWithCompletionHandler:(MGLOfflinePackListingCompletionHandler)completion {
+- (void)reloadPacks {
+    [self getPacksWithCompletionHandler:^(NS_ARRAY_OF(MGLOfflinePack *) *packs, __unused NSError * _Nullable error) {
+        self.packs = [packs mutableCopy];
+        
+        for (MGLOfflinePack *pack in packs) {
+            pack.delegate = self;
+            [pack requestProgress];
+        }
+    }];
+}
+
+- (void)getPacksWithCompletionHandler:(void (^)(NS_ARRAY_OF(MGLOfflinePack *) *packs, NSError * _Nullable error))completion {
     self.mbglFileSource->listOfflineRegions([&, completion](std::exception_ptr exception, mbgl::optional<std::vector<mbgl::OfflineRegion>> regions) {
         NSError *error;
         if (exception) {
