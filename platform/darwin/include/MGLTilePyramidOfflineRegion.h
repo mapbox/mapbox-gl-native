@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
  An offline region defined by a style URL, geographic coordinate bounds, and
  range of zoom levels.
  */
-@interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion>
+@interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion, NSSecureCoding, NSCopying>
 
 /**
  URL of the style whose resources are required for offline viewing.
