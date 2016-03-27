@@ -43,9 +43,12 @@ custom_categories:
       - MGLOfflineStorage
       - MGLOfflinePack
       - MGLOfflinePackAdditionCompletionHandler
-      - MGLOfflinePackDelegate
-      - MGLOfflinePackListingCompletionHandler
+      - MGLOfflinePackErrorNotification
+      - MGLOfflinePackErrorUserInfoKey
+      - MGLOfflinePackMaximumCountUserInfoKey
+      - MGLOfflinePackMaximumMapboxTilesReachedNotification
       - MGLOfflinePackProgress
+      - MGLOfflinePackProgressChangedNotification
       - MGLOfflinePackRemovalCompletionHandler
       - MGLOfflinePackState
       - MGLTilePyramidOfflineRegion
