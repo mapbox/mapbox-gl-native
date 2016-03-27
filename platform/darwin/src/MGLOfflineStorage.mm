@@ -48,8 +48,12 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
                                                                  appropriateForURL:nil
                                                                             create:YES
                                                                              error:nil];
-        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:
-                             [NSBundle mainBundle].bundleIdentifier];
+        NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
+        if (!bundleIdentifier) {
+            // There’s no main bundle identifier when running in a unit test bundle.
+            bundleIdentifier = [NSBundle bundleForClass:[self class]].bundleIdentifier;
+        }
+        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
         [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
                                  withIntermediateDirectories:YES
                                                   attributes:nil
@@ -74,15 +78,10 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                                 inDomain:NSUserDomainMask
                                                                        appropriateForURL:nil
-                                                                                  create:YES
+                                                                                  create:NO
                                                                                    error:nil];
-        legacyCacheDirectoryURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:
-                                   [NSBundle mainBundle].bundleIdentifier];
-        [[NSFileManager defaultManager] createDirectoryAtURL:legacyCacheDirectoryURL
-                                 withIntermediateDirectories:YES
-                                                  attributes:nil
-                                                       error:nil];
-        NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageLegacyFileName];
+        legacyCacheDirectoryURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+        NSURL *legacyCacheURL = [legacyCacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
         NSString *legacyCachePath = legacyCacheURL ? legacyCacheURL.path : @"";
 #endif
         if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
