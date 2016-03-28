@@ -814,6 +814,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                       - viewController.bottomLayoutGuide.length);
     contentInset.bottom = (CGRectGetMaxY(self.bounds)
                            - [self convertPoint:bottomPoint fromView:viewController.view].y);
+
+    // Negative insets are invalid, replace with 0.
+    contentInset.top = fmaxf(contentInset.top, 0);
+    contentInset.bottom = fmaxf(contentInset.bottom, 0);
+
     self.contentInset = contentInset;
 }
 
