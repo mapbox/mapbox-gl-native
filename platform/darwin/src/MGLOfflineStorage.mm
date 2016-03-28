@@ -49,6 +49,12 @@
         NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:fileName];
         NSString *cachePath = cacheURL ? cacheURL.path : @"";
         
+        // Avoid backing up the offline cache onto iCloud, because it can be
+        // redownloaded. Ideally, we’d even put the ambient cache in Caches, so
+        // it can be reclaimed by the system when disk space runs low. But
+        // unfortunately it has to live in the same file as offline resources.
+        [cacheURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        
         // Move the offline cache from v3.2.0-beta.1 to a location that can also
         // be used for ambient caching.
         NSString *legacyCacheFileName = @"offline.db";
