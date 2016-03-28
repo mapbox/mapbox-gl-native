@@ -33,7 +33,17 @@ bash "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework/strip-fra
 
 If your application targets iOS 7.x, you’ll need to install the static framework instead:
 
-1. Open the project editor and select your application target. Drag `Mapbox.framework` from the `static` folder into the “Embedded Binaries” section of the General tab. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Build from source manually per above.
+
+1. Drag the Mapbox.bundle and Mapbox.framework files in `build/ios/pkg/static` into the Project navigator, checking "Copy items if needed". It should happen automatically, but ensure that:
+   
+   - `Mapbox.framework` is listed in your `Link Binary With Libraries` build phase.
+   - Your *Framework Search Paths* (`FRAMEWORK_SEARCH_PATHS`) build setting includes the directory that contains `Mapbox.framework`. For most projects, the default value of `$(inherited) $(PROJECT_DIR)` should be sufficient.  
+   - `Mapbox.bundle` is in your target's *Copy Bundle Resources* build phase.
+
+1. **Optional** As [noted in the documentation](https://www.mapbox.com/ios-sdk/#telemetry_opt_out) you may use the provided Settings.bundle to provide a Telemetry opt out for users. To use the provided file, drag the `Settings.bundle` file in `build/ios/pkg` into the Project navigator, checking "Copy items if needed". It should happen automatically, but ensure that:
+
+   - `Settings.bundle` is in your target's *Copy Bundle Resources* build phase. 
 
 1. Add the following Cocoa Touch frameworks and libraries to the “Linked Frameworks and Libraries” section:
 
