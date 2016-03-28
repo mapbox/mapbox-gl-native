@@ -4,6 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 
 ## 3.2.0
 
+- If you’ve previously installed the SDK as a static framework, the installation workflow has changed to address issues when submitting your application to the App Store or installing it on a device. Upon upgrading to this version of the SDK, you’ll need to add Mapbox.bundle to the Copy Bundle Resources build phase and remove Mapbox.framework from the Embed Frameworks build phase. ([#4455](https://github.com/mapbox/mapbox-gl-native/pull/4455))
 - Offline packs can now be downloaded to allow users to view specific regions of the map offline. A new MGLOfflineStorage class provides APIs for managing MGLOfflinePacks. ([#4221](https://github.com/mapbox/mapbox-gl-native/pull/4221))
 - Tiles and other resources are cached in the same file that holds offline resources. The combined cache file is located in a subdirectory of the user’s Application Support directory, which means iOS will not delete the file when disk space runs low. ([#4377](https://github.com/mapbox/mapbox-gl-native/pull/4377))
 - The user dot no longer disappears after panning the map across the antimeridian at low zoom levels. ([#4275](https://github.com/mapbox/mapbox-gl-native/pull/4275))
@@ -20,8 +21,6 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 - The user dot no longer lags when panning the map. ([#3683](https://github.com/mapbox/mapbox-gl-native/pull/3683))
 - The Improve This Map tool now uses the same zoom level that is currently being shown in the map view. ([#4068](https://github.com/mapbox/mapbox-gl-native/pull/4068))
 - Fixed a formatting issue in the documentation for `MGLCoordinateBoundsIsEmpty()`. ([#3958](https://github.com/mapbox/mapbox-gl-native/pull/3958))
-- Fixed issues with configuration and documentation that caused problems when installing apps built with the static binary to devices. This change also fixed App Store submission problems when uploading an app built with the static binary. ([#4455](https://github.com/mapbox/mapbox-gl-native/pull/4455))
-- If you’ve previously installed the SDK as a static framework, the installation workflow has changed to address issues in the App Store submission process and installation on devices. The new workflow requires that you add Mapbox.bundle to the Copy Resources build phase and remove Mapbox.framework from the Embed Binaries build phase.
 
 ## 3.1.2
 
