@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10109" systemVersion="15E39d" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10109"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -17,6 +17,7 @@
         </customObject>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="offlinePacksArrayController" destination="dWe-R6-sRz" id="Ar5-xu-ABm"/>
                 <outlet property="preferencesWindow" destination="UWc-yQ-qda" id="Ota-aT-Mz2"/>
             </connections>
         </customObject>
@@ -111,6 +112,12 @@
                             <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
                                 <connections>
                                     <action selector="saveDocumentAs:" target="-1" id="mDf-zr-I0C"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Offline Pack…" id="UXB-sj-C7i">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="addOfflinePack:" target="-1" id="Usu-xO-QEx"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Revert to Saved" id="KaW-ft-85H">
@@ -516,6 +523,13 @@
                                     <action selector="performZoom:" target="-1" id="DIl-cC-cCs"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Uix-g7-fAt"/>
+                            <menuItem title="Offline Packs" id="YW3-jR-knj">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="makeKeyAndOrderFront:" target="Jjv-gs-Tx6" id="cJK-pv-fl5"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="eu3-7i-yIM"/>
                             <menuItem title="Bring All to Front" id="LE2-aR-0XJ">
                                 <modifierMask key="keyEquivalentModifierMask"/>
@@ -551,7 +565,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="109" y="131" width="350" height="62"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="eA4-n3-qPe">
                 <rect key="frame" x="0.0" y="0.0" width="350" height="62"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -609,8 +623,190 @@
             <point key="canvasLocation" x="754" y="210"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="45S-yT-WUN"/>
+        <window title="Offline Packs" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="MBXOfflinePacksPanel" animationBehavior="default" id="Jjv-gs-Tx6" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="830" y="430" width="400" height="300"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <view key="contentView" id="8ha-hw-zOD">
+                <rect key="frame" x="0.0" y="0.0" width="400" height="300"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q8b-0e-dLv">
+                        <rect key="frame" x="-1" y="20" width="402" height="281"/>
+                        <clipView key="contentView" id="J9U-Yx-o2S">
+                            <rect key="frame" x="1" y="0.0" width="400" height="280"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" headerView="MAZ-Iq-hBi" id="Ato-Vu-HYT">
+                                    <rect key="frame" x="0.0" y="0.0" width="400" height="257"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <size key="intercellSpacing" width="3" height="2"/>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                    <tableColumns>
+                                        <tableColumn identifier="" editable="NO" width="16" minWidth="10" maxWidth="3.4028234663852886e+38" id="xtw-hQ-8C5" userLabel="State">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="edU-Yw-20f"/>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.stateImage" id="2wd-1J-TZt"/>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="116" minWidth="40" maxWidth="1000" id="2hD-LN-h0L">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="oys-QZ-34I">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.context" id="NtD-s5-ZUq">
+                                                    <dictionary key="options">
+                                                        <string key="NSValueTransformerName">OfflinePackNameValueTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="pkI-c7-xoD">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Downloaded">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="WfC-qb-HsW">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="sNm-Qn-ne6"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfResourcesCompleted" id="mu6-Jg-GiU"/>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn identifier="" editable="NO" width="50" minWidth="10" maxWidth="3.4028234663852886e+38" id="Rrd-A9-jqc">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Total">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="mHy-qJ-rOA">
+                                                <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="0" maximumIntegerDigits="42" id="kyx-ZP-OBH"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfResourcesExpected" id="mh2-k0-vvB"/>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn identifier="" editable="NO" width="60" minWidth="10" maxWidth="3.4028234663852886e+38" id="h7m-6l-KaS">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Size">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="701-bg-k6L">
+                                                <byteCountFormatter key="formatter" allowsNonnumericFormatting="NO" id="IXV-J9-sP3"/>
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="dWe-R6-sRz" name="value" keyPath="arrangedObjects.countOfBytesCompleted" id="Zsa-Na-yFN"/>
+                                            </connections>
+                                        </tableColumn>
+                                    </tableColumns>
+                                    <connections>
+                                        <action trigger="doubleAction" selector="chooseOfflinePack:" target="-1" id="pUN-eT-zRT"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="QLr-6P-Ogs">
+                            <rect key="frame" x="1" y="7" width="0.0" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="q0K-eE-mzL">
+                            <rect key="frame" x="224" y="17" width="15" height="102"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <tableHeaderView key="headerView" id="MAZ-Iq-hBi">
+                            <rect key="frame" x="0.0" y="0.0" width="400" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </tableHeaderView>
+                    </scrollView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wzf-ce-Spm">
+                        <rect key="frame" x="0.0" y="-1" width="21" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="21" id="5ST-tY-8Ph"/>
+                        </constraints>
+                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="sew-F7-i5T">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="addOfflinePack:" target="-1" id="SN0-PM-HoU"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7L7-hr-zId">
+                        <rect key="frame" x="20" y="0.0" width="21" height="19"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="21" id="JYb-AF-8gZ"/>
+                        </constraints>
+                        <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSRemoveTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="oTF-3m-6qT">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="delete:" target="-1" id="EGL-bf-yUD"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="7L7-hr-zId" firstAttribute="centerY" secondItem="wzf-ce-Spm" secondAttribute="centerY" id="7TI-6w-bf1"/>
+                    <constraint firstAttribute="bottom" secondItem="Q8b-0e-dLv" secondAttribute="bottom" constant="20" symbolic="YES" id="DZa-ly-bhV"/>
+                    <constraint firstItem="wzf-ce-Spm" firstAttribute="top" secondItem="Q8b-0e-dLv" secondAttribute="bottom" id="LhK-5z-CQA"/>
+                    <constraint firstItem="Q8b-0e-dLv" firstAttribute="leading" secondItem="8ha-hw-zOD" secondAttribute="leading" constant="-1" id="Oyo-ch-rZo"/>
+                    <constraint firstAttribute="bottom" secondItem="7L7-hr-zId" secondAttribute="bottom" id="TtY-j1-T5h"/>
+                    <constraint firstItem="Q8b-0e-dLv" firstAttribute="top" secondItem="8ha-hw-zOD" secondAttribute="top" constant="-1" id="WDk-Ig-Grr"/>
+                    <constraint firstAttribute="trailing" secondItem="Q8b-0e-dLv" secondAttribute="trailing" constant="-1" id="hHf-rd-Wcv"/>
+                    <constraint firstItem="7L7-hr-zId" firstAttribute="leading" secondItem="8ha-hw-zOD" secondAttribute="leading" constant="20" symbolic="YES" id="iKJ-ph-ACS"/>
+                    <constraint firstAttribute="bottom" secondItem="wzf-ce-Spm" secondAttribute="bottom" constant="-1" id="jFV-Xi-fWr"/>
+                    <constraint firstItem="wzf-ce-Spm" firstAttribute="leading" secondItem="8ha-hw-zOD" secondAttribute="leading" id="kJt-oJ-72R"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="720" y="317"/>
+        </window>
+        <arrayController objectClassName="MGLOfflinePack" editable="NO" avoidsEmptySelection="NO" id="dWe-R6-sRz" userLabel="Offline Packs Array Controller">
+            <declaredKeys>
+                <string>context</string>
+                <string>countOfResourcesCompleted</string>
+                <string>countOfResourcesExpected</string>
+                <string>countOfBytesCompleted</string>
+                <string>stateImage</string>
+            </declaredKeys>
+        </arrayController>
     </objects>
     <resources>
+        <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSFollowLinkFreestandingTemplate" width="14" height="14"/>
+        <image name="NSRemoveTemplate" width="11" height="11"/>
     </resources>
 </document>

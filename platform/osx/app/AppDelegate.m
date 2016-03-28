@@ -7,7 +7,57 @@ NSString * const MGLLastMapCameraDefaultsKey = @"MGLLastMapCamera";
 NSString * const MGLLastMapStyleURLDefaultsKey = @"MGLLastMapStyleURL";
 NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
+/**
+ Some convenience methods to make offline pack properties easier to bind to.
+ */
+@implementation MGLOfflinePack (Additions)
+
++ (NSSet *)keyPathsForValuesAffectingStateImage {
+    return [NSSet setWithObjects:@"state", nil];
+}
+
+- (NSImage *)stateImage {
+    switch (self.state) {
+        case MGLOfflinePackStateComplete:
+            return [NSImage imageNamed:@"NSMenuOnStateTemplate"];
+            
+        case MGLOfflinePackStateActive:
+            return [NSImage imageNamed:@"NSFollowLinkFreestandingTemplate"];
+            
+        default:
+            return nil;
+    }
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfResourcesCompleted {
+    return [NSSet setWithObjects:@"progress", nil];
+}
+
+- (uint64_t)countOfResourcesCompleted {
+    return self.progress.countOfResourcesCompleted;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfResourcesExpected {
+    return [NSSet setWithObjects:@"progress", nil];
+}
+
+- (uint64_t)countOfResourcesExpected {
+    return self.progress.countOfResourcesExpected;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfBytesCompleted {
+    return [NSSet setWithObjects:@"progress", nil];
+}
+
+- (uint64_t)countOfBytesCompleted {
+    return self.progress.countOfBytesCompleted;
+}
+
+@end
+
 @interface AppDelegate ()
+
+@property (weak) IBOutlet NSArrayController *offlinePacksArrayController;
 
 @end
 
@@ -63,6 +113,8 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         [alert runModal];
         [self showPreferences:nil];
     }
+    
+    [self.offlinePacksArrayController bind:@"content" toObject:[MGLOfflineStorage sharedOfflineStorage] withKeyPath:@"packs" options:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -79,6 +131,8 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
             [[NSUserDefaults standardUserDefaults] setInteger:mapView.debugMask forKey:MGLLastMapDebugMaskDefaultsKey];
         }
     }
+    
+    [self.offlinePacksArrayController unbind:@"content"];
 }
 
 #pragma mark Services
@@ -121,6 +175,45 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
 }
 
+#pragma mark Offline pack management
+
+- (IBAction)delete:(id)sender {
+    for (MGLOfflinePack *pack in self.offlinePacksArrayController.selectedObjects) {
+        [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
+            if (error) {
+                [[NSAlert alertWithError:error] runModal];
+            }
+        }];
+    }
+}
+
+- (IBAction)chooseOfflinePack:(id)sender {
+    for (MGLOfflinePack *pack in self.offlinePacksArrayController.selectedObjects) {
+        switch (pack.state) {
+            case MGLOfflinePackStateComplete:
+            {
+                if ([pack.region isKindOfClass:[MGLTilePyramidOfflineRegion class]]) {
+                    MGLTilePyramidOfflineRegion *region = (MGLTilePyramidOfflineRegion *)pack.region;
+                    self.pendingVisibleCoordinateBounds = region.bounds;
+                    [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
+                }
+                break;
+            }
+                
+            case MGLOfflinePackStateInactive:
+                [pack resume];
+                break;
+                
+            case MGLOfflinePackStateActive:
+                [pack suspend];
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
 #pragma mark Help methods
 
 - (IBAction)showShortcuts:(id)sender {
@@ -153,6 +246,9 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     }
     if (menuItem.action == @selector(showPreferences:)) {
         return YES;
+    }
+    if (menuItem.action == @selector(delete:)) {
+        return self.offlinePacksArrayController.selectedObjects.count;
     }
     return NO;
 }
