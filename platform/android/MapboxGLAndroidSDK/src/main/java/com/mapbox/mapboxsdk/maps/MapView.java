@@ -497,22 +497,6 @@ public class MapView extends FrameLayout {
     }
 
     /**
-     * You must call this method from the parent's {@link Activity#onStart()} or {@link Fragment#onStart()}.
-     */
-    @UiThread
-    public void onStart() {
-        mUserLocationView.onStart();
-    }
-
-    /**
-     * You must call this method from the parent's {@link Activity#onStop()} or {@link Fragment#onStop()}
-     */
-    @UiThread
-    public void onStop() {
-        mUserLocationView.onStop();
-    }
-
-    /**
      * You must call this method from the parent's {@link Activity#onPause()} or {@link Fragment#onPause()}.
      */
     @UiThread

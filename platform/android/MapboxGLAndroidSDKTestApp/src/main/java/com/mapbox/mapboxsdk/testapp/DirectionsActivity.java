@@ -141,12 +141,6 @@ public class DirectionsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mMapView.onResume();
@@ -156,12 +150,6 @@ public class DirectionsActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
     }
 
     @Override
