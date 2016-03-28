@@ -43,10 +43,10 @@ private:
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
         uint16_t a, b, c;
     };
-    void addCurrentVertex(const GeometryCoordinate& currentVertex, float flip, double& distance,
+    void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
             const vec2<double>& normal, float endLeft, float endRight, bool round,
             GLint startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
-    void addPieSliceVertex(const GeometryCoordinate& currentVertex, float flip, double distance,
+    void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
             const vec2<double>& extrude, bool lineTurnsLeft, GLint startVertex,
             std::vector<TriangleElement>& triangleStore);
 
