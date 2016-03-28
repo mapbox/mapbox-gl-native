@@ -41,6 +41,17 @@ void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
 const float COS_HALF_SHARP_CORNER = std::cos(75.0 / 2.0 * (M_PI / 180.0));
 const float SHARP_CORNER_OFFSET = 15.0f;
 
+// The number of bits that is used to store the line distance in the buffer.
+const int LINE_DISTANCE_BUFFER_BITS = 14;
+
+// We don't have enough bits for the line distance as we'd like to have, so
+// use this value to scale the line distance (in tile units) down to a smaller
+// value. This lets us store longer distances while sacrificing precision.
+const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
+
+// The maximum line distance, in tile units, that fits in the buffer.
+const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
+
 void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
     const GLsizei len = [&vertices] {
         GLsizei l = static_cast<GLsizei>(vertices.size());
@@ -363,7 +374,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
 
 void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
                                   float flip,
-                                  double distance,
+                                  double &distance,
                                   const vec2<double>& normal,
                                   float endLeft,
                                   float endRight,
@@ -375,7 +386,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
     vec2<double> extrude = normal * flip;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0, endLeft, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 0, endLeft, distance * LINE_DISTANCE_SCALE)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -386,13 +397,22 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
     extrude = normal * (-flip);
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1, -endRight, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, extrude.x, extrude.y, tx, 1, -endRight, distance * LINE_DISTANCE_SCALE)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
     }
     e1 = e2;
     e2 = e3;
+
+    // There is a maximum "distance along the line" that we can store in the buffers.
+    // When we get close to the distance, reset it to zero and add the vertex again with
+    // a distance of zero. The max distance is determined by the number of bits we allocate
+    // to `linesofar`.
+    if (distance > MAX_LINE_DISTANCE / 2.0f) {
+        distance = 0;
+        addCurrentVertex(currentVertex, flip, distance, normal, endLeft, endRight, round, startVertex, triangleStore);
+    }
 }
 
 void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
@@ -405,7 +425,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
     int8_t ty = lineTurnsLeft;
 
     auto flippedExtrude = extrude * (flip * (lineTurnsLeft ? -1 : 1));
-    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance)
+    e3 = vertexBuffer.add(currentVertex.x, currentVertex.y, flippedExtrude.x, flippedExtrude.y, 0, ty, 0, distance * LINE_DISTANCE_SCALE)
          - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
