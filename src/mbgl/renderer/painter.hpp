@@ -181,13 +181,6 @@ private:
     std::unique_ptr<CollisionBoxShader> collisionBoxShader;
     std::unique_ptr<CircleShader> circleShader;
 
-    StaticVertexBuffer backgroundBuffer = {
-        { -1, -1 }, { 1, -1 },
-        { -1,  1 }, { 1,  1 }
-    };
-
-    VertexArrayObject backgroundArray;
-
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer = {
         // top left triangle
@@ -203,6 +196,8 @@ private:
 
     VertexArrayObject coveringPlainArray;
     VertexArrayObject coveringRasterArray;
+    VertexArrayObject backgroundPatternArray;
+    VertexArrayObject backgroundArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer = {
