@@ -2969,9 +2969,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated
 {
-    CGFloat defaultPadding = 100;
-    CGFloat yPadding = (self.frame.size.height / 2 <= defaultPadding) ? (self.frame.size.height / 5) : defaultPadding;
-    CGFloat xPadding = (self.frame.size.width / 2 <= defaultPadding) ? (self.frame.size.width / 5) : defaultPadding;
+    CGFloat maximumPadding = 100;
+    CGFloat yPadding = (self.frame.size.height / 5 <= maximumPadding) ? (self.frame.size.height / 5) : maximumPadding;
+    CGFloat xPadding = (self.frame.size.width / 5 <= maximumPadding) ? (self.frame.size.width / 5) : maximumPadding;
 
     UIEdgeInsets edgeInsets = UIEdgeInsetsMake(yPadding, xPadding, yPadding, xPadding);
 
