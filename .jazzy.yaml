@@ -49,9 +49,12 @@ custom_categories:
       - MGLOfflinePackMaximumMapboxTilesReachedNotification
       - MGLOfflinePackProgress
       - MGLOfflinePackProgressChangedNotification
+      - MGLOfflinePackProgressUserInfoKey
       - MGLOfflinePackRemovalCompletionHandler
       - MGLOfflinePackState
+      - MGLOfflinePackStateUserInfoKey
       - MGLTilePyramidOfflineRegion
+      - NSValue(MGLOfflinePackAdditions)
   - name: Geometry
     children:
       - MGLCoordinateBounds

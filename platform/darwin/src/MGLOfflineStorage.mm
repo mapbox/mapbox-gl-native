@@ -15,6 +15,8 @@ NSString * const MGLOfflinePackProgressChangedNotification = @"MGLOfflinePackPro
 NSString * const MGLOfflinePackErrorNotification = @"MGLOfflinePackError";
 NSString * const MGLOfflinePackMaximumMapboxTilesReachedNotification = @"MGLOfflinePackMaximumMapboxTilesReached";
 
+NSString * const MGLOfflinePackStateUserInfoKey = @"State";
+NSString * const MGLOfflinePackProgressUserInfoKey = @"Progress";
 NSString * const MGLOfflinePackErrorUserInfoKey = @"Error";
 NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
@@ -242,7 +244,10 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 #pragma mark MGLOfflinePackDelegate methods
 
 - (void)offlinePack:(MGLOfflinePack *)pack progressDidChange:(__unused MGLOfflinePackProgress)progress {
-    [[NSNotificationCenter defaultCenter] postNotificationName:MGLOfflinePackProgressChangedNotification object:pack];
+    [[NSNotificationCenter defaultCenter] postNotificationName:MGLOfflinePackProgressChangedNotification object:pack userInfo:@{
+        MGLOfflinePackStateUserInfoKey: @(pack.state),
+        MGLOfflinePackProgressUserInfoKey: [NSValue valueWithMGLOfflinePackProgress:progress],
+    }];
 }
 
 - (void)offlinePack:(MGLOfflinePack *)pack didReceiveError:(NSError *)error {

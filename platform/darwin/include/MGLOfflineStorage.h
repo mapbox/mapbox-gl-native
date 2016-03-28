@@ -14,8 +14,11 @@ NS_ASSUME_NONNULL_BEGIN
  resources are required for offline viewing. This notification is posted
  whenever any field in the `progress` property changes.
  
- The `object` is the `MGLOfflinePack` object whose progress changed. For details
- about the pack’s current progress, use the pack’s `progress` property.
+ The `object` is the `MGLOfflinePack` object whose progress changed. The
+ `userInfo` dictionary contains the pack’s current state in the
+ `MGLOfflinePackStateUserInfoKey` key and details about the pack’s current
+ progress in the `MGLOfflinePackProgressUserInfoKey` key. You may also consult
+ the pack’s `state` and `progress` properties, which provide the same values.
  
  If you only need to observe changes in a particular pack’s progress, you can
  alternatively observe KVO change notifications to the pack’s `progress` key
@@ -52,17 +55,37 @@ extern NSString * const MGLOfflinePackErrorNotification;
 extern NSString * const MGLOfflinePackMaximumMapboxTilesReachedNotification;
 
 /**
+ The key for an `NSNumber` object that indicates an offline pack’s current
+ state. This key is used in the `userInfo` dictionary of an
+ `MGLOfflinePackProgressChangedNotification` notification. Call `-integerValue`
+ on the object to receive the `MGLOfflinePackState`-typed state.
+ */
+extern NSString * const MGLOfflinePackStateUserInfoKey;
+
+/**
+ The key for an `NSValue` object that indicates an offline pack’s current
+ progress. This key is used in the `userInfo` dictionary of an
+ `MGLOfflinePackProgressChangedNotification` notification. Call
+ `-MGLOfflinePackProgressValue` on the object to receive the
+ `MGLOfflinePackProgress`-typed progress.
+ */
+extern NSString * const MGLOfflinePackProgressUserInfoKey;
+
+/**
  The key for an `NSError` object that is encountered in the course of
- downloading an offline pack. The error’s domain is `MGLErrorDomain`. See
- `MGLErrorCode` for possible error codes.
+ downloading an offline pack. This key is used in the `userInfo` dictionary of
+ an `MGLOfflinePackErrorNotification` notification. The error’s domain is
+ `MGLErrorDomain`. See `MGLErrorCode` for possible error codes.
  */
 extern NSString * const MGLOfflinePackErrorUserInfoKey;
 
 /**
  The key for an `NSNumber` object that indicates the maximum number of
  Mapbox-hosted tiles that may be downloaded and stored on the current device.
- Call `-unsignedLongLongValue` on the object to receive the `uint64_t`-typed
- tile limit.
+ This key is used in the `userInfo` dictionary of an
+ `MGLOfflinePackMaximumMapboxTilesReachedNotification` notification. Call
+ `-unsignedLongLongValue` on the object to receive the `uint64_t`-typed tile
+ limit.
  */
 extern NSString * const MGLOfflinePackMaximumCountUserInfoKey;
 

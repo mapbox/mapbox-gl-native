@@ -82,6 +82,18 @@
     [self expectationForNotification:MGLOfflinePackProgressChangedNotification object:pack handler:^BOOL(NSNotification * _Nonnull notification) {
         MGLOfflinePack *notificationPack = notification.object;
         XCTAssert([notificationPack isKindOfClass:[MGLOfflinePack class]], @"Object of notification should be an MGLOfflinePack.");
+        
+        NSDictionary *userInfo = notification.userInfo;
+        XCTAssertNotNil(userInfo, @"Progress change notification should have a userInfo dictionary.");
+        
+        NSNumber *stateNumber = userInfo[MGLOfflinePackStateUserInfoKey];
+        XCTAssert([stateNumber isKindOfClass:[NSNumber class]], @"Progress change notification’s state should be an NSNumber.");
+        XCTAssertEqual(stateNumber.integerValue, pack.state, @"State in a progress change notification should match the pack’s state.");
+        
+        NSValue *progressValue = userInfo[MGLOfflinePackProgressUserInfoKey];
+        XCTAssert([progressValue isKindOfClass:[NSValue class]], @"Progress change notification’s progress should be an NSValue.");
+        XCTAssertEqualObjects(progressValue, [NSValue valueWithMGLOfflinePackProgress:pack.progress], @"Progress change notification’s progress should match pack’s progress.");
+        
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
     [self waitForExpectationsWithTimeout:1 handler:nil];

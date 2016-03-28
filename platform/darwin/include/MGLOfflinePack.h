@@ -161,4 +161,25 @@ typedef struct MGLOfflinePackProgress {
 
 @end
 
+/**
+ Methods for round-tripping `MGLOfflinePackProgress` values.
+ */
+@interface NSValue (MGLOfflinePackAdditions)
+
+/**
+ Creates a new value object containing the given `MGLOfflinePackProgress`
+ structure.
+ 
+ @param progress The value for the new object.
+ @return A new value object that contains the offline pack progress information.
+ */
++ (NSValue *)valueWithMGLOfflinePackProgress:(MGLOfflinePackProgress)progress;
+
+/**
+ The `MGLOfflinePackProgress` structure representation of the value.
+ */
+@property (readonly) MGLOfflinePackProgress MGLOfflinePackProgressValue;
+
+@end
+
 NS_ASSUME_NONNULL_END
