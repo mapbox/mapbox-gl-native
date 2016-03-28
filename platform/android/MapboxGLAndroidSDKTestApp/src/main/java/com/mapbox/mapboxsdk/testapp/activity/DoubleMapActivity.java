@@ -109,13 +109,6 @@ public class DoubleMapActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStart() {
-            super.onStart();
-            mMapView.onStart();
-            mMapViewMini.onStart();
-        }
-
-        @Override
         public void onResume() {
             super.onResume();
             mMapView.onResume();
@@ -127,13 +120,6 @@ public class DoubleMapActivity extends AppCompatActivity {
             super.onPause();
             mMapView.onPause();
             mMapViewMini.onPause();
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-            mMapView.onStop();
-            mMapViewMini.onStop();
         }
 
         @Override
