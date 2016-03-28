@@ -93,12 +93,6 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapboxM
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mMapView.onResume();
@@ -115,12 +109,6 @@ public class PressForMarkerActivity extends AppCompatActivity implements MapboxM
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
         outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
     }
 
     @Override

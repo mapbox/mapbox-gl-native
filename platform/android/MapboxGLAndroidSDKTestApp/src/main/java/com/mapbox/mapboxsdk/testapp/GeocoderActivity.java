@@ -108,18 +108,6 @@ public class GeocoderActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         mapView.onPause();

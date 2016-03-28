@@ -198,17 +198,6 @@ public final class UserLocationView extends View {
         mProjection = mapboxMap.getProjection();
     }
 
-    public void onStart() {
-        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
-            mBearingChangeListener.onStart(getContext());
-        }
-    }
-
-    public void onStop() {
-        mBearingChangeListener.onStop();
-        cancelAnimations();
-    }
-
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -395,9 +384,9 @@ public final class UserLocationView extends View {
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
             mShowAccuracy = false;
             mShowDirection = true;
-            mBearingChangeListener.onStart(getContext());
+            mBearingChangeListener.onResume();
         } else {
-            mBearingChangeListener.onStop();
+            mBearingChangeListener.onPause();
             if (myBearingTrackingMode == MyBearingTracking.GPS) {
                 mShowDirection = (mUserLocation != null) && mUserLocation.hasBearing();
             } else {
@@ -433,12 +422,12 @@ public final class UserLocationView extends View {
             mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }
 
-        public void onStart(Context context) {
+        public void onResume() {
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
             mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
         }
 
-        public void onStop() {
+        public void onPause() {
             mSensorManager.unregisterListener(this, mAccelerometer);
             mSensorManager.unregisterListener(this, mMagnetometer);
         }
@@ -661,11 +650,16 @@ public final class UserLocationView extends View {
 
     public void onPause() {
         mPaused = true;
+        mBearingChangeListener.onPause();
+        cancelAnimations();
         toggleGps(false);
     }
 
     public void onResume() {
         mPaused = false;
+        if (mMyBearingTrackingMode == MyBearingTracking.COMPASS) {
+            mBearingChangeListener.onResume();
+        }
         if (isEnabled()) {
             toggleGps(true);
         }

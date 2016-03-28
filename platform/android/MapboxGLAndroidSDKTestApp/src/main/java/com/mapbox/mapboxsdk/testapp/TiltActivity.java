@@ -46,18 +46,6 @@ public class TiltActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
