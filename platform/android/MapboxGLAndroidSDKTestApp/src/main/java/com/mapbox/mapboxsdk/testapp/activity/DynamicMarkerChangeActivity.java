@@ -88,13 +88,6 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         mMarker.setIcon(mIconFactory.fromResource(first ? R.drawable.ic_chelsea : R.drawable.ic_arsenal));
     }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -105,12 +98,6 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
     }
 
     @Override
