@@ -32,14 +32,6 @@
                 android:value="@string/category_other" />
         </activity>
         <activity
-            android:name=".activity.InfoWindowAdapterActivity"
-            android:description="@string/description_info_window_adapter"
-            android:label="@string/activity_infowindow_adapter">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_infowindow" />
-        </activity>
-        <activity
             android:name=".activity.InfoWindowActivity"
             android:description="@string/description_info_window"
             android:label="@string/activity_info_window">
@@ -47,11 +39,10 @@
                 android:name="@string/category"
                 android:value="@string/category_infowindow" />
         </activity>
-
         <activity
-            android:name=".activity.InfoWindowConcurrentActivity"
-            android:description="@string/description_info_window_concurrent"
-            android:label="@string/activity_info_window_concurrent">
+            android:name=".activity.InfoWindowAdapterActivity"
+            android:description="@string/description_info_window_adapter"
+            android:label="@string/activity_infowindow_adapter">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_infowindow" />

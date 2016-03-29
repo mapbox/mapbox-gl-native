@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -19,10 +20,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 
 import java.text.DecimalFormat;
 
-public class InfoWindowActivity extends AppCompatActivity {
+public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnInfoWindowCloseListener, MapboxMap.OnMapLongClickListener, MapboxMap.OnInfoWindowClickListener, MapboxMap.OnInfoWindowLongClickListener {
 
-    private MapView mMapView;
-    private Marker mCustomMarker;
+    private MapboxMap mapboxMap;
+    private MapView mapView;
+    private Marker customMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,121 +40,137 @@ public class InfoWindowActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                mapboxMap.addMarker(new MarkerOptions()
-                        .title("Intersection")
-                        .snippet("H St NW with 15th St NW")
-                        .position(new LatLng(38.9002073, -77.03364419)));
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.setAccessToken(ApiAccess.getToken(this));
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
+    }
 
-                Marker marker = mapboxMap.addMarker(new MarkerOptions()
-                        .title("White House")
-                        .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
-                        .position(new LatLng(38.897705003219784, -77.03655168667463)));
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        addMarkers();
+        addInfoWindowListeners();
+    }
 
-                // open InfoWindow at startup!
-                mapboxMap.selectMarker(marker);
+    private void addMarkers() {
+        mapboxMap.addMarker(new MarkerOptions()
+                .title("Intersection")
+                .snippet("H St NW with 15th St NW")
+                .position(new LatLng(38.9002073, -77.03364419)));
 
-                mapboxMap.addMarker(new MarkerOptions().title("Intersection")
-                        .snippet("E St NW with 17th St NW")
-                        .position(new LatLng(38.8954236, -77.0394623)));
+        mapboxMap.addMarker(new MarkerOptions().title("Intersection")
+                .snippet("E St NW with 17th St NW")
+                .position(new LatLng(38.8954236, -77.0394623)));
 
-                mapboxMap.setOnInfoWindowCloseListener(new MapboxMap.OnInfoWindowCloseListener() {
-                    @Override
-                    public void onInfoWindowClose(Marker marker) {
-                        Toast.makeText(getApplicationContext(), "OnClose: " + marker.getTitle(), Toast.LENGTH_LONG).show();
-                    }
-                });
+        Marker marker = mapboxMap.addMarker(new MarkerOptions()
+                .title("White House")
+                .snippet("The official residence and principal workplace of the President of the United States, located at 1600 Pennsylvania Avenue NW in Washington, D.C. It has been the residence of every U.S. president since John Adams in 1800.")
+                .position(new LatLng(38.897705003219784, -77.03655168667463)));
 
-                final DecimalFormat formatter = new DecimalFormat("#.#####");
-                mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
-                    @Override
-                    public void onMapLongClick(@NonNull LatLng point) {
-                        // Remove previous added marker
-                        if (mCustomMarker != null) {
-                            mapboxMap.removeAnnotation(mCustomMarker);
-                            mCustomMarker = null;
-                        }
+        // open InfoWindow at startup
+        mapboxMap.selectMarker(marker);
+    }
 
-                        // Add marker on long click location with default marker image
-                        mCustomMarker = mapboxMap.addMarker(new MarkerOptions()
-                                .title("Custom Marker")
-                                .snippet(formatter.format(point.getLatitude()) + ", " + formatter.format(point.getLongitude()))
-                                .position(point));
-                    }
-                });
+    private void addInfoWindowListeners() {
+        mapboxMap.setOnInfoWindowCloseListener(this);
+        mapboxMap.setOnMapLongClickListener(this);
+        mapboxMap.setOnInfoWindowClickListener(this);
+        mapboxMap.setOnInfoWindowLongClickListener(this);
+    }
 
+    private void toggleConcurrentInfoWindow(boolean allowConcurrentInfoWindow) {
+        mapboxMap.deselectMarkers();
+        mapboxMap.setAllowConcurrentMultipleOpenInfoWindows(allowConcurrentInfoWindow);
+    }
 
-                mapboxMap.setOnInfoWindowClickListener(new MapboxMap.OnInfoWindowClickListener() {
-                    @Override
-                    public boolean onInfoWindowClick(@NonNull Marker marker) {
-                        Toast.makeText(getApplicationContext(), "OnClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
-                        // return false to close the info window
-                        // return true to leave the info window open
-                        return false;
-                    }
-                });
+    @Override
+    public boolean onInfoWindowClick(@NonNull Marker marker) {
+        Toast.makeText(getApplicationContext(), "OnClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
+        // returning true will leave the info window open
+        return false;
+    }
 
-                mapboxMap.setOnInfoWindowLongClickListener(new MapboxMap.OnInfoWindowLongClickListener() {
-                    @Override
-                    public void onInfoWindowLongClick(Marker marker) {
-                        Toast.makeText(getApplicationContext(), "OnLongClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
-                    }
-                });
+    @Override
+    public void onInfoWindowClose(Marker marker) {
+        Toast.makeText(getApplicationContext(), "OnClose: " + marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
 
-            }
-        });
+    @Override
+    public void onInfoWindowLongClick(Marker marker) {
+        Toast.makeText(getApplicationContext(), "OnLongClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onMapLongClick(@NonNull LatLng point) {
+        if (customMarker != null) {
+            // Remove previous added marker
+            mapboxMap.removeAnnotation(customMarker);
+            customMarker = null;
+        }
+
+        // Add marker on long click location with default marker image
+        customMarker = mapboxMap.addMarker(new MarkerOptions()
+                .title("Custom Marker")
+                .snippet(new DecimalFormat("#.#####").format(point.getLatitude()) + ", " + new DecimalFormat("#.#####").format(point.getLongitude()))
+                .position(point));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mMapView.onStart();
+        mapView.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mMapView.onStop();
+        mapView.onStop();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_infowindow, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_toggle_concurrent_infowindow:
+                toggleConcurrentInfoWindow(!item.isChecked());
+                item.setChecked(!item.isChecked());
+                return true;
             case android.R.id.home:
                 onBackPressed();
                 return true;

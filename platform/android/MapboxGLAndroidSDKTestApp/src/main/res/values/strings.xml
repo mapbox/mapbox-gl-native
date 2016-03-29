@@ -6,14 +6,13 @@
     <!-- Test Activities -->
     <string name="activity_mapboxmap">MapboxMap Activity</string>
     <string name="activity_tilt">Map Tilt Activity</string>
-    <string name="activity_infowindow_adapter">InfoWindow Adapter Activity</string>
     <string name="activity_map_fragment_suport">Support Map Fragment Activity</string>
     <string name="activity_map_fragment">Map Fragment Activity</string>
     <string name="activity_press_for_marker">Press For Marker Activity</string>
     <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
     <string name="activity_manual_zoom">Manual Zoom Activity</string>
-    <string name="activity_info_window">InfoWindow Activity</string>
-    <string name="activity_info_window_concurrent">InfoWindow Activity (Concurrent) Activity</string>
+    <string name="activity_info_window">Basic InfoWindow example</string>
+    <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode Activity</string>
     <string name="activity_add_bulk_markers">Add Markers In Bulk Activity</string>
@@ -34,14 +33,14 @@
     <string name="description_user_location_tracking">Tracks the location of the user</string>
     <string name="description_custom_layer">Add a custom layer, experimental feature</string>
     <string name="description_mapboxmap">Test out MapboxMap interaction</string>
-    <string name="description_info_window_adapter">Learn how to craete custom InfoWindows</string>
+    <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
     <string name="description_tilt">Showcasing Tilt</string>
     <string name="description_map_fragment">Showcase MapFragment</string>
     <string name="description_map_fragment_support">Showcase SupportMapFragment</string>
     <string name="description_press_for_marker">Add marker on long press</string>
     <string name="description_manual_zoom">Different types of zoom in CameraUpdateFactory</string>
     <string name="description_minmax_zoom">Configure a max and min zoomlevel</string>
-    <string name="description_info_window">Example with an InfoWindow</string>
+    <string name="description_info_window">Learn how to handle the basic InfoWindow</string>
     <string name="description_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="description_info_window_concurrent">InfoWindow example with multiple open</string>
     <string name="description_add_bulk_markers">Example which adds Markers in bulk</string>
@@ -56,6 +55,8 @@
     <string name="description_directions">Example with Directions API</string>
     <string name="description_geocoder">Example with Geocoder API</string>
     <string name="description_scroll_by">Example to scroll with pixels in x,y direction</string>
+
+    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
 
     <string name="category_marker">Marker</string>
     <string name="category_infowindow">InfoWindow</string>
