@@ -22,6 +22,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
@@ -2441,6 +2442,23 @@ public class MapView extends FrameLayout {
         mMapboxMap = mapboxMap;
     }
 
+    @UiThread
+    public void snapshot(@NonNull final SnapshotReadyCallback callback) {
+        final TextureView textureView = (TextureView) findViewById(R.id.textureView);
+
+        new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                return textureView.getBitmap();
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                callback.onSnapshotReady(bitmap);
+            }
+        }.execute();
+    }
+
     //
     // View utility methods
     //
@@ -2737,4 +2755,7 @@ public class MapView extends FrameLayout {
         void onMapChanged(@MapChange int change);
     }
 
+    public interface SnapshotReadyCallback {
+        void onSnapshotReady(Bitmap snapshot);
+    }
 }
