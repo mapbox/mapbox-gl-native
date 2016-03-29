@@ -55,7 +55,7 @@
     XCTestExpectation *additionCompletionHandlerExpectation = [self expectationWithDescription:@"add pack completion handler"];
     [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable completionHandlerPack, NSError * _Nullable error) {
         XCTAssertNotNil(completionHandlerPack, @"Added pack should exist.");
-        XCTAssertEqual(completionHandlerPack.state, MGLOfflinePackStateUnknown, @"Pack should initially have unknown state.");
+        XCTAssertEqual(completionHandlerPack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
         pack = completionHandlerPack;
         [additionCompletionHandlerExpectation fulfill];
     }];
@@ -72,7 +72,7 @@
     XCTAssert([userInfo[nameKey] isKindOfClass:[NSString class]], @"Name of offline pack isn’t a string.");
     XCTAssertEqualObjects(userInfo[nameKey], name, @"Name of offline pack has changed.");
     
-    XCTAssertEqual(pack.state, MGLOfflinePackStateUnknown, @"Pack should initially have unknown state.");
+    XCTAssertEqual(pack.state, MGLOfflinePackStateInactive, @"New pack should initially have inactive state.");
     
     [self keyValueObservingExpectationForObject:pack keyPath:@"state" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
@@ -96,6 +96,7 @@
         
         return notificationPack == pack && pack.state == MGLOfflinePackStateInactive;
     }];
+    [pack requestProgress];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
