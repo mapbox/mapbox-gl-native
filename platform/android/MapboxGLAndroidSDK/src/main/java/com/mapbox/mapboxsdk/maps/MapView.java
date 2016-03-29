@@ -2444,19 +2444,7 @@ public class MapView extends FrameLayout {
 
     @UiThread
     public void snapshot(@NonNull final SnapshotReadyCallback callback) {
-        final TextureView textureView = (TextureView) findViewById(R.id.textureView);
-
-        new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                return textureView.getBitmap();
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                callback.onSnapshotReady(bitmap);
-            }
-        }.execute();
+        snapshot(callback, null);
     }
 
     @UiThread
