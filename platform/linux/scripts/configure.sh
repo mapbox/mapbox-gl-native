@@ -19,5 +19,5 @@ WEBP_VERSION=0.5.0
 
 function print_opengl_flags {
     CONFIG+="    'opengl_cflags%': $(quote_flags $(pkg-config gl x11 --cflags)),"$LN
-    CONFIG+="    'opengl_ldflags%': $(quote_flags $(pkg-config gl x11 --libs)),"$LN
+    CONFIG+="    'opengl_ldflags%': '-L/usr/local/lib/osmesa/lib -lOSMesa',"$LN
 }

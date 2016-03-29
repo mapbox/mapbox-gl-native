@@ -9,6 +9,9 @@
 #define MBGL_USE_CGL 1
 #endif
 #else
+#define MBGL_USE_OSMESA 1
+typedef struct osmesa_context* OSMesaContext;
+/*
 #define GL_GLEXT_PROTOTYPES
 #define MBGL_USE_GLX 1
 typedef struct _XDisplay Display;
@@ -16,6 +19,7 @@ typedef struct __GLXcontextRec* GLXContext;
 typedef struct __GLXFBConfigRec* GLXFBConfig;
 typedef long unsigned int XID;
 typedef XID GLXPbuffer;
+*/
 #endif
 
 #include <mbgl/mbgl.hpp>
@@ -80,6 +84,10 @@ private:
     GLXFBConfig *fbConfigs = nullptr;
     GLXContext glContext = 0;
     GLXPbuffer glxPbuffer = 0;
+#endif
+
+#if MBGL_USE_OSMESA
+    OSMesaContext glContext = 0;
 #endif
 
     bool extensionsLoaded = false;

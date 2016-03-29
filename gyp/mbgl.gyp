@@ -70,6 +70,7 @@
     ['headless_lib == "cgl" and host == "osx"', { 'includes': [ 'headless-cgl.gypi' ] } ],
     ['headless_lib == "eagl" and host == "ios"', { 'includes': [ 'headless-eagl.gypi' ] } ],
     ['headless_lib == "glx" and host == "linux"', { 'includes': [ 'headless-glx.gypi' ] } ],
+    ['headless_lib == "osmesa" and host == "linux"', { 'includes': [ 'headless-osmesa.gypi' ] } ],
     ['platform_lib == "osx" and host == "osx"', { 'includes': [ 'platform-osx.gypi' ] } ],
     ['platform_lib == "ios" and host == "ios"', { 'includes': [ 'platform-ios.gypi' ] } ],
     ['platform_lib == "linux"', { 'includes': [ 'platform-linux.gypi' ] } ],
