@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 
+#include <cassert>
 #include <cmath>
 
 namespace mbgl {
@@ -20,6 +21,8 @@ Anchors resample(const GeometryCoordinates &line, const float offset, const floa
     float markedDistance = offset - spacing;
 
     Anchors anchors;
+
+    assert(spacing > 0.0);
 
     int i = 0;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {

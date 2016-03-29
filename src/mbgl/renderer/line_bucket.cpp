@@ -69,7 +69,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
 
     const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : float(layout.miterLimit);
 
-    const double sharpCornerOffset = SHARP_CORNER_OFFSET * (util::EXTENT / (util::tileSize * overscaling));
+    const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
     const GeometryCoordinate firstVertex = vertices.front();
     const GeometryCoordinate lastVertex = vertices[len - 1];
