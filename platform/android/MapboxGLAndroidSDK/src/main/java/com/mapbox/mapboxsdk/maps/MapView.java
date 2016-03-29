@@ -2459,6 +2459,28 @@ public class MapView extends FrameLayout {
         }.execute();
     }
 
+    @UiThread
+    public void snapshot(@NonNull final SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
+        final TextureView textureView = (TextureView) findViewById(R.id.textureView);
+        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
+
+        new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                if (canUseBitmap) {
+                    return textureView.getBitmap(bitmap);
+                } else {
+                    return textureView.getBitmap();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                callback.onSnapshotReady(bitmap);
+            }
+        }.execute();
+    }
+
     //
     // View utility methods
     //
