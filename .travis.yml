@@ -14,13 +14,6 @@ addons_shortcuts:
       sources: [ 'ubuntu-toolchain-r-test' ]
       packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev',
                   'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
-  addons_clang38-tidy: &clang38-tidy
-    apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise' ]
-      packages: [ 'clang-tidy-3.8', 'clang-3.8', 'libgcc-4.9-dev', 'libstdc++-4.9-dev', 'libstdc++6',
-                  'libllvm3.4', 'libclang-common-3.8-dev', 'libclang1-3.8', 'liblldb-3.8',
-                  'libllvm3.8', 'lldb-3.8', 'llvm-3.8', 'llvm-3.8-dev', 'llvm-3.8-runtime', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
 
 matrix:
   exclude:
@@ -56,12 +49,6 @@ matrix:
       compiler: ": linux-clang35-release"
       env: FLAVOR=linux BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
       addons: *clang35
-
-    # clang-tidy - Clang 3.8 - Release
-    - os: linux
-      compiler: ": tidy-clang38-release"
-      env: FLAVOR=linux ACTION=tidy BUILDTYPE=Release _CXX=clang++-3.8 _CC=clang-3.8 AWS_ACCESS_KEY_ID=
-      addons: *clang38-tidy
 
 cache:
   directories:
