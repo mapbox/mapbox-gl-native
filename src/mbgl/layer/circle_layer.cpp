@@ -43,7 +43,7 @@ bool CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
 }
 
 std::unique_ptr<Bucket> CircleLayer::createBucket(StyleBucketParameters& parameters) const {
-    auto bucket = std::make_unique<CircleBucket>();
+    auto bucket = std::make_unique<CircleBucket>(parameters.mode);
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
         bucket->addGeometry(getGeometries(feature));

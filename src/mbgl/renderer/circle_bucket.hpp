@@ -2,9 +2,8 @@
 #define MBGL_RENDERER_CIRCLE_BUCKET
 
 #include <mbgl/renderer/bucket.hpp>
-
+#include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/circle_buffer.hpp>
 
@@ -17,7 +16,7 @@ class CircleBucket : public Bucket {
     using TriangleGroup = ElementGroup<3>;
 
 public:
-    CircleBucket();
+    CircleBucket(const MapMode);
     ~CircleBucket() override;
 
     void upload(gl::GLObjectStore&) override;
@@ -33,6 +32,8 @@ private:
     TriangleElementsBuffer elementsBuffer_;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
+
+    const MapMode mode;
 };
 
 } // namespace mbgl

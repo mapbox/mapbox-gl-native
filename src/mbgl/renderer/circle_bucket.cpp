@@ -7,7 +7,7 @@
 
 using namespace mbgl;
 
-CircleBucket::CircleBucket() {
+CircleBucket::CircleBucket(MapMode mode_) : mode(mode_) {
 }
 
 CircleBucket::~CircleBucket() {
@@ -38,7 +38,10 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             auto y = geometry.y;
 
             // Do not include points that are outside the tile boundaries.
-            if (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT) continue;
+            // Include all points in Still mode. You need to include points from
+            // neighbouring tiles so that they are not clipped at tile boundaries.
+            if ((mode != MapMode::Still) &&
+                (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
             // this geometry will be of the Point type, and we'll derive
             // two triangles from it.

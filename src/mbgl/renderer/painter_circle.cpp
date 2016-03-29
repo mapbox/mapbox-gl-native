@@ -17,7 +17,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    config.stencilTest = GL_FALSE;
+    config.stencilTest = data.mode == MapMode::Still ? GL_TRUE : GL_FALSE;
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
