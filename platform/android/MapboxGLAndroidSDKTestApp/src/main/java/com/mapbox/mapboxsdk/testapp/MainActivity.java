@@ -245,8 +245,6 @@ public class MainActivity extends AppCompatActivity {
                         != PackageManager.PERMISSION_GRANTED)) {
             toggleGps(false);
         }
-
-        mMapView.onStart();
     }
 
     // Called when our app comes into the foreground
@@ -263,13 +261,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         mMapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mMapView.onStop();
     }
 
     @Override
