@@ -111,6 +111,7 @@ void OfflineDatabase::removeExisting() {
 void OfflineDatabase::migrateToVersion3() {
     db->exec("PRAGMA auto_vacuum = INCREMENTAL");
     db->exec("VACUUM");
+    db->exec("PRAGMA user_version = 3");
 }
 
 OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {

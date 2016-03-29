@@ -669,6 +669,13 @@ static int databasePageCount(const std::string& path) {
     return stmt.get<int>(0);
 }
 
+static int databaseUserVersion(const std::string& path) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt = db.prepare("pragma user_version");
+    stmt.run();
+    return stmt.get<int>(0);
+}
+
 TEST(OfflineDatabase, MigrateFromV2Schema) {
     using namespace mbgl;
 
@@ -685,6 +692,7 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
         }
     }
 
+    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline/v3.db"));
     EXPECT_LT(databasePageCount("test/fixtures/offline/v3.db"),
               databasePageCount("test/fixtures/offline/v2.db"));
 }
