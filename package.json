@@ -26,7 +26,7 @@
   ],
   "devDependencies": {
     "aws-sdk": "^2.2.21",
-    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#10924ef1cea1bea0cb1fa0aac4233a037a4daecc",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#a42cd0cb818356d91fc6b61e2b64801e57486ac0",
     "node-gyp": "^3.2.1",
     "request": "^2.67.0",
     "tape": "^4.2.2"
