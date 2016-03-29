@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
@@ -1468,6 +1469,16 @@ public class MapboxMap {
         mMapView.update();
     }
 
+    @UiThread
+    public void snapshot(@NonNull SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
+        mMapView.snapshot(callback, bitmap);
+    }
+
+    @UiThread
+    public void snapshot(@NonNull SnapshotReadyCallback callback) {
+        mMapView.snapshot(callback, null);
+    }
+
     //
     // Interfaces
     //
@@ -1687,6 +1698,10 @@ public class MapboxMap {
          * Invoked when a task is complete.
          */
         void onFinish();
+    }
+
+    public interface SnapshotReadyCallback {
+        void onSnapshotReady(Bitmap snapshot);
     }
 
     private class MapChangeCameraPositionListener implements MapView.OnMapChangedListener {

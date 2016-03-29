@@ -23,6 +23,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
@@ -2451,6 +2452,28 @@ public class MapView extends FrameLayout {
 
     void setMapboxMap(MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
+    }
+
+    @UiThread
+    void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
+        final TextureView textureView = (TextureView) findViewById(R.id.textureView);
+        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
+
+        new AsyncTask<Void, Void, Bitmap>() {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                if (canUseBitmap) {
+                    return textureView.getBitmap(bitmap);
+                } else {
+                    return textureView.getBitmap();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                callback.onSnapshotReady(bitmap);
+            }
+        }.execute();
     }
 
     //

@@ -33,6 +33,7 @@
     <string name="activity_geocoder">Geocoder</string>
 
     <!-- Other -->
+    <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
     <string name="activity_custom_layer">Custom Layer (experimental)</string>
     <string name="activity_map_padding">Map Padding</string>
@@ -63,6 +64,7 @@
     <string name="description_directions">Example with Directions API</string>
     <string name="description_geocoder">Example with Geocoder API</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
+    <string name="description_snapshot">Example to make a snapshot of the map</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
 
@@ -80,6 +82,7 @@
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
     <string name="button_camera_animate">Animate</string>
+    <string name="button_make_snapshot">Snapshot</string>
 
     <string name="label_fps">FPS:</string>
 
