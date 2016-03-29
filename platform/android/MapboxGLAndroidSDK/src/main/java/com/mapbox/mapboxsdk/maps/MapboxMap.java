@@ -610,29 +610,36 @@ public class MapboxMap {
     public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
         int count = markerOptionsList.size();
         List<Marker> markers = new ArrayList<>(count);
-        MarkerOptions markerOptions;
-        Marker marker;
-        for (int i = 0; i < count; i++) {
-            markerOptions = markerOptionsList.get(i);
-            marker = prepareMarker(markerOptions);
-            markers.add(marker);
-        }
-
-        long[] ids = mMapView.addMarkers(markers);
-        long id = 0;
-        Marker m;
-
-        for (int i = 0; i < markers.size(); i++) {
-            m = markers.get(i);
-            m.setMapboxMap(this);
-            if (ids != null) {
-                id = ids[i];
-            } else {
-                //unit test
-                id++;
+        if (count > 0) {
+            MarkerOptions markerOptions;
+            Marker marker;
+            for (int i = 0; i < count; i++) {
+                markerOptions = markerOptionsList.get(i);
+                marker = prepareMarker(markerOptions);
+                markers.add(marker);
             }
-            m.setId(id);
-            mAnnotations.put(id, m);
+
+            if (markers.size() > 0) {
+                long[] ids = mMapView.addMarkers(markers);
+
+                // if unittests or markers are correctly added to map
+                if (ids == null || ids.length == markers.size()) {
+                    long id = 0;
+                    Marker m;
+                    for (int i = 0; i < markers.size(); i++) {
+                        m = markers.get(i);
+                        m.setMapboxMap(this);
+                        if (ids != null) {
+                            id = ids[i];
+                        } else {
+                            //unit test
+                            id++;
+                        }
+                        m.setId(id);
+                        mAnnotations.put(id, m);
+                    }
+                }
+            }
         }
         return markers;
     }

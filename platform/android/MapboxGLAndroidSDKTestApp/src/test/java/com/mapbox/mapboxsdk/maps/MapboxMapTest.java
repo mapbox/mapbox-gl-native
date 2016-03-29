@@ -535,6 +535,23 @@ public class MapboxMapTest {
     }
 
     @Test
+    public void testAddMarkersEmpty() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        mMapboxMap.addMarkers(markerList);
+        assertEquals("Markers size should be 0", 0, mMapboxMap.getMarkers().size());
+    }
+
+    @Test
+    public void testAddMarkersSingleMarker() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions = new MarkerOptions().title("a");
+        markerList.add(markerOptions);
+        mMapboxMap.addMarkers(markerList);
+        assertEquals("Markers size should be 1", 1, mMapboxMap.getMarkers().size());
+        assertTrue(mMapboxMap.getMarkers().contains(markerOptions.getMarker()));
+    }
+
+    @Test
     public void testAddPolygon() {
         PolygonOptions polygonOptions = new PolygonOptions().add(new LatLng());
         Polygon polygon = mMapboxMap.addPolygon(polygonOptions);
