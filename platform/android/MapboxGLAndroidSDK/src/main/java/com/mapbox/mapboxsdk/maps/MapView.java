@@ -400,7 +400,7 @@ public class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if (change == DID_FINISH_LOADING_MAP) {
+                if (change == DID_FINISH_RENDERING_MAP_FULLY_RENDERED) {
                     reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
