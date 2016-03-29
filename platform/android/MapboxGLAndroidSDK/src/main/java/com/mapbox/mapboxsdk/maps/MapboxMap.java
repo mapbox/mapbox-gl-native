@@ -692,28 +692,35 @@ public class MapboxMap {
         int count = polylineOptionsList.size();
         Polyline polyline;
         List<Polyline> polylines = new ArrayList<>(count);
-        for (PolylineOptions options : polylineOptionsList) {
-            polyline = options.getPolyline();
-            if (!polyline.getPoints().isEmpty()) {
-                polylines.add(polyline);
-            }
-        }
 
-        long[] ids = mMapView.addPolylines(polylines);
-        long id = 0;
-        Polyline p;
-
-        for (int i = 0; i < polylines.size(); i++) {
-            p = polylines.get(i);
-            p.setMapboxMap(this);
-            if (ids != null) {
-                id = ids[i];
-            } else {
-                // unit test
-                id++;
+        if(count>0) {
+            for (PolylineOptions options : polylineOptionsList) {
+                polyline = options.getPolyline();
+                if (!polyline.getPoints().isEmpty()) {
+                    polylines.add(polyline);
+                }
             }
-            p.setId(id);
-            mAnnotations.put(id, p);
+
+            long[] ids = mMapView.addPolylines(polylines);
+
+            // if unit tests or polylines are correctly added to map
+            if (ids == null || ids.length == polylines.size()) {
+                long id = 0;
+                Polyline p;
+
+                for (int i = 0; i < polylines.size(); i++) {
+                    p = polylines.get(i);
+                    p.setMapboxMap(this);
+                    if (ids != null) {
+                        id = ids[i];
+                    } else {
+                        // unit test
+                        id++;
+                    }
+                    p.setId(id);
+                    mAnnotations.put(id, p);
+                }
+            }
         }
         return polylines;
     }
@@ -750,26 +757,32 @@ public class MapboxMap {
 
         Polygon polygon;
         List<Polygon> polygons = new ArrayList<>(count);
-        for (PolygonOptions polygonOptions : polygonOptionsList) {
-            polygon = polygonOptions.getPolygon();
-            if (!polygon.getPoints().isEmpty()) {
-                polygons.add(polygon);
+        if(count>0) {
+            for (PolygonOptions polygonOptions : polygonOptionsList) {
+                polygon = polygonOptions.getPolygon();
+                if (!polygon.getPoints().isEmpty()) {
+                    polygons.add(polygon);
+                }
             }
-        }
 
-        long[] ids = mMapView.addPolygons(polygons);
-        long id = 0;
-        for (int i = 0; i < polygons.size(); i++) {
-            polygon = polygons.get(i);
-            polygon.setMapboxMap(this);
-            if (ids != null) {
-                id = ids[i];
-            } else {
-                // unit test
-                id++;
+            long[] ids = mMapView.addPolygons(polygons);
+
+            // if unit tests or polygons correcly added to map
+            if(ids==null || ids.length==polygons.size()) {
+                long id = 0;
+                for (int i = 0; i < polygons.size(); i++) {
+                    polygon = polygons.get(i);
+                    polygon.setMapboxMap(this);
+                    if (ids != null) {
+                        id = ids[i];
+                    } else {
+                        // unit test
+                        id++;
+                    }
+                    polygon.setId(id);
+                    mAnnotations.put(id, polygon);
+                }
             }
-            polygon.setId(id);
-            mAnnotations.put(id, polygon);
         }
         return polygons;
     }
