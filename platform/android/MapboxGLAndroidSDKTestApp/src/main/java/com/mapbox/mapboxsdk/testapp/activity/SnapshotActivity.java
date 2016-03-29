@@ -61,7 +61,7 @@ public class SnapshotActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         final long startTime = System.nanoTime();
-                        mMapView.snapshot(new MapView.SnapshotReadyCallback() {
+                        mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
                             @Override
                             public void onSnapshotReady(Bitmap snapshot) {
                                 long endTime = System.nanoTime();
