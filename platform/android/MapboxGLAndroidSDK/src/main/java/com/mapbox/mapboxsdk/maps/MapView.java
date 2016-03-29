@@ -2443,12 +2443,7 @@ public class MapView extends FrameLayout {
     }
 
     @UiThread
-    public void snapshot(@NonNull final SnapshotReadyCallback callback) {
-        snapshot(callback, null);
-    }
-
-    @UiThread
-    public void snapshot(@NonNull final SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
+    void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
         final TextureView textureView = (TextureView) findViewById(R.id.textureView);
         final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
 
@@ -2765,7 +2760,4 @@ public class MapView extends FrameLayout {
         void onMapChanged(@MapChange int change);
     }
 
-    public interface SnapshotReadyCallback {
-        void onSnapshotReady(Bitmap snapshot);
-    }
 }
