@@ -4,14 +4,20 @@
 
 A library based on [Mapbox GL Native](../../README.md) for embedding interactive map views with scalable, customizable vector maps into Java applications on Android devices.
 
-This repository is for day-to-day development of the SDK. Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications. For production applications, please consider installing an official, prebuilt release instead; see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/) for installation instructions.
+**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/).**
 
-## Installing the SDK
+[![](https://www.mapbox.com/android-sdk/images/splash.jpg)](https://www.mapbox.com/android-sdk/)
 
-* [Installing the Mapbox Android SDK on Linux](INSTALL_LINUX.md)
-* [Installing the Mapbox Android SDK on OS X](INSTALL_OSX.md)
+## Contributing to the SDK
 
-## Setting up the Android emulator
+**These instructions are for developers interested in making code-level contributions to the SDK itself. If you instead want to use the SDK in your app, see above.**
+
+Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications.
+
+* [Contributing on Linux](CONTRIBUTING_LINUX.md)
+* [Contributing on OS X](CONTRIBUTING_OSX.md)
+
+### Setting up the Android emulator
 
 The Mapbox Android SDK requires Android 4.0.3+ (API level 15+).
 
@@ -35,7 +41,7 @@ In Android Studio, create an x86 AVD (Android Virtual Device):
 
 Now when you run or debug the Android project you will see a window "Choose Device". Select your new AVD from drop down under "Launch emulator". If you select "Use same device for future launches" Android Studio will remember the selection and not ask again.
 
-## Running Mapbox GL Native on a hardware Android device
+### Running Mapbox GL Native on a hardware Android device
 
 The Mapbox Android SDK requires Android 4.0.3+ (API level 15+).
 

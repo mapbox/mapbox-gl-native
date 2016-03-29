@@ -1,4 +1,4 @@
-# Developing for Android on Linux
+# Contributing to the Android SDK on Linux
 
 Install a build dependencies:
 
