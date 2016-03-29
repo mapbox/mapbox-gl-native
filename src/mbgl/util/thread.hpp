@@ -47,18 +47,18 @@ public:
     // Invoke object->fn(args...) in the runloop thread, and wait for the result.
     template <class R, typename Fn, class... Args>
     R invokeSync(Fn fn, Args&&... args) {
-        std::packaged_task<R ()> task(std::bind(fn, object, args...));
+        std::packaged_task<R (std::decay_t<Args>...)> task(bind(fn));
         std::future<R> future = task.get_future();
-        loop->invoke(std::move(task));
+        loop->invoke(std::move(task), std::forward<Args>(args)...);
         return future.get();
     }
 
     // Invoke object->fn(args...) in the runloop thread, and wait for it to complete.
     template <typename Fn, class... Args>
     void invokeSync(Fn fn, Args&&... args) {
-        std::packaged_task<void ()> task(std::bind(fn, object, args...));
+        std::packaged_task<void (std::decay_t<Args>...)> task(bind(fn));
         std::future<void> future = task.get_future();
-        loop->invoke(std::move(task));
+        loop->invoke(std::move(task), std::forward<Args>(args)...);
         future.get();
     }
 
@@ -70,8 +70,9 @@ private:
 
     template <typename Fn>
     auto bind(Fn fn) {
-        return [fn, this] (auto &&... args) {
-            return (object->*fn)(std::forward<decltype(args)>(args)...);
+        return [fn, this] (auto &&... args)
+        -> decltype((object->*fn)(std::forward<decltype(args)>(args)...)) {
+             return (object->*fn)(std::forward<decltype(args)>(args)...);
         };
     }
 
@@ -79,8 +80,6 @@ private:
     void run(P&& params, std::index_sequence<I...>);
 
     std::promise<void> running;
-    std::promise<void> joinable;
-
     std::thread thread;
 
     Object* object = nullptr;
@@ -119,22 +118,18 @@ void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
     RunLoop loop_(RunLoop::Type::New);
     loop = &loop_;
 
+    running.set_value();
+
     Object object_(std::get<I>(std::forward<P>(params))...);
     object = &object_;
 
-    running.set_value();
     loop_.run();
 
-    loop = nullptr;
-    object = nullptr;
-
-    joinable.get_future().get();
 }
 
 template <class Object>
 Thread<Object>::~Thread() {
     loop->stop();
-    joinable.set_value();
     thread.join();
 }
 
