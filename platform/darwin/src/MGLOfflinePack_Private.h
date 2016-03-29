@@ -19,17 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, nullable) mbgl::OfflineRegion *mbglOfflineRegion;
 
-- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region;
+@property (nonatomic, readwrite) MGLOfflinePackState state;
 
-/**
- Request an asynchronous update to the pack’s `state` and `progress` properties.
- 
- The state and progress of an inactive or completed pack are computed lazily. If
- you need the state or progress of a pack inside an
- `MGLOfflinePackListingCompletionHandler`, set the `delegate` property then call
- this method.
- */
-- (void)requestProgress;
+- (instancetype)initWithMBGLRegion:(mbgl::OfflineRegion *)region;
 
 /**
  Invalidates the pack and ensures that no future progress update can ever

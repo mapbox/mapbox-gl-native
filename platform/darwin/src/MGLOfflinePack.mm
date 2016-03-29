@@ -40,7 +40,6 @@ private:
 
 @property (nonatomic, weak, nullable) id <MGLOfflinePackDelegate> delegate;
 @property (nonatomic, nullable, readwrite) mbgl::OfflineRegion *mbglOfflineRegion;
-@property (nonatomic, readwrite) MGLOfflinePackState state;
 @property (nonatomic, readwrite) MGLOfflinePackProgress progress;
 
 @end
@@ -123,7 +122,7 @@ private:
 }
 
 - (void)requestProgress {
-    NSAssert(_state != MGLOfflinePackStateInvalid, @"Cannot request progress from an invalid offline pack.");
+    MGLAssertOfflinePackIsValid();
     
     mbgl::DefaultFileSource *mbglFileSource = [[MGLOfflineStorage sharedOfflineStorage] mbglFileSource];
     

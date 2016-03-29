@@ -18,6 +18,7 @@
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
                 <outlet property="offlinePacksArrayController" destination="dWe-R6-sRz" id="Ar5-xu-ABm"/>
+                <outlet property="offlinePacksPanel" destination="Jjv-gs-Tx6" id="0vK-rR-3ZX"/>
                 <outlet property="preferencesWindow" destination="UWc-yQ-qda" id="Ota-aT-Mz2"/>
             </connections>
         </customObject>
@@ -527,7 +528,7 @@
                             <menuItem title="Offline Packs" id="YW3-jR-knj">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="makeKeyAndOrderFront:" target="Jjv-gs-Tx6" id="cJK-pv-fl5"/>
+                                    <action selector="showOfflinePacksPanel:" target="Voe-Tx-rLC" id="kj9-ht-KmF"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="eu3-7i-yIM"/>

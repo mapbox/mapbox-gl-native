@@ -58,6 +58,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 @interface AppDelegate ()
 
 @property (weak) IBOutlet NSArrayController *offlinePacksArrayController;
+@property (weak) IBOutlet NSPanel *offlinePacksPanel;
 
 @end
 
@@ -177,6 +178,14 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 
 #pragma mark Offline pack management
 
+- (IBAction)showOfflinePacksPanel:(id)sender {
+    [self.offlinePacksPanel makeKeyAndOrderFront:sender];
+    
+    for (MGLOfflinePack *pack in self.offlinePacksArrayController.arrangedObjects) {
+        [pack requestProgress];
+    }
+}
+
 - (IBAction)delete:(id)sender {
     for (MGLOfflinePack *pack in self.offlinePacksArrayController.selectedObjects) {
         [[MGLOfflineStorage sharedOfflineStorage] removePack:pack withCompletionHandler:^(NSError * _Nullable error) {
@@ -245,6 +254,9 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
         return YES;
     }
     if (menuItem.action == @selector(showPreferences:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(showOfflinePacksPanel:)) {
         return YES;
     }
     if (menuItem.action == @selector(delete:)) {

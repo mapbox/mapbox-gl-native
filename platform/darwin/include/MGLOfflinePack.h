@@ -11,9 +11,11 @@ typedef NS_ENUM (NSInteger, MGLOfflinePackState) {
     /**
      It is unknown whether the pack is inactive, active, or complete.
      
-     This is the initial state of a pack. The state becomes known by the time
-     the shared `MGLOfflineStorage` object sends its first
-     `MGLOfflinePackProgressChangedNotification`.
+     This is the initial state of a pack. The state of a pack becomes known by
+     the time the shared `MGLOfflineStorage` object sends the first
+     `MGLOfflinePackProgressChangedNotification` about the pack. For inactive
+     packs, you must explicitly request a progress update using the
+     `-[MGLOfflinePack requestProgress]` method.
      
      An invalid pack always has a state of `MGLOfflinePackStateInvalid`, never
      `MGLOfflinePackStateUnknown`.
@@ -107,9 +109,10 @@ typedef struct MGLOfflinePackProgress {
  The pack’s current state.
  
  The state of an inactive or completed pack is computed lazily and is set to
- `MGLOfflinePackStateUnknown` by default. To get notified when the state becomes
- known, observe KVO change notifications on this pack’s `state` key path.
- Alternatively, you can add an observer for
+ `MGLOfflinePackStateUnknown` by default. To request the pack’s status, use the
+ `-requestProgress` method. To get notified when the state becomes known and
+ when it changes, observe KVO change notifications on this pack’s `state` key
+ path. Alternatively, you can add an observer for
  `MGLOfflinePackProgressChangedNotification`s about this pack that come from the
  default notification center.
  */
@@ -119,9 +122,10 @@ typedef struct MGLOfflinePackProgress {
  The pack’s current progress.
  
  The progress of an inactive or completed pack is computed lazily, and all its
- fields are set to 0 by default. To get notified when the progress becomes
- known, observe KVO change notifications on this pack’s `state` key path.
- Alternatively, you can add an observer for
+ fields are set to 0 by default. To request the pack’s progress, use the
+ `-requestProgress` method. To get notified when the progress becomes
+ known and when it changes, observe KVO change notifications on this pack’s
+ `state` key path. Alternatively, you can add an observer for
  `MGLOfflinePackProgressChangedNotification`s about this pack that come from the
  default notification center.
  */
@@ -158,6 +162,18 @@ typedef struct MGLOfflinePackProgress {
  To resume downloading, call the `-resume` method.
  */
 - (void)suspend;
+
+/**
+ Request an asynchronous update to the pack’s `state` and `progress` properties.
+ 
+ The state and progress of an inactive or completed pack are computed lazily. If
+ you need the state or progress of a pack whose `state` property is currently
+ set to `MGLOfflinePackStateUnknown`, observe KVO change notifications on this
+ pack’s `state` key path, then call this method. Alternatively, you can add an
+ observer for `MGLOfflinePackProgressChangedNotification` about this pack that
+ come from the default notification center.
+ */
+- (void)requestProgress;
 
 @end
 

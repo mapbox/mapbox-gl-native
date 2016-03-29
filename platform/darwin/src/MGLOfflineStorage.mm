@@ -130,10 +130,10 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 - (void)addPackForRegion:(id <MGLOfflineRegion>)region withContext:(NSData *)context completionHandler:(MGLOfflinePackAdditionCompletionHandler)completion {
     __weak MGLOfflineStorage *weakSelf = self;
     [self _addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+        pack.state = MGLOfflinePackStateInactive;
         MGLOfflineStorage *strongSelf = weakSelf;
         [[strongSelf mutableArrayValueForKey:@"packs"] addObject:pack];
         pack.delegate = strongSelf;
-        [pack requestProgress];
         if (completion) {
             completion(pack, error);
         }
@@ -208,7 +208,6 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         
         for (MGLOfflinePack *pack in packs) {
             pack.delegate = self;
-            [pack requestProgress];
         }
     }];
 }

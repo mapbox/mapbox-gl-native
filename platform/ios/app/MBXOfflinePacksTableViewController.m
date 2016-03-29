@@ -70,6 +70,13 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
                 
             default:
                 [self.tableView reloadData];
+                
+                for (MGLOfflinePack *pack in [MGLOfflineStorage sharedOfflineStorage].packs) {
+                    if (pack.state == MGLOfflinePackStateUnknown) {
+                        [pack requestProgress];
+                    }
+                }
+                
                 break;
         }
     } else {
