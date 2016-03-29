@@ -64,7 +64,7 @@ Style::Style(MapData& data_, FileSource& fileSource_)
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
       spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, data.pixelRatio, *spriteStore)),
-      lineAtlas(std::make_unique<LineAtlas>(512, 512)),
+      lineAtlas(std::make_unique<LineAtlas>(256, 512)),
       workers(4) {
     glyphStore->setObserver(this);
     spriteStore->setObserver(this);
