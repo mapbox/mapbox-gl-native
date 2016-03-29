@@ -245,13 +245,17 @@ void StyleParser::parseSources(const JSValue& value) {
 std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> StyleParser::parseGeoJSON(const JSValue& value) {
     using namespace mapbox::geojsonvt;
 
+    Options options;
+    options.buffer = util::EXTENT / util::tileSize * 128;
+    options.extent = util::EXTENT;
+
     try {
-        return std::make_unique<GeoJSONVT>(Convert::convert(value, 0));
+        return std::make_unique<GeoJSONVT>(Convert::convert(value, 0), options);
     } catch (const std::exception& ex) {
         Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", ex.what());
         // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
         // tiles to load.
-        return std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{});
+        return std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>{}, options);
     }
 }
 
