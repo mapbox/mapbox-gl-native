@@ -57,9 +57,9 @@
                 android:value="@string/category_marker" />
         </activity>
         <activity
-            android:name=".activity.CameraActivity"
-            android:description="@string/description_camera"
-            android:label="@string/activity_camera">
+            android:name=".activity.CameraAnimationTypeActivity"
+            android:description="@string/description_camera_animation_types"
+            android:label="@string/activity_camera_animation_types">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />

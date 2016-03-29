@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -12,39 +13,41 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/cameraMapView"
+        android:id="@id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"/>
+        android:layout_below="@+id/toolbar"
+        app:center_latitude="51.50325"
+        app:center_longitude="-0.11968"
+        app:zoom="15" />
 
     <Button
+        android:id="@+id/cameraMoveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_move"
-        android:id="@+id/cameraMoveButton"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"/>
+        android:layout_margin="@dimen/fab_margin"
+        android:text="@string/button_camera_move" />
 
     <Button
+        android:id="@+id/cameraEaseButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_ease"
-        android:id="@+id/cameraEaseButton"
         android:layout_alignTop="@+id/cameraMoveButton"
         android:layout_centerHorizontal="true"
-        android:background="@color/white"/>
+        android:text="@string/button_camera_ease" />
 
     <Button
+        android:id="@+id/cameraAnimateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_camera_animate"
-        android:id="@+id/cameraAnimateButton"
         android:layout_alignBottom="@+id/cameraEaseButton"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginRight="@dimen/fab_margin"
-        android:background="@color/white"/>
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:text="@string/button_camera_animate" />
 
 </RelativeLayout>

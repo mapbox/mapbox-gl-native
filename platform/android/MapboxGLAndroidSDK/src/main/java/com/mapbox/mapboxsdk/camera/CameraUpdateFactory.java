@@ -56,7 +56,6 @@ public final class CameraUpdateFactory {
         return newLatLngBounds(bounds, padding, padding, padding, padding);
     }
 
-
     /**
      * Returns a CameraUpdate that transforms the camera such that the specified latitude/longitude
      * bounds are centered on screen at the greatest possible zoom level.

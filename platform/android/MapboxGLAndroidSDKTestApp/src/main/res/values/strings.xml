@@ -5,25 +5,35 @@
 
     <!-- Test Activities -->
     <string name="activity_mapboxmap">MapboxMap Activity</string>
-    <string name="activity_tilt">Map Tilt Activity</string>
+
+    <!-- Fragment -->
     <string name="activity_map_fragment_suport">Support Map Fragment Activity</string>
     <string name="activity_map_fragment">Map Fragment Activity</string>
+
+    <!-- Markers -->
     <string name="activity_press_for_marker">Press For Marker Activity</string>
     <string name="activity_marker_in_bulk">Add Bulk Markers Activity</string>
-    <string name="activity_manual_zoom">Manual Zoom Activity</string>
+    <string name="activity_add_bulk_markers">Add Markers In Bulk Activity</string>
+
+    <!-- InfoWindow-->
     <string name="activity_info_window">Basic InfoWindow example</string>
     <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
+
+    <!-- Camera -->
+    <string name="activity_manual_zoom">Manual Zoom Activity</string>
     <string name="activity_visible_coordinate_bounds">Visible Coordinate Bounds Activity</string>
+    <string name="activity_tilt">Map Tilt Activity</string>
+    <string name="activity_scroll_by">Scroll By Method</string>
+
+    <!-- Other -->
     <string name="activity_user_tracking_mode">User tracking mode Activity</string>
-    <string name="activity_add_bulk_markers">Add Markers In Bulk Activity</string>
-    <string name="activity_camera">Camera Activity</string>
+    <string name="activity_camera_animation_types">Camera Animation Types</string>
     <string name="activity_polyline">Polyline Activity</string>
     <string name="activity_animate_coordinate_change">Animate Coordinate Change Activity</string>
     <string name="activity_custom_layer">Custom Layer Activity</string>
     <string name="activity_directions">Directions Activity</string>
     <string name="activity_geocoder">Geocoder Activity</string>
     <string name="activity_double_map">Double Map Activity</string>
-    <string name="activity_scroll_by">Scroll By Activity</string>
     <string name="activity_dynamic_marker">Dynamic Marker Activity</string>
     <string name="activity_map_padding">Map Padding Activity</string>
     <string name="activity_offline">Offline Map Activity</string>
@@ -44,7 +54,7 @@
     <string name="description_animate_coordinate_change">Animate Coordinate Change</string>
     <string name="description_info_window_concurrent">InfoWindow example with multiple open</string>
     <string name="description_add_bulk_markers">Example which adds Markers in bulk</string>
-    <string name="description_camera">Showcase Camera API</string>
+    <string name="description_camera_animation_types">Showcase the different animation types</string>
     <string name="description_visible_bounds">Limit Visible Bounds example</string>
     <string name="description_double_mapview">Having 2 MapViews in one location</string>
     <string name="description_dynamic_marker">Dynamic Marker example</string>

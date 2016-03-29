@@ -20,16 +20,20 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ApiAccess;
 import com.mapbox.mapboxsdk.maps.MapView;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraAnimationTypeActivity extends AppCompatActivity {
 
     private static final String TAG = "CameraActivity";
 
-    private MapView mMapView;
+    private MapView mapView;
+
+    private boolean cameraState;
+    private static final LatLng LAT_LNG_LONDON_EYE = new LatLng(51.50325, -0.11968);
+    private static final LatLng LAT_LNG_TOWER_BRIDGE = new LatLng(51.50550, -0.07520);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_camera_animation_types);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,13 +44,14 @@ public class CameraActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        mMapView = (MapView) findViewById(R.id.cameraMapView);
-        mMapView.setAccessToken(ApiAccess.getToken(this));
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.setAccessToken(ApiAccess.getToken(this));
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                // set a style
+                mapboxMap.getUiSettings().setAttributionEnabled(false);
+                mapboxMap.getUiSettings().setLogoEnabled(false);
                 mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition position) {
@@ -59,9 +64,10 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(44.50128, -88.06216))    // Sets the center of the map to Lambeau Field
-                                .zoom(14)                                   // Sets the zoom
-                                .tilt(30)                                   // Sets the tilt of the camera to 30 degrees
+                                .target(getNextLatLng())
+                                .zoom(14)
+                                .tilt(30)
+                                .tilt(0)
                                 .build();
 
                         mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -73,26 +79,27 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(48.21874, 11.62465))     // Sets the center of the map to Allianz Arena
-                                .zoom(16)                                   // Sets the zoom
-                                .bearing(180)                               // Sets the orientation of the camera to south
-                                .build();                                   // Creates a CameraPosition from the builder
+                                .target(getNextLatLng())
+                                .zoom(15)
+                                .bearing(180)
+                                .tilt(30)
+                                .build();
 
                         MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
                             @Override
                             public void onCancel() {
                                 Log.i(TAG, "Duration onCancel Callback called.");
-                                Toast.makeText(CameraActivity.this, "Ease onCancel Callback called.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(CameraAnimationTypeActivity.this, "Ease onCancel Callback called.", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
                             public void onFinish() {
                                 Log.i(TAG, "Duration onFinish Callback called.");
-                                Toast.makeText(CameraActivity.this, "Ease onFinish Callback called.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(CameraAnimationTypeActivity.this, "Ease onFinish Callback called.", Toast.LENGTH_LONG).show();
                             }
                         };
 
-                        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 25000, callback);
+                        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
                     }
                 });
 
@@ -101,72 +108,77 @@ public class CameraActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(-22.91214, -43.23012))   // Sets the center of the map to Maracanã
-                                .bearing(270)                               // Sets the orientation of the camera to west
-                                .tilt(20)                                   // Sets the tilt of the camera to 30 degrees
-                                .build();                                   // Creates a CameraPosition from the builder
+                                .target(getNextLatLng())
+                                .bearing(270)
+                                .tilt(20)
+                                .build();
 
                         MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
                             @Override
                             public void onCancel() {
                                 Log.i(TAG, "Duration onCancel Callback called.");
-                                Toast.makeText(CameraActivity.this, "Duration onCancel Callback called.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(CameraAnimationTypeActivity.this, "Duration onCancel Callback called.", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
                             public void onFinish() {
                                 Log.i(TAG, "Duration onFinish Callback called.");
-                                Toast.makeText(CameraActivity.this, "Duration onFinish Callback called.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(CameraAnimationTypeActivity.this, "Duration onFinish Callback called.", Toast.LENGTH_LONG).show();
                             }
                         };
 
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 25000, callback);
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
                     }
                 });
             }
         });
     }
 
+    private LatLng getNextLatLng() {
+        cameraState = !cameraState;
+        return cameraState ? LAT_LNG_TOWER_BRIDGE : LAT_LNG_LONDON_EYE;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        mMapView.onStart();
+        mapView.onStart();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mMapView.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mMapView.onPause();
+        mapView.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mMapView.onStop();
+        mapView.onStop();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mMapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
+        mapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        mapView.onLowMemory();
     }
 
     @Override

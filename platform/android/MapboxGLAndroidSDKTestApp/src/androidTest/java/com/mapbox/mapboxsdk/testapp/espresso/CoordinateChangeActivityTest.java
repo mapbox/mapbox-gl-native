@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on CameraActivity
+ * Tests on CameraAnimationTypeActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
