@@ -20,9 +20,10 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
                                  const double ratio,
                                  const bool sdf) {
     // Disallow invalid parameter configurations.
-    if (width == 0 || height == 0 || ratio <= 0 || ratio > 10 || width > 1024 ||
-        height > 1024) {
-        Log::Warning(Event::Sprite, "Can't create sprite with invalid metrics");
+    if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
+        ratio <= 0 || ratio > 10 ||
+        srcX + width > image.width || srcY + height > image.height) {
+        Log::Error(Event::Sprite, "Can't create sprite with invalid metrics");
         return nullptr;
     }
 
@@ -31,16 +32,11 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
     auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
     auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
 
-    const int32_t maxX = std::min(uint32_t(image.width), uint32_t(width + srcX)) - srcX;
-    assert(maxX <= int32_t(image.width));
-    const int32_t maxY = std::min(uint32_t(image.height), uint32_t(height + srcY)) - srcY;
-    assert(maxY <= int32_t(image.height));
-
     // Copy from the source image into our individual sprite image
-    for (uint16_t y = 0; y < maxY; ++y) {
+    for (uint16_t y = 0; y < height; ++y) {
         const auto dstRow = y * width;
         const auto srcRow = (y + srcY) * image.width + srcX;
-        for (uint16_t x = 0; x < maxX; ++x) {
+        for (uint16_t x = 0; x < width; ++x) {
             dstData[dstRow + x] = srcData[srcRow + x];
         }
     }
