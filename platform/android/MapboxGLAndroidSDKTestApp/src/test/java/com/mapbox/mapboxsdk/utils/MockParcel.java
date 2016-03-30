@@ -1,12 +1,13 @@
 package com.mapbox.mapboxsdk.utils;
 
 import android.os.Parcel;
-
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import android.os.Parcelable;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,22 +23,37 @@ import static org.mockito.Mockito.when;
 
 public class MockParcel {
 
-    public static Parcel obtain() {
-        return new MockParcel().getMockedParcel();
+    public static Parcel obtain(Parcelable target) {
+        Parcel parcel = new MockParcel(target).getMockedParcel();
+        target.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        return parcel;
     }
 
-    Parcel mockedParcel;
-    int position;
-    List<Object> objects;
-
-    public Parcel getMockedParcel() {
-        return mockedParcel;
+    public static Parcel obtain(Parcelable[] targets) {
+        if (targets == null || targets.length == 0) {
+            throw new IllegalArgumentException("The passed argument may not be null or empty");
+        }
+        Parcel parcel = new MockParcel(targets[0]).getMockedParcel();
+        parcel.writeParcelableArray(targets, 0);
+        parcel.setDataPosition(0);
+        return parcel;
     }
 
-    public MockParcel() {
+    private Parcel mockedParcel;
+    private int position;
+    private List<Object> objects;
+    private Object o;
+
+    private MockParcel(Object o) {
+        this.o = o;
         mockedParcel = mock(Parcel.class);
         objects = new ArrayList<>();
         setupMock();
+    }
+
+    private Parcel getMockedParcel() {
+        return mockedParcel;
     }
 
     private void setupMock() {
@@ -66,11 +82,11 @@ public class MockParcel {
                 return null;
             }
         };
-
         doAnswer(writeValueAnswer).when(mockedParcel).writeLong(anyLong());
         doAnswer(writeValueAnswer).when(mockedParcel).writeString(anyString());
         doAnswer(writeValueAnswer).when(mockedParcel).writeDouble(anyDouble());
-        doAnswer(writeArrayAnswer).when(mockedParcel).writeParcelableArray(any(LatLng[].class), eq(0));
+        doAnswer(writeValueAnswer).when(mockedParcel).writeParcelable(any(Parcelable.class), eq(0));
+        doAnswer(writeArrayAnswer).when(mockedParcel).writeParcelableArray(any(Parcelable[].class), eq(0));
     }
 
     private void setupReads() {
@@ -92,15 +108,26 @@ public class MockParcel {
                 return (Double) objects.get(position++);
             }
         });
-        when(mockedParcel.readParcelableArray(LatLng.class.getClassLoader())).thenAnswer(new Answer<LatLng[]>() {
+        when(mockedParcel.readParcelable(Parcelable.class.getClassLoader())).thenAnswer(new Answer<Parcelable>() {
             @Override
-            public LatLng[] answer(InvocationOnMock invocation) throws Throwable {
+            public Parcelable answer(InvocationOnMock invocation) throws Throwable {
+                return (Parcelable) objects.get(position++);
+            }
+        });
+        when(mockedParcel.readParcelableArray(Parcelable.class.getClassLoader())).thenAnswer(new Answer<Object[]>() {
+            @Override
+            public Object[] answer(InvocationOnMock invocation) throws Throwable {
                 int size = (Integer) objects.get(position++);
-                LatLng[] latLngs = LatLng.CREATOR.newArray(size);
+                Field field = o.getClass().getDeclaredField("CREATOR");
+                field.setAccessible(true);
+                Class<?> creatorClass = field.getType();
+                Object fieldValue = field.get(o);
+                Method myMethod = creatorClass.getDeclaredMethod("newArray", int.class);
+                Object[] array = (Object[]) myMethod.invoke(fieldValue, size);
                 for (int i = 0; i < size; i++) {
-                    latLngs[i] = (LatLng) objects.get(position++);
+                    array[i] = objects.get(position++);
                 }
-                return latLngs;
+                return array;
             }
         });
     }
@@ -114,5 +141,4 @@ public class MockParcel {
             }
         }).when(mockedParcel).setDataPosition(anyInt());
     }
-
 }
