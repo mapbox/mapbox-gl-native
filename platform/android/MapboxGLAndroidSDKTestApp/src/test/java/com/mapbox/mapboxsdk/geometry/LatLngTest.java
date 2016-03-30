@@ -176,22 +176,22 @@ public class LatLngTest {
 
     @Test
     public void testParcelable() {
-        LatLng latLng = new LatLng(1, 2, 3);
-        Parcel parcel = MockParcel.obtain();
-        latLng.writeToParcel(parcel, 0);
+        LatLng object = new LatLng(1, 2, 3);
+        Parcel parcel = MockParcel.obtain(object);
+        object.writeToParcel(parcel, 0);
         parcel.setDataPosition(0);
-        LatLng parceledLatLng = LatLng.CREATOR.createFromParcel(parcel);
-        assertEquals("parcel should match initial object", latLng, parceledLatLng);
+        LatLng parceable = LatLng.CREATOR.createFromParcel(parcel);
+        assertEquals("parcel should match initial object", object, parceable);
     }
 
     @Test
     public void testParcelableArray() {
-        LatLng[] latLngs = new LatLng[]{new LatLng(1, 2, 3), new LatLng(1, 2)};
-        Parcel parcel = MockParcel.obtain();
-        parcel.writeParcelableArray(latLngs, 0);
+        LatLng[] objects = new LatLng[]{new LatLng(1, 2, 3), new LatLng(1, 2)};
+        Parcel parcel = MockParcel.obtain(objects);
+        parcel.writeParcelableArray(objects, 0);
         parcel.setDataPosition(0);
-        LatLng[] parceledLatLngs = (LatLng[]) parcel.readParcelableArray(LatLng.class.getClassLoader());
-        assertArrayEquals("parcel should match initial object", latLngs, parceledLatLngs);
+        LatLng[] parcelableArray = (LatLng[]) parcel.readParcelableArray(LatLng.class.getClassLoader());
+        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
     }
 
     @Test

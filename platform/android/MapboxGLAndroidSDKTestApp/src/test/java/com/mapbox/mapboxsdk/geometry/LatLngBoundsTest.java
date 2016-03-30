@@ -1,6 +1,9 @@
 package com.mapbox.mapboxsdk.geometry;
 
+import android.os.Parcel;
+
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
+import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -168,5 +171,42 @@ public class LatLngBoundsTest {
                         .build());
     }
 
+    @Test
+    public void testParcelable() {
+        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                .include(new LatLng(10, 10))
+                .include(new LatLng(9, 8))
+                .build();
+        Parcel parcel = MockParcel.obtain(latLngBounds);
+        latLngBounds.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        LatLngBounds parceable = LatLngBounds.CREATOR.createFromParcel(parcel);
+        assertEquals("parcel should match initial object", latLngBounds, parceable);
+    }
 
+    @Test
+    public void testParcelableArray() {
+        LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+                .include(new LatLng(10, 10))
+                .include(new LatLng(9, 8))
+                .build();
+        LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+                .include(new LatLng(11, 12))
+                .include(new LatLng(95, 9))
+                .build();
+
+        LatLngBounds[] objects = new LatLngBounds[]{latLngBounds1, latLngBounds2};
+        Parcel parcel = MockParcel.obtain(objects);
+        LatLngBounds[] parcelableArray = (LatLngBounds[]) parcel.readParcelableArray(LatLngSpan.class.getClassLoader());
+        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
+    }
+
+    @Test
+    public void testDescribeContents() {
+        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                .include(new LatLng(10, 10))
+                .include(new LatLng(9, 8))
+                .build();
+        assertEquals("contents should be 0", 0, latLngBounds.describeContents(), DELTA);
+    }
 }
