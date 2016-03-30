@@ -127,7 +127,7 @@ void Source::load(FileSource& fileSource) {
 
                 info = std::move(newInfo);
             } else if (type == SourceType::GeoJSON) {
-                info = std::make_unique<SourceInfo>();
+                std::unique_ptr<SourceInfo> newInfo = std::make_unique<SourceInfo>();
 
                 rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
                 d.Parse<0>(res.data->c_str());
@@ -141,6 +141,9 @@ void Source::load(FileSource& fileSource) {
 
                 geojsonvt = StyleParser::parseGeoJSON(d);
                 reloadTiles = true;
+
+                newInfo->maxZoom = geojsonvt->options.maxZoom;
+                info = std::move(newInfo);
             }
 
             if (reloadTiles) {
@@ -352,9 +355,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     int32_t maxCoveringZoom = util::clamp<int32_t>(zoom + 1,  info->minZoom, info->maxZoom);
 
     if (zoom >= info->minZoom) {
-        const bool reparseOverscaled =
-            type == SourceType::Vector ||
-            type == SourceType::Annotations;
+        const bool reparseOverscaled = type != SourceType::Raster;
 
         const auto actualZ = zoom;
         if (zoom > info->maxZoom) {

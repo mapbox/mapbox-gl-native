@@ -203,6 +203,8 @@ void StyleParser::parseSources(const JSValue& value) {
             break;
 
         case SourceType::GeoJSON:
+            info = std::make_unique<SourceInfo>();
+
             // We should probably split this up to have URLs in the url property, and actual data
             // in the data property. Until then, we're going to detect the content based on the
             // object type.
@@ -213,8 +215,8 @@ void StyleParser::parseSources(const JSValue& value) {
                     url = { dataVal.GetString(), dataVal.GetStringLength() };
                 } else if (dataVal.IsObject()) {
                     // We need to parse dataVal as a GeoJSON object
-                    // TODO: parse GeoJSON data
                     geojsonvt = parseGeoJSON(dataVal);
+                    info->maxZoom = geojsonvt->options.maxZoom;
                 } else {
                     Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
                     continue;
@@ -223,9 +225,6 @@ void StyleParser::parseSources(const JSValue& value) {
                 Log::Error(Event::ParseStyle, "GeoJSON source must have a data value");
                 continue;
             }
-
-            // We always assume the default configuration for GeoJSON sources.
-            info = std::make_unique<SourceInfo>();
 
             break;
 

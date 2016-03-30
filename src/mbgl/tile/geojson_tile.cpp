@@ -119,7 +119,7 @@ void GeoJSONTileMonitor::setGeoJSONVT(mapbox::geojsonvt::GeoJSONVT* vt) {
 
 void GeoJSONTileMonitor::update() {
     if (geojsonvt) {
-        auto tile = convertTile(geojsonvt->getTile(tileID.z, tileID.x, tileID.y));
+        auto tile = convertTile(geojsonvt->getTile(tileID.sourceZ, tileID.x, tileID.y));
         callback(nullptr, std::move(tile), {}, {});
     }
 }
