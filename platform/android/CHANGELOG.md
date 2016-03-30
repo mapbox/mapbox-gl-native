@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.0.0
+
+Mapbox Android 4.0.0 contains the following 3 major new features.
+
+* MapboxMap API Change ([#3145](https://github.com/mapbox/mapbox-gl-native/issues/3145))
+* Offline Maps ([#3891](https://github.com/mapbox/mapbox-gl-native/issues/3891))
+* Telemetry ([#2421](https://github.com/mapbox/mapbox-gl-native/issues/2421))
+
 ## 4.0.0-rc.1
 
 * Default Value Bug Fix for MapboxMapOptions ([#4398](https://github.com/mapbox/mapbox-gl-native/issues/4398))
