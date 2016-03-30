@@ -32,6 +32,6 @@ public class MaxMinZoomActivityTest extends BaseTest {
 
     @Test
     public void testSanity() {
-        checkViewIsDisplayed(R.id.manualZoomMapView);
+        checkViewIsDisplayed(R.id.mapView);
     }
 }

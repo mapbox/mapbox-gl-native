@@ -7,24 +7,25 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapUtils;
 import com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.activity.PolylineActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Test;
 
-public abstract class BaseMainActivityTest extends ActivityInstrumentationTestCase2<FeatureOverviewActivity> {
+public abstract class BaseMainActivityTest extends ActivityInstrumentationTestCase2<PolylineActivity> {
 
     protected Solo solo;
     protected MapView mapView;
     protected MapboxMap mapboxMap;
 
     public BaseMainActivityTest() {
-        super(FeatureOverviewActivity.class);
+        super(PolylineActivity.class);
     }
 
     @Override
     public void setUp() throws Exception {
         solo = new Solo(getInstrumentation(), getActivity());
-        mapView = (MapView) solo.getView(R.id.mainMapView);
+        mapView = (MapView) solo.getView(R.id.mapView);
         mapboxMap = MapboxMapUtils.getMapboxMap(mapView);
     }
 

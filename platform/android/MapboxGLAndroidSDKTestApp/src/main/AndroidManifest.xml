@@ -23,14 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.LatLngBoundsActivity"
-            android:description="@string/description_visible_bounds"
-            android:label="@string/activity_visible_coordinate_bounds">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_other" />
-        </activity>
+
         <activity
             android:name=".activity.InfoWindowActivity"
             android:description="@string/description_info_window"
@@ -54,7 +47,15 @@
             android:label="@string/activity_add_bulk_markers">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_marker" />
+                android:value="@string/category_annotation" />
+        </activity>
+        <activity
+            android:name=".activity.AnimatedMarkerActivity"
+            android:description="@string/description_animated_marker"
+            android:label="@string/activity_animated_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
         </activity>
         <activity
             android:name=".activity.CameraAnimationTypeActivity"
@@ -65,9 +66,17 @@
                 android:value="@string/category_camera" />
         </activity>
         <activity
-            android:name=".activity.TiltActivity"
-            android:description="@string/description_tilt"
-            android:label="@string/activity_tilt">
+            android:name=".activity.CameraPositionActivity"
+            android:description="@string/description_cameraposition"
+            android:label="@string/activity_camera_position">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera" />
+        </activity>
+        <activity
+            android:name=".activity.LatLngBoundsActivity"
+            android:description="@string/description_visible_bounds"
+            android:label="@string/activity_visible_coordinate_bounds">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
@@ -89,17 +98,9 @@
                 android:value="@string/category_fragment" />
         </activity>
         <activity
-            android:name=".activity.PressForMarkerActivity"
-            android:description="@string/description_press_for_marker"
-            android:label="@string/activity_press_for_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_marker" />
-        </activity>
-        <activity
             android:name=".activity.ManualZoomActivity"
-            android:description="@string/description_manual_zoom"
-            android:label="@string/activity_manual_zoom">
+            android:description="@string/description_camera_zoom"
+            android:label="@string/activity_camera_zoom">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
@@ -126,15 +127,7 @@
             android:label="@string/activity_polyline">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_marker" />
-        </activity>
-        <activity
-            android:name=".activity.CoordinateChangeActivity"
-            android:description="@string/description_animate_coordinate_change"
-            android:label="@string/activity_animate_coordinate_change">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_camera" />
+                android:value="@string/category_annotation" />
         </activity>
         <activity
             android:name=".activity.DirectionsActivity"
@@ -153,14 +146,6 @@
                 android:value="@string/category_api" />
         </activity>
         <activity
-            android:name=".activity.DoubleMapActivity"
-            android:description="@string/description_double_mapview"
-            android:label="@string/activity_double_map">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_other" />
-        </activity>
-        <activity
             android:name=".activity.ScrollByActivity"
             android:description="@string/description_scroll_by"
             android:label="@string/activity_scroll_by">
@@ -174,7 +159,7 @@
             android:label="@string/activity_dynamic_marker">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_marker" />
+                android:value="@string/category_annotation" />
         </activity>
         <activity
             android:name=".activity.MapPaddingActivity"
@@ -193,14 +178,7 @@
                 android:name="@string/category"
                 android:value="@string/category_other" />
         </activity>
-        <activity
-            android:name=".activity.AnimatedMarkerActivity"
-            android:description="@string/description_animated_marker"
-            android:label="@string/activity_animated_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_marker" />
-        </activity>
+
 
         <!-- Configuration Settings -->
         <meta-data
