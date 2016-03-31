@@ -1,33 +1,48 @@
 # Distributing Mapbox GL Native for Android
 
-Depending on your use-case, you might want to support a subset of ABI's.
-This can be achieved using the different `Makefile` targets we expose.
+Depending on your use case, you may want to support all or just a subset of [Android ABIs](http://developer.android.com/ndk/guides/abis.html).
+This can be achieved using the different `Makefile` targets that are available.
 
-##### Build JNI libraries for all supported ABI's
+##### Build native libraries for all supported ABIs
 
-```
+```sh
 make apackage
 ```
 
-This will build libraries to support following ABI:
- - arm-v5
- - arm-v7
- - arm-v8
+This will build native libraries to support following ABIs:
+ - armeabi
+ - armeabi-v7a
+ - arm64-v8a
  - x86
- - x86-64
+ - x86_64
  - mips
 
+##### Build native libraries for a specific ABI
 
-##### Build JNI libraries for a specific ABI
-
-```
-make android-lib-%
-```
-
-In the command above you need to replace `%` with an ABI mentioned above. Eg.
-
-```
-make android-lib-x86
+```sh
+make android-lib-%%
 ```
 
-This will build the JNI library for the x86 architecture.
+In the command above you'll need to replace `%%` with an ABI key listed below:
+
+| ABI Key | Android ABI |
+|---------|-------------|
+| arm-v5 | armeabi |
+| arm-v7 | armeabi-v7a |
+| arm-v8 | arm64-v8a |
+| x86 | x86 |
+| x86-64 | x86_64 |
+| mips | mips |
+
+For example, to build the arm64-v8a ABI the Makefile target would be:
+
+```sh
+make android-lib-arm-v8
+```
+
+It's also possible to build multiple ABI (without having to build them all) by running the Makefile multiple times.  For example to build arm64-v8a and x86_64 in the same project the commands would be:
+
+```sh
+make android-lib-arm-v8
+make android-lib-arm-x86-64
+```
