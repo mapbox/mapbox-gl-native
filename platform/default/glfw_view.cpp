@@ -211,13 +211,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
 }
 
 mbgl::LatLng GLFWView::makeRandomPoint() const {
-    const auto nw = map->latLngForPixel({ 0, 0 });
-    const auto se = map->latLngForPixel({ double(width), double(height) });
-
-    const double lon = nw.longitude + (se.longitude - nw.longitude) * (double(std::rand()) / RAND_MAX);
-    const double lat = se.latitude + (nw.latitude - se.latitude) * (double(std::rand()) / RAND_MAX);
-
-    return { lat, lon };
+    const double x = width * double(std::rand()) / RAND_MAX;
+    const double y = height * double(std::rand()) / RAND_MAX;
+    return map->latLngForPixel({ x, y });
 }
 
 std::shared_ptr<const mbgl::SpriteImage>
