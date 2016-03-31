@@ -14,7 +14,6 @@
         '../platform/default/log_stderr.cpp',
         '../platform/default/string_stdlib.cpp',
         '../platform/default/run_loop.cpp',
-        '../platform/default/application_root.cpp',
         '../platform/default/thread.cpp',
         '../platform/default/image.cpp',
         '../platform/default/webp_reader.cpp',

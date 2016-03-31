@@ -25,7 +25,6 @@
         '../platform/default/sqlite3.cpp',
         '../platform/darwin/src/log_nslog.mm',
         '../platform/darwin/src/string_nsstring.mm',
-        '../platform/darwin/src/application_root.mm',
         '../platform/darwin/src/image.mm',
         '../platform/darwin/src/nsthread.mm',
         '../platform/darwin/src/reachability.m',
