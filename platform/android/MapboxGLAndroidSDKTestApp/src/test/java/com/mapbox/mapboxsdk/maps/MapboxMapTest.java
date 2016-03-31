@@ -197,7 +197,7 @@ public class MapboxMapTest {
         CameraPosition position = new CameraPosition.Builder().bearing(1).tilt(2).zoom(3).target(new LatLng(4, 5)).build();
         mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         mMapboxMap.setPadding(0, 0, 0, 0);
-        verify(mOnCameraChangeListener, times(2)).onCameraChange(position);
+        verify(mOnCameraChangeListener, times(1)).onCameraChange(position);
     }
 
     //
