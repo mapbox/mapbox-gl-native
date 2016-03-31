@@ -1430,7 +1430,6 @@ public class MapView extends FrameLayout {
             case MotionEvent.ACTION_POINTER_DOWN:
                 // Second pointer down
                 mTwoTap = event.getPointerCount() == 2
-                        && !mDestroyed
                         && mMapboxMap.getUiSettings().isZoomGesturesEnabled();
                 if (mTwoTap) {
                     // Confirmed 2nd Finger Down
