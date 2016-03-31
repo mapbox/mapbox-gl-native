@@ -64,8 +64,6 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
 
         // Image fill.
         if (pass == RenderPass::Translucent && posA && posB) {
-            const float factor =
-                (util::EXTENT / util::tileSize / std::pow(2, state.getIntegerZoom() - id.sourceZ));
 
             config.program = patternShader->getID();
             patternShader->u_matrix = vtxMatrix;
@@ -87,12 +85,12 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             }};
 
             patternShader->u_patternscale_a = {{
-                1.0f / (factor * imageSizeScaledA[0]),
-                1.0f / (factor * imageSizeScaledA[1])
+                1.0f / id.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
+                1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
             }};
             patternShader->u_patternscale_b = {{
-                1.0f / (factor * imageSizeScaledB[0]),
-                1.0f / (factor * imageSizeScaledB[1])
+                1.0f / id.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
+                1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
             }};
 
             float offsetAx = (std::fmod(util::tileSize, imageSizeScaledA[0]) * id.x) / (float)imageSizeScaledA[0];

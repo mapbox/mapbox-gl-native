@@ -1,9 +1,14 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <cassert>
 
 namespace mbgl {
+
+float TileID::pixelsToTileUnits(float pixelValue, float zoom) const {
+    return pixelValue * (util::EXTENT / (util::tileSize * overscaleFactor() * std::pow(2, zoom - z)));
+}
 
 TileID TileID::parent(uint8_t parent_z, uint8_t sourceMaxZoom) const {
     assert(parent_z < z);

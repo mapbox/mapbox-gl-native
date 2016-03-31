@@ -45,6 +45,7 @@ public:
         return y < rhs.y;
     }
 
+    float pixelsToTileUnits(float pixelValue, float zoom) const;
     TileID parent(uint8_t z, uint8_t sourceMaxZoom) const;
     TileID normalized() const;
     std::forward_list<TileID>

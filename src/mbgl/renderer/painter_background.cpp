@@ -63,7 +63,6 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         if (isPatterned) {
             patternShader->u_matrix = vtxMatrix;
-            const float factor = util::EXTENT / util::tileSize;
 
             std::array<int, 2> imageSizeScaledA = {{
                 (int)((*imagePosA).size[0] * properties.pattern.value.fromScale),
@@ -75,12 +74,12 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
             }};
 
             patternShader->u_patternscale_a = {{
-                1.0f / (factor * imageSizeScaledA[0]),
-                1.0f / (factor * imageSizeScaledA[1])
+                1.0f / id.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
+                1.0f / id.pixelsToTileUnits(imageSizeScaledA[1], state.getIntegerZoom())
             }};
             patternShader->u_patternscale_b = {{
-                1.0f / (factor * imageSizeScaledB[0]),
-                1.0f / (factor * imageSizeScaledB[1])
+                1.0f / id.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
+                1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
             }};
 
             float offsetAx = (std::fmod(util::tileSize, imageSizeScaledA[0]) * id.x) / (float)imageSizeScaledA[0];
