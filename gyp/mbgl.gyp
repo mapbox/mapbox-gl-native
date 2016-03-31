@@ -4,7 +4,6 @@
     'shaders.gypi',
     'version.gypi',
     'certificates.gypi',
-    'standalone.gypi',
     'core.gypi',
     'none.gypi',
   ],
@@ -64,7 +63,5 @@
     ['http_lib == "android" and host == "android"', { 'includes': [ 'http-android.gypi' ] } ],
     ['asset_lib == "fs"', { 'includes': [ 'asset-fs.gypi' ] } ],
     ['asset_lib == "zip"', { 'includes': [ 'asset-zip.gypi' ] } ],
-
-    ['install_prefix != ""', { 'includes': ['install.gypi' ] } ],
   ],
 }
