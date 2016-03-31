@@ -117,12 +117,6 @@ public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
@@ -132,12 +126,6 @@ public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyC
     public void onPause() {
         super.onPause();
         mapView.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
     }
 
     @Override

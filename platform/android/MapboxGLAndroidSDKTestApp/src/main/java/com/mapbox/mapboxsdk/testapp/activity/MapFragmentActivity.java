@@ -49,9 +49,9 @@ public class MapFragmentActivity extends AppCompatActivity {
             options.rotateGesturesEnabled(false);
 
             options.debugActive(false);
-            options.compassEnabled(false);
-            options.attributionEnabled(false);
-            options.logoEnabled(false);
+//            options.compassEnabled(false);
+//            options.attributionEnabled(false);
+//            options.logoEnabled(false);
 
             options.minZoom(9);
             options.maxZoom(11);

@@ -8,6 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLOfflineStorage (Private)
 
+/**
+ The shared file source object owned by the shared offline storage object.
+ */
 @property (nonatomic) mbgl::DefaultFileSource *mbglFileSource;
 
 @end

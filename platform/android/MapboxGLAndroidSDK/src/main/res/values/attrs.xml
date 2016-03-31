@@ -59,11 +59,8 @@
         <attr name="logo_margin_top" format="dimension" />
         <attr name="logo_margin_right" format="dimension" />
         <attr name="logo_margin_bottom" format="dimension" />
-        <attr name="logo_visibility">
-            <enum name="visible" value="0x0" />
-            <enum name="invisible" value="0x4" />
-            <enum name="gone" value="0x8" />
-        </attr>
+        <attr name="logo_enabled" format="boolean" />
+
         <attr name="attribution_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
@@ -84,10 +81,6 @@
         <attr name="attribution_margin_top" format="dimension" />
         <attr name="attribution_margin_right" format="dimension" />
         <attr name="attribution_margin_bottom" format="dimension" />
-        <attr name="attribution_visibility">
-            <enum name="visible" value="0x0" />
-            <enum name="invisible" value="0x4" />
-            <enum name="gone" value="0x8" />
-        </attr>
+        <attr name="attribution_enabled" format="boolean" />
     </declare-styleable>
 </resources>

@@ -88,6 +88,7 @@ public:
 
     void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
         try {
+            downloads.erase(region.getID());
             offlineDatabase.deleteRegion(std::move(region));
             callback({});
         } catch (...) {

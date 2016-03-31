@@ -18,6 +18,14 @@ public class OfflineRegion {
 
     private final static String LOG_TAG = "OfflineRegion";
 
+    //
+    // Static methods
+    //
+
+    static {
+        System.loadLibrary("mapbox-gl");
+    }
+
     // Parent OfflineManager
     private OfflineManager offlineManager;
 

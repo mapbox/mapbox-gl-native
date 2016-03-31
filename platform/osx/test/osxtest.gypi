@@ -44,6 +44,9 @@
       
       'sources': [
         './MGLGeometryTests.mm',
+        './MGLOfflinePackTests.m',
+        './MGLOfflineRegionTests.m',
+        './MGLOfflineStorageTests.m',
         './MGLStyleTests.mm',
       ],
 

@@ -96,18 +96,6 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         mapView.onPause();

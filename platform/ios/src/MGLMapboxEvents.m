@@ -122,7 +122,8 @@ const NSTimeInterval MGLFlushInterval = 180;
 @property (nonatomic) dispatch_queue_t debugLogSerialQueue;
 @property (nonatomic) MGLLocationManager *locationManager;
 @property (nonatomic) NSTimer *timer;
-@property (nonatomic) NSDate *lastInstanceIDRotationDate;
+@property (nonatomic) NSDate *instanceIDRotationDate;
+@property (nonatomic) NSDate *turnstileSendDate;
 
 @end
 
@@ -233,13 +234,13 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (NSString *)instanceID {
-    if (self.lastInstanceIDRotationDate && [[NSDate date] timeIntervalSinceDate:self.lastInstanceIDRotationDate] >= 0) {
+    if (self.instanceIDRotationDate && [[NSDate date] timeIntervalSinceDate:self.instanceIDRotationDate] >= 0) {
         _instanceID = nil;
     }
     if (!_instanceID) {
         _instanceID = [[NSUUID UUID] UUIDString];
         NSTimeInterval twentyFourHourTimeInterval = 24 * 3600;
-        self.lastInstanceIDRotationDate = [[NSDate date] dateByAddingTimeInterval:twentyFourHourTimeInterval];
+        self.instanceIDRotationDate = [[NSDate date] dateByAddingTimeInterval:twentyFourHourTimeInterval];
     }
     return _instanceID;
 }
@@ -314,38 +315,36 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (void)pushTurnstileEvent {
-    __weak MGLMapboxEvents *weakSelf = self;
+    if (self.turnstileSendDate && [[NSDate date] timeIntervalSinceDate:self.turnstileSendDate] < 0) {
+        return;
+    }
     
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLMapboxEvents *strongSelf = weakSelf;
-        
-        if (!strongSelf) {
+    NSString *vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    if (!vendorID) {
+        return;
+    }
+    
+    NSDictionary *turnstileEventAttributes = @{MGLEventKeyEvent: MGLEventTypeAppUserTurnstile,
+                                               MGLEventKeyCreated: [self.rfc3339DateFormatter stringFromDate:[NSDate date]],
+                                               MGLEventKeyVendorID: vendorID,
+                                               MGLEventKeyEnabledTelemetry: @([[self class] isEnabled])};
+    
+    if ([MGLAccountManager accessToken] == nil) {
+        return;
+    }
+    
+    __weak __typeof__(self) weakSelf = self;
+    [self.apiClient postEvent:turnstileEventAttributes completionHandler:^(NSError * _Nullable error) {
+        __strong __typeof__(weakSelf) strongSelf = weakSelf;
+        if (error) {
+            [strongSelf pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"Network error",
+                                                                         @"error": error}];
             return;
         }
-        
-        NSString *vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-        if (!vendorID) {
-            return;
-        }
-        
-        NSDictionary *turnstileEventAttributes = @{MGLEventKeyEvent: MGLEventTypeAppUserTurnstile,
-                                                   MGLEventKeyCreated: [strongSelf.rfc3339DateFormatter stringFromDate:[NSDate date]],
-                                                   MGLEventKeyVendorID: vendorID,
-                                                   MGLEventKeyEnabledTelemetry: @([[strongSelf class] isEnabled])};
-        
-        if ([MGLAccountManager accessToken] == nil) {
-            return;
-        }
-        [strongSelf.apiClient postEvent:turnstileEventAttributes completionHandler:^(NSError * _Nullable error) {
-            if (error) {
-                [strongSelf pushDebugEvent:MGLEventTypeLocalDebug withAttributes:@{MGLEventKeyLocalDebugDescription: @"Network error",
-                                                                                   @"error": error}];
-                return;
-            }
-            [strongSelf writeEventToLocalDebugLog:turnstileEventAttributes];
-        }];
-    });
+        [strongSelf writeEventToLocalDebugLog:turnstileEventAttributes];
+        NSTimeInterval twentyFourHourTimeInterval = 24 * 3600;
+        strongSelf.turnstileSendDate = [[NSDate date] dateByAddingTimeInterval:twentyFourHourTimeInterval];
+    }];
 }
 
 + (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {

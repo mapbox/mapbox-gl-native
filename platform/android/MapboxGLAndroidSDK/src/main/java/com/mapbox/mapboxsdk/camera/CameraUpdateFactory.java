@@ -249,7 +249,7 @@ public final class CameraUpdateFactory {
             float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
             float minScale = scaleX < scaleY ? scaleX : scaleY;
             double zoom = projection.calculateZoom(minScale);
-            zoom = MathUtils.clamp(zoom, (float) uiSettings.getMinZoom(), (float) uiSettings.getMaxZoom());
+            zoom = MathUtils.clamp(zoom, (float) mapboxMap.getMinZoom(), (float) mapboxMap.getMaxZoom());
 
             // Calculate the center point
             PointF paddedNEPixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);

@@ -4,8 +4,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol MGLOfflinePackDelegate;
-
 /**
  The state an offline pack is currently in.
  */
@@ -13,11 +11,11 @@ typedef NS_ENUM (NSInteger, MGLOfflinePackState) {
     /**
      It is unknown whether the pack is inactive, active, or complete.
      
-     This is the initial state of a pack that is obtained using the
-     `-[MGLOfflineStorage getPacksWithCompletionHandler:]` method. The state
-     becomes known by the time the pack’s delegate receives its first progress
-     update. For inactive packs, you must explicitly request a progress update
-     using the `-[MGLOfflinePack requestProgress]` method.
+     This is the initial state of a pack. The state of a pack becomes known by
+     the time the shared `MGLOfflineStorage` object sends the first
+     `MGLOfflinePackProgressChangedNotification` about the pack. For inactive
+     packs, you must explicitly request a progress update using the
+     `-[MGLOfflinePack requestProgress]` method.
      
      An invalid pack always has a state of `MGLOfflinePackStateInvalid`, never
      `MGLOfflinePackStateUnknown`.
@@ -86,9 +84,11 @@ typedef struct MGLOfflinePackProgress {
 
 /**
  An `MGLOfflinePack` represents a collection of resources necessary for viewing
- a region offline to a local database. It provides an optional
- `MGLOfflinePackDelegate` object with progress updates as data or errors arrive
- from the server.
+ a region offline to a local database.
+ 
+ To create an instance of `MGLOfflinePack`, use the
+ `+[MGLOfflineStorage addPackForRegion:withContext:completionHandler:]` method.
+ A pack created using `-[MGLOfflinePack init]` is immediately invalid.
  */
 @interface MGLOfflinePack : NSObject
 
@@ -109,9 +109,12 @@ typedef struct MGLOfflinePackProgress {
  The pack’s current state.
  
  The state of an inactive or completed pack is computed lazily and is set to
- `MGLOfflinePackStateUnknown` by default. If you need the state of a pack
- inside an `MGLOfflinePackListingCompletionHandler`, set the `delegate` property
- then call the `-requestProgress` method.
+ `MGLOfflinePackStateUnknown` by default. To request the pack’s status, use the
+ `-requestProgress` method. To get notified when the state becomes known and
+ when it changes, observe KVO change notifications on this pack’s `state` key
+ path. Alternatively, you can add an observer for
+ `MGLOfflinePackProgressChangedNotification`s about this pack that come from the
+ default notification center.
  */
 @property (nonatomic, readonly) MGLOfflinePackState state;
 
@@ -119,30 +122,42 @@ typedef struct MGLOfflinePackProgress {
  The pack’s current progress.
  
  The progress of an inactive or completed pack is computed lazily, and all its
- fields are set to 0 by default. If you need the progress of a pack inside an
- `MGLOfflinePackListingCompletionHandler`, set the `delegate` property then call
- the `-requestProgress` method.
+ fields are set to 0 by default. To request the pack’s progress, use the
+ `-requestProgress` method. To get notified when the progress becomes
+ known and when it changes, observe KVO change notifications on this pack’s
+ `state` key path. Alternatively, you can add an observer for
+ `MGLOfflinePackProgressChangedNotification`s about this pack that come from the
+ default notification center.
  */
 @property (nonatomic, readonly) MGLOfflinePackProgress progress;
 
 /**
- The pack’s delegate.
- 
- You can use the offline pack delegate to be notified of any changes in the
- pack’s progress and of any errors while downloading. For more information, see
- the `MGLOfflinePackDelegate` documentation.
- */
-@property (nonatomic, weak, nullable) id <MGLOfflinePackDelegate> delegate;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-/**
  Resumes downloading if the pack is inactive.
+ 
+ A pack resumes asynchronously. To get notified when this pack resumes, observe
+ KVO change notifications on this pack’s `state` key path. Alternatively, you
+ can add an observer for `MGLOfflinePackProgressChangedNotification`s about this
+ pack that come from the default notification center.
+ 
+ When a pack resumes after being suspended, it may begin by iterating over the
+ already downloaded resources. As a result, the `progress` structure’s
+ `countOfResourcesCompleted` field may revert to 0 before rapidly returning to
+ the level of progress at the time the pack was suspended.
+ 
+ To temporarily suspend downloading, call the `-suspend` method.
  */
 - (void)resume;
 
 /**
  Temporarily stops downloading if the pack is active.
+ 
+ A pack suspends asynchronously. To get notified when this pack resumes, observe
+ KVO change notifications on this pack’s `state` key path. Alternatively, you
+ can add an observer for `MGLOfflinePackProgressChangedNotification` about this
+ pack that come from the default notification center.
+ 
+ If the pack previously reached a higher level of progress before being
+ suspended, it may wait to suspend until it returns to that level.
  
  To resume downloading, call the `-resume` method.
  */
@@ -152,56 +167,34 @@ typedef struct MGLOfflinePackProgress {
  Request an asynchronous update to the pack’s `state` and `progress` properties.
  
  The state and progress of an inactive or completed pack are computed lazily. If
- you need the state or progress of a pack inside an
- `MGLOfflinePackListingCompletionHandler`, set the `delegate` property then call
- this method.
+ you need the state or progress of a pack whose `state` property is currently
+ set to `MGLOfflinePackStateUnknown`, observe KVO change notifications on this
+ pack’s `state` key path, then call this method. Alternatively, you can add an
+ observer for `MGLOfflinePackProgressChangedNotification` about this pack that
+ come from the default notification center.
  */
 - (void)requestProgress;
 
 @end
 
 /**
- The `MGLOfflinePackDelegate` protocol defines methods that a delegate of an
- `MGLOfflinePack` object can optionally implement to be notified of any changes
- in the pack’s download progress and of any errors while downloading.
+ Methods for round-tripping `MGLOfflinePackProgress` values.
  */
-@protocol MGLOfflinePackDelegate <NSObject>
-
-@optional
+@interface NSValue (MGLOfflinePackAdditions)
 
 /**
- Sent whenever the pack’s state or download progress changes. Every change to a
- field in the `progress` property corresponds to an invocation of this method.
+ Creates a new value object containing the given `MGLOfflinePackProgress`
+ structure.
  
- @param pack The pack whose state of progress changed.
- @param progress The updated progress. To get the updated state, refer to the
-    `state` property.
+ @param progress The value for the new object.
+ @return A new value object that contains the offline pack progress information.
  */
-- (void)offlinePack:(MGLOfflinePack *)pack progressDidChange:(MGLOfflinePackProgress)progress;
++ (NSValue *)valueWithMGLOfflinePackProgress:(MGLOfflinePackProgress)progress;
 
 /**
- Sent whenever the pack encounters an error while downloading.
- 
- Download errors may be recoverable. For example, this pack’s implementation may
- attempt to re-request failed resources based on an exponential backoff
- strategy or upon the restoration of network access.
- 
- @param pack The pack that encountered an error.
- @param error A download error. For a list of possible error codes, see
-    `MGLErrorCode`.
+ The `MGLOfflinePackProgress` structure representation of the value.
  */
-- (void)offlinePack:(MGLOfflinePack *)pack didReceiveError:(NSError *)error;
-
-/**
- Sent when the maximum number of Mapbox-hosted tiles has been downloaded and
- stored on the current device.
- 
- Once this limit is reached, no instance of `MGLOfflinePack` can download
- additional tiles from Mapbox APIs until already downloaded tiles are removed by
- calling the `-[MGLOfflineStorage removePack:withCompletionHandler:]` method.
- Contact your Mapbox sales representative to have the limit raised.
- */
-- (void)offlinePack:(MGLOfflinePack *)pack didReceiveMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
+@property (readonly) MGLOfflinePackProgress MGLOfflinePackProgressValue;
 
 @end
 

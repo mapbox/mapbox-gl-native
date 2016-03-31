@@ -50,8 +50,13 @@ final class NativeMapView {
 
     public NativeMapView(MapView mapView) {
         Context context = mapView.getContext();
-        String cachePath = context.getCacheDir().getAbsolutePath();
         String dataPath = context.getFilesDir().getAbsolutePath();
+
+        // With the availability of offline, we're unifying the ambient (cache) and the offline
+        // databases to be in the same folder, outside cache, to avoid automatic deletion from
+        // the system
+        String cachePath = dataPath;
+
         float pixelRatio = context.getResources().getDisplayMetrics().density;
         String apkPath = context.getPackageCodePath();
         int availableProcessors = Runtime.getRuntime().availableProcessors();

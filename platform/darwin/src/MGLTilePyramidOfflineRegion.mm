@@ -18,6 +18,10 @@
 
 @synthesize styleURL = _styleURL;
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 - (instancetype)init {
     [NSException raise:@"Method unavailable"
                 format:
@@ -65,6 +69,56 @@
                                                     MGLLatLngBoundsFromCoordinateBounds(_bounds),
                                                     _minimumZoomLevel, _maximumZoomLevel,
                                                     scaleFactor);
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder {
+    NSURL *styleURL = [coder decodeObjectForKey:@"styleURL"];
+    CLLocationCoordinate2D sw = CLLocationCoordinate2DMake([coder decodeDoubleForKey:@"southWestLatitude"],
+                                                           [coder decodeDoubleForKey:@"southWestLongitude"]);
+    CLLocationCoordinate2D ne = CLLocationCoordinate2DMake([coder decodeDoubleForKey:@"northEastLatitude"],
+                                                           [coder decodeDoubleForKey:@"northEastLongitude"]);
+    MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(sw, ne);
+    double minimumZoomLevel = [coder decodeDoubleForKey:@"minimumZoomLevel"];
+    double maximumZoomLevel = [coder decodeDoubleForKey:@"maximumZoomLevel"];
+    
+    return [self initWithStyleURL:styleURL bounds:bounds fromZoomLevel:minimumZoomLevel toZoomLevel:maximumZoomLevel];
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:_styleURL forKey:@"styleURL"];
+    [coder encodeDouble:_bounds.sw.latitude forKey:@"southWestLatitude"];
+    [coder encodeDouble:_bounds.sw.longitude forKey:@"southWestLongitude"];
+    [coder encodeDouble:_bounds.ne.latitude forKey:@"northEastLatitude"];
+    [coder encodeDouble:_bounds.ne.longitude forKey:@"northEastLongitude"];
+    [coder encodeDouble:_maximumZoomLevel forKey:@"maximumZoomLevel"];
+    [coder encodeDouble:_minimumZoomLevel forKey:@"minimumZoomLevel"];
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone {
+    return [[[self class] allocWithZone:zone] initWithStyleURL:_styleURL bounds:_bounds fromZoomLevel:_minimumZoomLevel toZoomLevel:_maximumZoomLevel];
+}
+
+- (BOOL)isEqual:(id)other {
+    if (other == self) {
+        return YES;
+    }
+    if (![other isKindOfClass:[self class]]) {
+        return NO;
+    }
+    
+    MGLTilePyramidOfflineRegion *otherRegion = other;
+    return (_minimumZoomLevel == otherRegion->_minimumZoomLevel
+            && _maximumZoomLevel == otherRegion->_maximumZoomLevel
+            && MGLCoordinateBoundsEqualToCoordinateBounds(_bounds, otherRegion->_bounds)
+            && [_styleURL isEqual:otherRegion->_styleURL]);
+}
+
+- (NSUInteger)hash {
+    return (_styleURL.hash
+            + @(_bounds.sw.latitude).hash + @(_bounds.sw.longitude).hash
+            + @(_bounds.ne.latitude).hash + @(_bounds.ne.longitude).hash
+            + @(_minimumZoomLevel).hash + @(_maximumZoomLevel).hash);
 }
 
 @end

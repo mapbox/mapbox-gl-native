@@ -424,6 +424,29 @@
                   @"compass should lie inside shrunken map view");
 }
 
+- (void)testContentInsetsWithTinyMapView {
+    [tester.viewController tinyMapView];
+    [self keyValueObservingExpectationForObject:tester.mapView keyPath:@"contentInset" handler:^BOOL(id observedObject, NSDictionary *change) {
+        XCTAssertEqual(tester.mapView.contentInset.top,
+                       0,
+                       @"map should not have top content inset");
+        XCTAssertEqual(tester.mapView.contentInset.bottom,
+                       0,
+                       @"map should not have bottom content inset");
+        return YES;
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    tester.mapView.frame = CGRectMake(0, 0, tester.mapView.frame.size.width, tester.mapView.frame.size.height);
+    [self keyValueObservingExpectationForObject:tester.mapView keyPath:@"contentInset" handler:^BOOL(id observedObject, NSDictionary *change) {
+        XCTAssertEqual(tester.mapView.contentInset.top,
+                       tester.viewController.topLayoutGuide.length,
+                       @"map should have top content inset equal to the top layout guide");
+        return YES;
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 - (void)testDelegateRegionWillChange {
     __block NSUInteger unanimatedCount;
     __block NSUInteger animatedCount;

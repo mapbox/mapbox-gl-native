@@ -8,6 +8,7 @@
 #include <mbgl/util/string.hpp>
 
 #include <gtest/gtest.h>
+#include <sqlite3.hpp>
 #include <sqlite3.h>
 #include <thread>
 #include <random>
@@ -653,4 +654,39 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     // Count decreases after deleting a region when the tiles are not used by other regions.
     db.deleteRegion(std::move(region1));
     EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+}
+
+static int databasePageCount(const std::string& path) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt = db.prepare("pragma page_count");
+    stmt.run();
+    return stmt.get<int>(0);
+}
+
+static int databaseUserVersion(const std::string& path) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    mapbox::sqlite::Statement stmt = db.prepare("pragma user_version");
+    stmt.run();
+    return stmt.get<int>(0);
+}
+
+TEST(OfflineDatabase, MigrateFromV2Schema) {
+    using namespace mbgl;
+
+    // v2.db is a v2 database containing a single offline region with a small number of resources.
+
+    deleteFile("test/fixtures/offline/v3.db");
+    writeFile("test/fixtures/offline/v3.db", util::read_file("test/fixtures/offline/v2.db"));
+
+    {
+        OfflineDatabase db("test/fixtures/offline/v3.db", 0);
+        auto regions = db.listRegions();
+        for (auto& region : regions) {
+            db.deleteRegion(std::move(region));
+        }
+    }
+
+    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline/v3.db"));
+    EXPECT_LT(databasePageCount("test/fixtures/offline/v3.db"),
+              databasePageCount("test/fixtures/offline/v2.db"));
 }
