@@ -16,7 +16,6 @@ HeadlessDisplay::HeadlessDisplay() {
     CGLPixelFormatAttribute attributes[] = {
         kCGLPFAOpenGLProfile,
         static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_Legacy),
-        kCGLPFAAccelerated,
         static_cast<CGLPixelFormatAttribute>(0)
     };
 

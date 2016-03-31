@@ -36,15 +36,17 @@ if [[ ${TRAVIS_TAG} == node-v${PACKAGE_JSON_VERSION} ]]; then
     fi
 fi
 
-if [[ ${TRAVIS_OS_NAME} == "linux" ]] && [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-    # Install and add awscli to PATH for uploading the results
-    pip install --user awscli
-    export PATH="`python -m site --user-base`/bin:${PATH}"
+if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
+    if [[ ${TRAVIS_OS_NAME} == "linux" ]] ; then
+        pip install --user awscli
+        export PATH="`python -m site --user-base`/bin:${PATH}"
+    else
+        brew install awscli
+    fi
 
-    REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
     gzip --stdout node_modules/mapbox-gl-test-suite/render-tests/index.html | \
         aws s3 cp --acl public-read --content-encoding gzip --content-type text/html \
-            - s3://mapbox/$REPO_NAME/render-tests/$TRAVIS_JOB_NUMBER/index.html
+            - s3://mapbox/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER/index.html
 
-    echo http://mapbox.s3.amazonaws.com/$REPO_NAME/render-tests/$TRAVIS_JOB_NUMBER/index.html
+    echo http://mapbox.s3.amazonaws.com/mapbox-gl-native/render-tests/$TRAVIS_JOB_NUMBER/index.html
 fi

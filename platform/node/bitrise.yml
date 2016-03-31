@@ -31,18 +31,15 @@ workflows:
         inputs:
         - content: |-
             #!/bin/bash
-            set -e
-            set -o pipefail
             export TRAVIS_OS_NAME=osx
             export TRAVIS_TAG=$BITRISE_GIT_TAG
+            export TRAVIS_JOB_NUMBER=$BITRISE_BUILD_NUMBER
             export NODE_VERSION=4
             export CXX=clang++
             export CC=clang
             source ./scripts/set_compiler.sh
             ./platform/node/scripts/install.sh
-            if command -v ccache >/dev/null 2>&1; then ccache --zero-stats ; fi
             ./platform/node/scripts/run.sh
-            if command -v ccache >/dev/null 2>&1; then ccache --show-stats ; fi
             ./platform/node/scripts/after_script.sh
     - slack:
         title: Post to Slack
