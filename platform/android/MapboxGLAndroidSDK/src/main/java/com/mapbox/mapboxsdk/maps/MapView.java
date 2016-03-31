@@ -400,19 +400,17 @@ public class MapView extends FrameLayout {
         addOnMapChangedListener(new OnMapChangedListener() {
             @Override
             public void onMapChanged(@MapChange int change) {
-                if (change == DID_FINISH_RENDERING_MAP_FULLY_RENDERED) {
+                if (change == DID_FINISH_RENDERING_MAP_FULLY_RENDERED && mInitialLoad) {
+                    mInitialLoad = false;
                     reloadIcons();
                     reloadMarkers();
                     adjustTopOffsetPixels();
-                    if (mInitialLoad) {
-                        mInitialLoad = false;
-                        if (mOnMapReadyCallbackList.size() > 0) {
-                            Iterator<OnMapReadyCallback> iterator = mOnMapReadyCallbackList.iterator();
-                            while (iterator.hasNext()) {
-                                OnMapReadyCallback callback = iterator.next();
-                                callback.onMapReady(mMapboxMap);
-                                iterator.remove();
-                            }
+                    if (mOnMapReadyCallbackList.size() > 0) {
+                        Iterator<OnMapReadyCallback> iterator = mOnMapReadyCallbackList.iterator();
+                        while (iterator.hasNext()) {
+                            OnMapReadyCallback callback = iterator.next();
+                            callback.onMapReady(mMapboxMap);
+                            iterator.remove();
                         }
                     }
                 }
