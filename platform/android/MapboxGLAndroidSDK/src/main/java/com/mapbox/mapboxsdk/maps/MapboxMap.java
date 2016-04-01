@@ -1469,11 +1469,22 @@ public class MapboxMap {
         mMapView.update();
     }
 
+    /**
+     * Takes a snapshot of the map.
+     *
+     * @param callback Callback method invoked when the snapshot is taken.
+     * @param bitmap   A pre-allocated bitmap.
+     */
     @UiThread
     public void snapshot(@NonNull SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
         mMapView.snapshot(callback, bitmap);
     }
 
+    /**
+     * Takes a snapshot of the map.
+     *
+     * @param callback Callback method invoked when the snapshot is taken.
+     */
     @UiThread
     public void snapshot(@NonNull SnapshotReadyCallback callback) {
         mMapView.snapshot(callback, null);
@@ -1700,7 +1711,13 @@ public class MapboxMap {
         void onFinish();
     }
 
+    /**
+     * Interface definition for a callback to be invoked when the snapshot has been taken.
+     */
     public interface SnapshotReadyCallback {
+        /**
+         * Invoked when the snapshot has been taken.
+         **/
         void onSnapshotReady(Bitmap snapshot);
     }
 
