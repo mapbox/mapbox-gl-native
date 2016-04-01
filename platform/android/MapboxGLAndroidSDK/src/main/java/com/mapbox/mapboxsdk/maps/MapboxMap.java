@@ -1449,6 +1449,14 @@ public class MapboxMap {
         return mMapView;
     }
 
+    void setUiSettings(UiSettings uiSettings){
+        mUiSettings = uiSettings;
+    }
+
+    void setProjection(Projection projection){
+        mProjection = projection;
+    }
+
     //
     // Invalidate
     //

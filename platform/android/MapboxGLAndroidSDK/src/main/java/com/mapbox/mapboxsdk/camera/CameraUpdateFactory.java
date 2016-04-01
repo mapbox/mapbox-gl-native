@@ -240,16 +240,21 @@ public final class CameraUpdateFactory {
                 nePixel.y = Math.max(nePixel.y, viewportHeight - pixel.y);
             }
 
-            // Calculate wid=th/height
+            // Calculate width/height
             float width = nePixel.x - swPixel.x;
             float height = nePixel.y - swPixel.y;
 
+
+            double zoom = 0;
+            float minScale = 1;
             // Calculate the zoom level
-            float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
-            float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
-            float minScale = scaleX < scaleY ? scaleX : scaleY;
-            double zoom = projection.calculateZoom(minScale);
-            zoom = MathUtils.clamp(zoom, (float) mapboxMap.getMinZoom(), (float) mapboxMap.getMaxZoom());
+            if (padding != null) {
+                float scaleX = (uiSettings.getWidth() - padding.left - padding.right) / width;
+                float scaleY = (uiSettings.getHeight() - padding.top - padding.bottom) / height;
+                minScale = scaleX < scaleY ? scaleX : scaleY;
+                zoom = projection.calculateZoom(minScale);
+                zoom = MathUtils.clamp(zoom, (float) mapboxMap.getMinZoom(), (float) mapboxMap.getMaxZoom());
+            }
 
             // Calculate the center point
             PointF paddedNEPixel = new PointF(nePixel.x + padding.right / minScale, nePixel.y + padding.top / minScale);
@@ -290,13 +295,22 @@ public final class CameraUpdateFactory {
             // Convert point to LatLng
             LatLng latLng = projection.fromScreenLocation(targetPoint);
 
-            CameraPosition cameraPosition = mapboxMap.getCameraPosition();
-            return new CameraPosition.Builder()
-                    .target(latLng)
-                    .zoom(cameraPosition.zoom)
-                    .tilt(cameraPosition.tilt)
-                    .bearing(cameraPosition.bearing)
-                    .build();
+            CameraPosition previousPosition = mapboxMap.getCameraPosition();
+            if (latLng != null) {
+                return new CameraPosition.Builder()
+                        .target(latLng)
+                        .zoom(previousPosition.zoom)
+                        .tilt(previousPosition.tilt)
+                        .bearing(previousPosition.bearing)
+                        .build();
+            } else {
+                return new CameraPosition.Builder(true)
+                        .tilt(previousPosition.tilt)
+                        .zoom(previousPosition.zoom)
+                        .bearing(previousPosition.bearing)
+                        .target(previousPosition.target)
+                        .build();
+            }
         }
     }
 
