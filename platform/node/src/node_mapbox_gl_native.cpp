@@ -19,7 +19,7 @@ mbgl::util::RunLoop& NodeRunLoop() {
 
 }
 
-NAN_MODULE_INIT(RegisterModule) {
+void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) {
     // This has the effect of:
     //   a) Ensuring that the static local variable is initialized before any thread contention.
     //   b) unreffing an async handle, which otherwise would keep the default loop running.
@@ -63,16 +63,19 @@ NAN_MODULE_INIT(RegisterModule) {
         Nan::New("Resource").ToLocalChecked(),
         resource);
 
-    // Make the exported object inherit from process.EventEmitter
-    v8::Local<v8::Object> process = Nan::Get(
-        Nan::GetCurrentContext()->Global(),
-        Nan::New("process").ToLocalChecked()).ToLocalChecked()->ToObject();
+    // Make the exported object inherit from EventEmitter
+    v8::Local<v8::Function> require = Nan::Get(module,
+        Nan::New("require").ToLocalChecked()).ToLocalChecked().As<v8::Function>();
 
-    v8::Local<v8::Object> EventEmitter = Nan::Get(process,
+    v8::Local<v8::Value> eventsString = Nan::New("events").ToLocalChecked();
+    v8::Local<v8::Object> events = Nan::Call(require, module, 1, &eventsString).ToLocalChecked()->ToObject();
+
+    v8::Local<v8::Object> EventEmitter = Nan::Get(events,
         Nan::New("EventEmitter").ToLocalChecked()).ToLocalChecked()->ToObject();
 
     Nan::SetPrototype(target,
         Nan::Get(EventEmitter, Nan::New("prototype").ToLocalChecked()).ToLocalChecked());
+    Nan::CallAsFunction(EventEmitter, target, 0, nullptr);
 
     mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(target->ToObject()));
 }
