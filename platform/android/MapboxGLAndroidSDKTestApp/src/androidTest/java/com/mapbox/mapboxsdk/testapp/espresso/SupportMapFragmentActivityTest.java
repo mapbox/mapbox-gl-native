@@ -6,7 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.SupportMapFragmentActivity;
+import com.mapbox.mapboxsdk.testapp.activity.fragment.SupportMapFragmentActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

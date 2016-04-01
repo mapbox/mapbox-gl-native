@@ -73,7 +73,7 @@
     <string name="category_infowindow">InfoWindow</string>
     <string name="category_camera">Camera</string>
     <string name="category_fragment">Fragment</string>
-    <string name="category_api">API</string>
+    <string name="category_api">Mapbox Android Services</string>
     <string name="category_other">Other</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>

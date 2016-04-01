@@ -5,9 +5,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapUtils;
-import com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.activity.PolylineActivity;
+import com.mapbox.mapboxsdk.testapp.activity.annotation.PolylineActivity;
 import com.robotium.solo.Solo;
 
 import org.junit.Test;
