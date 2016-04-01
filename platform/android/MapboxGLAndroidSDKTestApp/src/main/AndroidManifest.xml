@@ -198,10 +198,6 @@
 
         <!-- Configuration Settings -->
         <meta-data
-            android:name="com.mapbox.AccessToken"
-            android:value="" />
-
-        <meta-data
             android:name="com.mapbox.TestEventsServer"
             android:value="https://cloudfront-staging.tilestream.net" />
         <meta-data
