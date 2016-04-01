@@ -8,12 +8,10 @@
       'hard_dependency': 1,
       'dependencies': [
         'version',
+        'loop',
       ],
 
       'sources': [
-        '../platform/default/async_task.cpp',
-        '../platform/default/run_loop.cpp',
-        '../platform/default/timer.cpp',
         '../platform/default/default_file_source.cpp',
         '../platform/default/online_file_source.cpp',
         '../platform/default/mbgl/storage/offline.hpp',
@@ -80,7 +78,6 @@
 
       'variables': {
         'cflags_cc': [
-          '<@(libuv_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(zlib_cflags)',
@@ -92,7 +89,6 @@
           '<@(zlib_ldflags)',
         ],
         'libraries': [
-          '<@(libuv_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
           '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',

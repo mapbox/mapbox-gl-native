@@ -34,7 +34,6 @@
           '<@(libpng_static_libs)',
           '<@(libjpeg-turbo_static_libs)',
           '<@(sqlite_static_libs)',
-          '<@(libuv_static_libs)',
           '<@(nunicode_static_libs)',
           '<@(libzip_static_libs)',
       ],
