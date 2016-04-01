@@ -31,7 +31,7 @@ if [[ $1 == '--prepare' ]]; then
 fi
 
 adb install -rtdg platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk
-adb shell am start -n "com.mapbox.mapboxsdk.testapp/com.mapbox.mapboxsdk.testapp.FeatureOverviewActivity" \
+adb shell am start -n "com.mapbox.mapboxsdk.testapp/com.mapbox.mapboxsdk.testapp.activity.FeatureOverviewActivity" \
    -a android.intent.action.MAIN -c android.intent.category.LAUNCHER
 
 adb forward tcp:5039 tcp:5039

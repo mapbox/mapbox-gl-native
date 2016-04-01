@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.Feature;
+import com.mapbox.mapboxsdk.testapp.model.activity.Feature;
 import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 
 import java.util.List;

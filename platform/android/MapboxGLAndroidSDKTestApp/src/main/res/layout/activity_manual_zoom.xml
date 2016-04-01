@@ -11,6 +11,8 @@
         android:background="@color/primary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:layout_below="@id/toolbar"
         android:id="@+id/manualZoomMapView"

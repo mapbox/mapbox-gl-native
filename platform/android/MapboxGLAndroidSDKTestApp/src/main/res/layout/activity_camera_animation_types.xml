@@ -21,33 +21,34 @@
         app:center_longitude="-0.11968"
         app:zoom="15" />
 
-    <Button
-        android:id="@+id/cameraMoveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="@string/button_camera_move" />
 
-    <Button
-        android:id="@+id/cameraEaseButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/cameraMoveButton"
-        android:layout_centerHorizontal="true"
-        android:text="@string/button_camera_ease" />
+        android:orientation="horizontal"
+        android:weightSum="3">
 
-    <Button
-        android:id="@+id/cameraAnimateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/cameraEaseButton"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:text="@string/button_camera_animate" />
+        <Button
+            android:id="@+id/cameraMoveButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_camera_move" />
+
+        <Button
+            android:id="@+id/cameraEaseButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_camera_ease" />
+
+        <Button
+            android:id="@+id/cameraAnimateButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_camera_animate" />
+
+    </LinearLayout>
 
 </RelativeLayout>
