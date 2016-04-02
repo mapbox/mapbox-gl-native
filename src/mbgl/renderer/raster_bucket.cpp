@@ -29,7 +29,6 @@ void RasterBucket::setImage(PremultipliedImage image) {
 
 void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, gl::GLObjectStore& glObjectStore) {
     raster.bind(true, glObjectStore);
-    shader.u_image = 0;
     array.bind(shader, vertices, BUFFER_OFFSET_0, glObjectStore);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }

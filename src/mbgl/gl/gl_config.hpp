@@ -55,6 +55,7 @@ public:
         clearStencil.reset();
         program.reset();
         lineWidth.reset();
+        activeTexture.reset();
     }
 
     void setDirty() {
@@ -74,6 +75,7 @@ public:
         clearStencil.setDirty();
         program.setDirty();
         lineWidth.setDirty();
+        activeTexture.setDirty();
     }
 
     Value<StencilFunc> stencilFunc;
@@ -92,6 +94,7 @@ public:
     Value<ClearStencil> clearStencil;
     Value<Program> program;
     Value<LineWidth> lineWidth;
+    Value<ActiveTexture> activeTexture;
 };
 
 } // namespace gl

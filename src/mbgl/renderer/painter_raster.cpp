@@ -23,6 +23,10 @@ void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const
         rasterShader->u_spin_weights = spinWeights(properties.hueRotate);
 
         config.stencilTest = GL_FALSE;
+
+        rasterShader->u_image = 0;
+        config.activeTexture = GL_TEXTURE0;
+
         config.depthFunc.reset();
         config.depthTest = GL_TRUE;
         config.depthMask = GL_FALSE;

@@ -81,7 +81,6 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
 
         LinePatternPos posA = lineAtlas->getDashPosition(properties.dasharray.value.from, layout.cap == CapType::Round, glObjectStore);
         LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == CapType::Round, glObjectStore);
-        lineAtlas->bind(glObjectStore);
 
         const float widthA = posA.width * properties.dasharray.value.fromScale * properties.dashLineWidth;
         const float widthB = posB.width * properties.dasharray.value.toScale * properties.dashLineWidth;
@@ -95,12 +94,15 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_tex_y_a = posA.y;
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
-        linesdfShader->u_image = 0;
         linesdfShader->u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * data.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dasharray.value.t;
         linesdfShader->u_extra = extra;
         linesdfShader->u_offset = -properties.offset;
         linesdfShader->u_antialiasingmatrix = antialiasingMatrix;
+
+        linesdfShader->u_image = 0;
+        config.activeTexture = GL_TEXTURE0;
+        lineAtlas->bind(glObjectStore);
 
         bucket.drawLineSDF(*linesdfShader, glObjectStore);
 
@@ -139,7 +141,8 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linepatternShader->u_offset = -properties.offset;
         linepatternShader->u_antialiasingmatrix = antialiasingMatrix;
 
-        MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
+        linepatternShader->u_image = 0;
+        config.activeTexture = GL_TEXTURE0;
         spriteAtlas->bind(true, glObjectStore);
 
         bucket.drawLinePatterns(*linepatternShader, glObjectStore);

@@ -240,6 +240,19 @@ struct LineWidth {
     }
 };
 
+struct ActiveTexture {
+    using Type = GLint;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glActiveTexture(value));
+    }
+    inline static Type Get() {
+        Type activeTexture;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture));
+        return activeTexture;
+    }
+};
+
 #ifndef GL_ES_VERSION_2_0
 
 struct PixelZoom {

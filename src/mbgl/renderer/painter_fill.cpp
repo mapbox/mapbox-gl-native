@@ -102,7 +102,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             patternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
-            MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0));
+            config.activeTexture = GL_TEXTURE0;
             spriteAtlas->bind(true, glObjectStore);
 
             // Draw the actual triangles into the color & stencil buffer.

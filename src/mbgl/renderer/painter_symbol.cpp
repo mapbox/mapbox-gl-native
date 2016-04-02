@@ -174,6 +174,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
         const bool iconScaled = fontScale != 1 || data.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = layout.icon.rotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
+        config.activeTexture = GL_TEXTURE0;
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, glObjectStore);
 
         if (sdf) {
@@ -242,6 +243,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
             config.depthTest = GL_FALSE;
         }
 
+        config.activeTexture = GL_TEXTURE0;
         glyphAtlas->bind(glObjectStore);
 
         renderSDF(bucket,
