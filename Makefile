@@ -14,123 +14,201 @@ export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 else
 $(error Cannot determine build platform)
 endif
+
 export BUILD_VERSION = $(shell uname -m)
 
-RUN =  +@$(MAKE) -f scripts/main.mk
+RUN =  +$(MAKE) -f scripts/main.mk
 
-default: ; @printf "You must specify a valid target\n"
+default:
+	@printf "You must specify a valid target\n"
 
 #### OS X targets ##############################################################
 
-ifeq ($(BUILD),osx)
-.PHONY: osx xosx nosx run-osx run-xosx
-osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
-xosx: osx
-nosx: osx
-run-osx: osx ; @"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
-run-xosx: run-osx
+.PHONY: osx
+osx:
+	$(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/osxapp
 
-.PHONY: Xcode/osx Xcode/ios
-Xcode/ios: ; $(RUN) HOST=ios Xcode/__project__
-Xcode/osx: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/__project__
+.PHONY: run-osx
+run-osx: osx
+	"gyp/build/$(BUILDTYPE)/Mapbox GL.app/Contents/MacOS/Mapbox GL"
 
-.PHONY: xproj iproj
-xproj: Xcode/osx ; @open ./build/osx-x86_64/gyp/osx.xcodeproj
-iproj: Xcode/ios ; @open ./build/ios-all/gyp/ios.xcodeproj
+.PHONY: Xcode/osx
+Xcode/osx:
+	$(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/__project__
+
+.PHONY: xproj
+xproj: Xcode/osx
+	open ./build/osx-x86_64/gyp/osx.xcodeproj
+
+.PHONY: xpackage
+xpackage: Xcode/osx
+	./platform/osx/scripts/package.sh
+
+.PHONY: xpackage-strip
+xpackage-strip: Xcode/osx
+	./platform/osx/scripts/package.sh strip
+
+.PHONY: xtest
+xtest:
+	$(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/test
+
+.PHONY: xctest
+xctest: Xcode/osx
+	./platform/osx/scripts/test.sh
+
+#### iOS targets ##############################################################
+
+.PHONY: Xcode/ios
+Xcode/ios:
+	$(RUN) HOST=ios Xcode/__project__
+
+.PHONY: iproj
+iproj: Xcode/ios
+	open ./build/ios-all/gyp/ios.xcodeproj
 
 .PHONY: ios ibench isim
 ios ibench isim: export XCODEBUILD_ARGS += PROVISIONING_PROFILE="$$(PROVISIONING_PROFILE)"
 
 ios: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64 armv7 armv7s"
-ios: ; $(RUN) HOST=ios Xcode/iosapp
+	$(RUN) HOST=ios Xcode/iosapp
 
 isim: export XCODEBUILD_ARGS += -sdk iphonesimulator ARCHS="x86_64 i386"
-isim: ; $(RUN) HOST=ios Xcode/iosapp
+	$(RUN) HOST=ios Xcode/iosapp
 
 ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
-ibench: ; $(RUN) HOST=ios Xcode/ios-bench
+	$(RUN) HOST=ios Xcode/ios-bench
 
-.PHONY: ipackage ipackage-strip ipackage-sim itest
-ipackage: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
-ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
-ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
-iframework: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
-ifabric: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES ./platform/ios/scripts/package.sh
-itest: ipackage-sim ; ./platform/ios/scripts/test.sh
-idocument: ; OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
+.PHONY: ipackage
+ipackage: Xcode/ios
+	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
+	BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES \
+	./platform/ios/scripts/package.sh
 
-.PHONY: xpackage xpackage-strip xctest
-xpackage: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh
-xpackage-strip: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/package.sh strip
-xctest: Xcode/osx ; @JOBS=$(JOBS) ./platform/osx/scripts/test.sh
-endif
+.PHONY: ipackage-strip
+ipackage-strip: Xcode/ios
+	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
+	BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES \
+	./platform/ios/scripts/package.sh
 
-#### All platforms targets #####################################################
+.PHONY: ipackage-sim
+ipackage-sim: Xcode/ios
+	BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) \
+	BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES \
+	./platform/ios/scripts/package.sh
 
-.PHONY: linux run-linux run-valgrind-linux
-linux: ; $(RUN) Makefile/linuxapp
-nlinux: ; $(RUN) Ninja/linuxapp
-run-linux: linux ; (cd build/$(BUILD)-$(BUILD_VERSION)/$(BUILDTYPE) && ./mapbox-gl)
+.PHONY: iframework
+iframework: Xcode/ios
+	BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
+	./platform/ios/scripts/package.sh
+
+.PHONY: ifabric
+ifabric: Xcode/ios
+	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES \
+	./platform/ios/scripts/package.sh
+
+.PHONY: itest
+itest: ipackage-sim
+	./platform/ios/scripts/test.sh
+
+.PHONY: idocument
+idocument:
+	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
+
+#### Linux targets #####################################################
+
+.PHONY: linux
+linux:
+	$(RUN) Makefile/linuxapp
+
+.PHONY: nlinux
+nlinux:
+	$(RUN) Ninja/linuxapp
+
+.PHONY: run-linux
+run-linux: linux
+	(cd build/$(BUILD)-$(BUILD_VERSION)/$(BUILDTYPE) && ./mapbox-gl)
+
+.PHONY: run-valgrind-linux
 run-valgrind-linux: linux
 	(cd build/$(BUILD)-$(BUILD_VERSION)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-gl)
 
+#### Android targets #####################################################
 
-.PHONY: config compdb tidy
-config: ; $(RUN) config
-# Generates a compilation database with ninja for use in clang tooling
-compdb: ; $(RUN) Ninja/compdb
-tidy: ; $(RUN) tidy
-
-.PHONY: android android-lib
 # Builds a particular android architecture.
-android-lib-%: ; $(RUN) HOST=android HOST_VERSION=$* Makefile/androidapp
+android-lib-%:
+	$(RUN) HOST=android HOST_VERSION=$* Makefile/androidapp
 
 # Builds the default Android library
-android-lib: ; $(RUN) HOST=android Makefile/androidapp
+.PHONY: android-lib
+android-lib:
+	$(RUN) HOST=android Makefile/androidapp
 
 # Builds the selected/default Android library
+.PHONY: android
 android: android-lib
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds all android architectures for distribution.
-apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8
-apackage: android-lib-x86 android-lib-x86-64
-apackage: android-lib-mips
+.PHONY: apackage
+apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8 android-lib-x86 android-lib-x86-64 android-lib-mips
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+
+#### Node targets #####################################################
 
 # Builds the Node.js library
 .PHONY: node
-node: ; $(RUN) LOOP=uv HTTP=none ASSET=none Makefile/node
-
+node:
+	$(RUN) LOOP=uv HTTP=none ASSET=none Makefile/node
 
 .PHONY: Xcode/node
-Xcode/node: ; $(RUN) LOOP=uv HTTP=none ASSET=none Xcode/node
+Xcode/node:
+	$(RUN) LOOP=uv HTTP=none ASSET=none Xcode/node
 
 .PHONY: xnode
-xnode: Xcode/node ; @open ./build/binding.xcodeproj
+xnode: Xcode/node
+	open ./build/binding.xcodeproj
+
+.PHONY: nproj
 nproj:
 	$(RUN) HTTP=none ASSET=none node/xproj
-	@open ./build/binding.xcodeproj
+	open ./build/binding.xcodeproj
+
+#### Miscellaneous targets #####################################################
 
 .PHONY: test
-test: ; $(RUN) Makefile/test
-test-%: ; $(RUN) test-$*
-ifeq ($(BUILD),osx)
-xtest: ; $(RUN) HOST=osx HOST_VERSION=x86_64 Xcode/test
-endif
+test:
+	$(RUN) Makefile/test
+
+test-%:
+	$(RUN) test-$*
 
 .PHONY: check
-check: ; $(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 check
-coveralls: ; $(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 coveralls
+check:
+	$(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 check
+
+coveralls:
+	$(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 coveralls
 
 .PHONY: render
-render: ; $(RUN) Makefile/mbgl-render
+render:
+	$(RUN) Makefile/mbgl-render
 
 .PHONY: offline
-offline: ; $(RUN) Makefile/mbgl-offline
+offline:
+	$(RUN) Makefile/mbgl-offline
 
+.PHONY: config
+config:
+	$(RUN) config
 
-##### Maintenace operations ####################################################
+# Generates a compilation database with ninja for use in clang tooling
+.PHONY: compdb
+compdb:
+	$(RUN) Ninja/compdb
+
+.PHONY: tidy
+tidy:
+	$(RUN) tidy
 
 .PHONY: clear_xcode_cache
 clear_xcode_cache:
@@ -148,15 +226,7 @@ ifeq ($(BUILD), osx)
 	fi
 endif
 
-.PHONY: clear_sqlite_cache
-clear_sqlite_cache:
-ifeq ($(BUILD), osx)
-	rm -f ~/Library/Application\ Support/Mapbox\ GL/cache.db
-else
-	rm -f /tmp/mbgl-cache.db
-endif
-
-clean: clear_sqlite_cache clear_xcode_cache
+clean: clear_xcode_cache
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-find ./build -type f -not -path '*/*.xcodeproj/*' -exec rm {} \;
 	-rm -rf ./gyp/build/
