@@ -2,9 +2,14 @@
 
 set -euo pipefail
 
-CONFIG_FILE=$1
+INPUT_FILE=$1
+OUTPUT_FILE=$2
 
-if [ -z ${CONFIG_FILE} ]; then
+if [ -z ${INPUT_FILE} ]; then
+    abort 'You need to specify an input path for the configure.sh file'
+fi
+
+if [ -z ${OUTPUT_FILE} ]; then
     abort 'You need to specify an output path for the configuration file'
 fi
 
@@ -16,12 +21,9 @@ function info { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 function warn { >&2 echo -e "\033[1m\033[33m$1\033[0m"; }
 
 if [ -e "`pwd`/.git" ]; then
-    info "This build is within a git repository"
-    git submodule update --init
     export MASON_DIR="`pwd`/.mason"
     export PATH="${MASON_DIR}:${PATH}"
 else
-    info "This build is NOT within a git repository"
     which mason || abort "You must install mason to build mapbox-gl-native (https://github.com/mapbox/mason)"
     export MASON_DIR="$(dirname $(readlink $(which mason)))"
 fi
@@ -41,6 +43,9 @@ function print_flags {
             done
         else
             warn "* Not using ${NAME}"
+            for FLAGS in "$@" ; do
+                CONFIG+="    '${NAME}_${FLAGS}%': [],"$LN
+            done
         fi
     fi
 }
@@ -55,10 +60,7 @@ function print_opengl_flags {
 }
 
 # Load dependencies
-source platform/${MASON_PLATFORM}/scripts/configure.sh
-if [ -e platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh ]; then
-    source platform/${MASON_PLATFORM}/scripts/${MASON_PLATFORM_VERSION}/configure.sh
-fi
+source ${INPUT_FILE}
 
 PYTHON=`which python || abort 'Cannot find python'`
 
@@ -113,6 +115,6 @@ CONFIG+="  }
 }
 "
 
-mkdir -p $(dirname "${CONFIG_FILE}")
-echo "${CONFIG}" > ${CONFIG_FILE}
-cat ${CONFIG_FILE}
+mkdir -p $(dirname "${OUTPUT_FILE}")
+echo "${CONFIG}" > ${OUTPUT_FILE}
+cat ${OUTPUT_FILE}

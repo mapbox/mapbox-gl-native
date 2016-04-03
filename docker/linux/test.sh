@@ -3,7 +3,6 @@
 # set -e
 # set -o pipefail
 
-export FLAVOR=linux
 export CXX=g++-4.9
 export BUILDTYPE=Release
 
@@ -20,7 +19,7 @@ cd build
 source ./scripts/travis_helper.sh
 
 # install
-./platform/${FLAVOR}/scripts/install.sh
+./platform/linux/scripts/install.sh
 
 # script
-./platform/${FLAVOR}/scripts/run.sh
+./platform/linux/scripts/run.sh

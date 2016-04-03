@@ -33,14 +33,13 @@ Set the environment variable `MAPBOX_ACCESS_TOKEN` to your [Mapbox access token]
 
     export MAPBOX_ACCESS_TOKEN=MYTOKEN
 
-Then, you can then proceed to build the library:
+Then, you can then proceed to build the test application:
 
-    git submodule update --init
-    make linux
+    make glfw-app
 
 Set an access token as described below, and then run:
 
-    make run-linux
+    make run-glfw-app
 
 ### Test
 

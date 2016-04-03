@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# This script is sourced; do not set -e or -o pipefail here.
 
 if [ ! -z "${_CXX}" ]; then export CXX="${_CXX}" ; fi
 if [ ! -z "${_CC}" ]; then export CC="${_CC}" ; fi
@@ -25,3 +26,31 @@ fi
 echo "export CXX=\"${CXX}\""
 echo "export CC=\"${CC}\""
 ${CXX} --version
+
+# Ensure mason is on the PATH
+export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
+
+# Start the mock X server
+if [ -f /etc/init.d/xvfb ] ; then
+    mapbox_time "start_xvfb" \
+    sh -e /etc/init.d/xvfb start
+    sleep 2 # sometimes, xvfb takes some time to start up
+fi
+
+# Make sure we're connecting to xvfb
+export DISPLAY=:99.0
+
+mapbox_time "checkout_mason" \
+git submodule update --init .mason
+
+# Install and set up to load a more recent version of mesa
+mapbox_time "install_mesa" \
+mason install mesa 10.4.3
+export LD_LIBRARY_PATH="`mason prefix mesa 10.4.3`/lib:${LD_LIBRARY_PATH:-}"
+
+# Install and set up to load awscli
+pip install --user awscli
+export PATH="`python -m site --user-base`/bin:${PATH}"
+
+# Install coveralls gem
+gem install coveralls-lcov --no-rdoc --no-ri

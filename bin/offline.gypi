@@ -1,49 +1,39 @@
 {
-  'includes': [
-    '../gyp/common.gypi',
-  ],
   'targets': [
-    { 'target_name': 'mbgl-offline',
+    {
+      'target_name': 'mbgl-offline',
       'product_name': 'mbgl-offline',
       'type': 'executable',
 
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:headless-<(headless_lib)',
-        'mbgl.gyp:http-<(http_lib)',
-        'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:copy_certificate_bundle',
+        'platform-lib',
+        'copy_certificate_bundle',
       ],
 
       'include_dirs': [
+        '../include',
         '../src',
       ],
 
       'sources': [
-        './offline.cpp',
+        'offline.cpp',
       ],
 
-      'variables' : {
-        'cflags_cc': [
-          '<@(boost_cflags)',
-        ],
+      'cflags_cc': [
+        '<@(boost_cflags)',
+      ],
+
+      'link_settings': {
         'libraries': [
           '<@(boost_libprogram_options_static_libs)'
         ],
       },
 
-      'conditions': [
-        ['OS == "mac"', {
-          'libraries': [ '<@(libraries)' ],
-          'xcode_settings': {
-            'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-          }
-        }, {
-          'cflags_cc': [ '<@(cflags_cc)' ],
-          'libraries': [ '<@(libraries)' ],
-        }]
-      ],
+      'xcode_settings': {
+        'OTHER_CPLUSPLUSFLAGS': [
+          '<@(boost_cflags)',
+        ],
+      }
     },
   ],
 }

@@ -24,29 +24,15 @@ workflows:
                 envman add --key SKIPCI --value false
             fi
     - script:
-        title: Install Linux Dependencies
+        title: Build
+        run_if: '{{enveq "SKIPCI" "false"}}'
         inputs:
         - content: |-
             #!/bin/bash
-
+            set -eu -o pipefail
             apt-get install -y pkg-config
-    - script:
-        title: Build Android SDK For arm
-        inputs:
-        - content: |-
-            #!/bin/bash
-
-            make android -j4
-        - is_debug: 'yes'
-    - script:
-        title: Run Unit Tests
-        inputs:
-        - content: |-
-            #!/bin/bash
-
-            cd platform/android
-            ./gradlew testReleaseUnitTest --continue
-        - is_debug: 'yes'
+            make android
+            make test-android
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -68,47 +54,24 @@ workflows:
   scheduled:
     steps:
     - script:
-        title: Install Linux Dependencies
+        title: Build
         inputs:
         - content: |-
             #!/bin/bash
+            set -eu -o pipefail
 
             apt-get install -y pkg-config python-pip python-dev build-essential
             pip install awscli
-    - script:
-        title: Fetch GPG Secring For SDK Signing
-        inputs:
-        - content: |-
-            #!/bin/bash
 
             aws s3 cp s3://mapbox/android/signing-credentials/secring.gpg platform/android/MapboxGLAndroidSDK/secring.gpg
-          opts:
-            is_expand: true
-    - script:
-        title: Inject Signing And Publishing Credentials
-        inputs:
-        - content: |-
-            #!/bin/bash
 
             echo "NEXUS_USERNAME=$PUBLISH_NEXUS_USERNAME
             NEXUS_PASSWORD=$PUBLISH_NEXUS_PASSWORD
             signing.keyId=$SIGNING_KEYID
             signing.password=$SIGNING_PASSWORD
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
-          opts:
-            is_expand: true
-    - script:
-        title: Build Mapbox Android SDK For All ABI
-        inputs:
-        - content: |-
-            #!/bin/bash
 
             make apackage -j4
-    - script:
-        title: Publish To Maven Central
-        inputs:
-        - content: |-
-            #!/bin/bash
 
             cd platform/android
             ./gradlew uploadArchives

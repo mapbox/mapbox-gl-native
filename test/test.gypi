@@ -1,24 +1,19 @@
 {
-  'includes': [
-    '../gyp/common.gypi',
-  ],
-
   'targets': [
-    { 'target_name': 'test',
+    {
+      'target_name': 'test',
       'type': 'executable',
 
       'include_dirs': [
+        '../include',
         '../src',
         '../platform/default',
         'include',
       ],
 
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:http-<(http_lib)',
-        'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:headless-<(headless_lib)',
+        'platform-lib',
+        'copy_certificate_bundle',
       ],
 
       'sources': [
@@ -96,6 +91,8 @@
         'sprite/sprite_image.cpp',
         'sprite/sprite_parser.cpp',
         'sprite/sprite_store.cpp',
+
+        'src/main.cpp',
       ],
 
       'variables': {
@@ -121,30 +118,6 @@
       },
 
       'conditions': [
-        ['host == "ios"', {
-          'product_name': 'ios-test',
-          # iOS tests
-          'includes': [
-            '../gyp/target-ios-bundle.gypi',
-          ],
-          'sources': [
-            'src/main.mm',
-            '../src/mbgl/util/premultiply.cpp',
-          ],
-          'xcode_settings': {
-            'INFOPLIST_FILE': '../test/src/app-info.plist',
-          },
-          'copies': [
-            { 'destination': '<(PRODUCT_DIR)/$(WRAPPER_NAME)/test',
-              'files': [ '../test/fixtures' ],
-            },
-          ]
-        }, {
-          # non-iOS tests
-          'sources': [
-            'src/main.cpp',
-          ]
-        }],
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],

@@ -45,15 +45,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
             std::rethrow_exception(err);
         } catch (const std::exception& ex) {
             message = ex.what();
-#ifdef MBGL_HTTP_NSURL
-            EXPECT_STREQ("Could not connect to the server.", ex.what());
-#elif MBGL_HTTP_CURL
-            const char* prefix = "Couldn't connect to server:";
-            EXPECT_EQ(0, strncmp(prefix, ex.what(), strlen(prefix))) << "Full message is: \""
-                                                                     << ex.what() << "\"";
-#else
-            FAIL();
-#endif
+            EXPECT_TRUE(message.find("connect") != std::string::npos);
         }
         promise.set_value();
     });

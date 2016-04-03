@@ -3,13 +3,9 @@
 set -e
 set -o pipefail
 
+JOB=$1
+
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then
-    # Install and add awscli to PATH for uploading the results
-    pip install --user awscli
-    export PATH="`python -m site --user-base`/bin:${PATH}"
-
-    REPO_NAME=$(basename $TRAVIS_REPO_SLUG)
-
     aws s3 cp --recursive --acl public-read --exclude "*" --include "*/actual.png" test/fixtures \
-        s3://mapbox/$REPO_NAME/render-tests/$TRAVIS_JOB_NUMBER
+        s3://mapbox/mapbox-gl-native/render-tests/$JOB
 fi

@@ -25,12 +25,12 @@ command -v genhtml >/dev/null 2>&1 || usage
 lcov \
     --quiet \
     --zerocounters \
-    --directory "build/${HOST_SLUG}/${BUILDTYPE}" \
-    --output-file "build/${HOST_SLUG}/${BUILDTYPE}/coverage.info" \
+    --directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
+    --output-file "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
     >/dev/null 2>&1
 
 # Run all unit tests
-./scripts/run_tests.sh "build/${HOST_SLUG}/${BUILDTYPE}/test"
+make test-*
 
 # Collect coverage data and save it into coverage.info
 echo "Collecting coverage data..."
@@ -41,9 +41,9 @@ lcov \
     --directory "src/mbgl" \
     --directory "platform" \
     --directory "include/mbgl" \
-    --directory "build/${HOST_SLUG}/${BUILDTYPE}" \
-    --base-directory "build/${HOST_SLUG}/${BUILDTYPE}" \
-    --output-file "build/${HOST_SLUG}/${BUILDTYPE}/coverage.info" \
+    --directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
+    --base-directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
+    --output-file "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
     >/dev/null 2>&1
 
 # Generate HTML report based on coverage.info
@@ -59,8 +59,8 @@ genhtml \
     --sort \
     --demangle-cpp \
     --prefix $(pwd -P) \
-    --output-directory "build/${HOST_SLUG}/${BUILDTYPE}/coverage" \
-    "build/${HOST_SLUG}/${BUILDTYPE}/coverage.info" \
+    --output-directory "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage" \
+    "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
     >/dev/null 2>&1
 
-echo "Coverage report is now available in build/${HOST_SLUG}/${BUILDTYPE}/coverage/index.html"
+echo "Coverage report is now available in build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage/index.html"

@@ -72,12 +72,6 @@ echo ${HASH}
 echo ${HASH} >> ${VERSION}
 
 
-step "Creating build files…"
-export MASON_PLATFORM=ios
-export BUILDTYPE=${BUILDTYPE:-Release}
-export HOST=ios
-make Xcode/ios
-
 PROJ_VERSION=$(git rev-list --count HEAD)
 
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
@@ -91,13 +85,9 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             DEPLOYMENT_POSTPROCESSING=YES \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY= \
-            -project ./build/ios-all/gyp/mbgl.xcodeproj \
+            -project ./build/ios-all/platform/ios/platform.xcodeproj \
             -configuration ${BUILDTYPE} \
-            -target core \
-            -target platform-ios \
-            -target http-nsurl \
-            -target asset-fs \
-            -target headless-eagl \
+            -target platform-lib \
             -jobs ${JOBS}
     fi
 
@@ -112,7 +102,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY= \
-            -project ./build/ios-all/gyp/ios.xcodeproj \
+            -project ./build/ios-all/platform/ios/platform.xcodeproj \
             -configuration ${BUILDTYPE} \
             -target iossdk \
             -jobs ${JOBS}
@@ -125,13 +115,9 @@ if [[ ${BUILD_STATIC} == true ]]; then
         ARCHS="x86_64 i386" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios-all/gyp/mbgl.xcodeproj \
+        -project ./build/ios-all/platform/ios/platform.xcodeproj \
         -configuration ${BUILDTYPE} \
-        -target core \
-        -target platform-ios \
-        -target http-nsurl \
-        -target asset-fs \
-        -target headless-eagl \
+        -target platform-lib \
         -jobs ${JOBS}
 fi
 
@@ -143,13 +129,13 @@ if [[ ${BUILD_DYNAMIC} == true ]]; then
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         ENABLE_BITCODE=${ENABLE_BITCODE} \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
-        -project ./build/ios-all/gyp/ios.xcodeproj \
+        -project ./build/ios-all/platform/ios/platform.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target iossdk \
         -jobs ${JOBS}
 fi
 
-LIBS=(core.a platform-ios.a asset-fs.a http-nsurl.a)
+LIBS=(core.a platform-ios.a)
 
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
 if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
@@ -159,22 +145,22 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
-            ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphoneos/libmbgl-} \
-            ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
+            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphoneos/libmbgl-} \
+            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS devices"
         cp -r \
-            gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework \
+            build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework \
             ${OUTPUT}/dynamic/
-        cp -r gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
+        cp -r build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
             ${OUTPUT}/dynamic/
 
         step "Merging simulator dynamic library into device dynamic library…"
         lipo \
-            gyp/build/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
-            gyp/build/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
+            build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
+            build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
 else
@@ -184,15 +170,15 @@ else
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
-            ${LIBS[@]/#/gyp/build/${BUILDTYPE}-iphonesimulator/libmbgl-}
+            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS Simulator…"
         cp -r \
-            gyp/build/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
+            build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
             ${OUTPUT}/dynamic/${NAME}.framework
-        cp -r gyp/build/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
+        cp -r build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
             ${OUTPUT}/dynamic/
     fi
 fi

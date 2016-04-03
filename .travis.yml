@@ -1,6 +1,7 @@
-language: cpp
-
 sudo: false
+
+git:
+  submodules: false
 
 # Save common build configurations as shortcuts, so we can reference them later.
 addons_shortcuts:
@@ -15,39 +16,69 @@ addons_shortcuts:
       packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev',
                   'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
 
+env:
+  global:
+    - TERM: dumb
+    - CCACHE: 1
+    # AWS
+    - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="
+    - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
+    # Access Token
+    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
+
+install:
+  - source ./scripts/travis_helper.sh
+  - source ./scripts/travis_setup.sh
+before_script:
+  - ccache --zero-stats
+script:
+  - make linux
+  - make test-linux
+after_script:
+  - ccache --show-stats
+  - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
+
 matrix:
-  exclude:
-    - os: linux
   include:
-
-    # Linux/Node.js 4 - Clang 3.5 - Release
-    - os: linux
+    # Clang 3.5 - Release - Node
+    - language: node
       compiler: ": node4-clang35-release"
-      env: FLAVOR=node BUILDTYPE=Release NODE_VERSION=4 _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
+      script:
+        - nvm install 4
+        - nvm use 4
+        - make node
+        - make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
-    # Linux - GCC 4.9 - Debug
-    - os: linux
+    # GCC 4.9 - Debug - Coverage
+    - language: cpp
       compiler: ": linux-gcc49-debug"
-      env: FLAVOR=linux ACTION=coveralls _CXX=g++-4.9 _CC=gcc-4.9 CCACHE=1
+      env: BUILDTYPE=Debug _CXX=g++-4.9 _CC=gcc-4.9 ENABLE_COVERAGE=1
       addons: *gcc49
+      after_script:
+        - ccache --show-stats
+        - ./platform/linux/scripts/coveralls.sh
 
-    # Linux - GCC 4.9 - Release
-    - os: linux
+    # GCC 4.9 - Release
+    - language: cpp
       compiler: ": linux-gcc49-release"
-      env: FLAVOR=linux BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9 CCACHE=1
+      env: BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
       addons: *gcc49
 
-    # Linux - Clang 3.5 - Debug
-    - os: linux
+    # Clang 3.5 - Debug
+    - language: cpp
       compiler: ": linux-clang35-debug"
-      env: FLAVOR=linux BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
+      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
-    # Linux - Clang 3.5 - Release
-    - os: linux
+    # Clang 3.5 - Release
+    - language: cpp
       compiler: ": linux-clang35-release"
-      env: FLAVOR=linux BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 CCACHE=1
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
 cache:
@@ -57,44 +88,6 @@ cache:
     - $HOME/build/mapbox/mapbox-gl-native/.binaries
     - $HOME/build/mapbox/mapbox-gl-native/.scripts
 
-env:
-  global:
-    - TERM: dumb
-    # AWS
-    - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="
-    - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
-    # Access Token
-    - secure: "RiBIBfVhhaMjU5ksuwJO3shdvG9FpinBjdSv4co9jg9171SR8edNriedHjVKSIeBhSGNmZmX+twS3dJS/By6tl/LKh9sTynA+ZAYYljkE7jn881B/gMrlYvdAA6og5KvkhV1/0iJWlhuZrMTkhpDR200iLgg3EWBhWjltzmDW/I="
-
-before_install:
-- source ./scripts/set_compiler.sh
-- source ./scripts/travis_helper.sh
-- if [[ ${ACTION:-0} == 'coveralls' ]]; then
-    rvm install 2.3.0;
-    rvm use 2.3.0;
-    rvm rubygems latest --force;
-    gem install coveralls-lcov;
-  fi
-
-install:
-- ./platform/${FLAVOR}/scripts/install.sh
-
-before_script:
-- if command -v ccache >/dev/null 2>&1; then ccache --zero-stats ; fi
-
-script:
-- ./platform/${FLAVOR}/scripts/${ACTION:-run}.sh
-
-after_failure:
-- "[ -f ./platform/${FLAVOR}/scripts/after_failure.sh ] && ./platform/${FLAVOR}/scripts/after_failure.sh"
-
-after_script:
-- if command -v ccache >/dev/null 2>&1; then ccache --show-stats ; fi
-- "[ -f ./platform/${FLAVOR}/scripts/after_script.sh ] && ./platform/${FLAVOR}/scripts/after_script.sh"
-
 notifications:
   slack:
     secure: HHQYr7sF8M1SzoWSqgKVYtwAgGdLLCyTMsQjFhEEQNYO92ZwURE5s03qWTGH5k8+4Yqn26yrXt3NztLC4JIOpcGervN2mSZyq4dZgFTcWEd61igw0qwSenlwvFfbE1ASK/KYCzfyn9MIfHN+ovwLoRxXZkPwinKDvl3DXjBaFNg=
-
-git:
-  submodules: false

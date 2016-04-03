@@ -13,7 +13,7 @@ command -v ${CLANG_TIDY:-clang-tidy} >/dev/null 2>&1 || {
     exit 1
 }
 
-cd build/${HOST}-${HOST_VERSION}/${BUILDTYPE}
+cd build/${PLATFORM}-${SUBPLATFORM}/${BUILDTYPE}
 
 git ls-files '../../../src/mbgl/*.cpp' '../../../platform/*.cpp' '../../../test/*.cpp' | \
     xargs -I{} -P ${JOBS} ${CLANG_TIDY:-clang-tidy} -header-filter='\/mbgl\/' {}

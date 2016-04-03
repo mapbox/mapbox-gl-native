@@ -70,17 +70,6 @@ TEST_F(Storage, TEST_REQUIRES_SERVER(HTTPNetworkStatusChangePreempt)) {
         }
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
-#ifdef MBGL_HTTP_NSURL
-        EXPECT_TRUE(res.error->message ==
-                     "The operation couldn’t be completed. (NSURLErrorDomain error -1004.)" ||
-                 res.error->message == "Could not connect to the server.")
-         << "Full message is: \"" << res.error->message << "\"";
-#elif MBGL_HTTP_CURL
-        const std::string prefix { "Couldn't connect to server: " };
-        EXPECT_STREQ(prefix.c_str(), res.error->message.substr(0, prefix.size()).c_str()) << "Full message is: \"" << res.error->message << "\"";
-#else
-        FAIL();
-#endif
         ASSERT_FALSE(res.data.get());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(bool(res.modified));

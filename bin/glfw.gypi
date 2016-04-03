@@ -1,34 +1,34 @@
 {
-  'includes': [
-    '../../gyp/common.gypi',
-  ],
   'targets': [
-    { 'target_name': 'linuxapp',
-      'product_name': 'mapbox-gl',
+    {
+      'target_name': 'glfw-app',
+      'product_name': 'mapbox-glfw',
       'type': 'executable',
 
       'dependencies': [
-        'mbgl.gyp:core',
-        'mbgl.gyp:platform-<(platform_lib)',
-        'mbgl.gyp:http-<(http_lib)',
-        'mbgl.gyp:asset-<(asset_lib)',
-        'mbgl.gyp:copy_certificate_bundle',
+        'platform-lib',
+        'copy_certificate_bundle',
+      ],
+
+      'include_dirs': [
+        '../platform/default',
+        '../include',
+        '../src',
       ],
 
       'sources': [
-        'main.cpp',
-        '../default/settings_json.cpp',
-        '../default/glfw_view.hpp',
-        '../default/glfw_view.cpp',
-        '../default/log_stderr.cpp',
+        'glfw.cpp',
+        '../platform/default/settings_json.cpp',
+        '../platform/default/glfw_view.hpp',
+        '../platform/default/glfw_view.cpp',
+        '../platform/default/log_stderr.cpp',
       ],
 
-      'variables' : {
+      'variables': {
         'cflags_cc': [
-          '<@(opengl_cflags)',
-          '<@(boost_cflags)',
           '<@(glfw_cflags)',
           '<@(variant_cflags)',
+          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',
@@ -41,16 +41,12 @@
       'conditions': [
         ['OS == "mac"', {
           'xcode_settings': {
-            'SDKROOT': 'macosx',
-            'SUPPORTED_PLATFORMS':'macosx',
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
-            'MACOSX_DEPLOYMENT_TARGET': '10.10',
           },
         }, {
-          'cflags_cc': [ '<@(cflags_cc)' ],
-        }]
+         'cflags_cc': [ '<@(cflags_cc)' ],
+        }],
       ],
-
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
