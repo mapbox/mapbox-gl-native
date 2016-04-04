@@ -14,7 +14,9 @@ void Painter::renderTileDebug(const Tile& tile) {
     assert(tile.data);
     if (data.getDebug() != MapDebugOptions::NoDebug) {
         prepareTile(tile);
-        renderDebugText(*tile.data, tile.matrix);
+        if (data.getDebug() & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
+            renderDebugText(*tile.data, tile.matrix);
+        }
         if (data.getDebug() & MapDebugOptions::TileBorders) {
             renderDebugFrame(tile.matrix);
         }
