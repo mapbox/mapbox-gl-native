@@ -123,8 +123,8 @@
         </activity>
         <activity
             android:name=".activity.annotation.PolygonActivity"
-            android:description="@string/description_polygone"
-            android:label="@string/activity_polygone">
+            android:description="@string/description_polygon"
+            android:label="@string/activity_polygon">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
