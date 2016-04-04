@@ -328,7 +328,7 @@ bool Source::findLoadedChildren(const TileID& tileID, int32_t maxCoveringZoom, s
  *
  * @return boolean Whether a parent was found.
  */
-void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::vector<TileID>& retain) {
+void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std::vector<TileID>& retain, const StyleUpdateParameters& parameters) {
     for (int32_t z = tileID.z - 1; z >= minCoveringZoom; --z) {
         const TileID parent_id = tileID.parent(z, info->maxZoom);
         const TileData::State state = hasTile(parent_id);
@@ -337,6 +337,12 @@ void Source::findLoadedParent(const TileID& tileID, int32_t minCoveringZoom, std
             if (state == TileData::State::parsed) {
                 return;
             }
+        }
+
+        if (cache.has(parent_id.normalized().to_uint64())) {
+            addTile(parent_id, parameters);
+            retain.emplace_back(parent_id);
+            return;
         }
     }
 }
@@ -400,7 +406,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
             // Then, if there are no complete child tiles, try to find existing
             // parent tiles that completely cover the missing tile.
             if (!complete) {
-                findLoadedParent(tileID, minCoveringZoom, retain);
+                findLoadedParent(tileID, minCoveringZoom, retain, parameters);
             }
         }
     }
