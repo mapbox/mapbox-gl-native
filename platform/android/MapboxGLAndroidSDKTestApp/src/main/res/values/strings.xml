@@ -67,13 +67,14 @@
     <string name="description_snapshot">Example to make a snapshot of the map</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
+    <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss on Gesture</string>r
 
     <string name="category">category</string>
     <string name="category_annotation">Annotation</string>
     <string name="category_infowindow">InfoWindow</string>
     <string name="category_camera">Camera</string>
     <string name="category_fragment">Fragment</string>
-    <string name="category_api">Mapbox Android Services</string>
+    <string name="category_api">API</string>
     <string name="category_other">Other</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
@@ -106,14 +107,14 @@
     </string-array>
 
     <string-array name="user_tracking_mode">
-        <item>Disable tracking</item>
-        <item>Follow tracking mode</item>
+        <item>Disabled</item>
+        <item>Follow tracking</item>
     </string-array>
 
     <string-array name="user_bearing_mode">
-        <item>Disable bearing</item>
-        <item>GPS mode</item>
-        <item>Compass mode</item>
+        <item>Disabled</item>
+        <item>GPS bearing</item>
+        <item>Compass bearing</item>
         <!--<item>Combined mode</item>-->
     </string-array>
 
