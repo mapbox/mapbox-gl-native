@@ -52,11 +52,13 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
             options.attributionEnabled(false);
             options.logoEnabled(false);
 
+            LatLng dc = new LatLng(38.90252, -77.02291);
+
             options.minZoom(9);
             options.maxZoom(11);
             options.camera(new CameraPosition.Builder()
-                    .target(new LatLng(48.861431, 2.334166))
-                    .zoom(9)
+                    .target(dc)
+                    .zoom(11)
                     .build());
 
             mapFragment = SupportMapFragment.newInstance(options);
@@ -70,7 +72,7 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
-                mapboxMap.animateCamera(CameraUpdateFactory.zoomBy(2), 3500);
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().tilt(45.0).build()), 10000);
             }
         });
     }
