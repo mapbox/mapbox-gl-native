@@ -127,4 +127,6 @@
 
     <string name="dialog_camera_position">Animate to new position</string>
 
+    <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently Located</string>
+
 </resources>

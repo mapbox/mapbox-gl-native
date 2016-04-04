@@ -56,7 +56,7 @@ public class GeocoderActivity extends AppCompatActivity {
         }
 
         textView = (TextView) findViewById(R.id.message);
-        setMessage("Tap the map to trigger the geocoder.");
+        setMessage(getString(R.string.geocoder_instructions));
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(getString(R.string.mapbox_access_token));
