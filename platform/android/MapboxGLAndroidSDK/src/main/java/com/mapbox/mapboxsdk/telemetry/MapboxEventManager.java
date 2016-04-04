@@ -47,6 +47,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.internal.Util;
 
 /**
  * Singleton control center for managing Telemetry Data.
@@ -160,6 +161,8 @@ public class MapboxEventManager {
             // Build User Agent
             if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
                 userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
+                // Ensure that only ASCII characters are sent
+                userAgent = Util.toHumanReadableAscii(userAgent);
             }
 
         } catch (Exception e) {
