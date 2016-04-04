@@ -41,7 +41,7 @@
                 android:value="@string/category_infowindow" />
         </activity>
         <activity
-            android:name=".activity.annotation.BulkMarkerActivity"
+            android:name=".activity.annotation.AddMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_add_bulk_markers"
             android:label="@string/activity_add_bulk_markers">
@@ -53,6 +53,14 @@
             android:name=".activity.annotation.AnimatedMarkerActivity"
             android:description="@string/description_animated_marker"
             android:label="@string/activity_animated_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
+        <activity
+            android:name=".activity.annotation.DynamicMarkerChangeActivity"
+            android:description="@string/description_dynamic_marker"
+            android:label="@string/activity_dynamic_marker">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
@@ -161,14 +169,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
-        </activity>
-        <activity
-            android:name=".activity.annotation.DynamicMarkerChangeActivity"
-            android:description="@string/description_dynamic_marker"
-            android:label="@string/activity_dynamic_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
         </activity>
         <activity
             android:name=".activity.other.MapPaddingActivity"

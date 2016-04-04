@@ -30,7 +30,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class AddMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
@@ -63,7 +63,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     Spinner spinner = (Spinner) findViewById(R.id.spinner);
                     spinner.setAdapter(spinnerAdapter);
-                    spinner.setOnItemSelectedListener(BulkMarkerActivity.this);
+                    spinner.setOnItemSelectedListener(AddMarkerActivity.this);
                 }
             }
         });

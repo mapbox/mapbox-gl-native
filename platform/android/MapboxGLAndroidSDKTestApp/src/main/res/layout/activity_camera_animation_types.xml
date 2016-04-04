@@ -21,12 +21,11 @@
         app:center_longitude="-0.11968"
         app:zoom="15" />
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
         android:weightSum="3">
 
         <Button
@@ -51,5 +50,4 @@
             android:text="@string/button_camera_animate" />
 
     </LinearLayout>
-
 </RelativeLayout>

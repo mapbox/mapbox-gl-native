@@ -126,6 +126,9 @@ public class TrackingSettings {
                 uiSettings.setScrollGesturesEnabled(false);
                 uiSettings.setRotateGesturesEnabled((myBearingTrackingMode == MyBearingTracking.NONE));
             }
+        }else{
+            uiSettings.setScrollGesturesEnabled(true);
+            uiSettings.setRotateGesturesEnabled(true);
         }
     }
 

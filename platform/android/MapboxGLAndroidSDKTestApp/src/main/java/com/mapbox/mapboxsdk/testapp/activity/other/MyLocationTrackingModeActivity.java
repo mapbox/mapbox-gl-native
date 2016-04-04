@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,14 +17,14 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
 
@@ -200,10 +201,22 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_tracking, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_toggle_dismissible_tracking:
+                boolean state = !item.isChecked();
+                mMapboxMap.getTrackingSettings().setDismissTrackingOnGesture(state);
+                Toast.makeText(this, "Dismiss tracking mode on gesture = " + state, Toast.LENGTH_SHORT).show();
+                item.setChecked(state);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
