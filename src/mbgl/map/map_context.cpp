@@ -109,7 +109,6 @@ void MapContext::setStyleURL(const std::string& url) {
                 Log::Error(Event::Setup, "style %s could not be found or is an incompatible legacy map or style", styleURL.c_str());
             } else {
                 Log::Error(Event::Setup, "loading style failed: %s", res.error->message.c_str());
-                data.loading = false;
             }
         } else if (res.notModified || res.noContent) {
             return;
@@ -141,10 +140,6 @@ void MapContext::loadStyleJSON(const std::string& json, const std::string& base)
 
     // force style cascade, causing all pending transitions to complete.
     style->cascade();
-
-    // set loading here so we don't get a false loaded event as soon as map is
-    // created but before a style is loaded
-    data.loading = true;
 
     updateFlags |= Update::DefaultTransition | Update::Classes | Update::Zoom | Update::Annotations;
     asyncUpdate.send();

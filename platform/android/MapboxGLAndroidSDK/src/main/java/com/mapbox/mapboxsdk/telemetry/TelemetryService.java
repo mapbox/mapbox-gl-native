@@ -1,4 +1,5 @@
 package com.mapbox.mapboxsdk.telemetry;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+/**
+ * Manages Startup and Shutdown of Telemetry resources
+ */
 public class TelemetryService extends Service {
 
     private static final String TAG = "TelemetryService";
@@ -143,6 +147,11 @@ public class TelemetryService extends Service {
             Log.e(TAG, "Error while trying to sleep for 1 second: " + e);
         }
 
-        unregisterReceiver(telemetryLocationReceiver);
+        try {
+            unregisterReceiver(telemetryLocationReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Error when unregisterReceiver: " + e);
+        }
+
     }
 }

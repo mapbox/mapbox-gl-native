@@ -1,9 +1,10 @@
 #import "MGLLocationManager.h"
 #import <UIKit/UIKit.h>
 
-static const NSTimeInterval fiveMinuteTimeInterval = 300.0;
-static const NSTimeInterval fiveSecondTimeInterval = 5.0;
-static const CLLocationDistance regionRadiusLocationDistance = 300.0;
+static const NSTimeInterval MGLLocationManagerHibernationTimeout = 300.0;
+static const NSTimeInterval MGLLocationManagerHibernationPollInterval = 5.0;
+static const CLLocationDistance MGLLocationManagerHibernationRadius = 300.0;
+static const CLLocationDistance MGLLocationManagerDistanceFilter = 5.0;
 static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManagerRegionIdentifier.fence.center";
 
 @interface MGLLocationManager ()
@@ -54,7 +55,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
         CLLocationManager *standardLocationManager = [[CLLocationManager alloc] init];
         standardLocationManager.delegate = self;
         standardLocationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
-        standardLocationManager.distanceFilter = 1;
+        standardLocationManager.distanceFilter = MGLLocationManagerDistanceFilter;
         self.standardLocationManager = standardLocationManager;
     }
 }
@@ -105,12 +106,12 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
 
 - (void)startBackgroundTimeoutTimer {
     [self.backgroundLocationServiceTimeoutTimer invalidate];
-    self.backgroundLocationServiceTimeoutAllowedDate = [[NSDate date] dateByAddingTimeInterval:fiveMinuteTimeInterval];
-    self.backgroundLocationServiceTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:fiveSecondTimeInterval target:self selector:@selector(timeoutAllowedCheck) userInfo:nil repeats:YES];
+    self.backgroundLocationServiceTimeoutAllowedDate = [[NSDate date] dateByAddingTimeInterval:MGLLocationManagerHibernationTimeout];
+    self.backgroundLocationServiceTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:MGLLocationManagerHibernationPollInterval target:self selector:@selector(timeoutAllowedCheck) userInfo:nil repeats:YES];
 }
 
 - (void)establishRegionMonitoringForLocation:(CLLocation *)location {
-    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:regionRadiusLocationDistance identifier:MGLLocationManagerRegionIdentifier];
+    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:MGLLocationManagerHibernationRadius identifier:MGLLocationManagerRegionIdentifier];
     region.notifyOnEntry = NO;
     region.notifyOnExit = YES;
     [self.standardLocationManager startMonitoringForRegion:region];
@@ -135,7 +136,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
     if (location.speed > 0.0) {
         [self startBackgroundTimeoutTimer];
     }
-    if (self.standardLocationManager.monitoredRegions.count == 0 || location.horizontalAccuracy < regionRadiusLocationDistance) {
+    if (self.standardLocationManager.monitoredRegions.count == 0 || location.horizontalAccuracy < MGLLocationManagerHibernationRadius) {
         [self establishRegionMonitoringForLocation:location];
     }
     if ([self.delegate respondsToSelector:@selector(locationManager:didUpdateLocations:)]) {

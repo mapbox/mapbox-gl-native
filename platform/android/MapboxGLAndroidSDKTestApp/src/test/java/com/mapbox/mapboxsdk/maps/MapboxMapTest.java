@@ -10,9 +10,7 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.junit.Before;
@@ -26,11 +24,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.matches;
-import static org.mockito.Mockito.mock;
-
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -106,6 +102,30 @@ public class MapboxMapTest {
     @Test
     public void testUiSettings() {
         assertNotNull("UiSettings should not be null", mMapboxMap.getUiSettings());
+    }
+
+    //
+    // MinZoomLevel
+    //
+
+    @Test
+    public void testMinZoom() {
+        double zoom = 10;
+        mMapboxMap.setMinZoom(zoom);
+        assertEquals("MinZoom should match", zoom, mMapboxMap.getMinZoom(), 0);
+    }
+
+    @Test
+    public void testMaxZoom() {
+        double zoom = 10;
+        mMapboxMap.setMaxZoom(zoom);
+        assertEquals("MaxZoom should match", zoom, mMapboxMap.getMaxZoom(), 0);
+    }
+
+    @Test
+    public void testInitialZoomLevels() {
+        assertEquals("MaxZoom should match", 0, mMapboxMap.getMaxZoom(), 0);
+        assertEquals("MinZoom should match", 0, mMapboxMap.getMinZoom(), 0);
     }
 
     //
@@ -221,15 +241,15 @@ public class MapboxMapTest {
     }
 
     @Test
-    public void testOnBearingTrackingModeChangeListener(){
+    public void testOnBearingTrackingModeChangeListener() {
         mMapboxMap.setOnMyBearingTrackingModeChangeListener(mMyBearingTrackingModeChangeListener);
-        assertEquals("MyBearingTrackingChangeListerner should match",mMyBearingTrackingModeChangeListener, mMapboxMap.getOnMyBearingTrackingModeChangeListener());
+        assertEquals("MyBearingTrackingChangeListerner should match", mMyBearingTrackingModeChangeListener, mMapboxMap.getOnMyBearingTrackingModeChangeListener());
     }
 
     @Test
-    public void testOnLocationTrackingModeChangeListener(){
+    public void testOnLocationTrackingModeChangeListener() {
         mMapboxMap.setOnMyLocationTrackingModeChangeListener(mMyLocationTrackingModeChangeListener);
-        assertEquals("MyLocationTrackigChangeListener should match",mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
+        assertEquals("MyLocationTrackigChangeListener should match", mMyLocationTrackingModeChangeListener, mMapboxMap.getOnMyLocationTrackingModeChangeListener());
     }
 
     //
@@ -515,6 +535,23 @@ public class MapboxMapTest {
     }
 
     @Test
+    public void testAddMarkersEmpty() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        mMapboxMap.addMarkers(markerList);
+        assertEquals("Markers size should be 0", 0, mMapboxMap.getMarkers().size());
+    }
+
+    @Test
+    public void testAddMarkersSingleMarker() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions = new MarkerOptions().title("a");
+        markerList.add(markerOptions);
+        mMapboxMap.addMarkers(markerList);
+        assertEquals("Markers size should be 1", 1, mMapboxMap.getMarkers().size());
+        assertTrue(mMapboxMap.getMarkers().contains(markerOptions.getMarker()));
+    }
+
+    @Test
     public void testAddPolygon() {
         PolygonOptions polygonOptions = new PolygonOptions().add(new LatLng());
         Polygon polygon = mMapboxMap.addPolygon(polygonOptions);
@@ -545,6 +582,22 @@ public class MapboxMapTest {
     }
 
     @Test
+    public void addPolygonsEmpty() {
+        mMapboxMap.addPolygons(new ArrayList<PolygonOptions>());
+        assertEquals("Polygons size should be 0", 0, mMapboxMap.getPolygons().size());
+    }
+
+    @Test
+    public void addPolygonsSingle() {
+        List<PolygonOptions> polygonList = new ArrayList<>();
+        PolygonOptions polygonOptions = new PolygonOptions().fillColor(Color.BLACK).add(new LatLng());
+        polygonList.add(polygonOptions);
+        mMapboxMap.addPolygons(polygonList);
+        assertEquals("Polygons size should be 1", 1, mMapboxMap.getPolygons().size());
+        assertTrue(mMapboxMap.getPolygons().contains(polygonOptions.getPolygon()));
+    }
+
+    @Test
     public void testAddPolyline() {
         PolylineOptions polylineOptions = new PolylineOptions().add(new LatLng());
         Polyline polyline = mMapboxMap.addPolyline(polylineOptions);
@@ -572,6 +625,22 @@ public class MapboxMapTest {
         assertTrue(mMapboxMap.getPolylines().contains(polygonOptions1.getPolyline()));
         assertTrue(mMapboxMap.getPolylines().contains(polygonOptions2.getPolyline()));
         assertTrue("Polyline should be ignored", !mMapboxMap.getPolylines().contains(polygonOptions3.getPolyline()));
+    }
+
+    @Test
+    public void testAddPolylinesEmpty() {
+        mMapboxMap.addPolylines(new ArrayList<PolylineOptions>());
+        assertEquals("Polygons size should be 0", 0, mMapboxMap.getPolylines().size());
+    }
+
+    @Test
+    public void testAddPolylinesSingle() {
+        List<PolylineOptions> polylineList = new ArrayList<>();
+        PolylineOptions polygonOptions = new PolylineOptions().color(Color.BLACK).add(new LatLng());
+        polylineList.add(polygonOptions);
+        mMapboxMap.addPolylines(polylineList);
+        assertEquals("Polygons size should be 1", 1, mMapboxMap.getPolylines().size());
+        assertTrue(mMapboxMap.getPolylines().contains(polygonOptions.getPolyline()));
     }
 
     @Test
@@ -708,7 +777,6 @@ public class MapboxMapTest {
         mMapboxMap.deselectMarkers();
         assertTrue("Selected markers should be empty", mMapboxMap.getSelectedMarkers().isEmpty());
     }
-
 
     //
     // OnMarkerClick interface

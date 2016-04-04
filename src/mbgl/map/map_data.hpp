@@ -149,7 +149,6 @@ public:
     bool paused = false;
     std::mutex mutexPause;
     std::condition_variable condPause;
-    bool loading = false;
 };
 
 } // namespace mbgl

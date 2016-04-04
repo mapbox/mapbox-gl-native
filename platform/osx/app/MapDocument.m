@@ -204,6 +204,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         appDelegate.pendingZoomLevel = -1;
         appDelegate.pendingCamera = nil;
     }
+    if (!MGLCoordinateBoundsIsEmpty(appDelegate.pendingVisibleCoordinateBounds)) {
+        self.mapView.visibleCoordinateBounds = appDelegate.pendingVisibleCoordinateBounds;
+        appDelegate.pendingVisibleCoordinateBounds = (MGLCoordinateBounds){ { 0, 0 }, { 0, 0 } };
+    }
     if (appDelegate.pendingDebugMask) {
         self.mapView.debugMask = appDelegate.pendingDebugMask;
     }
@@ -348,6 +352,36 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     };
     MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoordinates count:4];
     [self.mapView addAnnotation:line];
+}
+
+#pragma mark Offline packs
+
+- (IBAction)addOfflinePack:(id)sender {
+    NSAlert *namePrompt = [[NSAlert alloc] init];
+    namePrompt.messageText = @"Add offline pack";
+    namePrompt.informativeText = @"Choose a name for the pack:";
+    NSTextField *nameTextField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    nameTextField.placeholderString = MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds);
+    [nameTextField sizeToFit];
+    NSRect textFieldFrame = nameTextField.frame;
+    textFieldFrame.size.width = 300;
+    nameTextField.frame = textFieldFrame;
+    namePrompt.accessoryView = nameTextField;
+    [namePrompt addButtonWithTitle:@"Add"];
+    [namePrompt addButtonWithTitle:@"Cancel"];
+    if ([namePrompt runModal] != NSAlertFirstButtonReturn) {
+        return;
+    }
+    
+    id <MGLOfflineRegion> region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:self.mapView.styleURL bounds:self.mapView.visibleCoordinateBounds fromZoomLevel:self.mapView.zoomLevel toZoomLevel:self.mapView.maximumZoomLevel];
+    NSData *context = [[NSValueTransformer valueTransformerForName:@"OfflinePackNameValueTransformer"] reverseTransformedValue:nameTextField.stringValue];
+    [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack * _Nullable pack, NSError * _Nullable error) {
+        if (error) {
+            [[NSAlert alertWithError:error] runModal];
+        } else {
+            [pack resume];
+        }
+    }];
 }
 
 #pragma mark Help methods
@@ -499,6 +533,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     if (menuItem.action == @selector(drawPolygonAndPolyLineAnnotations:)) {
         return !_isShowingPolygonAndPolylineAnnotations;
+    }
+    if (menuItem.action == @selector(addOfflinePack:)) {
+        NSURL *styleURL = self.mapView.styleURL;
+        return !styleURL.isFileURL;
     }
     if (menuItem.action == @selector(giveFeedback:)) {
         return YES;

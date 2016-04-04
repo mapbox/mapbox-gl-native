@@ -33,7 +33,6 @@
 #include <mbgl/shader/circle_shader.hpp>
 
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/mat3.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -255,89 +254,6 @@ void Painter::renderPass(RenderPass pass_,
     if (debug::renderTree) {
         Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
     }
-}
-
-void Painter::renderBackground(const BackgroundLayer& layer) {
-    // Note that for bottommost layers without a pattern, the background color is drawn with
-    // glClear rather than this method.
-    const BackgroundPaintProperties& properties = layer.paint;
-
-    if (!properties.pattern.value.to.empty()) {
-        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
-
-        if (!imagePosA || !imagePosB)
-            return;
-
-        config.program = patternShader->getID();
-        patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl_a = (*imagePosA).tl;
-        patternShader->u_pattern_br_a = (*imagePosA).br;
-        patternShader->u_pattern_tl_b = (*imagePosB).tl;
-        patternShader->u_pattern_br_b = (*imagePosB).br;
-        patternShader->u_mix = properties.pattern.value.t;
-        patternShader->u_opacity = properties.opacity;
-
-        LatLng latLng = state.getLatLng();
-        double centerX = state.lngX(latLng.longitude);
-        double centerY = state.latY(latLng.latitude);
-        float scale = 1 / std::pow(2, state.getZoomFraction());
-
-        std::array<float, 2> sizeA = (*imagePosA).size;
-        mat3 matrixA;
-        matrix::identity(matrixA);
-        matrix::scale(matrixA, matrixA,
-                      1.0f / (sizeA[0] * properties.pattern.value.fromScale),
-                      1.0f / (sizeA[1] * properties.pattern.value.fromScale));
-        matrix::translate(matrixA, matrixA,
-                          std::fmod(centerX, sizeA[0] * properties.pattern.value.fromScale),
-                          std::fmod(centerY, sizeA[1] * properties.pattern.value.fromScale));
-        matrix::rotate(matrixA, matrixA, -state.getAngle());
-        matrix::scale(matrixA, matrixA,
-                       scale * state.getWidth()  / 2,
-                      -scale * state.getHeight() / 2);
-
-        std::array<float, 2> sizeB = (*imagePosB).size;
-        mat3 matrixB;
-        matrix::identity(matrixB);
-        matrix::scale(matrixB, matrixB,
-                      1.0f / (sizeB[0] * properties.pattern.value.toScale),
-                      1.0f / (sizeB[1] * properties.pattern.value.toScale));
-        matrix::translate(matrixB, matrixB,
-                          std::fmod(centerX, sizeB[0] * properties.pattern.value.toScale),
-                          std::fmod(centerY, sizeB[1] * properties.pattern.value.toScale));
-        matrix::rotate(matrixB, matrixB, -state.getAngle());
-        matrix::scale(matrixB, matrixB,
-                       scale * state.getWidth()  / 2,
-                      -scale * state.getHeight() / 2);
-
-        patternShader->u_patternmatrix_a = matrixA;
-        patternShader->u_patternmatrix_b = matrixB;
-
-        VertexArrayObject::Unbind();
-        backgroundBuffer.bind(glObjectStore);
-        patternShader->bind(0);
-        spriteAtlas->bind(true, glObjectStore);
-    } else {
-        Color color = properties.color;
-        color[0] *= properties.opacity;
-        color[1] *= properties.opacity;
-        color[2] *= properties.opacity;
-        color[3] *= properties.opacity;
-
-        config.program = plainShader->getID();
-        plainShader->u_matrix = identityMatrix;
-        plainShader->u_color = color;
-        backgroundArray.bind(*plainShader, backgroundBuffer, BUFFER_OFFSET(0), glObjectStore);
-    }
-
-    config.stencilTest = GL_FALSE;
-    config.depthFunc.reset();
-    config.depthTest = GL_TRUE;
-    config.depthMask = GL_FALSE;
-    setDepthSublayer(0);
-
-    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 }
 
 mat4 Painter::translatedMatrix(const mat4& matrix, const std::array<float, 2> &translation, const TileID &id, TranslateAnchorType anchor) {

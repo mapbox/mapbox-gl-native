@@ -162,7 +162,7 @@ public class LatLngBounds implements Parcelable {
      * @param latLng the point which may be contained
      * @return true, if the point is contained within the box.
      */
-    public boolean including(final ILatLng latLng) {
+    public boolean contains(final ILatLng latLng) {
         final double latitude = latLng.getLatitude();
         final double longitude = latLng.getLongitude();
         return ((latitude < this.mLatNorth)

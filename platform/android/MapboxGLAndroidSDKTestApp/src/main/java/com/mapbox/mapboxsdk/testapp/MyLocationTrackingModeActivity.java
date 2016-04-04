@@ -170,12 +170,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mMapView.onResume();
@@ -191,12 +185,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mMapView.onStop();
     }
 
     @Override

@@ -24,8 +24,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.mapbox.mapboxsdk.BuildConfig;
+import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.location.LocationServices;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.security.MessageDigest;
@@ -46,6 +48,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * Singleton control center for managing Telemetry Data.
+ * Primary access is via MapboxEventManager.getMapboxEventManager()
+ */
 public class MapboxEventManager {
 
     private static final String TAG = "MapboxEventManager";
@@ -86,7 +92,7 @@ public class MapboxEventManager {
      * Private Constructor for configuring the single instance per app.
      */
     private MapboxEventManager() {
-
+        super();
     }
 
     /**
@@ -97,7 +103,7 @@ public class MapboxEventManager {
      * @param context     The context associated with MapView
      * @param accessToken The accessToken to load MapView
      */
-    public void initialise(@NonNull Context context, @NonNull String accessToken) {
+    public void initialize(@NonNull Context context, @NonNull String accessToken) {
         this.context = context.getApplicationContext();
         this.accessToken = accessToken;
 
@@ -152,7 +158,7 @@ public class MapboxEventManager {
             }
 
             // Build User Agent
-            if (!TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
+            if (TextUtils.equals(userAgent, BuildConfig.MAPBOX_EVENTS_USER_AGENT_BASE) && !TextUtils.isEmpty(appName) && !TextUtils.isEmpty(versionName)) {
                 userAgent = appName + "/" + versionName + "/" + versionCode + " " + userAgent;
             }
 
@@ -547,7 +553,16 @@ public class MapboxEventManager {
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SOURCE, evt.get(MapboxEvent.ATTRIBUTE_SOURCE));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_SESSION_ID, evt.get(MapboxEvent.ATTRIBUTE_SESSION_ID));
                     jsonObject.putOpt(MapboxEvent.KEY_LATITUDE, evt.get(MapboxEvent.KEY_LATITUDE));
-                    jsonObject.putOpt(MapboxEvent.KEY_LONGITUDE, evt.get(MapboxEvent.KEY_LONGITUDE));
+
+                    // Make sure Longitude Is Wrapped
+                    if (evt.containsKey(MapboxEvent.KEY_LONGITUDE)) {
+                        double lon = (double)evt.get(MapboxEvent.KEY_LONGITUDE);
+                        if ((lon < GeoConstants.MIN_LONGITUDE) || (lon > GeoConstants.MAX_LONGITUDE)) {
+                            lon = MathUtils.wrap(lon, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
+                        }
+                        jsonObject.put(MapboxEvent.KEY_LONGITUDE, lon);
+                    }
+
                     jsonObject.putOpt(MapboxEvent.KEY_ALTITUDE, evt.get(MapboxEvent.KEY_ALTITUDE));
                     jsonObject.putOpt(MapboxEvent.KEY_ZOOM, evt.get(MapboxEvent.KEY_ZOOM));
                     jsonObject.putOpt(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, evt.get(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM));

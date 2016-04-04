@@ -206,7 +206,11 @@ OnlineFileRequestImpl::OnlineFileRequestImpl(FileRequest* key_, const Resource& 
       resource(resource_),
       callback(std::move(callback_)) {
     // Force an immediate first request if we don't have an expiration time.
-    schedule(impl, SystemClock::now());
+    if (resource.priorExpires) {
+        schedule(impl, resource.priorExpires);
+    } else {
+        schedule(impl, SystemClock::now());
+    }
 }
 
 OnlineFileRequestImpl::~OnlineFileRequestImpl() {

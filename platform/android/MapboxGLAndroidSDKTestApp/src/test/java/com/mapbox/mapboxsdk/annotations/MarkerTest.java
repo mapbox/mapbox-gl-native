@@ -113,7 +113,7 @@ public class MarkerTest {
     @Test
     public void testToString() {
         Marker marker = new MarkerOptions().position(new LatLng(0, 0)).getMarker();
-        assertEquals(marker.toString(), "Marker [position[" + "LatLng [longitude=0.0, latitude=0.0, altitude=0.0]" + "]]");
+        assertEquals(marker.toString(), "Marker [position[" + "LatLng [latitude=0.0, longitude=0.0, altitude=0.0]" + "]]");
     }
 
 }

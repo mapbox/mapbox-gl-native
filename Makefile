@@ -51,9 +51,9 @@ ibench: export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
 ibench: ; $(RUN) HOST=ios Xcode/ios-bench
 
 .PHONY: ipackage ipackage-strip ipackage-sim itest
-ipackage: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
-ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO ./platform/ios/scripts/package.sh
-ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
+ipackage: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
+ipackage-strip: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
+ipackage-sim: Xcode/ios ; @JOBS=$(JOBS) BUILDTYPE=Debug BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) BUNDLE_RESOURCES=YES PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK=YES ./platform/ios/scripts/package.sh
 iframework: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) ./platform/ios/scripts/package.sh
 ifabric: Xcode/ios ; @JOBS=$(JOBS) BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES ./platform/ios/scripts/package.sh
 itest: ipackage-sim ; ./platform/ios/scripts/test.sh
@@ -93,7 +93,7 @@ android: android-lib
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 # Builds all android architectures for distribution.
-apackage: android-lib-arm-v5 android-lib-arm-v7
+apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8
 apackage: android-lib-x86 android-lib-x86-64
 apackage: android-lib-mips
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)

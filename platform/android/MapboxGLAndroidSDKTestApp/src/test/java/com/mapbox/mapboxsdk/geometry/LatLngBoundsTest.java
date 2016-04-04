@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.geometry;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -100,12 +99,12 @@ public class LatLngBoundsTest {
 
     @Test
     public void testIncluding() {
-        assertTrue("LatLng should be included", mLatLngBounds.including(new LatLng(1, 1)));
+        assertTrue("LatLng should be included", mLatLngBounds.contains(new LatLng(1, 1)));
     }
 
     @Test
     public void testNoIncluding() {
-        assertFalse("LatLng should not be included", mLatLngBounds.including(new LatLng(3, 1)));
+        assertFalse("LatLng should not be included", mLatLngBounds.contains(new LatLng(3, 1)));
     }
 
     @Test

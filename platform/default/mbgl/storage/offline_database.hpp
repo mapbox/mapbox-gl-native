@@ -58,8 +58,10 @@ public:
 
 private:
     void connect(int flags);
+    int userVersion();
     void ensureSchema();
     void removeExisting();
+    void migrateToVersion3();
 
     class Statement {
     public:

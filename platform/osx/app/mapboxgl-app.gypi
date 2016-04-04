@@ -29,6 +29,8 @@
         './LocationCoordinate2DTransformer.m',
         './MapDocument.h',
         './MapDocument.m',
+        './OfflinePackNameValueTransformer.h',
+        './OfflinePackNameValueTransformer.m',
         './TimeIntervalTransformer.h',
         './TimeIntervalTransformer.m',
         './NSValue+Additions.h',

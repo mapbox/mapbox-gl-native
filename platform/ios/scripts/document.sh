@@ -19,19 +19,22 @@ BRANCH=$( git describe --tags --match=ios-v*.*.* --abbrev=0 )
 SHORT_VERSION=$( echo ${BRANCH} | sed 's/^ios-v//' )
 RELEASE_VERSION=$( echo ${SHORT_VERSION} | sed -e 's/^ios-v//' -e 's/-.*//' )
 
+SWIFT_VERSION=$(xcrun swift -version | head -n 1 | sed -e 's/^Apple Swift version //' -e 's/ .*$//')
+
 rm -rf /tmp/mbgl
 mkdir -p /tmp/mbgl/
 README=/tmp/mbgl/README.md
 cp platform/ios/docs/doc-README.md "${README}"
 # http://stackoverflow.com/a/4858011/4585461
 echo "## Changes in version ${RELEASE_VERSION}" >> "${README}"
-sed -n -e '/^## iOS/{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' CHANGELOG.md >> "${README}"
+sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' platform/ios/CHANGELOG.md >> "${README}"
 
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
 jazzy \
     --sdk iphonesimulator \
+    --swift-version $SWIFT_VERSION \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
