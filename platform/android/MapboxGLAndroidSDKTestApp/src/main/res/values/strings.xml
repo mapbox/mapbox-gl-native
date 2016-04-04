@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Mapbox GL</string>
+    <string name="app_name">Mapbox Android SDK TestApp</string>
 
     <!-- Test Activities -->
     <string name="activity_mapboxmap">MapboxMap Activity</string>
