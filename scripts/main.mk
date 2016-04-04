@@ -128,7 +128,7 @@ Makefile/%: Makefile/__project__
 
 Xcode/node: Xcode/__project__ node/xproj
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target node...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) set -o pipefail && xcodebuild \
+	xcodebuild \
 		$(XCODEBUILD_ARGS) \
 		-project ./build/binding.xcodeproj \
 		-configuration $(BUILDTYPE) \
@@ -137,7 +137,8 @@ Xcode/node: Xcode/__project__ node/xproj
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
-	$(QUIET)$(ENV) set -o pipefail && xcodebuild \
+	xcodebuild \
+		PROVISIONING_PROFILE="$(PROVISIONING_PROFILE)" \
 		$(XCODEBUILD_ARGS) \
 		-project ./build/$(HOST_SLUG)/gyp/$(HOST).xcodeproj \
 		-configuration $(BUILDTYPE) \

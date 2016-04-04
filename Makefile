@@ -66,21 +66,17 @@ Xcode/ios:
 iproj: Xcode/ios
 	open ./build/ios-all/gyp/ios.xcodeproj
 
-.PHONY: ios ibench isim
-ios ibench isim:
-	export XCODEBUILD_ARGS += PROVISIONING_PROFILE="$$(PROVISIONING_PROFILE)"
-
+.PHONY: ios
 ios:
-	export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64 armv7 armv7s"
-	$(RUN) HOST=ios Xcode/iosapp
+	$(RUN) HOST=ios XCODEBUILD_ARGS='-sdk iphoneos ARCHS="arm64 armv7 armv7s"' Xcode/iosapp
 
+.PHONY: isim
 isim:
-	export XCODEBUILD_ARGS += -sdk iphonesimulator ARCHS="x86_64 i386"
-	$(RUN) HOST=ios Xcode/iosapp
+	$(RUN) HOST=ios XCODEBUILD_ARGS='-sdk iphonesimulator ARCHS="x86_64 i386"' Xcode/iosapp
 
+.PHONY: ibench
 ibench:
-	export XCODEBUILD_ARGS += -sdk iphoneos ARCHS="arm64"
-	$(RUN) HOST=ios Xcode/ios-bench
+	$(RUN) HOST=ios XCODEBUILD_ARGS='-sdk iphoneos ARCHS="arm64"' Xcode/ios-bench
 
 .PHONY: ipackage
 ipackage: Xcode/ios
