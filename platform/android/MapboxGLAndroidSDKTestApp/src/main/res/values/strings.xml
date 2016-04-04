@@ -15,7 +15,7 @@
     <string name="activity_animated_marker">Animated Marker (experimental)</string>
     <string name="activity_dynamic_marker">Dynamic Marker</string>
     <string name="activity_polyline">Polyline</string>
-    <string name="activity_polygone">Polygone</string>
+    <string name="activity_polygon">Polygon</string>
 
     <!-- InfoWindow-->
     <string name="activity_info_window">Standard InfoWindow example</string>
@@ -60,13 +60,13 @@
     <string name="description_offline">Offline Map example</string>
     <string name="description_animated_marker">Animate the position change of a Marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
-    <string name="description_polygone">Add a polygone to a map</string>
+    <string name="description_polygon">Add a polygon to a map</string>
     <string name="description_directions">Example with Directions API</string>
     <string name="description_geocoder">Example with Geocoder API</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
 
-    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
+    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
 
     <string name="category">category</string>
     <string name="category_annotation">Annotation</string>
