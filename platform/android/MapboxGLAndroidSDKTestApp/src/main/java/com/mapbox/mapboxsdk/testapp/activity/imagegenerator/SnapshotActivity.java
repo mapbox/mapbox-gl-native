@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.other;
+package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;

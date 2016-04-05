@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.other;
+package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
 import android.location.Location;
 import android.os.Bundle;

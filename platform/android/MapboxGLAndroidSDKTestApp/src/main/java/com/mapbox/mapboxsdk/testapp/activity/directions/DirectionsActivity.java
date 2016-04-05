@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.api;
+package com.mapbox.mapboxsdk.testapp.activity.directions;
 
 import android.graphics.Color;
 import android.os.Bundle;
