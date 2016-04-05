@@ -170,7 +170,7 @@ xnode: Xcode/node
 
 .PHONY: nproj
 nproj:
-	$(RUN) HTTP=none ASSET=none node/xproj
+	$(RUN) LOOP=uv HTTP=none ASSET=none node/xproj
 	open ./build/binding.xcodeproj
 
 #### Miscellaneous targets #####################################################
