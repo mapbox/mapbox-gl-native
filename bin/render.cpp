@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
     double lat = 0, lon = 0;
     double zoom = 0;
     double bearing = 0;
+    double pitch = 0;
 
     int width = 512;
     int height = 512;
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
         ("lat,y", po::value(&lat)->value_name("degrees")->default_value(lat), "Latitude in degrees")
         ("zoom,z", po::value(&zoom)->value_name("number")->default_value(zoom), "Zoom level")
         ("bearing,b", po::value(&bearing)->value_name("degrees")->default_value(bearing), "Bearing")
+        ("pitch,p", po::value(&pitch)->value_name("degrees")->default_value(pitch), "Pitch")
         ("width,w", po::value(&width)->value_name("pixels")->default_value(width), "Image width")
         ("height,h", po::value(&height)->value_name("pixels")->default_value(height), "Image height")
         ("class,c", po::value(&classes)->value_name("name"), "Class name")
@@ -89,6 +91,7 @@ int main(int argc, char *argv[]) {
 
     map.setLatLngZoom({ lat, lon }, zoom);
     map.setBearing(bearing);
+    map.setPitch(pitch);
 
     if (debug) {
         map.setDebug(debug ? mbgl::MapDebugOptions::TileBorders | mbgl::MapDebugOptions::ParseStatus : mbgl::MapDebugOptions::NoDebug);
