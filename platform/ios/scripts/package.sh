@@ -93,7 +93,11 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             CODE_SIGN_IDENTITY= \
             -project ./build/ios-all/gyp/mbgl.xcodeproj \
             -configuration ${BUILDTYPE} \
-            -target everything \
+            -target core \
+            -target platform-ios \
+            -target http-nsurl \
+            -target asset-fs \
+            -target headless-eagl \
             -jobs ${JOBS}
     fi
 
@@ -123,7 +127,11 @@ if [[ ${BUILD_STATIC} == true ]]; then
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         -project ./build/ios-all/gyp/mbgl.xcodeproj \
         -configuration ${BUILDTYPE} \
-        -target everything \
+        -target core \
+        -target platform-ios \
+        -target http-nsurl \
+        -target asset-fs \
+        -target headless-eagl \
         -jobs ${JOBS}
 fi
 
