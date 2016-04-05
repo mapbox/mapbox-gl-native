@@ -6,9 +6,10 @@ import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
  * Icon is the visual representation of a {@link Marker} on a {@link MapView}.
+ *
  * @see Marker
  */
-public final class Icon {
+public class Icon {
     private Bitmap mBitmap;
     private String mId;
 
@@ -39,8 +40,13 @@ public final class Icon {
 
     @Override
     public int hashCode() {
-        int result = mBitmap.hashCode();
-        result = 31 * result + mId.hashCode();
+        int result = 0;
+        if (mBitmap != null) {
+            result = mBitmap.hashCode();
+        }
+        if (mId != null) {
+            result = 31 * result + mId.hashCode();
+        }
         return result;
     }
 }

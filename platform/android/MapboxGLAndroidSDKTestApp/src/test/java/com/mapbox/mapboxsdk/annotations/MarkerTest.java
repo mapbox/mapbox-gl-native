@@ -2,16 +2,21 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 public class MarkerTest {
 
@@ -88,6 +93,35 @@ public class MarkerTest {
     }
 
     @Test
+    public void testEqualityDifferentLocation() {
+        MarkerOptions marker = new MarkerOptions().position(new LatLng(0, 0));
+        MarkerOptions other = new MarkerOptions().position(new LatLng(1, 0));
+        assertNotEquals("Should not match", other, marker);
+    }
+
+
+    @Test
+    public void testEqualityDifferentSnippet() {
+        MarkerOptions marker = new MarkerOptions().snippet("s");
+        MarkerOptions other = new MarkerOptions();
+        assertNotEquals("Should not match", other, marker);
+    }
+
+    @Test
+    public void testEqualityDifferentIcon() {
+        MarkerOptions marker = new MarkerOptions().icon(mock(Icon.class));
+        MarkerOptions other = new MarkerOptions();
+        assertNotEquals("Should not match", other, marker);
+    }
+
+    @Test
+    public void testEqualityDifferentTitle() {
+        MarkerOptions marker = new MarkerOptions().title("t");
+        MarkerOptions other = new MarkerOptions();
+        assertNotEquals("Should not match", other, marker);
+    }
+
+    @Test
     public void testEqualsItself() {
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(0, 0));
         Marker marker = markerOptions.getMarker();
@@ -116,4 +150,29 @@ public class MarkerTest {
         assertEquals(marker.toString(), "Marker [position[" + "LatLng [latitude=0.0, longitude=0.0, altitude=0.0]" + "]]");
     }
 
+    @Test
+    public void testParcelable() {
+        MarkerOptions object = new MarkerOptions().position(new LatLng(0, 0)).snippet("s").title("t");
+        Parcel parcel = MockParcel.obtain(object);
+        object.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        MarkerOptions parceable = MarkerOptions.CREATOR.createFromParcel(parcel);
+        assertEquals("parcel should match initial object", object, parceable);
+    }
+
+    @Test
+    public void testParcelableArray() {
+        MarkerOptions[] objects = new MarkerOptions[]{new MarkerOptions().position(new LatLng(0, 0)), new MarkerOptions().position(new LatLng(1, 1))};
+        Parcel parcel = MockParcel.obtain(objects);
+        parcel.writeParcelableArray(objects, 0);
+        parcel.setDataPosition(0);
+        MarkerOptions[] parcelableArray = (MarkerOptions[]) parcel.readParcelableArray(LatLng.class.getClassLoader());
+        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
+    }
+
+    @Test
+    public void testDescribeContents() {
+        MarkerOptions object = new MarkerOptions().position(new LatLng(0, 0)).snippet("s").title("t");
+        assertEquals("contents should be 0", 1034152.0, object.describeContents(), 0);
+    }
 }

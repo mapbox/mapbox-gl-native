@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyByte;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -82,6 +83,7 @@ public class MockParcel {
                 return null;
             }
         };
+        doAnswer(writeValueAnswer).when(mockedParcel).writeByte(anyByte());
         doAnswer(writeValueAnswer).when(mockedParcel).writeLong(anyLong());
         doAnswer(writeValueAnswer).when(mockedParcel).writeString(anyString());
         doAnswer(writeValueAnswer).when(mockedParcel).writeDouble(anyDouble());
@@ -90,6 +92,12 @@ public class MockParcel {
     }
 
     private void setupReads() {
+        when(mockedParcel.readByte()).thenAnswer(new Answer<Byte>() {
+            @Override
+            public Byte answer(InvocationOnMock invocation) throws Throwable {
+                return (Byte) objects.get(position++);
+            }
+        });
         when(mockedParcel.readLong()).thenAnswer(new Answer<Long>() {
             @Override
             public Long answer(InvocationOnMock invocation) throws Throwable {
