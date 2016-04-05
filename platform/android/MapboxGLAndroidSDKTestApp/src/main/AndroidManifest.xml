@@ -122,7 +122,7 @@
                 android:value="@string/category_other" />
         </activity>
         <activity
-            android:name=".activity.other.MyLocationTrackingModeActivity"
+            android:name=".activity.userlocation.MyLocationTrackingModeActivity"
             android:description="@string/description_user_location_tracking"
             android:label="@string/activity_user_tracking_mode">
             <meta-data
@@ -147,7 +147,7 @@
                 android:value="@string/category_annotation" />
         </activity>
         <activity
-            android:name=".activity.api.DirectionsActivity"
+            android:name=".activity.directions.DirectionsActivity"
             android:description="@string/description_directions"
             android:label="@string/activity_directions">
             <meta-data
@@ -155,7 +155,7 @@
                 android:value="@string/category_api" />
         </activity>
         <activity
-            android:name=".activity.api.GeocoderActivity"
+            android:name=".activity.geocoding.GeocoderActivity"
             android:description="@string/description_geocoder"
             android:label="@string/activity_geocoder">
             <meta-data
@@ -171,7 +171,7 @@
                 android:value="@string/category_camera" />
         </activity>
         <activity
-            android:name=".activity.other.MapPaddingActivity"
+            android:name=".activity.maplayout.MapPaddingActivity"
             android:description="@string/description_map_padding"
             android:label="@string/activity_map_padding"
             android:screenOrientation="portrait">
@@ -180,7 +180,7 @@
                 android:value="@string/category_other" />
         </activity>
         <activity
-            android:name=".activity.other.OfflineActivity"
+            android:name=".activity.offline.OfflineActivity"
             android:description="@string/description_offline"
             android:label="@string/activity_offline">
             <meta-data
@@ -188,7 +188,7 @@
                 android:value="@string/category_other" />
         </activity>
         <activity
-            android:name=".activity.other.SnapshotActivity"
+            android:name=".activity.imagegenerator.SnapshotActivity"
             android:description="@string/description_snapshot"
             android:label="@string/activity_snapshot">
             <meta-data

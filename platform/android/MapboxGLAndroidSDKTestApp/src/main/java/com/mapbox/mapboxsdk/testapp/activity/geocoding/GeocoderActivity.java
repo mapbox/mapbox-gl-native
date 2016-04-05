@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.api;
+package com.mapbox.mapboxsdk.testapp.activity.geocoding;
 
 import android.graphics.PointF;
 import android.os.AsyncTask;

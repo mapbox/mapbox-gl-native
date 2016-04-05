@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.testapp.activity.other;
+package com.mapbox.mapboxsdk.testapp.activity.offline;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
