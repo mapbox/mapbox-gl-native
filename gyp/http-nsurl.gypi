@@ -25,7 +25,7 @@
       },
 
       'xcode_settings': {
-        'CLANG_ENABLE_OBJC_ARC': 'NO',
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
       },
 
       'direct_dependent_settings': {

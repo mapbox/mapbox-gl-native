@@ -19,7 +19,6 @@ class HTTPNSURLContext;
 class HTTPNSURLRequest : public HTTPRequestBase {
 public:
     HTTPNSURLRequest(HTTPNSURLContext*, Resource, Callback);
-    ~HTTPNSURLRequest();
 
     void cancel() final;
 
@@ -39,7 +38,6 @@ private:
 class HTTPNSURLContext : public HTTPContextBase {
 public:
     HTTPNSURLContext();
-    ~HTTPNSURLContext();
 
     HTTPRequestBase* createRequest(const Resource&, HTTPRequestBase::Callback) final;
 
@@ -58,21 +56,12 @@ HTTPNSURLContext::HTTPNSURLContext() {
         sessionConfig.URLCache = nil;
 
         session = [NSURLSession sessionWithConfiguration:sessionConfig];
-        [session retain];
 
         // Write user agent string
         userAgent = @"MapboxGL";
 
         accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
     }
-}
-
-HTTPNSURLContext::~HTTPNSURLContext() {
-    [session release];
-    session = nullptr;
-
-    [userAgent release];
-    userAgent = nullptr;
 }
 
 HTTPRequestBase* HTTPNSURLContext::createRequest(const Resource& resource, HTTPRequestBase::Callback callback) {
@@ -125,21 +114,11 @@ HTTPNSURLRequest::HTTPNSURLRequest(HTTPNSURLContext* context_,
                         async.send();
                     }
               }];
-        [task retain];
         [task resume];
     }
 }
 
-HTTPNSURLRequest::~HTTPNSURLRequest() {
-    assert(!task);
-}
-
 void HTTPNSURLRequest::handleResponse() {
-    if (task) {
-        [task release];
-        task = nullptr;
-    }
-
     assert(response);
     notify(*response);
 
@@ -147,11 +126,8 @@ void HTTPNSURLRequest::handleResponse() {
 }
 
 void HTTPNSURLRequest::cancel() {
-    if (task) {
-        [task cancel];
-        [task release];
-        task = nullptr;
-    }
+    [task cancel];
+    task = nil;
 
     {
         std::lock_guard<std::mutex> lock(cancelled->second);
