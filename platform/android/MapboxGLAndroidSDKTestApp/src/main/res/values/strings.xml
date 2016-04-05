@@ -71,11 +71,15 @@
 
     <string name="category">category</string>
     <string name="category_annotation">Annotation</string>
-    <string name="category_infowindow">InfoWindow</string>
     <string name="category_camera">Camera</string>
+    <string name="category_directions">Directions</string>
     <string name="category_fragment">Fragment</string>
-    <string name="category_api">API</string>
-    <string name="category_other">Other</string>
+    <string name="category_geocoding">Geocoding</string>
+    <string name="category_imagegenerator">Image Generator</string>
+    <string name="category_infowindow">InfoWindow</string>
+    <string name="category_maplayout">Map Layout</string>
+    <string name="category_offline">Offline</string>
+    <string name="category_userlocation">User Location</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>

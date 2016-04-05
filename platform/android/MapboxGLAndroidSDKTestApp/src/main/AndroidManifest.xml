@@ -119,7 +119,7 @@
             android:label="@string/activity_minmax_zoom">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_other" />
+                android:value="@string/category_camera" />
         </activity>
         <activity
             android:name=".activity.userlocation.MyLocationTrackingModeActivity"
@@ -127,7 +127,7 @@
             android:label="@string/activity_user_tracking_mode">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_other" />
+                android:value="@string/category_userlocation" />
         </activity>
         <activity
             android:name=".activity.annotation.PolygonActivity"
@@ -152,7 +152,7 @@
             android:label="@string/activity_directions">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_api" />
+                android:value="@string/category_directions" />
         </activity>
         <activity
             android:name=".activity.geocoding.GeocoderActivity"
@@ -160,7 +160,7 @@
             android:label="@string/activity_geocoder">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_api" />
+                android:value="@string/category_geocoding" />
         </activity>
         <activity
             android:name=".activity.camera.ScrollByActivity"
@@ -177,7 +177,7 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_other" />
+                android:value="@string/category_maplayout" />
         </activity>
         <activity
             android:name=".activity.offline.OfflineActivity"
@@ -185,7 +185,7 @@
             android:label="@string/activity_offline">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_other" />
+                android:value="@string/category_offline" />
         </activity>
         <activity
             android:name=".activity.imagegenerator.SnapshotActivity"
@@ -193,7 +193,7 @@
             android:label="@string/activity_snapshot">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_other" />
+                android:value="@string/category_imagegenerator" />
         </activity>
 
         <!-- Configuration Settings -->
