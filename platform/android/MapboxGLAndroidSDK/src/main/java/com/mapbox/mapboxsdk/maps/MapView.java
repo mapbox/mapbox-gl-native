@@ -78,6 +78,7 @@ import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
@@ -1540,55 +1541,35 @@ public class MapView extends FrameLayout {
             // Open / Close InfoWindow
             PointF tapPoint = new PointF(e.getX(), e.getY());
 
-            List<Marker> selectedMarkers = mMapboxMap.getSelectedMarkers();
+            VisibleRegion visibleRegion = mMapboxMap.getProjection().getVisibleRegion();
+            LatLngBounds screenBounds = visibleRegion.latLngBounds;
 
-            final float toleranceSides = 15 * mScreenDensity;
-            final float toleranceTop = 20 * mScreenDensity;
-            final float toleranceBottom = 5 * mScreenDensity;
+            List<Marker> allMarkers = getMarkersInBounds(screenBounds);
+            boolean foundMaker = false;
 
-            RectF tapRect = new RectF(tapPoint.x - toleranceSides, tapPoint.y + toleranceTop,
-                    tapPoint.x + toleranceSides, tapPoint.y - toleranceBottom);
+            if (allMarkers != null) {
+                Collections.sort(allMarkers);
 
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.bottom)));
-            builder.include(fromScreenLocation(new PointF(tapRect.left, tapRect.top)));
-            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.top)));
-            builder.include(fromScreenLocation(new PointF(tapRect.right, tapRect.bottom)));
+                List<Marker> selectedMarkers = mMapboxMap.getSelectedMarkers();
+                for (Marker marker : allMarkers) {
+                    RectF rect = marker.getBounds();
+                    if (rect != null) {
+                        PointF markerPoint = toScreenLocation(marker.getPosition());
+                        rect.offset(markerPoint.x - rect.width() / 2, markerPoint.y - rect.height() / 2);
 
-            List<Marker> nearbyMarkers = getMarkersInBounds(builder.build());
-            long newSelectedMarkerId = -1;
+                        if (rect.contains(tapPoint.x, tapPoint.y)) {
+                            foundMaker = true;
 
-            if (nearbyMarkers != null && nearbyMarkers.size() > 0) {
-                Collections.sort(nearbyMarkers);
-                for (Marker nearbyMarker : nearbyMarkers) {
-                    boolean found = false;
-                    for (Marker selectedMarker : selectedMarkers) {
-                        if (selectedMarker.equals(nearbyMarker)) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        newSelectedMarkerId = nearbyMarker.getId();
-                        break;
-                    }
-                }
-            }
-
-            if (newSelectedMarkerId >= 0) {
-                List<Annotation> annotations = mMapboxMap.getAnnotations();
-                int count = annotations.size();
-                for (int i = 0; i < count; i++) {
-                    Annotation annotation = annotations.get(i);
-                    if (annotation instanceof Marker) {
-                        if (annotation.getId() == newSelectedMarkerId) {
-                            if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                mMapboxMap.selectMarker((Marker) annotation);
+                            if (!selectedMarkers.contains(marker)) {
+                                mMapboxMap.selectMarker(marker);
                             }
                             break;
                         }
                     }
                 }
-            } else {
+            }
+
+            if (!foundMaker) {
                 // deselect any selected marker
                 mMapboxMap.deselectMarkers();
 
@@ -1599,7 +1580,6 @@ public class MapView extends FrameLayout {
                     listener.onMapClick(point);
                 }
             }
-
             trackGestureEvent(MapboxEvent.GESTURE_SINGLETAP, e.getX(), e.getY());
             return true;
         }

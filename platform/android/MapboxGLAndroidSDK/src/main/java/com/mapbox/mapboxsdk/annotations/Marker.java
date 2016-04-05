@@ -1,13 +1,16 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
  * Marker is an annotation that shows an icon image at a geographical location.
@@ -24,6 +27,9 @@ public class Marker extends Annotation {
     private InfoWindow infoWindow = null;
     private boolean infoWindowShown = false;
     private int topOffsetPixels;
+
+    @Nullable
+    private RectF bounds;
 
     /**
      * Constructor
@@ -92,6 +98,15 @@ public class Marker extends Annotation {
      */
     public void setIcon(@Nullable Icon icon) {
         this.icon = icon;
+        if (icon != null) {
+            Bitmap bitmap = icon.getBitmap();
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            bounds = new RectF(0, 0, width, height);
+        } else {
+            bounds = null;
+        }
+
         MapboxMap map = getMapboxMap();
         if (map != null) {
             map.updateMarker(this);
@@ -100,6 +115,19 @@ public class Marker extends Annotation {
 
     public Icon getIcon() {
         return icon;
+    }
+
+    /**
+     * Get the RectF corresponding to the Icon Bitmap bounds.
+     *
+     * @return a copy of the precomputed RectF that can be manipulated safely or null if no Bitmap has been set.
+     */
+    @Nullable
+    public RectF getBounds() {
+        if (bounds != null) {
+            return new RectF(bounds);
+        }
+        return null;
     }
 
     void setTitle(String title) {
