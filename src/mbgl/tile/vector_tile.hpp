@@ -6,6 +6,8 @@
 #include <mbgl/util/pbf.hpp>
 
 #include <map>
+#include <unordered_map>
+#include <functional>
 
 namespace mbgl {
 
@@ -17,6 +19,8 @@ public:
 
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
+    std::unordered_map<std::string,Value> getProperties() const override;
+    uint64_t getID() const override;
     GeometryCollection getGeometries() const override;
     uint32_t getExtent() const override;
 
@@ -34,6 +38,7 @@ public:
 
     std::size_t featureCount() const override { return features.size(); }
     util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
+    std::string getName() const override;
 
 private:
     friend class VectorTile;
@@ -41,7 +46,8 @@ private:
 
     std::string name;
     uint32_t extent = 4096;
-    std::map<std::string, uint32_t> keys;
+    std::map<std::string, uint32_t> keysMap;
+    std::vector<std::reference_wrapper<const std::string>> keys;
     std::vector<Value> values;
     std::vector<pbf> features;
 };

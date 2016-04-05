@@ -27,6 +27,7 @@ class AnnotationTileLayer : public GeometryTileLayer {
 public:
     std::size_t featureCount() const override { return features.size(); }
     util::ptr<const GeometryTileFeature> getFeature(std::size_t i) const override { return features[i]; }
+    std::string getName() const override { return ""; };
 
     std::vector<util::ptr<const AnnotationTileFeature>> features;
 };

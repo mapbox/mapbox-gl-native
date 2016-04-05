@@ -36,7 +36,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         const SymbolLayoutProperties& layout, const bool addToBuffers, const uint32_t index_,
         const float textBoxScale, const float textPadding, const float textAlongLine,
         const float iconBoxScale, const float iconPadding, const float iconAlongLine,
-        const GlyphPositions& face) :
+        const GlyphPositions& face, const IndexedSubfeature& indexedFeature) :
     x(anchor.x),
     y(anchor.y),
     index(index_),
@@ -54,16 +54,19 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
             SymbolQuads()),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine),
-    iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine) {};
+    textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine, indexedFeature),
+    iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine, indexedFeature)
+    {};
 
 
-SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_)
+SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, const std::string& bucketName_, const std::string& sourceLayerName_)
     : overscaling(overscaling_),
       zoom(zoom_),
       tileSize(util::tileSize * overscaling_),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      mode(mode_) {}
+      mode(mode_),
+      bucketName(bucketName_),
+      sourceLayerName(sourceLayerName_) {}
 
 SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
@@ -109,6 +112,8 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
         return;
     }
 
+    auto layerName = layer.getName();
+
     // Determine and load glyph ranges
     const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
     for (GLsizei i = 0; i < featureCount; i++) {
@@ -119,6 +124,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
             continue;
 
         SymbolFeature ft;
+        ft.index = i;
 
         auto getValue = [&feature](const std::string& key) -> std::string {
             auto value = feature->getValue(key);
@@ -283,7 +289,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
         // if either shapedText or icon position is present, add the feature
         if (shapedText || shapedIcon) {
-            addFeature(feature.geometry, shapedText, shapedIcon, face);
+            addFeature(feature.geometry, shapedText, shapedIcon, face, feature.index);
         }
     }
 
@@ -292,7 +298,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
 
 void SymbolBucket::addFeature(const GeometryCollection &lines,
-        const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face) {
+        const Shaping &shapedText, const PositionedIcon &shapedIcon, const GlyphPositions &face, const size_t index) {
 
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
@@ -320,6 +326,8 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
     auto& clippedLines = isLine ?
         util::clipLines(lines, 0, 0, util::EXTENT, util::EXTENT) :
         lines;
+
+    IndexedSubfeature indexedFeature = {index, sourceLayerName, bucketName, symbolInstances.size()};
 
     for (const auto& line : clippedLines) {
         if (line.empty()) continue;
@@ -357,7 +365,7 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
             symbolInstances.emplace_back(anchor, line, shapedText, shapedIcon, layout, addToBuffers, symbolInstances.size(),
                     textBoxScale, textPadding, textAlongLine,
                     iconBoxScale, iconPadding, iconAlongLine,
-                    face);
+                    face, indexedFeature);
         }
     }
 }
@@ -445,9 +453,7 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
-            if (!layout.textIgnorePlacement) {
-                collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale);
-            }
+            collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.textIgnorePlacement);
             if (glyphScale < collisionTile.maxScale) {
                 addSymbols<SymbolRenderData::TextBuffer, TextElementGroup>(
                     renderDataInProgress->text, symbolInstance.glyphQuads, glyphScale,
@@ -456,9 +462,7 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         }
 
         if (hasIcon) {
-            if (!layout.iconIgnorePlacement) {
-                collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale);
-            }
+            collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.iconIgnorePlacement);
             if (iconScale < collisionTile.maxScale) {
                 addSymbols<SymbolRenderData::IconBuffer, IconElementGroup>(
                     renderDataInProgress->icon, symbolInstance.iconQuads, iconScale,

@@ -158,6 +158,10 @@ public:
                         const char* before = nullptr);
     void removeCustomLayer(const std::string& id);
 
+    // Feature queries
+    std::vector<std::string> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
+    std::vector<std::string> queryRenderedFeatures(const std::array<ScreenCoordinate, 2>&, const optional<std::vector<std::string>>& layerIDs = {});
+
     // Memory
     void setSourceTileCacheSize(size_t);
     void onLowMemory();

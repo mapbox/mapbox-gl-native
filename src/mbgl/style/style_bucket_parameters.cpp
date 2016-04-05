@@ -5,7 +5,8 @@
 namespace mbgl {
 
 void StyleBucketParameters::eachFilteredFeature(const Filter& filter,
-                                                std::function<void (const GeometryTileFeature&)> function) {
+                                                std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)> function) {
+    auto name = layer.getName();
     for (std::size_t i = 0; !cancelled() && i < layer.featureCount(); i++) {
         auto feature = layer.getFeature(i);
 
@@ -13,7 +14,7 @@ void StyleBucketParameters::eachFilteredFeature(const Filter& filter,
         if (!Filter::visit(filter, evaluator))
             continue;
 
-        function(*feature);
+        function(*feature, i, name);
     }
 }
 

@@ -33,12 +33,16 @@ typedef bgm::box<CollisionPoint> Box;
 typedef std::pair<Box, CollisionBox> CollisionTreeBox;
 typedef bgi::rtree<CollisionTreeBox, bgi::linear<16, 4>> Tree;
 
+class IndexedSubfeature;
+
 class CollisionTile {
 public:
     explicit CollisionTile(PlacementConfig);
 
     float placeFeature(const CollisionFeature& feature, const bool allowOverlap, const bool avoidEdges);
-    void insertFeature(CollisionFeature& feature, const float minPlacementScale);
+    void insertFeature(CollisionFeature& feature, const float minPlacementScale, const bool ignorePlacement);
+
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const float minX, const float minY, const float maxX, const float maxY, const float scale);
 
     const PlacementConfig config;
 
@@ -50,9 +54,10 @@ private:
     float findPlacementScale(float minPlacementScale,
             const vec2<float>& anchor, const CollisionBox& box,
             const vec2<float>& blockingAnchor, const CollisionBox& blocking);
-    Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box);
+    Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
     Tree tree;
+    Tree ignoredTree;
     std::array<float, 4> rotationMatrix;
     std::array<float, 4> reverseRotationMatrix;
     std::array<CollisionBox, 4> edges;

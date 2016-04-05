@@ -1,4 +1,5 @@
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/constants.hpp>
 #include <cmath>
 
@@ -121,7 +122,7 @@ float CollisionTile::placeFeature(const CollisionFeature &feature, const bool al
     return minPlacementScale;
 }
 
-void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlacementScale) {
+void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlacementScale, const bool ignorePlacement) {
     for (auto& box : feature.boxes) {
         box.placementScale = minPlacementScale;
     }
@@ -131,22 +132,58 @@ void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlac
         for (auto& box : feature.boxes) {
             treeBoxes.emplace_back(getTreeBox(box.anchor.matMul(rotationMatrix), box), box);
         }
-        tree.insert(treeBoxes.begin(), treeBoxes.end());
+        if (ignorePlacement) {
+            ignoredTree.insert(treeBoxes.begin(), treeBoxes.end());
+        } else {
+            tree.insert(treeBoxes.begin(), treeBoxes.end());
+        }
     }
 
 }
 
-Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box) {
+Box CollisionTile::getTreeBox(const vec2<float> &anchor, const CollisionBox &box, const float scale) {
     return Box{
         CollisionPoint{
-            anchor.x + box.x1,
-            anchor.y + box.y1 * yStretch
+            anchor.x + box.x1 / scale,
+            anchor.y + box.y1 / scale * yStretch
         },
         CollisionPoint{
-            anchor.x + box.x2,
-            anchor.y + box.y2 * yStretch
+            anchor.x + box.x2 / scale,
+            anchor.y + box.y2 / scale * yStretch
         }
     };
+}
+
+std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const float minX, const float minY, const float maxX, const float maxY, const float scale) {
+
+    std::vector<IndexedSubfeature> result;
+
+    auto anchor = vec2<float>(minX, minY).matMul(rotationMatrix);
+    CollisionBox queryBox(anchor, 0, 0, maxX - minX, maxY - minY, scale);
+
+    std::vector<CollisionTreeBox> blockingBoxes;
+    tree.query(bgi::intersects(getTreeBox(anchor, queryBox)), std::back_inserter(blockingBoxes));
+    ignoredTree.query(bgi::intersects(getTreeBox(anchor, queryBox)), std::back_inserter(blockingBoxes));
+
+    std::unordered_map<std::string, std::set<std::size_t>> sourceLayerFeatures;
+
+    for (auto& blockingTreeBox : blockingBoxes) {
+        const auto& blocking = std::get<1>(blockingTreeBox);
+
+        auto& indexedFeature = blocking.indexedFeature;
+
+        auto& seenFeatures = sourceLayerFeatures[indexedFeature.sourceLayerName];
+        if (seenFeatures.find(indexedFeature.index) == seenFeatures.end()) {
+            auto blockingAnchor = blocking.anchor.matMul(rotationMatrix);
+            float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
+            if (minPlacementScale >= scale) {
+                seenFeatures.insert(indexedFeature.index);
+                result.push_back(indexedFeature);
+            }
+        }
+    }
+
+    return result;
 }
 
 } // namespace mbgl

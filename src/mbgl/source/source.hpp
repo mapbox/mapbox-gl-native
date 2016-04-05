@@ -20,12 +20,14 @@ class GeoJSONVT;
 
 namespace mbgl {
 
+class Style;
 class StyleUpdateParameters;
 class Painter;
 class FileSource;
 class AsyncRequest;
 class TransformState;
 class Tile;
+class TileCoordinate;
 struct ClipID;
 struct box;
 
@@ -69,6 +71,12 @@ public:
 
     std::forward_list<Tile *> getLoadedTiles() const;
     const std::vector<Tile*>& getTiles() const;
+
+    std::unordered_map<std::string, std::vector<std::string>> queryRenderedFeatures(
+            const std::vector<TileCoordinate>& queryGeometry,
+            const double zoom,
+            const double bearing,
+            const optional<std::vector<std::string>>& layerIDs);
 
     void setCacheSize(size_t);
     void onLowMemory();

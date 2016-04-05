@@ -22,6 +22,7 @@
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 namespace mbgl {
 
@@ -710,6 +711,39 @@ void Map::removeAnnotations(const AnnotationIDs& annotations) {
 AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return impl->annotationManager->getPointAnnotationsInBounds(bounds);
 }
+
+#pragma mark - Feature query api
+
+std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordinate>& queryPoints, const TransformState& transformState) {
+    std::vector<TileCoordinate> queryGeometry;
+    for (auto& p : queryPoints) {
+        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(transformState, 0, { p.x, transformState.getHeight() - p.y }));
+    }
+    return queryGeometry;
+}
+
+std::vector<std::string> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
+    if (!impl->style) return {};
+
+    auto queryGeometry = pointsToCoordinates({ point }, impl->transform.getState());
+    return impl->style->queryRenderedFeatures(queryGeometry, impl->transform.getZoom(), impl->transform.getAngle(), layerIDs);
+}
+
+std::vector<std::string> Map::queryRenderedFeatures(const std::array<ScreenCoordinate, 2>& box, const optional<std::vector<std::string>>& layerIDs) {
+    if (!impl->style) return {};
+
+    std::vector<ScreenCoordinate> queryPoints {
+        { box[0].x, box[0].y },
+            { box[1].x, box[0].y },
+            { box[1].x, box[1].y },
+            { box[0].x, box[1].y },
+            { box[0].x, box[0].y }
+    };
+    auto queryGeometry = pointsToCoordinates(queryPoints, impl->transform.getState());
+
+    return impl->style->queryRenderedFeatures(queryGeometry, impl->transform.getZoom(), impl->transform.getAngle(), layerIDs);
+}
+
 
 #pragma mark - Style API
 

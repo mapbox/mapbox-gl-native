@@ -7,11 +7,13 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 
 #include <atomic>
 #include <string>
 #include <memory>
 #include <functional>
+#include <unordered_map>
 
 namespace mbgl {
 
@@ -81,6 +83,14 @@ public:
     virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
     virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}
     virtual void redoPlacement(const std::function<void()>&) {}
+
+    virtual void queryRenderedFeatures(
+            std::unordered_map<std::string, std::vector<std::string>>& result,
+            const GeometryCollection& queryGeometry,
+            const double bearing,
+            const double tileSize,
+            const double scale,
+            const optional<std::vector<std::string>>& layerIDs);
 
     bool isReady() const {
         return isReadyState(state);

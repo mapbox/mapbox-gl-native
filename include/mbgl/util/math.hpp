@@ -88,6 +88,14 @@ inline T dist(const S1& a, const S2& b) {
     return c;
 }
 
+template <typename T, typename S1, typename S2>
+inline T distSqr(const S1& a, const S2& b) {
+    T dx = b.x - a.x;
+    T dy = b.y - a.y;
+    T c = dx * dx + dy * dy;
+    return c;
+}
+
 template <typename T>
 inline T round(const T& a) {
     return T(::round(a.x), ::round(a.y));
@@ -111,6 +119,15 @@ inline S unit(const S& a) {
         return a;
     }
     return a * (1 / magnitude);
+}
+
+template <typename T, typename S = double>
+inline T rotate(const T& a, S angle) {
+    S cos = std::cos(angle);
+    S sin = std::sin(angle);
+    S x = cos * a.x - sin * a.y;
+    S y = sin * a.x + cos * a.y;
+    return T(x, y);
 }
 
 template <typename T>

@@ -16,6 +16,7 @@ class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 class CollisionTile;
+class FeatureIndex;
 
 class StyleBucketParameters {
 public:
@@ -27,6 +28,7 @@ public:
                           SpriteStore& spriteStore_,
                           GlyphAtlas& glyphAtlas_,
                           GlyphStore& glyphStore_,
+                          FeatureIndex& featureIndex_,
                           const MapMode mode_)
         : tileID(tileID_),
           layer(layer_),
@@ -36,13 +38,14 @@ public:
           spriteStore(spriteStore_),
           glyphAtlas(glyphAtlas_),
           glyphStore(glyphStore_),
+          featureIndex(featureIndex_),
           mode(mode_) {}
 
     bool cancelled() const {
         return state == TileData::State::obsolete;
     }
 
-    void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&)>);
+    void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)>);
 
     const TileID& tileID;
     const GeometryTileLayer& layer;
@@ -52,6 +55,7 @@ public:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
+    FeatureIndex& featureIndex;
     const MapMode mode;
 };
 

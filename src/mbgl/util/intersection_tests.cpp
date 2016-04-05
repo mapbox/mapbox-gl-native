@@ -1,0 +1,147 @@
+#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/util/math.hpp>
+
+namespace mbgl {
+namespace util {
+
+bool polygonContainsPoint(const GeometryCoordinates& ring, const GeometryCoordinate& p) {
+    bool c = false;
+    for (auto i = ring.begin(), j = ring.end() - 1; i != ring.end(); j = i++) {
+        auto& p1 = *i;
+        auto& p2 = *j;
+        if (((p1.y > p.y) != (p2.y > p.y)) && (p.x < float(p2.x - p1.x) * float(p.y - p1.y) / float(p2.y - p1.y) + p1.x)) {
+            c = !c;
+        }
+    }
+    return c;
+}
+
+bool multiPolygonContainsPoint(const GeometryCollection& rings, const GeometryCoordinate& p) {
+    bool c = false;
+    for (auto& ring : rings) {
+        c = (c != polygonContainsPoint(ring, p));
+    }
+    return c;
+}
+
+// Code from http://stackoverflow.com/a/1501725/331379.
+float distToSegmentSquared(const GeometryCoordinate& p, const GeometryCoordinate& v, const GeometryCoordinate& w) {
+    if (v == w) return util::distSqr<float>(p, v);
+    const float l2 = util::distSqr<float>(v, w);
+    const float t = float((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    if (t < 0) return util::distSqr<float>(p, v);
+    if (t > 1) return util::distSqr<float>(p, w);
+    return util::distSqr<float>(p, vec2<float>(w - v) * t + v);
+}
+
+bool pointIntersectsBufferedLine(const GeometryCoordinate& p, const GeometryCoordinates& line, const float radius) {
+    const float radiusSquared = radius * radius;
+
+    if (line.size() == 1) return util::distSqr<float>(p, line.at(0)) < radiusSquared;
+    if (line.size() == 0) return false;
+
+    for (auto i = line.begin() + 1; i != line.end(); i++) {
+        // Find line segments that have a distance <= radius^2 to p
+        // In that case, we treat the line as "containing point p".
+        auto& v = *(i - 1);
+        auto& w = *i;
+        if (distToSegmentSquared(p, v, w) < radiusSquared) return true;
+    }
+    return false;
+}
+
+// http://bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
+bool isCounterClockwise(const GeometryCoordinate& a, const GeometryCoordinate& b, const GeometryCoordinate& c) {
+    return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
+}
+
+bool lineSegmentIntersectsLineSegment(const GeometryCoordinate& a0, const GeometryCoordinate& a1, const GeometryCoordinate& b0, const GeometryCoordinate& b1) {
+    return isCounterClockwise(a0, b0, b1) != isCounterClockwise(a1, b0, b1) &&
+        isCounterClockwise(a0, a1, b0) != isCounterClockwise(a0, a1, b1);
+}
+bool lineIntersectsLine(const GeometryCoordinates& lineA, const GeometryCoordinates& lineB) {
+    if (lineA.size() == 0 || lineB.size() == 0) return false;
+    for (auto i = lineA.begin(); i != lineA.end() - 1; i++) {
+        auto& a0 = *i;
+        auto& a1 = *(i + 1);
+        for (auto j = lineB.begin(); j != lineB.end() - 1; j++) {
+            auto& b0 = *j;
+            auto& b1 = *(j + 1);
+            if (lineSegmentIntersectsLineSegment(a0, a1, b0, b1)) return true;
+        }
+    }
+    return false;
+}
+
+bool lineIntersectsBufferedLine(const GeometryCoordinates& lineA, const GeometryCoordinates& lineB, float radius) {
+    if (lineA.size() > 1) {
+        if (lineIntersectsLine(lineA, lineB)) return true;
+
+        // Check whether any point in either line is within radius of the other line
+        for (auto& p : lineB) {
+            if (pointIntersectsBufferedLine(p, lineA, radius)) return true;
+        }
+    }
+
+    for (auto& p : lineA) {
+        if (pointIntersectsBufferedLine(p, lineB, radius)) return true;
+    }
+
+    return false;
+}
+
+bool multiPolygonIntersectsBufferedMultiPoint(const GeometryCollection& multiPolygon, const GeometryCollection& rings, float radius) {
+    for (auto& polygon : multiPolygon) {
+        for (auto& ring : rings) {
+            for (auto& point : ring) {
+                if (polygonContainsPoint(polygon, point)) return true;
+                if (pointIntersectsBufferedLine(point, polygon, radius)) return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool multiPolygonIntersectsBufferedMultiLine(const GeometryCollection& multiPolygon, const GeometryCollection& multiLine, float radius) {
+    for (auto& line : multiLine) {
+        for (auto& polygon : multiPolygon) {
+
+            if (polygon.size() >= 3) {
+                for (auto& p : line) {
+                    if (polygonContainsPoint(polygon, p)) return true;
+                }
+            }
+
+            if (lineIntersectsBufferedLine(polygon, line, radius)) return true;
+        }
+    }
+
+    return false;
+}
+
+bool multiPolygonIntersectsMultiPolygon(const GeometryCollection& multiPolygonA, const GeometryCollection& multiPolygonB) {
+    if (multiPolygonA.size() == 1 && multiPolygonA.at(0).size() == 1) {
+        return multiPolygonContainsPoint(multiPolygonB, multiPolygonA.at(0).at(0));
+    }
+
+    for (auto& ring : multiPolygonB) {
+        for (auto& p : ring) {
+            if (multiPolygonContainsPoint(multiPolygonA, p)) return true;
+        }
+    }
+
+    for (auto& polygon : multiPolygonA) {
+        for (auto& p : polygon) {
+            if (multiPolygonContainsPoint(multiPolygonB, p)) return true;
+        }
+
+        for (auto& polygonB : multiPolygonB) {
+            if (lineIntersectsLine(polygon, polygonB)) return true;
+        }
+    }
+
+    return false;
+}
+
+}
+}

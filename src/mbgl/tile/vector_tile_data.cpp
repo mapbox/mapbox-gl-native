@@ -5,6 +5,8 @@
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/text/collision_tile.hpp>
 
 namespace mbgl {
 
@@ -65,8 +67,8 @@ VectorTileData::VectorTileData(const TileID& id_,
             }
 
             std::exception_ptr error;
-            if (result.is<TileParseResultBuckets>()) {
-                auto& resultBuckets = result.get<TileParseResultBuckets>();
+            if (result.is<TileParseResultData>()) {
+                auto& resultBuckets = result.get<TileParseResultData>();
                 state = resultBuckets.state;
 
                 // Persist the configuration we just placed so that we can later check whether we need to
@@ -76,6 +78,11 @@ VectorTileData::VectorTileData(const TileID& id_,
                 // Move over all buckets we received in this parse request, potentially overwriting
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
+
+                if (state == State::parsed) {
+                    featureIndex = std::move(resultBuckets.featureIndex);
+                    geometryTile = std::move(resultBuckets.geometryTile);
+                }
 
             } else {
                 error = result.get<std::exception_ptr>();
@@ -105,8 +112,8 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
         }
 
         std::exception_ptr error;
-        if (result.is<TileParseResultBuckets>()) {
-            auto& resultBuckets = result.get<TileParseResultBuckets>();
+        if (result.is<TileParseResultData>()) {
+            auto& resultBuckets = result.get<TileParseResultData>();
             state = resultBuckets.state;
 
             // Move over all buckets we received in this parse request, potentially overwriting
@@ -118,6 +125,11 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
             // Persist the configuration we just placed so that we can later check whether we need to
             // place again in case the configuration has changed.
             placedConfig = config;
+
+            if (state == State::parsed) {
+                featureIndex = std::move(resultBuckets.featureIndex);
+                geometryTile = std::move(resultBuckets.geometryTile);
+            }
 
         } else {
             error = result.get<std::exception_ptr>();
@@ -153,7 +165,7 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     // we are parsing buckets.
     if (workRequest) return;
 
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -164,6 +176,10 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
             bucket.second->swapRenderData();
         }
 
+        if (featureIndex) {
+            featureIndex->setCollisionTile(std::move(collisionTile));
+        }
+
         // The target configuration could have changed since we started placement. In this case,
         // we're starting another placement run.
         if (placedConfig != targetConfig) {
@@ -172,6 +188,19 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
             callback();
         }
     });
+}
+
+void VectorTileData::queryRenderedFeatures(
+        std::unordered_map<std::string, std::vector<std::string>>& result,
+        const GeometryCollection& queryGeometry,
+        const double bearing,
+        const double tileSize,
+        const double scale,
+        const optional<std::vector<std::string>>& layerIDs) {
+
+    if (!featureIndex || !geometryTile) return;
+
+    featureIndex->query(result, queryGeometry, bearing, tileSize, scale, layerIDs, *geometryTile, style);
 }
 
 void VectorTileData::cancel() {

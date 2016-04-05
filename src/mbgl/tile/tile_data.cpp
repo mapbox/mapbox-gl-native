@@ -29,4 +29,12 @@ void TileData::dumpDebugLogs() const {
     Log::Info(Event::General, "TileData::state: %s", TileData::StateToString(state));
 }
 
+void TileData::queryRenderedFeatures(
+        std::unordered_map<std::string, std::vector<std::string>>&,
+        const GeometryCollection&,
+        const double,
+        const double,
+        const double,
+        const optional<std::vector<std::string>>&) {}
+
 } // namespace mbgl

@@ -13,6 +13,7 @@ namespace mbgl {
 class AsyncRequest;
 class RasterBucket;
 class GeometryTileLoader;
+class CollisionTile;
 
 using RasterTileParseResult = variant<
     std::unique_ptr<Bucket>, // success
@@ -52,7 +53,7 @@ public:
     Request redoPlacement(TileWorker&,
                           const std::unordered_map<std::string, std::unique_ptr<Bucket>>&,
                           PlacementConfig config,
-                          std::function<void()> callback);
+                          std::function<void(std::unique_ptr<CollisionTile>)> callback);
 
 private:
     class Impl;

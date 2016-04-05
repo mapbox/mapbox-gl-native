@@ -30,6 +30,7 @@ class StyleLayer;
 class Tile;
 class Bucket;
 class StyleUpdateParameters;
+class TileCoordinate;
 
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
@@ -106,6 +107,14 @@ public:
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData() const;
+
+    std::vector<std::string> queryRenderedFeatures(
+            const std::vector<TileCoordinate>& queryGeometry,
+            const double zoom,
+            const double bearing,
+            const optional<std::vector<std::string>>& layerIDs);
+
+    float getQueryRadius() const;
 
     void setSourceTileCacheSize(size_t);
     void onLowMemory();

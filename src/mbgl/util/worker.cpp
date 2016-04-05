@@ -5,6 +5,7 @@
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/text/collision_tile.hpp>
 
 #include <cassert>
 #include <future>
@@ -53,9 +54,8 @@ public:
     void redoPlacement(TileWorker* worker,
                        const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
                        PlacementConfig config,
-                       std::function<void()> callback) {
-        worker->redoPlacement(buckets, config);
-        callback();
+                       std::function<void(std::unique_ptr<CollisionTile>)> callback) {
+        callback(worker->redoPlacement(buckets, config));
     }
 };
 
@@ -101,7 +101,7 @@ std::unique_ptr<AsyncRequest>
 Worker::redoPlacement(TileWorker& worker,
                       const std::unordered_map<std::string, std::unique_ptr<Bucket>>& buckets,
                       PlacementConfig config,
-                      std::function<void()> callback) {
+                      std::function<void(std::unique_ptr<CollisionTile>)> callback) {
     current = (current + 1) % threads.size();
     return threads[current]->invokeWithCallback(&Worker::Impl::redoPlacement, callback, &worker,
                                                 &buckets, config);

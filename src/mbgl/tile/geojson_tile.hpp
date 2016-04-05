@@ -39,6 +39,7 @@ public:
     GeoJSONTileLayer(Features&&);
     std::size_t featureCount() const override;
     util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
+    std::string getName() const override { return ""; };
 
 private:
     const Features features;

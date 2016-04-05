@@ -3,6 +3,7 @@
 
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/style/types.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 #include <vector>
 

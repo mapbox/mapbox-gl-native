@@ -1,6 +1,6 @@
 'use strict';
 
-var suite = require('mapbox-gl-test-suite').render;
+var suite = require('mapbox-gl-test-suite').query;
 var suiteImplementation = require('./suite_implementation');
 
 var tests;

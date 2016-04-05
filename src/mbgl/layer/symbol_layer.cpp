@@ -116,7 +116,9 @@ bool SymbolLayer::recalculate(const StyleCalculationParameters& parameters) {
 std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& parameters) const {
     auto bucket = std::make_unique<SymbolBucket>(parameters.tileID.overscaleFactor(),
                                                  parameters.tileID.z,
-                                                 parameters.mode);
+                                                 parameters.mode,
+                                                 id,
+                                                 parameters.layer.getName());
 
     bucket->layout = layout;
 

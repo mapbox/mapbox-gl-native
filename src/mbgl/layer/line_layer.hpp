@@ -42,10 +42,19 @@ public:
 
     std::unique_ptr<Bucket> createBucket(StyleBucketParameters&) const override;
 
+    float getQueryRadius() const override;
+    bool queryIntersectsGeometry(
+            const GeometryCollection& queryGeometry,
+            const GeometryCollection& geometry,
+            const float bearing,
+            const float pixelsToTileUnits) const override;
+
     LineLayoutProperties layout;
     LinePaintProperties paint;
 
     float dashLineWidth = 1;
+private:
+    float getLineWidth() const;
 };
 
 template <>

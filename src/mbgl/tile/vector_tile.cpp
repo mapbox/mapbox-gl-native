@@ -54,8 +54,8 @@ VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& lay
 }
 
 optional<Value> VectorTileFeature::getValue(const std::string& key) const {
-    auto keyIter = layer.keys.find(key);
-    if (keyIter == layer.keys.end()) {
+    auto keyIter = layer.keysMap.find(key);
+    if (keyIter == layer.keysMap.end()) {
         return optional<Value>();
     }
 
@@ -63,7 +63,7 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     while (tags) {
         uint32_t tag_key = tags.varint();
 
-        if (layer.keys.size() <= tag_key) {
+        if (layer.keysMap.size() <= tag_key) {
             throw std::runtime_error("feature referenced out of range key");
         }
 
@@ -82,6 +82,21 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
     }
 
     return optional<Value>();
+}
+
+std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
+    std::unordered_map<std::string,Value> properties;
+    pbf tags = tags_pbf;
+    while (tags) {
+        uint32_t tag_key = tags.varint();
+        uint32_t tag_val = tags.varint();
+        properties[layer.keys.at(tag_key)] = layer.values.at(tag_val);
+    }
+    return properties;
+}
+
+uint64_t VectorTileFeature::getID() const {
+    return id;
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {
@@ -166,7 +181,7 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
         } else if (layer_pbf.tag == 2) { // feature
             features.push_back(layer_pbf.message());
         } else if (layer_pbf.tag == 3) { // keys
-            keys.emplace(layer_pbf.string(), keys.size());
+            keysMap.emplace(layer_pbf.string(), keysMap.size());
         } else if (layer_pbf.tag == 4) { // values
             values.emplace_back(parseValue(layer_pbf.message()));
         } else if (layer_pbf.tag == 5) { // extent
@@ -175,10 +190,18 @@ VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
             layer_pbf.skip();
         }
     }
+
+    for (auto &pair : keysMap) {
+        keys.emplace_back(std::reference_wrapper<const std::string>(pair.first));
+    }
 }
 
 util::ptr<const GeometryTileFeature> VectorTileLayer::getFeature(std::size_t i) const {
     return std::make_shared<VectorTileFeature>(features.at(i), *this);
+}
+
+std::string VectorTileLayer::getName() const {
+    return name;
 }
 
 VectorTileMonitor::VectorTileMonitor(const TileID& tileID_, float pixelRatio_, const std::string& urlTemplate_, FileSource& fileSource_)

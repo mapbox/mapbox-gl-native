@@ -314,6 +314,44 @@ RenderData Style::getRenderData() const {
     return result;
 }
 
+std::vector<std::string> Style::queryRenderedFeatures(
+        const std::vector<TileCoordinate>& queryGeometry,
+        const double zoom,
+        const double bearing,
+        const optional<std::vector<std::string>>& layerIDs) {
+    std::vector<std::unordered_map<std::string, std::vector<std::string>>> sourceResults;
+    for (const auto& source : sources) {
+        sourceResults.emplace_back(source->queryRenderedFeatures(queryGeometry, zoom, bearing, layerIDs));
+    }
+
+
+    std::vector<std::string> features;
+    auto featuresInserter = std::back_inserter(features);
+
+    // Combine all results based on the style layer order.
+    for (auto& layerPtr : layers) {
+        auto& layerID = layerPtr->id;
+        for (auto& sourceResult : sourceResults) {
+            auto it = sourceResult.find(layerID);
+            if (it != sourceResult.end()) {
+                auto& layerFeatures = it->second;
+                std::move(layerFeatures.begin(), layerFeatures.end(), featuresInserter);
+            }
+        }
+    }
+
+    return features;
+}
+
+float Style::getQueryRadius() const {
+    float additionalRadius = 0;
+    for (auto& layer : layers) {
+        additionalRadius = util::max(additionalRadius, layer->getQueryRadius());
+    }
+    return additionalRadius;
+}
+
+
 void Style::setSourceTileCacheSize(size_t size) {
     for (const auto& source : sources) {
         source->setCacheSize(size);
