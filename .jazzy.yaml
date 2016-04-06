@@ -1,14 +1,14 @@
-module_name: Mapbox
-author_name: Mapbox
+module: Mapbox
+author: Mapbox
 author_url: https://www.mapbox.com/
 github_url: https://github.com/mapbox/mapbox-gl-native
 dash_url: https://www.mapbox.com/ios-sdk/docsets/Mapbox.xml
 copyright: '© 2014–2016 [Mapbox](https://www.mapbox.com/). See [license](https://github.com/mapbox/mapbox-gl-native/blob/master/LICENSE.md) for more details.'
 
-custom_head: |
+head: |
   <link rel='shortcut icon' href='https://www.mapbox.com/img/favicon.ico' type='image/x-icon' />
 
-objc_mode: Yes
+objc: Yes
 skip_undocumented: Yes
 hide_documentation_coverage: Yes
 umbrella_header: platform/ios/include/Mapbox.h
