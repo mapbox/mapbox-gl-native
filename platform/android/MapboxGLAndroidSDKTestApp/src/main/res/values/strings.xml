@@ -35,14 +35,14 @@
     <!-- Other -->
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
-    <string name="activity_custom_layer">Custom Layer (experimental)</string>
+    <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
     <string name="activity_offline">Offline Map</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
-    <string name="description_custom_layer">Experimental feature</string>
+    <string name="description_custom_layer">Overlay a custom native layer on the map</string>
     <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
     <string name="description_cameraposition">CameraPosition capabilities</string>
     <string name="description_map_fragment">Showcase MapFragment</string>
@@ -72,6 +72,7 @@
     <string name="category">category</string>
     <string name="category_annotation">Annotation</string>
     <string name="category_camera">Camera</string>
+    <string name="category_custom_layer">Custom Layer</string>
     <string name="category_directions">Directions</string>
     <string name="category_fragment">Fragment</string>
     <string name="category_geocoding">Geocoding</string>

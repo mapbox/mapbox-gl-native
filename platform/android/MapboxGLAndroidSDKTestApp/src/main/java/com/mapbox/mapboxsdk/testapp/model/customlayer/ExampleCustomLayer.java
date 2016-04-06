@@ -1,6 +1,6 @@
-package com.mapbox.mapboxsdk.testapp.model.other;
+package com.mapbox.mapboxsdk.testapp.model.customlayer;
 
-public class CustomLayer {
+public class ExampleCustomLayer {
     static {
         System.loadLibrary("example-custom-layer");
     }
