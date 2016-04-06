@@ -41,7 +41,7 @@
                 android:value="@string/category_infowindow" />
         </activity>
         <activity
-            android:name=".activity.annotation.AddMarkerActivity"
+            android:name=".activity.annotation.BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_add_bulk_markers"
             android:label="@string/activity_add_bulk_markers">

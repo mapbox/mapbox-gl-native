@@ -4,7 +4,7 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.mapbox.mapboxsdk.testapp.activity.annotation.AddMarkerActivity;
+import com.mapbox.mapboxsdk.testapp.activity.annotation.BulkMarkerActivity;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import org.junit.Before;
@@ -13,17 +13,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests on AddMarkerActivity
+ * Tests on BulkMarkerActivity
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class AddMarkerActivityTest extends BaseTest {
+public class BulkMarkerActivityTest extends BaseTest {
 
     @Rule
-    public ActivityTestRule<AddMarkerActivity> mActivityRule = new ActivityTestRule<>(
-            AddMarkerActivity.class);
+    public ActivityTestRule<BulkMarkerActivity> mActivityRule = new ActivityTestRule<>(
+            BulkMarkerActivity.class);
 
-    private AddMarkerActivity mActivity = null;
+    private BulkMarkerActivity mActivity = null;
 
     @Before
     public void setActivity() {
