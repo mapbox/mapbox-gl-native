@@ -6,6 +6,7 @@
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <memory>
 #include <string>
@@ -17,6 +18,7 @@ class StyleCascadeParameters;
 class StyleCalculationParameters;
 class StyleBucketParameters;
 class Bucket;
+class Source;
 
 class StyleLayer {
 public:
@@ -43,7 +45,7 @@ public:
     virtual void parsePaints(const JSValue& value) = 0;
 
     // If the layer has a ref, the ref. Otherwise, the id.
-    const std::string& bucketName() const;
+    const util::ID<StyleLayer> bucketID() const;
 
     // Partially evaluate paint properties based on a set of classes.
     virtual void cascade(const StyleCascadeParameters&) = 0;
@@ -61,9 +63,9 @@ public:
     bool needsRendering() const;
 
 public:
-    std::string id;
-    std::string ref;
-    std::string source;
+    util::ID<StyleLayer> id;
+    util::ID<StyleLayer> ref;
+    util::ID<Source> source;
     std::string sourceLayer;
     FilterExpression filter;
     float minZoom = -std::numeric_limits<float>::infinity();

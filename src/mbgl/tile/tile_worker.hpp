@@ -7,13 +7,14 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
+#include <mbgl/util/id.hpp>
 #include <mbgl/text/placement_config.hpp>
 
 #include <string>
 #include <memory>
 #include <mutex>
 #include <list>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 
@@ -25,13 +26,14 @@ class GlyphStore;
 class Bucket;
 class StyleLayer;
 class SymbolLayer;
+class Source;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
 class TileParseResultBuckets {
 public:
     TileData::State state = TileData::State::invalid;
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> buckets;
 };
 
 using TileParseResult = mapbox::util::variant<
@@ -41,7 +43,7 @@ using TileParseResult = mapbox::util::variant<
 class TileWorker : public util::noncopyable {
 public:
     TileWorker(TileID,
-               std::string sourceID,
+               util::ID<Source> sourceID,
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
@@ -55,16 +57,16 @@ public:
 
     TileParseResult parsePendingLayers(PlacementConfig);
 
-    void redoPlacement(const std::unordered_map<std::string, std::unique_ptr<Bucket>>*,
+    void redoPlacement(const std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>>*,
                        PlacementConfig);
 
 private:
     void parseLayer(const StyleLayer*, const GeometryTile&);
-    void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
+    void insertBucket(util::ID<StyleLayer> name, std::unique_ptr<Bucket>);
     void placeLayers(PlacementConfig);
 
     const TileID id;
-    const std::string sourceID;
+    const util::ID<Source> sourceID;
 
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
@@ -82,7 +84,7 @@ private:
 
     // Contains buckets that have been parsed, but still need placement.
     // They will be placed when all buckets have been parsed.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> placementPending;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> placementPending;
 
     // Temporary holder
     TileParseResultBuckets result;

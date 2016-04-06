@@ -240,12 +240,12 @@ void Painter::renderPass(RenderPass pass_,
             MBGL_DEBUG_GROUP("background");
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
-            MBGL_DEBUG_GROUP(layer.id + " - custom");
+            MBGL_DEBUG_GROUP(layer.id.str() + " - custom");
             VertexArrayObject::Unbind();
             layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
-            MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->id));
+            MBGL_DEBUG_GROUP(layer.id.str() + " - " + std::string(item.tile->id));
             prepareTile(*item.tile);
             item.bucket->render(*this, layer, item.tile->id, item.tile->matrix);
         }

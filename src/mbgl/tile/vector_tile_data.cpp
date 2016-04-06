@@ -10,7 +10,7 @@ namespace mbgl {
 
 VectorTileData::VectorTileData(const TileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
-                               std::string sourceID,
+                               util::ID<Source> sourceID,
                                Style& style_,
                                const MapMode mode_,
                                const std::function<void(std::exception_ptr)>& callback)
@@ -131,7 +131,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 }
 
 Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
-    const auto it = buckets.find(layer.bucketName());
+    const auto it = buckets.find(layer.bucketID());
     if (it == buckets.end()) {
         return nullptr;
     }

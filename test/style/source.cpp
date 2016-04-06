@@ -86,7 +86,7 @@ TEST(Source, LoadingFail) {
         test.end();
     };
 
-    Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "url", 512, nullptr, nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -109,7 +109,7 @@ TEST(Source, LoadingCorrupt) {
         test.end();
     };
 
-    Source source(SourceType::Vector, "source", "url", 512, nullptr, nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "url", 512, nullptr, nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -126,7 +126,7 @@ TEST(Source, RasterTileEmpty) {
     };
 
     test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
-        EXPECT_EQ("source", source.id);
+        EXPECT_EQ(util::ID<Source>("source"), source.id);
         test.end();
     };
 
@@ -137,7 +137,8 @@ TEST(Source, RasterTileEmpty) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -155,7 +156,7 @@ TEST(Source, VectorTileEmpty) {
     };
 
     test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
-        EXPECT_EQ("source", source.id);
+        EXPECT_EQ(util::ID<Source>("source"), source.id);
         test.end();
     };
 
@@ -166,7 +167,8 @@ TEST(Source, VectorTileEmpty) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -195,7 +197,8 @@ TEST(Source, RasterTileFail) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -224,7 +227,8 @@ TEST(Source, VectorTileFail) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -252,7 +256,8 @@ TEST(Source, RasterTileCorrupt) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -285,7 +290,8 @@ TEST(Source, VectorTileCorrupt) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -312,7 +318,8 @@ TEST(Source, RasterTileCancel) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -339,7 +346,8 @@ TEST(Source, VectorTileCancel) {
     auto info = std::make_unique<SourceInfo>();
     info->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, util::ID<Source>("source"), "", 512, std::move(info),
+                  nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);

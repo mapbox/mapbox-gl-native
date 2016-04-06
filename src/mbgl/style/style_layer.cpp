@@ -2,8 +2,8 @@
 
 namespace mbgl {
 
-const std::string& StyleLayer::bucketName() const {
-    return ref.empty() ? id : ref;
+const util::ID<StyleLayer> StyleLayer::bucketID() const {
+    return ref.valid() ? ref : id;
 }
 
 bool StyleLayer::hasRenderPass(RenderPass pass) const {

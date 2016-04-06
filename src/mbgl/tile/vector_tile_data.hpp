@@ -4,22 +4,24 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/util/id.hpp>
 
 #include <atomic>
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 
 class Style;
 class AsyncRequest;
 class GeometryTileMonitor;
+class Source;
 
 class VectorTileData : public TileData {
 public:
     VectorTileData(const TileID&,
                    std::unique_ptr<GeometryTileMonitor> monitor,
-                   std::string sourceID,
+                   util::ID<Source> sourceID,
                    Style&,
                    const MapMode,
                    const std::function<void(std::exception_ptr)>& callback);
@@ -46,7 +48,7 @@ private:
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
+    std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>> buckets;
 
     // Stores the placement configuration of the text that is currently placed on the screen.
     PlacementConfig placedConfig;

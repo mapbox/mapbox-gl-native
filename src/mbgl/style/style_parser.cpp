@@ -351,7 +351,7 @@ void StyleParser::parseLayers(const JSValue& value) {
     }
 }
 
-void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<StyleLayer>& layer) {
+void StyleParser::parseLayer(const util::ID<StyleLayer> id, const JSValue& value, std::unique_ptr<StyleLayer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;

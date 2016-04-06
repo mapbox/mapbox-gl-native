@@ -40,7 +40,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         layer->id = layerID;
         layer->source = AnnotationManager::SourceID;
-        layer->sourceLayer = layer->id;
+        layer->sourceLayer = layerID;
 
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 
@@ -56,7 +56,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         layer->id = layerID;
         layer->source = AnnotationManager::SourceID;
-        layer->sourceLayer = layer->id;
+        layer->sourceLayer = layerID;
 
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 
@@ -71,9 +71,9 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
             : geojsonvt::ProjectedFeatureType::Polygon;
 
         layer->id = layerID;
-        layer->ref = "";
+        layer->ref = util::ID<StyleLayer>();
         layer->source = AnnotationManager::SourceID;
-        layer->sourceLayer = layer->id;
+        layer->sourceLayer = layerID;
         layer->visibility = VisibilityType::Visible;
 
         style.addLayer(std::move(layer), sourceLayer->id);

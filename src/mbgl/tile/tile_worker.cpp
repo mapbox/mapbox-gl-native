@@ -17,7 +17,7 @@
 using namespace mbgl;
 
 TileWorker::TileWorker(TileID id_,
-                       std::string sourceID_,
+                       util::ID<Source> sourceID_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
@@ -49,12 +49,12 @@ TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<StyleLaye
 
     // We're storing a set of bucket names we've parsed to avoid parsing a bucket twice that is
     // referenced from more than one layer
-    std::set<std::string> parsed;
+    std::set<util::ID<StyleLayer>> parsed;
 
     for (auto i = layers.rbegin(); i != layers.rend(); i++) {
         const StyleLayer* layer = i->get();
-        if (parsed.find(layer->bucketName()) == parsed.end()) {
-            parsed.emplace(layer->bucketName());
+        if (parsed.find(layer->bucketID()) == parsed.end()) {
+            parsed.emplace(layer->bucketID());
             parseLayer(layer, *geometryTile);
         }
     }
@@ -81,7 +81,7 @@ TileParseResult TileWorker::parsePendingLayers(const PlacementConfig config) {
                                 *layer.spriteAtlas,
                                 glyphAtlas,
                                 glyphStore);
-            placementPending.emplace(layer.bucketName(), std::move(it->second));
+            placementPending.emplace(layer.bucketID(), std::move(it->second));
             pending.erase(it++);
             continue;
         }
@@ -109,7 +109,7 @@ void TileWorker::placeLayers(const PlacementConfig config) {
 }
 
 void TileWorker::redoPlacement(
-    const std::unordered_map<std::string, std::unique_ptr<Bucket>>* buckets,
+    const std::map<util::ID<StyleLayer>, std::unique_ptr<Bucket>>* buckets,
     PlacementConfig config) {
 
     CollisionTile collisionTile(config);
@@ -166,14 +166,14 @@ void TileWorker::parseLayer(const StyleLayer* layer, const GeometryTile& geometr
             // We cannot parse this bucket yet. Instead, we're saving it for later.
             pending.emplace_back(layer->as<SymbolLayer>(), std::move(bucket));
         } else {
-            placementPending.emplace(layer->bucketName(), std::move(bucket));
+            placementPending.emplace(layer->bucketID(), std::move(bucket));
         }
     } else {
-        insertBucket(layer->bucketName(), std::move(bucket));
+        insertBucket(layer->bucketID(), std::move(bucket));
     }
 }
 
-void TileWorker::insertBucket(const std::string& name, std::unique_ptr<Bucket> bucket) {
+void TileWorker::insertBucket(const util::ID<StyleLayer> name, std::unique_ptr<Bucket> bucket) {
     if (bucket->hasData()) {
         result.buckets.emplace(name, std::move(bucket));
     }

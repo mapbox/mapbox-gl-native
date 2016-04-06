@@ -495,7 +495,7 @@ void Map::addCustomLayer(const std::string& id,
                          const char* before) {
     context->invoke(&MapContext::addLayer,
         std::make_unique<CustomLayer>(id, initialize, render, deinitialize, context_),
-        before ? std::string(before) : optional<std::string>());
+        before ? util::ID<StyleLayer>(before) : util::ID<StyleLayer>());
 }
 
 void Map::removeCustomLayer(const std::string& id) {

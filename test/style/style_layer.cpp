@@ -20,5 +20,5 @@ TEST(StyleLayer, Clone) {
 TEST(StyleLayer, CloneCopiesBaseProperties) {
     std::unique_ptr<BackgroundLayer> layer = std::make_unique<BackgroundLayer>();
     layer->id = "test";
-    EXPECT_EQ("test", layer->clone()->id);
+    EXPECT_EQ(util::ID<StyleLayer>("test"), layer->clone()->id);
 }
