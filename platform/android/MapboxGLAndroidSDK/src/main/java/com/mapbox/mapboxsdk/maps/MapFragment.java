@@ -1,14 +1,19 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 
 /**
  * Fragment wrapper around a map view.
@@ -44,7 +49,7 @@ public final class MapFragment extends Fragment {
     }
 
     /**
-     * Creates the fragment view hierachy.
+     * Creates the fragment view hierarchy.
      *
      * @param inflater           Inflater used to inflate content.
      * @param container          The parent layout for the map fragment.
@@ -54,8 +59,56 @@ public final class MapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        MapboxMapOptions options = getArguments().getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
+        MapboxMapOptions options = null;
+
+        // Get bundle
+        Bundle bundle = getArguments();
+        if (bundle != null && bundle.containsKey(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS)) {
+            options = bundle.getParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS);
+        }
+
+        // Assign an AccessToken if needed
+        if (options == null || options.getAccessToken() == null) {
+            String token = getToken(inflater.getContext());
+            if (TextUtils.isEmpty(token)) {
+                throw new InvalidAccessTokenException();
+            }
+            if (options == null) {
+                options = new MapboxMapOptions().accessToken(token);
+            } else {
+                options.accessToken(token);
+            }
+        }
         return mMap = new MapView(inflater.getContext(), options);
+    }
+
+    /**
+     * <p>
+     * Returns the Mapbox access token set in the app resources.
+     * </p>
+     * It will first search the application manifest for a {@link MapboxConstants#KEY_META_DATA_MANIFEST}
+     * meta-data value. If not found it will then attempt to load the access token from the
+     * {@code res/raw/token.txt} development file.
+     *
+     * @param context The {@link Context} of the {@link android.app.Activity} or {@link android.app.Fragment}.
+     * @return The Mapbox access token or null if not found.
+     * @see MapboxConstants#KEY_META_DATA_MANIFEST
+     */
+    private String getToken(@NonNull Context context) {
+        try {
+            // read out AndroidManifest
+            PackageManager packageManager = context.getPackageManager();
+            ApplicationInfo appInfo = packageManager.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            String token = appInfo.metaData.getString(MapboxConstants.KEY_META_DATA_MANIFEST);
+            if (token == null || token.isEmpty()) {
+                throw new IllegalArgumentException();
+            }
+            return token;
+        } catch (Exception e) {
+            // use fallback on string resource, used for development
+            int tokenResId = context.getResources().getIdentifier("mapbox_access_token", "string", context.getPackageName());
+            return tokenResId != 0 ? context.getString(tokenResId) : null;
+        }
     }
 
     /**
