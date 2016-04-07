@@ -82,8 +82,7 @@
 /* Begin PBXFileReference section */
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
-		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mapbox.framework; path = ../../../build/ios/pkg/dynamic/Mapbox.framework; sourceTree = "<group>"; };
-		DACAD7111B08719F009119DC /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapboxEvents.h; path = ../../platform/ios/MGLMapboxEvents.h; sourceTree = SOURCE_ROOT; };
+		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -147,7 +146,6 @@
 		DD04331A196DB9BC00E6F39D = {
 			isa = PBXGroup;
 			children = (
-				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
 				DD04332C196DB9BC00E6F39D /* App */,
 				DDBD0139196DC38D0033959E /* Tests */,
 				DD043325196DB9BC00E6F39D /* Frameworks */,
@@ -167,6 +165,7 @@
 		DD043325196DB9BC00E6F39D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
 				DD0580E71ACB628200B112C9 /* IOKit.framework */,
 			);
 			name = Frameworks;
@@ -179,7 +178,6 @@
 				DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */,
 				DD043361196DBBD500E6F39D /* MGLTViewController.h */,
 				DD043360196DBBD500E6F39D /* MGLTViewController.m */,
-				DDAE739B1ACB557500E1A793 /* GL Library */,
 				DD04332D196DB9BC00E6F39D /* Supporting Files */,
 			);
 			name = App;
@@ -240,14 +238,6 @@
 				DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */,
 			);
 			name = OHHTTPStubs;
-			sourceTree = "<group>";
-		};
-		DDAE739B1ACB557500E1A793 /* GL Library */ = {
-			isa = PBXGroup;
-			children = (
-				DACAD7111B08719F009119DC /* MGLMapboxEvents.h */,
-			);
-			name = "GL Library";
 			sourceTree = "<group>";
 		};
 		DDBD0139196DC38D0033959E /* Tests */ = {
@@ -545,10 +535,6 @@
 				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"../../mason_packages/**",
-				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -570,10 +556,6 @@
 				INFOPLIST_FILE = "$(SRCROOT)/App-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"../../mason_packages/**",
-				);
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.mapbox.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";

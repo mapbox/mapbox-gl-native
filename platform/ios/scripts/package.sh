@@ -213,10 +213,10 @@ SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v
 SHORT_VERSION=${SEM_VERSION%-*}
 if [[ ${BUNDLE_RESOURCES} ]]; then
     cp -pv LICENSE.md ${STATIC_SETTINGS_DIRECTORY}
-    cp -rv platform/ios/app/Settings.bundle ${STATIC_SETTINGS_DIRECTORY}
+    cp -rv platform/ios/framework/Settings.bundle ${STATIC_SETTINGS_DIRECTORY}
 else
     cp -pv LICENSE.md "${OUTPUT}"
-    cp -rv platform/ios/app/Settings.bundle "${OUTPUT}"
+    cp -rv platform/ios/framework/Settings.bundle "${OUTPUT}"
 fi
 if [[ ${BUILD_STATIC} == true ]]; then
     mkdir -p ${STATIC_BUNDLE_PATH}
