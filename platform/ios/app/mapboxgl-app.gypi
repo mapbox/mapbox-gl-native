@@ -32,7 +32,7 @@
         'MBXOfflinePacksTableViewController.h',
         'MBXOfflinePacksTableViewController.m',
         'MBXViewController.h',
-        'MBXViewController.mm',
+        'MBXViewController.m',
       ],
 
       'xcode_settings': {

@@ -3,12 +3,11 @@
 #import "MBXOfflinePacksTableViewController.h"
 
 #import <Mapbox/Mapbox.h>
-#import "../../../include/mbgl/util/default_styles.hpp"
 
 #import <CoreLocation/CoreLocation.h>
 #import <OpenGLES/ES2/gl.h>
+#import <objc/runtime.h>
 
-static UIColor *const kTintColor = [UIColor colorWithRed:0.120 green:0.550 blue:0.670 alpha:1.000];
 static NSString * const kCustomCalloutTitle = @"Custom Callout";
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
@@ -21,7 +20,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
-@property (nonatomic) NSUInteger styleIndex;
+@property (nonatomic) NSInteger styleIndex;
 
 @end
 
@@ -42,6 +41,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             @"MBXShowsUserLocation": @NO,
             @"MBXDebug": @NO,
         }];
+        
+        
     }
 }
 
@@ -53,11 +54,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
-    self.styleIndex = 0;
-    self.mapView.styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].url)];
-
-    UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
-    [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
+    self.styleIndex = -1;
+    [self cycleStyles:self];
 
     [self restoreState:nil];
 }
@@ -97,7 +95,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     return UIInterfaceOrientationMaskAll;
 }
@@ -355,10 +353,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         vertexShader = glCreateShader(GL_VERTEX_SHADER);
         fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         
-        glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
         glCompileShader(vertexShader);
         glAttachShader(program, vertexShader);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
         glCompileShader(fragmentShader);
         glAttachShader(program, fragmentShader);
         glLinkProgram(program);
@@ -427,13 +425,54 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (IBAction)cycleStyles:(__unused id)sender
 {
+    static NSArray *styleNames;
+    static NSArray *styleURLs;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        styleNames = @[
+            @"Streets",
+            @"Emerald",
+            @"Light",
+            @"Dark",
+            @"Satellite",
+            @"Hybrid",
+        ];
+        styleURLs = @[
+            [MGLStyle streetsStyleURL],
+            [MGLStyle emeraldStyleURL],
+            [MGLStyle lightStyleURL],
+            [MGLStyle darkStyleURL],
+            [MGLStyle satelliteStyleURL],
+            [MGLStyle hybridStyleURL],
+        ];
+        NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
+        
+        // Make sure defaultStyleURLs is up-to-date.
+        unsigned numMethods = 0;
+        Method *methods = class_copyMethodList(object_getClass([MGLStyle class]), &numMethods);
+        unsigned numStyleURLMethods = 0;
+        for (NSUInteger i; i < numMethods; i++) {
+            Method method = methods[i];
+            if (method_getNumberOfArguments(method) == 2 /* _cmd, self */) {
+                SEL selector = method_getName(method);
+                NSString *name = @(sel_getName(selector));
+                if ([name rangeOfString:@"StyleURL"].location != NSNotFound) {
+                    numStyleURLMethods += 1;
+                }
+            }
+        }
+        NSAssert(numStyleURLMethods == styleNames.count,
+                 @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
+                 numStyleURLMethods, (unsigned long)styleNames.count);
+    });
+    
+    self.styleIndex = (self.styleIndex + 1) % styleNames.count;
+
+    self.mapView.styleURL = styleURLs[self.styleIndex];
+    
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
-
-    self.styleIndex = (self.styleIndex + 1) % mbgl::util::default_styles::numOrderedStyles;
-
-    self.mapView.styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].url)];
-
-    [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
+    [titleButton setTitle:styleNames[self.styleIndex] forState:UIControlStateNormal];
 }
 
 - (IBAction)locateUser:(__unused id)sender
