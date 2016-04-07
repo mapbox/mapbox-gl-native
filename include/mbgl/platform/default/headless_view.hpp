@@ -88,6 +88,7 @@ private:
 
 #if MBGL_USE_OSMESA
     OSMesaContext glContext = 0;
+    void *pBuffer = nullptr;
 #endif
 
     bool extensionsLoaded = false;

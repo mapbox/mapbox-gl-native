@@ -31,9 +31,21 @@ void HeadlessView::createContext() {
     if (glContext == 0) {
         throw std::runtime_error("Error creating GL context object.");
     }
+
+    // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
+    // activate the context.
+    pBuffer = malloc(4 * sizeof(GLubyte));
+    if (!pBuffer) {
+       throw std::runtime_error("Alloc pixel buffer failed!");
+    }
 }
 
 void HeadlessView::destroyContext() {
+    if (pBuffer) {
+        free(pBuffer);
+        pBuffer = nullptr;
+    }
+
     OSMesaDestroyContext(glContext);
 }
 
@@ -100,15 +112,14 @@ void HeadlessView::clearBuffers() {
 }
 
 void HeadlessView::activateContext() {
-    if (!OSMesaMakeCurrent(glContext, nullptr, GL_UNSIGNED_BYTE, 8, 8)) {
+    if (!OSMesaMakeCurrent(glContext, pBuffer, GL_UNSIGNED_BYTE, 1, 1)) {
         throw std::runtime_error("Switching OpenGL context failed.\n");
     }
 }
 
 void HeadlessView::deactivateContext() {
-    if (!OSMesaMakeCurrent(nullptr, nullptr, GL_UNSIGNED_BYTE, 8, 8)) {
-        throw std::runtime_error("Removing OpenGL context failed.\n");
-    }
+    // no-op
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=482787
 }
 
 } // namespace mbgl
