@@ -648,12 +648,13 @@ public class MapboxEventManager {
                 Response response = client.newCall(request).execute();
                 Log.d(TAG, "response code = " + response.code() + " for events " + events.size());
 
-                // Reset Events
-                // ============
-                events.removeAllElements();
             } catch (Exception e) {
                 Log.e(TAG, "FlushTheEventsTask borked: " + e);
                 e.printStackTrace();
+            } finally {
+                // Reset Events
+                // ============
+                events.removeAllElements();
             }
 
             return null;
