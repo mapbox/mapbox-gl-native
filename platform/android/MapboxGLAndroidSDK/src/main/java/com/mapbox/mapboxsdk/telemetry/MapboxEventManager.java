@@ -82,7 +82,7 @@ public class MapboxEventManager {
     private long mapboxSessionIdLastSet = 0;
     private static long hourInMillis = 1000 * 60 * 60;
     private static long flushDelayInitialInMillis = 1000 * 10;  // 10 Seconds
-    private static long flushDelayInMillis = 1000 * 60 * 2;  // 2 Minutes
+    private static long flushDelayInMillis = 1000 * 60 * 3;  // 3 Minutes
     private static final int SESSION_ID_ROTATION_HOURS = 24;
 
     private static MessageDigest messageDigest = null;
@@ -536,7 +536,10 @@ public class MapboxEventManager {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = cm.getActiveNetworkInfo();
             if (networkInfo == null || !networkInfo.isConnected()) {
-                Log.w(TAG, "Not connected to network, so returning without attempting to send events");
+                Log.w(TAG, "Not connected to network, so empty events cache and return without attempting to send events");
+                // Make sure that events don't pile up when Offline
+                // and thus impact available memory over time.
+                events.removeAllElements();
                 return null;
             }
 
