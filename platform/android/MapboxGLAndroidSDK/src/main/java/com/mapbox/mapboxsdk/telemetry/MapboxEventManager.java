@@ -527,7 +527,7 @@ public class MapboxEventManager {
         @Override
         protected Void doInBackground(Void... voids) {
 
-             if (events.size() < 1) {
+             if (events.isEmpty()) {
                 Log.d(TAG, "No events in the queue to send so returning.");
                 return null;
             }
