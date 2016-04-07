@@ -28,11 +28,29 @@ npm test
 ## Rendering a map tile
 
 ```js
+var mbgl = require('mapbox-gl-native');
+var sharp = require('sharp');
 var map = new mbgl.Map({ request: function() {} });
+
 map.load(require('./test/fixtures/style.json'));
-map.render({}, function(err, image) {
+
+map.render({}, function(err, buffer) {
     if (err) throw err;
-    fs.writeFileSync('image.png', image);
+
+    map.release();
+
+    var image = sharp(buffer, {
+        raw: {
+            width: 512,
+            height: 512,
+            channels: 4
+        }
+    });
+
+    // Convert raw image buffer to PNG
+    image.toFile('image.png', function(err) {
+        if (err) throw err;
+    });
 });
 ```
 
@@ -49,7 +67,7 @@ The first argument passed to `map.render` is an options object, all keys are opt
 }
 ```
 
-When you are finished using a map object, you can call `map.release()` to dispose the internal map resources manually. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than v8's garbage collector.
+When you are finished using a map object, you can call `map.release()` to permanently dispose the internal map resources. This is not necessary, but can be helpful to optimize resource usage (memory, file sockets) on a more granualar level than v8's garbage collector. Calling `map.release()` will prevent a map object from being used for any further render calls, but can be safely called as soon as the `map.render()` callback returns, as the returned pixel buffer will always be retained for the scope of the callback.
 
 ## Implementing a file source
 
@@ -239,9 +257,10 @@ var map = new mbgl.Map({
 var style = mapboxStyle;
 
 map.load(style);
-map.render({}, function(err, image) {
+map.render({}, function(err, buffer) {
     if (err) throw err;
-    fs.writeFileSync('image.png', image);
+
+    // Do something with raw pixel buffer
 });
 
 ```
