@@ -52,7 +52,6 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
 
 NodeLogObserver::~NodeLogObserver() {
     queue->stop();
-    module.Reset();
 }
 
 bool NodeLogObserver::onRecord(mbgl::EventSeverity severity, mbgl::Event event, int64_t code, const std::string &text) {

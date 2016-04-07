@@ -77,7 +77,7 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
         Nan::Get(EventEmitter, Nan::New("prototype").ToLocalChecked()).ToLocalChecked());
     Nan::CallAsFunction(EventEmitter, target, 0, nullptr);
 
-    mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(target->ToObject()));
+    mbgl::Log::setObserver(std::make_unique<node_mbgl::NodeLogObserver>(target));
 }
 
 NODE_MODULE(mapbox_gl_native, RegisterModule)
