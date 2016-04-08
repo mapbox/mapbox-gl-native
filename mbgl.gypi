@@ -266,6 +266,14 @@
               '<@(libuv_ldflags)',
             ],
           },
+
+          'conditions': [
+            ['OS == "mac"', {
+              'xcode_settings': {
+                'OTHER_CPLUSPLUSFLAGS': [ '<@(libuv_cflags)' ],
+              },
+            }],
+          ],
         }],
       ],
 
