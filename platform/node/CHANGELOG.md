@@ -1,3 +1,13 @@
+# 3.1.0
+
+- Adds debug render options ([#3840](https://github.com/mapbox/mapbox-gl-native/pull/3840))
+- Fixes circle bucket rendering on tile boundaries ([#3764](https://github.com/mapbox/mapbox-gl-native/issues/3764))
+- Fixes a segfault caused by improperly disposing the entire module in the `NodeLog` destructor ([#4639](https://github.com/mapbox/mapbox-gl-native/pull/4639))
+- Fixes an issue with vanishing GeoJSON layers at high zoom levels ([#4632](https://github.com/mapbox/mapbox-gl-native/issues/4632))
+- Fixes inheritance from EventEmitter ([#4567](https://github.com/mapbox/mapbox-gl-native/pull/4576))
+- Fixes intermittent `stencil mask overflow` error ([#962](https://github.com/mapbox/mapbox-gl-native/issues/962))
+- Drops support for Node.js v5.x prebuilt binaries due to ongoing npm3 instability ([#4370](https://github.com/mapbox/mapbox-gl-native/issues/4370))
+
 # 3.0.2
 
 - Fixes a memory leak in `NodeMap::request` ([#3829](https://github.com/mapbox/mapbox-gl-native/pull/3829))
