@@ -10,6 +10,7 @@
   },
   'includes': [
     '../../mbgl.gypi',
+    '../../test/test.gypi',
   ],
   'target_defaults': {
     'target_conditions': [
@@ -33,6 +34,40 @@
     ],
   },
   'targets': [
+    {
+      'target_name': 'test',
+      'type': 'executable',
+      'product_name': 'ios-test',
+      'product_extension': 'app',
+      'mac_bundle': 1,
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+      ],
+
+      'sources': [
+        '../../test/src/main.mm',
+#        '../../src/mbgl/util/premultiply.cpp',
+      ],
+
+      'xcode_settings': {
+        'SDKROOT': 'iphoneos',
+        'SUPPORTED_PLATFORMS': 'iphonesimulator iphoneos',
+        'INFOPLIST_FILE': '../../test/src/app-info.plist',
+        'IPHONEOS_DEPLOYMENT_TARGET': '8.0',
+        'TARGETED_DEVICE_FAMILY': '1,2',
+        'COPY_PHASE_STRIP': 'NO',
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
+        'CLANG_ENABLE_MODULES': 'YES',
+        'CODE_SIGN_IDENTITY': 'iPhone Developer',
+      },
+
+      'copies': [{
+        'destination': '<(PRODUCT_DIR)/$(WRAPPER_NAME)/test',
+        'files': [ '../../test/fixtures' ],
+      }]
+    },
     {
       'target_name': 'platform-lib',
       'product_name': 'mbgl-platform-ios',

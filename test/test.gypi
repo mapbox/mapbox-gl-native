@@ -1,31 +1,20 @@
 {
   'targets': [
     {
-      'target_name': 'test',
-      'type': 'executable',
+      'target_name': 'test-lib',
+      'type': 'static_library',
+      'standalone_static_library': 1,
+      'hard_dependency': 1,
 
       'include_dirs': [
         '../include',
         '../src',
         '../platform/default',
         'include',
-      ],
-
-      'dependencies': [
-        'platform-lib',
-        'copy_certificate_bundle',
+        'src',
       ],
 
       'sources': [
-        # Test helper files
-        'src/stub_file_source.cpp',
-        'include/mbgl/test/stub_file_source.hpp',
-        'include/mbgl/test/mock_view.hpp',
-        'include/mbgl/test/util.hpp',
-        'src/util.cpp',
-        'include/mbgl/test/fixture_log_observer.hpp',
-        'src/fixture_log_observer.cpp',
-
         'util/assert.cpp',
         'util/async_task.cpp',
         'util/clip_ids.cpp',
@@ -49,7 +38,6 @@
         'api/render_missing.cpp',
         'api/set_style.cpp',
         'api/custom_layer.cpp',
-        'api/offline.cpp',
 
         'geometry/binpack.cpp',
 
@@ -92,7 +80,14 @@
         'sprite/sprite_parser.cpp',
         'sprite/sprite_store.cpp',
 
-        'src/main.cpp',
+        'src/mbgl/test/stub_file_source.hpp',
+        'src/mbgl/test/stub_file_source.cpp',
+        'src/mbgl/test/mock_view.hpp',
+        'src/mbgl/test/util.hpp',
+        'src/mbgl/test/util.cpp',
+        'src/mbgl/test/fixture_log_observer.hpp',
+        'src/mbgl/test/fixture_log_observer.cpp',
+        'src/mbgl/test/test.cpp'
       ],
 
       'variables': {
@@ -134,6 +129,32 @@
           }, {
             'libraries': [ '<@(libraries)', '<@(ldflags)' ],
           }]
+        ],
+      },
+
+      'direct_dependent_settings': {
+        'include_dirs': [
+          'include',
+        ],
+
+        # Force the linker to include all the objects from the lib-test archive. Otherwise they'd
+        # be discarded because there are no undefined symbols to pull them in, and the resulting
+        # executable would run zero tests.
+
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': {
+              'OTHER_LDFLAGS': [
+                '-Wl,-force_load,<(PRODUCT_DIR)/libtest-lib.a',
+              ],
+            }
+          }, {
+            'link_settings': {
+              'ldflags': [
+                '-Wl,-whole-archive <(PRODUCT_DIR)/libtest-lib.a -Wl,-no-whole-archive',
+              ],
+            },
+          }],
         ],
       },
     },

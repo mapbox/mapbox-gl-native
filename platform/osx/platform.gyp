@@ -17,6 +17,19 @@
   ],
   'targets': [
     {
+      'target_name': 'test',
+      'type': 'executable',
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+      ],
+
+      'sources': [
+        '../../test/src/main.cpp',
+      ],
+    },
+    {
       'target_name': 'platform-lib',
       'product_name': 'mbgl-platform-osx',
       'type': 'static_library',

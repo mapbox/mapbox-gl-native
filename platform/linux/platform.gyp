@@ -19,6 +19,20 @@
   ],
   'targets': [
     {
+      'target_name': 'test',
+      'type': 'executable',
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+        'copy_certificate_bundle',
+      ],
+
+      'sources': [
+        '../../test/src/main.cpp',
+      ],
+    },
+    {
       'target_name': 'platform-lib',
       'product_name': 'mbgl-platform-linux',
       'type': 'static_library',

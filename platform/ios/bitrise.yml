@@ -29,6 +29,8 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew tap mapbox/homebrew-ios-sim-3
+            brew install mapbox/homebrew-ios-sim-3/ios-sim
             gem install jazzy --no-rdoc --no-ri
             export BUILDTYPE=Debug
             make ios

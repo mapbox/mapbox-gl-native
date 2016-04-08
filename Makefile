@@ -21,17 +21,17 @@ OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
 osx:
 	$(RUN) PLATFORM=osx Xcode/All
 
-$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi
+$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi test/test.gypi
 	$(RUN) PLATFORM=osx Xcode/__project__
 
 xproj: $(OSX_PROJ_PATH)
 	open $(OSX_PROJ_PATH)
 
-$(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/osxtest.xcscheme $(OSX_PROJ_PATH)
+$(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/osxtest.xcscheme
 	mkdir -p $(basename $@)
 	cp $< $@
 
-test-osx: $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
+test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
 	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build
 	build/osx-x86_64/$(BUILDTYPE)/test
 	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test
@@ -43,14 +43,18 @@ IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
 ios:
 	$(RUN) PLATFORM=ios Xcode/All
 
-$(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi
+$(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi test/test.gypi
 	$(RUN) PLATFORM=ios Xcode/__project__
 
 iproj: $(IOS_PROJ_PATH)
 	open $(IOS_PROJ_PATH)
 
-test-ios:
-	# Currently nothing
+test-ios: $(IOS_PROJ_PATH)
+	xcodebuild -project $(IOS_PROJ_PATH) -configuration $(BUILDTYPE) \
+	  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
+	  -target test build
+	ios-sim start
+	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose
 
 ipackage: $(IOS_PROJ_PATH)
 	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \

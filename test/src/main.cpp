@@ -1,6 +1,5 @@
-#include <mbgl/test/util.hpp>
+#include <mbgl/test.hpp>
 
-GTEST_API_ int main(int argc, char *argv[]) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+int main(int argc, char *argv[]) {
+    return mbgl::runTests(argc, argv);
 }
