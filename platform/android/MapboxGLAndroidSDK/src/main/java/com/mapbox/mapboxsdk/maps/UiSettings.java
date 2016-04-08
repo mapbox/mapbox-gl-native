@@ -1,13 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
@@ -20,11 +16,19 @@ public class UiSettings {
     private ViewSettings logoSettings;
     private ViewSettings attributionSettings;
 
-    private boolean rotateGesturesEnabled;
-    private boolean tiltGesturesEnabled;
-    private boolean zoomGesturesEnabled;
+    private boolean rotateGesturesEnabled = true;
+    private boolean rotateGestureChangeAllowed = true;
+
+    private boolean tiltGesturesEnabled = true;
+    private boolean tiltGestureChangeAllowed = true;
+
+    private boolean zoomGesturesEnabled = true;
+    private boolean zoomGestureChangeAllowed = true;
+
+    private boolean scrollGesturesEnabled = true;
+    private boolean scrollGestureChangeAllowed = true;
+
     private boolean zoomControlsEnabled;
-    private boolean scrollGesturesEnabled;
 
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
@@ -339,7 +343,9 @@ public class UiSettings {
      * @param rotateGesturesEnabled If true, rotating is enabled.
      */
     public void setRotateGesturesEnabled(boolean rotateGesturesEnabled) {
-        this.rotateGesturesEnabled = rotateGesturesEnabled;
+        if (rotateGestureChangeAllowed) {
+            this.rotateGesturesEnabled = rotateGesturesEnabled;
+        }
     }
 
     /**
@@ -349,6 +355,14 @@ public class UiSettings {
      */
     public boolean isRotateGesturesEnabled() {
         return rotateGesturesEnabled;
+    }
+
+    void setRotateGestureChangeAllowed(boolean rotateGestureChangeAllowed) {
+        this.rotateGestureChangeAllowed = rotateGestureChangeAllowed;
+    }
+
+    boolean isRotateGestureChangeAllowed() {
+        return rotateGestureChangeAllowed;
     }
 
     /**
@@ -364,7 +378,9 @@ public class UiSettings {
      * @param tiltGesturesEnabled If true, tilting is enabled.
      */
     public void setTiltGesturesEnabled(boolean tiltGesturesEnabled) {
-        this.tiltGesturesEnabled = tiltGesturesEnabled;
+        if (tiltGestureChangeAllowed) {
+            this.tiltGesturesEnabled = tiltGesturesEnabled;
+        }
     }
 
     /**
@@ -374,6 +390,14 @@ public class UiSettings {
      */
     public boolean isTiltGesturesEnabled() {
         return tiltGesturesEnabled;
+    }
+
+    void setTiltGestureChangeAllowed(boolean tiltGestureChangeAllowed) {
+        this.tiltGestureChangeAllowed = tiltGestureChangeAllowed;
+    }
+
+    boolean isTiltGestureChangeAllowed() {
+        return tiltGestureChangeAllowed;
     }
 
     /**
@@ -389,7 +413,9 @@ public class UiSettings {
      * @param zoomGesturesEnabled If true, zooming is enabled.
      */
     public void setZoomGesturesEnabled(boolean zoomGesturesEnabled) {
-        this.zoomGesturesEnabled = zoomGesturesEnabled;
+        if (zoomGestureChangeAllowed) {
+            this.zoomGesturesEnabled = zoomGesturesEnabled;
+        }
     }
 
     /**
@@ -399,6 +425,14 @@ public class UiSettings {
      */
     public boolean isZoomGesturesEnabled() {
         return zoomGesturesEnabled;
+    }
+
+    void setZoomGestureChangeAllowed(boolean zoomGestureChangeAllowed) {
+        this.zoomGestureChangeAllowed = zoomGestureChangeAllowed;
+    }
+
+    boolean isZoomGestureChangeAllowed() {
+        return zoomGestureChangeAllowed;
     }
 
     /**
@@ -439,7 +473,9 @@ public class UiSettings {
      * @param scrollGesturesEnabled If true, scrolling is enabled.
      */
     public void setScrollGesturesEnabled(boolean scrollGesturesEnabled) {
-        this.scrollGesturesEnabled = scrollGesturesEnabled;
+        if (scrollGestureChangeAllowed) {
+            this.scrollGesturesEnabled = scrollGesturesEnabled;
+        }
     }
 
     /**
@@ -449,6 +485,14 @@ public class UiSettings {
      */
     public boolean isScrollGesturesEnabled() {
         return scrollGesturesEnabled;
+    }
+
+    void setScrollGestureChangeAllowed(boolean scrollGestureChangeAllowed) {
+        this.scrollGestureChangeAllowed = scrollGestureChangeAllowed;
+    }
+
+    boolean isScrollGestureChangeAllowed() {
+        return scrollGestureChangeAllowed;
     }
 
     /**

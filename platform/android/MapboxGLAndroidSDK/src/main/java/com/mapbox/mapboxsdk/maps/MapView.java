@@ -262,10 +262,19 @@ public class MapView extends FrameLayout {
 
         // Enable gestures
         UiSettings uiSettings = mMapboxMap.getUiSettings();
+
         uiSettings.setZoomGesturesEnabled(options.getZoomGesturesEnabled());
+        uiSettings.setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
+
         uiSettings.setScrollGesturesEnabled(options.getScrollGesturesEnabled());
+        uiSettings.setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
+
         uiSettings.setRotateGesturesEnabled(options.getRotateGesturesEnabled());
+        uiSettings.setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
+
         uiSettings.setTiltGesturesEnabled(options.getTiltGesturesEnabled());
+        uiSettings.setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
+
         uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
 
         // Zoom
@@ -338,9 +347,13 @@ public class MapView extends FrameLayout {
 
             UiSettings uiSettings = mMapboxMap.getUiSettings();
             uiSettings.setZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED));
+            uiSettings.setZoomGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE));
             uiSettings.setScrollGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED));
+            uiSettings.setScrollGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE));
             uiSettings.setRotateGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED));
+            uiSettings.setRotateGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE));
             uiSettings.setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
+            uiSettings.setTiltGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE));
             uiSettings.setZoomControlsEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED));
 
             // Compass
@@ -451,9 +464,13 @@ public class MapView extends FrameLayout {
         // UiSettings
         UiSettings uiSettings = mMapboxMap.getUiSettings();
         outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, uiSettings.isZoomGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE, uiSettings.isZoomGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, uiSettings.isScrollGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE,uiSettings.isScrollGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, uiSettings.isRotateGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE,uiSettings.isRotateGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, uiSettings.isTiltGesturesEnabled());
+        outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE,uiSettings.isTiltGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, uiSettings.isZoomControlsEnabled());
 
         // UiSettings - Compass
