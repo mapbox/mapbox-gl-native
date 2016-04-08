@@ -752,6 +752,18 @@ public class MapboxMapTest {
     }
 
     @Test
+    public void testClear() {
+        List<MarkerOptions> markerList = new ArrayList<>();
+        MarkerOptions markerOptions1 = new MarkerOptions().title("a");
+        MarkerOptions markerOptions2 = new MarkerOptions().title("b");
+        markerList.add(markerOptions1);
+        markerList.add(markerOptions2);
+        mMapboxMap.addMarkers(markerList);
+        mMapboxMap.clear();
+        assertTrue("Annotations should be empty", mMapboxMap.getAnnotations().isEmpty());
+    }
+
+    @Test
     public void testRemoveAnnotationsByList() {
         List<MarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a");

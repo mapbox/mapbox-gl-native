@@ -895,6 +895,14 @@ public class MapboxMap {
     }
 
     /**
+     * Removes all markers, polylines, polygons, overlays, etc from the map.
+     */
+    @UiThread
+    public void clear(){
+        removeAnnotations();
+    }
+
+    /**
      * Return a annotation based on its id.
      *
      * @return An annotation with a matched id, null is returned if no match was found.
