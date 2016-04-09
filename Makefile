@@ -21,7 +21,7 @@ OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
 osx:
 	$(RUN) PLATFORM=osx Xcode/All
 
-$(OSX_PROJ_PATH):
+$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi
 	$(RUN) PLATFORM=osx Xcode/__project__
 
 xproj: $(OSX_PROJ_PATH)
@@ -43,7 +43,7 @@ IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
 ios:
 	$(RUN) PLATFORM=ios Xcode/All
 
-$(IOS_PROJ_PATH):
+$(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi
 	$(RUN) PLATFORM=ios Xcode/__project__
 
 iproj: $(IOS_PROJ_PATH)
