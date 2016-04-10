@@ -452,7 +452,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         unsigned numMethods = 0;
         Method *methods = class_copyMethodList(object_getClass([MGLStyle class]), &numMethods);
         unsigned numStyleURLMethods = 0;
-        for (NSUInteger i; i < numMethods; i++) {
+        for (NSUInteger i = 0; i < numMethods; i++) {
             Method method = methods[i];
             if (method_getNumberOfArguments(method) == 2 /* _cmd, self */) {
                 SEL selector = method_getName(method);
