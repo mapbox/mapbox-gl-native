@@ -135,11 +135,11 @@ glfw-app:
 	$(RUN) Makefile/glfw-app
 
 .PHONY: run-glfw-app
-run-glfw-app:
+run-glfw-app: glfw-app
 	$(RUN) run-glfw-app
 
 .PHONY: run-valgrind-glfw-app
-run-valgrind-glfw-app:
+run-valgrind-glfw-app: glfw-app
 	$(RUN) run-valgrind-glfw-app
 
 .PHONY: test
