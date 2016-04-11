@@ -16,9 +16,6 @@
     "nan": "^2.2.1",
     "node-pre-gyp": "^0.6.26"
   },
-  "bundledDependencies": [
-    "node-pre-gyp"
-  ],
   "devDependencies": {
     "aws-sdk": "^2.3.2",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#1e0d988e187a6c9a7a74fa8d7feb9c66c2258123",
@@ -30,6 +27,7 @@
     "node": ">=4.2.1"
   },
   "scripts": {
+    "preinstall": "npm install node-pre-gyp",
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-suite": "node platform/node/test/render.test.js"
