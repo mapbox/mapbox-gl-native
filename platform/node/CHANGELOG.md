@@ -1,3 +1,7 @@
+# 3.1.1
+
+- Moves node-pre-gyp from `bundledDependencies` to `preinstall` ([#4680](https://github.com/mapbox/mapbox-gl-native/pull/4680))
+
 # 3.1.0
 
 - Adds debug render options ([#3840](https://github.com/mapbox/mapbox-gl-native/pull/3840))
