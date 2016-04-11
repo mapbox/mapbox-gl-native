@@ -33,7 +33,7 @@ $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/o
 
 test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
 	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build
-	build/osx-x86_64/$(BUILDTYPE)/test
+	build/osx-x86_64/$(BUILDTYPE)/test || ([[ $$? == 139 || $$? == 134 ]] && cat `ls -t1 ~/Library/Logs/DiagnosticReports/* | head -n1`; exit 1)
 	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test
 
 #### iOS targets ##############################################################
