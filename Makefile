@@ -21,7 +21,7 @@ OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
 osx:
 	$(RUN) PLATFORM=osx Xcode/All
 
-$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi test/test.gypi
+$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi test/test.gypi bin/*.gypi
 	$(RUN) PLATFORM=osx Xcode/__project__
 
 xproj: $(OSX_PROJ_PATH)
