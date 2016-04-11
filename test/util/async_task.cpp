@@ -122,5 +122,5 @@ TEST(AsyncTask, ThreadSafety) {
 
     // We expect here more than 1 but 1 would also be
     // a valid result, although very unlikely (I hope).
-    EXPECT_GT(count, 1);
+    EXPECT_GT(count, 0);
 }
