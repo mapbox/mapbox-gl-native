@@ -32,6 +32,7 @@ workflows:
             brew unlink node
             brew install awscli homebrew/versions/node4-lts
             brew link homebrew/versions/node4-lts
+            gem install xcpretty --no-rdoc --no-ri
             make node
             make test-node || result=$?
             ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER} ${BITRISE_GIT_TAG:-}

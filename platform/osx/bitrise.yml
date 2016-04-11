@@ -29,6 +29,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            gem install xcpretty --no-rdoc --no-ri
             export BUILDTYPE=Debug
             make osx
             make test-osx

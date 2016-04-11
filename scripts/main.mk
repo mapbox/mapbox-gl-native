@@ -108,13 +108,13 @@ Makefile/%: Makefile/__project__
 
 Xcode/%: Xcode/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
-	xcodebuild \
+	set -o pipefail && xcodebuild \
 		CODE_SIGNING_REQUIRED=NO \
 		CODE_SIGN_IDENTITY= \
 		-project $(PLATFORM_OUTPUT)/platform/$(PLATFORM)/platform.xcodeproj \
 		-configuration $(BUILDTYPE) \
 		-target $* \
-		-jobs $(JOBS)
+		-jobs $(JOBS) | xcpretty
 
 Ninja/%: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
