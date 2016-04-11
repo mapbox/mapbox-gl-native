@@ -471,7 +471,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     CGContextDrawRadialGradient(context, gradient,
                                 centerPoint, 0.0,
                                 centerPoint, haloRadius,
-                                nil);
+                                kNilOptions);
 
     image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();

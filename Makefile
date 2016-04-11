@@ -52,7 +52,7 @@ ios: $(IOS_PROJ_PATH)
 	  -project $(IOS_PROJ_PATH) -target All build | xcpretty
 
 iproj: $(IOS_PROJ_PATH)
-	open $(IOS_PROJ_PATH)
+	open platform/ios/ios.xcworkspace
 
 test-ios: ios
 	ios-sim start

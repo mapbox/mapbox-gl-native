@@ -533,14 +533,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (_delegate == delegate) return;
 
     _delegate = delegate;
-
-    if ([delegate respondsToSelector:@selector(mapView:symbolNameForAnnotation:)])
-    {
-        [NSException raise:@"Method unavailable" format:
-         @"-mapView:symbolNameForAnnotation: has been removed from the MGLMapViewDelegate protocol, but %@ still implements it. "
-         @"Implement -[%@ mapView:imageForAnnotation:] instead.",
-         NSStringFromClass([delegate class]), NSStringFromClass([delegate class])];
-    }
     
     _delegateHasAlphasForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:alphaForShapeAnnotation:)];
     _delegateHasStrokeColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:strokeColorForShapeAnnotation:)];

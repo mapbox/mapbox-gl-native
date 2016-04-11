@@ -85,9 +85,9 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             DEPLOYMENT_POSTPROCESSING=YES \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY= \
-            -project ./build/ios-all/platform/ios/platform.xcodeproj \
+            -workspace ./platform/ios/ios.xcworkspace \
             -configuration ${BUILDTYPE} \
-            -target platform-lib \
+            -scheme static \
             -jobs ${JOBS} | xcpretty
     fi
 
@@ -102,9 +102,9 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY= \
-            -project ./build/ios-all/platform/ios/platform.xcodeproj \
+            -workspace ./platform/ios/ios.xcworkspace \
             -configuration ${BUILDTYPE} \
-            -target iossdk \
+            -scheme dynamic \
             -jobs ${JOBS} | xcpretty
     fi
 fi
@@ -115,9 +115,9 @@ if [[ ${BUILD_STATIC} == true ]]; then
         ARCHS="x86_64 i386" \
         ONLY_ACTIVE_ARCH=NO \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -project ./build/ios-all/platform/ios/platform.xcodeproj \
+        -workspace ./platform/ios/ios.xcworkspace \
         -configuration ${BUILDTYPE} \
-        -target platform-lib \
+        -scheme static \
         -jobs ${JOBS} | xcpretty
 fi
 
@@ -129,9 +129,9 @@ if [[ ${BUILD_DYNAMIC} == true ]]; then
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         ENABLE_BITCODE=${ENABLE_BITCODE} \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
-        -project ./build/ios-all/platform/ios/platform.xcodeproj \
+        -workspace ./platform/ios/ios.xcworkspace \
         -configuration ${BUILDTYPE} \
-        -target iossdk \
+        -scheme dynamic \
         -jobs ${JOBS} | xcpretty
 fi
 
@@ -202,10 +202,9 @@ fi
 
 if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
-    mkdir -p "${OUTPUT}/static/${NAME}.framework/Headers"
-    cp -pv platform/{darwin,ios}/include/*.h "${OUTPUT}/static/${NAME}.framework/Headers"
+    cp -rv "build/ios-all/${BUILDTYPE}-iphoneos/Headers" "${OUTPUT}/static/${NAME}.framework/Headers"
     cat platform/ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
-    cat platform/ios/framework/Mapbox.h >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
+    cat "build/ios-all/${BUILDTYPE}-iphoneos/Headers/Mapbox.h" >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
 fi
 
 step "Copying library resources…"

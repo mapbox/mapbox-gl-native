@@ -5,7 +5,6 @@
 #import "MGLTilePyramidOfflineRegion.h"
 
 #include <mbgl/storage/default_file_source.hpp>
-#include <mbgl/util/string.hpp>
 
 /**
  Assert that the current offline pack is valid.

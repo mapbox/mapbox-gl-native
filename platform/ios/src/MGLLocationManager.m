@@ -61,12 +61,16 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
 }
 
 - (void)startLocationServices {
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized ||
-        [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
-       
+    CLAuthorizationStatus authorizationStatus = [CLLocationManager authorizationStatus];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 80000
+    BOOL authorizedAlways = authorizationStatus == kCLAuthorizationStatusAuthorizedAlways;
+#else
+    BOOL authorizedAlways = authorizationStatus == kCLAuthorizationStatusAuthorized;
+#endif
+    if (authorizedAlways || authorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
         // If the host app can run in the background with `always` location permissions then allow background
         // updates and start the significant location change service and background timeout timer
-        if (self.hostAppHasBackgroundCapability && [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized) {
+        if (self.hostAppHasBackgroundCapability && authorizedAlways) {
             [self.standardLocationManager startMonitoringSignificantLocationChanges];
             [self startBackgroundTimeoutTimer];
             // On iOS 9 and above also allow background location updates
@@ -121,7 +125,11 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     switch (status) {
-        case kCLAuthorizationStatusAuthorized: // Also handles kCLAuthorizationStatusAuthorizedAlways
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 80000
+        case kCLAuthorizationStatusAuthorizedAlways:
+#else
+        case kCLAuthorizationStatusAuthorized:
+#endif
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             [self startUpdatingLocation];
             break;

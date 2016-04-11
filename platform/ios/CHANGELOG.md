@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 ## master
 
 - User location heading updates now resume properly when an app becomes active again. ([#4674](https://github.com/mapbox/mapbox-gl-native/pull/4674))
+- Removed unused SVG files from the SDK’s resource bundle. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
 
 ## 3.2.0
 

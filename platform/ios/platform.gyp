@@ -66,7 +66,17 @@
       'copies': [{
         'destination': '<(PRODUCT_DIR)/$(WRAPPER_NAME)/test',
         'files': [ '../../test/fixtures' ],
-      }]
+      }],
+
+      'link_settings': {
+        'libraries': [
+          '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+          '$(SDKROOT)/System/Library/Frameworks/GLKit.framework',
+          '$(SDKROOT)/System/Library/Frameworks/ImageIO.framework',
+          '$(SDKROOT)/System/Library/Frameworks/MobileCoreServices.framework',
+          '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
+        ],
+      },
     },
     {
       'target_name': 'platform-lib',
@@ -104,53 +114,6 @@
         '../darwin/src/image.mm',
         '../darwin/src/nsthread.mm',
         '../darwin/src/reachability.m',
-        '../darwin/src/NSException+MGLAdditions.h',
-        '../darwin/src/NSString+MGLAdditions.h',
-        '../darwin/src/NSString+MGLAdditions.m',
-        '../darwin/src/MGLTypes.m',
-        '../darwin/src/MGLStyle.mm',
-        '../darwin/src/MGLGeometry_Private.h',
-        '../darwin/src/MGLGeometry.mm',
-        '../darwin/src/MGLShape.m',
-        '../darwin/src/MGLMultiPoint_Private.h',
-        '../darwin/src/MGLMultiPoint.mm',
-        '../darwin/src/MGLPointAnnotation.m',
-        '../darwin/src/MGLPolyline.mm',
-        '../darwin/src/MGLPolygon.mm',
-        '../darwin/src/MGLMapCamera.mm',
-        '../darwin/src/MGLOfflinePack.mm',
-        '../darwin/src/MGLOfflinePack_Private.h',
-        '../darwin/src/MGLOfflineStorage.mm',
-        '../darwin/src/MGLOfflineStorage_Private.h',
-        '../darwin/src/MGLOfflineRegion_Private.h',
-        '../darwin/src/MGLTilePyramidOfflineRegion.mm',
-        '../darwin/src/MGLAccountManager_Private.h',
-        '../darwin/src/MGLAccountManager.m',
-        '../darwin/src/NSBundle+MGLAdditions.h',
-        '../darwin/src/NSBundle+MGLAdditions.m',
-        '../darwin/src/NSProcessInfo+MGLAdditions.h',
-        '../darwin/src/NSProcessInfo+MGLAdditions.m',
-        'src/MGLMapboxEvents.h',
-        'src/MGLMapboxEvents.m',
-        'src/MGLAPIClient.h',
-        'src/MGLAPIClient.m',
-        'src/MGLLocationManager.h',
-        'src/MGLLocationManager.m',
-        'src/MGLMapView.mm',
-        'src/MGLUserLocation_Private.h',
-        'src/MGLUserLocation.m',
-        'src/MGLUserLocationAnnotationView.h',
-        'src/MGLUserLocationAnnotationView.m',
-        'src/MGLAnnotationImage_Private.h',
-        'src/MGLAnnotationImage.m',
-        'src/MGLCompactCalloutView.h',
-        'src/MGLCompactCalloutView.m',
-        'vendor/SMCalloutView/SMCalloutView.h',
-        'vendor/SMCalloutView/SMCalloutView.m',
-        'vendor/Fabric/FABAttributes.h',
-        'vendor/Fabric/FABKitProtocol.h',
-        'vendor/Fabric/Fabric.h',
-        'vendor/Fabric/Fabric+FABKits.h',
       ],
 
       'variables': {
@@ -168,16 +131,6 @@
         'libraries': [
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',
-          '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
-          '$(SDKROOT)/System/Library/Frameworks/CoreLocation.framework',
-          '$(SDKROOT)/System/Library/Frameworks/GLKit.framework',
-          '$(SDKROOT)/System/Library/Frameworks/ImageIO.framework',
-          '$(SDKROOT)/System/Library/Frameworks/MobileCoreServices.framework',
-          '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
-          '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
-          '$(SDKROOT)/System/Library/Frameworks/Security.framework',
-          '$(SDKROOT)/System/Library/Frameworks/SystemConfiguration.framework',
-          '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
         ],
       },
 
@@ -193,79 +146,6 @@
           'OTHER_LDFLAGS': [ '<@(ldflags)' ],
         },
       },
-
-      'direct_dependent_settings': {
-        'include_dirs': [
-          'include',
-          '../darwin/include',
-          '../include',
-        ],
-        'mac_bundle_resources': [
-          '<!@(find resources -type f \! -name "README" \! -name \'.*\')',
-          '<!@(find ../default/resources -type f \! -name "README" \! -name \'.der\')',
-        ],
-      },
     },
-    {
-      'target_name': 'iossdk',
-      'product_name': 'Mapbox',
-      'type': 'shared_library',
-      'mac_bundle': 1,
-
-      'dependencies': [
-        'platform-lib',
-      ],
-
-      'xcode_settings': {
-        'CLANG_ENABLE_OBJC_ARC': 'YES',
-        'COMBINE_HIDPI_IMAGES': 'NO', # disable combining @2x, @3x images into .tiff files
-        'CURRENT_PROJECT_VERSION': '0',
-        'DEFINES_MODULE': 'YES',
-        'DYLIB_INSTALL_NAME_BASE': '@rpath',
-        'INFOPLIST_FILE': 'framework/Info.plist',
-        'IPHONEOS_DEPLOYMENT_TARGET': '8.0',
-        'LD_RUNPATH_SEARCH_PATHS': [
-          '$(inherited)',
-          '@executable_path/Frameworks',
-          '@loader_path/Frameworks',
-        ],
-        'PRODUCT_BUNDLE_IDENTIFIER': 'com.mapbox.sdk.ios',
-        'OTHER_LDFLAGS': [ '-stdlib=libc++', '-lstdc++' ],
-        'SDKROOT': 'iphoneos',
-        'SKIP_INSTALL': 'YES',
-        'SUPPORTED_PLATFORMS': [
-          'iphonesimulator',
-          'iphoneos',
-        ],
-        'VERSIONING_SYSTEM': 'apple-generic',
-      },
-
-      'mac_framework_headers': [
-        'framework/Mapbox.h',
-        '<!@(find ../{darwin,ios}/include -type f \! -name \'.*\' \! -name Mapbox.h)',
-      ],
-
-      'sources': [
-        'framework/Mapbox.m',
-      ],
-
-      'configurations': {
-        'Debug': {
-          'xcode_settings': {
-            'CODE_SIGN_IDENTITY': 'iPhone Developer',
-            'DEAD_CODE_STRIPPING': 'YES',
-            'GCC_OPTIMIZATION_LEVEL': '0',
-          },
-        },
-        'Release': {
-          'xcode_settings': {
-            'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
-            'CODE_SIGN_IDENTITY': 'iPhone Distribution',
-            'DEAD_CODE_STRIPPING': 'YES',
-            'GCC_OPTIMIZATION_LEVEL': 's',
-          },
-        },
-      },
-    }
   ],
 }

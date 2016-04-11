@@ -79,6 +79,8 @@ Makefile/__project__: $(PLATFORM_CONFIG_OUTPUT)
 
 .PHONY: Xcode/__project__
 Xcode/__project__: $(PLATFORM_CONFIG_OUTPUT)
+	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Exporting gyp variables to xcconfig...$(FORMAT_END)\n"
+	$(ENV) ./scripts/export-xcconfig.py $(PLATFORM_CONFIG_OUTPUT) $(PLATFORM_OUTPUT)/mbgl.xcconfig
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
 	$(ENV) deps/run_gyp platform/$(PLATFORM)/platform.gyp $(GYP_FLAGS) -f xcode$(GYP_FLAVOR_SUFFIX)
 
