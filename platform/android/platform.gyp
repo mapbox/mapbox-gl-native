@@ -5,8 +5,24 @@
   },
   'includes': [
     '../../mbgl.gypi',
+    '../../test/test.gypi',
   ],
   'targets': [
+    {
+      'target_name': 'test-jni-lib',
+      'product_name': 'test-jni-lib',
+      'type': 'shared_library',
+      'hard_dependency': 1,
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+      ],
+
+      'sources': [
+        '../../test/src/main.jni.cpp',
+      ],
+    },
     {
       'target_name': 'platform-lib',
       'product_name': 'mapbox-gl',
@@ -114,6 +130,7 @@
       'dependencies': [
         'platform-lib',
         'example-custom-layer-lib',
+        'test-jni-lib',
       ],
 
       'variables': {

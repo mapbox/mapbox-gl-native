@@ -103,6 +103,8 @@ apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8 android-lib-x
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 test-android:
+	$(RUN) PLATFORM=android SUBPLATFORM=x86 Makefile/test-jni-lib
+	javac test/src/Main.java
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 #### Node targets #####################################################
