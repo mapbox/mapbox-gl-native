@@ -3047,6 +3047,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.locationManager.headingFilter = 5.0;
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
+
+        if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+        {
+            [self.locationManager startUpdatingHeading];
+        }
     }
     else if ( ! shouldEnableLocationServices && self.locationManager)
     {
