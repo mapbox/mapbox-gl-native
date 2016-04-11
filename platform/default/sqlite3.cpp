@@ -338,5 +338,40 @@ void Statement::clearBindings() {
     sqlite3_clear_bindings(stmt);
 }
 
+Transaction::Transaction(Database& db_, Mode mode)
+    : db(db_) {
+    switch (mode) {
+    case Deferred:
+        db.exec("BEGIN DEFERRED TRANSACTION");
+        break;
+    case Immediate:
+        db.exec("BEGIN IMMEDIATE TRANSACTION");
+        break;
+    case Exclusive:
+        db.exec("BEGIN EXCLUSIVE TRANSACTION");
+        break;
+    }
+}
+
+Transaction::~Transaction() {
+    if (needRollback) {
+        try {
+            rollback();
+        } catch (...) {
+            // Ignore failed rollbacks in destructor.
+        }
+    }
+}
+
+void Transaction::commit() {
+    needRollback = false;
+    db.exec("COMMIT TRANSACTION");
+}
+
+void Transaction::rollback() {
+    needRollback = false;
+    db.exec("ROLLBACK TRANSACTION");
+}
+
 } // namespace sqlite
 } // namespace mapbox

@@ -88,5 +88,29 @@ private:
     sqlite3_stmt *stmt = nullptr;
 };
 
+class Transaction {
+private:
+    Transaction(const Transaction&) = delete;
+    Transaction(Transaction&&) = delete;
+    Transaction& operator=(const Transaction&) = delete;
+
+public:
+    enum Mode {
+        Deferred,
+        Immediate,
+        Exclusive
+    };
+
+    Transaction(Database&, Mode = Deferred);
+    ~Transaction();
+
+    void commit();
+    void rollback();
+
+private:
+    Database& db;
+    bool needRollback = true;
+};
+
 }
 }
