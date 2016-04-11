@@ -32,9 +32,9 @@ $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/o
 	cp $< $@
 
 test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
-	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build
+	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build | xcpretty
 	build/osx-x86_64/$(BUILDTYPE)/test || ([[ $$? == 139 || $$? == 134 ]] && cat `ls -t1 ~/Library/Logs/DiagnosticReports/* | head -n1`; exit 1)
-	xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test
+	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test | xcpretty
 
 #### iOS targets ##############################################################
 
@@ -50,9 +50,9 @@ iproj: $(IOS_PROJ_PATH)
 	open $(IOS_PROJ_PATH)
 
 test-ios: $(IOS_PROJ_PATH)
-	xcodebuild -project $(IOS_PROJ_PATH) -configuration $(BUILDTYPE) \
+	set -o pipefail && xcodebuild -project $(IOS_PROJ_PATH) -configuration $(BUILDTYPE) \
 	  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -target test build
+	  -target test build | xcpretty
 	ios-sim start
 	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose
 

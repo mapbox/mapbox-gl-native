@@ -88,7 +88,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             -project ./build/ios-all/platform/ios/platform.xcodeproj \
             -configuration ${BUILDTYPE} \
             -target platform-lib \
-            -jobs ${JOBS}
+            -jobs ${JOBS} | xcpretty
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
@@ -105,7 +105,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             -project ./build/ios-all/platform/ios/platform.xcodeproj \
             -configuration ${BUILDTYPE} \
             -target iossdk \
-            -jobs ${JOBS}
+            -jobs ${JOBS} | xcpretty
     fi
 fi
 
@@ -118,7 +118,7 @@ if [[ ${BUILD_STATIC} == true ]]; then
         -project ./build/ios-all/platform/ios/platform.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target platform-lib \
-        -jobs ${JOBS}
+        -jobs ${JOBS} | xcpretty
 fi
 
 if [[ ${BUILD_DYNAMIC} == true ]]; then
@@ -132,7 +132,7 @@ if [[ ${BUILD_DYNAMIC} == true ]]; then
         -project ./build/ios-all/platform/ios/platform.xcodeproj \
         -configuration ${BUILDTYPE} \
         -target iossdk \
-        -jobs ${JOBS}
+        -jobs ${JOBS} | xcpretty
 fi
 
 LIBS=(core.a platform-ios.a)
