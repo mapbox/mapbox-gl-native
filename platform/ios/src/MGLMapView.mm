@@ -2568,10 +2568,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
 {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays)
     {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
+#endif
 
     [self addAnnotations:overlays];
 }
@@ -2583,10 +2585,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
 {
+#if DEBUG
     for (id <MGLOverlay> overlay in overlays)
     {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"overlay should conform to MGLOverlay");
     }
+#endif
 
     [self removeAnnotations:overlays];
 }
