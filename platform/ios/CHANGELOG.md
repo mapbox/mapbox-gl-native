@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 ## 3.2.1
 
 - Fixed a hang that could occur if the host application attempts to set user defaults on a background queue. ([#4745](https://github.com/mapbox/mapbox-gl-native/pull/4745))
+- User location heading updates now resume properly when an app becomes active again. ([#4674](https://github.com/mapbox/mapbox-gl-native/pull/4674))
 
 ## 3.2.0
 
