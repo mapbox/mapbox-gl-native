@@ -87,7 +87,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 }
 
 - (void)setupBaseURL {
-    NSString *testServerURL = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMetricsTestServerURL"];
+    NSString *testServerURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"MGLTelemetryTestServerURL"];
     if (testServerURL) {
         _baseURL = testServerURL;
         _usesTestServer = YES;

@@ -24,8 +24,6 @@
 	<string>7877</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>MGLMetricsTestServerURL</key>
-	<string>https://cloudfront-staging.tilestream.net</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -40,9 +38,9 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2014–2016 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The map will ALWAYS display the user's location.</string>
+	<string>The map will ALWAYS display the user’s location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The map will display the user's location.</string>
+	<string>The map will display the user’s location.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Default</string>
 	<key>UIMainStoryboardFile</key>
