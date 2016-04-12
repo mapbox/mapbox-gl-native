@@ -11,6 +11,7 @@
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
 		DA482C801C12582600772FE3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; };
 		DA482C811C12582600772FE3 /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DAABF7511CBC78EC005B1825 /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAABF7501CBC78EC005B1825 /* libKIF.a */; };
 		DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */; };
 		DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043360196DBBD500E6F39D /* MGLTViewController.m */; };
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
@@ -24,38 +25,9 @@
 		DD0E6F9D1B01B68E00DC035A /* OHPathHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */; };
 		DDBD016C196DC4740033959E /* MapViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD0168196DC4740033959E /* MapViewTests.m */; };
 		DDBD016D196DC4740033959E /* KIFTestActor+MapboxGL.m in Sources */ = {isa = PBXBuildFile; fileRef = DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */; };
-		DDBD016E196DC4A10033959E /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDBD0144196DC3AE0033959E /* libKIF.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DA3BDF011BA2326400553BD2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 9CC9673B1AD4B1B600576D13;
-			remoteInfo = KIFFramework;
-		};
-		DDBD0143196DC3AE0033959E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EABD46AA1857A0C700A5F081;
-			remoteInfo = KIF;
-		};
-		DDBD0147196DC3AE0033959E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EB60ECC1177F8C83005A041A;
-			remoteInfo = "Test Host";
-		};
-		DDBD0149196DC3AE0033959E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = EABD46CD1857A0F300A5F081;
-			remoteInfo = "KIF Tests";
-		};
 		DDBD0160196DC3D70033959E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DD04331B196DB9BC00E6F39D /* Project object */;
@@ -83,6 +55,7 @@
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
 		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAABF7501CBC78EC005B1825 /* libKIF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKIF.a; path = "KIF/build/Debug-iphonesimulator/libKIF.a"; sourceTree = "<group>"; };
 		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -113,7 +86,6 @@
 		DD0E6F951B01B68E00DC035A /* OHHTTPStubsResponse+JSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OHHTTPStubsResponse+JSON.m"; path = "OHHTTPStubs/OHHTTPStubs/Sources/OHHTTPStubsResponse+JSON.m"; sourceTree = SOURCE_ROOT; };
 		DD0E6F961B01B68E00DC035A /* OHPathHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OHPathHelpers.h; path = OHHTTPStubs/OHHTTPStubs/Sources/OHPathHelpers.h; sourceTree = SOURCE_ROOT; };
 		DD0E6F971B01B68E00DC035A /* OHPathHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OHPathHelpers.m; path = OHHTTPStubs/OHHTTPStubs/Sources/OHPathHelpers.m; sourceTree = SOURCE_ROOT; };
-		DDBD013A196DC3AE0033959E /* KIF.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = KIF.xcodeproj; path = KIF/KIF.xcodeproj; sourceTree = SOURCE_ROOT; };
 		DDBD0152196DC3D70033959E /* Test Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Test Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDBD0165196DC4560033959E /* Bundle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Bundle-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DDBD0168196DC4740033959E /* MapViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewTests.m; sourceTree = SOURCE_ROOT; };
@@ -135,7 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */,
-				DDBD016E196DC4A10033959E /* libKIF.a in Frameworks */,
+				DAABF7511CBC78EC005B1825 /* libKIF.a in Frameworks */,
 				DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -167,6 +139,7 @@
 			children = (
 				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
 				DD0580E71ACB628200B112C9 /* IOKit.framework */,
+				DAABF7501CBC78EC005B1825 /* libKIF.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -247,31 +220,11 @@
 				DDBD016A196DC4740033959E /* KIFTestActor+MapboxGL.m */,
 				DDBD0168196DC4740033959E /* MapViewTests.m */,
 				DDBD0167196DC46B0033959E /* Supporting Files */,
-				DDBD014D196DC3B00033959E /* KIF */,
 				DD0E6F6B1B01906600DC035A /* OCMock */,
 				DD0E6F861B01B67100DC035A /* OHHTTPStubs */,
 			);
 			name = Tests;
 			path = "Mapbox GL Tests";
-			sourceTree = "<group>";
-		};
-		DDBD013B196DC3AE0033959E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				DDBD0144196DC3AE0033959E /* libKIF.a */,
-				DDBD0148196DC3AE0033959E /* Test Host.app */,
-				DDBD014A196DC3AE0033959E /* KIF Tests - XCTest.xctest */,
-				DA3BDF021BA2326400553BD2 /* KIF.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		DDBD014D196DC3B00033959E /* KIF */ = {
-			isa = PBXGroup;
-			children = (
-				DDBD013A196DC3AE0033959E /* KIF.xcodeproj */,
-			);
-			name = KIF;
 			sourceTree = "<group>";
 		};
 		DDBD0167196DC46B0033959E /* Supporting Files */ = {
@@ -347,12 +300,6 @@
 			mainGroup = DD04331A196DB9BC00E6F39D;
 			productRefGroup = DD043324196DB9BC00E6F39D /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = DDBD013B196DC3AE0033959E /* Products */;
-					ProjectRef = DDBD013A196DC3AE0033959E /* KIF.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				DD043322196DB9BC00E6F39D /* Mapbox GL Tests */,
@@ -360,37 +307,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		DA3BDF021BA2326400553BD2 /* KIF.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = KIF.framework;
-			remoteRef = DA3BDF011BA2326400553BD2 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		DDBD0144196DC3AE0033959E /* libKIF.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libKIF.a;
-			remoteRef = DDBD0143196DC3AE0033959E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		DDBD0148196DC3AE0033959E /* Test Host.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "Test Host.app";
-			remoteRef = DDBD0147196DC3AE0033959E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		DDBD014A196DC3AE0033959E /* KIF Tests - XCTest.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "KIF Tests - XCTest.xctest";
-			remoteRef = DDBD0149196DC3AE0033959E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DD043321196DB9BC00E6F39D /* Resources */ = {
@@ -484,6 +400,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SYMROOT = "../../../build/ios-all";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -517,6 +434,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				SDKROOT = iphoneos;
+				SYMROOT = "../../../build/ios-all";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -587,6 +505,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/OCMock",
+					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -620,6 +539,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/OCMock",
+					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
