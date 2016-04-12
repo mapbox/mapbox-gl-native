@@ -565,14 +565,14 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="Preferences" animationBehavior="default" id="UWc-yQ-qda">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="109" y="131" width="350" height="62"/>
+            <rect key="contentRect" x="109" y="131" width="350" height="84"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
             <view key="contentView" id="eA4-n3-qPe">
-                <rect key="frame" x="0.0" y="0.0" width="350" height="62"/>
+                <rect key="frame" x="0.0" y="0.0" width="350" height="84"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0IK-AW-Gg3">
-                        <rect key="frame" x="18" y="23" width="89" height="17"/>
+                        <rect key="frame" x="18" y="45" width="89" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Access token:" id="Ptd-FI-M5A">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -583,7 +583,7 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sb-sf-oJU">
-                        <rect key="frame" x="113" y="20" width="197" height="22"/>
+                        <rect key="frame" x="113" y="42" width="197" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="jlV-TC-NUv">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -594,7 +594,7 @@
                         </connections>
                     </textField>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="c3S-LC-PoX">
-                        <rect key="frame" x="318" y="25" width="12" height="12"/>
+                        <rect key="frame" x="318" y="47" width="12" height="12"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="12" id="M3J-pU-gKn"/>
                         </constraints>
@@ -606,6 +606,16 @@
                             <action selector="openAccessTokenManager:" target="-1" id="1LX-4G-roC"/>
                         </connections>
                     </button>
+                    <button translatesAutoresizingMaskIntoConstraints="NO" id="7IZ-zl-iT1">
+                        <rect key="frame" x="18" y="18" width="109" height="18"/>
+                        <buttonCell key="cell" type="check" title="Scroll to zoom" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="hVR-66-JSh">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <binding destination="45S-yT-WUN" name="value" keyPath="values.MGLScrollWheelZoomsMapView" id="2AZ-bk-DM5"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="c3S-LC-PoX" secondAttribute="trailing" constant="20" symbolic="YES" id="7QU-Jd-Rg6"/>
@@ -613,15 +623,18 @@
                     <constraint firstItem="7sb-sf-oJU" firstAttribute="leading" secondItem="0IK-AW-Gg3" secondAttribute="trailing" constant="8" symbolic="YES" id="SS6-VQ-sLK"/>
                     <constraint firstItem="0IK-AW-Gg3" firstAttribute="leading" secondItem="eA4-n3-qPe" secondAttribute="leading" constant="20" symbolic="YES" id="TYG-io-qfV"/>
                     <constraint firstItem="7sb-sf-oJU" firstAttribute="top" secondItem="eA4-n3-qPe" secondAttribute="top" constant="20" symbolic="YES" id="Vzb-q8-ecP"/>
+                    <constraint firstItem="7IZ-zl-iT1" firstAttribute="leading" secondItem="0IK-AW-Gg3" secondAttribute="leading" id="aIY-WX-AW9"/>
+                    <constraint firstItem="7IZ-zl-iT1" firstAttribute="top" secondItem="7sb-sf-oJU" secondAttribute="bottom" constant="8" symbolic="YES" id="ide-24-GqL"/>
                     <constraint firstItem="c3S-LC-PoX" firstAttribute="leading" secondItem="7sb-sf-oJU" secondAttribute="trailing" constant="8" symbolic="YES" id="pjl-9u-IgM"/>
                     <constraint firstItem="7sb-sf-oJU" firstAttribute="baseline" secondItem="0IK-AW-Gg3" secondAttribute="baseline" id="qIY-Jr-9Ws"/>
+                    <constraint firstAttribute="bottom" secondItem="7IZ-zl-iT1" secondAttribute="bottom" constant="20" symbolic="YES" id="wng-pn-VIz"/>
                     <constraint firstItem="7sb-sf-oJU" firstAttribute="centerY" secondItem="c3S-LC-PoX" secondAttribute="centerY" id="zej-gw-fC0"/>
                 </constraints>
             </view>
             <connections>
                 <outlet property="initialFirstResponder" destination="7sb-sf-oJU" id="UZe-di-dnA"/>
             </connections>
-            <point key="canvasLocation" x="754" y="210"/>
+            <point key="canvasLocation" x="754" y="221"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="45S-yT-WUN"/>
         <window title="Offline Packs" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="MBXOfflinePacksPanel" animationBehavior="default" id="Jjv-gs-Tx6" customClass="NSPanel">

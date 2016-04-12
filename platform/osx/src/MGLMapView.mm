@@ -56,6 +56,9 @@ const CGFloat MGLKeyPanningIncrement = 150;
 /// Degrees that a single press of the rotation keyboard shortcut rotates the map by.
 const CLLocationDegrees MGLKeyRotationIncrement = 25;
 
+/// Key for the user default that, when true, causes the map view to zoom in and out on scroll wheel events.
+NSString * const MGLScrollWheelZoomsMapViewDefaultKey = @"MGLScrollWheelZoomsMapView";
+
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
@@ -192,6 +195,14 @@ public:
 }
 
 #pragma mark Lifecycle
+
++ (void)initialize {
+    if (self == [MGLMapView class]) {
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+            MGLScrollWheelZoomsMapViewDefaultKey: @NO,
+        }];
+    }
+}
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
     if (self = [super initWithFrame:frameRect]) {
@@ -1332,7 +1343,8 @@ public:
 
 - (void)scrollWheel:(NSEvent *)event {
     // https://developer.apple.com/library/mac/releasenotes/AppKit/RN-AppKitOlderNotes/#10_7Dragging
-    if (event.phase == NSEventPhaseNone && event.momentumPhase == NSEventPhaseNone && !event.hasPreciseScrollingDeltas) {
+    BOOL isScrollWheel = event.phase == NSEventPhaseNone && event.momentumPhase == NSEventPhaseNone && !event.hasPreciseScrollingDeltas;
+    if (isScrollWheel || [[NSUserDefaults standardUserDefaults] boolForKey:MGLScrollWheelZoomsMapViewDefaultKey]) {
         // A traditional, vertical scroll wheel zooms instead of panning.
         if (self.zoomEnabled && std::abs(event.scrollingDeltaX) < std::abs(event.scrollingDeltaY)) {
             _mbglMap->cancelTransitions();
