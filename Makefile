@@ -33,7 +33,8 @@ $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/o
 
 test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
 	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build | xcpretty
-	build/osx-x86_64/$(BUILDTYPE)/test || ([[ $$? == 139 || $$? == 134 ]] && cat `ls -t1 ~/Library/Logs/DiagnosticReports/* | head -n1`; exit 1)
+	ulimit -c unlimited && (build/osx-x86_64/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
+	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
 	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test | xcpretty
 
 #### iOS targets ##############################################################
