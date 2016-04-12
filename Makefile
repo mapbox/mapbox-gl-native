@@ -40,6 +40,7 @@ test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcsch
 #### iOS targets ##############################################################
 
 IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
+IOS_WORK_PATH = platform/ios/ios.xcworkspace
 
 $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi test/test.gypi
 	$(RUN) PLATFORM=ios Xcode/__project__
@@ -49,10 +50,10 @@ ios: $(IOS_PROJ_PATH)
 	  ARCHS=i386 ONLY_ACTIVE_ARCH=YES \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -project $(IOS_PROJ_PATH) -target All build | xcpretty
+	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
 
 iproj: $(IOS_PROJ_PATH)
-	open platform/ios/ios.xcworkspace
+	open $(IOS_WORK_PATH)
 
 test-ios: ios
 	ios-sim start
