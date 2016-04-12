@@ -37,6 +37,7 @@
     <string name="activity_user_tracking_mode">User tracking mode</string>
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
+    <string name="activity_debug_mode">Debug Mode</string>
     <string name="activity_offline">Offline Map</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
 
@@ -57,6 +58,7 @@
     <string name="description_visible_bounds">Center the camera around a bounds</string>
     <string name="description_dynamic_marker">Update position and icon</string>
     <string name="description_map_padding">Map Padding example</string>
+    <string name="description_debug_mode">Debug Mode</string>
     <string name="description_offline">Offline Map example</string>
     <string name="description_animated_marker">Animate the position change of a Marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
