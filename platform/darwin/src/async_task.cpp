@@ -29,7 +29,7 @@ public:
     }
 
     ~Impl() {
-        CFRunLoopRemoveSource(loop, source, kCFRunLoopDefaultMode);
+        CFRunLoopSourceInvalidate(source);
         CFRelease(source);
     }
 

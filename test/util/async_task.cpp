@@ -64,6 +64,33 @@ TEST(AsyncTask, DestroyShouldNotRunQueue) {
     EXPECT_EQ(count, 0);
 }
 
+TEST(AsyncTask, DestroyAfterSignaling) {
+    RunLoop loop;
+
+    // We're creating two tasks and signal both of them; the one that gets fired first destroys
+    // the other one. Make sure that the second one we destroyed doesn't fire.
+
+    std::unique_ptr<AsyncTask> task1, task2;
+
+    task1 = std::make_unique<AsyncTask>([&] {
+        task2.reset();
+        if (!task1) {
+            FAIL() << "Task was destroyed but invoked anyway";
+        }
+    });
+    task2 = std::make_unique<AsyncTask>([&] {
+        task1.reset();
+        if (!task2) {
+            FAIL() << "Task was destroyed but invoked anyway";
+        }
+    });
+
+    task1->send();
+    task2->send();
+
+    loop.runOnce();
+}
+
 TEST(AsyncTask, RequestCoalescingMultithreaded) {
     RunLoop loop;
 
