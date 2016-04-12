@@ -44,7 +44,9 @@ $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mb
 	$(RUN) PLATFORM=ios Xcode/__project__
 
 ios: $(IOS_PROJ_PATH)
-	set -o pipefail && xcodebuild -configuration $(BUILDTYPE) -sdk iphonesimulator \
+	set -o pipefail && xcodebuild \
+	  ARCHS=i386 ONLY_ACTIVE_ARCH=YES \
+	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -project $(IOS_PROJ_PATH) -target All build | xcpretty
 
