@@ -31,7 +31,7 @@ Map::Map(View& view_, FileSource& fileSource, MapMode mapMode, GLContextMode con
 
 Map::~Map() {
     resume();
-    context->invoke(&MapContext::cleanup);
+    context->invokeSync(&MapContext::cleanup);
 }
 
 void Map::pause() {
