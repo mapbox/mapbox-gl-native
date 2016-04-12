@@ -40,19 +40,18 @@ test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcsch
 
 IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
 
-ios:
-	$(RUN) PLATFORM=ios Xcode/All
-
 $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi test/test.gypi
 	$(RUN) PLATFORM=ios Xcode/__project__
+
+ios: $(IOS_PROJ_PATH)
+	set -o pipefail && xcodebuild -configuration $(BUILDTYPE) -sdk iphonesimulator \
+	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
+	  -project $(IOS_PROJ_PATH) -target All build | xcpretty
 
 iproj: $(IOS_PROJ_PATH)
 	open $(IOS_PROJ_PATH)
 
-test-ios: $(IOS_PROJ_PATH)
-	set -o pipefail && xcodebuild -project $(IOS_PROJ_PATH) -configuration $(BUILDTYPE) \
-	  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -target test build | xcpretty
+test-ios: ios
 	ios-sim start
 	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose
 
