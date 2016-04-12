@@ -239,6 +239,10 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     // We can't use REPLACE because it would change the id value.
 
+    // Begin an immediate-mode transaction to ensure that two writers do not attempt
+    // to INSERT a resource at the same moment.
+    Transaction transaction(*db, Transaction::Immediate);
+
     Statement update = getStatement(
         "UPDATE resources "
         "SET kind       = ?1, "
@@ -267,6 +271,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     update->run();
     if (db->changes() != 0) {
+        transaction.commit();
         return false;
     }
 
@@ -290,6 +295,8 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     insert->run();
+    transaction.commit();
+
     return true;
 }
 
@@ -380,6 +387,10 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     // We can't use REPLACE because it would change the id value.
 
+    // Begin an immediate-mode transaction to ensure that two writers do not attempt
+    // to INSERT a resource at the same moment.
+    Transaction transaction(*db, Transaction::Immediate);
+
     Statement update = getStatement(
         "UPDATE tiles "
         "SET modified       = ?1, "
@@ -414,6 +425,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     update->run();
     if (db->changes() != 0) {
+        transaction.commit();
         return false;
     }
 
@@ -440,6 +452,8 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     }
 
     insert->run();
+    transaction.commit();
+
     return true;
 }
 
