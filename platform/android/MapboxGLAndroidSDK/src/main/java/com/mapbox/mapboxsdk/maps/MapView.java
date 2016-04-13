@@ -2297,7 +2297,6 @@ public class MapView extends FrameLayout {
      * @param listener The callback that's invoked on every frame rendered to the map view.
      * @see MapView#removeOnMapChangedListener(OnMapChangedListener)
      */
-    @UiThread
     public void addOnMapChangedListener(@Nullable OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.add(listener);
@@ -2310,7 +2309,6 @@ public class MapView extends FrameLayout {
      * @param listener The previously added callback to remove.
      * @see MapView#addOnMapChangedListener(OnMapChangedListener)
      */
-    @UiThread
     public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
         if (listener != null) {
             mOnMapChangedListener.remove(listener);
