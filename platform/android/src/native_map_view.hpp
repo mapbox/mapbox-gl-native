@@ -57,6 +57,7 @@ private:
 
 private:
     JavaVM *vm = nullptr;
+    JNIEnv *env = nullptr;
     jweak obj = nullptr;
 
     ANativeWindow *window = nullptr;
@@ -83,9 +84,6 @@ private:
 
     int availableProcessors = 0;
     size_t totalMemory = 0;
-
-    jboolean renderDetach = false;
-    JNIEnv *renderEnv = nullptr;
 
     // Ensure these are initialised last
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;

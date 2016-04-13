@@ -54,14 +54,15 @@ void log_gl_string(GLenum name, const char *label) {
     }
 }
 
-NativeMapView::NativeMapView(JNIEnv *env, jobject obj_, float pixelRatio_, int availableProcessors_, size_t totalMemory_)
+NativeMapView::NativeMapView(JNIEnv *env_, jobject obj_, float pixelRatio_, int availableProcessors_, size_t totalMemory_)
     : mbgl::View(*this),
+      env(env_),
       pixelRatio(pixelRatio_),
       availableProcessors(availableProcessors_),
       totalMemory(totalMemory_) {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::NativeMapView");
 
-    assert(env != nullptr);
+    assert(env_ != nullptr);
     assert(obj_ != nullptr);
 
     if (env->GetJavaVM(&vm) < 0) {
@@ -104,16 +105,10 @@ NativeMapView::~NativeMapView() {
     map.reset();
     fileSource.reset();
 
-    jint ret;
-    JNIEnv *env = nullptr;
-    ret = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
-    if (ret == JNI_OK) {
-        env->DeleteWeakGlobalRef(obj);
-    } else {
-        mbgl::Log::Error(mbgl::Event::JNI, "GetEnv() failed with %i", ret);
-        throw std::runtime_error("GetEnv() failed");
-    }
+    env->DeleteWeakGlobalRef(obj);
+
     obj = nullptr;
+    env = nullptr;
     vm = nullptr;
 }
 
@@ -133,8 +128,6 @@ void NativeMapView::activate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
 
     assert(vm != nullptr);
-
-    renderDetach = attach_jni_thread(vm, &renderEnv, "Map Thread");
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
         if (!eglMakeCurrent(display, surface, surface, context)) {
@@ -166,8 +159,6 @@ void NativeMapView::deactivate() {
     } else {
         mbgl::Log::Info(mbgl::Event::Android, "Not deactivating as we are not ready");
     }
-
-    detach_jni_thread(vm, &renderEnv, renderDetach);
 }
 
 void NativeMapView::invalidate() {
@@ -176,15 +167,10 @@ void NativeMapView::invalidate() {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    JNIEnv *env = nullptr;
-    bool detach = attach_jni_thread(vm, &env, "NativeMapView::invalidate()");
-
     env->CallVoidMethod(obj, onInvalidateId);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }
-
-    detach_jni_thread(vm, &env, detach);
 }
 
 void NativeMapView::render() {
@@ -661,15 +647,10 @@ void NativeMapView::notifyMapChange(mbgl::MapChange change) {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    JNIEnv *env = nullptr;
-    bool detach = attach_jni_thread(vm, &env, "NativeMapView::notifyMapChange()");
-
     env->CallVoidMethod(obj, onMapChangedId, change);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }
-
-    detach_jni_thread(vm, &env, detach);
 }
 
 void NativeMapView::enableFps(bool enable) {
@@ -703,15 +684,10 @@ void NativeMapView::updateFps() {
     assert(vm != nullptr);
     assert(obj != nullptr);
 
-    JNIEnv *env = nullptr;
-    bool detach = attach_jni_thread(vm, &env, "NativeMapView::updateFps()");
-
     env->CallVoidMethod(obj, onFpsChangedId, fps);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
     }
-
-    detach_jni_thread(vm, &env, detach);
 }
 
 void NativeMapView::resizeView(int w, int h) {
