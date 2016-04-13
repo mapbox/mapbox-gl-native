@@ -469,11 +469,11 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, uiSettings.isZoomGesturesEnabled());
         outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE, uiSettings.isZoomGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, uiSettings.isScrollGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE,uiSettings.isScrollGestureChangeAllowed());
+        outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE, uiSettings.isScrollGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, uiSettings.isRotateGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE,uiSettings.isRotateGestureChangeAllowed());
+        outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE, uiSettings.isRotateGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, uiSettings.isTiltGesturesEnabled());
-        outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE,uiSettings.isTiltGestureChangeAllowed());
+        outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE, uiSettings.isTiltGestureChangeAllowed());
         outState.putBoolean(MapboxConstants.STATE_ZOOM_CONTROLS_ENABLED, uiSettings.isZoomControlsEnabled());
 
         // UiSettings - Compass
@@ -588,6 +588,7 @@ public class MapView extends FrameLayout {
         if (duration != null) {
             actualDuration = duration;
         }
+        mUserLocationView.setTilt(pitch);
         mNativeMapView.setPitch(pitch, actualDuration);
     }
 
@@ -889,58 +890,59 @@ public class MapView extends FrameLayout {
      * Set the user location view default drawable .
      */
     void setUserLocationDrawable(Drawable drawable) {
-        mUserLocationView.setUserLocationDrawable(drawable);
+        mUserLocationView.setForegroundDrawable(drawable);
     }
 
     /**
      * Set the user location view default drawable and its shadow.
      */
     void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mUserLocationView.setUserLocationDrawable(drawable, shadowDrawable);
+        mUserLocationView.setForegroundDrawable(drawable);
+        mUserLocationView.setShadowDrawable(shadowDrawable);
     }
+//
+//    /**
+//     * Set the user location view bearing drawable.
+//     */
+//    void setUserLocationBearingDrawable(Drawable drawable) {
+//        mUserLocationView.setUserLocationBearingDrawable(drawable);
+//    }
+//
+//    /**
+//     * Set the user location view bearing drawable and its shadow.
+//     */
+//    void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
+//        mUserLocationView.setUserLocationBearingDrawable(drawable, shadowDrawable);
+//    }
+//
+//    /**
+//     * Set the stale user location view drawable.
+//     */
+//    void setUserLocationStaleDrawable(Drawable drawable) {
+//        mUserLocationView.setUserLocationStaleDrawable(drawable);
+//    }
+//
+//    /**
+//     * Set the stale user location view drawable and its shadow.
+//     */
+//    void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
+//        mUserLocationView.setUserLocationStaleDrawable(drawable, shadowDrawable);
+//    }
 
-    /**
-     * Set the user location view bearing drawable.
-     */
-    void setUserLocationBearingDrawable(Drawable drawable) {
-        mUserLocationView.setUserLocationBearingDrawable(drawable);
-    }
-
-    /**
-     * Set the user location view bearing drawable and its shadow.
-     */
-    void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mUserLocationView.setUserLocationBearingDrawable(drawable, shadowDrawable);
-    }
-
-    /**
-     * Set the stale user location view drawable.
-     */
-    void setUserLocationStaleDrawable(Drawable drawable) {
-        mUserLocationView.setUserLocationStaleDrawable(drawable);
-    }
-
-    /**
-     * Set the stale user location view drawable and its shadow.
-     */
-    void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mUserLocationView.setUserLocationStaleDrawable(drawable, shadowDrawable);
-    }
-
-    /**
-     * Set the offset of the user location view shadow
-     */
-    void setUserLocationShadowOffset(int x, int y) {
-        mUserLocationView.setUserLocationShadowOffset(x, y);
-    }
-
-    /**
-     * Change the accuracy color
-     * @param color int real color (not a @ColorRes)
-     */
-    void setUserLocationAccuracyColor(int color) {
-        mUserLocationView.setUserLocationAccuracyColor(color);
-    }
+//    /**
+//     * Set the offset of the user location view shadow
+//     */
+//    void setUserLocationShadowOffset(int x, int y) {
+//        mUserLocationView.setUserLocationShadowOffset(x, y);
+//    }
+//
+//    /**
+//     * Change the accuracy color
+//     * @param color int real color (not a @ColorRes)
+//     */
+//    void setUserLocationAccuracyColor(int color) {
+//        mUserLocationView.setUserLocationAccuracyColor(color);
+//    }
 
     //
     // Projection
@@ -955,7 +957,7 @@ public class MapView extends FrameLayout {
     }
 
     PointF toScreenLocation(@NonNull LatLng location) {
-        if (mDestroyed) {
+        if (mDestroyed || location == null) {
             return new PointF();
         }
         PointF  pointF = mNativeMapView.pixelForLatLng(location);
@@ -1125,7 +1127,7 @@ public class MapView extends FrameLayout {
     }
 
     private List<Marker> getMarkersInBounds(@NonNull LatLngBounds bbox) {
-        if (mDestroyed || bbox==null) {
+        if (mDestroyed || bbox == null) {
             return new ArrayList<>();
         }
 
@@ -1838,8 +1840,9 @@ public class MapView extends FrameLayout {
                     mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
                 } else {
                     // around user location view
-                    PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
-                    mNativeMapView.scaleBy(detector.getScaleFactor(), centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
+                    float x = mUserLocationView.getX() + mUserLocationView.getWidth() / 2;
+                    float y = mUserLocationView.getY() + mUserLocationView.getHeight() / 2;
+                    mNativeMapView.scaleBy(detector.getScaleFactor(), x / mScreenDensity, y / mScreenDensity);
                 }
             }
             return true;
@@ -1918,8 +1921,9 @@ public class MapView extends FrameLayout {
                         detector.getFocusY() / mScreenDensity);
             } else {
                 // around center userlocation
-                PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
-                mNativeMapView.setBearing(bearing, centerPoint.x / mScreenDensity, centerPoint.y / mScreenDensity);
+                float x = mUserLocationView.getX() + mUserLocationView.getWidth() / 2;
+                float y = mUserLocationView.getY() + mUserLocationView.getHeight() / 2;
+                mNativeMapView.setBearing(bearing, x / mScreenDensity, y / mScreenDensity);
             }
             return true;
         }

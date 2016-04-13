@@ -592,52 +592,52 @@ public class MapboxMap {
     }
 
     /**
-     * Set the user location view bearing drawable.
-     */
-    public void setUserLocationBearingDrawable(Drawable drawable) {
-        mMapView.setUserLocationBearingDrawable(drawable);
-    }
-
-    /**
-     * Set the user location view bearing drawable and its shadow.
-     */
-    public void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mMapView.setUserLocationBearingDrawable(drawable, shadowDrawable);
-    }
-
-    /**
-     * Set the stale user location view drawable.
-     */
-    public void setUserLocationStaleDrawable(Drawable drawable) {
-        mMapView.setUserLocationStaleDrawable(drawable);
-    }
-
-    /**
-     * Set the stale user location view drawable and its shadow.
-     */
-    public void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mMapView.setUserLocationStaleDrawable(drawable, shadowDrawable);
-    }
-
-
-    /**
-     * Set the offset of the user location view shadow.
-     *
-     * @param x int x offset in pixels
-     * @param y int y offset in pixels
-     */
-    public void setUserLocationShadowOffset(int x, int y) {
-        mMapView.setUserLocationShadowOffset(x, y);
-    }
-
-    /**
-     * Change the accuracy circle (fill and stroke) color of the user location view
-     *
-     * @param color int real color (not a @ColorRes)
-     */
-    public void setUserLocationAccuracyColor(int color) {
-        mMapView.setUserLocationAccuracyColor(color);
-    }
+//     * Set the user location view bearing drawable.
+//     */
+//    public void setUserLocationBearingDrawable(Drawable drawable) {
+//        mMapView.setUserLocationBearingDrawable(drawable);
+//    }
+//
+//    /**
+//     * Set the user location view bearing drawable and its shadow.
+//     */
+//    public void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
+//        mMapView.setUserLocationBearingDrawable(drawable, shadowDrawable);
+//    }
+//
+//    /**
+//     * Set the stale user location view drawable.
+//     */
+//    public void setUserLocationStaleDrawable(Drawable drawable) {
+//        mMapView.setUserLocationStaleDrawable(drawable);
+//    }
+//
+//    /**
+//     * Set the stale user location view drawable and its shadow.
+//     */
+//    public void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
+//        mMapView.setUserLocationStaleDrawable(drawable, shadowDrawable);
+//    }
+//
+//
+//    /**
+//     * Set the offset of the user location view shadow.
+//     *
+//     * @param x int x offset in pixels
+//     * @param y int y offset in pixels
+//     */
+//    public void setUserLocationShadowOffset(int x, int y) {
+//        mMapView.setUserLocationShadowOffset(x, y);
+//    }
+//
+//    /**
+//     * Change the accuracy circle (fill and stroke) color of the user location view
+//     *
+//     * @param color int real color (not a @ColorRes)
+//     */
+//    public void setUserLocationAccuracyColor(int color) {
+//        mMapView.setUserLocationAccuracyColor(color);
+//    }
 
 
     /**
