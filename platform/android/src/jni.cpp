@@ -21,6 +21,7 @@
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <jni/jni.hpp>
 
@@ -1700,6 +1701,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     theJVM = vm;
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
+
+    static mbgl::util::RunLoop mainRunLoop;
 
     mbgl::android::RegisterNativeHTTPRequest(env);
 
