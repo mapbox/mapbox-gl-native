@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -18,6 +17,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.ColorInt;
+import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -50,9 +50,8 @@ public final class UserLocationView extends View {
 
     private float compassDirection;
     private MyBearingListener mBearingChangeListener;
-    private double mCurrentBearing;
-
-    private float gpsDirection;
+//    private double mCurrentBearing;
+//    private float gpsDirection;
 
     // Shadow
     private Drawable backgroundDrawable;
@@ -73,10 +72,10 @@ public final class UserLocationView extends View {
     private int backgroundOffsetRight;
     private int backgroundOffsetBottom;
 
-    private boolean paused;
-    private boolean showMarker;
-    private boolean showDirection;
-    private boolean showAccurancy;
+//    private boolean paused;
+//    private boolean showMarker;
+//    private boolean showDirection;
+//    private boolean showAccurancy;
 
     @MyLocationTracking.Mode
     private int myLocationTrackingMode;
@@ -88,17 +87,17 @@ public final class UserLocationView extends View {
     private Projection projection;
 
     private LatLng markerScreenCoordinate;
-    private LatLng currentMapViewCoordinate;
+    //    private LatLng currentMapViewCoordinate;
     private PointF markerScreenPoint;
 
     private Location location;
     private UserLocationListener userLocationListener;
 
-    private ObjectAnimator mMarkerDirectionAnimator;
+    //    private ObjectAnimator mMarkerDirectionAnimator;
     private ValueAnimator mMarkerCoordinateAnimator;
-    private ObjectAnimator mMarkerAccuracyAnimator;
+//    private ObjectAnimator mMarkerAccuracyAnimator;
 
-    private MapboxMap.OnMyLocationChangeListener onMyLocationChangeListener;
+//    private MapboxMap.OnMyLocationChangeListener onMyLocationChangeListener;
 
     public UserLocationView(Context context) {
         super(context);
@@ -116,8 +115,6 @@ public final class UserLocationView extends View {
     }
 
     private void init(Context context) {
-        markerScreenCoordinate = new LatLng();
-
         viewBounds = new Rect();
 
 //        setBackgroundColor(ContextCompat.getColor(context,android.R.color.darker_gray));
@@ -139,29 +136,27 @@ public final class UserLocationView extends View {
         mBearingChangeListener = new MyBearingListener(context);
     }
 
-    public void setForegroundDrawable(Drawable drawable) {
+    public final void setForegroundDrawable(Drawable drawable) {
         foregroundDrawable = drawable;
-        //TODO remove test only
-//        foregroundDrawable.setAlpha(80);
         invalidateBounds();
     }
 
-    public void setForegroundDrawableTint(@ColorInt int color) {
+    public final void setForegroundDrawableTint(@ColorInt int color) {
         if (foregroundDrawable == null) {
             return;
         }
         foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 
-    public PointF getForegroundCenter() {
+    public final PointF getForegroundCenter() {
         return new PointF(foregroundBounds.centerX(), foregroundBounds.centerY());
     }
 
-    public void setShadowDrawable(Drawable drawable) {
+    public final void setShadowDrawable(Drawable drawable) {
         setShadowDrawable(drawable, 0, 0, 0, 0);
     }
 
-    public void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
+    public final void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
         backgroundDrawable = drawable;
         backgroundOffsetLeft = left;
         backgroundOffsetTop = top;
@@ -170,7 +165,7 @@ public final class UserLocationView extends View {
         invalidateBounds();
     }
 
-    public void setShadowDrawableTint(@ColorInt int color) {
+    public final void setShadowDrawableTint(@ColorInt int color) {
         if (backgroundDrawable == null) {
             return;
         }
@@ -178,7 +173,7 @@ public final class UserLocationView extends View {
         backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 
-    public void setAccurancyTint(@ColorInt int color, @IntRange(from = 0, to = 100) int alpha) {
+    public final void setAccurancyTint(@ColorInt int color, @IntRange(from = 0, to = 100) int alpha) {
         accurancyPaint.setColor(color);
         accurancyPaint.setAlpha(alpha);
     }
@@ -222,6 +217,19 @@ public final class UserLocationView extends View {
         if (foregroundDrawable != null && foregroundBounds != null) {
             getRotateDrawable(foregroundDrawable, compassDirection).draw(canvas);
         }
+
+        if(myLocationTrackingMode==MyLocationTracking.TRACKING_FOLLOW) {
+            setX(markerScreenPoint.x - getWidth() / 2);
+            setY(markerScreenPoint.y - getHeight() / 2);
+        }else{
+            float bearing = 0;
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(markerScreenCoordinate)
+                    .bearing(bearing)
+                    .build();
+            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+        }
+
     }
 
     private Drawable getRotateDrawable(final Drawable d, final float angle) {
@@ -259,18 +267,13 @@ public final class UserLocationView extends View {
         setMeasuredDimension(4 * maxAccurancy, 4 * maxAccurancy);
     }
 
-    //TODO add android annotation for floatrange
-    public void setTilt(double tilt) {
+    public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
         this.tilt = tilt;
         setRotationX((float) tilt);
     }
 
-    public void setDirection(float direction) {
-        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-            compassDirection = direction % 360.0f;
-        } else {
-            gpsDirection = direction % 360.0f;
-        }
+    public void setDirection(@FloatRange(from = 0, to = 360.0f) float direction) {
+        compassDirection = direction % 360.0f;
         updateOnNextFrame();
     }
 //
@@ -289,14 +292,12 @@ public final class UserLocationView extends View {
     }
 
     public void onPause() {
-        paused = true;
 //        mBearingChangeListener.onPause();
 //        cancelAnimations();
         toggleGps(false);
     }
 
     public void onResume() {
-        paused = false;
         if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
 //            mBearingChangeListener.onResume();
         }
@@ -305,71 +306,78 @@ public final class UserLocationView extends View {
         }
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
-
     public void update() {
-        if (isEnabled() && showMarker) {
-            setVisibility(View.VISIBLE);
-
-//            mStaleMarker = isStale(mUserLocation);
-
-            // compute new marker position
-            // TODO add JNI method that takes existing pointf
+        if (isEnabled()) {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+                // show location on map
                 markerScreenPoint = getMarkerScreenPoint();
 
-//                markerScreenPoint = new PointF(((uiSettings.getWidth() - getWidth() + contentPadding[0] - contentPadding[2]) / 2)
-//                        , ((uiSettings.getHeight() - getHeight() - contentPadding[3] + contentPadding[1]) / 2));
-
-                setX(markerScreenPoint.x - getWidth() / 2);
-                setY(markerScreenPoint.y - getHeight() / 2);
             } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                double bearing = 0;
-                if (showDirection) {
-                    bearing = myBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : location.getBearing();
-                } else {
-                    bearing = mapboxMap.getCameraPosition().bearing;
-                }
-
-                if (currentMapViewCoordinate == null) {
-                    currentMapViewCoordinate = mapboxMap.getCameraPosition().target;
-                }
-
-                // only update if there is an actual change
-                if ((!currentMapViewCoordinate.equals(markerScreenCoordinate)) || (!(mCurrentBearing == bearing))) {
-
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(markerScreenCoordinate)
-                            .bearing(bearing)
-                            .build();
-                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
-
-//                    mMarkerScreenMatrix.reset();
-                    markerScreenPoint = getMarkerScreenPoint();
-//                    mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
-
-                    // set values for next check for actual change
-                    currentMapViewCoordinate = markerScreenCoordinate;
-                    mCurrentBearing = bearing;
+                LatLng currentTarget = mapboxMap.getCameraPosition().target;
+                if (!currentTarget.equals(new LatLng(location))) {
+                    getMarkerScreenPoint();
                 }
             }
 
-            // rotate so arrow in points to bearing
-            if (showDirection) {
-                if (myBearingTrackingMode == MyBearingTracking.COMPASS && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                    setDirection(compassDirection);
-//                    mMarkerScreenMatrix.preRotate((float)(mCompassMarkerDirection + mMapboxMap.getCameraPosition().bearing));
-                } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
-                    if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                        setDirection(gpsDirection);
-//                        mMarkerScreenMatrix.preRotate((float)(mGpsMarkerDirection +  mMapboxMap.getCameraPosition().bearing));
-                    } else {
-//                        MarkerScreenMatrix.preRotate(gpsDirection);
-                    }
-                }
-            }
+
+//
+//        if (isEnabled() && showMarker) {
+//            setVisibility(View.VISIBLE);
+//
+////            mStaleMarker = isStale(mUserLocation);
+//
+//            // compute new marker position
+//            // TODO add JNI method that takes existing pointf
+//            if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+//                // show location on map
+//                markerScreenPoint = getMarkerScreenPoint();
+//                setX(markerScreenPoint.x - getWidth() / 2);
+//                setY(markerScreenPoint.y - getHeight() / 2);
+//            } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+//                double bearing = 0;
+//                if (showDirection) {
+//                    bearing = myBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : location.getBearing();
+//                } else {
+//                    bearing = mapboxMap.getCameraPosition().bearing;
+//                }
+//
+//                if (currentMapViewCoordinate == null) {
+//                    currentMapViewCoordinate = mapboxMap.getCameraPosition().target;
+//                }
+//
+//                // only update if there is an actual change
+//                if ((!currentMapViewCoordinate.equals(markerScreenCoordinate)) || (!(mCurrentBearing == bearing))) {
+//
+//                    CameraPosition cameraPosition = new CameraPosition.Builder()
+//                            .target(markerScreenCoordinate)
+//                            .bearing(bearing)
+//                            .build();
+//                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+//
+////                    mMarkerScreenMatrix.reset();
+//                    markerScreenPoint = getMarkerScreenPoint();
+////                    mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
+//
+//                    // set values for next check for actual change
+//                    currentMapViewCoordinate = markerScreenCoordinate;
+//                    mCurrentBearing = bearing;
+//                }
+//            }
+
+//            // rotate so arrow in points to bearing
+//            if (showDirection) {
+//                if (myBearingTrackingMode == MyBearingTracking.COMPASS && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+//                    setDirection(compassDirection);
+////                    mMarkerScreenMatrix.preRotate((float)(mCompassMarkerDirection + mMapboxMap.getCameraPosition().bearing));
+//                } else if (myBearingTrackingMode == MyBearingTracking.GPS) {
+//                    if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+//                        setDirection(gpsDirection);
+////                        mMarkerScreenMatrix.preRotate((float)(mGpsMarkerDirection +  mMapboxMap.getCameraPosition().bearing));
+//                    } else {
+////                        MarkerScreenMatrix.preRotate(gpsDirection);
+//                    }
+//                }
+//            }
 //
 //            // adjust accuracy circle
 //            if (mShowAccuracy && !mStaleMarker) {
@@ -408,8 +416,10 @@ public final class UserLocationView extends View {
 
     public PointF getMarkerScreenPoint() {
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+            // point at a certain latlng
             markerScreenPoint = projection.toScreenLocation(markerScreenCoordinate);
         } else {
+            // center viewport
             int[] contentPadding = mapboxMap.getPadding();
             UiSettings uiSettings = mapboxMap.getUiSettings();
             markerScreenPoint = new PointF(((uiSettings.getWidth() - getWidth() + contentPadding[0] - contentPadding[2]) / 2)
@@ -422,7 +432,6 @@ public final class UserLocationView extends View {
         this.mapboxMap = mapboxMap;
         this.projection = mapboxMap.getProjection();
     }
-
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -468,38 +477,21 @@ public final class UserLocationView extends View {
         return location;
     }
 
-    public void cancelAnimations() {
-        if (mMarkerCoordinateAnimator != null) {
-            mMarkerCoordinateAnimator.cancel();
-            mMarkerCoordinateAnimator = null;
-        }
-
-        if (mMarkerDirectionAnimator != null) {
-            mMarkerDirectionAnimator.cancel();
-            mMarkerDirectionAnimator = null;
-        }
-
-//        if (mMarkerAccuracyAnimator != null) {
-//            mMarkerAccuracyAnimator.cancel();
-//            mMarkerAccuracyAnimator = null;
-//        }
-    }
-
     public void setLocation(Location location) {
-        // if null we should hide the marker
-        if (location == null) {
-            showMarker = false;
-            showDirection = false;
-            showAccurancy = false;
-
-            cancelAnimations();
-
-            location = null;
-            return;
-        }
-
-        cancelAnimations();
-        showMarker = true;
+//        // if null we should hide the marker
+//        if (location == null) {
+//            showMarker = false;
+//            showDirection = false;
+//            showAccurancy = false;
+//
+//            cancelAnimations();
+//
+//            location = null;
+//            return;
+//        }
+//
+//        cancelAnimations();
+//        showMarker = true;
 
         LatLng previousCoordinate;
         if (this.location == null) {
@@ -508,6 +500,7 @@ public final class UserLocationView extends View {
             previousCoordinate = new LatLng(this.location);
         }
 
+        markerScreenCoordinate = new LatLng(location);
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
             // moving marker above map
             mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
@@ -516,53 +509,52 @@ public final class UserLocationView extends View {
                     previousCoordinate, new LatLng(location)
             ));
             mMarkerCoordinateAnimator.start();
-            markerScreenCoordinate = new LatLng(location);
-        } else {
-            // moving map under the tracker
-            markerScreenCoordinate = new LatLng(location);
         }
-
-        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE && myBearingTrackingMode == MyBearingTracking.GPS) {
-            // show GPS direction
-            showDirection = location.hasBearing();
-            if (showDirection) {
-                if (this.location != null && this.location.hasBearing()) {
-                    gpsDirection = this.location.getBearing();
-                }
-                float oldDir = gpsDirection;
-                float newDir = location.getBearing();
-                float diff = oldDir - newDir;
-                if (diff > 180.0f) {
-                    newDir += 360.0f;
-                } else if (diff < -180.0f) {
-                    newDir -= 360.f;
-                }
-                mMarkerDirectionAnimator = ObjectAnimator.ofFloat(this, "direction", oldDir, newDir);
-                mMarkerDirectionAnimator.setDuration(1000);
-                mMarkerDirectionAnimator.start();
-            }
-        } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && myBearingTrackingMode == MyBearingTracking.GPS) {
-            // always show north & rotate map below
-            showDirection = true;
-            gpsDirection = 0;
-        }
-
-        showAccurancy = location.hasAccuracy();
-        if (showAccurancy) {
-            if (this.location != null && this.location.hasAccuracy()) {
-                accurancy = this.location.getAccuracy();
-            }
-            mMarkerAccuracyAnimator = ObjectAnimator.ofFloat(this, "accuracy", location.getAccuracy());
-            mMarkerAccuracyAnimator.setDuration(1000);
-            mMarkerAccuracyAnimator.start();
-        }
-
         this.location = location;
-        updateOnNextFrame();
 
-        if (onMyLocationChangeListener != null) {
-            onMyLocationChangeListener.onMyLocationChange(location);
-        }
+
+//
+//        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE && myBearingTrackingMode == MyBearingTracking.GPS) {
+//            // show GPS direction
+//            showDirection = location.hasBearing();
+//            if (showDirection) {
+//                if (this.location != null && this.location.hasBearing()) {
+//                    gpsDirection = this.location.getBearing();
+//                }
+//                float oldDir = gpsDirection;
+//                float newDir = location.getBearing();
+//                float diff = oldDir - newDir;
+//                if (diff > 180.0f) {
+//                    newDir += 360.0f;
+//                } else if (diff < -180.0f) {
+//                    newDir -= 360.f;
+//                }
+//                mMarkerDirectionAnimator = ObjectAnimator.ofFloat(this, "direction", oldDir, newDir);
+//                mMarkerDirectionAnimator.setDuration(1000);
+//                mMarkerDirectionAnimator.start();
+//            }
+//        } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && myBearingTrackingMode == MyBearingTracking.GPS) {
+//            // always show north & rotate map below
+//            showDirection = true;
+//            gpsDirection = 0;
+//        }
+//
+//        showAccurancy = location.hasAccuracy();
+//        if (showAccurancy) {
+//            if (this.location != null && this.location.hasAccuracy()) {
+//                accurancy = this.location.getAccuracy();
+//            }
+//            mMarkerAccuracyAnimator = ObjectAnimator.ofFloat(this, "accuracy", location.getAccuracy());
+//            mMarkerAccuracyAnimator.setDuration(1000);
+//            mMarkerAccuracyAnimator.start();
+//        }
+//
+//        this.location = location;
+//        updateOnNextFrame();
+//
+//        if (onMyLocationChangeListener != null) {
+//            onMyLocationChangeListener.onMyLocationChange(location);
+//        }
     }
 
     public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
@@ -573,18 +565,18 @@ public final class UserLocationView extends View {
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
         this.myBearingTrackingMode = myBearingTrackingMode;
 
-//        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-//            mShowAccuracy = false;
-//            mShowDirection = true;
-//            mBearingChangeListener.onResume();
-//        } else {
-//            mBearingChangeListener.onPause();
-//            if (myBearingTrackingMode == MyBearingTracking.GPS) {
-//                mShowDirection = (mUserLocation != null) && mUserLocation.hasBearing();
-//            } else {
-//                mShowDirection = false;
-//            }
-//        }
+        if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+//            showAccurancy = false;
+//            showDirection = true;
+            mBearingChangeListener.onResume();
+        } else {
+            mBearingChangeListener.onPause();
+            if (myBearingTrackingMode == MyBearingTracking.GPS) {
+//                showDirection = (location != null) && location.hasBearing();
+            } else {
+//                showDirection = false;
+            }
+        }
         update();
     }
 
@@ -597,42 +589,40 @@ public final class UserLocationView extends View {
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
 
             // center view directly
-//            mMarkerScreenMatrix.reset();
             markerScreenPoint = getMarkerScreenPoint();
             setX(markerScreenPoint.x);
             setY(markerScreenPoint.y);
-//            mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
         }
     }
 
     private void setCompass(float bearing) {
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-            // animate marker
-            showDirection = true;
-            float oldDir = compassDirection;
-            float newDir = bearing;
-            float diff = oldDir - newDir;
-            if (diff > 180.0f) {
-                newDir += 360.0f;
-            } else if (diff < -180.0f) {
-                newDir -= 360.f;
-            }
-            mMarkerDirectionAnimator = ObjectAnimator.ofFloat(this, "direction", oldDir, newDir);
-            mMarkerDirectionAnimator.setDuration(1000);
-            mMarkerDirectionAnimator.start();
-            compassDirection = bearing;
+//            // animate marker
+////            showDirection = true;
+//            float oldDir = compassDirection;
+//            float newDir = bearing;
+//            float diff = oldDir - newDir;
+//            if (diff > 180.0f) {
+//                newDir += 360.0f;
+//            } else if (diff < -180.0f) {
+//                newDir -= 360.f;
+//            }
+//            mMarkerDirectionAnimator = ObjectAnimator.ofFloat(this, "direction", oldDir, newDir);
+//            mMarkerDirectionAnimator.setDuration(1000);
+//            mMarkerDirectionAnimator.start();
+//            compassDirection = bearing;
 
         } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-            cancelAnimations();
-            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
-                // always show north & change map direction
-                showDirection = true;
-                gpsDirection = 0;
-                compassDirection = 0;
-                update();
-            }
+//            cancelAnimations();
+//            if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
+//                // always show north & change map direction
+//                showDirection = true;
+//                gpsDirection = 0;
+//                compassDirection = 0;
+//                update();
+//            }
         } else {
-            showDirection = false;
+//            showDirection = false;
         }
     }
 
@@ -653,7 +643,7 @@ public final class UserLocationView extends View {
         @Override
         public void onLocationChanged(Location location) {
             UserLocationView locationView = mUserLocationView.get();
-            if (locationView != null && !locationView.isPaused()) {
+            if (locationView != null) {
                 locationView.setLocation(location);
             }
         }
@@ -701,9 +691,9 @@ public final class UserLocationView extends View {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (paused) {
-                return;
-            }
+//            if (paused) {
+//                return;
+//            }
 
             long currentTime = SystemClock.elapsedRealtime();
             if (currentTime < mCompassUpdateNextTimestamp) {
