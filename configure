@@ -39,7 +39,8 @@ function print_flags {
         if [ ! -z ${!VERSION:-} ] ; then
             mason install ${NAME} ${!VERSION}
             for FLAGS in "$@" ; do
-                CONFIG+="    '${NAME}_${FLAGS}%': $(quote_flags $(mason ${FLAGS} ${NAME} ${!VERSION})),"$LN
+                flags=$(mason ${FLAGS} ${NAME} ${!VERSION}) || exit 1
+                CONFIG+="    '${NAME}_${FLAGS}%': $(quote_flags $flags),"$LN
             done
         else
             warn "* Not using ${NAME}"
