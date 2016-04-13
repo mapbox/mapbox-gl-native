@@ -118,6 +118,8 @@ public class MapView extends FrameLayout {
     private int mAverageIconWidth;
 
     private NativeMapView mNativeMapView;
+    private boolean mHasSurface = false;
+
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
@@ -1243,6 +1245,10 @@ public class MapView extends FrameLayout {
             return;
         }
 
+        if (!mHasSurface) {
+            return;
+        }
+
         mNativeMapView.render();
     }
 
@@ -1276,12 +1282,16 @@ public class MapView extends FrameLayout {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             mNativeMapView.createSurface(mSurface = new Surface(surface));
             mNativeMapView.resizeFramebuffer(width, height);
+
+            mHasSurface = true;
         }
 
         // Called when the native surface texture has been destroyed
         // Must do all EGL/GL ES destruction here
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            mHasSurface = false;
+
             if (mNativeMapView != null) {
                 mNativeMapView.destroySurface();
             }
