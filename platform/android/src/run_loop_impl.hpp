@@ -27,6 +27,11 @@ public:
         std::list<Runnable*>::iterator iter;
     };
 
+    Impl(RunLoop*, RunLoop::Type);
+    ~Impl();
+
+    void wake();
+
     void addRunnable(Runnable*);
     void removeRunnable(Runnable*);
     void initRunnable(Runnable*);
@@ -35,6 +40,8 @@ public:
 
 private:
     friend RunLoop;
+
+    int fds[2];
 
     JNIEnv *env = nullptr;
     bool detach = false;
