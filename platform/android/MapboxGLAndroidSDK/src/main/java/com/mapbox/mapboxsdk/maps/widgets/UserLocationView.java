@@ -123,13 +123,10 @@ public final class UserLocationView extends View {
 //        setBackgroundColor(ContextCompat.getColor(context,android.R.color.darker_gray));
 
         accurancyPaint = new Paint();
-        accurancyPaint.setColor(Color.RED);
+        accurancyPaint.setColor(ContextCompat.getColor(context, R.color.mapbox_blue));
         accurancyPaint.setAlpha(80);
 
-
         setShadowDrawable(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_shadow));
-        setShadowDrawableTint(Color.BLACK);
-
         setForegroundDrawable(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_bearing));
         setOnClickListener(new OnClickListener() {
             @Override
@@ -138,7 +135,6 @@ public final class UserLocationView extends View {
             }
         });
 
-        setForegroundDrawableTint(Color.RED);
 
         mBearingChangeListener = new MyBearingListener(context);
     }
@@ -327,8 +323,8 @@ public final class UserLocationView extends View {
 //                markerScreenPoint = new PointF(((uiSettings.getWidth() - getWidth() + contentPadding[0] - contentPadding[2]) / 2)
 //                        , ((uiSettings.getHeight() - getHeight() - contentPadding[3] + contentPadding[1]) / 2));
 
-                setX(markerScreenPoint.x-getWidth()/2);
-                setY(markerScreenPoint.y-getHeight()/2);
+                setX(markerScreenPoint.x - getWidth() / 2);
+                setY(markerScreenPoint.y - getHeight() / 2);
             } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 double bearing = 0;
                 if (showDirection) {
@@ -344,23 +340,23 @@ public final class UserLocationView extends View {
                 // only update if there is an actual change
                 if ((!currentMapViewCoordinate.equals(markerScreenCoordinate)) || (!(mCurrentBearing == bearing))) {
 
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(markerScreenCoordinate)
-                                .bearing(bearing)
-                                .build();
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(markerScreenCoordinate)
+                            .bearing(bearing)
+                            .build();
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
 
 //                    mMarkerScreenMatrix.reset();
-                        markerScreenPoint = getMarkerScreenPoint();
+                    markerScreenPoint = getMarkerScreenPoint();
 //                    mMarkerScreenMatrix.setTranslate(mMarkerScreenPoint.x, mMarkerScreenPoint.y);
 
-                        // set values for next check for actual change
-                        currentMapViewCoordinate = markerScreenCoordinate;
-                        mCurrentBearing = bearing;
-                    }
+                    // set values for next check for actual change
+                    currentMapViewCoordinate = markerScreenCoordinate;
+                    mCurrentBearing = bearing;
                 }
+            }
 
-                // rotate so arrow in points to bearing
+            // rotate so arrow in points to bearing
             if (showDirection) {
                 if (myBearingTrackingMode == MyBearingTracking.COMPASS && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
                     setDirection(compassDirection);
@@ -405,10 +401,10 @@ public final class UserLocationView extends View {
 //            mMarkerScreenMatrix.mapRect(mDirtyRectF, largerBounds);
 //            mDirtyRectF.roundOut(mDirtyRect);
 //            invalidate(mDirtyRect); // the new marker location
-            } else {
-                setVisibility(View.INVISIBLE);
-            }
+        } else {
+            setVisibility(View.INVISIBLE);
         }
+    }
 
     public PointF getMarkerScreenPoint() {
         if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {

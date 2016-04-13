@@ -9,6 +9,6 @@
     <dimen name="ten_dp">10dp</dimen>
     <dimen name="sixteen_dp">16dp</dimen>
     <dimen name="seventy_six_dp">76dp</dimen>
-    <dimen name="userlocationview_inner_circle">19dp</dimen>
-    <dimen name="userlocationview_outer_circle">20dp</dimen>
+    <dimen name="userlocationview_inner_circle">18dp</dimen>
+    <dimen name="userlocationview_outer_circle">22dp</dimen>
 </resources>
