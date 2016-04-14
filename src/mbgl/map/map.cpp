@@ -3,9 +3,9 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/property_transition.hpp>
@@ -49,13 +49,17 @@ public:
     RenderState renderState = RenderState::never;
     Transform transform;
 
-    std::unique_ptr<MapData> dataPtr;
-    MapData& data;
+    const MapMode mode;
+    const GLContextMode contextMode;
+    const float pixelRatio;
+
+    MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
     gl::GLObjectStore glObjectStore;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
 
+    std::unique_ptr<AnnotationManager> annotationManager;
     std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
@@ -82,9 +86,11 @@ Map::Impl::Impl(View& view_, FileSource& fileSource_, MapMode mode_, GLContextMo
     : view(view_),
       fileSource(fileSource_),
       transform(view, constrainMode_),
-      dataPtr(std::make_unique<MapData>(mode_, contextMode_, view_.getPixelRatio())),
-      data(*dataPtr),
+      mode(mode_),
+      contextMode(contextMode_),
+      pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
+      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
       texturePool(std::make_unique<gl::TexturePool>()) {
 }
 
@@ -98,7 +104,7 @@ Map::~Map() {
     impl->style.reset();
     impl->painter.reset();
     impl->texturePool.reset();
-    impl->dataPtr.reset();
+    impl->annotationManager.reset();
 
     impl->glObjectStore.performCleanup();
 
@@ -111,7 +117,7 @@ void Map::renderStill(StillImageCallback callback) {
         return;
     }
 
-    if (impl->data.mode != MapMode::Still) {
+    if (impl->mode != MapMode::Still) {
         callback(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")), {});
         return;
     }
@@ -189,7 +195,7 @@ void Map::Impl::update() {
         updateFlags = Update::Nothing;
     }
 
-    if (updateFlags == Update::Nothing || (data.mode == MapMode::Still && !callback)) {
+    if (updateFlags == Update::Nothing || (mode == MapMode::Still && !callback)) {
         return;
     }
 
@@ -199,33 +205,33 @@ void Map::Impl::update() {
     timePoint = Clock::now();
 
     if (style->loaded && updateFlags & Update::Annotations) {
-        data.getAnnotationManager()->updateStyle(*style);
+        annotationManager->updateStyle(*style);
         updateFlags |= Update::Classes;
     }
 
     if (updateFlags & Update::Classes) {
-        style->cascade(timePoint, data.mode);
+        style->cascade(timePoint, mode);
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transformState.getZoom(), timePoint, data.mode);
+        style->recalculate(transformState.getZoom(), timePoint, mode);
     }
 
-    StyleUpdateParameters parameters(data.pixelRatio,
-                                     data.getDebug(),
+    StyleUpdateParameters parameters(pixelRatio,
+                                     debugOptions,
                                      timePoint,
                                      transformState,
                                      style->workers,
                                      fileSource,
                                      *texturePool,
                                      style->shouldReparsePartialTiles,
-                                     data.mode,
-                                     *data.getAnnotationManager(),
+                                     mode,
+                                     *annotationManager,
                                      *style);
 
     style->update(parameters);
 
-    if (data.mode == MapMode::Continuous) {
+    if (mode == MapMode::Continuous) {
         view.invalidate();
     } else if (callback && style->isLoaded()) {
         view.activate();
@@ -245,16 +251,16 @@ void Map::Impl::render() {
 
     FrameData frameData { view.getFramebufferSize(),
                           timePoint,
-                          data.pixelRatio,
-                          data.mode,
-                          data.contextMode,
-                          data.getDebug() };
+                          pixelRatio,
+                          mode,
+                          contextMode,
+                          debugOptions };
 
     painter->render(*style,
                     frameData,
-                    data.getAnnotationManager()->getSpriteAtlas());
+                    annotationManager->getSpriteAtlas());
 
-    if (data.mode == MapMode::Still) {
+    if (mode == MapMode::Still) {
         callback(nullptr, view.readStillImage());
         callback = nullptr;
     }
@@ -285,7 +291,7 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleURL = url;
     impl->styleJSON.clear();
 
-    impl->style = std::make_unique<Style>(impl->fileSource, impl->data.pixelRatio);
+    impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     const size_t pos = impl->styleURL.rfind('/');
     std::string base = "";
@@ -320,7 +326,7 @@ void Map::setStyleJSON(const std::string& json, const std::string& base) {
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
-    impl->style = std::make_unique<Style>(impl->fileSource, impl->data.pixelRatio);
+    impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
     impl->loadStyleJSON(json, base);
 }
@@ -331,7 +337,7 @@ void Map::Impl::loadStyleJSON(const std::string& json, const std::string& base) 
     styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
-    style->cascade(Clock::now(), data.mode);
+    style->cascade(Clock::now(), mode);
 
     updateFlags |= Update::Classes | Update::RecalculateStyle | Update::Annotations;
     asyncUpdate.send();
@@ -657,15 +663,15 @@ LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {
 #pragma mark - Annotations
 
 void Map::addAnnotationIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {
-    impl->data.getAnnotationManager()->addIcon(name, sprite);
+    impl->annotationManager->addIcon(name, sprite);
 }
 
 void Map::removeAnnotationIcon(const std::string& name) {
-    impl->data.getAnnotationManager()->removeIcon(name);
+    impl->annotationManager->removeIcon(name);
 }
 
 double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
-    return impl->data.getAnnotationManager()->getTopOffsetPixelsForIcon(name);
+    return impl->annotationManager->getTopOffsetPixelsForIcon(name);
 }
 
 AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
@@ -673,7 +679,7 @@ AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
 }
 
 AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
-    auto result = impl->data.getAnnotationManager()->addPointAnnotations(annotations, getMaxZoom());
+    auto result = impl->annotationManager->addPointAnnotations(annotations, getMaxZoom());
     update(Update::Annotations);
     return result;
 }
@@ -683,13 +689,13 @@ AnnotationID Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
 }
 
 AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
-    auto result = impl->data.getAnnotationManager()->addShapeAnnotations(annotations, getMaxZoom());
+    auto result = impl->annotationManager->addShapeAnnotations(annotations, getMaxZoom());
     update(Update::Annotations);
     return result;
 }
 
 void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
-    impl->data.getAnnotationManager()->updatePointAnnotation(annotationId, annotation, getMaxZoom());
+    impl->annotationManager->updatePointAnnotation(annotationId, annotation, getMaxZoom());
     update(Update::Annotations);
 }
 
@@ -698,12 +704,12 @@ void Map::removeAnnotation(AnnotationID annotation) {
 }
 
 void Map::removeAnnotations(const AnnotationIDs& annotations) {
-    impl->data.getAnnotationManager()->removeAnnotations(annotations);
+    impl->annotationManager->removeAnnotations(annotations);
     update(Update::Annotations);
 }
 
 AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
-    return impl->data.getAnnotationManager()->getPointAnnotationsInBounds(bounds);
+    return impl->annotationManager->getPointAnnotationsInBounds(bounds);
 }
 
 #pragma mark - Style API
@@ -737,18 +743,28 @@ void Map::removeCustomLayer(const std::string& id) {
 
 #pragma mark - Toggles
 
-void Map::setDebug(MapDebugOptions mode) {
-    impl->data.setDebug(mode);
+void Map::setDebug(MapDebugOptions debugOptions) {
+    impl->debugOptions = debugOptions;
     update(Update::Repaint);
 }
 
 void Map::cycleDebugOptions() {
-    impl->data.cycleDebugOptions();
+    if (impl->debugOptions & MapDebugOptions::Collision)
+        impl->debugOptions = MapDebugOptions::NoDebug;
+    else if (impl->debugOptions & MapDebugOptions::Timestamps)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::Collision;
+    else if (impl->debugOptions & MapDebugOptions::ParseStatus)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::Timestamps;
+    else if (impl->debugOptions & MapDebugOptions::TileBorders)
+        impl->debugOptions = impl->debugOptions | MapDebugOptions::ParseStatus;
+    else
+        impl->debugOptions = MapDebugOptions::TileBorders;
+
     update(Update::Repaint);
 }
 
 MapDebugOptions Map::getDebug() const {
-    return impl->data.getDebug();
+    return impl->debugOptions;
 }
 
 bool Map::isFullyLoaded() const {
@@ -801,7 +817,7 @@ void Map::Impl::onResourceLoaded() {
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
-    if (data.mode == MapMode::Still && callback) {
+    if (mode == MapMode::Still && callback) {
         callback(error, {});
         callback = nullptr;
     }

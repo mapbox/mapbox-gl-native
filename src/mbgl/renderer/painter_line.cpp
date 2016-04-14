@@ -2,7 +2,6 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/layer/line_layer.hpp>
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>

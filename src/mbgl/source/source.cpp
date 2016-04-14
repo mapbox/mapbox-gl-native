@@ -1,5 +1,4 @@
 #include <mbgl/source/source.hpp>
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/vector_tile.hpp>

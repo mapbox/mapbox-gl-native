@@ -1,7 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
-#include <mbgl/map/map_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/io.hpp>
 
