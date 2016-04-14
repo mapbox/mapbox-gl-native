@@ -81,13 +81,17 @@ static const int benchmarkDuration = 200; // frames
         // Do nothing. The benchmark is completed.
         NSLog(@"Benchmark completed.");
         NSLog(@"Result:");
+        double totalFPS = 0;
         size_t colWidth = 0;
         for (const auto& row : result) {
             colWidth = std::max(row.first.size(), colWidth);
         }
         for (const auto& row : result) {
             NSLog(@"| %-*s | %4.1f fps |", int(colWidth), row.first.c_str(), row.second);
+            totalFPS += row.second;
         }
+        NSLog(@"Total FPS: %4.1f", totalFPS);
+        NSLog(@"Average FPS: %4.1f", totalFPS / result.size());
         exit(0);
     }
 }
