@@ -61,7 +61,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
-    if (data.mode == MapMode::Continuous) {
+    if (frame.mapMode == MapMode::Continuous) {
         FadeProperties f = frameHistory.getFadeProperties(frame.timePoint, util::DEFAULT_FADE_DURATION);
         sdfShader.u_fadedist = f.fadedist * 10;
         sdfShader.u_minfadezoom = std::floor(f.minfadezoom * 10);
@@ -76,7 +76,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
     // drawing blurry font on retina screens.
-    const float gamma = 0.105 * sdfFontSize / fontSize / data.pixelRatio;
+    const float gamma = 0.105 * sdfFontSize / fontSize / frame.pixelRatio;
 
     const float sdfPx = 8.0f;
     const float blurOffset = 1.19f;
@@ -138,7 +138,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
     config.depthMask = GL_FALSE;
 
     // TODO remove the `true ||` when #1673 is implemented
-    const bool drawAcrossEdges = (data.mode == MapMode::Continuous) && (true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
+    const bool drawAcrossEdges = (frame.mapMode == MapMode::Continuous) && (true || !(layout.text.allowOverlap || layout.icon.allowOverlap ||
           layout.text.ignorePlacement || layout.icon.ignorePlacement));
 
     // Disable the stencil test so that labels aren't clipped to tile boundaries.
@@ -172,7 +172,7 @@ void Painter::renderSymbol(SymbolBucket& bucket, const SymbolLayer& layer, const
         const float fontScale = fontSize / 1.0f;
 
         SpriteAtlas* activeSpriteAtlas = layer.spriteAtlas;
-        const bool iconScaled = fontScale != 1 || data.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
+        const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = layout.icon.rotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
         config.activeTexture = GL_TEXTURE0;
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, glObjectStore);

@@ -17,7 +17,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     // Abort early.
     if (pass == RenderPass::Opaque) return;
 
-    config.stencilTest = data.mode == MapMode::Still ? GL_TRUE : GL_FALSE;
+    config.stencilTest = frame.mapMode == MapMode::Still ? GL_TRUE : GL_FALSE;
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
@@ -36,7 +36,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     // a faux-antialiasing for the circle. since blur is a ratio of the circle's
     // size and the intent is to keep the blur at roughly 1px, the two
     // are inversely related.
-    float antialiasing = 1 / data.pixelRatio / properties.radius;
+    float antialiasing = 1 / frame.pixelRatio / properties.radius;
 
     config.program = circleShader->getID();
 

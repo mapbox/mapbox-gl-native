@@ -27,7 +27,6 @@
 
 namespace mbgl {
 
-class MapData;
 class Style;
 class StyleLayer;
 class Tile;
@@ -76,11 +75,15 @@ class GLObjectStore;
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;
     TimePoint timePoint;
+    float pixelRatio;
+    MapMode mapMode;
+    GLContextMode contextMode;
+    MapDebugOptions debugOptions;
 };
 
 class Painter : private util::noncopyable {
 public:
-    Painter(MapData&, TransformState&, gl::GLObjectStore&);
+    Painter(TransformState&, gl::GLObjectStore&);
     ~Painter();
 
     void render(const Style& style,
@@ -152,7 +155,6 @@ private:
         return identity;
     }();
 
-    MapData& data;
     TransformState& state;
     gl::GLObjectStore& glObjectStore;
 

@@ -68,7 +68,7 @@ public:
     Map::StillImageCallback callback;
     size_t sourceCacheSize;
     TransformState transformState;
-    FrameData frameData;
+    TimePoint timePoint;
     bool loading = false;
 };
 
@@ -132,9 +132,6 @@ void Map::renderStill(StillImageCallback callback) {
     }
 
     impl->callback = callback;
-    impl->transformState = impl->transform.getState();
-    impl->frameData = FrameData{ impl->view.getFramebufferSize(), Clock::now() };
-
     impl->updateFlags |= Update::RenderStill;
     impl->asyncUpdate.send();
 }
@@ -162,9 +159,6 @@ void Map::render() {
     impl->view.notifyMapChange(MapChangeWillStartRenderingFrame);
 
     const Update flags = impl->transform.updateTransitions(Clock::now());
-
-    impl->transformState = impl->transform.getState();
-    impl->frameData = FrameData { impl->view.getFramebufferSize(), Clock::now() };
 
     impl->render();
 
@@ -202,7 +196,7 @@ void Map::Impl::update() {
     // This time point is used to:
     // - Calculate style property transitions;
     // - Hint style sources to notify when all its tiles are loaded;
-    frameData.timePoint = Clock::now();
+    timePoint = Clock::now();
 
     if (style->loaded && updateFlags & Update::Annotations) {
         data.getAnnotationManager()->updateStyle(*style);
@@ -210,16 +204,16 @@ void Map::Impl::update() {
     }
 
     if (updateFlags & Update::Classes) {
-        style->cascade(frameData.timePoint, data.mode);
+        style->cascade(timePoint, data.mode);
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transformState.getZoom(), frameData.timePoint, data.mode);
+        style->recalculate(transformState.getZoom(), timePoint, data.mode);
     }
 
     StyleUpdateParameters parameters(data.pixelRatio,
                                      data.getDebug(),
-                                     frameData.timePoint,
+                                     timePoint,
                                      transformState,
                                      style->workers,
                                      fileSource,
@@ -243,9 +237,18 @@ void Map::Impl::update() {
 }
 
 void Map::Impl::render() {
+    transformState = transform.getState();
+
     if (!painter) {
-        painter = std::make_unique<Painter>(data, transformState, glObjectStore);
+        painter = std::make_unique<Painter>(transformState, glObjectStore);
     }
+
+    FrameData frameData { view.getFramebufferSize(),
+                          timePoint,
+                          data.pixelRatio,
+                          data.mode,
+                          data.contextMode,
+                          data.getDebug() };
 
     painter->render(*style,
                     frameData,

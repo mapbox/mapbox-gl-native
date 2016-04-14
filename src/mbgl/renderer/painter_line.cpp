@@ -27,7 +27,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
 
     // the distance over which the line edge fades out.
     // Retina devices need a smaller distance to avoid aliasing.
-    float antialiasing = 1.0 / data.pixelRatio;
+    float antialiasing = 1.0 / frame.pixelRatio;
 
     float blur = properties.blur + antialiasing;
     float edgeWidth = properties.width / 2.0;
@@ -94,7 +94,7 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_tex_y_a = posA.y;
         linesdfShader->u_patternscale_b = {{ scaleXB, scaleYB }};
         linesdfShader->u_tex_y_b = posB.y;
-        linesdfShader->u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * data.pixelRatio) / 2;
+        linesdfShader->u_sdfgamma = lineAtlas->width / (std::min(widthA, widthB) * 256.0 * frame.pixelRatio) / 2;
         linesdfShader->u_mix = properties.dasharray.value.t;
         linesdfShader->u_extra = extra;
         linesdfShader->u_offset = -properties.offset;

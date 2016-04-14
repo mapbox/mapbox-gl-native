@@ -12,12 +12,12 @@ using namespace mbgl;
 void Painter::renderTileDebug(const Tile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + std::string(tile.id));
     assert(tile.data);
-    if (data.getDebug() != MapDebugOptions::NoDebug) {
+    if (frame.debugOptions != MapDebugOptions::NoDebug) {
         setClipping(tile.clip);
-        if (data.getDebug() & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
+        if (frame.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
             renderDebugText(*tile.data, tile.matrix);
         }
-        if (data.getDebug() & MapDebugOptions::TileBorders) {
+        if (frame.debugOptions & MapDebugOptions::TileBorders) {
             renderDebugFrame(tile.matrix);
         }
     }
@@ -31,8 +31,8 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
     if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()
                               || !(tileData.debugBucket->modified == tileData.modified)
                               || !(tileData.debugBucket->expires == tileData.expires)
-                              || tileData.debugBucket->debugMode != data.getDebug()) {
-        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, data.getDebug());
+                              || tileData.debugBucket->debugMode != frame.debugOptions) {
+        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, frame.debugOptions);
     }
 
     config.program = plainShader->getID();
@@ -40,7 +40,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
 
     // Draw white outline
     plainShader->u_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-    config.lineWidth = 4.0f * data.pixelRatio;
+    config.lineWidth = 4.0f * frame.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader, glObjectStore);
 
 #ifndef GL_ES_VERSION_2_0
@@ -51,7 +51,7 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
 
     // Draw black text.
     plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-    config.lineWidth = 2.0f * data.pixelRatio;
+    config.lineWidth = 2.0f * frame.pixelRatio;
     tileData.debugBucket->drawLines(*plainShader, glObjectStore);
 
     config.depthFunc.reset();
@@ -74,6 +74,6 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET_0, glObjectStore);
     plainShader->u_color = {{ 1.0f, 0.0f, 0.0f, 1.0f }};
-    config.lineWidth = 4.0f * data.pixelRatio;
+    config.lineWidth = 4.0f * frame.pixelRatio;
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }
