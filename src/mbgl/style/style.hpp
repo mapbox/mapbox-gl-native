@@ -7,6 +7,7 @@
 #include <mbgl/source/source.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/map/mode.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -19,7 +20,6 @@
 
 namespace mbgl {
 
-class MapData;
 class FileSource;
 class GlyphAtlas;
 class GlyphStore;
@@ -27,11 +27,9 @@ class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
 class StyleLayer;
-class TransformState;
 class Tile;
 class Bucket;
-
-namespace gl { class TexturePool; }
+class StyleUpdateParameters;
 
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
@@ -56,7 +54,7 @@ class Style : public GlyphStore::Observer,
               public Source::Observer,
               public util::noncopyable {
 public:
-    Style(MapData&, FileSource&);
+    Style(FileSource&, float pixelRatio);
     ~Style();
 
     class Observer : public GlyphStore::Observer,
@@ -81,10 +79,10 @@ public:
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const TransformState&, const TimePoint&, gl::TexturePool&);
+    void update(const StyleUpdateParameters&);
 
-    void cascade(const TimePoint&);
-    void recalculate(float z, const TimePoint&);
+    void cascade(const TimePoint&, MapMode);
+    void recalculate(float z, const TimePoint&, MapMode);
 
     bool hasTransitions() const;
 
@@ -114,7 +112,6 @@ public:
 
     void dumpDebugLogs() const;
 
-    MapData& data;
     FileSource& fileSource;
     std::unique_ptr<GlyphStore> glyphStore;
     std::unique_ptr<GlyphAtlas> glyphAtlas;
@@ -145,8 +142,6 @@ private:
     void onTileError(Source&, const TileID&, std::exception_ptr) override;
     void onPlacementRedone() override;
 
-    bool shouldReparsePartialTiles = false;
-
     Observer nullObserver;
     Observer* observer = &nullObserver;
 
@@ -156,6 +151,7 @@ private:
     bool hasPendingTransitions = false;
 
 public:
+    bool shouldReparsePartialTiles = false;
     bool loaded = false;
     Worker workers;
 };

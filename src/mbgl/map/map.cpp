@@ -9,6 +9,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/style_update_parameters.hpp>
 #include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -209,14 +210,26 @@ void Map::Impl::update() {
     }
 
     if (updateFlags & Update::Classes) {
-        style->cascade(frameData.timePoint);
+        style->cascade(frameData.timePoint, data.mode);
     }
 
     if (updateFlags & Update::Classes || updateFlags & Update::RecalculateStyle) {
-        style->recalculate(transformState.getZoom(), frameData.timePoint);
+        style->recalculate(transformState.getZoom(), frameData.timePoint, data.mode);
     }
 
-    style->update(transformState, frameData.timePoint, *texturePool);
+    StyleUpdateParameters parameters(data.pixelRatio,
+                                     data.getDebug(),
+                                     frameData.timePoint,
+                                     transformState,
+                                     style->workers,
+                                     fileSource,
+                                     *texturePool,
+                                     style->shouldReparsePartialTiles,
+                                     data.mode,
+                                     *data.getAnnotationManager(),
+                                     *style);
+
+    style->update(parameters);
 
     if (data.mode == MapMode::Continuous) {
         view.invalidate();
@@ -269,7 +282,7 @@ void Map::setStyleURL(const std::string& url) {
     impl->styleURL = url;
     impl->styleJSON.clear();
 
-    impl->style = std::make_unique<Style>(impl->data, impl->fileSource);
+    impl->style = std::make_unique<Style>(impl->fileSource, impl->data.pixelRatio);
 
     const size_t pos = impl->styleURL.rfind('/');
     std::string base = "";
@@ -304,7 +317,7 @@ void Map::setStyleJSON(const std::string& json, const std::string& base) {
 
     impl->styleURL.clear();
     impl->styleJSON.clear();
-    impl->style = std::make_unique<Style>(impl->data, impl->fileSource);
+    impl->style = std::make_unique<Style>(impl->fileSource, impl->data.pixelRatio);
 
     impl->loadStyleJSON(json, base);
 }
@@ -315,7 +328,7 @@ void Map::Impl::loadStyleJSON(const std::string& json, const std::string& base) 
     styleJSON = json;
 
     // force style cascade, causing all pending transitions to complete.
-    style->cascade(Clock::now());
+    style->cascade(Clock::now(), data.mode);
 
     updateFlags |= Update::Classes | Update::RecalculateStyle | Update::Annotations;
     asyncUpdate.send();

@@ -10,15 +10,14 @@ using namespace mbgl;
 TEST(Style, UnusedSource) {
     util::RunLoop loop;
 
-    MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
     StubFileSource fileSource;
-    Style style { data, fileSource };
+    Style style { fileSource, 1.0 };
 
     auto now = Clock::now();
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"), "");
-    style.cascade(now);
-    style.recalculate(0, now);
+    style.cascade(now, MapMode::Still);
+    style.recalculate(0, now, MapMode::Still);
 
     Source *usedSource = style.getSource("usedsource");
     EXPECT_TRUE(usedSource);
@@ -32,9 +31,8 @@ TEST(Style, UnusedSource) {
 TEST(Style, UnusedSourceActiveViaClassUpdate) {
     util::RunLoop loop;
 
-    MapData data { MapMode::Still, GLContextMode::Unique, 1.0 };
     StubFileSource fileSource;
-    Style style { data, fileSource };
+    Style style { fileSource, 1.0 };
 
     style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"), "");
     EXPECT_TRUE(style.addClass("visible"));
@@ -42,8 +40,8 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
 
     auto now = Clock::now();
 
-    style.cascade(now);
-    style.recalculate(0, now);
+    style.cascade(now, MapMode::Still);
+    style.recalculate(0, now, MapMode::Still);
 
     Source *unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);
@@ -55,8 +53,8 @@ TEST(Style, UnusedSourceActiveViaClassUpdate) {
 
     now = Clock::now();
 
-    style.cascade(now);
-    style.recalculate(0, now);
+    style.cascade(now, MapMode::Still);
+    style.recalculate(0, now, MapMode::Still);
 
     unusedSource = style.getSource("unusedsource");
     EXPECT_TRUE(unusedSource);

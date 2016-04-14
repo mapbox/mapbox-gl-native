@@ -57,13 +57,12 @@ std::vector<std::string> Style::getClasses() const {
     return classes;
 }
 
-Style::Style(MapData& data_, FileSource& fileSource_)
-    : data(data_),
-      fileSource(fileSource_),
+Style::Style(FileSource& fileSource_, float pixelRatio)
+    : fileSource(fileSource_),
       glyphStore(std::make_unique<GlyphStore>(fileSource)),
       glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteStore(std::make_unique<SpriteStore>(data.pixelRatio)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, data.pixelRatio, *spriteStore)),
+      spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(256, 512)),
       workers(4) {
     glyphStore->setObserver(this);
@@ -147,20 +146,8 @@ void Style::removeLayer(const std::string& id) {
     layers.erase(it);
 }
 
-void Style::update(const TransformState& transform, const TimePoint& timePoint,
-                   gl::TexturePool& texturePool) {
+void Style::update(const StyleUpdateParameters& parameters) {
     bool allTilesUpdated = true;
-    StyleUpdateParameters parameters(data.pixelRatio,
-                                     data.getDebug(),
-                                     timePoint,
-                                     transform,
-                                     workers,
-                                     fileSource,
-                                     texturePool,
-                                     shouldReparsePartialTiles,
-                                     data.mode,
-                                     *data.getAnnotationManager(),
-                                     *this);
 
     for (const auto& source : sources) {
         if (!source->update(parameters)) {
@@ -175,7 +162,7 @@ void Style::update(const TransformState& transform, const TimePoint& timePoint,
     }
 }
 
-void Style::cascade(const TimePoint& timePoint) {
+void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     // When in continuous mode, we can either have user- or style-defined
     // transitions. Still mode is always immediate.
     static const PropertyTransition immediateTransition;
@@ -190,7 +177,7 @@ void Style::cascade(const TimePoint& timePoint) {
     const StyleCascadeParameters parameters {
         classIDs,
         timePoint,
-        data.mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
+        mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
     };
 
     transitionProperties = {};
@@ -200,7 +187,7 @@ void Style::cascade(const TimePoint& timePoint) {
     }
 }
 
-void Style::recalculate(float z, const TimePoint& timePoint) {
+void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
     for (const auto& source : sources) {
         source->enabled = false;
     }
@@ -211,7 +198,7 @@ void Style::recalculate(float z, const TimePoint& timePoint) {
         z,
         timePoint,
         zoomHistory,
-        data.mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
+        mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
 
     hasPendingTransitions = false;
