@@ -50,12 +50,42 @@ public class SupportMapFragment extends Fragment {
      * @return MapFragment created.
      */
     public static SupportMapFragment newInstance(@Nullable MapboxMapOptions mapboxMapOptions) {
-        SupportMapFragment mapFragment = new SupportMapFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
-        mapFragment.setArguments(bundle);
+        return newInstance(mapboxMapOptions, null);
+    }
+
+    /**
+     * Creates a MapFragment instance
+     *
+     * @param onMapReadyCallback Callback when map ready.
+     * @return MapFragment created.
+     */
+    public static SupportMapFragment newInstance(@Nullable OnMapReadyCallback onMapReadyCallback) {
+        SupportMapFragment mapFragment = newInstance(null, onMapReadyCallback);
+        if(onMapReadyCallback != null)
+            mapFragment.mOnMapReadyCallback = onMapReadyCallback;
         return mapFragment;
     }
+
+    /**
+     * Creates a MapFragment instance
+     *
+     * @param mapboxMapOptions The configuration options to be used.
+     * @param onMapReadyCallback Callback when map ready.
+     * @return MapFragment created.
+     */
+    public static SupportMapFragment newInstance(MapboxMapOptions mapboxMapOptions, OnMapReadyCallback onMapReadyCallback) {
+        SupportMapFragment mapFragment = newInstance();
+        if(onMapReadyCallback != null)
+            mapFragment.mOnMapReadyCallback = onMapReadyCallback;
+        if(mapboxMapOptions != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(MapboxConstants.FRAG_ARG_MAPBOXMAPOPTIONS, mapboxMapOptions);
+            mapFragment.setArguments(bundle);
+        }
+        return mapFragment;
+    }
+
+
 
     /**
      * Creates the fragment view hierarchy.
