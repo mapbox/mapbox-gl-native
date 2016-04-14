@@ -586,17 +586,13 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
 TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     using namespace mbgl;
 
-    Log::setObserver(std::make_unique<FixtureLogObserver>());
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response big;
     big.data = randomString(1024 * 100);
-    db.put(Resource::style("http://example.com/big"), big);
-    EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
 
-    auto observer = Log::removeObserver();
-    auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Unable to make space for entry" }));
+    EXPECT_FALSE(db.put(Resource::style("http://example.com/big"), big).first);
+    EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
 }
 
 TEST(OfflineDatabase, OfflineMapboxTileCount) {
