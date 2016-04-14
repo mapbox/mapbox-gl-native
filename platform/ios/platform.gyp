@@ -23,13 +23,6 @@
           'GCC_VERSION': 'com.apple.compilers.llvm.clang.1_0',
           'CODE_SIGN_IDENTITY': 'iPhone Developer',
         },
-        'configurations': {
-          'Release': {
-            'xcode_settings': {
-              'ARCHS': [ "armv7", "armv7s", "arm64", "i386", "x86_64" ],
-            },
-          },
-        },
       }],
     ],
   },
