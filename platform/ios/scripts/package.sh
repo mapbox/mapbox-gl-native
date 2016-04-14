@@ -9,7 +9,6 @@ OUTPUT=build/ios/pkg
 
 BUILDTYPE=${BUILDTYPE:-Release}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
-ENABLE_BITCODE=${BITCODE:-YES}
 GCC_GENERATE_DEBUGGING_SYMBOLS=${SYMBOLS:-YES}
 
 BUILD_DYNAMIC=true
@@ -47,7 +46,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
 fi
 IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
-echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${GCC_GENERATE_DEBUGGING_SYMBOLS}; Bitcode: ${ENABLE_BITCODE}; Mapbox.bundle: ${BUNDLE_RESOURCES} bundle.outside: ${PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK}"
+echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${GCC_GENERATE_DEBUGGING_SYMBOLS}; Mapbox.bundle: ${BUNDLE_RESOURCES} bundle.outside: ${PLACE_RESOURCE_BUNDLES_OUTSIDE_FRAMEWORK}"
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -62,7 +61,6 @@ if [[ ${BUILD_DYNAMIC} == true ]]; then
     mkdir -p "${OUTPUT}"/dynamic
 fi
 
-
 step "Recording library version…"
 VERSION="${OUTPUT}"/version.txt
 echo -n "https://github.com/mapbox/mapbox-gl-native/commit/" > ${VERSION}
@@ -74,64 +72,32 @@ echo ${HASH} >> ${VERSION}
 
 PROJ_VERSION=$(git rev-list --count HEAD)
 
-if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
-    if [[ ${BUILD_STATIC} == true ]]; then
-        step "Building intermediate static libraries for iOS devices (build ${PROJ_VERSION})…"
-        xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
-            ARCHS="arm64 armv7 armv7s" \
-            ONLY_ACTIVE_ARCH=NO \
-            GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-            ENABLE_BITCODE=${ENABLE_BITCODE} \
-            DEPLOYMENT_POSTPROCESSING=YES \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY= \
-            -workspace ./platform/ios/ios.xcworkspace \
-            -configuration ${BUILDTYPE} \
-            -scheme static \
-            -jobs ${JOBS} | xcpretty
-    fi
+step "Building targets (build ${PROJ_VERSION})…"
 
-    if [[ ${BUILD_DYNAMIC} == true ]]; then
-        step "Building dynamic framework for iOS devices (build ${PROJ_VERSION})…"
-        xcodebuild -sdk iphoneos${IOS_SDK_VERSION} \
-            ARCHS="arm64 armv7 armv7s" \
-            ONLY_ACTIVE_ARCH=NO \
-            GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-            ENABLE_BITCODE=${ENABLE_BITCODE} \
-            DEPLOYMENT_POSTPROCESSING=YES \
-            CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY= \
-            -workspace ./platform/ios/ios.xcworkspace \
-            -configuration ${BUILDTYPE} \
-            -scheme dynamic \
-            -jobs ${JOBS} | xcpretty
-    fi
+SCHEME='dynamic'
+if [[ ${BUILD_DYNAMIC} == true && ${BUILD_STATIC} == true ]]; then
+    SCHEME+='+static'
+elif [[ ${BUILD_STATIC} == true ]]; then
+    SCHEME='static'
 fi
 
-if [[ ${BUILD_STATIC} == true ]]; then
-    step "Building intermediate static libraries for iOS Simulator (build ${PROJ_VERSION})…"
-    xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
-        ARCHS="x86_64 i386" \
-        ONLY_ACTIVE_ARCH=NO \
-        GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        -workspace ./platform/ios/ios.xcworkspace \
-        -configuration ${BUILDTYPE} \
-        -scheme static \
-        -jobs ${JOBS} | xcpretty
-fi
+xcodebuild \
+    GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
+    CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+    -workspace ./platform/ios/ios.xcworkspace \
+    -scheme ${SCHEME} \
+    -configuration ${BUILDTYPE} \
+    -sdk iphonesimulator \
+    -jobs ${JOBS} | xcpretty
 
-if [[ ${BUILD_DYNAMIC} == true ]]; then
-    step "Building dynamic framework for iOS Simulator (build ${PROJ_VERSION})…"
-    xcodebuild -sdk iphonesimulator${IOS_SDK_VERSION} \
-        ARCHS="x86_64 i386" \
-        ONLY_ACTIVE_ARCH=NO \
+if [[ ${BUILD_FOR_DEVICE} == true ]]; then
+    xcodebuild \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
-        ENABLE_BITCODE=${ENABLE_BITCODE} \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
         -workspace ./platform/ios/ios.xcworkspace \
+        -scheme ${SCHEME} \
         -configuration ${BUILDTYPE} \
-        -scheme dynamic \
+        -sdk iphoneos \
         -jobs ${JOBS} | xcpretty
 fi
 
