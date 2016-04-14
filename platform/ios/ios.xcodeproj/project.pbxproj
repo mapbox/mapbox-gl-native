@@ -20,6 +20,12 @@
 		DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC99E1CB6E088006E619F /* Assets.xcassets */; };
 		DA27C24E1CBB3811000B0ECD /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA27C24D1CBB3811000B0ECD /* GLKit.framework */; };
 		DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8847FF1CBAFA6200AB86E3 /* MGLAccountManager_Private.h */; };
+		DA2E88561CC036F400F24E7B /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
+		DA2E88611CC0382C00F24E7B /* MGLGeometryTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */; };
+		DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */; };
+		DA2E88631CC0382C00F24E7B /* MGLOfflineRegionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */; };
+		DA2E88641CC0382C00F24E7B /* MGLOfflineStorageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */; };
+		DA2E88651CC0382C00F24E7B /* MGLStyleTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */; };
 		DA4A26941CB6E337000B7809 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC9561CB6C1C2006E619F /* Main.storyboard */; };
 		DA4A26951CB6E337000B7809 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC95B1CB6C1C2006E619F /* LaunchScreen.storyboard */; };
 		DA8847D91CBAF91600AB86E3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -171,6 +177,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		DA2E88571CC036F400F24E7B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
+			remoteInfo = dynamic;
+		};
 		DA8847D71CBAF91600AB86E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -242,6 +255,13 @@
 		DA1DC99C1CB6E076006E619F /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		DA1DC99E1CB6E088006E619F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DA27C24D1CBB3811000B0ECD /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		DA2E88511CC036F400F24E7B /* test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA2E88551CC036F400F24E7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
+		DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflinePackTests.m; path = ../../darwin/test/MGLOfflinePackTests.m; sourceTree = "<group>"; };
+		DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflineRegionTests.m; path = ../../darwin/test/MGLOfflineRegionTests.m; sourceTree = "<group>"; };
+		DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflineStorageTests.m; path = ../../darwin/test/MGLOfflineStorageTests.m; sourceTree = "<group>"; };
+		DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLStyleTests.mm; path = ../../darwin/test/MGLStyleTests.mm; sourceTree = "<group>"; };
 		DA4A26961CB6E795000B7809 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA8847D21CBAF91600AB86E3 /* Mapbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA8847D61CBAF91600AB86E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -358,6 +378,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DA2E884E1CC036F400F24E7B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA2E88561CC036F400F24E7B /* Mapbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DA8847CE1CBAF91600AB86E3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -394,6 +422,7 @@
 				DA1DC94C1CB6C1C2006E619F /* Demo App */,
 				DABCABA91CB80692000A7C39 /* Benchmarking App */,
 				DA8847D31CBAF91600AB86E3 /* SDK */,
+				DA2E88521CC036F400F24E7B /* test */,
 				DA1DC9921CB6DF24006E619F /* Frameworks */,
 				DAC07C951CBB2CAD000CB309 /* Configuration */,
 				DA1DC94B1CB6C1C2006E619F /* Products */,
@@ -407,6 +436,7 @@
 				DABCABA81CB80692000A7C39 /* Bench GL.app */,
 				DA8847D21CBAF91600AB86E3 /* Mapbox.framework */,
 				DAA4E4131CBB71D400178DFB /* libMapbox.a */,
+				DA2E88511CC036F400F24E7B /* test.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -457,6 +487,19 @@
 				DA4A26961CB6E795000B7809 /* Mapbox.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA2E88521CC036F400F24E7B /* test */ = {
+			isa = PBXGroup;
+			children = (
+				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
+				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
+				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
+				DA2E885F1CC0382C00F24E7B /* MGLOfflineStorageTests.m */,
+				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
+				DA2E88551CC036F400F24E7B /* Info.plist */,
+			);
+			path = test;
 			sourceTree = "<group>";
 		};
 		DA8847D31CBAF91600AB86E3 /* SDK */ = {
@@ -747,6 +790,24 @@
 			productReference = DA1DC94A1CB6C1C2006E619F /* Mapbox GL.app */;
 			productType = "com.apple.product-type.application";
 		};
+		DA2E88501CC036F400F24E7B /* test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA2E88591CC036F400F24E7B /* Build configuration list for PBXNativeTarget "test" */;
+			buildPhases = (
+				DA2E884D1CC036F400F24E7B /* Sources */,
+				DA2E884E1CC036F400F24E7B /* Frameworks */,
+				DA2E884F1CC036F400F24E7B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA2E88581CC036F400F24E7B /* PBXTargetDependency */,
+			);
+			name = test;
+			productName = test;
+			productReference = DA2E88511CC036F400F24E7B /* test.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DA8847D11CBAF91600AB86E3 /* dynamic */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DA8847DD1CBAF91600AB86E3 /* Build configuration list for PBXNativeTarget "dynamic" */;
@@ -815,6 +876,9 @@
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					DA2E88501CC036F400F24E7B = {
+						CreatedOnToolsVersion = 7.3;
+					};
 					DA8847D11CBAF91600AB86E3 = {
 						CreatedOnToolsVersion = 7.3;
 					};
@@ -843,6 +907,7 @@
 				DABCABA71CB80692000A7C39 /* bench */,
 				DA8847D11CBAF91600AB86E3 /* dynamic */,
 				DAA4E4121CBB71D400178DFB /* static */,
+				DA2E88501CC036F400F24E7B /* test */,
 			);
 		};
 /* End PBXProject section */
@@ -860,6 +925,13 @@
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
 				DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */,
 				DA1DC9721CB6C6CE006E619F /* Settings.bundle in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA2E884F1CC036F400F24E7B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,6 +975,18 @@
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA2E884D1CC036F400F24E7B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA2E88631CC0382C00F24E7B /* MGLOfflineRegionTests.m in Sources */,
+				DA2E88651CC0382C00F24E7B /* MGLStyleTests.mm in Sources */,
+				DA2E88611CC0382C00F24E7B /* MGLGeometryTests.mm in Sources */,
+				DA2E88641CC0382C00F24E7B /* MGLOfflineStorageTests.m in Sources */,
+				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -986,6 +1070,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DA2E88581CC036F400F24E7B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
+			targetProxy = DA2E88571CC036F400F24E7B /* PBXContainerItemProxy */;
+		};
 		DA8847D81CBAF91600AB86E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
@@ -1133,6 +1222,32 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = "Mapbox GL";
+			};
+			name = Release;
+		};
+		DA2E885A1CC036F400F24E7B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = ../../include;
+				INFOPLIST_FILE = test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DA2E885B1CC036F400F24E7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = ../../include;
+				INFOPLIST_FILE = test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -1320,6 +1435,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		DA2E88591CC036F400F24E7B /* Build configuration list for PBXNativeTarget "test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA2E885A1CC036F400F24E7B /* Debug */,
+				DA2E885B1CC036F400F24E7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		DA8847DD1CBAF91600AB86E3 /* Build configuration list for PBXNativeTarget "dynamic" */ = {
 			isa = XCConfigurationList;

@@ -489,6 +489,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -527,6 +528,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
+					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = "KIF_XCTEST=1";
 				HEADER_SEARCH_PATHS = (

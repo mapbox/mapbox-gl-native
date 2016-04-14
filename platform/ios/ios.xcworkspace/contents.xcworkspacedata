@@ -5,10 +5,10 @@
       location = "group:ios.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:test/ios-tests.xcodeproj">
+      location = "group:uitest/ios-tests.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:test/KIF/KIF.xcodeproj">
+      location = "group:uitest/KIF/KIF.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:../../build/ios-all/platform/ios/platform.xcodeproj">

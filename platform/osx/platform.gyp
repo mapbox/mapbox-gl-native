@@ -230,11 +230,11 @@
       },
 
       'sources': [
-        'test/MGLGeometryTests.mm',
-        'test/MGLOfflinePackTests.m',
-        'test/MGLOfflineRegionTests.m',
-        'test/MGLOfflineStorageTests.m',
-        'test/MGLStyleTests.mm',
+        '../darwin/test/MGLGeometryTests.mm',
+        '../darwin/test/MGLOfflinePackTests.m',
+        '../darwin/test/MGLOfflineRegionTests.m',
+        '../darwin/test/MGLOfflineStorageTests.m',
+        '../darwin/test/MGLStyleTests.mm',
       ],
 
       'include_dirs': [
