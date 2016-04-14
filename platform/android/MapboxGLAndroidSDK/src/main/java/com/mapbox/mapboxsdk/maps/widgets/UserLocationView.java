@@ -22,6 +22,7 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -269,7 +270,7 @@ public final class UserLocationView extends View {
             } else if (mMyLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 double bearing;
                 if (mShowDirection) {
-                    bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS ? mBearingChangeListener.getCompassBearing() : mUserLocation.getBearing();
+                    bearing = mMyBearingTrackingMode == MyBearingTracking.COMPASS && mBearingChangeListener.getCompassBearing() != 0f ? mBearingChangeListener.getCompassBearing() : mUserLocation.getBearing();
                 } else {
                     bearing = mMapboxMap.getCameraPosition().bearing;
                 }
@@ -397,6 +398,7 @@ public final class UserLocationView extends View {
     }
 
     private class MyBearingListener implements SensorEventListener {
+        private static final String TAG = "SensorEventListener";
 
         private SensorManager mSensorManager;
         private Sensor mAccelerometer;
@@ -423,13 +425,19 @@ public final class UserLocationView extends View {
         }
 
         public void onResume() {
-            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-            mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+            if (mAccelerometer != null && mMagnetometer != null) {
+                mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+                mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+            } else {
+                Log.w(TAG, "Accelerometer or magnetic sensor not available in you device");
+            }
         }
 
         public void onPause() {
-            mSensorManager.unregisterListener(this, mAccelerometer);
-            mSensorManager.unregisterListener(this, mMagnetometer);
+            if (mAccelerometer != null && mMagnetometer != null) {
+                mSensorManager.unregisterListener(this, mAccelerometer);
+                mSensorManager.unregisterListener(this, mMagnetometer);
+            }
         }
 
         public float getCompassBearing() {
