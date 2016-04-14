@@ -17,7 +17,7 @@
 
 // This test needs to come first so it can test the initial loading of packs.
 - (void)testAAALoadPacks {
-    XCTestExpectation *kvoExpectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
         return changeKind = NSKeyValueChangeSetting;
     }];
@@ -106,7 +106,7 @@
     MGLOfflinePack *pack = [MGLOfflineStorage sharedOfflineStorage].packs.lastObject;
     XCTAssertNotNil(pack, @"Added pack should still exist.");
     
-    XCTestExpectation *kvoExpectation = [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
+    [self keyValueObservingExpectationForObject:[MGLOfflineStorage sharedOfflineStorage] keyPath:@"packs" handler:^BOOL(id _Nonnull observedObject, NSDictionary * _Nonnull change) {
         NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];
         return changeKind = NSKeyValueChangeRemoval && indices.count == 1;

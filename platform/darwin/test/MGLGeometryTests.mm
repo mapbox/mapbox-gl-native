@@ -17,23 +17,23 @@
 }
 
 - (void)testAngleConversions {
-    XCTAssertEqual(-180, MGLDegreesFromRadians(-M_PI));
+    XCTAssertEqualWithAccuracy(-180, MGLDegreesFromRadians(-M_PI), 5);
     XCTAssertEqual(0, MGLDegreesFromRadians(0));
-    XCTAssertEqual(45, MGLDegreesFromRadians(M_PI_4));
-    XCTAssertEqual(90, MGLDegreesFromRadians(M_PI_2));
-    XCTAssertEqual(180, MGLDegreesFromRadians(M_PI));
-    XCTAssertEqual(360, MGLDegreesFromRadians(2 * M_PI));
-    XCTAssertEqual(720, MGLDegreesFromRadians(4 * M_PI));
+    XCTAssertEqualWithAccuracy(45, MGLDegreesFromRadians(M_PI_4), 5);
+    XCTAssertEqualWithAccuracy(90, MGLDegreesFromRadians(M_PI_2), 5);
+    XCTAssertEqualWithAccuracy(180, MGLDegreesFromRadians(M_PI), 5);
+    XCTAssertEqualWithAccuracy(360, MGLDegreesFromRadians(2 * M_PI), 5);
+    XCTAssertEqualWithAccuracy(720, MGLDegreesFromRadians(4 * M_PI), 5);
     
-    XCTAssertEqual(-360, MGLDegreesFromRadians(MGLRadiansFromDegrees(-360)));
-    XCTAssertEqual(-180, MGLDegreesFromRadians(MGLRadiansFromDegrees(-180)));
-    XCTAssertEqual(-90, MGLDegreesFromRadians(MGLRadiansFromDegrees(-90)));
-    XCTAssertEqual(-45, MGLDegreesFromRadians(MGLRadiansFromDegrees(-45)));
-    XCTAssertEqual(0, MGLDegreesFromRadians(MGLRadiansFromDegrees(0)));
-    XCTAssertEqual(45, MGLDegreesFromRadians(MGLRadiansFromDegrees(45)));
-    XCTAssertEqual(90, MGLDegreesFromRadians(MGLRadiansFromDegrees(90)));
-    XCTAssertEqual(180, MGLDegreesFromRadians(MGLRadiansFromDegrees(180)));
-    XCTAssertEqual(360, MGLDegreesFromRadians(MGLRadiansFromDegrees(360)));
+    XCTAssertEqualWithAccuracy(-360, MGLDegreesFromRadians(MGLRadiansFromDegrees(-360)), 4);
+    XCTAssertEqualWithAccuracy(-180, MGLDegreesFromRadians(MGLRadiansFromDegrees(-180)), 5);
+    XCTAssertEqualWithAccuracy(-90, MGLDegreesFromRadians(MGLRadiansFromDegrees(-90)), 5);
+    XCTAssertEqualWithAccuracy(-45, MGLDegreesFromRadians(MGLRadiansFromDegrees(-45)), 5);
+    XCTAssertEqualWithAccuracy(0, MGLDegreesFromRadians(MGLRadiansFromDegrees(0)), 5);
+    XCTAssertEqualWithAccuracy(45, MGLDegreesFromRadians(MGLRadiansFromDegrees(45)), 5);
+    XCTAssertEqualWithAccuracy(90, MGLDegreesFromRadians(MGLRadiansFromDegrees(90)), 5);
+    XCTAssertEqualWithAccuracy(180, MGLDegreesFromRadians(MGLRadiansFromDegrees(180)), 5);
+    XCTAssertEqualWithAccuracy(360, MGLDegreesFromRadians(MGLRadiansFromDegrees(360)), 4);
 }
 
 - (void)testAltitudeConversions {
