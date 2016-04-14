@@ -158,7 +158,7 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
     }
 
     if (evict_ && !evict(size)) {
-        Log::Warning(Event::Database, "Unable to make space for entry");
+        Log::Debug(Event::Database, "Unable to make space for entry");
         return { false, 0 };
     }
 
