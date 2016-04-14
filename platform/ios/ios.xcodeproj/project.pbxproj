@@ -422,7 +422,7 @@
 				DA1DC94C1CB6C1C2006E619F /* Demo App */,
 				DABCABA91CB80692000A7C39 /* Benchmarking App */,
 				DA8847D31CBAF91600AB86E3 /* SDK */,
-				DA2E88521CC036F400F24E7B /* test */,
+				DA2E88521CC036F400F24E7B /* SDK Tests */,
 				DA1DC9921CB6DF24006E619F /* Frameworks */,
 				DAC07C951CBB2CAD000CB309 /* Configuration */,
 				DA1DC94B1CB6C1C2006E619F /* Products */,
@@ -489,7 +489,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		DA2E88521CC036F400F24E7B /* test */ = {
+		DA2E88521CC036F400F24E7B /* SDK Tests */ = {
 			isa = PBXGroup;
 			children = (
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
@@ -499,6 +499,7 @@
 				DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */,
 				DA2E88551CC036F400F24E7B /* Info.plist */,
 			);
+			name = "SDK Tests";
 			path = test;
 			sourceTree = "<group>";
 		};
@@ -1443,6 +1444,7 @@
 				DA2E885B1CC036F400F24E7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		DA8847DD1CBAF91600AB86E3 /* Build configuration list for PBXNativeTarget "dynamic" */ = {
 			isa = XCConfigurationList;

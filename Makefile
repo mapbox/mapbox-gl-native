@@ -56,6 +56,11 @@ iproj: $(IOS_PROJ_PATH)
 	open $(IOS_WORK_PATH)
 
 test-ios: ios
+	set -o pipefail && xcodebuild \
+	  ARCHS=i386 ONLY_ACTIVE_ARCH=YES \
+	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
+	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
+	  -workspace $(IOS_WORK_PATH) -scheme CI test | xcpretty
 	ios-sim start
 	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose
 
