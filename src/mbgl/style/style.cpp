@@ -159,7 +159,7 @@ void Style::update(const TransformState& transform, const TimePoint& timePoint,
                                      texturePool,
                                      shouldReparsePartialTiles,
                                      data.mode,
-                                     data,
+                                     *data.getAnnotationManager(),
                                      *this);
 
     for (const auto& source : sources) {

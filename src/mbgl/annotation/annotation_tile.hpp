@@ -38,12 +38,11 @@ public:
     std::map<std::string, util::ptr<AnnotationTileLayer>> layers;
 };
 
-class MapData;
+class AnnotationManager;
 
 class AnnotationTileMonitor : public GeometryTileMonitor {
 public:
-    // TODO: should just take AnnotationManager&, but we need to eliminate util::exclusive<AnnotationManager> from MapData first.
-    AnnotationTileMonitor(const TileID&, MapData&);
+    AnnotationTileMonitor(const TileID&, AnnotationManager&);
     ~AnnotationTileMonitor();
 
     void update(std::unique_ptr<GeometryTile>);
@@ -52,7 +51,7 @@ public:
     TileID tileID;
 
 private:
-    MapData& data;
+    AnnotationManager& annotationManager;
     GeometryTileMonitor::Callback callback;
 };
 

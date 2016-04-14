@@ -267,7 +267,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
             if (type == SourceType::Vector) {
                 monitor = std::make_unique<VectorTileMonitor>(normalizedID, parameters.pixelRatio, info->tiles.at(0), parameters.fileSource);
             } else if (type == SourceType::Annotations) {
-                monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.data);
+                monitor = std::make_unique<AnnotationTileMonitor>(normalizedID, parameters.annotationManager);
             } else if (type == SourceType::GeoJSON) {
                 monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), normalizedID);
             } else {
