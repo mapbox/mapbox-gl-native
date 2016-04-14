@@ -44,6 +44,9 @@ import java.lang.ref.WeakReference;
  */
 public final class UserLocationView extends View {
 
+    protected LatLng latLng;
+    protected PointF screenLocation;
+
     // Foreground
     private Drawable foregroundRotatedDrawable;
     private Drawable foregroundDrawable;
@@ -77,6 +80,9 @@ public final class UserLocationView extends View {
 //    private boolean showDirection;
 //    private boolean showAccurancy;
 
+
+    private UserLocationBehaviour userLocationBehaviour;
+
     @MyLocationTracking.Mode
     private int myLocationTrackingMode;
 
@@ -86,9 +92,9 @@ public final class UserLocationView extends View {
     private MapboxMap mapboxMap;
     private Projection projection;
 
-    private LatLng markerScreenCoordinate;
+//    private LatLng markerScreenCoordinate;
     //    private LatLng currentMapViewCoordinate;
-    private PointF markerScreenPoint;
+//    private PointF markerScreenPoint;
 
     private Location location;
     private UserLocationListener userLocationListener;
@@ -115,6 +121,9 @@ public final class UserLocationView extends View {
     }
 
     private void init(Context context) {
+
+        userLocationBehaviour = new UserLocationBehaviourFactory().getBehaviouralModel(MyLocationTracking.TRACKING_NONE);
+
         viewBounds = new Rect();
 
 //        setBackgroundColor(ContextCompat.getColor(context,android.R.color.darker_gray));
@@ -217,19 +226,6 @@ public final class UserLocationView extends View {
         if (foregroundDrawable != null && foregroundBounds != null) {
             getRotateDrawable(foregroundDrawable, compassDirection).draw(canvas);
         }
-
-        if(myLocationTrackingMode==MyLocationTracking.TRACKING_FOLLOW) {
-            setX(markerScreenPoint.x - getWidth() / 2);
-            setY(markerScreenPoint.y - getHeight() / 2);
-        }else{
-            float bearing = 0;
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(markerScreenCoordinate)
-                    .bearing(bearing)
-                    .build();
-            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
-        }
-
     }
 
     private Drawable getRotateDrawable(final Drawable d, final float angle) {
@@ -308,16 +304,18 @@ public final class UserLocationView extends View {
 
     public void update() {
         if (isEnabled()) {
-            if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-                // show location on map
-                markerScreenPoint = getMarkerScreenPoint();
-
-            } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-                LatLng currentTarget = mapboxMap.getCameraPosition().target;
-                if (!currentTarget.equals(new LatLng(location))) {
-                    getMarkerScreenPoint();
-                }
-            }
+            userLocationBehaviour.invalidate();
+//
+//            if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+//                // show location on map
+//                markerScreenPoint = getMarkerScreenPoint();
+//
+//            } else if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+//                LatLng currentTarget = mapboxMap.getCameraPosition().target;
+//                if (!currentTarget.equals(new LatLng(location))) {
+//                    getMarkerScreenPoint();
+//                }
+//            }
 
 
 //
@@ -414,20 +412,6 @@ public final class UserLocationView extends View {
         }
     }
 
-    public PointF getMarkerScreenPoint() {
-        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-            // point at a certain latlng
-            markerScreenPoint = projection.toScreenLocation(markerScreenCoordinate);
-        } else {
-            // center viewport
-            int[] contentPadding = mapboxMap.getPadding();
-            UiSettings uiSettings = mapboxMap.getUiSettings();
-            markerScreenPoint = new PointF(((uiSettings.getWidth() - getWidth() + contentPadding[0] - contentPadding[2]) / 2)
-                    , ((uiSettings.getHeight() - getHeight() - contentPadding[3] + contentPadding[1]) / 2));
-        }
-        return markerScreenPoint;
-    }
-
     public void setMapboxMap(MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         this.projection = mapboxMap.getProjection();
@@ -493,24 +477,30 @@ public final class UserLocationView extends View {
 //        cancelAnimations();
 //        showMarker = true;
 
-        LatLng previousCoordinate;
-        if (this.location == null) {
-            previousCoordinate = new LatLng(location);
-        } else {
-            previousCoordinate = new LatLng(this.location);
-        }
-
-        markerScreenCoordinate = new LatLng(location);
-        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-            // moving marker above map
-            mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-            mMarkerCoordinateAnimator.setDuration(1000);
-            mMarkerCoordinateAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(
-                    previousCoordinate, new LatLng(location)
-            ));
-            mMarkerCoordinateAnimator.start();
+        if (location == null) {
+            return;
         }
         this.location = location;
+        userLocationBehaviour.update(location);
+
+//        LatLng previousCoordinate;
+//        if (this.location == null) {
+//            previousCoordinate = new LatLng(location);
+//        } else {
+//            previousCoordinate = new LatLng(this.location);
+//        }
+//
+//        markerScreenCoordinate = new LatLng(location);
+//        if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
+//            // moving marker above map
+//            mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
+//            mMarkerCoordinateAnimator.setDuration(1000);
+//            mMarkerCoordinateAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(
+//                    previousCoordinate, new LatLng(location)
+//            ));
+//            mMarkerCoordinateAnimator.start();
+//        }
+//        this.location = location;
 
 
 //
@@ -583,15 +573,13 @@ public final class UserLocationView extends View {
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         this.myLocationTrackingMode = myLocationTrackingMode;
 
+        UserLocationBehaviourFactory factory = new UserLocationBehaviourFactory();
+        userLocationBehaviour = factory.getBehaviouralModel(myLocationTrackingMode);
+
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && location != null) {
             // center map directly if we have a location fix
-            markerScreenCoordinate = new LatLng(location.getLatitude(), location.getLongitude());
+            userLocationBehaviour.update(location);
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
-
-            // center view directly
-            markerScreenPoint = getMarkerScreenPoint();
-            setX(markerScreenPoint.x);
-            setY(markerScreenPoint.y);
         }
     }
 
@@ -624,6 +612,10 @@ public final class UserLocationView extends View {
         } else {
 //            showDirection = false;
         }
+    }
+
+    public PointF getMarkerScreenPoint() {
+        return userLocationBehaviour.getScreenLocation();
     }
 
     private static class UserLocationListener implements LocationListener {
@@ -735,12 +727,14 @@ public final class UserLocationView extends View {
 
     private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
 
+        private UserLocationBehaviour behaviour;
         private double mFromLat;
         private double mFromLng;
         private double mToLat;
         private double mToLng;
 
-        private MarkerCoordinateAnimatorListener(LatLng from, LatLng to) {
+        private MarkerCoordinateAnimatorListener(UserLocationBehaviour behaviour, LatLng from, LatLng to) {
+            this.behaviour = behaviour;
             mFromLat = from.getLatitude();
             mFromLng = from.getLongitude();
             mToLat = to.getLatitude();
@@ -752,11 +746,90 @@ public final class UserLocationView extends View {
             float frac = animation.getAnimatedFraction();
             double latitude = mFromLat + (mToLat - mFromLat) * frac;
             double longitude = mFromLng + (mToLng - mFromLng) * frac;
-            markerScreenCoordinate.setLatitude(latitude);
-            markerScreenCoordinate.setLongitude(longitude);
+            behaviour.update(latitude, longitude);
             updateOnNextFrame();
         }
     }
 
+    private class UserLocationBehaviourFactory {
 
+        public UserLocationBehaviour getBehaviouralModel(@MyLocationTracking.Mode int mode) {
+            if (mode == MyLocationTracking.TRACKING_NONE) {
+                return new UserLocationShowBehaviour();
+            } else {
+                return new UserLocationTrackingBehaviour();
+            }
+        }
+    }
+
+    private abstract class UserLocationBehaviour {
+
+        abstract void update(Location location);
+
+        public void update(double lat, double lon) {
+            latLng.setLatitude(lat);
+            latLng.setLongitude(lon);
+        }
+
+        abstract void invalidate();
+
+        public PointF getScreenLocation() {
+            invalidate();
+            return screenLocation;
+        }
+    }
+
+    private class UserLocationTrackingBehaviour extends UserLocationBehaviour {
+
+        @Override
+        void update(Location location) {
+            if (latLng == null || !latLng.equals(new LatLng(location))) {
+                latLng = new LatLng(location);
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(latLng)
+                        .build();
+                mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 300, null);
+            }
+        }
+
+        @Override
+        void invalidate() {
+            int[] contentPadding = mapboxMap.getPadding();
+            UiSettings uiSettings = mapboxMap.getUiSettings();
+            screenLocation = new PointF(((uiSettings.getWidth() - getWidth() + contentPadding[0] - contentPadding[2]) / 2)
+                    , ((uiSettings.getHeight() - getHeight() - contentPadding[3] + contentPadding[1]) / 2));
+            if(screenLocation!=null) {
+                setX(screenLocation.x);
+                setY(screenLocation.y);
+            }
+        }
+    }
+
+    private class UserLocationShowBehaviour extends UserLocationBehaviour {
+
+        @Override
+        void update(Location location) {
+            LatLng previousCoordinate;
+            if (latLng == null) {
+                previousCoordinate = new LatLng(location);
+            } else {
+                previousCoordinate = latLng;
+            }
+
+            latLng = new LatLng(location);
+            mMarkerCoordinateAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
+            mMarkerCoordinateAnimator.setDuration(1000);
+            mMarkerCoordinateAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this, previousCoordinate, latLng));
+            mMarkerCoordinateAnimator.start();
+        }
+
+        @Override
+        void invalidate() {
+            screenLocation = projection.toScreenLocation(latLng);
+            if (screenLocation != null) {
+                setX(screenLocation.x - getWidth() / 2);
+                setY(screenLocation.y - getHeight() / 2);
+            }
+        }
+    }
 }

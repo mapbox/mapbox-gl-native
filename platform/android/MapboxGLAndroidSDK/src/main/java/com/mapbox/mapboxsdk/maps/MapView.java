@@ -1606,8 +1606,11 @@ public class MapView extends FrameLayout {
                         zoom(true, e.getX(), e.getY());
                     } else {
                         // Zoom in on user location view
-                        PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
-                        zoom(true, centerPoint.x, centerPoint.y);
+
+                        // TODO fix padding issue
+//                        PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
+//                        zoom(true, centerPoint.x, centerPoint.y);
+                        zoom(true, getWidth() / 2, getHeight() / 2);
                     }
                     break;
             }
