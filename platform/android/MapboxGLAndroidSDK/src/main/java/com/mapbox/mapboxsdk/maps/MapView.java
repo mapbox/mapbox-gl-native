@@ -883,68 +883,6 @@ public class MapView extends FrameLayout {
     }
 
     //
-    // User marker location drawable management
-    //
-
-    /**
-     * Set the user location view default drawable .
-     */
-    void setUserLocationDrawable(Drawable drawable) {
-        mUserLocationView.setForegroundDrawable(drawable);
-    }
-
-    /**
-     * Set the user location view default drawable and its shadow.
-     */
-    void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
-        mUserLocationView.setForegroundDrawable(drawable);
-        mUserLocationView.setShadowDrawable(shadowDrawable);
-    }
-//
-//    /**
-//     * Set the user location view bearing drawable.
-//     */
-//    void setUserLocationBearingDrawable(Drawable drawable) {
-//        mUserLocationView.setUserLocationBearingDrawable(drawable);
-//    }
-//
-//    /**
-//     * Set the user location view bearing drawable and its shadow.
-//     */
-//    void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
-//        mUserLocationView.setUserLocationBearingDrawable(drawable, shadowDrawable);
-//    }
-//
-//    /**
-//     * Set the stale user location view drawable.
-//     */
-//    void setUserLocationStaleDrawable(Drawable drawable) {
-//        mUserLocationView.setUserLocationStaleDrawable(drawable);
-//    }
-//
-//    /**
-//     * Set the stale user location view drawable and its shadow.
-//     */
-//    void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
-//        mUserLocationView.setUserLocationStaleDrawable(drawable, shadowDrawable);
-//    }
-
-//    /**
-//     * Set the offset of the user location view shadow
-//     */
-//    void setUserLocationShadowOffset(int x, int y) {
-//        mUserLocationView.setUserLocationShadowOffset(x, y);
-//    }
-//
-//    /**
-//     * Change the accuracy color
-//     * @param color int real color (not a @ColorRes)
-//     */
-//    void setUserLocationAccuracyColor(int color) {
-//        mUserLocationView.setUserLocationAccuracyColor(color);
-//    }
-
-    //
     // Projection
     //
 
