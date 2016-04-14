@@ -87,7 +87,6 @@
 		DA88485C1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88484D1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.h */; };
 		DA88485D1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88484E1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.m */; };
 		DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DA8848611CBAFC2E00AB86E3 /* Mapbox.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88485F1CBAFC2E00AB86E3 /* Mapbox.m */; };
 		DA88486D1CBAFCC100AB86E3 /* Compass.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848631CBAFCC100AB86E3 /* Compass.png */; };
 		DA88486E1CBAFCC100AB86E3 /* Compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848641CBAFCC100AB86E3 /* Compass@2x.png */; };
 		DA88486F1CBAFCC100AB86E3 /* Compass@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848651CBAFCC100AB86E3 /* Compass@3x.png */; };
@@ -310,7 +309,6 @@
 		DA88484D1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLUserLocationAnnotationView.h; path = src/MGLUserLocationAnnotationView.h; sourceTree = "<group>"; };
 		DA88484E1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLUserLocationAnnotationView.m; path = src/MGLUserLocationAnnotationView.m; sourceTree = "<group>"; };
 		DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mapbox.h; sourceTree = "<group>"; };
-		DA88485F1CBAFC2E00AB86E3 /* Mapbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mapbox.m; sourceTree = "<group>"; };
 		DA8848631CBAFCC100AB86E3 /* Compass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Compass.png; sourceTree = "<group>"; };
 		DA8848641CBAFCC100AB86E3 /* Compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Compass@2x.png"; sourceTree = "<group>"; };
 		DA8848651CBAFCC100AB86E3 /* Compass@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Compass@3x.png"; sourceTree = "<group>"; };
@@ -465,7 +463,6 @@
 			isa = PBXGroup;
 			children = (
 				DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */,
-				DA88485F1CBAFC2E00AB86E3 /* Mapbox.m */,
 				DA8847DE1CBAFA3E00AB86E3 /* Foundation */,
 				DA8848331CBAFB2A00AB86E3 /* Kit */,
 				DA8848621CBAFCC100AB86E3 /* Resources */,
@@ -922,7 +919,6 @@
 				DA8848901CBB048E00AB86E3 /* reachability.m in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,
 				DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */,
-				DA8848611CBAFC2E00AB86E3 /* Mapbox.m in Sources */,
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
 				DA8848281CBAFA6200AB86E3 /* MGLShape.m in Sources */,
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,

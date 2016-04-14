@@ -143,7 +143,6 @@
       ],
 
       'sources': [
-        'sdk/Mapbox.m',
         '../darwin/src/NSException+MGLAdditions.h',
         '../darwin/src/NSString+MGLAdditions.h',
         '../darwin/src/NSString+MGLAdditions.m',

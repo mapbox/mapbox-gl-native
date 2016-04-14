@@ -4,8 +4,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void mgl_linkBundleCategory();
-
 @interface NSBundle (MGLAdditions)
 
 /// Returns the bundle containing the SDK’s classes and Info.plist file.

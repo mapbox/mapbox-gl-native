@@ -2,8 +2,6 @@
 
 #import "MGLMapView_Private.h"
 
-void mgl_linkMapViewIBCategory() {}
-
 @implementation MGLMapView (IBAdditions)
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyleURL__ {

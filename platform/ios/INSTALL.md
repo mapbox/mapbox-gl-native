@@ -123,8 +123,6 @@ If your application targets iOS 7.x, you’ll need to install the static framewo
    - `libsqlite3.tbd`
    - `libz.tbd`
 
-1. In the Build Settings tab, add `-ObjC` to the “Other Linker Flags” (`OTHER_LDFLAGS`) build setting.
-
 ### Use
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target. In the Info tab, set `MGLMapboxAccessToken` to your access token. You can obtain one from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).

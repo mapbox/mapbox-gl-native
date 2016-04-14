@@ -1,7 +1,5 @@
 #import "MGLMapView.h"
 
-void mgl_linkMapViewIBCategory();
-
 @interface MGLMapView (Private)
 
 /// True if the view or application is in a state where it is not expected to be
