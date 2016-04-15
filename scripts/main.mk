@@ -67,6 +67,7 @@ $(PLATFORM_CONFIG_OUTPUT): .mason configure $(PLATFORM_CONFIG_INPUT)
 
 GYP_FLAGS += -I$(PLATFORM_CONFIG_OUTPUT)
 GYP_FLAGS += -Dcoverage=$(ENABLE_COVERAGE)
+GYP_FLAGS += -Dforce_libuv=$(FORCE_LIBUV)
 GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
 GYP_FLAGS += -Goutput_dir=.
 GYP_FLAGS += --depth=.

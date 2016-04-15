@@ -1,6 +1,12 @@
 {
   'variables': {
-    'loop_lib': 'darwin',
+    'conditions': [
+      ['force_libuv', {
+        'loop_lib': 'uv',
+      }, {
+        'loop_lib': 'darwin',
+      }],
+    ],
     'headless_lib': 'cgl',
   },
   'xcode_settings': {

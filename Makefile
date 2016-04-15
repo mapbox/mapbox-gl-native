@@ -1,5 +1,6 @@
 export BUILDTYPE ?= Release
 export ENABLE_COVERAGE ?= 0
+export FORCE_LIBUV ?= 0
 
 ifeq ($(shell uname -s), Darwin)
   export JOBS ?= $(shell sysctl -n hw.ncpu)
