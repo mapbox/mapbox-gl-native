@@ -111,7 +111,7 @@ public class Marker extends Annotation {
         this.title = title;
     }
 
-    void setEmplacedText(String emplacedText) {
+    public void setEmplacedText(String emplacedText) {
         if(emplacedText != null) {
             this.emplacedText = emplacedText;
         }

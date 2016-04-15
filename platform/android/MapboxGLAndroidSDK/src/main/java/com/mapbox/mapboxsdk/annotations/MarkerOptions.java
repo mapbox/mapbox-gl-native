@@ -108,6 +108,12 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         return icon;
     }
 
+    public void setEmplacedText(String emplacedText) {
+        if(emplacedText != null) {
+            this.marker.setEmplacedText(emplacedText);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
