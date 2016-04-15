@@ -147,7 +147,7 @@ public:
     bool isGestureInProgress() const { return state.isGestureInProgress(); }
 
     // Transform state
-    TransformState getState() const { return state; }
+    const TransformState& getState() const { return state; }
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }

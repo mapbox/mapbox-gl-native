@@ -42,7 +42,7 @@
 
 using namespace mbgl;
 
-Painter::Painter(TransformState& state_, gl::GLObjectStore& glObjectStore_)
+Painter::Painter(const TransformState& state_, gl::GLObjectStore& glObjectStore_)
     : state(state_),
       glObjectStore(glObjectStore_) {
     gl::debugging::enable();
