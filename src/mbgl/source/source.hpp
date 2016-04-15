@@ -88,7 +88,7 @@ private:
                              bool isNewTile);
     bool handlePartialTile(const TileID&);
     bool findLoadedChildren(const TileID&, int32_t maxCoveringZoom, std::vector<TileID>& retain);
-    void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::vector<TileID>& retain);
+    void findLoadedParent(const TileID&, int32_t minCoveringZoom, std::vector<TileID>& retain, const StyleUpdateParameters&);
 
     TileData::State addTile(const TileID&, const StyleUpdateParameters&);
     TileData::State hasTile(const TileID&);
