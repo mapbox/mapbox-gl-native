@@ -8,6 +8,7 @@ namespace mbgl {
 
 class FileSource;
 class AsyncRequest;
+class WorkRequest;
 class StyleLayer;
 namespace gl { class TexturePool; }
 
@@ -22,7 +23,7 @@ public:
                    const std::function<void(std::exception_ptr)>& callback);
     ~RasterTileData();
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
     Bucket* getBucket(StyleLayer const &layer_desc) override;
     bool hasData() const override;
 
@@ -31,7 +32,7 @@ private:
     Worker& worker;
     std::unique_ptr<AsyncRequest> req;
     std::unique_ptr<Bucket> bucket;
-    std::unique_ptr<AsyncRequest> workRequest;
+    std::unique_ptr<WorkRequest> workRequest;
 };
 
 } // namespace mbgl

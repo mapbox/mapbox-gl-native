@@ -13,6 +13,7 @@ namespace mbgl {
 
 class Style;
 class AsyncRequest;
+class WorkRequest;
 class GeometryTileMonitor;
 
 class VectorTileData : public TileData {
@@ -35,7 +36,7 @@ public:
 
     bool hasData() const override;
 
-    void cancel() override;
+    bool tryCancel(bool force = false) override;
 
 private:
     Style& style;
@@ -44,7 +45,7 @@ private:
 
     std::unique_ptr<GeometryTileMonitor> monitor;
     std::unique_ptr<AsyncRequest> tileRequest;
-    std::unique_ptr<AsyncRequest> workRequest;
+    std::unique_ptr<WorkRequest> workRequest;
 
     // Contains all the Bucket objects for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

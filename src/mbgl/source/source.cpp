@@ -253,13 +253,15 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
-            newTile->data = std::make_shared<RasterTileData>(normalizedID,
-                                                             parameters.pixelRatio,
-                                                             info->tiles.at(0),
-                                                             parameters.texturePool,
-                                                             parameters.worker,
-                                                             parameters.fileSource,
-                                                             callback);
+            newTile->data = std::shared_ptr<RasterTileData>(new RasterTileData(
+                normalizedID,
+                parameters.pixelRatio,
+                info->tiles.at(0),
+                parameters.texturePool,
+                parameters.worker,
+                parameters.fileSource,
+                callback
+            ), [this](TileData* data) { tileDataDeleter.add(data); });
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
@@ -274,12 +276,14 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
                 return TileData::State::invalid;
             }
 
-            newTile->data = std::make_shared<VectorTileData>(normalizedID,
-                                                             std::move(monitor),
-                                                             id,
-                                                             parameters.style,
-                                                             parameters.mode,
-                                                             callback);
+            newTile->data = std::shared_ptr<VectorTileData>(new VectorTileData{
+                normalizedID,
+                std::move(monitor),
+                id,
+                parameters.style,
+                parameters.mode,
+                callback
+            }, [this](TileData* data) { tileDataDeleter.add(data); });
         }
 
         tileDataMap.emplace(newTile->data->id, newTile->data);
@@ -442,7 +446,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         bool obsolete = retain_data.find(tile->id) == retain_data.end();
         if (obsolete) {
             if (!tileCache.has(tile->id.normalized().to_uint64())) {
-                tile->cancel();
+                tile->tryCancel();
             }
             return true;
         } else {

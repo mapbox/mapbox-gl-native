@@ -1,8 +1,11 @@
 #ifndef MBGL_UTIL_RUN_LOOP
 #define MBGL_UTIL_RUN_LOOP
 
+#include <mbgl/platform/log.hpp>
+#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
+#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/work_task.hpp>
 #include <mbgl/util/work_request.hpp>
 
@@ -58,7 +61,7 @@ public:
 
     // Post the cancellable work fn(args...) to this RunLoop.
     template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
+    std::unique_ptr<WorkRequest>
     invokeCancellable(Fn&& fn, Args&&... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
@@ -76,7 +79,7 @@ public:
 
     // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
     template <class Fn, class Cb, class... Args>
-    std::unique_ptr<AsyncRequest>
+    std::unique_ptr<WorkRequest>
     invokeWithCallback(Fn&& fn, Cb&& callback, Args&&... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
@@ -138,8 +141,33 @@ private:
         // If the task has completed and the after callback has executed, this will
         // do nothing.
         void cancel() override {
+#if defined(DEBUG)
+            auto now = Clock::now();
+
+            if (!tryCancel()) {
+                std::lock_guard<std::recursive_mutex> lock(mutex);
+                *canceled = true;
+
+                using std::chrono::duration_cast;
+                long elapsed = duration_cast<Milliseconds>(Clock::now() - now).count();
+
+                if (ThreadContext::currentlyOn(ThreadType::Map)) {
+                    Log::Warning(mbgl::Event::General, "Map thread blocked for %ld ms.", elapsed);
+                }
+            };
+#else
             std::lock_guard<std::recursive_mutex> lock(mutex);
             *canceled = true;
+#endif
+        }
+
+        bool tryCancel() override {
+            if (mutex.try_lock()) {
+                *canceled = true;
+                mutex.unlock();
+                return true;
+            }
+            return false;
         }
 
     private:

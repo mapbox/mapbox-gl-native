@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class AsyncRequest;
+class WorkRequest;
 class RasterBucket;
 class GeometryTileLoader;
 
@@ -33,7 +33,7 @@ public:
     // bind references to itself, and if and when those lambdas execute, the references
     // will still be valid.
 
-    using Request = std::unique_ptr<AsyncRequest>;
+    using Request = std::unique_ptr<WorkRequest>;
 
     Request parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                             std::shared_ptr<const std::string> data,

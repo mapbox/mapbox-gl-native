@@ -59,6 +59,7 @@ VectorTileData::VectorTileData(const TileID& id_,
         // request in case there is one.
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+            WorkCompletedNotifier notifier(this);
             workRequest.reset();
             if (state == State::obsolete) {
                 return;
@@ -88,7 +89,8 @@ VectorTileData::VectorTileData(const TileID& id_,
 }
 
 VectorTileData::~VectorTileData() {
-    cancel();
+    assert(tryCancel());
+    workRequest.reset();
 }
 
 bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
@@ -99,6 +101,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 
     workRequest.reset();
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
         if (state == State::obsolete) {
             return;
@@ -154,6 +157,7 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     if (workRequest) return;
 
     workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig] {
+        WorkCompletedNotifier notifier(this);
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -174,10 +178,19 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     });
 }
 
-void VectorTileData::cancel() {
+bool VectorTileData::tryCancel(bool force) {
     state = State::obsolete;
     tileRequest.reset();
-    workRequest.reset();
+
+    if (force) {
+        workRequest.reset();
+    }
+
+    if (workRequest) {
+        return workRequest->tryCancel();
+    }
+
+    return true;
 }
 
 bool VectorTileData::hasData() const {
