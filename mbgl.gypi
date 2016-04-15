@@ -22,6 +22,8 @@
           'GCC_WARN_PEDANTIC': 'YES',
           'GCC_WARN_UNINITIALIZED_AUTOS': 'YES_AGGRESSIVE',
           'MACOSX_DEPLOYMENT_TARGET': '10.10',
+          'ALWAYS_SEARCH_USER_PATHS': 'NO',
+          'COMBINE_HIDPI_IMAGES': 'YES',
         },
       }, {
         'cflags_cc': [
@@ -117,6 +119,14 @@
             'cflags_cc': [ '-g', '-O3' ],
           }],
         ],
+      },
+    },
+  },
+  'configurations': {
+    'Debug': {
+      'xcode_settings': {
+        'ENABLE_TESTABILITY': 'YES',
+        'ONLY_ACTIVE_ARCH': 'YES',
       },
     },
   },

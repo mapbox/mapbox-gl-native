@@ -54,6 +54,7 @@
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',
         'CODE_SIGN_IDENTITY': 'iPhone Developer',
+        'PRODUCT_BUNDLE_IDENTIFIER': 'com.mapbox.MapboxGLUnitTest',
       },
 
       'copies': [{
