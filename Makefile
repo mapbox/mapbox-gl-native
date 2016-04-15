@@ -47,7 +47,7 @@ $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mb
 
 ios: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
-	  ARCHS=i386 ONLY_ACTIVE_ARCH=YES \
+	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
@@ -59,7 +59,7 @@ test-ios: ios
 	ios-sim start --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
 	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
 	set -o pipefail && xcodebuild \
-	  ARCHS=i386 ONLY_ACTIVE_ARCH=YES \
+	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI test | xcpretty
