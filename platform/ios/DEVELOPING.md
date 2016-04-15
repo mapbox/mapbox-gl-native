@@ -12,9 +12,9 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK and
 
     make iproj
 
-Which will create and open an Xcode project that can build the entire library from source. Now open platform/ios/ios.xcworkspace, which includes both that project and an Objective-C test application. Before building, use the scheme picker button in the toolbar to change the scheme from “All (ios project)” to “iosapp” and the destination from “My Mac” to one of the simulators or connected devices listed in the menu.
+Which will create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications. Before building, use the scheme picker button in the toolbar to change the scheme to “iosapp” and the destination to one of the simulators or connected devices listed in the menu.
 
-If you don't have an Apple Developer account, change the destination from "My Mac" to a simulator such as "iPhone 6" before you run and build the app.
+If you don't have an Apple Developer account, change the destination to a simulator such as "iPhone 6" before you run and build the app.
 
 `ipackage` is only one of several available `make` build targets. Others include:
 
@@ -25,12 +25,11 @@ If you don't have an Apple Developer account, change the destination from "My Ma
 
 You can customize the build output by passing the following arguments into the `make` invocation:
 
-* `BITCODE=NO` builds without Bitcode support.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
 * `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for compatibility with iOS 7.x.
 * `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries.
 
-### Access Tokens
+### Access tokens
 
 _The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
 
@@ -44,13 +43,17 @@ Set up the access token by editing the scheme for the application target, then a
 
 Run
 
-    make itest
+    make test-ios
 
-To run the included integration tests on the command line.
+To run the included unit tests and integration tests on the command line.
 
-If you want to run the tests in Xcode instead, first `make ipackage` to create a local static library version, then open `platform/ios/test/ios-tests.xcodeproj`, and lastly `Command + U` on the `Mapbox GL Tests` application target.
+To instead run the tests in Xcode:
 
-### Usage
+1. Run `make iproj` to set up the workspace.
+1. Change the scheme to “test (platform project)” and press Command-R to run core unit tests.
+1. Change the scheme to “CI” and press Command-U to run SDK integration tests.
+
+### iosapp usage
 
 - Pan to move
 - Pinch to zoom
