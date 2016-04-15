@@ -127,6 +127,11 @@ std::array<uint16_t, 2> NativeMapView::getFramebufferSize() const {
 void NativeMapView::activate() {
     mbgl::Log::Debug(mbgl::Event::Android, "NativeMapView::activate");
 
+    oldDisplay = eglGetCurrentDisplay();
+    oldReadSurface = eglGetCurrentSurface(EGL_READ);
+    oldDrawSurface = eglGetCurrentSurface(EGL_DRAW);
+    oldContext = eglGetCurrentContext();
+
     assert(vm != nullptr);
 
     if ((display != EGL_NO_DISPLAY) && (surface != EGL_NO_SURFACE) && (context != EGL_NO_CONTEXT)) {
@@ -150,7 +155,13 @@ void NativeMapView::deactivate() {
 
     assert(vm != nullptr);
 
-    if (display != EGL_NO_DISPLAY) {
+    if (oldContext != context && oldContext != EGL_NO_CONTEXT) {
+        if (!eglMakeCurrent(oldDisplay, oldDrawSurface, oldReadSurface, oldContext)) {
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
+                             eglGetError());
+            throw std::runtime_error("eglMakeCurrent() failed");
+        }
+    } else if (display != EGL_NO_DISPLAY) {
         if (!eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d",
                              eglGetError());
