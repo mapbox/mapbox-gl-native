@@ -21,6 +21,7 @@ public class Marker extends Annotation {
     private String snippet;
     private Icon icon;
     private String title;
+    private String emplacedText = "";
     private InfoWindow infoWindow = null;
     private boolean infoWindowShown = false;
     private int topOffsetPixels;
@@ -49,6 +50,10 @@ public class Marker extends Annotation {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getEmplacedText() {
+        return emplacedText;
     }
 
     /**
@@ -104,6 +109,12 @@ public class Marker extends Annotation {
 
     void setTitle(String title) {
         this.title = title;
+    }
+
+    void setEmplacedText(String emplacedText) {
+        if(emplacedText != null) {
+            this.emplacedText = emplacedText;
+        }
     }
 
     /**

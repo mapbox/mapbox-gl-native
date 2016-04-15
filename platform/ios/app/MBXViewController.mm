@@ -43,6 +43,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             @"MBXDebug": @NO,
         }];
     }
+    [MGLAccountManager setAccessToken: @"pk.eyJ1IjoidHJ1ZWZsb3ciLCJhIjoiQkY2T0laWSJ9.PaohE8wfcH24JUW28wshlQ"];
 }
 
 - (void)viewDidLoad
@@ -58,7 +59,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
     [titleButton setTitle:@(mbgl::util::default_styles::orderedStyles[self.styleIndex].name) forState:UIControlStateNormal];
     
-    self.mapView.styleURL = [NSURL URLWithString:@"mapbox://styles/trueflow/cilru0odx00b1c7luiieu5mk5"];
+    self.mapView.styleURL = [NSURL URLWithString:@"https://dev.1f.lv/venues/5/contexts/23648/floor/1?access_token=cEjEtDfPoKfB8ie4DuFxJlIRavRgddvd"];
 
     [self restoreState:nil];
 }
