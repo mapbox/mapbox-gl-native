@@ -8,6 +8,7 @@ namespace mbgl {
 
 class FileSource;
 class AsyncRequest;
+class WorkRequest;
 class StyleLayer;
 namespace gl { class TexturePool; }
 
@@ -31,7 +32,7 @@ private:
     Worker& worker;
     std::unique_ptr<AsyncRequest> req;
     std::unique_ptr<Bucket> bucket;
-    std::unique_ptr<AsyncRequest> workRequest;
+    std::unique_ptr<WorkRequest> workRequest;
 };
 
 } // namespace mbgl

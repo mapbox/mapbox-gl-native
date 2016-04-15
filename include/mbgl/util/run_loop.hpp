@@ -61,7 +61,7 @@ public:
 
     // Post the cancellable work fn(args...) to this RunLoop.
     template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
+    std::unique_ptr<WorkRequest>
     invokeCancellable(Fn&& fn, Args&&... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
@@ -79,7 +79,7 @@ public:
 
     // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
     template <class Fn, class Cb, class... Args>
-    std::unique_ptr<AsyncRequest>
+    std::unique_ptr<WorkRequest>
     invokeWithCallback(Fn&& fn, Cb&& callback, Args&&... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;

@@ -254,7 +254,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
 
         // If we don't find working tile data, we're just going to load it.
         if (type == SourceType::Raster) {
-            newTile->data = std::make_shared<RasterTileData>(new RasterTileData{
+            newTile->data = std::shared_ptr<RasterTileData>(new RasterTileData(
                 normalizedID,
                 parameters.pixelRatio,
                 info->tiles.at(0),
@@ -262,7 +262,7 @@ TileData::State Source::addTile(const TileID& tileID, const StyleUpdateParameter
                 parameters.worker,
                 parameters.fileSource,
                 callback
-            }, [this](TileData* data) { tileDataDeleter.add(data); });
+            ), [this](TileData* data) { tileDataDeleter.add(data); });
         } else {
             std::unique_ptr<GeometryTileMonitor> monitor;
 
