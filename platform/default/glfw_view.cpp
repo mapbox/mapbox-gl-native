@@ -448,7 +448,11 @@ void GLFWView::run() {
     };
 
     frameTick.start(mbgl::Duration::zero(), mbgl::Milliseconds(1000 / 60), callback);
+#if defined(__APPLE__)
+    while (!glfwWindowShouldClose(window)) runLoop.run();
+#else
     runLoop.run();
+#endif
 }
 
 float GLFWView::getPixelRatio() const {
