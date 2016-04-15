@@ -6,6 +6,8 @@ set -u
 
 NAME=Mapbox
 OUTPUT=build/ios/pkg
+DERIVED_DATA=build/DerivedData/ios
+PRODUCTS=${DERIVED_DATA}/Build/Products
 
 BUILDTYPE=${BUILDTYPE:-Release}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -84,6 +86,7 @@ fi
 xcodebuild \
     GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+    -derivedDataPath ${DERIVED_DATA} \
     -workspace ./platform/ios/ios.xcworkspace \
     -scheme ${SCHEME} \
     -configuration ${BUILDTYPE} \
@@ -94,6 +97,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     xcodebuild \
         GCC_GENERATE_DEBUGGING_SYMBOLS=${GCC_GENERATE_DEBUGGING_SYMBOLS} \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+        -derivedDataPath ${DERIVED_DATA} \
         -workspace ./platform/ios/ios.xcworkspace \
         -scheme ${SCHEME} \
         -configuration ${BUILDTYPE} \
@@ -111,22 +115,24 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
-            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphoneos/libmbgl-} \
-            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphonesimulator/libmbgl-}
+            ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphoneos/libmbgl-} \
+            ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS devices"
         cp -r \
-            build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework \
+            ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework \
             ${OUTPUT}/dynamic/
-        cp -r build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
-            ${OUTPUT}/dynamic/
+        if [[ -e ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM ]]; then
+            cp -r ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework.dSYM \
+                ${OUTPUT}/dynamic/
+        fi
 
         step "Merging simulator dynamic library into device dynamic library…"
         lipo \
-            build/ios-all/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
-            build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
+            ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
+            ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
 else
@@ -136,16 +142,18 @@ else
         libtool -static -no_warning_for_no_symbols \
             `find mason_packages/ios-${IOS_SDK_VERSION} -type f -name libgeojsonvt.a` \
             -o ${OUTPUT}/static/${NAME}.framework/${NAME} \
-            ${LIBS[@]/#/build/ios-all/${BUILDTYPE}-iphonesimulator/libmbgl-}
+            ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/libmbgl-}
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
         step "Copying dynamic framework into place for iOS Simulator…"
         cp -r \
-            build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
+            ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework \
             ${OUTPUT}/dynamic/${NAME}.framework
-        cp -r build/ios-all/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
-            ${OUTPUT}/dynamic/
+        if [[ -e ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM ]]; then
+            cp -r ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework.dSYM \
+                ${OUTPUT}/dynamic/
+        fi
     fi
 fi
 
@@ -168,9 +176,9 @@ fi
 
 if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
-    cp -rv "build/ios-all/${BUILDTYPE}-iphoneos/Headers" "${OUTPUT}/static/${NAME}.framework/Headers"
+    cp -rv "${PRODUCTS}/${BUILDTYPE}-iphoneos/Headers" "${OUTPUT}/static/${NAME}.framework/Headers"
     cat platform/ios/framework/Mapbox-static.h > "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
-    cat "build/ios-all/${BUILDTYPE}-iphoneos/Headers/Mapbox.h" >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
+    cat "${PRODUCTS}/${BUILDTYPE}-iphoneos/Headers/Mapbox.h" >> "${OUTPUT}/static/${NAME}.framework/Headers/Mapbox.h"
 fi
 
 step "Copying library resources…"

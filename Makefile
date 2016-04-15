@@ -41,6 +41,7 @@ test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcsch
 
 IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
+IOS_DERIVED_DATA_PATH = build/DerivedData/ios
 
 $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi test/test.gypi
 	$(RUN) PLATFORM=ios Xcode/__project__
@@ -48,6 +49,7 @@ $(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mb
 ios: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
+	  -derivedDataPath $(IOS_DERIVED_DATA_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
@@ -57,9 +59,10 @@ iproj: $(IOS_PROJ_PATH)
 
 test-ios: ios
 	ios-sim start --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
-	ios-sim launch build/ios-all/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
+	ios-sim launch $(IOS_DERIVED_DATA_PATH)/Build/Products/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
 	set -o pipefail && xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
+	  -derivedDataPath $(IOS_DERIVED_DATA_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI test | xcpretty
