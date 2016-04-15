@@ -47,7 +47,7 @@ public:
 
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
-    void invoke(Fn&& fn, Args&&... args) {
+    void invoke(Fn fn, Args... args) {
         auto tuple = std::make_tuple(std::move(args)...);
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
             std::move(fn),
@@ -59,7 +59,7 @@ public:
     // Post the cancellable work fn(args...) to this RunLoop.
     template <class Fn, class... Args>
     std::unique_ptr<AsyncRequest>
-    invokeCancellable(Fn&& fn, Args&&... args) {
+    invokeCancellable(Fn fn, Args... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
 
@@ -77,7 +77,7 @@ public:
     // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
     template <class Fn, class Cb, class... Args>
     std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn&& fn, Cb&& callback, Args&&... args) {
+    invokeWithCallback(Fn fn, Cb callback, Args... args) {
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
 
@@ -86,9 +86,9 @@ public:
         // because if the request was cancelled, then R might have been destroyed. L2 needs to check
         // the flag because the request may have been cancelled after L2 was invoked but before it
         // began executing.
-        auto after = [flag, current = RunLoop::Get(), callback1 = std::move(callback)] (auto&&... results1) {
+        auto after = [flag, current = RunLoop::Get(), callback1 = std::move(callback)] (auto... results1) {
             if (!*flag) {
-                current->invoke([flag, callback2 = std::move(callback1)] (auto&&... results2) {
+                current->invoke([flag, callback2 = std::move(callback1)] (auto... results2) {
                     if (!*flag) {
                         callback2(std::move(results2)...);
                     }
@@ -96,7 +96,7 @@ public:
             }
         };
 
-        auto tuple = std::make_tuple(std::move(args)..., after);
+        auto tuple = std::make_tuple(std::move(args)..., std::move(after));
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
             std::move(fn),
             std::move(tuple),
@@ -145,7 +145,7 @@ private:
     private:
         template <std::size_t... I>
         void invoke(std::index_sequence<I...>) {
-            func(std::move(std::get<I>(std::forward<P>(params)))...);
+            func(std::move(std::get<I>(params))...);
         }
 
         std::recursive_mutex mutex;

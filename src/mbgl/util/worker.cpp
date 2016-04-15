@@ -73,7 +73,7 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
                         const std::shared_ptr<const std::string> data,
                         std::function<void(RasterTileParseResult)> callback) {
     current = (current + 1) % threads.size();
-    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, bucket,
+    return threads[current]->invokeWithCallback(&Worker::Impl::parseRasterTile, callback, std::move(bucket),
                                                 data);
 }
 
