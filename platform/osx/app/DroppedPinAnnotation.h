@@ -1,4 +1,4 @@
-#import "MGLPointAnnotation.h"
+#import <Mapbox/Mapbox.h>
 
 @interface DroppedPinAnnotation : MGLPointAnnotation
 

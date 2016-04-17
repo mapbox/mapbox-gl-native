@@ -17,6 +17,8 @@ default:
 #### OS X targets ##############################################################
 
 OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
+OSX_WORK_PATH = platform/osx/osx.xcworkspace
+OSX_DERIVED_DATA_PATH = build/DerivedData/osx
 
 osx:
 	$(RUN) PLATFORM=osx Xcode/All
@@ -25,7 +27,7 @@ $(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mb
 	$(RUN) PLATFORM=osx Xcode/__project__
 
 xproj: $(OSX_PROJ_PATH)
-	open $(OSX_PROJ_PATH)
+	open $(OSX_WORK_PATH)
 
 $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/osxtest.xcscheme
 	mkdir -p $(basename $@)
