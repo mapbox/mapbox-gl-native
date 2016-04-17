@@ -480,13 +480,13 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         return YES;
     }
     if (menuItem.action == @selector(dropPin:)) {
-        BOOL isOverAnnotation = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
-        menuItem.hidden = isOverAnnotation;
+        id <MGLAnnotation> annotationUnderCursor = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
+        menuItem.hidden = annotationUnderCursor != nil;
         return YES;
     }
     if (menuItem.action == @selector(removePin:)) {
-        BOOL isOverAnnotation = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
-        menuItem.hidden = !isOverAnnotation;
+        id <MGLAnnotation> annotationUnderCursor = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
+        menuItem.hidden = annotationUnderCursor == nil;
         return YES;
     }
     if (menuItem.action == @selector(toggleTileBoundaries:)) {
@@ -647,7 +647,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [NSCursor dragCopyCursor],
             [NSCursor contextualMenuCursor],
         ];
-        annotationImage.cursor = cursors[arc4random_uniform(cursors.count)];
+        annotationImage.cursor = cursors[arc4random_uniform((uint32_t)cursors.count) % cursors.count];
     } else {
         annotationImage.cursor = nil;
     }

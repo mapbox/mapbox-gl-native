@@ -481,6 +481,8 @@ public:
     _delegateHasFillColorsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:fillColorForPolygonAnnotation:)];
     _delegateHasLineWidthsForShapeAnnotations = [_delegate respondsToSelector:@selector(mapView:lineWidthForPolylineAnnotation:)];
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
     if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)]) {
         NSLog(@"-mapView:regionWillChangeAnimated: is not supported by the OS X SDK, but %@ implements it anyways. "
               @"Please implement -[%@ mapView:cameraWillChangeAnimated:] instead.",
@@ -496,6 +498,7 @@ public:
               @"Please implement -[%@ mapView:cameraDidChangeAnimated:] instead.",
               NSStringFromClass([delegate class]), NSStringFromClass([delegate class]));
     }
+#pragma clang diagnostic pop
 }
 
 #pragma mark Style
@@ -2109,10 +2112,8 @@ public:
 }
 
 - (NSString *)view:(__unused NSView *)view stringForToolTip:(__unused NSToolTipTag)tag point:(__unused NSPoint)point userData:(void *)data {
-    if ((NSUInteger)data >= MGLAnnotationTagNotFound) {
-        return nil;
-    }
-    MGLAnnotationTag annotationTag = (NSUInteger)data;
+    NSAssert((NSUInteger)data < MGLAnnotationTagNotFound, @"Invalid annotation tag in tooltip rect user data.");
+    MGLAnnotationTag annotationTag = (MGLAnnotationTag)MIN((NSUInteger)data, MGLAnnotationTagNotFound);
     id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     return annotation.toolTip;
 }
@@ -2332,7 +2333,7 @@ public:
         mbgl::PremultipliedImage image { w, h };
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
         
-        const int stride = image.stride();
+        const size_t stride = image.stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
         uint8_t *rgba = image.data.get();
         for (int i = 0, j = h - 1; i < j; i++, j--) {
