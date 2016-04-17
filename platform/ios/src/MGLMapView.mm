@@ -2370,11 +2370,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations
 {
-    [self addAnnotations:annotations withAnnotationImage:nil];
-}
-
-- (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations withAnnotationImage:(MGLAnnotationImage *)explicitAnnotationImage
-{
     if ( ! annotations) return;
     [self willChangeValueForKey:@"annotations"];
 
@@ -2394,8 +2389,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         else
         {
-            MGLAnnotationImage *annotationImage = explicitAnnotationImage;
-            if ( ! annotationImage && delegateImplementsImageForPoint)
+            MGLAnnotationImage *annotationImage;
+            if (delegateImplementsImageForPoint)
             {
                 annotationImage = [self.delegate mapView:self imageForAnnotation:annotation];
             }
@@ -2421,7 +2416,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             }
             [annotationImages addObject:annotationImage];
 
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
+            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
         }
     }
 
@@ -3067,48 +3062,42 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (annotationImage.image)
     {
         // Add the new icon to the style.
-        annotationImage.styleIconIdentifier = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+        NSString *updatedIconIdentifier = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+        annotationImage.styleIconIdentifier = updatedIconIdentifier;
         [self installAnnotationImage:annotationImage];
         
         if ([iconIdentifier isEqualToString:fallbackIconIdentifier])
         {
-            // Remove any annotations associated with the annotation image.
-            NSMutableArray *annotationsToRecreate = [NSMutableArray array];
+            // Update any annotations associated with the annotation image.
             for (auto &pair : _annotationContextsByAnnotationTag)
             {
                 if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
                 {
-                    [annotationsToRecreate addObject:pair.second.annotation];
+                    const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
+                    _mbglMap->updatePointAnnotation(pair.first, { latLng, updatedIconIdentifier.UTF8String ?: "" });
                 }
             }
-            [self removeAnnotations:annotationsToRecreate];
-            
-            // Recreate the annotations with the new icon.
-            [self addAnnotations:annotationsToRecreate withAnnotationImage:annotationImage];
         }
     }
     else
     {
-        // Remove any annotations associated with the annotation image.
-        NSMutableArray *annotationsToRecreate = [NSMutableArray array];
-        for (auto &pair : _annotationContextsByAnnotationTag)
-        {
-            if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
-            {
-                [annotationsToRecreate addObject:pair.second.annotation];
-            }
-        }
-        [self removeAnnotations:annotationsToRecreate];
-        
-        // Recreate the annotations, falling back to the default icon.
+        // Add the default icon to the style if necessary.
         annotationImage.styleIconIdentifier = fallbackIconIdentifier;
         if ( ! [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName])
         {
             [self installAnnotationImage:self.defaultAnnotationImage];
         }
-        [self addAnnotations:annotationsToRecreate withAnnotationImage:annotationImage];
+        
+        // Update any annotations associated with the annotation image.
+        for (auto &pair : _annotationContextsByAnnotationTag)
+        {
+            if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
+            {
+                const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
+                _mbglMap->updatePointAnnotation(pair.first, { latLng, fallbackIconIdentifier.UTF8String ?: "" });
+            }
+        }
     }
-    _mbglMap->update(mbgl::Update::Annotations);
 }
 
 #pragma mark - User Location -
