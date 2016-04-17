@@ -10,7 +10,7 @@ The Mapbox OS X SDK and the osxapp demo application run on OS X 10.10.0 and abov
 
 1. [Install core dependencies](../../INSTALL.md).
 1. Run `make xproj`.
-1. Switch to the osxsdk or osxapp scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
+1. Switch to the dynamic or osxapp scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
 
 ### Access tokens
 

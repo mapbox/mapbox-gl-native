@@ -20,24 +20,25 @@ OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
 OSX_WORK_PATH = platform/osx/osx.xcworkspace
 OSX_DERIVED_DATA_PATH = build/DerivedData/osx
 
-osx:
-	$(RUN) PLATFORM=osx Xcode/All
-
 $(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi test/test.gypi bin/*.gypi
 	$(RUN) PLATFORM=osx Xcode/__project__
+
+osx: $(OSX_PROJ_PATH)
+	set -o pipefail && xcodebuild \
+	  -derivedDataPath $(OSX_DERIVED_DATA_PATH) \
+	  -configuration $(BUILDTYPE) \
+	  -workspace $(OSX_WORK_PATH) -scheme CI build | xcpretty
 
 xproj: $(OSX_PROJ_PATH)
 	open $(OSX_WORK_PATH)
 
-$(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme: platform/osx/scripts/osxtest.xcscheme
-	mkdir -p $(basename $@)
-	cp $< $@
-
-test-osx: $(OSX_PROJ_PATH) $(OSX_PROJ_PATH)/xcshareddata/xcschemes/osxtest.xcscheme node_modules/express
-	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -target test build | xcpretty
-	ulimit -c unlimited && (build/osx-x86_64/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
+test-osx: osx node_modules/express
+	ulimit -c unlimited && ($(OSX_DERIVED_DATA_PATH)/Build/Products/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
-	set -o pipefail && xcodebuild -project $(OSX_PROJ_PATH) -configuration $(BUILDTYPE) -scheme osxtest test | xcpretty
+	set -o pipefail && xcodebuild \
+	  -derivedDataPath $(OSX_DERIVED_DATA_PATH) \
+	  -configuration $(BUILDTYPE) \
+	  -workspace $(OSX_WORK_PATH) -scheme CI test | xcpretty
 
 #### iOS targets ##############################################################
 
