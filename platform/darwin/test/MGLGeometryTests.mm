@@ -1,8 +1,5 @@
 #import "../../darwin/src/MGLGeometry_Private.h"
 
-#pragma clang diagnostic ignored "-Wgnu-statement-expression"
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 #import <XCTest/XCTest.h>
 
 @interface MGLGeometryTests : XCTestCase

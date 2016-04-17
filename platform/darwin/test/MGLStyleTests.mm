@@ -2,9 +2,6 @@
 
 #import <mbgl/util/default_styles.hpp>
 
-#pragma clang diagnostic ignored "-Wgnu-statement-expression"
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 #import <XCTest/XCTest.h>
 
 @interface MGLStyleTests : XCTestCase

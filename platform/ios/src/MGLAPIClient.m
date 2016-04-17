@@ -54,7 +54,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             statusError = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
         }
         if (completionHandler) {
-            error = error ? error : statusError;
+            error = error ?: statusError;
             completionHandler(error);
         }
         [self.dataTasks removeObject:dataTask];
@@ -120,7 +120,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     NSString *appBuildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
     NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
     NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
-    NSString *sdkVersion = semanticVersion ? semanticVersion : shortVersion;
+    NSString *sdkVersion = semanticVersion ?: shortVersion;
     _userAgent = [NSString stringWithFormat:@"%@/%@/%@ %@/%@", appName, appVersion, appBuildNumber, MGLAPIClientUserAgentBase, sdkVersion];
 }
 

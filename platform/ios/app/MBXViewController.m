@@ -11,10 +11,10 @@
 static NSString * const kCustomCalloutTitle = @"Custom Callout";
 
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
-    { 38.9131982, -77.0325453144239 },
-    { 37.7757368, -122.4135302 },
-    { 12.9810816, 77.6368034 },
-    { -13.15589555, -74.2178961777998 },
+    { .latitude = 38.9131982, .longitude = -77.0325453144239 },
+    { .latitude = 37.7757368, .longitude = -122.4135302 },
+    { .latitude = 12.9810816, .longitude = 77.6368034 },
+    { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>

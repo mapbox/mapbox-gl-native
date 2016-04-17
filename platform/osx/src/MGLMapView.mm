@@ -79,8 +79,8 @@ struct MGLAttribution {
     /// URL to open when the attribution button is clicked.
     NSString *urlString;
 } MGLAttributions[] = {
-    { @"Mapbox", @"https://www.mapbox.com/about/maps/" },
-    { @"OpenStreetMap", @"http://www.openstreetmap.org/about/" },
+    { .title = @"Mapbox", .urlString = @"https://www.mapbox.com/about/maps/" },
+    { .title = @"OpenStreetMap", .urlString = @"http://www.openstreetmap.org/about/" },
 };
 
 /// Unique identifier representing a single annotation in mbgl.

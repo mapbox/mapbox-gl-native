@@ -1,8 +1,5 @@
 #import <Mapbox/Mapbox.h>
 
-#pragma clang diagnostic ignored "-Wgnu-statement-expression"
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 #import <XCTest/XCTest.h>
 
 @interface MGLOfflineStorageTests : XCTestCase
@@ -33,8 +30,8 @@
     NSURL *styleURL = [MGLStyle lightStyleURL];
     /// Somewhere near Grape Grove, Ohio, United States.
     MGLCoordinateBounds bounds = {
-        { 39.70358155855172, -83.69506472545841 },
-        { 39.703818870225376, -83.69420641857361 },
+        { .latitude = 39.70358155855172, .longitude = -83.69506472545841 },
+        { .latitude = 39.703818870225376, .longitude = -83.69420641857361 },
     };
     double zoomLevel = 20;
     MGLTilePyramidOfflineRegion *region = [[MGLTilePyramidOfflineRegion alloc] initWithStyleURL:styleURL bounds:bounds fromZoomLevel:zoomLevel toZoomLevel:zoomLevel];

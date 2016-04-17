@@ -1,8 +1,5 @@
 #import <Mapbox/Mapbox.h>
 
-#pragma clang diagnostic ignored "-Wgnu-statement-expression"
-#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
-
 #import <XCTest/XCTest.h>
 
 @interface MGLOfflineRegionTests : XCTestCase
