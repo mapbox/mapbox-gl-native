@@ -191,6 +191,7 @@ public:
     NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
     
     MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    NS_MUTABLE_SET_OF(id <MGLAnnotation>) *_pointAnnotations;
     /// Tag of the selected annotation. If the user location annotation is selected, this ivar is set to `MGLAnnotationTagNotFound`.
     MGLAnnotationTag _selectedAnnotationTag;
     BOOL _userLocationAnnotationIsSelected;
@@ -343,6 +344,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
+    _pointAnnotations = [NSMutableSet set];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
 
@@ -1608,6 +1610,21 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             [MGLMapboxEvents ensureMetricsOptoutExists];
         }
     }
+    else if ([keyPath isEqualToString:@"coordinate"] && [object conformsToProtocol:@protocol(MGLAnnotation)])
+    {
+        id <MGLAnnotation> annotation = object;
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        if (annotationTag != MGLAnnotationTagNotFound)
+        {
+            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            if (annotationTag == _selectedAnnotationTag)
+            {
+                [self deselectAnnotation:annotation animated:YES];
+            }
+        }
+    }
 }
 
 + (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomEnabled
@@ -2417,6 +2434,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             [annotationImages addObject:annotationImage];
 
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
+            
+            if ( ! [_pointAnnotations containsObject:annotation] && [annotation isKindOfClass:[NSObject class]])
+            {
+                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:NULL];
+                [_pointAnnotations addObject:annotation];
+            }
         }
     }
 
@@ -2571,6 +2594,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         
         _annotationContextsByAnnotationTag.erase(annotationTag);
+        
+        if ([annotation isKindOfClass:[NSObject class]])
+        {
+            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate"];
+        }
+        [_pointAnnotations removeObject:annotation];
     }
 
     if ( ! annotationTagsToRemove.empty())

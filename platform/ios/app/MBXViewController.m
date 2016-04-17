@@ -719,4 +719,15 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     return nil;
 }
 
+- (void)mapView:(MGLMapView *)mapView tapOnCalloutForAnnotation:(id <MGLAnnotation>)annotation
+{
+    if ( ! [annotation isKindOfClass:[MGLPointAnnotation class]])
+    {
+        return;
+    }
+    
+    MGLPointAnnotation *point = annotation;
+    point.coordinate = [self.mapView convertPoint:self.mapView.center toCoordinateFromView:self.mapView];
+}
+
 @end
