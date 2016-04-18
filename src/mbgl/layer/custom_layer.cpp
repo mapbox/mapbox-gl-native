@@ -47,7 +47,27 @@ void CustomLayer::render(const TransformState& state) const {
     parameters.bearing = -state.getAngle() * util::RAD2DEG;
     parameters.pitch = state.getPitch();
     parameters.altitude = state.getAltitude();
+    
+    mat4 projMatrix;
+    mat4 nativeMatrix;
+    mat4 extrudeMatrix;
+    
+    state.getProjMatrix(projMatrix);
+    
+    // The extrusion matrix.
+    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
+    
+    // The native matrix is a 1:1 matrix that paints the coordinates at the
+    // same screen position as the vertex specifies.
+    matrix::identity(nativeMatrix);
+    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
 
+    for(int i = 0; i < 16; i++) {
+        parameters.projMatrix[i] = projMatrix[i];
+        parameters.nativeMatrix[i] = nativeMatrix[i];
+        parameters.extrudeMatrix[i] = extrudeMatrix[i];
+    }
+    
     renderFn(context, parameters);
 }
 

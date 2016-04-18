@@ -210,6 +210,9 @@ struct CustomLayerRenderParameters {
     double bearing;
     double pitch;
     double altitude;
+    double projMatrix[16];
+    double nativeMatrix[16];
+    double extrudeMatrix[16];
 };
 
 /**
