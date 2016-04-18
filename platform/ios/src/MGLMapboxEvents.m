@@ -140,6 +140,9 @@ const NSTimeInterval MGLFlushInterval = 180;
              @"MGLMapboxAccountType": accountTypeNumber ?: @0,
              @"MGLMapboxMetricsEnabled": @YES,
              @"MGLMapboxMetricsDebugLoggingEnabled": @NO,
+#if TARGET_OS_SIMULATOR
+             @"MGLTelemetryTestServerURL": @"https://cloudfront-staging.tilestream.net",
+#endif
          }];
     }
 }
@@ -360,7 +363,7 @@ const NSTimeInterval MGLFlushInterval = 180;
         [self pushTurnstileEvent];
     }
     
-    if ([self isPaused]) {
+    if (self.paused) {
         return;
     }
     
@@ -450,7 +453,7 @@ const NSTimeInterval MGLFlushInterval = 180;
 // Called implicitly from public use of +flush.
 //
 - (void)postEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
-    if ([self isPaused]) {
+    if (self.paused) {
         return;
     }
     

@@ -42,7 +42,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
             @"MBXShowsUserLocation": @NO,
             @"MBXDebug": @NO,
-            @"MGLTelemetryTestServerURL": @"https://cloudfront-staging.tilestream.net",
         }];
     }
 }
