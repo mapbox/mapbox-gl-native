@@ -989,10 +989,7 @@ IB_DESIGNABLE
 
 - (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
 
-/**
-    Empties the in-memory tile cache.
- */
-- (void)emptyMemoryCache;
+- (void)emptyMemoryCache __attribute__((deprecated));
 
 /**
     Resets the map to the minimum zoom level, a center coordinate of (0, 0), and

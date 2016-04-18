@@ -16,6 +16,9 @@
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;
 
+/** Empties the in-memory tile cache. */
+- (void)didReceiveMemoryWarning;
+
 @end
 
 @interface MBXBenchViewController () <MGLMapViewDelegate>
@@ -142,7 +145,7 @@ static const int benchmarkDuration = 200; // frames
         {
             // Start the benchmarking timer.
             state = State::WarmingUp;
-            [self.mapView emptyMemoryCache];
+            [self.mapView didReceiveMemoryWarning];
             NSLog(@"- Warming up for %d frames...", warmupDuration);
             [mapView setNeedsGLDisplay];
         }

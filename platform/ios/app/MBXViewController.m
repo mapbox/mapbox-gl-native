@@ -159,7 +159,6 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                             ((debugMask & MGLMapDebugCollisionBoxesMask)
                              ? @"Hide Collision Boxes"
                              : @"Show Collision Boxes"),
-                            @"Empty Memory",
                             @"Add 100 Points",
                             @"Add 1,000 Points",
                             @"Add 10,000 Points",
@@ -201,21 +200,17 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        [self.mapView emptyMemoryCache];
+        [self parseFeaturesAddingCount:100];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
     {
-        [self parseFeaturesAddingCount:100];
+        [self parseFeaturesAddingCount:1000];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 7)
     {
-        [self parseFeaturesAddingCount:1000];
-    }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
-    {
         [self parseFeaturesAddingCount:10000];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 8)
     {
         // PNW triangle
         //
@@ -282,19 +277,19 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             free(polygonCoordinates);
         }
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 9)
     {
         [self startWorldTour:actionSheet];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
         [self presentAnnotationWithCustomCallout];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 11)
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 12)
     {
         if (_isShowingCustomStyleLayer)
         {
@@ -305,12 +300,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [self insertCustomStyleLayer];
         }
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
     {
         NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogfilePath] encoding:NSUTF8StringEncoding error:nil];
         NSLog(@"%@", fileContents);
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 15)
+    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
     {
         NSString *filePath = [self telemetryDebugLogfilePath];
         if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath]) {
