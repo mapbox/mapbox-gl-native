@@ -203,5 +203,10 @@ public class SupportMapFragment extends Fragment {
      */
     public void getMapAsync(@NonNull final OnMapReadyCallback onMapReadyCallback) {
         mOnMapReadyCallback = onMapReadyCallback;
+        if (mMap == null) {
+            mOnMapReadyCallback = onMapReadyCallback;
+        } else {
+            mMap.getMapAsync(onMapReadyCallback);
+        }
     }
 }
