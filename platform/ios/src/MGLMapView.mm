@@ -291,6 +291,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _mbglMap->setStyleURL([[styleURL absoluteString] UTF8String]);
 }
 
+- (IBAction)reloadStyle:(__unused id)sender {
+    NSURL *styleURL = self.styleURL;
+    _mbglMap->setStyleURL("");
+    self.styleURL = styleURL;
+}
+
 - (void)commonInit
 {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;

@@ -136,6 +136,20 @@ IB_DESIGNABLE
 @property (nonatomic, null_resettable) NSURL *styleURL;
 
 /**
+ Reloads the style.
+ 
+ You do not normally need to call this method. The map view automatically
+ responds to changes in network connectivity by reloading the style. You may
+ need to call this method if you change the access token after a style has
+ loaded but before loading a style associated with a different Mapbox account.
+ 
+ This method does not bust the cache. Even if the style has recently changed on
+ the server, calling this method does not necessarily ensure that the map view
+ reflects those changes.
+ */
+- (IBAction)reloadStyle:(id)sender;
+
+/**
  A control indicating the map's direction and allowing the user to manipulate
  the direction, positioned in the upper-right corner.
  */
