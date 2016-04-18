@@ -4226,9 +4226,24 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::CustomLayerRenderParamet
     CGFloat pitch = params.pitch;
     CGFloat perspectiveSkew = params.altitude;
     MGLCustomStyleLayerDrawingHandler draw = reinterpret_cast<MGLCustomStyleLayerHandlers *>(context)->draw;
+    GLKMatrix4 projMatrix = GLKMatrix4Make(
+		    params.projMatrix[0], params.projMatrix[1], params.projMatrix[2], params.projMatrix[3], 
+		    params.projMatrix[4], params.projMatrix[5], params.projMatrix[6], params.projMatrix[7], 
+		    params.projMatrix[8], params.projMatrix[9], params.projMatrix[10], params.projMatrix[11], 
+		    params.projMatrix[12], params.projMatrix[13], params.projMatrix[14], params.projMatrix[15]);
+    GLKMatrix4 nativeMatrix = GLKMatrix4Make(
+		    params.nativeMatrix[0], params.nativeMatrix[1], params.nativeMatrix[2], params.nativeMatrix[3],
+		    params.nativeMatrix[4], params.nativeMatrix[5], params.nativeMatrix[6], params.nativeMatrix[7],
+		    params.nativeMatrix[8], params.nativeMatrix[9], params.nativeMatrix[10], params.nativeMatrix[11],
+		    params.nativeMatrix[12], params.nativeMatrix[13], params.nativeMatrix[14], params.nativeMatrix[15]);
+    GLKMatrix4 extrudeMatrix = GLKMatrix4Make(
+		    params.extrudeMatrix[0], params.extrudeMatrix[1], params.extrudeMatrix[2], params.extrudeMatrix[3],
+		    params.extrudeMatrix[4], params.extrudeMatrix[5], params.extrudeMatrix[6], params.extrudeMatrix[7],
+		    params.extrudeMatrix[8], params.extrudeMatrix[9], params.extrudeMatrix[10], params.extrudeMatrix[11],
+		    params.extrudeMatrix[12], params.extrudeMatrix[13], params.extrudeMatrix[14], params.extrudeMatrix[15]);
     if (draw)
     {
-        draw(size, centerCoordinate, zoomLevel, direction, pitch, perspectiveSkew);
+        draw(size, centerCoordinate, zoomLevel, direction, pitch, perspectiveSkew, projMatrix, nativeMatrix, extrudeMatrix);
     }
 }
 
