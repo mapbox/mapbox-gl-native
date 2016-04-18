@@ -144,7 +144,7 @@ run-glfw-app:
 run-valgrind-glfw-app:
 	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
 
-ifneq (,$(shell command -v gdb))
+ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
 
