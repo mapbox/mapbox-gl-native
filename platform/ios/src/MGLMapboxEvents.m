@@ -140,16 +140,17 @@ const NSTimeInterval MGLFlushInterval = 180;
              @"MGLMapboxAccountType": accountTypeNumber ?: @0,
              @"MGLMapboxMetricsEnabled": @YES,
              @"MGLMapboxMetricsDebugLoggingEnabled": @NO,
-#if TARGET_OS_SIMULATOR
-             @"MGLTelemetryTestServerURL": @"https://cloudfront-staging.tilestream.net",
-#endif
          }];
     }
 }
 
 + (BOOL)isEnabled {
+#if TARGET_OS_SIMULATOR
+    return NO;
+#else
     return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
             [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
+#endif
 }
 
 - (BOOL)debugLoggingEnabled {
