@@ -3171,7 +3171,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
 
     MGLUserTrackingMode oldMode = _userTrackingMode;
+    [self willChangeValueForKey:@"userTrackingMode"];
     _userTrackingMode = mode;
+    [self didChangeValueForKey:@"userTrackingMode"];
 
     switch (_userTrackingMode)
     {
