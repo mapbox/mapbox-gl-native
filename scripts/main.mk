@@ -139,10 +139,10 @@ tidy: Ninja/compdb
 #### Run tests #################################################################
 
 run-glfw-app:
-	$(PLATFORM_OUTPUT)/$(BUILDTYPE)/mapbox-glfw
+	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && ./mapbox-glfw
 
 run-valgrind-glfw-app:
-	valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup $(PLATFORM_OUTPUT)/$(BUILDTYPE)/mapbox-glfw
+	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
 
 ifneq (,$(shell command -v gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
