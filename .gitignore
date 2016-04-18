@@ -4,6 +4,7 @@
 *.gcda
 *~
 offline.db
+xcuserdata
 /platform/node/test/actual
 /platform/node/test/diff
 /mason_packages
