@@ -1,4 +1,6 @@
 #import "MBXViewController.h"
+
+#import "MBXAppDelegate.h"
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
 
@@ -57,6 +59,34 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [self cycleStyles:self];
 
     [self restoreState:nil];
+    
+    if ( ! [MGLAccountManager accessToken].length)
+    {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Access Token" message:@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:" preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField)
+         {
+             textField.keyboardType = UIKeyboardTypeURL;
+             textField.autocorrectionType = UITextAutocorrectionTypeNo;
+             textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+         }];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+        {
+            UITextField *textField = alertController.textFields.firstObject;
+            NSString *accessToken = textField.text;
+            [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
+            [MGLAccountManager setAccessToken:accessToken];
+            [self.mapView reloadStyle:self];
+        }];
+        [alertController addAction:OKAction];
+        
+        if ([alertController respondsToSelector:@selector(setPreferredAction:)])
+        {
+            alertController.preferredAction = OKAction;
+        }
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
 }
 
 - (void)saveState:(__unused NSNotification *)notification

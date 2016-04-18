@@ -2,6 +2,8 @@
 #import "MBXViewController.h"
 #import <Mapbox/Mapbox.h>
 
+NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
+
 @implementation MBXAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -12,14 +14,12 @@
         if (accessToken) {
             // Store to preferences so that we can launch the app later on without having to specify
             // token.
-            [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:@"access_token"];
+            [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
         } else {
             // Try to retrieve from preferences, maybe we've stored them there previously and can reuse
             // the token.
-            accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"];
+            accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MBXMapboxAccessTokenDefaultsKey];
         }
-        if ( ! accessToken) NSLog(@"No access token set. Mapbox vector tiles won't work.");
-
         [MGLAccountManager setAccessToken:accessToken];
     }
 
