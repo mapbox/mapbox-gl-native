@@ -12,7 +12,7 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK and
 
     make iproj
 
-Which will create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications. Before building, use the scheme picker button in the toolbar to change the scheme to “iosapp” and the destination to one of the simulators or connected devices listed in the menu.
+Which will create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications. Before building, use the scheme picker button in the toolbar to create a `New Scheme` and then select `iosapp` as the target and use the default "iosapp" as the name and click `Ok`. Finally, change the scheme to the new “iosapp” and the destination to one of the simulators or connected devices listed in the menu.
 
 If you don't have an Apple Developer account, change the destination to a simulator such as "iPhone 6" before you run and build the app.
 
