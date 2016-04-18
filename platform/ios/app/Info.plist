@@ -24,17 +24,6 @@
 	<string>7877</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>cloudfront-staging.tilestream.net</key>
-			<dict>
-				<key>NSExceptionRequiresForwardSecrecy</key>
-				<false/>
-			</dict>
-		</dict>
-	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2014–2016 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
