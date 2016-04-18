@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA17BE301CC4BAC300402C41 /* MGLMapView_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */; };
+		DA17BE311CC4BDAA00402C41 /* MGLMapView_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */; };
 		DA1DC96A1CB6C6B7006E619F /* MBXCustomCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */; };
 		DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */; };
 		DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96C1CB6C6CE006E619F /* points.geojson */; };
@@ -239,6 +241,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLMapView_Internal.h; path = src/MGLMapView_Internal.h; sourceTree = "<group>"; };
 		DA1DC94A1CB6C1C2006E619F /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA1DC9501CB6C1C2006E619F /* MBXAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXAppDelegate.h; sourceTree = "<group>"; };
 		DA1DC9531CB6C1C2006E619F /* MBXViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXViewController.h; sourceTree = "<group>"; };
@@ -591,6 +594,7 @@
 				DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */,
 				DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */,
 				DA8848361CBAFB8500AB86E3 /* MGLMapView.h */,
+				DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */,
 				DA8848371CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h */,
 				DA8848381CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h */,
 				DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */,
@@ -735,6 +739,7 @@
 				DA8848551CBAFB9800AB86E3 /* MGLLocationManager.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
 				DA88483D1CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h in Headers */,
+				DA17BE301CC4BAC300402C41 /* MGLMapView_Internal.h in Headers */,
 				DA88481E1CBAFA6200AB86E3 /* MGLMultiPoint_Private.h in Headers */,
 				DA8847F71CBAFA5100AB86E3 /* MGLOverlay.h in Headers */,
 				DA88488B1CBB037E00AB86E3 /* SMCalloutView.h in Headers */,
@@ -772,6 +777,7 @@
 				DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */,
 				DABFB8661CBE99E500D62B32 /* MGLPointAnnotation.h in Headers */,
 				DABFB8621CBE99E500D62B32 /* MGLOfflinePack.h in Headers */,
+				DA17BE311CC4BDAA00402C41 /* MGLMapView_Internal.h in Headers */,
 				DABFB86C1CBE99E500D62B32 /* MGLTypes.h in Headers */,
 				DABFB8691CBE99E500D62B32 /* MGLShape.h in Headers */,
 				DABFB8701CBE9A0F00D62B32 /* MGLMapView+IBAdditions.h in Headers */,

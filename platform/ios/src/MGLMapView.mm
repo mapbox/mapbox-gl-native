@@ -1,6 +1,4 @@
-#import "MGLMapView.h"
-#import "MGLMapView+IBAdditions.h"
-#import "MGLMapView+MGLCustomStyleLayerAdditions.h"
+#import "MGLMapView_Internal.h"
 
 #import <mbgl/platform/log.hpp>
 #import <mbgl/gl/gl.hpp>
