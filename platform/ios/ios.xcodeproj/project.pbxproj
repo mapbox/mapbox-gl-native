@@ -113,6 +113,10 @@
 		DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
 		DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88488D1CBB047F00AB86E3 /* reachability.h */; };
 		DA8848901CBB048E00AB86E3 /* reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488F1CBB048E00AB86E3 /* reachability.m */; };
+		DA8963371CC549A100684375 /* glyphs in Resources */ = {isa = PBXBuildFile; fileRef = DA8963331CC549A100684375 /* glyphs */; };
+		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
+		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
+		DA89633A1CC549A100684375 /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963361CC549A100684375 /* tiles */; };
 		DAA4E4051CBB5C9E00178DFB /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAA4E4041CBB5C9E00178DFB /* ImageIO.framework */; };
 		DAA4E4071CBB5CBF00178DFB /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAA4E4061CBB5CBF00178DFB /* MobileCoreServices.framework */; };
 		DAA4E4081CBB6C9500178DFB /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -349,6 +353,10 @@
 		DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
 		DA88488D1CBB047F00AB86E3 /* reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reachability.h; path = ../../include/mbgl/platform/darwin/reachability.h; sourceTree = "<group>"; };
 		DA88488F1CBB048E00AB86E3 /* reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = reachability.m; path = src/reachability.m; sourceTree = "<group>"; };
+		DA8963331CC549A100684375 /* glyphs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glyphs; sourceTree = "<group>"; };
+		DA8963341CC549A100684375 /* sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sprites; sourceTree = "<group>"; };
+		DA8963351CC549A100684375 /* styles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = styles; sourceTree = "<group>"; };
+		DA8963361CC549A100684375 /* tiles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tiles; sourceTree = "<group>"; };
 		DAA4E4021CBB5C2F00178DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		DAA4E4041CBB5C9E00178DFB /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		DAA4E4061CBB5CBF00178DFB /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -649,6 +657,18 @@
 			name = reachability;
 			sourceTree = "<group>";
 		};
+		DA8963321CC5498400684375 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				DA8963331CC549A100684375 /* glyphs */,
+				DA8963341CC549A100684375 /* sprites */,
+				DA8963351CC549A100684375 /* styles */,
+				DA8963361CC549A100684375 /* tiles */,
+			);
+			name = Fixtures;
+			path = assets;
+			sourceTree = "<group>";
+		};
 		DABCABA91CB80692000A7C39 /* Benchmarking App */ = {
 			isa = PBXGroup;
 			children = (
@@ -659,6 +679,7 @@
 				DABCABBF1CB80717000A7C39 /* locations.cpp */,
 				DABCABC01CB80717000A7C39 /* locations.hpp */,
 				DABCABB61CB80692000A7C39 /* Assets.xcassets */,
+				DA8963321CC5498400684375 /* Fixtures */,
 				DABCABB81CB80692000A7C39 /* LaunchScreen.storyboard */,
 				DABCABBB1CB80692000A7C39 /* Info.plist */,
 				DABCABAA1CB80692000A7C39 /* Supporting Files */,
@@ -959,8 +980,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA89633A1CC549A100684375 /* tiles in Resources */,
+				DA8963391CC549A100684375 /* styles in Resources */,
 				DABCABBA1CB80692000A7C39 /* LaunchScreen.storyboard in Resources */,
+				DA8963381CC549A100684375 /* sprites in Resources */,
 				DABCABB71CB80692000A7C39 /* Assets.xcassets in Resources */,
+				DA8963371CC549A100684375 /* glyphs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
