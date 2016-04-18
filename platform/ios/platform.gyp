@@ -88,6 +88,7 @@
         '../default',
         '../../include',
         '../../src', # TODO: eliminate
+        '<(SHARED_INTERMEDIATE_DIR)/include',
       ],
 
       'sources': [
