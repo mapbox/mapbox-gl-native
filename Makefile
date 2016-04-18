@@ -193,8 +193,8 @@ tidy:
 
 clean:
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
-	-find ./build -type f -not -path '*/*.xcodeproj/*' -exec rm {} \;
-	-rm -rf ./platform/android/MapboxGLAndroidSDK/build \
+	-rm -rf ./build \
+	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs \
