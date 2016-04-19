@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -105,6 +107,14 @@ public class DoubleMapActivity extends AppCompatActivity {
                         // permission is handled in MainActivity
                         getActivity().finish();
                     }
+
+                    mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(@NonNull LatLng point) {
+                            // test if we can open 2 activities after each other
+                            startActivity(new Intent(mMapViewMini.getContext(), DoubleMapActivity.class));
+                        }
+                    });
                 }
             });
         }
