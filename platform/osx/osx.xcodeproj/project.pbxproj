@@ -222,7 +222,7 @@
 		DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = mapbox.pdf; path = src/resources/mapbox.pdf; sourceTree = SOURCE_ROOT; };
 		DAE6C3BD1CC31F2E00DB3429 /* MGLAnnotationCallout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MGLAnnotationCallout.xib; path = src/resources/MGLAnnotationCallout.xib; sourceTree = SOURCE_ROOT; };
 		DAE6C3C11CC31F4500DB3429 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mapbox.h; sourceTree = "<group>"; };
-		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = "../../build/osx-x86_64/mbgl.xcconfig"; sourceTree = "<group>"; };
+		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = "../../build/osx/mbgl.xcconfig"; sourceTree = "<group>"; };
 		DAE6C3C61CC3499100DB3429 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
 		DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflinePackTests.m; path = ../../darwin/test/MGLOfflinePackTests.m; sourceTree = "<group>"; };

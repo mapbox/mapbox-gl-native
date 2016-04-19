@@ -17,7 +17,7 @@
                BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
                BuildableName = "mbgl-offline"
                BlueprintName = "mbgl-offline"
-               ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+               ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
             BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
             BuildableName = "mbgl-offline"
             BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+            ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -59,7 +59,7 @@
             BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
             BuildableName = "mbgl-offline"
             BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+            ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -78,7 +78,7 @@
             BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
             BuildableName = "mbgl-offline"
             BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+            ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

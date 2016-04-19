@@ -17,7 +17,7 @@
                BlueprintIdentifier = "4E8A9455A3A23B7FD2A8FC52"
                BuildableName = "All"
                BlueprintName = "All"
-               ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+               ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry

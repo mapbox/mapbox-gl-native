@@ -19,7 +19,7 @@
                BlueprintIdentifier = "6EE19CDFBCE7BD04FE561812"
                BuildableName = "osxtest.xctest"
                BlueprintName = "osxtest"
-               ReferencedContainer = "container:../../build/osx-x86_64/platform/osx/platform.xcodeproj">
+               ReferencedContainer = "container:../../build/osx/platform/osx/platform.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

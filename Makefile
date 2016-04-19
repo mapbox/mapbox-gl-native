@@ -23,10 +23,9 @@ default:
 
 #### OS X targets ##############################################################
 
-OSX_OUTPUT_PATH = build/osx-x86_64
+OSX_OUTPUT_PATH = build/osx
 OSX_PROJ_PATH = $(OSX_OUTPUT_PATH)/platform/osx/platform.xcodeproj
 OSX_WORK_PATH = platform/osx/osx.xcworkspace
-OSX_DERIVED_DATA_PATH = build/DerivedData/osx
 
 $(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configure
 	MASON_PLATFORM=osx ./configure $< $@
@@ -39,7 +38,7 @@ $(OSX_PROJ_PATH): platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi $(OSX
 
 osx: $(OSX_PROJ_PATH)
 	set -o pipefail && xcodebuild \
-	  -derivedDataPath $(OSX_DERIVED_DATA_PATH) \
+	  -derivedDataPath $(OSX_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(OSX_WORK_PATH) -scheme CI build | xcpretty
 
@@ -47,10 +46,10 @@ xproj: $(OSX_PROJ_PATH)
 	open $(OSX_WORK_PATH)
 
 test-osx: osx node_modules/express
-	ulimit -c unlimited && ($(OSX_DERIVED_DATA_PATH)/Build/Products/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
+	ulimit -c unlimited && ($(OSX_OUTPUT_PATH)/Build/Products/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
 	set -o pipefail && xcodebuild \
-	  -derivedDataPath $(OSX_DERIVED_DATA_PATH) \
+	  -derivedDataPath $(OSX_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(OSX_WORK_PATH) -scheme CI test | xcpretty
 
