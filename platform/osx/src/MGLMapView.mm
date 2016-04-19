@@ -1416,12 +1416,20 @@ public:
     BOOL isScrollWheel = event.phase == NSEventPhaseNone && event.momentumPhase == NSEventPhaseNone && !event.hasPreciseScrollingDeltas;
     if (isScrollWheel || [[NSUserDefaults standardUserDefaults] boolForKey:MGLScrollWheelZoomsMapViewDefaultKey]) {
         // A traditional, vertical scroll wheel zooms instead of panning.
-        if (self.zoomEnabled && std::abs(event.scrollingDeltaX) < std::abs(event.scrollingDeltaY)) {
-            _mbglMap->cancelTransitions();
-            
-            NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
-            double zoomDelta = event.scrollingDeltaY / 4;
-            [self scaleBy:exp2(zoomDelta) atPoint:gesturePoint animated:YES];
+        if (self.zoomEnabled) {
+            const double delta =
+                event.scrollingDeltaY / ([event hasPreciseScrollingDeltas] ? 100 : 10);
+            if (delta != 0) {
+                double scale = 2.0 / (1.0 + std::exp(-std::abs(delta)));
+
+                // Zooming out.
+                if (delta < 0) {
+                    scale = 1.0 / scale;
+                }
+
+                NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
+                [self scaleBy:scale atPoint:gesturePoint animated:NO];
+            }
         }
     } else if (self.scrollEnabled
                && _magnificationGestureRecognizer.state == NSGestureRecognizerStatePossible
