@@ -34,6 +34,20 @@ export PLATFORM_OUTPUT = ./build/$(PLATFORM_SLUG)
 export PLATFORM_CONFIG_INPUT = platform/$(MASON_PLATFORM)/scripts/configure.sh
 export PLATFORM_CONFIG_OUTPUT = $(PLATFORM_OUTPUT)/config.gypi
 
+ifeq ($(PLATFORM),qt)
+  ifeq ($(shell uname -s), Darwin)
+    export MASON_PLATFORM = osx
+    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
+    export PLATFORM_SLUG = qt-osx-$(SUBPLATFORM)
+    export PLATFORM_CONFIG_INPUT = platform/qt/scripts/configure.sh
+  else ifeq ($(shell uname -s), Linux)
+    export MASON_PLATFORM = linux
+    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
+    export PLATFORM_SLUG = qt-linux-$(SUBPLATFORM)
+    export PLATFORM_CONFIG_INPUT = platform/qt/scripts/configure.sh
+  endif
+endif
+
 ifneq (,$(findstring clang,$(CXX)))
 	CXX_HOST = "clang"
 else ifneq (,$(findstring g++,$(CXX)))
@@ -123,6 +137,9 @@ tidy: Ninja/compdb
 
 run-glfw-app:
 	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && ./mapbox-glfw
+
+run-qt-app:
+	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && ./qmapboxgl
 
 run-valgrind-glfw-app:
 	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw

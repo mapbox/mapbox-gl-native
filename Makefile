@@ -165,6 +165,24 @@ test-node: node
 	npm test
 	npm run test-suite
 
+#### Qt targets #####################################################
+
+.PHONY: qt-lib
+qt-lib:
+	$(RUN) PLATFORM=qt Makefile/qt-lib
+
+.PHONY: qt-app
+qt-app:
+	$(RUN) PLATFORM=qt Makefile/qt-app
+
+.PHONY: run-qt-app
+run-qt-app: qt-app
+	$(RUN) PLATFORM=qt run-qt-app
+
+.PHONY: test-qt
+test-qt: node_modules/express
+	$(RUN) PLATFORM=qt test-*
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: linux

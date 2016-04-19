@@ -60,6 +60,12 @@ function print_opengl_flags {
     CONFIG+="    'opengl_ldflags%': [],"$LN
 }
 
+function print_qt_flags {
+    CONFIG+="    'qt_cflags%': [], "$LN
+    CONFIG+="    'qt_ldflags%': [],  "$LN
+    CONFIG+="    'qt_moc%': [],  "$LN
+}
+
 # Load dependencies
 source ${INPUT_FILE}
 
@@ -91,6 +97,7 @@ CONFIG+="  },"$LN
 CONFIG+="  'variables': {"$LN
 
 print_opengl_flags
+print_qt_flags
 
 print_flags boost cflags
 print_flags boost_libprogram_options static_libs
