@@ -70,7 +70,7 @@ MBGL_DEFINE_ENUM_CLASS(LineCapTypeClass, LineCapType, {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class JoinType : uint8_t {
+enum class LineJoinType : uint8_t {
     Miter,
     Bevel,
     Round,
@@ -79,12 +79,12 @@ enum class JoinType : uint8_t {
     FlipBevel
 };
 
-MBGL_DEFINE_ENUM_CLASS(JoinTypeClass, JoinType, {
-    { JoinType::Miter, "miter" },
-    { JoinType::Bevel, "bevel" },
-    { JoinType::Round, "round" },
-    { JoinType::FakeRound, "fakeround" },
-    { JoinType::FlipBevel, "flipbevel" },
+MBGL_DEFINE_ENUM_CLASS(LineJoinTypeClass, LineJoinType, {
+    { LineJoinType::Miter, "miter" },
+    { LineJoinType::Bevel, "bevel" },
+    { LineJoinType::Round, "round" },
+    { LineJoinType::FakeRound, "fakeround" },
+    { LineJoinType::FlipBevel, "flipbevel" },
 });
 
 // -------------------------------------------------------------------------------------------------

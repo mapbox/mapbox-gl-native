@@ -31,7 +31,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         type = geojsonvt::ProjectedFeatureType::LineString;
 
         std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>();
-        layer->layout.join = JoinType::Round;
+        layer->layout.join = LineJoinType::Round;
 
         const LineAnnotationProperties& properties = shape.properties.get<LineAnnotationProperties>();
         layer->paint.opacity = properties.opacity;

@@ -67,7 +67,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         return;
     }
 
-    const float miterLimit = layout.join == JoinType::Bevel ? 1.05f : float(layout.miterLimit);
+    const float miterLimit = layout.join == LineJoinType::Bevel ? 1.05f : float(layout.miterLimit);
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
@@ -172,33 +172,33 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
-        JoinType currentJoin = layout.join;
+        LineJoinType currentJoin = layout.join;
         const LineCapType currentCap = nextVertex ? beginCap : endCap;
 
         if (middleVertex) {
-            if (currentJoin == JoinType::Round) {
+            if (currentJoin == LineJoinType::Round) {
                 if (miterLength < layout.roundLimit) {
-                    currentJoin = JoinType::Miter;
+                    currentJoin = LineJoinType::Miter;
                 } else if (miterLength <= 2) {
-                    currentJoin = JoinType::FakeRound;
+                    currentJoin = LineJoinType::FakeRound;
                 }
             }
 
-            if (currentJoin == JoinType::Miter && miterLength > miterLimit) {
-                currentJoin = JoinType::Bevel;
+            if (currentJoin == LineJoinType::Miter && miterLength > miterLimit) {
+                currentJoin = LineJoinType::Bevel;
             }
 
-            if (currentJoin == JoinType::Bevel) {
+            if (currentJoin == LineJoinType::Bevel) {
                 // The maximum extrude length is 128 / 63 = 2 times the width of the line
                 // so if miterLength >= 2 we need to draw a different type of bevel where.
                 if (miterLength > 2) {
-                    currentJoin = JoinType::FlipBevel;
+                    currentJoin = LineJoinType::FlipBevel;
                 }
 
                 // If the miterLength is really small and the line bevel wouldn't be visible,
                 // just draw a miter join to save a triangle.
                 if (miterLength < miterLimit) {
-                    currentJoin = JoinType::Miter;
+                    currentJoin = LineJoinType::Miter;
                 }
             }
         }
@@ -207,12 +207,12 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         if (prevVertex)
             distance += util::dist<double>(currentVertex, prevVertex);
 
-        if (middleVertex && currentJoin == JoinType::Miter) {
+        if (middleVertex && currentJoin == LineJoinType::Miter) {
             joinNormal = joinNormal * miterLength;
             addCurrentVertex(currentVertex, distance, joinNormal, 0, 0, false, startVertex,
                              triangleStore);
 
-        } else if (middleVertex && currentJoin == JoinType::FlipBevel) {
+        } else if (middleVertex && currentJoin == LineJoinType::FlipBevel) {
             // miter is too big, flip the direction to make a beveled join
 
             if (miterLength > 100) {
@@ -230,7 +230,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
 
             addCurrentVertex(currentVertex, distance, joinNormal * -1.0, 0, 0, false, startVertex,
                              triangleStore);
-        } else if (middleVertex && (currentJoin == JoinType::Bevel || currentJoin == JoinType::FakeRound)) {
+        } else if (middleVertex && (currentJoin == LineJoinType::Bevel || currentJoin == LineJoinType::FakeRound)) {
             const bool lineTurnsLeft = (prevNormal.x * nextNormal.y - prevNormal.y * nextNormal.x) > 0;
             const float offset = -std::sqrt(miterLength * miterLength - 1);
             float offsetA;
@@ -250,7 +250,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
                                  startVertex, triangleStore);
             }
 
-            if (currentJoin == JoinType::FakeRound) {
+            if (currentJoin == LineJoinType::FakeRound) {
                 // The join angle is sharp enough that a round join would be visible.
                 // Bevel joins fill the gap between segments with a single pie slice triangle.
                 // Create a round join by adding multiple pie slices. The join isn't actually round, but
@@ -308,7 +308,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
                                  startVertex, triangleStore);
             }
 
-        } else if (middleVertex ? currentJoin == JoinType::Round : currentCap == LineCapType::Round) {
+        } else if (middleVertex ? currentJoin == LineJoinType::Round : currentCap == LineCapType::Round) {
             if (!startOfLine) {
                 // Close previous segment with a butt
                 addCurrentVertex(currentVertex, distance, prevNormal, 0, 0, false,

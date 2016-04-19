@@ -111,13 +111,13 @@ optional<LineCapType> parseProperty<LineCapType>(const char* name, const JSValue
 }
 
 template <>
-optional<JoinType> parseProperty<JoinType>(const char* name, const JSValue& value) {
+optional<LineJoinType> parseProperty<LineJoinType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
     }
 
-    return { JoinTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return { LineJoinTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template <>
@@ -326,8 +326,8 @@ template <> optional<Function<LineCapType>> parseProperty(const char* name, cons
     return parseFunction<LineCapType>(name, value);
 }
 
-template <> optional<Function<JoinType>> parseProperty(const char* name, const JSValue& value) {
-    return parseFunction<JoinType>(name, value);
+template <> optional<Function<LineJoinType>> parseProperty(const char* name, const JSValue& value) {
+    return parseFunction<LineJoinType>(name, value);
 }
 
 template <> optional<Function<PlacementType>> parseProperty(const char* name, const JSValue& value) {

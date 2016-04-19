@@ -10,7 +10,7 @@ namespace mbgl {
 class LineLayoutProperties {
 public:
     LayoutProperty<LineCapType> cap { LineCapType::Butt };
-    LayoutProperty<JoinType> join { JoinType::Miter };
+    LayoutProperty<LineJoinType> join { LineJoinType::Miter };
     LayoutProperty<float> miterLimit { 2.0f };
     LayoutProperty<float> roundLimit { 1.0f };
 };
