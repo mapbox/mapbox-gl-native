@@ -3098,14 +3098,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if ([iconIdentifier isEqualToString:fallbackIconIdentifier])
         {
             // Update any annotations associated with the annotation image.
-            for (auto &pair : _annotationContextsByAnnotationTag)
-            {
-                if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
-                {
-                    const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
-                    _mbglMap->updatePointAnnotation(pair.first, { latLng, updatedIconIdentifier.UTF8String ?: "" });
-                }
-            }
+            [self applyIconIdentifier:updatedIconIdentifier toAnnotationsWithImageReuseIdentifier:reuseIdentifier];
         }
     }
     else
@@ -3118,13 +3111,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         
         // Update any annotations associated with the annotation image.
-        for (auto &pair : _annotationContextsByAnnotationTag)
+        [self applyIconIdentifier:fallbackIconIdentifier toAnnotationsWithImageReuseIdentifier:reuseIdentifier];
+    }
+}
+
+- (void)applyIconIdentifier:(NSString *)iconIdentifier toAnnotationsWithImageReuseIdentifier:(NSString *)reuseIdentifier
+{
+    for (auto &pair : _annotationContextsByAnnotationTag)
+    {
+        if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
         {
-            if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
-            {
-                const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
-                _mbglMap->updatePointAnnotation(pair.first, { latLng, fallbackIconIdentifier.UTF8String ?: "" });
-            }
+            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
+            _mbglMap->updatePointAnnotation(pair.first, { latLng, iconIdentifier.UTF8String ?: "" });
         }
     }
 }
