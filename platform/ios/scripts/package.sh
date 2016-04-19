@@ -6,7 +6,7 @@ set -u
 
 NAME=Mapbox
 OUTPUT=build/ios/pkg
-DERIVED_DATA=build/DerivedData/ios
+DERIVED_DATA=build/ios
 PRODUCTS=${DERIVED_DATA}/Build/Products
 
 BUILDTYPE=${BUILDTYPE:-Release}

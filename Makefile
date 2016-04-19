@@ -55,10 +55,9 @@ test-osx: osx node_modules/express
 
 #### iOS targets ##############################################################
 
-IOS_OUTPUT_PATH = build/ios-all
+IOS_OUTPUT_PATH = build/ios
 IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/platform/ios/platform.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
-IOS_DERIVED_DATA_PATH = build/DerivedData/ios
 
 $(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configure
 	MASON_PLATFORM=ios ./configure $< $@
@@ -72,7 +71,7 @@ $(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS
 ios: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_DERIVED_DATA_PATH) \
+	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
@@ -82,10 +81,10 @@ iproj: $(IOS_PROJ_PATH)
 
 test-ios: ios
 	ios-sim start --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
-	ios-sim launch $(IOS_DERIVED_DATA_PATH)/Build/Products/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
+	ios-sim launch $(IOS_OUTPUT_PATH)/Build/Products/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
 	set -o pipefail && xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_DERIVED_DATA_PATH) \
+	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
 	  -workspace $(IOS_WORK_PATH) -scheme CI test | xcpretty
