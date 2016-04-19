@@ -121,13 +121,13 @@ optional<LineJoinType> parseProperty<LineJoinType>(const char* name, const JSVal
 }
 
 template <>
-optional<PlacementType> parseProperty<PlacementType>(const char* name, const JSValue& value) {
+optional<SymbolPlacementType> parseProperty<SymbolPlacementType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
     }
 
-    return { PlacementTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return { SymbolPlacementTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template <>
@@ -330,8 +330,8 @@ template <> optional<Function<LineJoinType>> parseProperty(const char* name, con
     return parseFunction<LineJoinType>(name, value);
 }
 
-template <> optional<Function<PlacementType>> parseProperty(const char* name, const JSValue& value) {
-    return parseFunction<PlacementType>(name, value);
+template <> optional<Function<SymbolPlacementType>> parseProperty(const char* name, const JSValue& value) {
+    return parseFunction<SymbolPlacementType>(name, value);
 }
 
 template <> optional<Function<TextAnchorType>> parseProperty(const char* name, const JSValue& value) {

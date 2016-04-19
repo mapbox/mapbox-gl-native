@@ -113,14 +113,14 @@ MBGL_DEFINE_ENUM_CLASS(RotateAnchorTypeClass, RotateAnchorType, {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class PlacementType : bool {
+enum class SymbolPlacementType : bool {
     Point,
     Line,
 };
 
-MBGL_DEFINE_ENUM_CLASS(PlacementTypeClass, PlacementType, {
-    { PlacementType::Point, "point" },
-    { PlacementType::Line, "line" },
+MBGL_DEFINE_ENUM_CLASS(SymbolPlacementTypeClass, SymbolPlacementType, {
+    { SymbolPlacementType::Point, "point" },
+    { SymbolPlacementType::Line, "line" },
 });
 
 // -------------------------------------------------------------------------------------------------

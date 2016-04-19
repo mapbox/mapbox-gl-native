@@ -11,7 +11,7 @@ class SpriteAtlas;
 
 class SymbolLayoutProperties {
 public:
-    LayoutProperty<PlacementType> placement { PlacementType::Point };
+    LayoutProperty<SymbolPlacementType> placement { SymbolPlacementType::Point };
     LayoutProperty<float> spacing { 250.0f };
     LayoutProperty<bool> avoidEdges { false };
 

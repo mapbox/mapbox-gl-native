@@ -163,7 +163,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
         }
     }
 
-    if (layout.placement == PlacementType::Line) {
+    if (layout.placement == SymbolPlacementType::Line) {
         util::mergeLines(features);
     }
 }
@@ -238,7 +238,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
         if (feature.label.length()) {
             shapedText = fontStack->getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ layout.placement != PlacementType::Line ?
+                /* maxWidth: ems */ layout.placement != SymbolPlacementType::Line ?
                     layout.text.maxWidth * 24 : 0,
                 /* lineHeight: ems */ layout.text.lineHeight * 24,
                 /* horizontalAlign */ horizontalAlign,
@@ -289,19 +289,19 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
     const float textMaxBoxScale = tilePixelRatio * layout.textMaxSize / glyphSize;
     const float iconBoxScale = tilePixelRatio * layout.icon.size;
     const float symbolSpacing = tilePixelRatio * layout.spacing;
-    const bool avoidEdges = layout.avoidEdges && layout.placement != PlacementType::Line;
+    const bool avoidEdges = layout.avoidEdges && layout.placement != SymbolPlacementType::Line;
     const float textPadding = layout.text.padding * tilePixelRatio;
     const float iconPadding = layout.icon.padding * tilePixelRatio;
     const float textMaxAngle = layout.text.maxAngle * util::DEG2RAD;
     const bool textAlongLine =
         layout.text.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == PlacementType::Line;
+        layout.placement == SymbolPlacementType::Line;
     const bool iconAlongLine =
         layout.icon.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == PlacementType::Line;
+        layout.placement == SymbolPlacementType::Line;
     const bool mayOverlap = layout.text.allowOverlap || layout.icon.allowOverlap ||
         layout.text.ignorePlacement || layout.icon.ignorePlacement;
-    const bool isLine = layout.placement == PlacementType::Line;
+    const bool isLine = layout.placement == SymbolPlacementType::Line;
     const float textRepeatDistance = symbolSpacing / 2;
 
     auto& clippedLines = isLine ?
@@ -373,10 +373,10 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
 
     const bool textAlongLine =
         layout.text.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == PlacementType::Line;
+        layout.placement == SymbolPlacementType::Line;
     const bool iconAlongLine =
         layout.icon.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == PlacementType::Line;
+        layout.placement == SymbolPlacementType::Line;
 
     const bool mayOverlap = layout.text.allowOverlap || layout.icon.allowOverlap ||
         layout.text.ignorePlacement || layout.icon.ignorePlacement;
