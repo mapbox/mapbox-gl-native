@@ -46,7 +46,7 @@ public class FeatureOverviewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar!=null){
+        if (actionBar != null) {
             actionBar.setElevation(getResources().getDimension(R.dimen.toolbar_shadow));
         }
 
@@ -115,9 +115,10 @@ public class FeatureOverviewActivity extends AppCompatActivity {
             List<Feature> features = new ArrayList<>();
             PackageInfo app = params[0];
 
+            String packageName = getApplicationContext().getPackageName();
             String metaDataKey = getString(R.string.category);
             for (ActivityInfo info : app.activities) {
-                if (!info.name.equals(FeatureOverviewActivity.class.getName())) {
+                if (info.name.startsWith(packageName) && !info.name.equals(FeatureOverviewActivity.class.getName())) {
                     String label = getString(info.labelRes);
                     String description = getString(info.descriptionRes);
                     String category = resolveMetaData(info.metaData, metaDataKey);

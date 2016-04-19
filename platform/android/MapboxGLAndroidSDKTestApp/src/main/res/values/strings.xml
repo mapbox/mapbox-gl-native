@@ -33,6 +33,7 @@
     <string name="activity_geocoder">Geocoder</string>
 
     <!-- Other -->
+    <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
     <string name="activity_custom_layer">Custom Layer</string>
@@ -67,6 +68,7 @@
     <string name="description_geocoder">Example with Geocoder API</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
+    <string name="description_doublemap">2 maps in a view hierarchy</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
     <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss on Gesture</string>r

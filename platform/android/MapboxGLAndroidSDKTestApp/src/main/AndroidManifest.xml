@@ -210,6 +210,14 @@
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator" />
         </activity>
+        <activity
+            android:name=".activity.maplayout.DoubleMapActivity"
+            android:description="@string/description_doublemap"
+            android:label="@string/activity_double_map">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_maplayout" />
+        </activity>
 
         <!-- Configuration Settings -->
         <meta-data
