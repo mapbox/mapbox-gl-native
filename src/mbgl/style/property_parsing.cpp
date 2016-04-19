@@ -101,13 +101,13 @@ optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, con
 }
 
 template <>
-optional<CapType> parseProperty<CapType>(const char* name, const JSValue& value) {
+optional<LineCapType> parseProperty<LineCapType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
     }
 
-    return { CapTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return { LineCapTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template <>
@@ -322,8 +322,8 @@ template <> optional<Function<RotateAnchorType>> parseProperty(const char* name,
     return parseFunction<RotateAnchorType>(name, value);
 }
 
-template <> optional<Function<CapType>> parseProperty(const char* name, const JSValue& value) {
-    return parseFunction<CapType>(name, value);
+template <> optional<Function<LineCapType>> parseProperty(const char* name, const JSValue& value) {
+    return parseFunction<LineCapType>(name, value);
 }
 
 template <> optional<Function<JoinType>> parseProperty(const char* name, const JSValue& value) {

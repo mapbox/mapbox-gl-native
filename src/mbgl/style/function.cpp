@@ -19,7 +19,7 @@ template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }};
 template <> inline std:: string defaultStopsValue() { return {}; }
 template <> inline TranslateAnchorType defaultStopsValue() { return {}; };
 template <> inline RotateAnchorType defaultStopsValue() { return {}; };
-template <> inline CapType defaultStopsValue() { return {}; };
+template <> inline LineCapType defaultStopsValue() { return {}; };
 template <> inline JoinType defaultStopsValue() { return {}; };
 template <> inline PlacementType defaultStopsValue() { return {}; };
 template <> inline TextAnchorType defaultStopsValue() { return {}; };
@@ -84,7 +84,7 @@ template class Function<std::array<float, 2>>;
 template class Function<std::string>;
 template class Function<TranslateAnchorType>;
 template class Function<RotateAnchorType>;
-template class Function<CapType>;
+template class Function<LineCapType>;
 template class Function<JoinType>;
 template class Function<PlacementType>;
 template class Function<TextAnchorType>;

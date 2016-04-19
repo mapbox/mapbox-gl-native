@@ -38,7 +38,7 @@ template<> inline std::vector<float> interpolate(const std::vector<float> a, con
 template<> inline std::string interpolate(const std::string a, const std::string, const double) { return a; }
 template<> inline TranslateAnchorType interpolate(const TranslateAnchorType a, const TranslateAnchorType, const double) { return a; }
 template<> inline RotateAnchorType interpolate(const RotateAnchorType a, const RotateAnchorType, const double) { return a; }
-template<> inline CapType interpolate(const CapType a, const CapType, const double) { return a; }
+template<> inline LineCapType interpolate(const LineCapType a, const LineCapType, const double) { return a; }
 template<> inline JoinType interpolate(const JoinType a, const JoinType, const double) { return a; }
 template<> inline PlacementType interpolate(const PlacementType a, const PlacementType, const double) { return a; }
 template<> inline TextAnchorType interpolate(const TextAnchorType a, const TextAnchorType, const double) { return a; }

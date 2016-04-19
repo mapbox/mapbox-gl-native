@@ -56,16 +56,16 @@ MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class CapType : uint8_t {
+enum class LineCapType : uint8_t {
     Round,
     Butt,
     Square,
 };
 
-MBGL_DEFINE_ENUM_CLASS(CapTypeClass, CapType, {
-    { CapType::Round, "round" },
-    { CapType::Butt, "butt" },
-    { CapType::Square, "square" },
+MBGL_DEFINE_ENUM_CLASS(LineCapTypeClass, LineCapType, {
+    { LineCapType::Round, "round" },
+    { LineCapType::Butt, "butt" },
+    { LineCapType::Square, "square" },
 });
 
 // -------------------------------------------------------------------------------------------------

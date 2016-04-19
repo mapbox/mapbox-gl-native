@@ -78,8 +78,8 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.dasharray.value.from, layout.cap == CapType::Round, glObjectStore);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == CapType::Round, glObjectStore);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.dasharray.value.from, layout.cap == LineCapType::Round, glObjectStore);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.dasharray.value.to, layout.cap == LineCapType::Round, glObjectStore);
 
         const float widthA = posA.width * properties.dasharray.value.fromScale * properties.dashLineWidth;
         const float widthB = posB.width * properties.dasharray.value.toScale * properties.dashLineWidth;

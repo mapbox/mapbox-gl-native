@@ -80,8 +80,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         return;
     }
 
-    const CapType beginCap = layout.cap;
-    const CapType endCap = closed ? CapType::Butt : CapType(layout.cap);
+    const LineCapType beginCap = layout.cap;
+    const LineCapType endCap = closed ? LineCapType::Butt : LineCapType(layout.cap);
 
     double distance = 0;
     bool startOfLine = true;
@@ -173,7 +173,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
         JoinType currentJoin = layout.join;
-        const CapType currentCap = nextVertex ? beginCap : endCap;
+        const LineCapType currentCap = nextVertex ? beginCap : endCap;
 
         if (middleVertex) {
             if (currentJoin == JoinType::Round) {
@@ -279,7 +279,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
                                  false, startVertex, triangleStore);
             }
 
-        } else if (!middleVertex && currentCap == CapType::Butt) {
+        } else if (!middleVertex && currentCap == LineCapType::Butt) {
             if (!startOfLine) {
                 // Close previous segment with a butt
                 addCurrentVertex(currentVertex, distance, prevNormal, 0, 0, false,
@@ -292,7 +292,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
                                  startVertex, triangleStore);
             }
 
-        } else if (!middleVertex && currentCap == CapType::Square) {
+        } else if (!middleVertex && currentCap == LineCapType::Square) {
             if (!startOfLine) {
                 // Close previous segment with a square cap
                 addCurrentVertex(currentVertex, distance, prevNormal, 1, 1, false,
@@ -308,7 +308,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
                                  startVertex, triangleStore);
             }
 
-        } else if (middleVertex ? currentJoin == JoinType::Round : currentCap == CapType::Round) {
+        } else if (middleVertex ? currentJoin == JoinType::Round : currentCap == LineCapType::Round) {
             if (!startOfLine) {
                 // Close previous segment with a butt
                 addCurrentVertex(currentVertex, distance, prevNormal, 0, 0, false,
