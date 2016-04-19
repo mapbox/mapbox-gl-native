@@ -2,8 +2,10 @@
   'variables': {
     'loop_lib': 'darwin',
     'headless_lib': 'cgl',
+    'coverage': 0,
   },
   'includes': [
+    '../../build/osx-x86_64/config.gypi',
     '../../mbgl.gypi',
     '../../test/test.gypi',
     '../../bin/glfw.gypi',

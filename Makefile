@@ -9,6 +9,13 @@ else
   $(error Cannot determine host platform)
 endif
 
+ifneq (,$(wildcard .git/.))
+.mason:
+	git submodule update --init
+else
+.mason: ;
+endif
+
 RUN = +$(MAKE) -f scripts/main.mk
 
 default:
@@ -16,12 +23,19 @@ default:
 
 #### OS X targets ##############################################################
 
-OSX_PROJ_PATH = build/osx-x86_64/platform/osx/platform.xcodeproj
+OSX_OUTPUT_PATH = build/osx-x86_64
+OSX_PROJ_PATH = $(OSX_OUTPUT_PATH)/platform/osx/platform.xcodeproj
 OSX_WORK_PATH = platform/osx/osx.xcworkspace
 OSX_DERIVED_DATA_PATH = build/DerivedData/osx
 
-$(OSX_PROJ_PATH): platform/osx/platform.gyp platform/osx/scripts/configure.sh mbgl.gypi test/test.gypi bin/*.gypi
-	$(RUN) PLATFORM=osx Xcode/__project__
+$(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configure
+	MASON_PLATFORM=osx ./configure $< $@
+
+$(OSX_OUTPUT_PATH)/mbgl.xcconfig: $(OSX_OUTPUT_PATH)/config.gypi
+	./scripts/export-xcconfig.py $< $@
+
+$(OSX_PROJ_PATH): platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi $(OSX_OUTPUT_PATH)/mbgl.xcconfig mbgl.gypi test/test.gypi bin/*.gypi
+	./deps/run_gyp -f xcode --depth=. --generator-output=$(OSX_OUTPUT_PATH) $<
 
 osx: $(OSX_PROJ_PATH)
 	set -o pipefail && xcodebuild \
@@ -42,12 +56,19 @@ test-osx: osx node_modules/express
 
 #### iOS targets ##############################################################
 
-IOS_PROJ_PATH = build/ios-all/platform/ios/platform.xcodeproj
+IOS_OUTPUT_PATH = build/ios-all
+IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/platform/ios/platform.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_DERIVED_DATA_PATH = build/DerivedData/ios
 
-$(IOS_PROJ_PATH): platform/ios/platform.gyp platform/ios/scripts/configure.sh mbgl.gypi test/test.gypi
-	$(RUN) PLATFORM=ios Xcode/__project__
+$(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configure
+	MASON_PLATFORM=ios ./configure $< $@
+
+$(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
+	./scripts/export-xcconfig.py $< $@
+
+$(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS_OUTPUT_PATH)/mbgl.xcconfig mbgl.gypi test/test.gypi
+	./deps/run_gyp -f xcode --depth=. --generator-output=$(IOS_OUTPUT_PATH) $<
 
 ios: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \

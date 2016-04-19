@@ -2,8 +2,10 @@
   'variables': {
     'loop_lib': 'darwin',
     'headless_lib': 'eagl',
+    'coverage': 0,
   },
   'includes': [
+    '../../build/ios-all/config.gypi',
     '../../mbgl.gypi',
     '../../test/test.gypi',
   ],

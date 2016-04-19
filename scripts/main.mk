@@ -77,13 +77,6 @@ Makefile/__project__: $(PLATFORM_CONFIG_OUTPUT)
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
 	$(ENV) deps/run_gyp platform/$(PLATFORM)/platform.gyp $(GYP_FLAGS) -f make$(GYP_FLAVOR_SUFFIX)
 
-.PHONY: Xcode/__project__
-Xcode/__project__: $(PLATFORM_CONFIG_OUTPUT)
-	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Exporting gyp variables to xcconfig...$(FORMAT_END)\n"
-	$(ENV) ./scripts/export-xcconfig.py $(PLATFORM_CONFIG_OUTPUT) $(PLATFORM_OUTPUT)/mbgl.xcconfig
-	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
-	$(ENV) deps/run_gyp platform/$(PLATFORM)/platform.gyp $(GYP_FLAGS) -f xcode$(GYP_FLAVOR_SUFFIX)
-
 .PHONY: Ninja/__project__
 Ninja/__project__: $(PLATFORM_CONFIG_OUTPUT)
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
@@ -107,16 +100,6 @@ Xcode/node: $(PLATFORM_CONFIG_OUTPUT)
 Makefile/%: Makefile/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
 	$(ENV) $(MAKE) -j$(JOBS) -C $(PLATFORM_OUTPUT) BUILDTYPE=$(BUILDTYPE) $*
-
-Xcode/%: Xcode/__project__
-	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
-	set -o pipefail && xcodebuild \
-		CODE_SIGNING_REQUIRED=NO \
-		CODE_SIGN_IDENTITY= \
-		-project $(PLATFORM_OUTPUT)/platform/$(PLATFORM)/platform.xcodeproj \
-		-configuration $(BUILDTYPE) \
-		-target $* \
-		-jobs $(JOBS) | xcpretty
 
 Ninja/%: Ninja/__project__
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Building target $*...$(FORMAT_END)\n"
