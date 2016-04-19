@@ -1,12 +1,13 @@
 #import "MGLMapView_Private.h"
+#import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionButton.h"
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
 
-#import "../../darwin/src/MGLGeometry_Private.h"
-#import "../../darwin/src/MGLMultiPoint_Private.h"
-#import "../../darwin/src/MGLOfflineStorage_Private.h"
+#import "MGLGeometry_Private.h"
+#import "MGLMultiPoint_Private.h"
+#import "MGLOfflineStorage_Private.h"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -31,10 +32,10 @@
 #import <map>
 #import <unordered_set>
 
-#import "../../darwin/src/NSBundle+MGLAdditions.h"
-#import "../../darwin/src/NSProcessInfo+MGLAdditions.h"
-#import "../../darwin/src/NSException+MGLAdditions.h"
-#import "../../darwin/src/NSString+MGLAdditions.h"
+#import "NSBundle+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
+#import "NSException+MGLAdditions.h"
+#import "NSString+MGLAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -130,9 +131,8 @@ mbgl::Color MGLColorObjectFromNSColor(NSColor *color) {
 class MGLAnnotationContext {
 public:
     id <MGLAnnotation> annotation;
-    /// mbgl-given identifier for the annotation image used by this annotation.
-    /// Based on the annotation image’s reusable identifier.
-    NSString *symbolIdentifier;
+    /// The annotation’s image’s reuse identifier.
+    NSString *imageReuseIdentifier;
 };
 
 @interface MGLMapView () <NSPopoverDelegate, MGLMultiPointDelegate>
@@ -165,6 +165,7 @@ public:
     BOOL _didHideCursorDuringGesture;
     
     MGLAnnotationContextMap _annotationContextsByAnnotationTag;
+    NS_MUTABLE_SET_OF(id <MGLAnnotation>) *_pointAnnotations;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
@@ -279,6 +280,7 @@ public:
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
+    _pointAnnotations = [NSMutableSet set];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastClick = {};
@@ -464,6 +466,18 @@ public:
     if ([keyPath isEqualToString:@"contentLayoutRect"] ||
         [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
         [self adjustContentInsets];
+    } else if ([keyPath isEqualToString:@"coordinate"] &&
+               [object conformsToProtocol:@protocol(MGLAnnotation)]) {
+        id <MGLAnnotation> annotation = object;
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        if (annotationTag != MGLAnnotationTagNotFound) {
+            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            if (annotationTag == _selectedAnnotationTag) {
+                [self deselectAnnotation:annotation];
+            }
+        }
     }
 }
 
@@ -1539,6 +1553,7 @@ public:
     
     std::vector<mbgl::PointAnnotation> points;
     std::vector<mbgl::ShapeAnnotation> shapes;
+    NSMutableArray *annotationImages = [NSMutableArray arrayWithCapacity:annotations.count];
     
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
@@ -1555,25 +1570,27 @@ public:
                 annotationImage = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName];
             }
             if (!annotationImage) {
-                // Create a default annotation image that depicts a round pin
-                // rising from the center, with a shadow slightly below center.
-                // The alignment rect therefore excludes the bottom half.
-                NSImage *image = MGLDefaultMarkerImage();
-                NSRect alignmentRect = image.alignmentRect;
-                alignmentRect.origin.y = NSMidY(alignmentRect);
-                alignmentRect.size.height /= 2;
-                image.alignmentRect = alignmentRect;
-                annotationImage = [MGLAnnotationImage annotationImageWithImage:image
-                                                               reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
+                annotationImage = self.defaultAnnotationImage;
+            }
+            
+            NSString *symbolName = annotationImage.styleIconIdentifier;
+            if (!symbolName) {
+                symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+                annotationImage.styleIconIdentifier = symbolName;
             }
             
             if (!self.annotationImagesByIdentifier[annotationImage.reuseIdentifier]) {
                 self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
                 [self installAnnotationImage:annotationImage];
             }
+            [annotationImages addObject:annotationImage];
             
-            NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName ? [symbolName UTF8String] : "");
+            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
+            
+            if ( ! [_pointAnnotations containsObject:annotation] && [annotation isKindOfClass:[NSObject class]]) {
+                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:NULL];
+                [_pointAnnotations addObject:annotation];
+            }
             
             // Opt into potentially expensive tooltip tracking areas.
             if (annotation.toolTip.length) {
@@ -1587,9 +1604,12 @@ public:
         std::vector<MGLAnnotationTag> pointAnnotationTags = _mbglMap->addPointAnnotations(points);
         
         for (size_t i = 0; i < pointAnnotationTags.size(); ++i) {
+            MGLAnnotationImage *annotationImage = annotationImages[i];
+            annotationImage.styleIconIdentifier = @(points[i].icon.c_str());
+            
             MGLAnnotationContext context;
             context.annotation = annotations[i];
-            context.symbolIdentifier = @(points[i].icon.c_str());
+            context.imageReuseIdentifier = annotationImage.reuseIdentifier;
             _annotationContextsByAnnotationTag[pointAnnotationTags[i]] = context;
         }
     }
@@ -1610,9 +1630,25 @@ public:
     [self updateAnnotationTrackingAreas];
 }
 
+/// Initializes and returns a default annotation image that depicts a round pin
+/// rising from the center, with a shadow slightly below center. The alignment
+/// rect therefore excludes the bottom half.
+- (MGLAnnotationImage *)defaultAnnotationImage {
+    NSImage *image = MGLDefaultMarkerImage();
+    NSRect alignmentRect = image.alignmentRect;
+    alignmentRect.origin.y = NSMidY(alignmentRect);
+    alignmentRect.size.height /= 2;
+    image.alignmentRect = alignmentRect;
+    return [MGLAnnotationImage annotationImageWithImage:image
+                                        reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
+}
+
 /// Sends the raw pixel data of the annotation image’s image to mbgl and
 /// calculates state needed for hit testing later.
 - (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage {
+    NSString *iconIdentifier = annotationImage.styleIconIdentifier;
+    self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
+    
     NSImage *image = annotationImage.image;
     NSSize size = image.size;
     if (size.width == 0 || size.height == 0 || !image.valid) {
@@ -1634,8 +1670,7 @@ public:
     std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.size(), cPremultipliedImage.data.get());
     auto cSpriteImage = std::make_shared<mbgl::SpriteImage>(std::move(cPremultipliedImage),
                                                             (float)(rep.pixelsWide / size.width));
-    NSString *symbolName = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
-    _mbglMap->addAnnotationIcon(symbolName.UTF8String, cSpriteImage);
+    _mbglMap->addAnnotationIcon(iconIdentifier.UTF8String, cSpriteImage);
     
     // Create a slop area with a “radius” equal to the annotation image’s entire
     // size, allowing the eventual click to be on any point within this image.
@@ -1678,6 +1713,11 @@ public:
         }
         
         _annotationContextsByAnnotationTag.erase(annotationTag);
+        
+        if ([annotation isKindOfClass:[NSObject class]]) {
+            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate"];
+        }
+        [_pointAnnotations removeObject:annotation];
     }
     
     [self willChangeValueForKey:@"annotations"];
@@ -1688,11 +1728,6 @@ public:
 }
 
 - (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier {
-    // This prefix is used to avoid collisions with style-defined sprites in
-    // mbgl, but reusable identifiers are never prefixed.
-    if ([identifier hasPrefix:MGLAnnotationSpritePrefix]) {
-        identifier = [identifier substringFromIndex:MGLAnnotationSpritePrefix.length];
-    }
     return self.annotationImagesByIdentifier[identifier];
 }
 
@@ -1951,6 +1986,9 @@ public:
     }
     NSImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if (!image) {
+        image = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName].image;
+    }
+    if (!image) {
         return NSZeroRect;
     }
     
@@ -1974,7 +2012,7 @@ public:
         return nil;
     }
     
-    NSString *customSymbol = _annotationContextsByAnnotationTag.at(annotationTag).symbolIdentifier;
+    NSString *customSymbol = _annotationContextsByAnnotationTag.at(annotationTag).imageReuseIdentifier;
     NSString *symbolName = customSymbol.length ? customSymbol : MGLDefaultStyleMarkerSymbolName;
     
     return [self dequeueReusableAnnotationImageWithIdentifier:symbolName];

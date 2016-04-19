@@ -1,9 +1,10 @@
-#import "MGLAnnotationImage.h"
+#import "MGLAnnotationImage_Private.h"
 
 @interface MGLAnnotationImage ()
 
 @property (nonatomic) NSImage *image;
 @property (nonatomic) NSString *reuseIdentifier;
+@property (nonatomic, strong, nullable) NSString *styleIconIdentifier;
 
 @end
 

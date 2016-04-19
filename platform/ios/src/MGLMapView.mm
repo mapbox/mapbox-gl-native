@@ -2697,11 +2697,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 return true;
             }
             
-            UIImage *image = annotationImage.image ? annotationImage.image : fallbackImage;
-            
             // Filter out the annotation if the fattened finger didn’t land
             // within the image’s alignment rect.
-            CGRect annotationRect = [self frameOfImage:image centeredAtCoordinate:annotation.coordinate];
+            CGRect annotationRect = [self frameOfImage:annotationImage.image ?: fallbackImage centeredAtCoordinate:annotation.coordinate];
             return !!!CGRectIntersectsRect(annotationRect, hitRect);
         });
         nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
