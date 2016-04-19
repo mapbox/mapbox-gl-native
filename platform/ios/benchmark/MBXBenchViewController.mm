@@ -1,5 +1,7 @@
 #import "MBXBenchViewController.h"
 
+#import "MBXBenchAppDelegate.h"
+
 #import <Mapbox/Mapbox.h>
 #import "MGLMapView_Internal.h"
 
@@ -44,10 +46,42 @@
     self.mapView.rotateEnabled = NO;
     self.mapView.userInteractionEnabled = YES;
 
-    [self startBenchmarkIteration];
-
     [self.view addSubview:self.mapView];
+}
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if ([MGLAccountManager accessToken].length) {
+        [self startBenchmarkIteration];
+    } else {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Access Token" message:@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:" preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.keyboardType = UIKeyboardTypeURL;
+            textField.autocorrectionType = UITextAutocorrectionTypeNo;
+            textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        }];
+        
+        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            [self startBenchmarkIteration];
+        }]];
+        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UITextField *textField = alertController.textFields.firstObject;
+            NSString *accessToken = textField.text;
+            [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
+            [MGLAccountManager setAccessToken:accessToken];
+            [self.mapView reloadStyle:self];
+            
+            [self startBenchmarkIteration];
+        }];
+        [alertController addAction:OKAction];
+        
+        if ([alertController respondsToSelector:@selector(setPreferredAction:)]) {
+            alertController.preferredAction = OKAction;
+        }
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
 }
 
 size_t idx = 0;
