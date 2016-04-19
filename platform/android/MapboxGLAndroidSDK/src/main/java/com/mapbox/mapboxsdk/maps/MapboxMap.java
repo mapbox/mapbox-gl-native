@@ -11,6 +11,7 @@ import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -30,7 +31,9 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -195,7 +198,7 @@ public class MapboxMap {
      */
     public MyLocationViewSettings getMyLocationViewSettings() {
         if (myLocationViewSettings == null) {
-            myLocationViewSettings = new MyLocationViewSettings(mMapView,mMapView.getUserLocationView());
+            myLocationViewSettings = new MyLocationViewSettings(mMapView, mMapView.getUserLocationView());
         }
         return myLocationViewSettings;
     }
@@ -1436,8 +1439,10 @@ public class MapboxMap {
      *
      * @param listener The callback that's invoked when the user clicks on a marker.
      *                 To unset the callback, use null.
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationServices#addLocationListener(LocationListener)})}
      */
     @UiThread
+    @Deprecated
     public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mMapView.setOnMyLocationChangeListener(listener);
     }
@@ -1711,7 +1716,9 @@ public class MapboxMap {
      * Interface definition for a callback to be invoked when the the My Location view changes location.
      *
      * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationListener}
      */
+    @Deprecated
     public interface OnMyLocationChangeListener {
         /**
          * Called when the location of the My Location view has changed
