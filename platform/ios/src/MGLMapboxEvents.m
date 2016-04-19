@@ -240,8 +240,9 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (void)userDefaultsDidChange:(NSNotification *)notification {
-    MGLAssertIsMainThread();
-    [self pauseOrResumeMetricsCollectionIfRequired];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self pauseOrResumeMetricsCollectionIfRequired];
+    });
 }
 
 - (void)pauseOrResumeMetricsCollectionIfRequired {
