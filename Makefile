@@ -26,6 +26,7 @@ default:
 OSX_OUTPUT_PATH = build/osx
 OSX_PROJ_PATH = $(OSX_OUTPUT_PATH)/platform/osx/platform.xcodeproj
 OSX_WORK_PATH = platform/osx/osx.xcworkspace
+OSX_USER_DATA_PATH = $(OSX_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 $(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configure
 	MASON_PLATFORM=osx ./configure $< $@
@@ -42,7 +43,9 @@ osx: $(OSX_PROJ_PATH)
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(OSX_WORK_PATH) -scheme CI build | xcpretty
 
-xproj: $(OSX_PROJ_PATH)
+xproj: $(OSX_PROJ_PATH) $(OSX_WORK_PATH)
+	mkdir -p "$(OSX_USER_DATA_PATH)"
+	cp platform/osx/WorkspaceSettings.xcsettings "$(OSX_USER_DATA_PATH)/WorkspaceSettings.xcsettings"
 	open $(OSX_WORK_PATH)
 
 test-osx: osx node_modules/express
@@ -58,6 +61,7 @@ test-osx: osx node_modules/express
 IOS_OUTPUT_PATH = build/ios
 IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/platform/ios/platform.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
+IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 $(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configure
 	MASON_PLATFORM=ios ./configure $< $@
@@ -77,6 +81,8 @@ ios: $(IOS_PROJ_PATH)
 	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
 
 iproj: $(IOS_PROJ_PATH)
+	mkdir -p "$(IOS_USER_DATA_PATH)"
+	cp platform/ios/WorkspaceSettings.xcsettings "$(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings"
 	open $(IOS_WORK_PATH)
 
 test-ios: ios

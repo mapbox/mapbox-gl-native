@@ -7,7 +7,7 @@
 	<key>CustomBuildLocationType</key>
 	<string>RelativeToDerivedData</string>
 	<key>DerivedDataCustomLocation</key>
-	<string>../../build/DerivedData</string>
+	<string>../../build</string>
 	<key>DerivedDataLocationStyle</key>
 	<string>WorkspaceRelativePath</string>
 	<key>IssueFilterStyle</key>
