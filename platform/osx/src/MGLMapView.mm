@@ -381,7 +381,6 @@ public:
 
 /// Adds gesture recognizers for manipulating the viewport and selecting annotations.
 - (void)installGestureRecognizers {
-    self.acceptsTouchEvents = YES;
     _scrollEnabled = YES;
     _zoomEnabled = YES;
     _rotateEnabled = YES;
