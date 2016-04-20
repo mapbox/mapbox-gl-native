@@ -8,7 +8,7 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 - Removed the `armv7s` slice from the SDK to reduce its size. iPhone 5 and iPhone 5c automatically use the `armv7` slice instead. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
 - The user dot now moves smoothly between user location updates while user location tracking is disabled. ([#1582](https://github.com/mapbox/mapbox-gl-native/pull/1582))
 - User location heading updates now resume properly when an app becomes active again. ([#4674](https://github.com/mapbox/mapbox-gl-native/pull/4674))
-- An MGLAnnotation can be relocated by changing its `coordinate` property in a KVO-compliant way. ([#3835](https://github.com/mapbox/mapbox-gl-native/pull/3835))
+- An MGLAnnotation can be relocated by changing its `coordinate` property in a KVO-compliant way. An MGLMultiPoint cannot be relocated. ([#3835](https://github.com/mapbox/mapbox-gl-native/pull/3835))
 - Setting the `image` property of an MGLAnnotationImage to `nil` resets it to the default red pin image and reclaims resources that can be used to customize additional annotations. ([#3835](https://github.com/mapbox/mapbox-gl-native/pull/3835))
 - Fixed an issue preventing KVO change notifications from being generated on MGLMapView’s `userTrackingMode` key path when `-setUserTrackingMode:animated:` is called. ([#4724](https://github.com/mapbox/mapbox-gl-native/pull/4724))
 - Fixed a hang that could occur if the host application attempts to set user defaults on a background queue. ([#4745](https://github.com/mapbox/mapbox-gl-native/pull/4745))

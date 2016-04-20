@@ -460,21 +460,20 @@ public:
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(__unused id)object change:(__unused NSDictionary *)change context:(__unused void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__unused NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:@"contentLayoutRect"] ||
         [keyPath isEqualToString:@"titlebarAppearsTransparent"]) {
         [self adjustContentInsets];
     } else if ([keyPath isEqualToString:@"coordinate"] &&
-               [object conformsToProtocol:@protocol(MGLAnnotation)]) {
+               [object conformsToProtocol:@protocol(MGLAnnotation)] &&
+               ![object isKindOfClass:[MGLMultiPoint class]]) {
         id <MGLAnnotation> annotation = object;
-        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
-        if (annotationTag != MGLAnnotationTagNotFound) {
-            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
-            if (annotationTag == _selectedAnnotationTag) {
-                [self deselectAnnotation:annotation];
-            }
+        MGLAnnotationTag annotationTag = (MGLAnnotationTag)(NSUInteger)context;
+        const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+        _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+        if (annotationTag == _selectedAnnotationTag) {
+            [self deselectAnnotation:annotation];
         }
     }
 }
@@ -1608,6 +1607,7 @@ public:
             _annotationContextsByAnnotationTag[annotationTag] = context;
             
             if ([annotation isKindOfClass:[NSObject class]]) {
+                NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
                 [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
             }
         }
@@ -1624,10 +1624,6 @@ public:
             MGLAnnotationContext context;
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
-            
-            if ([annotation isKindOfClass:[NSObject class]]) {
-                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
-            }
         }
     }
     
@@ -1720,7 +1716,8 @@ public:
         
         _annotationContextsByAnnotationTag.erase(annotationTag);
         
-        if ([annotation isKindOfClass:[NSObject class]]) {
+        if ([annotation isKindOfClass:[NSObject class]] &&
+            ![annotation isKindOfClass:[MGLMultiPoint class]]) {
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
         }
     }
