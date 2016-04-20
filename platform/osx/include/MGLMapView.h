@@ -37,23 +37,24 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     viewpoints, and present information in the form of annotations and overlays.
     
     The map view loads scalable vector tiles that conform to the
-    [Mapbox Vector Tile Specification](https://github.com/mapbox/vector-tile-spec).
+    <a href="https://github.com/mapbox/vector-tile-spec">Mapbox Vector Tile Specification</a>.
     It styles them with a style that conforms to the
-    [Mapbox GL style specification](https://www.mapbox.com/mapbox-gl-style-spec/).
-    Such styles can be designed in [Mapbox Studio](https://www.mapbox.com/studio/)
-    and hosted on mapbox.com.
+    <a href="https://www.mapbox.com/mapbox-gl-style-spec/">Mapbox GL style specification</a>.
+    Such styles can be designed in
+    <a href="https://www.mapbox.com/studio/">Mapbox Studio</a> and hosted on
+    mapbox.com.
     
     A collection of Mapbox-hosted styles is available through the MGLStyle
     class. These basic styles use
-    [Mapbox Streets](https://www.mapbox.com/developers/vector-tiles/mapbox-streets)
-    or [Mapbox Satellite](https://www.mapbox.com/satellite/) data sources, but
-    you can specify a custom style that makes use of your own data.
+    <a href="https://www.mapbox.com/developers/vector-tiles/mapbox-streets">Mapbox Streets</a>
+    or <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a> data
+    sources, but you can specify a custom style that makes use of your own data.
     
     Mapbox-hosted vector tiles and styles require an API access token, which you
     can obtain from the
-    [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). Access
-    tokens associate requests to Mapbox’s vector tile and style APIs with your
-    Mapbox account. They also deter other developers from using your styles
+    <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
+    Access tokens associate requests to Mapbox’s vector tile and style APIs with
+    your Mapbox account. They also deter other developers from using your styles
     without your permission.
     
     @note You are responsible for getting permission to use the map data and for
@@ -128,9 +129,9 @@ IB_DESIGNABLE
     
     @note The Mapbox terms of service, which governs the use of Mapbox-hosted
         vector tiles and styles,
-        [requires](https://www.mapbox.com/help/mapbox-logo/) most Mapbox
-        customers to display the Mapbox logo. If this applies to you, do not
-        hide this view or change its contents. */
+        <a href="https://www.mapbox.com/help/mapbox-logo/">requires</a> most
+        Mapbox customers to display the Mapbox logo. If this applies to you, do
+        not hide this view or change its contents. */
 @property (nonatomic, readonly) NSImageView *logoView;
 
 /** A view showing legally required copyright notices, positioned along the
@@ -138,11 +139,11 @@ IB_DESIGNABLE
     
     @note The Mapbox terms of service, which governs the use of Mapbox-hosted
         vector tiles and styles,
-        [requires](https://www.mapbox.com/help/attribution/) these copyright
-        notices to accompany any map that features Mapbox-designed styles,
-        OpenStreetMap data, or other Mapbox data such as satellite or terrain
-        data. If that applies to this map view, do not hide this view or remove
-        any notices from it. */
+        <a href="https://www.mapbox.com/help/attribution/">requires</a> these
+        copyright notices to accompany any map that features Mapbox-designed
+        styles, OpenStreetMap data, or other Mapbox data such as satellite or
+        terrain data. If that applies to this map view, do not hide this view or
+        remove any notices from it. */
 @property (nonatomic, readonly) NSView *attributionView;
 
 #pragma mark Manipulating the viewpoint
