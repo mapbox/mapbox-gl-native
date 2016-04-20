@@ -1612,12 +1612,21 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         id <MGLAnnotation> annotation = object;
         MGLAnnotationTag annotationTag = (MGLAnnotationTag)(NSUInteger)context;
-        const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
-        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-        _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
-        if (annotationTag == _selectedAnnotationTag)
+        // We can get here because a subclass registered itself as an observer
+        // of the coordinate key path of a non-multipoint annotation but failed
+        // to handle the change. This check deters us from treating the
+        // subclass’s context as an annotation tag. If the context happens to
+        // match a valid annotation tag, the annotation will be unnecessarily
+        // but safely updated.
+        if (annotation == [self annotationWithTag:annotationTag])
         {
-            [self deselectAnnotation:annotation animated:YES];
+            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            if (annotationTag == _selectedAnnotationTag)
+            {
+                [self deselectAnnotation:annotation animated:YES];
+            }
         }
     }
 }
