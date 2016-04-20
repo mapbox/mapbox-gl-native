@@ -17,7 +17,18 @@
         <attr name="style_url" format="string" />
         <attr name="access_token" format="string" />
         <attr name="style_classes" format="string" />
+
+        <!-- My Location-->
         <attr name="my_location_enabled" format="boolean" />
+        <attr name="my_location_tint" format="color" />
+        <attr name="my_location_foreground" format="reference" />
+        <attr name="my_location_background" format="reference" />
+        <attr name="my_location_background_left" format="integer" />
+        <attr name="my_location_background_top" format="integer" />
+        <attr name="my_location_background_right" format="integer" />
+        <attr name="my_location_background_bottom" format="integer" />
+
+        <!-- Compass -->
         <attr name="compass_enabled" format="boolean" />
         <attr name="compass_gravity">
             <flag name="top" value="0x30" />

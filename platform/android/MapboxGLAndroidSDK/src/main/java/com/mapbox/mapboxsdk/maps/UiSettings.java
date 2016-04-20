@@ -5,6 +5,8 @@ import android.support.annotation.UiThread;
 import android.view.Gravity;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
  */
@@ -12,6 +14,7 @@ public class UiSettings {
 
     private MapView mapView;
 
+    private MyLocationViewSettings myLocationViewSettings;
     private ViewSettings compassSettings;
     private ViewSettings logoSettings;
     private ViewSettings attributionSettings;
@@ -543,5 +546,13 @@ public class UiSettings {
         mapView.setLogoMargins(getLogoMarginLeft(), getLogoMarginTop(), getLogoMarginRight(), getLogoMarginBottom());
         mapView.setCompassMargins(getCompassMarginLeft(), getCompassMarginTop(), getCompassMarginRight(), getCompassMarginBottom());
         mapView.setAttributionMargins(getAttributionMarginLeft(), getAttributionMarginTop(), getAttributionMarginRight(), getAttributionMarginBottom());
+    }
+
+    public MyLocationViewSettings getMyLocationViewSettings() {
+        return myLocationViewSettings;
+    }
+
+    public void setMyLocationViewSettings(MyLocationViewSettings myLocationViewSettings) {
+        this.myLocationViewSettings = myLocationViewSettings;
     }
 }

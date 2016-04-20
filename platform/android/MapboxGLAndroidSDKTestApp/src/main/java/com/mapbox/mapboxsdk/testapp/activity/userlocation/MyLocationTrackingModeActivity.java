@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
@@ -56,6 +57,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
+                MyLocationViewSettings locationViewSettings = mapboxMap.getMyLocationViewSettings();
+                 locationViewSettings.setPadding(0, (int) getResources().getDimension(R.dimen.locationview_padding_top), 0, 0);
+
                 mapboxMap.setOnMyLocationChangeListener(MyLocationTrackingModeActivity.this);
 
                 ArrayAdapter<CharSequence> locationTrackingAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.user_tracking_mode, android.R.layout.simple_spinner_item);
@@ -70,14 +74,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 mBearingSpinner.setAdapter(bearingTrackingAdapter);
                 mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
 
-                try {
-                    mapboxMap.setMyLocationEnabled(true);
-                } catch (SecurityException e) {
-                    //should not occur, permission was checked in FeatureOverviewActivity
-                    Toast.makeText(MyLocationTrackingModeActivity.this,
-                            "Location permission is not available", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
 
                 mapboxMap.setOnMyLocationTrackingModeChangeListener(new MapboxMap.OnMyLocationTrackingModeChangeListener() {
                     @Override
@@ -110,6 +106,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
             if (mLocation == null) {
                 // initial location to reposition map
                 mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+                mMapboxMap.setMyLocationEnabled(true);
                 mLocationSpinner.setEnabled(true);
                 mBearingSpinner.setEnabled(true);
             }

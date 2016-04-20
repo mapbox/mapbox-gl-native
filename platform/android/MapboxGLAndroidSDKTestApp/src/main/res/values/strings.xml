@@ -36,6 +36,7 @@
     <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
+    <string name="activity_user_tracking_customization">User location customization</string>
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
     <string name="activity_debug_mode">Debug Mode</string>
@@ -44,6 +45,7 @@
 
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
+    <string name="description_user_location_customization">Customize the location of the user</string>
     <string name="description_custom_layer">Overlay a custom native layer on the map</string>
     <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
     <string name="description_cameraposition">CameraPosition capabilities</string>

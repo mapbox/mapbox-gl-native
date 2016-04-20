@@ -79,7 +79,10 @@ import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.location.LocationListener;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
@@ -260,6 +263,7 @@ public class MapView extends FrameLayout {
         if (!TextUtils.isEmpty(style)) {
             mMapboxMap.setStyleUrl(style);
         }
+
 
         mMapboxMap.setMyLocationEnabled(options.getLocationEnabled());
 
@@ -591,6 +595,7 @@ public class MapView extends FrameLayout {
         mUserLocationView.setTilt(pitch);
         mNativeMapView.setPitch(pitch, actualDuration);
     }
+
 
     //
     // Direction
@@ -1104,16 +1109,26 @@ public class MapView extends FrameLayout {
             return;
         }
 
-        if (left == mContentPaddingLeft && top == mContentPaddingTop && right == mContentPaddingRight && bottom == mContentPaddingBottom) {
-            return;
-        }
+//        if (left == mContentPaddingLeft && top == mContentPaddingTop && right == mContentPaddingRight && bottom == mContentPaddingBottom) {
+//            return;
+//        }
 
         mContentPaddingLeft = left;
         mContentPaddingTop = top;
         mContentPaddingRight = right;
         mContentPaddingBottom = bottom;
 
+        int[] userLocationViewPadding = mMapboxMap.getMyLocationViewSettings().getPadding();
+        left += userLocationViewPadding[0];
+        top += userLocationViewPadding[1];
+        right += userLocationViewPadding[2];
+        bottom += userLocationViewPadding[3];
+
         mNativeMapView.setContentPadding(top / mScreenDensity, left / mScreenDensity, bottom / mScreenDensity, right / mScreenDensity);
+    }
+
+    public void invalidateContentPadding() {
+        setContentPadding(mContentPaddingLeft, mContentPaddingTop, mContentPaddingRight, mContentPaddingBottom);
     }
 
     double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
@@ -1544,11 +1559,7 @@ public class MapView extends FrameLayout {
                         zoom(true, e.getX(), e.getY());
                     } else {
                         // Zoom in on user location view
-
-                        // TODO fix padding issue
-//                        PointF centerPoint = mUserLocationView.getMarkerScreenPoint();
-//                        zoom(true, centerPoint.x, centerPoint.y);
-                        zoom(true, getWidth() / 2, getHeight() / 2);
+                        zoom(true, mUserLocationView.getCenterX(), mUserLocationView.getCenterY());
                     }
                     break;
             }
@@ -2334,8 +2345,13 @@ public class MapView extends FrameLayout {
         return mUserLocationView.getLocation();
     }
 
-    void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
-        mUserLocationView.setOnMyLocationChangeListener(listener);
+    void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
+        LocationServices.getLocationServices(getContext()).addLocationListener(new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                listener.onMyLocationChange(location);
+            }
+        });
     }
 
     void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
@@ -2489,6 +2505,10 @@ public class MapView extends FrameLayout {
 
     void setMapboxMap(MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
+    }
+
+    UserLocationView getUserLocationView() {
+        return mUserLocationView;
     }
 
     @UiThread

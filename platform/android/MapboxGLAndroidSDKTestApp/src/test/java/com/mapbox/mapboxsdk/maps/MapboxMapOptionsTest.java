@@ -166,5 +166,6 @@ public class MapboxMapOptionsTest {
         assertEquals("test", new MapboxMapOptions().accessToken("test").getAccessToken());
         assertNotEquals("nottest", new MapboxMapOptions().accessToken("test").getStyle());
     }
+    
 }
 
