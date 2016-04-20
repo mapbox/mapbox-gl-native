@@ -1,6 +1,6 @@
 # Changelog for Mapbox iOS SDK
 
-Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## master
 
