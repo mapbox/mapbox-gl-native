@@ -527,7 +527,7 @@ public:
 
 - (nonnull NSURL *)styleURL {
     NSString *styleURLString = @(_mbglMap->getStyleURL().c_str()).mgl_stringOrNilIfEmpty;
-    return styleURLString ? [NSURL URLWithString:styleURLString] : [MGLStyle streetsStyleURL];
+    return styleURLString ? [NSURL URLWithString:styleURLString] : [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion];
 }
 
 - (void)setStyleURL:(nullable NSURL *)styleURL {
@@ -542,7 +542,7 @@ public:
         if (![MGLAccountManager accessToken]) {
             return;
         }
-        styleURL = [MGLStyle streetsStyleURL];
+        styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion];
     }
     
     if (![styleURL scheme]) {
