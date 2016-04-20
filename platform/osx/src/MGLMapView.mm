@@ -165,7 +165,6 @@ public:
     BOOL _didHideCursorDuringGesture;
     
     MGLAnnotationContextMap _annotationContextsByAnnotationTag;
-    NS_MUTABLE_SET_OF(id <MGLAnnotation>) *_pointAnnotations;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
@@ -280,7 +279,6 @@ public:
     // Set up annotation management and selection state.
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
-    _pointAnnotations = [NSMutableSet set];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastClick = {};
@@ -1587,11 +1585,6 @@ public:
             
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
             
-            if ( ! [_pointAnnotations containsObject:annotation] && [annotation isKindOfClass:[NSObject class]]) {
-                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:NULL];
-                [_pointAnnotations addObject:annotation];
-            }
-            
             // Opt into potentially expensive tooltip tracking areas.
             if (annotation.toolTip.length) {
                 _wantsToolTipRects = YES;
@@ -1601,27 +1594,40 @@ public:
     
     // Add any point annotations to mbgl and our own index.
     if (points.size()) {
-        std::vector<MGLAnnotationTag> pointAnnotationTags = _mbglMap->addPointAnnotations(points);
+        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addPointAnnotations(points);
         
-        for (size_t i = 0; i < pointAnnotationTags.size(); ++i) {
+        for (size_t i = 0; i < annotationTags.size(); ++i) {
+            MGLAnnotationTag annotationTag = annotationTags[i];
             MGLAnnotationImage *annotationImage = annotationImages[i];
             annotationImage.styleIconIdentifier = @(points[i].icon.c_str());
+            id <MGLAnnotation> annotation = annotations[i];
             
             MGLAnnotationContext context;
-            context.annotation = annotations[i];
+            context.annotation = annotation;
             context.imageReuseIdentifier = annotationImage.reuseIdentifier;
-            _annotationContextsByAnnotationTag[pointAnnotationTags[i]] = context;
+            _annotationContextsByAnnotationTag[annotationTag] = context;
+            
+            if ([annotation isKindOfClass:[NSObject class]]) {
+                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
+            }
         }
     }
     
     // Add any shape annotations to mbgl and our own index.
     if (shapes.size()) {
-        std::vector<MGLAnnotationTag> shapeAnnotationTags = _mbglMap->addShapeAnnotations(shapes);
+        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addShapeAnnotations(shapes);
         
-        for (size_t i = 0; i < shapeAnnotationTags.size(); ++i) {
+        for (size_t i = 0; i < annotationTags.size(); ++i) {
+            MGLAnnotationTag annotationTag = annotationTags[i];
+            id <MGLAnnotation> annotation = annotations[i];
+            
             MGLAnnotationContext context;
-            context.annotation = annotations[i];
-            _annotationContextsByAnnotationTag[shapeAnnotationTags[i]] = context;
+            context.annotation = annotation;
+            _annotationContextsByAnnotationTag[annotationTag] = context;
+            
+            if ([annotation isKindOfClass:[NSObject class]]) {
+                [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
+            }
         }
     }
     
@@ -1715,9 +1721,8 @@ public:
         _annotationContextsByAnnotationTag.erase(annotationTag);
         
         if ([annotation isKindOfClass:[NSObject class]]) {
-            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate"];
+            [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
         }
-        [_pointAnnotations removeObject:annotation];
     }
     
     [self willChangeValueForKey:@"annotations"];
