@@ -23,6 +23,7 @@ custom_categories:
       - MGLMapView
       - MGLMapViewDelegate
       - MGLStyle
+      - MGLStyleCurrentVersion
       - MGLUserTrackingMode
   - name: Annotations
     children:

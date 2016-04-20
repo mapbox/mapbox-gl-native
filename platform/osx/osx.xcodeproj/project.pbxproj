@@ -29,6 +29,7 @@
 		DA8933AE1CCD290700E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933AB1CCD290700E68420 /* Localizable.strings */; };
 		DA8933B51CCD2C2500E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B31CCD2C2500E68420 /* Foundation.strings */; };
 		DA8933B81CCD2C2D00E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B61CCD2C2D00E68420 /* Foundation.stringsdict */; };
+		DAB6924A1CC75A31005AAB54 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
 		DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = DAE6C2E11CC304F900DB3429 /* Credits.rtf */; };
 		DAE6C2ED1CC3050F00DB3429 /* DroppedPinAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E41CC3050F00DB3429 /* DroppedPinAnnotation.m */; };
@@ -115,13 +116,6 @@
 			remoteGlobalIDString = DAE6C3271CC30DB200DB3429;
 			remoteInfo = dynamic;
 		};
-		DAE6C3351CC30DB200DB3429 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DA839E8A1CC2E3400062CAFB /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DA839E911CC2E3400062CAFB;
-			remoteInfo = osxapp;
-		};
 		DAE6C33B1CC30DB200DB3429 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA839E8A1CC2E3400062CAFB /* Project object */;
@@ -186,8 +180,8 @@
 		DAE6C32C1CC30DB200DB3429 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAE6C3311CC30DB200DB3429 /* test.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = test.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAE6C33A1CC30DB200DB3429 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-core.a"; path = "../../build/DerivedData/osx/Build/Products/Debug/libmbgl-core.a"; sourceTree = "<group>"; };
-		DAE6C3461CC31D1200DB3429 /* libmbgl-platform-osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-platform-osx.a"; path = "../../build/DerivedData/osx/Build/Products/Debug/libmbgl-platform-osx.a"; sourceTree = "<group>"; };
+		DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libmbgl-core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAE6C3461CC31D1200DB3429 /* libmbgl-platform-osx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libmbgl-platform-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAE6C34A1CC31E0400DB3429 /* MGLAccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAccountManager.h; sourceTree = "<group>"; };
 		DAE6C34B1CC31E0400DB3429 /* MGLAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotation.h; sourceTree = "<group>"; };
 		DAE6C34C1CC31E0400DB3429 /* MGLGeometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLGeometry.h; sourceTree = "<group>"; };
@@ -280,6 +274,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAB6924A1CC75A31005AAB54 /* libmbgl-core.a in Frameworks */,
 				DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -597,7 +592,6 @@
 			);
 			dependencies = (
 				DAE6C3341CC30DB200DB3429 /* PBXTargetDependency */,
-				DAE6C3361CC30DB200DB3429 /* PBXTargetDependency */,
 			);
 			name = test;
 			productName = dynamicTests;
@@ -749,11 +743,6 @@
 			isa = PBXTargetDependency;
 			target = DAE6C3271CC30DB200DB3429 /* dynamic */;
 			targetProxy = DAE6C3331CC30DB200DB3429 /* PBXContainerItemProxy */;
-		};
-		DAE6C3361CC30DB200DB3429 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DA839E911CC2E3400062CAFB /* osxapp */;
-			targetProxy = DAE6C3351CC30DB200DB3429 /* PBXContainerItemProxy */;
 		};
 		DAE6C33C1CC30DB200DB3429 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

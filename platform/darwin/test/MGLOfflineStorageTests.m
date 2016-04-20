@@ -27,7 +27,7 @@
 - (void)testAddPack {
     NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
     
-    NSURL *styleURL = [MGLStyle lightStyleURL];
+    NSURL *styleURL = [MGLStyle lightStyleURLWithVersion:8];
     /// Somewhere near Grape Grove, Ohio, United States.
     MGLCoordinateBounds bounds = {
         { .latitude = 39.70358155855172, .longitude = -83.69506472545841 },

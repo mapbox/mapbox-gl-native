@@ -370,7 +370,7 @@
                                     <action selector="setStyle:" target="-1" id="I4L-Wx-UXA"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Emerald" tag="2" keyEquivalent="2" id="BBa-Qa-SQr">
+                            <menuItem title="Outdoors" tag="2" keyEquivalent="2" id="BBa-Qa-SQr">
                                 <connections>
                                     <action selector="setStyle:" target="-1" id="rM1-yG-t5u"/>
                                 </connections>

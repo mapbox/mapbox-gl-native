@@ -475,19 +475,19 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     dispatch_once(&onceToken, ^{
         styleNames = @[
             @"Streets",
-            @"Emerald",
+            @"Outdoors",
             @"Light",
             @"Dark",
             @"Satellite",
             @"Hybrid",
         ];
         styleURLs = @[
-            [MGLStyle streetsStyleURL],
-            [MGLStyle emeraldStyleURL],
-            [MGLStyle lightStyleURL],
-            [MGLStyle darkStyleURL],
-            [MGLStyle satelliteStyleURL],
-            [MGLStyle hybridStyleURL],
+            [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle outdoorsStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle lightStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle darkStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle satelliteStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle hybridStyleURLWithVersion:MGLStyleCurrentVersion],
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
         
@@ -497,10 +497,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         unsigned numStyleURLMethods = 0;
         for (NSUInteger i = 0; i < numMethods; i++) {
             Method method = methods[i];
-            if (method_getNumberOfArguments(method) == 2 /* _cmd, self */) {
+            if (method_getNumberOfArguments(method) == 3 /* _cmd, self, version */) {
                 SEL selector = method_getName(method);
                 NSString *name = @(sel_getName(selector));
-                if ([name rangeOfString:@"StyleURL"].location != NSNotFound) {
+                if ([name hasSuffix:@"StyleURLWithVersion:"]) {
                     numStyleURLMethods += 1;
                 }
             }
