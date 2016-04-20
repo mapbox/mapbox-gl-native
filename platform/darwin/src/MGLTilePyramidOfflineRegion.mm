@@ -33,7 +33,7 @@
 - (instancetype)initWithStyleURL:(NSURL *)styleURL bounds:(MGLCoordinateBounds)bounds fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel {
     if (self = [super init]) {
         if (!styleURL) {
-            styleURL = [MGLStyle streetsStyleURL];
+            styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion];
         }
         
         if (!styleURL.scheme) {
