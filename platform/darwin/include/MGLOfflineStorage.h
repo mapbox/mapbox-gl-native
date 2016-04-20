@@ -211,9 +211,9 @@ typedef void (^MGLOfflinePackRemovalCompletionHandler)(NSError * _Nullable error
  attempt to download additional tiles until already downloaded tiles are removed
  by calling the `-removePack:withCompletionHandler:` method.
  
- @note The [Mapbox Terms of Service](https://www.mapbox.com/tos/) prohibits
-    changing or bypassing this limit without permission from Mapbox. Contact
-    your Mapbox sales representative to have the limit raised.
+ @note The <a href="https://www.mapbox.com/tos/">Mapbox Terms of Service</a>
+    prohibits changing or bypassing this limit without permission from Mapbox.
+    Contact your Mapbox sales representative to have the limit raised.
  */
 - (void)setMaximumAllowedMapboxTiles:(uint64_t)maximumCount;
 

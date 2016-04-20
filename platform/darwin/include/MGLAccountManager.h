@@ -13,15 +13,16 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Authorizing Access
 
 /**
- Set the [Mapbox access token](https://www.mapbox.com/help/define-access-token/)
+ Set the
+ <a href="https://www.mapbox.com/help/define-access-token/">Mapbox access token</a>
  to be used by all instances of MGLMapView in the current application.
  
  Mapbox-hosted vector tiles and styles require an API access token, which you
  can obtain from the
- [Mapbox account page](https://www.mapbox.com/studio/account/tokens/). Access
- tokens associate requests to Mapbox’s vector tile and style APIs with your
- Mapbox account. They also deter other developers from using your styles without
- your permission.
+ <a href="https://www.mapbox.com/studio/account/tokens/">Mapbox account page</a>.
+ Access tokens associate requests to Mapbox’s vector tile and style APIs with
+ your Mapbox account. They also deter other developers from using your styles
+ without your permission.
  
  @param accessToken A Mapbox access token. Calling this method with a value of
     `nil` has no effect.
@@ -37,8 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Returns the
- [Mapbox access token](https://www.mapbox.com/help/define-access-token/) in use
- by instances of MGLMapView in the current application.
+ <a href="https://www.mapbox.com/help/define-access-token/">Mapbox access token</a>
+ in use by instances of MGLMapView in the current application.
  */
 + (nullable NSString *)accessToken;
 
