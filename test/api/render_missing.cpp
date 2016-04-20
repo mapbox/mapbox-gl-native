@@ -47,7 +47,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
             std::rethrow_exception(err);
         } catch (const std::exception& ex) {
             message = ex.what();
-            EXPECT_TRUE(message.find("connect") != std::string::npos);
+            EXPECT_TRUE(message.find("onnect") != std::string::npos); // [C|c]onnect
         }
         loop.stop();
     });
