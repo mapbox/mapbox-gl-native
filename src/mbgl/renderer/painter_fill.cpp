@@ -4,6 +4,7 @@
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/outlinepattern_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 
@@ -108,6 +109,44 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
             bucket.drawElements(*patternShader, glObjectStore);
+
+            if (properties.fillAntialias && stroke_color == fill_color) {
+                config.program = outlinePatternShader->getID();
+                outlinePatternShader->u_matrix = vtxMatrix;
+                config.lineWidth = 2.0f;
+
+                // Draw the entire line
+                outlinePatternShader->u_world = {{
+                    static_cast<float>(frame.framebufferSize[0]),
+                    static_cast<float>(frame.framebufferSize[1])
+                }};
+
+                outlinePatternShader->u_pattern_tl_a = (*posA).tl;
+                outlinePatternShader->u_pattern_br_a = (*posA).br;
+                outlinePatternShader->u_pattern_tl_b = (*posB).tl;
+                outlinePatternShader->u_pattern_br_b = (*posB).br;
+                outlinePatternShader->u_opacity = properties.fillOpacity;
+                outlinePatternShader->u_image = 0;
+                outlinePatternShader->u_mix = properties.fillPattern.value.t;
+
+                outlinePatternShader->u_patternscale_a = {{
+                    1.0f / id.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
+                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
+                }};
+                outlinePatternShader->u_patternscale_b = {{
+                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
+                    1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
+                }};
+
+                outlinePatternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
+                outlinePatternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
+
+                config.activeTexture = GL_TEXTURE0;
+                spriteAtlas->bind(true, glObjectStore);
+
+                setDepthSublayer(2);
+                bucket.drawVertices(*outlinePatternShader, glObjectStore);
+            }
         }
     }
     else {
@@ -135,7 +174,7 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
         outlineShader->u_color = fill_color;
-
+        
         // Draw the entire line
         outlineShader->u_world = {{
             static_cast<float>(frame.framebufferSize[0]),

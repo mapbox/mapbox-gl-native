@@ -6,6 +6,7 @@
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/outline_shader.hpp>
+#include <mbgl/shader/outlinepattern_shader.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/platform/log.hpp>
 
@@ -240,6 +241,18 @@ void FillBucket::drawVertices(OutlineShader& shader, gl::GLObjectStore& glObject
     for (auto& group : lineGroups) {
         assert(group);
         group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, glObjectStore);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
+        vertex_index += group->vertex_length * vertexBuffer.itemSize;
+        elements_index += group->elements_length * lineElementsBuffer.itemSize;
+    }
+}
+
+void FillBucket::drawVertices(OutlinePatternShader& shader, gl::GLObjectStore& glObjectStore) {
+    GLbyte* vertex_index = BUFFER_OFFSET(0);
+    GLbyte* elements_index = BUFFER_OFFSET(0);
+    for (auto& group : lineGroups) {
+        assert(group);
+        group->array[1].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, glObjectStore);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;

@@ -53,6 +53,7 @@ class BackgroundLayer;
 class SDFShader;
 class PlainShader;
 class OutlineShader;
+class OutlinePatternShader;
 class LineShader;
 class LinejoinShader;
 class LineSDFShader;
@@ -190,6 +191,7 @@ private:
 
     std::unique_ptr<PlainShader> plainShader;
     std::unique_ptr<OutlineShader> outlineShader;
+    std::unique_ptr<OutlinePatternShader> outlinePatternShader;
     std::unique_ptr<LineShader> lineShader;
     std::unique_ptr<LineSDFShader> linesdfShader;
     std::unique_ptr<LinepatternShader> linepatternShader;

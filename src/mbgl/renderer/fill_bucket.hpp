@@ -16,6 +16,7 @@ namespace mbgl {
 
 class FillVertexBuffer;
 class OutlineShader;
+class OutlinePatternShader;
 class PlainShader;
 class PatternShader;
 
@@ -26,7 +27,7 @@ class FillBucket : public Bucket {
     static void free(void *userData, void *ptr);
 
     typedef ElementGroup<2> TriangleGroup;
-    typedef ElementGroup<1> LineGroup;
+    typedef ElementGroup<2> LineGroup;
 
 public:
     FillBucket();
@@ -43,6 +44,7 @@ public:
     void drawElements(PlainShader&, gl::GLObjectStore&);
     void drawElements(PatternShader&, gl::GLObjectStore&);
     void drawVertices(OutlineShader&, gl::GLObjectStore&);
+    void drawVertices(OutlinePatternShader&, gl::GLObjectStore&);
 
 private:
     TESSalloc *allocator;

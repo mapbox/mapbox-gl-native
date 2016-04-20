@@ -21,7 +21,8 @@
     "source": "mapbox",
     "source-layer": "water",
     "paint": {
-      "fill-pattern": "noise"
+      "fill-pattern": "noise",
+      "fill-antialias": false
     }
   }, {
     "id": "admin",
