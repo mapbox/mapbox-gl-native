@@ -30,7 +30,7 @@ public:
     LayoutProperty<std::string> textField { "" };
     LayoutProperty<std::string> textFont { "Open Sans Regular, Arial Unicode MS Regular" };
     LayoutProperty<float> textSize { 16.0f };
-    LayoutProperty<float> textMaxWidth { 15.0f /* em */ };
+    LayoutProperty<float> textMaxWidth { 10.0f /* em */ };
     LayoutProperty<float> textLineHeight { 1.2f /* em */ };
     LayoutProperty<float> textLetterSpacing { 0.0f /* em */ };
     LayoutProperty<TextJustifyType> textJustify { TextJustifyType::Center };
