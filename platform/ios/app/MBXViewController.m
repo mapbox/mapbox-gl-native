@@ -10,14 +10,24 @@
 #import <OpenGLES/ES2/gl.h>
 #import <objc/runtime.h>
 
-static NSString * const kCustomCalloutTitle = @"Custom Callout";
-
 static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 38.9131982, .longitude = -77.0325453144239 },
     { .latitude = 37.7757368, .longitude = -122.4135302 },
     { .latitude = 12.9810816, .longitude = 77.6368034 },
     { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
+
+@interface MBXDroppedPinAnnotation : MGLPointAnnotation
+@end
+
+@implementation MBXDroppedPinAnnotation
+@end
+
+@interface MBXCustomCalloutAnnotation : MGLPointAnnotation
+@end
+
+@implementation MBXCustomCalloutAnnotation
+@end
 
 @interface MBXViewController () <UIActionSheetDelegate, MGLMapViewDelegate>
 
@@ -68,7 +78,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     else
     {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Access Token" message:@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Access Token", @"Title of the access token prompt") message:NSLocalizedString(@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:", @"Message of the access token prompt") preferredStyle:UIAlertControllerStyleAlert];
         [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField)
          {
              textField.keyboardType = UIKeyboardTypeURL;
@@ -76,8 +86,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
              textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
          }];
         
-        [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"") style:UIAlertActionStyleCancel handler:nil]];
+        UIAlertAction *OKAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
         {
             UITextField *textField = alertController.textFields.firstObject;
             NSString *accessToken = textField.text;
@@ -150,37 +160,37 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 - (IBAction)showSettings:(__unused id)sender
 {
     MGLMapDebugMaskOptions debugMask = self.mapView.debugMask;
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Map Settings"
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Map Settings", @"Title of the settings action sheet")
                                                        delegate:self
-                                              cancelButtonTitle:@"Cancel"
+                                              cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
                                          destructiveButtonTitle:nil
                                               otherButtonTitles:
-                            @"Reset Position",
-                            ((debugMask & MGLMapDebugTileBoundariesMask)
-                             ? @"Hide Tile Boundaries"
-                             : @"Show Tile Boundaries"),
-                            ((debugMask & MGLMapDebugTileInfoMask)
-                             ? @"Hide Tile Info"
-                             : @"Show Tile Info"),
-                            ((debugMask & MGLMapDebugTimestampsMask)
-                             ? @"Hide Tile Timestamps"
-                             : @"Show Tile Timestamps"),
-                            ((debugMask & MGLMapDebugCollisionBoxesMask)
-                             ? @"Hide Collision Boxes"
-                             : @"Show Collision Boxes"),
-                            @"Add 100 Points",
-                            @"Add 1,000 Points",
-                            @"Add 10,000 Points",
-                            @"Add Test Shapes",
-                            @"Start World Tour",
-                            @"Add Custom Callout Point",
-                            @"Remove Annotations",
-                            (_isShowingCustomStyleLayer
-                             ? @"Hide Custom Style Layer"
-                             : @"Show Custom Style Layer"),
-                            @"Print Telemetry Logfile",
-                            @"Delete Telemetry Logfile",
-                            nil];
+        NSLocalizedString(@"Reset Position", @"Action in the settings action sheet"),
+        ((debugMask & MGLMapDebugTileBoundariesMask)
+         ? NSLocalizedString(@"Hide Tile Boundaries", @"Action in the settings action sheet")
+         : NSLocalizedString(@"Show Tile Boundaries", @"Action in the settings action sheet")),
+        ((debugMask & MGLMapDebugTileInfoMask)
+         ? NSLocalizedString(@"Hide Tile Info", @"Action in the settings action sheet")
+         : NSLocalizedString(@"Show Tile Info", @"Action in the settings action sheet")),
+        ((debugMask & MGLMapDebugTimestampsMask)
+         ? NSLocalizedString(@"Hide Tile Timestamps", @"Action in the settings action sheet")
+         : NSLocalizedString(@"Show Tile Timestamps", @"Action in the settings action sheet")),
+        ((debugMask & MGLMapDebugCollisionBoxesMask)
+         ? NSLocalizedString(@"Hide Collision Boxes", @"Action in the settings action sheet")
+         : NSLocalizedString(@"Show Collision Boxes", @"Action in the settings action sheet")),
+        NSLocalizedString(@"Add 100 Points", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Add 1,000 Points", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Add 10,000 Points", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Add Test Shapes", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Start World Tour", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Add Custom Callout Point", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Remove Annotations", @"Action in the settings action sheet"),
+        (_isShowingCustomStyleLayer
+         ? NSLocalizedString(@"Hide Custom Style Layer", @"Action in the settings action sheet")
+         : NSLocalizedString(@"Show Custom Style Layer", @"Action in the settings action sheet")),
+        NSLocalizedString(@"Print Telemetry Logfile", @"Action in the settings action sheet"),
+        NSLocalizedString(@"Delete Telemetry Logfile", @"Action in the settings action sheet"),
+        nil];
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
 }
@@ -434,9 +444,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 {
     [self.mapView removeAnnotations:self.mapView.annotations];
     
-    MGLPointAnnotation *annotation = [MGLPointAnnotation new];
+    MBXCustomCalloutAnnotation *annotation = [[MBXCustomCalloutAnnotation alloc] init];
     annotation.coordinate = CLLocationCoordinate2DMake(48.8533940, 2.3775439);
-    annotation.title = kCustomCalloutTitle;
+    annotation.title = NSLocalizedString(@"Custom Callout", @"Title of a custom callout view");
     
     [self.mapView addAnnotation:annotation];
     [self.mapView showAnnotations:@[annotation] animated:YES];
@@ -446,10 +456,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        MGLPointAnnotation *point = [MGLPointAnnotation new];
+        MBXDroppedPinAnnotation *point = [[MBXDroppedPinAnnotation alloc] init];
         point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
                                  toCoordinateFromView:self.mapView];
-        point.title = @"Dropped Marker";
+        point.title = NSLocalizedString(@"Dropped Pin", @"Title of a dropped pin annotation");
         point.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:point.coordinate];
         [self.mapView addAnnotation:point];
         [self.mapView selectAnnotation:point animated:YES];
@@ -464,12 +474,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         styleNames = @[
-            @"Streets",
-            @"Emerald",
-            @"Light",
-            @"Dark",
-            @"Satellite",
-            @"Hybrid",
+            NSLocalizedString(@"Streets", @"Style name"),
+            NSLocalizedString(@"Emerald", @"Style name"),
+            NSLocalizedString(@"Light", @"Style name"),
+            NSLocalizedString(@"Dark", @"Style name"),
+            NSLocalizedString(@"Satellite", @"Style name"),
+            NSLocalizedString(@"Hybrid", @"Style name"),
         ];
         styleURLs = @[
             [MGLStyle streetsStyleURL],
@@ -594,8 +604,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {
-    if ([annotation.title isEqualToString:@"Dropped Marker"]
-        || [annotation.title isEqualToString:kCustomCalloutTitle])
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]]
+        || [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
     {
         return nil; // use default marker
     }
@@ -707,7 +717,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             break;
         case MGLUserTrackingModeFollowWithCourse:
             newButtonImage = nil;
-            newButtonTitle = @"Course";
+            newButtonTitle = NSLocalizedString(@"Course", @"User tracking mode");
             break;
     }
 
@@ -720,7 +730,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 - (UIView<MGLCalloutView> *)mapView:(__unused MGLMapView *)mapView calloutViewForAnnotation:(id<MGLAnnotation>)annotation
 {
     if ([annotation respondsToSelector:@selector(title)]
-        && [annotation.title isEqualToString:kCustomCalloutTitle])
+        && [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
     {
         MBXCustomCalloutView *calloutView = [[MBXCustomCalloutView alloc] init];
         calloutView.representedObject = annotation;

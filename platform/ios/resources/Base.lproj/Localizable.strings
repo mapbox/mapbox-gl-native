@@ -1,0 +1,75 @@
+/* Accessibility label */
+"Attribution info" = "Attribution info";
+
+/* No comment provided by engineer. */
+"Cancel" = "Cancel";
+
+/* Accessibility label */
+"Compass" = "Compass";
+
+/* Telemetry prompt button */
+"Don’t Participate" = "Don’t Participate";
+
+/* Action in attribution sheet */
+"Improve This Map" = "Improve This Map";
+
+/* Telemetry prompt button */
+"Keep Participating" = "Keep Participating";
+
+/* Telemetry prompt title */
+"Make Mapbox Maps Better" = "Make Mapbox Maps Better";
+
+/* Accessibility label */
+"Map" = "Map";
+
+/* Action sheet title */
+"Mapbox iOS SDK" = "Mapbox iOS SDK";
+
+/* Accessibility label */
+"Mapbox logo" = "Mapbox logo";
+
+/* Action in attribution sheet */
+"Mapbox Telemetry" = "Mapbox Telemetry";
+
+/* Setup documentation URL display string */
+"mapbox.com/help/first-steps-ios-sdk" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Compass abbreviation for north */
+"N" = "N";
+
+/* Telemetry prompt button */
+"Participate" = "Participate";
+
+/* Telemetry prompt button */
+"Stop Participating" = "Stop Participating";
+
+/* Telemetry prompt button */
+"Tell Me More" = "Tell Me More";
+
+/* No comment provided by engineer. */
+"The session data task failed. Original request was: %@" = "The session data task failed. Original request was: %@";
+
+/* No comment provided by engineer. */
+"The status code was %ld" = "The status code was %ld";
+
+/* Instructions in Interface Builder designable; property list dictionary key, file name */
+"To display a Mapbox-hosted map here, set %@ to your access token in %@\n\nFor detailed instructions, see:" = "To display a Mapbox-hosted map here, set %1$@ to your access token in %2$@\n\nFor detailed instructions, see:";
+
+/* Accessibility label */
+"User location" = "User location";
+
+/* Telemetry prompt message */
+"You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data." = "You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Default user location annotation title */
+"You Are Here" = "You Are Here";
+
+/* Telemetry prompt message */
+"You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data." = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Action in attribution sheet */
+"© Mapbox" = "© Mapbox";
+
+/* Action in attribution sheet */
+"© OpenStreetMap" = "© OpenStreetMap";
+

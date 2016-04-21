@@ -125,6 +125,12 @@ ifabric: $(IOS_PROJ_PATH)
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
+igenstrings:
+	genstrings -u -o platform/ios/app/Base.lproj platform/ios/app/*.{m,mm}
+	genstrings -u -o platform/ios/resources/Base.lproj platform/ios/src/*.{m,mm}
+	-find platform/ios/ -path '*/Base.lproj/Localizable.strings' -exec \
+		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
+
 #### Android targets #####################################################
 
 # Builds a particular android architecture.

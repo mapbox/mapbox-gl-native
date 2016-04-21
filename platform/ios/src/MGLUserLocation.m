@@ -1,6 +1,7 @@
 #import "MGLUserLocation_Private.h"
 
 #import "MGLMapView.h"
+#import "NSBundle+MGLAdditions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -68,7 +69,7 @@ NS_ASSUME_NONNULL_END
 
 - (NSString *)title
 {
-    return (_title ? _title : @"You Are Here");
+    return _title ?: NSLocalizedString(@"You Are Here", @"Default user location annotation title");
 }
 
 - (NSString *)description

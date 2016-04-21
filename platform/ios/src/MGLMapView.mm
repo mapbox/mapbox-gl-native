@@ -27,9 +27,9 @@
 #include <mbgl/util/chrono.hpp>
 
 #import "Mapbox.h"
-#import "../../darwin/src/MGLGeometry_Private.h"
-#import "../../darwin/src/MGLMultiPoint_Private.h"
-#import "../../darwin/src/MGLOfflineStorage_Private.h"
+#import "MGLGeometry_Private.h"
+#import "MGLMultiPoint_Private.h"
+#import "MGLOfflineStorage_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSString+MGLAdditions.h"
@@ -58,8 +58,6 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view has finished moving to the first reported user location.
     MGLUserTrackingStateChanged,
 };
-
-NSString *const MGLMapboxSetupDocumentationURLDisplayString = @"mapbox.com/help/first-steps-ios-sdk";
 
 const NSTimeInterval MGLAnimationDuration = 0.3;
 
@@ -305,7 +303,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self createGLView];
     }
 
-    self.accessibilityLabel = @"Map";
+    self.accessibilityLabel = NSLocalizedString(@"Map", @"Accessibility label");
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
 
@@ -350,7 +348,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     //
     UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
     _logoView = [[UIImageView alloc] initWithImage:logo];
-    _logoView.accessibilityLabel = @"Mapbox logo";
+    _logoView.accessibilityLabel = NSLocalizedString(@"Mapbox logo", @"Accessibility label");
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
@@ -358,7 +356,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup attribution
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    _attributionButton.accessibilityLabel = @"Attribution info";
+    _attributionButton.accessibilityLabel = NSLocalizedString(@"Attribution info", @"Accessibility label");
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
@@ -367,8 +365,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // setup compass
     //
-    _compassView = [[UIImageView alloc] initWithImage:[MGLMapView resourceImageNamed:@"Compass.png"]];
-    _compassView.accessibilityLabel = @"Compass";
+    _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
+    _compassView.accessibilityLabel = NSLocalizedString(@"Compass", @"Accessibility label");
     _compassView.frame = CGRectMake(0, 0, _compassView.image.size.width, _compassView.image.size.height);
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
@@ -491,6 +489,26 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         return reinterpret_cast<mbgl::gl::glProc>(symbol);
     });
+}
+
+- (UIImage *)compassImage
+{
+    UIImage *scaleImage = [MGLMapView resourceImageNamed:@"Compass.png"];
+    UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
+    [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
+    
+    NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedString(@"N", @"Compass abbreviation for north") attributes:@{
+        NSFontAttributeName: [UIFont systemFontOfSize:9 weight:UIFontWeightUltraLight],
+        NSForegroundColorAttributeName: [UIColor whiteColor],
+    }];
+    CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
+                                   scaleImage.size.height * 0.45,
+                                   north.size.width, north.size.height);
+    [north drawInRect:stringRect];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
 }
 
 - (void)reachabilityChanged:(NSNotification *)notification
@@ -1518,15 +1536,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     if ( ! self.attributionSheet)
     {
-        self.attributionSheet = [[UIActionSheet alloc] initWithTitle:@"Mapbox iOS SDK"
+        self.attributionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Mapbox iOS SDK", @"Action sheet title")
                                                             delegate:self
-                                                   cancelButtonTitle:@"Cancel"
+                                                   cancelButtonTitle:NSLocalizedString(@"Cancel", @"")
                                               destructiveButtonTitle:nil
                                                    otherButtonTitles:
-                                 @"© Mapbox",
-                                 @"© OpenStreetMap",
-                                 @"Improve This Map",
-                                 @"Mapbox Telemetry",
+                                 NSLocalizedString(@"© Mapbox", @"Action in attribution sheet"),
+                                 NSLocalizedString(@"© OpenStreetMap", @"Action in attribution sheet"),
+                                 NSLocalizedString(@"Improve This Map", @"Action in attribution sheet"),
+                                 NSLocalizedString(@"Mapbox Telemetry", @"Action in attribution sheet"),
                                  nil];
 
     }
@@ -1561,22 +1579,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"])
         {
-            message = @"You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
-            participate = @"Keep Participating";
-            optOut = @"Stop Participating";
+            message = NSLocalizedString(@"You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.", @"Telemetry prompt message");
+            participate = NSLocalizedString(@"Keep Participating", @"Telemetry prompt button");
+            optOut = NSLocalizedString(@"Stop Participating", @"Telemetry prompt button");
         }
         else
         {
-            message = @"You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
-            participate = @"Participate";
-            optOut = @"Don’t Participate";
+            message = NSLocalizedString(@"You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.", @"Telemetry prompt message");
+            participate = NSLocalizedString(@"Participate", @"Telemetry prompt button");
+            optOut = NSLocalizedString(@"Don’t Participate", @"Telemetry prompt button");
         }
 
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Make Mapbox Maps Better"
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Make Mapbox Maps Better", @"Telemetry prompt title")
                                                         message:message
                                                        delegate:self
                                               cancelButtonTitle:participate
-                                              otherButtonTitles:@"Tell Me More", optOut, nil];
+                                              otherButtonTitles:NSLocalizedString(@"Tell Me More", @"Telemetry prompt button"), optOut, nil];
         [alert show];
     }
 }
@@ -1590,7 +1608,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else if (buttonIndex == alertView.firstOtherButtonIndex)
     {
         [[UIApplication sharedApplication] openURL:
-         [NSURL URLWithString:@"https://mapbox.com/telemetry/"]];
+         [NSURL URLWithString:@"https://www.mapbox.com/telemetry/"]];
     }
     else if (buttonIndex == alertView.firstOtherButtonIndex + 1)
     {
@@ -4042,7 +4060,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // Headline
     UILabel *headlineLabel = [[UILabel alloc] init];
-    headlineLabel.text = @"MGLMapView";
+    headlineLabel.text = NSStringFromClass([self class]);
     headlineLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     headlineLabel.textAlignment = NSTextAlignmentCenter;
     headlineLabel.numberOfLines = 1;
@@ -4053,8 +4071,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // Explanation
     UILabel *explanationLabel = [[UILabel alloc] init];
-    explanationLabel.text = (@"To display a Mapbox-hosted map here, set MGLMapboxAccessToken to your access token in Info.plist\n\n"
-                             @"For detailed instructions, see:");
+    explanationLabel.text = [NSString stringWithFormat:NSLocalizedString(@"To display a Mapbox-hosted map here, set %@ to your access token in %@\n\nFor detailed instructions, see:", @"Instructions in Interface Builder designable; property list dictionary key, file name"), @"MGLMapboxAccessToken", @"Info.plist"];
     explanationLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     explanationLabel.numberOfLines = 0;
     explanationLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -4064,7 +4081,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     // Link
     UIButton *linkButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [linkButton setTitle:MGLMapboxSetupDocumentationURLDisplayString forState:UIControlStateNormal];
+    [linkButton setTitle:NSLocalizedString(@"mapbox.com/help/first-steps-ios-sdk", @"Setup documentation URL display string") forState:UIControlStateNormal];
     linkButton.translatesAutoresizingMaskIntoConstraints = NO;
     linkButton.titleLabel.numberOfLines = 0;
     [linkButton setContentCompressionResistancePriority:UILayoutPriorityDefaultLow

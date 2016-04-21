@@ -1,5 +1,6 @@
 #import "MGLCoordinateFormatter.h"
 
+#import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 
 @implementation MGLCoordinateFormatter {

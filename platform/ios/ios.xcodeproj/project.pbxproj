@@ -134,6 +134,8 @@
 		DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */; };
 		DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88488D1CBB047F00AB86E3 /* reachability.h */; };
 		DA8848901CBB048E00AB86E3 /* reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488F1CBB048E00AB86E3 /* reachability.m */; };
+		DA89632B1CC4E66500684375 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8963291CC4E66500684375 /* Localizable.strings */; };
+		DA89632F1CC4EE3300684375 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89632C1CC4ECD300684375 /* Localizable.strings */; };
 		DA8963371CC549A100684375 /* glyphs in Resources */ = {isa = PBXBuildFile; fileRef = DA8963331CC549A100684375 /* glyphs */; };
 		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
 		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
@@ -387,6 +389,8 @@
 		DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
 		DA88488D1CBB047F00AB86E3 /* reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reachability.h; path = ../../include/mbgl/platform/darwin/reachability.h; sourceTree = "<group>"; };
 		DA88488F1CBB048E00AB86E3 /* reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = reachability.m; path = src/reachability.m; sourceTree = "<group>"; };
+		DA89632A1CC4E66500684375 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA89632D1CC4ECD300684375 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA8963331CC549A100684375 /* glyphs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glyphs; sourceTree = "<group>"; };
 		DA8963341CC549A100684375 /* sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sprites; sourceTree = "<group>"; };
 		DA8963351CC549A100684375 /* styles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = styles; sourceTree = "<group>"; };
@@ -497,6 +501,7 @@
 				DA1DC9561CB6C1C2006E619F /* Main.storyboard */,
 				DA1DC95B1CB6C1C2006E619F /* LaunchScreen.storyboard */,
 				DA1DC99E1CB6E088006E619F /* Assets.xcassets */,
+				DA8963291CC4E66500684375 /* Localizable.strings */,
 				DA1DC96C1CB6C6CE006E619F /* points.geojson */,
 				DA1DC96D1CB6C6CE006E619F /* polyline.geojson */,
 				DA1DC96F1CB6C6CE006E619F /* threestates.geojson */,
@@ -655,6 +660,7 @@
 		DA8848621CBAFCC100AB86E3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				DA89632C1CC4ECD300684375 /* Localizable.strings */,
 				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
 				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
 				DA8848631CBAFCC100AB86E3 /* Compass.png */,
@@ -1001,6 +1007,7 @@
 				DA4A26951CB6E337000B7809 /* LaunchScreen.storyboard in Resources */,
 				DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */,
 				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
+				DA89632B1CC4E66500684375 /* Localizable.strings in Resources */,
 				DA1DC99D1CB6E076006E619F /* Default-568h@2x.png in Resources */,
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
 				DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */,
@@ -1019,6 +1026,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA89632F1CC4EE3300684375 /* Localizable.strings in Resources */,
 				DA8848731CBAFCC100AB86E3 /* mapbox.png in Resources */,
 				DA8848741CBAFCC100AB86E3 /* mapbox@2x.png in Resources */,
 				DA88487A1CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der in Resources */,
@@ -1197,6 +1205,22 @@
 				DA1DC95C1CB6C1C2006E619F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DA8963291CC4E66500684375 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA89632A1CC4E66500684375 /* Base */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		DA89632C1CC4ECD300684375 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA89632D1CC4ECD300684375 /* Base */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		DABCABB81CB80692000A7C39 /* LaunchScreen.storyboard */ = {

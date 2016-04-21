@@ -86,13 +86,13 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 }
 
 - (IBAction)addCurrentRegion:(id)sender {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add Offline Pack" message:@"Choose a name for the pack:" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Add Offline Pack", @"Title of offline pack name prompt") message:NSLocalizedString(@"Choose a name for the pack:", @"Message of offline pack name prompt") preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         textField.placeholder = [NSString stringWithFormat:@"%@", MGLStringFromCoordinateBounds(self.mapView.visibleCoordinateBounds)];
     }];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"") style:UIAlertActionStyleCancel handler:nil]];
     
-    UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    UIAlertAction *downloadAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Download", @"Title of the button for downloading offline pack") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         MGLMapView *mapView = self.mapView;
         NSAssert(mapView, @"No map view to get the current region from.");
         
@@ -109,9 +109,9 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
         
         [[MGLOfflineStorage sharedOfflineStorage] addPackForRegion:region withContext:context completionHandler:^(MGLOfflinePack *pack, NSError *error) {
             if (error) {
-                NSString *message = [NSString stringWithFormat:@"Mapbox GL was unable to add the offline pack “%@”.", name];
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Can’t Add Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
-                [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+                NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Mapbox GL was unable to add the offline pack “%@”.", @"Error message: name"), name];
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Can’t Add Offline Pack", @"Error title") message:message preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:nil]];
                 [self presentViewController:alertController animated:YES completion:nil];
             } else {
                 [pack resume];
@@ -154,16 +154,16 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     NSString *statusString;
     switch (pack.state) {
         case MGLOfflinePackStateUnknown:
-            statusString = @"Calculating progress…";
+            statusString = NSLocalizedString(@"Calculating progress…", @"Offline pack status");
             break;
             
         case MGLOfflinePackStateInactive:
-            statusString = [NSString stringWithFormat:@"%@ of %@ resources (%@)",
+            statusString = [NSString stringWithFormat:NSLocalizedString(@"%@ of %@ resources (%@)", @"Offline pack status: completed, expected, bytes"),
                             completedString, expectedString, byteCountString];
             break;
             
         case MGLOfflinePackStateComplete:
-            statusString = [NSString stringWithFormat:@"%@ resources (%@)",
+            statusString = [NSString stringWithFormat:NSLocalizedString(@"%@ resources (%@)", @"Offline pack status: completed, bytes"),
                             completedString, byteCountString];
             break;
             
@@ -173,9 +173,9 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
                                                                    numberStyle:NSNumberFormatterDecimalStyle];
             }
             if (progress.maximumResourcesExpected > progress.countOfResourcesExpected) {
-                expectedString = [@"at least " stringByAppendingString:expectedString];
+                expectedString = [NSString stringWithFormat:NSLocalizedString(@"at least %@", @"Offline pack status: expected resources"), expectedString];
             }
-            statusString = [NSString stringWithFormat:@"Downloading %@ of %@ resources (%@ so far)…",
+            statusString = [NSString stringWithFormat:NSLocalizedString(@"Downloading %@ of %@ resources (%@ so far)…", @"Offline pack status: completed, expected, bytes"),
                             completedString, expectedString, byteCountString];
             break;
             
@@ -247,12 +247,12 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     NSError *error = notification.userInfo[MGLOfflinePackErrorUserInfoKey];
     NSAssert([error isKindOfClass:[NSError class]], @"MGLOfflineStorage notification has a non-error error.");
     
-    NSString *message = [NSString stringWithFormat:@"iosapp encountered an error while downloading the offline pack “%@”: %@", pack.name, error.localizedFailureReason];
+    NSString *message = [NSString stringWithFormat:NSLocalizedString(@"Mapbox GL encountered an error while downloading the offline pack “%@”: %@", @"Error message: name, reason"), pack.name, error.localizedFailureReason];
     if (error.code == MGLErrorCodeConnectionFailed) {
         NSLog(@"%@", message);
     } else {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Error Downloading Offline Pack" message:message preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error Downloading Offline Pack", @"Error title") message:message preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"") style:UIAlertActionStyleDefault handler:nil]];
         [self presentViewController:alertController animated:YES completion:nil];
     }
 }

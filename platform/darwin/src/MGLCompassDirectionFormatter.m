@@ -1,5 +1,7 @@
 #import "MGLCompassDirectionFormatter.h"
 
+#import "NSBundle+MGLAdditions.h"
+
 #define wrap(value, min, max) \
     (fmod((fmod((value - min), (max - min)) + (max - min)), (max - min)) + min)
 

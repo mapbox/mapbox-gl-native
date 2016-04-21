@@ -4,6 +4,7 @@
 #import "MGLUserLocation_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
+#import "NSBundle+MGLAdditions.h"
 
 const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
@@ -53,7 +54,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
-        self.accessibilityLabel = @"User location";
+        self.accessibilityLabel = NSLocalizedString(@"User location", @"Accessibility label");
     }
     return self;
 }
