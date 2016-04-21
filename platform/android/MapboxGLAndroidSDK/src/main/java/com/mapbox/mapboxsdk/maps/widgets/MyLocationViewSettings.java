@@ -53,9 +53,9 @@ public class MyLocationViewSettings {
 
     private int[] padding = new int[4];
 
-    public MyLocationViewSettings(MapView mapView) {
+    public MyLocationViewSettings(MapView mapView, UserLocationView userLocationView) {
         this.mapView = mapView;
-        this.userLocationView = (UserLocationView) mapView.findViewById(R.id.userLocationView);
+        this.userLocationView = userLocationView;
     }
 
     public boolean isEnabled() {

@@ -18,10 +18,10 @@ public class TrackingSettings {
     private boolean dismissBearingTrackingOnGesture = true;
 
     @MyLocationTracking.Mode
-    private int mMyLocationTrackingMode;
+    private int myLocationTrackingMode;
 
     @MyBearingTracking.Mode
-    private int mMyBearingTrackingMode;
+    private int myBearingTrackingMode;
 
     TrackingSettings(@NonNull MapView mapView, UiSettings uiSettings) {
         this.mapView = mapView;
@@ -43,7 +43,7 @@ public class TrackingSettings {
      */
     @UiThread
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        mMyLocationTrackingMode = myLocationTrackingMode;
+        this.myLocationTrackingMode = myLocationTrackingMode;
         mapView.setMyLocationTrackingMode(myLocationTrackingMode);
         validateGesturesForLocationTrackingMode();
     }
@@ -58,7 +58,7 @@ public class TrackingSettings {
     @UiThread
     @MyLocationTracking.Mode
     public int getMyLocationTrackingMode() {
-        return mMyLocationTrackingMode;
+        return myLocationTrackingMode;
     }
 
     /**
@@ -78,7 +78,7 @@ public class TrackingSettings {
      */
     @UiThread
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        mMyBearingTrackingMode = myBearingTrackingMode;
+        this.myBearingTrackingMode = myBearingTrackingMode;
         mapView.setMyBearingTrackingMode(myBearingTrackingMode);
         validateGesturesForBearingTrackingMode();
     }
@@ -93,7 +93,7 @@ public class TrackingSettings {
     @UiThread
     @MyBearingTracking.Mode
     public int getMyBearingTrackingMode() {
-        return mMyBearingTrackingMode;
+        return myBearingTrackingMode;
     }
 
     /**
@@ -172,6 +172,6 @@ public class TrackingSettings {
      * @return True if location tracking is disabled.
      */
     public boolean isLocationTrackingDisabled(){
-        return mMyLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
+        return myLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }

@@ -198,7 +198,7 @@ public class MapboxMap {
      */
     public MyLocationViewSettings getMyLocationViewSettings() {
         if (myLocationViewSettings == null) {
-            myLocationViewSettings = new MyLocationViewSettings(mMapView);
+            myLocationViewSettings = new MyLocationViewSettings(mMapView,mMapView.getUserLocationView());
         }
         return myLocationViewSettings;
     }
