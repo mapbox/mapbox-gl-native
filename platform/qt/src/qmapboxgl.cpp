@@ -105,12 +105,6 @@ QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
     : QObject(parent_)
     , d_ptr(new QMapboxGLPrivate(this, settings))
 {
-    mbgl::MapMode mapMode = static_cast<mbgl::MapMode>(settings.mapMode());
-    mbgl::GLContextMode contextMode = static_cast<mbgl::GLContextMode>(settings.contextMode());
-    mbgl::ConstrainMode constrainMode = static_cast<mbgl::ConstrainMode>(settings.constrainMode());
-
-    d_ptr->fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    d_ptr->mapObj = std::make_unique<mbgl::Map>(*d_ptr, *d_ptr->fileSourceObj, mapMode, contextMode, constrainMode);
 }
 
 QMapboxGL::~QMapboxGL()
@@ -585,9 +579,11 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , mapObj(std::make_unique<mbgl::Map>(
         *this, *fileSourceObj,
-        mbgl::MapMode::Continuous,
-        mbgl::GLContextMode::Shared))
+        static_cast<mbgl::MapMode>(settings.mapMode()),
+        static_cast<mbgl::GLContextMode>(settings.contextMode()),
+        static_cast<mbgl::ConstrainMode>(settings.constrainMode())))
 {
+    fileSourceObj->setAccessToken(settings.accessToken().toStdString());
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()));
     connect(this, SIGNAL(mapRegionDidChange()), q_ptr, SIGNAL(mapRegionDidChange()));
 }
