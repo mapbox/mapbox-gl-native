@@ -1,14 +1,18 @@
 # Contributing
 
-If you have a usage question for a product built on Mapbox GL (such as Mapbox Mobile toolkits like our SDKs), please visit https://www.mapbox.com/help/.
+If you have a usage question for a product built on Mapbox GL (such as our iOS or Android SDKs), please visit https://www.mapbox.com/help/.
 
 If you want to contribute code:
 
 1. Please familiarize yourself with the [install process](INSTALL.md).
 
-1. Ensure that the [existing issues](https://github.com/mapbox/mapbox-gl-native/issues?utf8=✓&q=) don't already cover your question or contribution.
+1. Ensure that existing [pull requests](https://github.com/mapbox/mapbox-gl-native/pulls) and [issues](https://github.com/mapbox/mapbox-gl-native/issues) don’t already cover your contribution or question.
 
-1. Pull requests gladly accepted. If there are any changes that developers using one of the GL SDKs should be aware of, please update the “master” section of the relevant changelog: [iOS](CHANGELOG.md) [Node.js](platform/node/CHANGELOG.md).
+1. Pull requests are gladly accepted. If there are any changes that developers using one of the GL SDKs should be aware of, please update the **master** section of the relevant changelog(s):
+ - [iOS](platform/ios/CHANGELOG.md)
+ - [Android](platform/android/CHANGELOG.md)
+ - [Node.js](platform/node/CHANGELOG.md)
+ - Other platforms, look in: `/platform/{platform-name}/CHANGELOG.md`
 
 1. Prefix your commit messages with the platform(s) your changes affect: `[core]`, `[ios]`, `[android]`, `[node]`, and so on.
 
