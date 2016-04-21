@@ -13,11 +13,11 @@ SDK | Languages | Build status
 [Mapbox iOS SDK](platform/ios/) | Objective-C or Swift | [![Bitrise](https://www.bitrise.io/app/7514e4cf3da2cc57.svg?token=OwqZE5rSBR9MVWNr_lf4sA&branch=master)](https://www.bitrise.io/app/7514e4cf3da2cc57)
 [Mapbox OS X SDK](platform/osx/) | Objective-C or Swift | [![Bitrise](https://www.bitrise.io/app/155ef7da24b38dcd.svg?token=4KSOw_gd6WxTnvGE2rMttg&branch=master)](https://www.bitrise.io/app/155ef7da24b38dcd)
 [node-mapbox-gl-native](platform/node/) | Node.js | [![Linux](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds) / [![OS X](https://www.bitrise.io/app/55e3a9bf71202106.svg?token=5qf5ZUcKVN3LDnHhW7rO0w)](https://www.bitrise.io/app/55e3a9bf71202106)
+[Mapbox GL Qt](platform/qt) | C++03 | [![Travis](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
 
 Additional Mapbox GL Native–based libraries are developed outside of this repository:
 
 * [React Native Mapbox GL](https://github.com/mapbox/react-native-mapbox-gl) for React Native applications on iOS and Android
-* [QMapboxGL](https://github.com/tmpsantos/qmapboxgl) for Qt-based applications
 * Telerik’s [Mapbox plugin](http://plugins.telerik.com/cordova/plugin/mapbox) for Apache Cordova Hybrid applications
 * Telerik’s [Mapbox plugin](http://plugins.telerik.com/nativescript/plugin/mapbox) for NativeScript Hybrid applications
 * Xamarin's [Mapbox component](https://components.xamarin.com/view/mapboxsdk) for Xamarin Hybrid applications
