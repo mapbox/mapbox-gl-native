@@ -16,6 +16,8 @@ extern NSString * const MGLMapboxAccessTokenDefaultsKey;
 @property (assign) double pendingZoomLevel;
 @property (copy) MGLMapCamera *pendingCamera;
 @property (assign) MGLCoordinateBounds pendingVisibleCoordinateBounds;
+@property (assign) double pendingMinimumZoomLevel;
+@property (assign) double pendingMaximumZoomLevel;
 @property (copy) NSURL *pendingStyleURL;
 @property (assign) MGLMapDebugMaskOptions pendingDebugMask;
 

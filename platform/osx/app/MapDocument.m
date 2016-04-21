@@ -211,6 +211,12 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (appDelegate.pendingDebugMask) {
         self.mapView.debugMask = appDelegate.pendingDebugMask;
     }
+    if (appDelegate.pendingMinimumZoomLevel >= 0) {
+        self.mapView.zoomLevel = MAX(appDelegate.pendingMinimumZoomLevel, self.mapView.zoomLevel);
+    }
+    if (appDelegate.pendingMaximumZoomLevel >= 0) {
+        self.mapView.zoomLevel = MIN(appDelegate.pendingMaximumZoomLevel, self.mapView.zoomLevel);
+    }
     
     // Temporarily set the display name to the default center coordinate instead
     // of “Untitled” until the binding kicks in.

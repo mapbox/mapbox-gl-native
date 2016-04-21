@@ -24,6 +24,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
 - (void)applyToMapView:(MGLMapView *)mapView {
     mapView.styleURL = self.styleURL;
     [mapView setVisibleCoordinateBounds:self.bounds];
+    mapView.zoomLevel = MIN(self.maximumZoomLevel, MAX(self.minimumZoomLevel, mapView.zoomLevel));
 }
 
 @end

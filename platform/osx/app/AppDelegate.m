@@ -204,6 +204,8 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
                 if ([pack.region isKindOfClass:[MGLTilePyramidOfflineRegion class]]) {
                     MGLTilePyramidOfflineRegion *region = (MGLTilePyramidOfflineRegion *)pack.region;
                     self.pendingVisibleCoordinateBounds = region.bounds;
+                    self.pendingMinimumZoomLevel = region.minimumZoomLevel;
+                    self.pendingMaximumZoomLevel = region.maximumZoomLevel;
                     [[NSDocumentController sharedDocumentController] openUntitledDocumentAndDisplay:YES error:NULL];
                 }
                 break;
