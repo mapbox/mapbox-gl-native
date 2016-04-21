@@ -4,6 +4,7 @@
     <item name="fab" type="id" />
     <item name="progress" type="id" />
     <item name="imageView" type="id" />
+    <item name="textView" type="id" />
     <item name="toolbar" type="id" />
     <item name="container" type="id" />
     <item name="item_click_support" type="id" />

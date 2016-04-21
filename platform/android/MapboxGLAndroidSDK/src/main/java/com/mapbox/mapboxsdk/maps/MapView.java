@@ -65,6 +65,7 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -1319,6 +1320,11 @@ public class MapView extends FrameLayout {
 
             mCompassView.update(getDirection());
             mMyLocationView.update();
+
+            for (MarkerView view : mMapboxMap.getMarkerViews()) {
+                view.update();
+            }
+
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();
             }
