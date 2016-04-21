@@ -255,10 +255,12 @@ public class MapboxMap {
     }
 
     /**
-     * Ease the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
-     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * Gradually move the camera by the default duration, zoom will not be affected unless specified
+     * within {@link CameraUpdate}. If {@link #getCameraPosition()} is called during the animation,
+     * it will return the current location of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update) {
@@ -266,11 +268,14 @@ public class MapboxMap {
     }
 
     /**
-     * Ease the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
-     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
+     * unless specified within {@link CameraUpdate}. If {@link #getCameraPosition()} is called
+     * during the animation, it will return the current location of the camera in flight.
      *
      * @param update     The change that should be applied to the camera.
-     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly
+     *                   positive, otherwise an IllegalArgumentException will be thrown.
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs) {
@@ -278,12 +283,20 @@ public class MapboxMap {
     }
 
     /**
-     * Ease the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
-     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * Gradually move the camera by a specified duration in milliseconds, zoom will not be affected
+     * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
+     * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
+     * will return the current location of the camera in flight.
      *
      * @param update     The change that should be applied to the camera.
-     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
-     * @param callback   An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly
+     *                   positive, otherwise an IllegalArgumentException will be thrown.
+     * @param callback   An optional callback to be notified from the main thread when the animation
+     *                   stops. If the animation stops due to its natural completion, the callback
+     *                   will be notified with onFinish(). If the animation stops due to interruption
+     *                   by a later camera movement or a user gesture, onCancel() will be called.
+     *                   Do not update or ease the camera from within onCancel().
+     * @see {@link CameraUpdateFactory} for a set of camera updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
@@ -308,12 +321,13 @@ public class MapboxMap {
     }
 
     /**
-     * Animates the movement of the camera from the current position to the position defined in the update.
-     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
-     * <p/>
-     * See CameraUpdateFactory for a set of updates.
+     * Animate the camera to a new location defined within {@link CameraUpdate} using a transition
+     * animation that evokes powered flight. The animation will last the default amount of time.
+     * During the animation, a call to {@link #getCameraPosition()} returns an intermediate location
+     * of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update) {
@@ -321,12 +335,16 @@ public class MapboxMap {
     }
 
     /**
-     * Animates the movement of the camera from the current position to the position defined in the update and calls an optional callback on completion.
-     * See CameraUpdateFactory for a set of updates.
-     * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
+     * Animate the camera to a new location defined within {@link CameraUpdate} using a transition
+     * animation that evokes powered flight. The animation will last the default amount of time. A
+     * callback can be used to be notified when animating the camera stops. During the animation, a
+     * call to {@link #getCameraPosition()} returns an intermediate location of the camera in flight.
      *
      * @param update   The change that should be applied to the camera.
-     * @param callback The callback to invoke from the main thread when the animation stops. If the animation completes normally, onFinish() is called; otherwise, onCancel() is called. Do not update or animate the camera from within onCancel().
+     * @param callback The callback to invoke from the main thread when the animation stops. If the
+     *                 animation completes normally, onFinish() is called; otherwise, onCancel() is
+     *                 called. Do not update or animate the camera from within onCancel().
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
@@ -334,11 +352,15 @@ public class MapboxMap {
     }
 
     /**
-     * Moves the map according to the update with an animation over a specified duration. See CameraUpdateFactory for a set of updates.
-     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * Animate the camera to a new location defined within {@link CameraUpdate} using a transition
+     * animation that evokes powered flight. The animation will last a specified amount of time
+     * given in milliseconds. During the animation, a call to {@link #getCameraPosition()} returns
+     * an intermediate location of the camera in flight.
      *
      * @param update     The change that should be applied to the camera.
-     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly
+     *                   positive, otherwise an IllegalArgumentException will be thrown.
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs) {
@@ -346,12 +368,22 @@ public class MapboxMap {
     }
 
     /**
-     * Moves the map according to the update with an animation over a specified duration, and calls an optional callback on completion. See CameraUpdateFactory for a set of updates.
-     * If getCameraPosition() is called during the animation, it will return the current location of the camera in flight.
+     * Animate the camera to a new location defined within {@link CameraUpdate} using a transition
+     * animation that evokes powered flight. The animation will last a specified amount of time
+     * given in milliseconds. A callback can be used to be notified when animating the camera stops.
+     * During the animation, a call to {@link #getCameraPosition()} returns an intermediate location
+     * of the camera in flight.
      *
      * @param update     The change that should be applied to the camera.
-     * @param durationMs The duration of the animation in milliseconds. This must be strictly positive, otherwise an IllegalArgumentException will be thrown.
-     * @param callback   An optional callback to be notified from the main thread when the animation stops. If the animation stops due to its natural completion, the callback will be notified with onFinish(). If the animation stops due to interruption by a later camera movement or a user gesture, onCancel() will be called. The callback should not attempt to move or animate the camera in its cancellation method. If a callback isn't required, leave it as null.
+     * @param durationMs The duration of the animation in milliseconds. This must be strictly
+     *                   positive, otherwise an IllegalArgumentException will be thrown.
+     * @param callback   An optional callback to be notified from the main thread when the animation
+     *                   stops. If the animation stops due to its natural completion, the callback
+     *                   will be notified with onFinish(). If the animation stops due to interruption
+     *                   by a later camera movement or a user gesture, onCancel() will be called.
+     *                   Do not update or animate the camera from within onCancel(). If a callback
+     *                   isn't required, leave it as null.
+     * @see {@link CameraUpdateFactory} for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
