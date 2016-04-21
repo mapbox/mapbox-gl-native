@@ -31,7 +31,10 @@ function print_qt_flags {
     CONFIG+="    'qt_ldflags%': $(quote_flags $(mason ldflags Qt system "QtCore QtGui QtOpenGL QtNetwork")),"$LN
 
     QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
-    if [ ${QT_VERSION_MAJOR} -gt 4 ] ; then
+    if hash moc 2>/dev/null && hash rcc 2>/dev/null; then
+        CONFIG+="    'qt_moc%': '$(which moc)',"$LN
+        CONFIG+="    'qt_rcc%': '$(which rcc)',"$LN
+    elif [ ${QT_VERSION_MAJOR} -gt 4 ] ; then
         CONFIG+="    'qt_moc%': '$(pkg-config Qt${QT_VERSION_MAJOR}Core --variable=host_bins)/moc',"$LN
         CONFIG+="    'qt_rcc%': '$(pkg-config Qt${QT_VERSION_MAJOR}Core --variable=host_bins)/rcc',"$LN
     else
