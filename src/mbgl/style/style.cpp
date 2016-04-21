@@ -70,7 +70,9 @@ Style::Style(FileSource& fileSource_, float pixelRatio)
 
 void Style::setJSON(const std::string& json, const std::string&) {
     sources.clear();
-    layers.clear();
+    layers.erase(std::remove_if(layers.begin(), layers.end(), [](const auto& layer) {
+            return !layer->template is<CustomLayer>();
+        }), layers.end());
     classes.clear();
 
     StyleParser parser;
