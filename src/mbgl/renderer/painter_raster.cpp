@@ -15,12 +15,12 @@ void Painter::renderRaster(RasterBucket& bucket, const RasterLayer& layer, const
         config.program = rasterShader->getID();
         rasterShader->u_matrix = matrix;
         rasterShader->u_buffer = 0;
-        rasterShader->u_opacity = properties.opacity;
-        rasterShader->u_brightness_low = properties.brightnessMin;
-        rasterShader->u_brightness_high = properties.brightnessMax;
-        rasterShader->u_saturation_factor = saturationFactor(properties.saturation);
-        rasterShader->u_contrast_factor = contrastFactor(properties.contrast);
-        rasterShader->u_spin_weights = spinWeights(properties.hueRotate);
+        rasterShader->u_opacity = properties.rasterOpacity;
+        rasterShader->u_brightness_low = properties.rasterBrightnessMin;
+        rasterShader->u_brightness_high = properties.rasterBrightnessMax;
+        rasterShader->u_saturation_factor = saturationFactor(properties.rasterSaturation);
+        rasterShader->u_contrast_factor = contrastFactor(properties.rasterContrast);
+        rasterShader->u_spin_weights = spinWeights(properties.rasterHueRotate);
 
         config.stencilTest = GL_FALSE;
 

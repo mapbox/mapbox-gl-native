@@ -28,7 +28,7 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     vec2<float> bl{left, bottom};
 
 
-    float angle = layout.icon.rotate * util::DEG2RAD;
+    float angle = layout.iconRotate * util::DEG2RAD;
     if (alongLine) {
         assert(static_cast<unsigned int>(anchor.segment) < line.size());
         const GeometryCoordinate &prev= line[anchor.segment];
@@ -136,8 +136,8 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
         const bool alongLine, const GlyphPositions& face) {
 
-    const float textRotate = layout.text.rotate * util::DEG2RAD;
-    const bool keepUpright = layout.text.keepUpright;
+    const float textRotate = layout.textRotate * util::DEG2RAD;
+    const bool keepUpright = layout.textKeepUpright;
 
     SymbolQuads quads;
 

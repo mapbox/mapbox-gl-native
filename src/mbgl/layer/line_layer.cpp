@@ -11,57 +11,57 @@ std::unique_ptr<StyleLayer> LineLayer::clone() const {
 }
 
 void LineLayer::parseLayout(const JSValue& value) {
-    layout.cap.parse("line-cap", value);
-    layout.join.parse("line-join", value);
-    layout.miterLimit.parse("line-miter-limit", value);
-    layout.roundLimit.parse("line-round-limit", value);
+    layout.lineCap.parse("line-cap", value);
+    layout.lineJoin.parse("line-join", value);
+    layout.lineMiterLimit.parse("line-miter-limit", value);
+    layout.lineRoundLimit.parse("line-round-limit", value);
 }
 
 void LineLayer::parsePaints(const JSValue& layer) {
-    paint.opacity.parse("line-opacity", layer);
-    paint.color.parse("line-color", layer);
-    paint.translate.parse("line-translate", layer);
-    paint.translateAnchor.parse("line-translate-anchor", layer);
-    paint.width.parse("line-width", layer);
-    paint.gapWidth.parse("line-gap-width", layer);
-    paint.offset.parse("line-offset", layer);
-    paint.blur.parse("line-blur", layer);
-    paint.dasharray.parse("line-dasharray", layer);
-    paint.pattern.parse("line-pattern", layer);
+    paint.lineOpacity.parse("line-opacity", layer);
+    paint.lineColor.parse("line-color", layer);
+    paint.lineTranslate.parse("line-translate", layer);
+    paint.lineTranslateAnchor.parse("line-translate-anchor", layer);
+    paint.lineWidth.parse("line-width", layer);
+    paint.lineGapWidth.parse("line-gap-width", layer);
+    paint.lineOffset.parse("line-offset", layer);
+    paint.lineBlur.parse("line-blur", layer);
+    paint.lineDasharray.parse("line-dasharray", layer);
+    paint.linePattern.parse("line-pattern", layer);
 }
 
 void LineLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.opacity.cascade(parameters);
-    paint.color.cascade(parameters);
-    paint.translate.cascade(parameters);
-    paint.translateAnchor.cascade(parameters);
-    paint.width.cascade(parameters);
-    paint.gapWidth.cascade(parameters);
-    paint.offset.cascade(parameters);
-    paint.blur.cascade(parameters);
-    paint.dasharray.cascade(parameters);
-    paint.pattern.cascade(parameters);
+    paint.lineOpacity.cascade(parameters);
+    paint.lineColor.cascade(parameters);
+    paint.lineTranslate.cascade(parameters);
+    paint.lineTranslateAnchor.cascade(parameters);
+    paint.lineWidth.cascade(parameters);
+    paint.lineGapWidth.cascade(parameters);
+    paint.lineOffset.cascade(parameters);
+    paint.lineBlur.cascade(parameters);
+    paint.lineDasharray.cascade(parameters);
+    paint.linePattern.cascade(parameters);
 }
 
 bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
     // for scaling dasharrays
     StyleCalculationParameters dashArrayParams = parameters;
     dashArrayParams.z = std::floor(dashArrayParams.z);
-    paint.width.calculate(dashArrayParams);
-    paint.dashLineWidth = paint.width;
+    paint.lineWidth.calculate(dashArrayParams);
+    paint.dashLineWidth = paint.lineWidth;
 
     bool hasTransitions = false;
 
-    hasTransitions |= paint.opacity.calculate(parameters);
-    hasTransitions |= paint.color.calculate(parameters);
-    hasTransitions |= paint.translate.calculate(parameters);
-    hasTransitions |= paint.translateAnchor.calculate(parameters);
-    hasTransitions |= paint.width.calculate(parameters);
-    hasTransitions |= paint.gapWidth.calculate(parameters);
-    hasTransitions |= paint.offset.calculate(parameters);
-    hasTransitions |= paint.blur.calculate(parameters);
-    hasTransitions |= paint.dasharray.calculate(parameters);
-    hasTransitions |= paint.pattern.calculate(parameters);
+    hasTransitions |= paint.lineOpacity.calculate(parameters);
+    hasTransitions |= paint.lineColor.calculate(parameters);
+    hasTransitions |= paint.lineTranslate.calculate(parameters);
+    hasTransitions |= paint.lineTranslateAnchor.calculate(parameters);
+    hasTransitions |= paint.lineWidth.calculate(parameters);
+    hasTransitions |= paint.lineGapWidth.calculate(parameters);
+    hasTransitions |= paint.lineOffset.calculate(parameters);
+    hasTransitions |= paint.lineBlur.calculate(parameters);
+    hasTransitions |= paint.lineDasharray.calculate(parameters);
+    hasTransitions |= paint.linePattern.calculate(parameters);
 
     passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
 
@@ -74,10 +74,10 @@ std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameter
     bucket->layout = layout;
 
     StyleCalculationParameters p(parameters.tileID.z);
-    bucket->layout.cap.calculate(p);
-    bucket->layout.join.calculate(p);
-    bucket->layout.miterLimit.calculate(p);
-    bucket->layout.roundLimit.calculate(p);
+    bucket->layout.lineCap.calculate(p);
+    bucket->layout.lineJoin.calculate(p);
+    bucket->layout.lineMiterLimit.calculate(p);
+    bucket->layout.lineRoundLimit.calculate(p);
 
     parameters.eachFilteredFeature(filter, [&] (const auto& feature) {
         bucket->addGeometry(getGeometries(feature));

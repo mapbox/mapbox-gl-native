@@ -101,8 +101,8 @@ bool SymbolBucket::needsClipping() const {
 
 void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
                                  const FilterExpression& filter) {
-    const bool has_text = !layout.text.field.value.empty() && !layout.text.font.value.empty();
-    const bool has_icon = !layout.icon.image.value.empty();
+    const bool has_text = !layout.textField.value.empty() && !layout.textFont.value.empty();
+    const bool has_icon = !layout.iconImage.value.empty();
 
     if (!has_text && !has_icon) {
         return;
@@ -125,11 +125,11 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
         };
 
         if (has_text) {
-            std::string u8string = util::replaceTokens(layout.text.field, getValue);
+            std::string u8string = util::replaceTokens(layout.textField, getValue);
 
-            if (layout.text.transform == TextTransformType::Uppercase) {
+            if (layout.textTransform == TextTransformType::Uppercase) {
                 u8string = platform::uppercase(u8string);
-            } else if (layout.text.transform == TextTransformType::Lowercase) {
+            } else if (layout.textTransform == TextTransformType::Lowercase) {
                 u8string = platform::lowercase(u8string);
             }
 
@@ -144,7 +144,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
         }
 
         if (has_icon) {
-            ft.sprite = util::replaceTokens(layout.icon.image, getValue);
+            ft.sprite = util::replaceTokens(layout.iconImage, getValue);
         }
 
         if (ft.label.length() || ft.sprite.length()) {
@@ -163,17 +163,17 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
         }
     }
 
-    if (layout.placement == SymbolPlacementType::Line) {
+    if (layout.symbolPlacement == SymbolPlacementType::Line) {
         util::mergeLines(features);
     }
 }
 
 bool SymbolBucket::needsDependencies(GlyphStore& glyphStore, SpriteStore& spriteStore) {
-    if (!layout.text.field.value.empty() && !layout.text.font.value.empty() && !glyphStore.hasGlyphRanges(layout.text.font, ranges)) {
+    if (!layout.textField.value.empty() && !layout.textFont.value.empty() && !glyphStore.hasGlyphRanges(layout.textFont, ranges)) {
         return true;
     }
 
-    if (!layout.icon.image.value.empty() && !spriteStore.isLoaded()) {
+    if (!layout.iconImage.value.empty() && !spriteStore.isLoaded()) {
         return true;
     }
 
@@ -187,7 +187,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
     float horizontalAlign = 0.5;
     float verticalAlign = 0.5;
 
-    switch (layout.text.anchor) {
+    switch (layout.textAnchor) {
         case TextAnchorType::Top:
         case TextAnchorType::Bottom:
         case TextAnchorType::Center:
@@ -204,7 +204,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
             break;
     }
 
-    switch (layout.text.anchor) {
+    switch (layout.textAnchor) {
         case TextAnchorType::Left:
         case TextAnchorType::Right:
         case TextAnchorType::Center:
@@ -221,11 +221,11 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
             break;
     }
 
-    const float justify = layout.text.justify == TextJustifyType::Right ? 1 :
-        layout.text.justify == TextJustifyType::Left ? 0 :
+    const float justify = layout.textJustify == TextJustifyType::Right ? 1 :
+        layout.textJustify == TextJustifyType::Left ? 0 :
         0.5;
 
-    auto fontStack = glyphStore.getFontStack(layout.text.font);
+    auto fontStack = glyphStore.getFontStack(layout.textFont);
 
     for (const auto& feature : features) {
         if (feature.geometry.empty()) continue;
@@ -238,18 +238,18 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
         if (feature.label.length()) {
             shapedText = fontStack->getShaping(
                 /* string */ feature.label,
-                /* maxWidth: ems */ layout.placement != SymbolPlacementType::Line ?
-                    layout.text.maxWidth * 24 : 0,
-                /* lineHeight: ems */ layout.text.lineHeight * 24,
+                /* maxWidth: ems */ layout.symbolPlacement != SymbolPlacementType::Line ?
+                    layout.textMaxWidth * 24 : 0,
+                /* lineHeight: ems */ layout.textLineHeight * 24,
                 /* horizontalAlign */ horizontalAlign,
                 /* verticalAlign */ verticalAlign,
                 /* justify */ justify,
-                /* spacing: ems */ layout.text.letterSpacing * 24,
-                /* translate */ vec2<float>(layout.text.offset.value[0], layout.text.offset.value[1]));
+                /* spacing: ems */ layout.textLetterSpacing * 24,
+                /* translate */ vec2<float>(layout.textOffset.value[0], layout.textOffset.value[1]));
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.text.font, **fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.textFont, **fontStack, face);
             }
         }
 
@@ -284,24 +284,24 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
 
-    const float fontScale = layout.text.size / glyphSize;
+    const float fontScale = layout.textSize / glyphSize;
     const float textBoxScale = tilePixelRatio * fontScale;
     const float textMaxBoxScale = tilePixelRatio * layout.textMaxSize / glyphSize;
-    const float iconBoxScale = tilePixelRatio * layout.icon.size;
-    const float symbolSpacing = tilePixelRatio * layout.spacing;
-    const bool avoidEdges = layout.avoidEdges && layout.placement != SymbolPlacementType::Line;
-    const float textPadding = layout.text.padding * tilePixelRatio;
-    const float iconPadding = layout.icon.padding * tilePixelRatio;
-    const float textMaxAngle = layout.text.maxAngle * util::DEG2RAD;
+    const float iconBoxScale = tilePixelRatio * layout.iconSize;
+    const float symbolSpacing = tilePixelRatio * layout.symbolSpacing;
+    const bool avoidEdges = layout.symbolAvoidEdges && layout.symbolPlacement != SymbolPlacementType::Line;
+    const float textPadding = layout.textPadding * tilePixelRatio;
+    const float iconPadding = layout.iconPadding * tilePixelRatio;
+    const float textMaxAngle = layout.textMaxAngle * util::DEG2RAD;
     const bool textAlongLine =
-        layout.text.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == SymbolPlacementType::Line;
+        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.icon.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == SymbolPlacementType::Line;
-    const bool mayOverlap = layout.text.allowOverlap || layout.icon.allowOverlap ||
-        layout.text.ignorePlacement || layout.icon.ignorePlacement;
-    const bool isLine = layout.placement == SymbolPlacementType::Line;
+        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.symbolPlacement == SymbolPlacementType::Line;
+    const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
+        layout.textIgnorePlacement || layout.iconIgnorePlacement;
+    const bool isLine = layout.symbolPlacement == SymbolPlacementType::Line;
     const float textRepeatDistance = symbolSpacing / 2;
 
     auto& clippedLines = isLine ?
@@ -372,14 +372,14 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
     // create the bufers used for rendering.
 
     const bool textAlongLine =
-        layout.text.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == SymbolPlacementType::Line;
+        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.icon.rotationAlignment == RotationAlignmentType::Map &&
-        layout.placement == SymbolPlacementType::Line;
+        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.symbolPlacement == SymbolPlacementType::Line;
 
-    const bool mayOverlap = layout.text.allowOverlap || layout.icon.allowOverlap ||
-        layout.text.ignorePlacement || layout.icon.ignorePlacement;
+    const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
+        layout.textIgnorePlacement || layout.iconIgnorePlacement;
 
     // Sort symbols by their y position on the canvas so that they lower symbols
     // are drawn on top of higher symbols.
@@ -403,18 +403,18 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
 
-        const bool iconWithoutText = layout.text.optional || !hasText;
-        const bool textWithoutIcon = layout.icon.optional || !hasIcon;
+        const bool iconWithoutText = layout.textOptional || !hasText;
+        const bool textWithoutIcon = layout.iconOptional || !hasIcon;
 
         // Calculate the scales at which the text and icon can be placed without collision.
 
         float glyphScale = hasText ?
             collisionTile.placeFeature(symbolInstance.textCollisionFeature,
-                    layout.text.allowOverlap, layout.avoidEdges) :
+                    layout.textAllowOverlap, layout.symbolAvoidEdges) :
             collisionTile.minScale;
         float iconScale = hasIcon ?
             collisionTile.placeFeature(symbolInstance.iconCollisionFeature,
-                    layout.icon.allowOverlap, layout.avoidEdges) :
+                    layout.iconAllowOverlap, layout.symbolAvoidEdges) :
             collisionTile.minScale;
 
 
@@ -432,24 +432,24 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
-            if (!layout.text.ignorePlacement) {
+            if (!layout.textIgnorePlacement) {
                 collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale);
             }
             if (glyphScale < collisionTile.maxScale) {
                 addSymbols<SymbolRenderData::TextBuffer, TextElementGroup>(
                     renderDataInProgress->text, symbolInstance.glyphQuads, glyphScale,
-                    layout.text.keepUpright, textAlongLine, collisionTile.config.angle);
+                    layout.textKeepUpright, textAlongLine, collisionTile.config.angle);
             }
         }
 
         if (hasIcon) {
-            if (!layout.icon.ignorePlacement) {
+            if (!layout.iconIgnorePlacement) {
                 collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale);
             }
             if (iconScale < collisionTile.maxScale) {
                 addSymbols<SymbolRenderData::IconBuffer, IconElementGroup>(
                     renderDataInProgress->icon, symbolInstance.iconQuads, iconScale,
-                    layout.icon.keepUpright, iconAlongLine, collisionTile.config.angle);
+                    layout.iconKeepUpright, iconAlongLine, collisionTile.config.angle);
             }
         }
     }

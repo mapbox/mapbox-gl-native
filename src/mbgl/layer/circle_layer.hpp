@@ -8,15 +8,15 @@ namespace mbgl {
 
 class CirclePaintProperties {
 public:
-    PaintProperty<float> radius { 5.0f };
-    PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
-    PaintProperty<float> opacity { 1.0f };
-    PaintProperty<std::array<float, 2>> translate { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> translateAnchor { TranslateAnchorType::Map };
-    PaintProperty<float> blur { 0 };
+    PaintProperty<float> circleRadius { 5.0f };
+    PaintProperty<Color> circleColor { {{ 0, 0, 0, 1 }} };
+    PaintProperty<float> circleOpacity { 1.0f };
+    PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };
+    PaintProperty<TranslateAnchorType> circleTranslateAnchor { TranslateAnchorType::Map };
+    PaintProperty<float> circleBlur { 0 };
 
     bool isVisible() const {
-        return radius > 0 && color.value[3] > 0 && opacity > 0;
+        return circleRadius > 0 && circleColor.value[3] > 0 && circleOpacity > 0;
     }
 };
 

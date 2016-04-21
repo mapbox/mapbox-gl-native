@@ -8,25 +8,25 @@ std::unique_ptr<StyleLayer> BackgroundLayer::clone() const {
 }
 
 void BackgroundLayer::parsePaints(const JSValue& layer) {
-    paint.opacity.parse("background-opacity", layer);
-    paint.color.parse("background-color", layer);
-    paint.pattern.parse("background-pattern", layer);
+    paint.backgroundOpacity.parse("background-opacity", layer);
+    paint.backgroundColor.parse("background-color", layer);
+    paint.backgroundPattern.parse("background-pattern", layer);
 }
 
 void BackgroundLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.opacity.cascade(parameters);
-    paint.color.cascade(parameters);
-    paint.pattern.cascade(parameters);
+    paint.backgroundOpacity.cascade(parameters);
+    paint.backgroundColor.cascade(parameters);
+    paint.backgroundPattern.cascade(parameters);
 }
 
 bool BackgroundLayer::recalculate(const StyleCalculationParameters& parameters) {
     bool hasTransitions = false;
 
-    hasTransitions |= paint.opacity.calculate(parameters);
-    hasTransitions |= paint.color.calculate(parameters);
-    hasTransitions |= paint.pattern.calculate(parameters);
+    hasTransitions |= paint.backgroundOpacity.calculate(parameters);
+    hasTransitions |= paint.backgroundColor.calculate(parameters);
+    hasTransitions |= paint.backgroundPattern.calculate(parameters);
 
-    passes = paint.opacity > 0 ? RenderPass::Translucent : RenderPass::None;
+    passes = paint.backgroundOpacity > 0 ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }

@@ -67,7 +67,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         return;
     }
 
-    const float miterLimit = layout.join == LineJoinType::Bevel ? 1.05f : float(layout.miterLimit);
+    const float miterLimit = layout.lineJoin == LineJoinType::Bevel ? 1.05f : float(layout.lineMiterLimit);
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
@@ -80,8 +80,8 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
         return;
     }
 
-    const LineCapType beginCap = layout.cap;
-    const LineCapType endCap = closed ? LineCapType::Butt : LineCapType(layout.cap);
+    const LineCapType beginCap = layout.lineCap;
+    const LineCapType endCap = closed ? LineCapType::Butt : LineCapType(layout.lineCap);
 
     double distance = 0;
     bool startOfLine = true;
@@ -172,12 +172,12 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevVertex && nextVertex;
-        LineJoinType currentJoin = layout.join;
+        LineJoinType currentJoin = layout.lineJoin;
         const LineCapType currentCap = nextVertex ? beginCap : endCap;
 
         if (middleVertex) {
             if (currentJoin == LineJoinType::Round) {
-                if (miterLength < layout.roundLimit) {
+                if (miterLength < layout.lineRoundLimit) {
                     currentJoin = LineJoinType::Miter;
                 } else if (miterLength <= 2) {
                     currentJoin = LineJoinType::FakeRound;

@@ -8,37 +8,37 @@ std::unique_ptr<StyleLayer> RasterLayer::clone() const {
 }
 
 void RasterLayer::parsePaints(const JSValue& layer) {
-    paint.opacity.parse("raster-opacity", layer);
-    paint.hueRotate.parse("raster-hue-rotate", layer);
-    paint.brightnessMin.parse("raster-brightness-min", layer);
-    paint.brightnessMax.parse("raster-brightness-max", layer);
-    paint.saturation.parse("raster-saturation", layer);
-    paint.contrast.parse("raster-contrast", layer);
-    paint.fadeDuration.parse("raster-fade-duration", layer);
+    paint.rasterOpacity.parse("raster-opacity", layer);
+    paint.rasterHueRotate.parse("raster-hue-rotate", layer);
+    paint.rasterBrightnessMin.parse("raster-brightness-min", layer);
+    paint.rasterBrightnessMax.parse("raster-brightness-max", layer);
+    paint.rasterSaturation.parse("raster-saturation", layer);
+    paint.rasterContrast.parse("raster-contrast", layer);
+    paint.rasterFadeDuration.parse("raster-fade-duration", layer);
 }
 
 void RasterLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.opacity.cascade(parameters);
-    paint.hueRotate.cascade(parameters);
-    paint.brightnessMin.cascade(parameters);
-    paint.brightnessMax.cascade(parameters);
-    paint.saturation.cascade(parameters);
-    paint.contrast.cascade(parameters);
-    paint.fadeDuration.cascade(parameters);
+    paint.rasterOpacity.cascade(parameters);
+    paint.rasterHueRotate.cascade(parameters);
+    paint.rasterBrightnessMin.cascade(parameters);
+    paint.rasterBrightnessMax.cascade(parameters);
+    paint.rasterSaturation.cascade(parameters);
+    paint.rasterContrast.cascade(parameters);
+    paint.rasterFadeDuration.cascade(parameters);
 }
 
 bool RasterLayer::recalculate(const StyleCalculationParameters& parameters) {
     bool hasTransitions = false;
 
-    hasTransitions |= paint.opacity.calculate(parameters);
-    hasTransitions |= paint.hueRotate.calculate(parameters);
-    hasTransitions |= paint.brightnessMin.calculate(parameters);
-    hasTransitions |= paint.brightnessMax.calculate(parameters);
-    hasTransitions |= paint.saturation.calculate(parameters);
-    hasTransitions |= paint.contrast.calculate(parameters);
-    hasTransitions |= paint.fadeDuration.calculate(parameters);
+    hasTransitions |= paint.rasterOpacity.calculate(parameters);
+    hasTransitions |= paint.rasterHueRotate.calculate(parameters);
+    hasTransitions |= paint.rasterBrightnessMin.calculate(parameters);
+    hasTransitions |= paint.rasterBrightnessMax.calculate(parameters);
+    hasTransitions |= paint.rasterSaturation.calculate(parameters);
+    hasTransitions |= paint.rasterContrast.calculate(parameters);
+    hasTransitions |= paint.rasterFadeDuration.calculate(parameters);
 
-    passes = paint.opacity > 0 ? RenderPass::Translucent : RenderPass::None;
+    passes = paint.rasterOpacity > 0 ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }

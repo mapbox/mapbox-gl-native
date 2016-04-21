@@ -23,27 +23,27 @@ void Painter::renderCircle(CircleBucket& bucket,
     setDepthSublayer(0);
 
     const CirclePaintProperties& properties = layer.paint;
-    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, id, properties.circleTranslateAnchor);
 
-    Color color = properties.color;
-    color[0] *= properties.opacity;
-    color[1] *= properties.opacity;
-    color[2] *= properties.opacity;
-    color[3] *= properties.opacity;
+    Color color = properties.circleColor;
+    color[0] *= properties.circleOpacity;
+    color[1] *= properties.circleOpacity;
+    color[2] *= properties.circleOpacity;
+    color[3] *= properties.circleOpacity;
 
     // Antialiasing factor: this is a minimum blur distance that serves as
     // a faux-antialiasing for the circle. since blur is a ratio of the circle's
     // size and the intent is to keep the blur at roughly 1px, the two
     // are inversely related.
-    float antialiasing = 1 / frame.pixelRatio / properties.radius;
+    float antialiasing = 1 / frame.pixelRatio / properties.circleRadius;
 
     config.program = circleShader->getID();
 
     circleShader->u_matrix = vtxMatrix;
     circleShader->u_exmatrix = extrudeMatrix;
     circleShader->u_color = color;
-    circleShader->u_blur = std::max<float>(properties.blur, antialiasing);
-    circleShader->u_size = properties.radius;
+    circleShader->u_blur = std::max<float>(properties.circleBlur, antialiasing);
+    circleShader->u_size = properties.circleRadius;
 
     bucket.drawCircles(*circleShader, glObjectStore);
 }

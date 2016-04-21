@@ -10,104 +10,103 @@ std::unique_ptr<StyleLayer> SymbolLayer::clone() const {
 }
 
 void SymbolLayer::parseLayout(const JSValue& value) {
-    layout.placement.parse("symbol-placement", value);
-    layout.spacing.parse("symbol-spacing", value);
-    layout.avoidEdges.parse("symbol-avoid-edges", value);
+    layout.symbolPlacement.parse("symbol-placement", value);
+    layout.symbolSpacing.parse("symbol-spacing", value);
+    layout.symbolAvoidEdges.parse("symbol-avoid-edges", value);
 
-    layout.icon.allowOverlap.parse("icon-allow-overlap", value);
-    layout.icon.ignorePlacement.parse("icon-ignore-placement", value);
-    layout.icon.optional.parse("icon-optional", value);
-    layout.icon.rotationAlignment.parse("icon-rotation-alignment", value);
-    layout.icon.size.parse("icon-size", value);
-    layout.icon.image.parse("icon-image", value);
-    layout.icon.rotate.parse("icon-rotate", value);
-    layout.icon.padding.parse("icon-padding", value);
-    layout.icon.keepUpright.parse("icon-keep-upright", value);
-    layout.icon.offset.parse("icon-offset", value);
+    layout.iconAllowOverlap.parse("icon-allow-overlap", value);
+    layout.iconIgnorePlacement.parse("icon-ignore-placement", value);
+    layout.iconOptional.parse("icon-optional", value);
+    layout.iconRotationAlignment.parse("icon-rotation-alignment", value);
+    layout.iconSize.parse("icon-size", value);
+    layout.iconImage.parse("icon-image", value);
+    layout.iconRotate.parse("icon-rotate", value);
+    layout.iconPadding.parse("icon-padding", value);
+    layout.iconKeepUpright.parse("icon-keep-upright", value);
+    layout.iconOffset.parse("icon-offset", value);
 
-    layout.text.rotationAlignment.parse("text-rotation-alignment", value);
-    layout.text.field.parse("text-field", value);
-    layout.text.font.parse("text-font", value);
-    layout.text.size.parse("text-size", value);
-    layout.text.maxWidth.parse("text-max-width", value);
-    layout.text.lineHeight.parse("text-line-height", value);
-    layout.text.letterSpacing.parse("text-letter-spacing", value);
-    layout.text.justify.parse("text-justify", value);
-    layout.text.anchor.parse("text-anchor", value);
-    layout.text.maxAngle.parse("text-max-angle", value);
-    layout.text.rotate.parse("text-rotate", value);
-    layout.text.padding.parse("text-padding", value);
-    layout.text.keepUpright.parse("text-keep-upright", value);
-    layout.text.transform.parse("text-transform", value);
-    layout.text.offset.parse("text-offset", value);
-    layout.text.allowOverlap.parse("text-allow-overlap", value);
-    layout.text.ignorePlacement.parse("text-ignore-placement", value);
-    layout.text.optional.parse("text-optional", value);
+    layout.textRotationAlignment.parse("text-rotation-alignment", value);
+    layout.textField.parse("text-field", value);
+    layout.textFont.parse("text-font", value);
+    layout.textSize.parse("text-size", value);
+    layout.textMaxWidth.parse("text-max-width", value);
+    layout.textLineHeight.parse("text-line-height", value);
+    layout.textLetterSpacing.parse("text-letter-spacing", value);
+    layout.textJustify.parse("text-justify", value);
+    layout.textAnchor.parse("text-anchor", value);
+    layout.textMaxAngle.parse("text-max-angle", value);
+    layout.textRotate.parse("text-rotate", value);
+    layout.textPadding.parse("text-padding", value);
+    layout.textKeepUpright.parse("text-keep-upright", value);
+    layout.textTransform.parse("text-transform", value);
+    layout.textOffset.parse("text-offset", value);
+    layout.textAllowOverlap.parse("text-allow-overlap", value);
+    layout.textIgnorePlacement.parse("text-ignore-placement", value);
+    layout.textOptional.parse("text-optional", value);
 }
 
 void SymbolLayer::parsePaints(const JSValue& layer) {
-    paint.icon.opacity.parse("icon-opacity", layer);
-    paint.icon.color.parse("icon-color", layer);
-    paint.icon.haloColor.parse("icon-halo-color", layer);
-    paint.icon.haloWidth.parse("icon-halo-width", layer);
-    paint.icon.haloBlur.parse("icon-halo-blur", layer);
-    paint.icon.translate.parse("icon-translate", layer);
-    paint.icon.translateAnchor.parse("icon-translate-anchor", layer);
+    paint.iconOpacity.parse("icon-opacity", layer);
+    paint.iconColor.parse("icon-color", layer);
+    paint.iconHaloColor.parse("icon-halo-color", layer);
+    paint.iconHaloWidth.parse("icon-halo-width", layer);
+    paint.iconHaloBlur.parse("icon-halo-blur", layer);
+    paint.iconTranslate.parse("icon-translate", layer);
+    paint.iconTranslateAnchor.parse("icon-translate-anchor", layer);
 
-    paint.text.opacity.parse("text-opacity", layer);
-    paint.text.color.parse("text-color", layer);
-    paint.text.haloColor.parse("text-halo-color", layer);
-    paint.text.haloWidth.parse("text-halo-width", layer);
-    paint.text.haloBlur.parse("text-halo-blur", layer);
-    paint.text.translate.parse("text-translate", layer);
-    paint.text.translateAnchor.parse("text-translate-anchor", layer);
+    paint.textOpacity.parse("text-opacity", layer);
+    paint.textColor.parse("text-color", layer);
+    paint.textHaloColor.parse("text-halo-color", layer);
+    paint.textHaloWidth.parse("text-halo-width", layer);
+    paint.textHaloBlur.parse("text-halo-blur", layer);
+    paint.textTranslate.parse("text-translate", layer);
+    paint.textTranslateAnchor.parse("text-translate-anchor", layer);
 }
 
 void SymbolLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.icon.opacity.cascade(parameters);
-    paint.icon.color.cascade(parameters);
-    paint.icon.haloColor.cascade(parameters);
-    paint.icon.haloWidth.cascade(parameters);
-    paint.icon.haloBlur.cascade(parameters);
-    paint.icon.translate.cascade(parameters);
-    paint.icon.translateAnchor.cascade(parameters);
+    paint.iconOpacity.cascade(parameters);
+    paint.iconColor.cascade(parameters);
+    paint.iconHaloColor.cascade(parameters);
+    paint.iconHaloWidth.cascade(parameters);
+    paint.iconHaloBlur.cascade(parameters);
+    paint.iconTranslate.cascade(parameters);
+    paint.iconTranslateAnchor.cascade(parameters);
 
-    paint.text.opacity.cascade(parameters);
-    paint.text.color.cascade(parameters);
-    paint.text.haloColor.cascade(parameters);
-    paint.text.haloWidth.cascade(parameters);
-    paint.text.haloBlur.cascade(parameters);
-    paint.text.translate.cascade(parameters);
-    paint.text.translateAnchor.cascade(parameters);
+    paint.textOpacity.cascade(parameters);
+    paint.textColor.cascade(parameters);
+    paint.textHaloColor.cascade(parameters);
+    paint.textHaloWidth.cascade(parameters);
+    paint.textHaloBlur.cascade(parameters);
+    paint.textTranslate.cascade(parameters);
+    paint.textTranslateAnchor.cascade(parameters);
 }
 
 bool SymbolLayer::recalculate(const StyleCalculationParameters& parameters) {
     bool hasTransitions = false;
 
-    hasTransitions |= paint.icon.opacity.calculate(parameters);
-    hasTransitions |= paint.icon.color.calculate(parameters);
-    hasTransitions |= paint.icon.haloColor.calculate(parameters);
-    hasTransitions |= paint.icon.haloWidth.calculate(parameters);
-    hasTransitions |= paint.icon.haloBlur.calculate(parameters);
-    hasTransitions |= paint.icon.translate.calculate(parameters);
-    hasTransitions |= paint.icon.translateAnchor.calculate(parameters);
+    hasTransitions |= paint.iconOpacity.calculate(parameters);
+    hasTransitions |= paint.iconColor.calculate(parameters);
+    hasTransitions |= paint.iconHaloColor.calculate(parameters);
+    hasTransitions |= paint.iconHaloWidth.calculate(parameters);
+    hasTransitions |= paint.iconHaloBlur.calculate(parameters);
+    hasTransitions |= paint.iconTranslate.calculate(parameters);
+    hasTransitions |= paint.iconTranslateAnchor.calculate(parameters);
 
-    hasTransitions |= paint.text.opacity.calculate(parameters);
-    hasTransitions |= paint.text.color.calculate(parameters);
-    hasTransitions |= paint.text.haloColor.calculate(parameters);
-    hasTransitions |= paint.text.haloWidth.calculate(parameters);
-    hasTransitions |= paint.text.haloBlur.calculate(parameters);
-    hasTransitions |= paint.text.translate.calculate(parameters);
-    hasTransitions |= paint.text.translateAnchor.calculate(parameters);
+    hasTransitions |= paint.textOpacity.calculate(parameters);
+    hasTransitions |= paint.textColor.calculate(parameters);
+    hasTransitions |= paint.textHaloColor.calculate(parameters);
+    hasTransitions |= paint.textHaloWidth.calculate(parameters);
+    hasTransitions |= paint.textHaloBlur.calculate(parameters);
+    hasTransitions |= paint.textTranslate.calculate(parameters);
+    hasTransitions |= paint.textTranslateAnchor.calculate(parameters);
 
     // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
-    layout.icon.size.calculate(parameters);
-    layout.text.size.calculate(parameters);
-    paint.icon.size = layout.icon.size;
-    paint.text.size = layout.text.size;
+    layout.iconSize.calculate(parameters);
+    layout.textSize.calculate(parameters);
+    paint.iconSize = layout.iconSize;
+    paint.textSize = layout.textSize;
 
-    passes = (paint.icon.isVisible() || paint.text.isVisible())
-        ? RenderPass::Translucent : RenderPass::None;
+    passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }
@@ -120,48 +119,48 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
     bucket->layout = layout;
 
     StyleCalculationParameters p(parameters.tileID.z);
-    bucket->layout.placement.calculate(p);
-    if (bucket->layout.placement.value == SymbolPlacementType::Line) {
-        bucket->layout.icon.rotationAlignment.value = RotationAlignmentType::Map;
-        bucket->layout.text.rotationAlignment.value = RotationAlignmentType::Map;
+    bucket->layout.symbolPlacement.calculate(p);
+    if (bucket->layout.symbolPlacement.value == SymbolPlacementType::Line) {
+        bucket->layout.iconRotationAlignment.value = RotationAlignmentType::Map;
+        bucket->layout.textRotationAlignment.value = RotationAlignmentType::Map;
     };
-    bucket->layout.spacing.calculate(p);
-    bucket->layout.avoidEdges.calculate(p);
+    bucket->layout.symbolSpacing.calculate(p);
+    bucket->layout.symbolAvoidEdges.calculate(p);
 
-    bucket->layout.icon.allowOverlap.calculate(p);
-    bucket->layout.icon.ignorePlacement.calculate(p);
-    bucket->layout.icon.optional.calculate(p);
-    bucket->layout.icon.rotationAlignment.calculate(p);
-    bucket->layout.icon.image.calculate(p);
-    bucket->layout.icon.padding.calculate(p);
-    bucket->layout.icon.rotate.calculate(p);
-    bucket->layout.icon.keepUpright.calculate(p);
-    bucket->layout.icon.offset.calculate(p);
+    bucket->layout.iconAllowOverlap.calculate(p);
+    bucket->layout.iconIgnorePlacement.calculate(p);
+    bucket->layout.iconOptional.calculate(p);
+    bucket->layout.iconRotationAlignment.calculate(p);
+    bucket->layout.iconImage.calculate(p);
+    bucket->layout.iconPadding.calculate(p);
+    bucket->layout.iconRotate.calculate(p);
+    bucket->layout.iconKeepUpright.calculate(p);
+    bucket->layout.iconOffset.calculate(p);
 
-    bucket->layout.text.rotationAlignment.calculate(p);
-    bucket->layout.text.field.calculate(p);
-    bucket->layout.text.font.calculate(p);
-    bucket->layout.text.maxWidth.calculate(p);
-    bucket->layout.text.lineHeight.calculate(p);
-    bucket->layout.text.letterSpacing.calculate(p);
-    bucket->layout.text.maxAngle.calculate(p);
-    bucket->layout.text.rotate.calculate(p);
-    bucket->layout.text.padding.calculate(p);
-    bucket->layout.text.ignorePlacement.calculate(p);
-    bucket->layout.text.optional.calculate(p);
-    bucket->layout.text.justify.calculate(p);
-    bucket->layout.text.anchor.calculate(p);
-    bucket->layout.text.keepUpright.calculate(p);
-    bucket->layout.text.transform.calculate(p);
-    bucket->layout.text.offset.calculate(p);
-    bucket->layout.text.allowOverlap.calculate(p);
+    bucket->layout.textRotationAlignment.calculate(p);
+    bucket->layout.textField.calculate(p);
+    bucket->layout.textFont.calculate(p);
+    bucket->layout.textMaxWidth.calculate(p);
+    bucket->layout.textLineHeight.calculate(p);
+    bucket->layout.textLetterSpacing.calculate(p);
+    bucket->layout.textMaxAngle.calculate(p);
+    bucket->layout.textRotate.calculate(p);
+    bucket->layout.textPadding.calculate(p);
+    bucket->layout.textIgnorePlacement.calculate(p);
+    bucket->layout.textOptional.calculate(p);
+    bucket->layout.textJustify.calculate(p);
+    bucket->layout.textAnchor.calculate(p);
+    bucket->layout.textKeepUpright.calculate(p);
+    bucket->layout.textTransform.calculate(p);
+    bucket->layout.textOffset.calculate(p);
+    bucket->layout.textAllowOverlap.calculate(p);
 
-    bucket->layout.icon.size.calculate(StyleCalculationParameters(18));
-    bucket->layout.text.size.calculate(StyleCalculationParameters(18));
-    bucket->layout.iconMaxSize = bucket->layout.icon.size;
-    bucket->layout.textMaxSize = bucket->layout.text.size;
-    bucket->layout.icon.size.calculate(StyleCalculationParameters(p.z + 1));
-    bucket->layout.text.size.calculate(StyleCalculationParameters(p.z + 1));
+    bucket->layout.iconSize.calculate(StyleCalculationParameters(18));
+    bucket->layout.textSize.calculate(StyleCalculationParameters(18));
+    bucket->layout.iconMaxSize = bucket->layout.iconSize;
+    bucket->layout.textMaxSize = bucket->layout.textSize;
+    bucket->layout.iconSize.calculate(StyleCalculationParameters(p.z + 1));
+    bucket->layout.textSize.calculate(StyleCalculationParameters(p.z + 1));
 
     bucket->parseFeatures(parameters.layer, filter);
 

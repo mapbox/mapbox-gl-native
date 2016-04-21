@@ -124,16 +124,27 @@ private:
 
     void setClipping(const ClipID&);
 
-    template <typename BucketProperties, typename StyleProperties>
     void renderSDF(SymbolBucket &bucket,
                    const TileID &id,
                    const mat4 &matrixSymbol,
-                   const BucketProperties& bucketProperties,
-                   const StyleProperties& styleProperties,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::GLObjectStore&));
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::GLObjectStore&),
+
+                   // Layout
+                   RotationAlignmentType rotationAlignment,
+                   float layoutSize,
+
+                   // Paint
+                   float opacity,
+                   Color color,
+                   Color haloColor,
+                   float haloWidth,
+                   float haloBlur,
+                   std::array<float, 2> translate,
+                   TranslateAnchorType translateAnchor,
+                   float paintSize);
 
     void setDepthSublayer(int n);
 

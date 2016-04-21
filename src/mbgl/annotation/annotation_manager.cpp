@@ -116,8 +116,8 @@ void AnnotationManager::updateStyle(Style& style) {
         layer->id = PointLayerID;
         layer->source = SourceID;
         layer->sourceLayer = PointLayerID;
-        layer->layout.icon.image = std::string("{sprite}");
-        layer->layout.icon.allowOverlap = true;
+        layer->layout.iconImage = std::string("{sprite}");
+        layer->layout.iconAllowOverlap = true;
         layer->spriteAtlas = &spriteAtlas;
 
         style.addLayer(std::move(layer));

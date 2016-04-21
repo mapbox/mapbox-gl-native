@@ -11,28 +11,28 @@ using namespace mbgl;
 
 void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileID& id, const mat4& matrix) {
     const FillPaintProperties& properties = layer.paint;
-    mat4 vtxMatrix = translatedMatrix(matrix, properties.translate, id, properties.translateAnchor);
+    mat4 vtxMatrix = translatedMatrix(matrix, properties.fillTranslate, id, properties.fillTranslateAnchor);
 
-    Color fill_color = properties.color;
-    fill_color[0] *= properties.opacity;
-    fill_color[1] *= properties.opacity;
-    fill_color[2] *= properties.opacity;
-    fill_color[3] *= properties.opacity;
+    Color fill_color = properties.fillColor;
+    fill_color[0] *= properties.fillOpacity;
+    fill_color[1] *= properties.fillOpacity;
+    fill_color[2] *= properties.fillOpacity;
+    fill_color[3] *= properties.fillOpacity;
 
-    Color stroke_color = properties.outlineColor;
+    Color stroke_color = properties.fillOutlineColor;
     if (stroke_color[3] < 0) {
         stroke_color = fill_color;
     } else {
-        stroke_color[0] *= properties.opacity;
-        stroke_color[1] *= properties.opacity;
-        stroke_color[2] *= properties.opacity;
-        stroke_color[3] *= properties.opacity;
+        stroke_color[0] *= properties.fillOpacity;
+        stroke_color[1] *= properties.fillOpacity;
+        stroke_color[2] *= properties.fillOpacity;
+        stroke_color[3] *= properties.fillOpacity;
     }
 
-    const bool pattern = !properties.pattern.value.from.empty();
+    const bool pattern = !properties.fillPattern.value.from.empty();
 
-    bool outline = properties.antialias && !pattern && stroke_color != fill_color;
-    bool fringeline = properties.antialias && !pattern && stroke_color == fill_color;
+    bool outline = properties.fillAntialias && !pattern && stroke_color != fill_color;
+    bool fringeline = properties.fillAntialias && !pattern && stroke_color == fill_color;
 
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
@@ -59,8 +59,8 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
     }
 
     if (pattern) {
-        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.fillPattern.value.from, true);
+        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.fillPattern.value.to, true);
 
         // Image fill.
         if (pass == RenderPass::Translucent && posA && posB) {
@@ -71,17 +71,17 @@ void Painter::renderFill(FillBucket& bucket, const FillLayer& layer, const TileI
             patternShader->u_pattern_br_a = (*posA).br;
             patternShader->u_pattern_tl_b = (*posB).tl;
             patternShader->u_pattern_br_b = (*posB).br;
-            patternShader->u_opacity = properties.opacity;
+            patternShader->u_opacity = properties.fillOpacity;
             patternShader->u_image = 0;
-            patternShader->u_mix = properties.pattern.value.t;
+            patternShader->u_mix = properties.fillPattern.value.t;
 
             std::array<int, 2> imageSizeScaledA = {{
-                (int)((*posA).size[0] * properties.pattern.value.fromScale),
-                (int)((*posA).size[1] * properties.pattern.value.fromScale)
+                (int)((*posA).size[0] * properties.fillPattern.value.fromScale),
+                (int)((*posA).size[1] * properties.fillPattern.value.fromScale)
             }};
             std::array<int, 2> imageSizeScaledB = {{
-                (int)((*posB).size[0] * properties.pattern.value.toScale),
-                (int)((*posB).size[1] * properties.pattern.value.toScale)
+                (int)((*posB).size[0] * properties.fillPattern.value.toScale),
+                (int)((*posB).size[1] * properties.fillPattern.value.toScale)
             }};
 
             patternShader->u_patternscale_a = {{

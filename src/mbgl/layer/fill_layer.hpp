@@ -8,13 +8,13 @@ namespace mbgl {
 
 class FillPaintProperties {
 public:
-    PaintProperty<bool> antialias { true };
-    PaintProperty<float> opacity { 1.0f };
-    PaintProperty<Color> color { {{ 0, 0, 0, 1 }} };
-    PaintProperty<Color> outlineColor { {{ 0, 0, 0, -1 }} };
-    PaintProperty<std::array<float, 2>> translate { {{ 0, 0 }} };
-    PaintProperty<TranslateAnchorType> translateAnchor { TranslateAnchorType::Map };
-    PaintProperty<std::string, Faded<std::string>> pattern { "" };
+    PaintProperty<bool> fillAntialias { true };
+    PaintProperty<float> fillOpacity { 1.0f };
+    PaintProperty<Color> fillColor { {{ 0, 0, 0, 1 }} };
+    PaintProperty<Color> fillOutlineColor { {{ 0, 0, 0, -1 }} };
+    PaintProperty<std::array<float, 2>> fillTranslate { {{ 0, 0 }} };
+    PaintProperty<TranslateAnchorType> fillTranslateAnchor { TranslateAnchorType::Map };
+    PaintProperty<std::string, Faded<std::string>> fillPattern { "" };
 };
 
 class FillLayer : public StyleLayer {

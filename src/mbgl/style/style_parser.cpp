@@ -497,7 +497,7 @@ std::vector<std::string> StyleParser::fontStacks() const {
 
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>()) {
-            LayoutProperty<std::string> property = layer->as<SymbolLayer>()->layout.text.font;
+            LayoutProperty<std::string> property = layer->as<SymbolLayer>()->layout.textFont;
             if (property.parsedValue) {
                 for (const auto& stop : property.parsedValue->getStops()) {
                     result.insert(stop.second);

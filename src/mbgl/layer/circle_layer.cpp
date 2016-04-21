@@ -10,32 +10,32 @@ std::unique_ptr<StyleLayer> CircleLayer::clone() const {
 }
 
 void CircleLayer::parsePaints(const JSValue& layer) {
-    paint.radius.parse("circle-radius", layer);
-    paint.color.parse("circle-color", layer);
-    paint.opacity.parse("circle-opacity", layer);
-    paint.translate.parse("circle-translate", layer);
-    paint.translateAnchor.parse("circle-translate-anchor", layer);
-    paint.blur.parse("circle-blur", layer);
+    paint.circleRadius.parse("circle-radius", layer);
+    paint.circleColor.parse("circle-color", layer);
+    paint.circleOpacity.parse("circle-opacity", layer);
+    paint.circleTranslate.parse("circle-translate", layer);
+    paint.circleTranslateAnchor.parse("circle-translate-anchor", layer);
+    paint.circleBlur.parse("circle-blur", layer);
 }
 
 void CircleLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.radius.cascade(parameters);
-    paint.color.cascade(parameters);
-    paint.opacity.cascade(parameters);
-    paint.translate.cascade(parameters);
-    paint.translateAnchor.cascade(parameters);
-    paint.blur.cascade(parameters);
+    paint.circleRadius.cascade(parameters);
+    paint.circleColor.cascade(parameters);
+    paint.circleOpacity.cascade(parameters);
+    paint.circleTranslate.cascade(parameters);
+    paint.circleTranslateAnchor.cascade(parameters);
+    paint.circleBlur.cascade(parameters);
 }
 
 bool CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
     bool hasTransitions = false;
 
-    hasTransitions |= paint.radius.calculate(parameters);
-    hasTransitions |= paint.color.calculate(parameters);
-    hasTransitions |= paint.opacity.calculate(parameters);
-    hasTransitions |= paint.translate.calculate(parameters);
-    hasTransitions |= paint.translateAnchor.calculate(parameters);
-    hasTransitions |= paint.blur.calculate(parameters);
+    hasTransitions |= paint.circleRadius.calculate(parameters);
+    hasTransitions |= paint.circleColor.calculate(parameters);
+    hasTransitions |= paint.circleOpacity.calculate(parameters);
+    hasTransitions |= paint.circleTranslate.calculate(parameters);
+    hasTransitions |= paint.circleTranslateAnchor.calculate(parameters);
+    hasTransitions |= paint.circleBlur.calculate(parameters);
 
     passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
 

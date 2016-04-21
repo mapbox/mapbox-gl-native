@@ -8,13 +8,13 @@ namespace mbgl {
 
 class RasterPaintProperties {
 public:
-    PaintProperty<float> opacity { 1.0f };
-    PaintProperty<float> hueRotate { 0.0f };
-    PaintProperty<float> brightnessMin { 0.0f };
-    PaintProperty<float> brightnessMax { 1.0f };
-    PaintProperty<float> saturation { 0.0f };
-    PaintProperty<float> contrast { 0.0f };
-    PaintProperty<float> fadeDuration { 0.0f };
+    PaintProperty<float> rasterOpacity { 1.0f };
+    PaintProperty<float> rasterHueRotate { 0.0f };
+    PaintProperty<float> rasterBrightnessMin { 0.0f };
+    PaintProperty<float> rasterBrightnessMax { 1.0f };
+    PaintProperty<float> rasterSaturation { 0.0f };
+    PaintProperty<float> rasterContrast { 0.0f };
+    PaintProperty<float> rasterFadeDuration { 0.0f };
 };
 
 class RasterLayer : public StyleLayer {

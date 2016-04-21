@@ -14,13 +14,13 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     // glClear rather than this method.
     const BackgroundPaintProperties& properties = layer.paint;
 
-    const bool isPatterned = !properties.pattern.value.to.empty();// && false;
+    const bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
     if (isPatterned) {
-        imagePosA = spriteAtlas->getPosition(properties.pattern.value.from, true);
-        imagePosB = spriteAtlas->getPosition(properties.pattern.value.to, true);
+        imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from, true);
+        imagePosB = spriteAtlas->getPosition(properties.backgroundPattern.value.to, true);
 
         if (!imagePosA || !imagePosB)
             return;
@@ -31,18 +31,18 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_pattern_br_a = (*imagePosA).br;
         patternShader->u_pattern_tl_b = (*imagePosB).tl;
         patternShader->u_pattern_br_b = (*imagePosB).br;
-        patternShader->u_mix = properties.pattern.value.t;
-        patternShader->u_opacity = properties.opacity;
+        patternShader->u_mix = properties.backgroundPattern.value.t;
+        patternShader->u_opacity = properties.backgroundOpacity;
 
         spriteAtlas->bind(true, glObjectStore);
         backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
 
     } else {
-        Color color = properties.color;
-        color[0] *= properties.opacity;
-        color[1] *= properties.opacity;
-        color[2] *= properties.opacity;
-        color[3] *= properties.opacity;
+        Color color = properties.backgroundColor;
+        color[0] *= properties.backgroundOpacity;
+        color[1] *= properties.backgroundOpacity;
+        color[2] *= properties.backgroundOpacity;
+        color[3] *= properties.backgroundOpacity;
 
         config.program = plainShader->getID();
         plainShader->u_color = color;
@@ -66,12 +66,12 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
             patternShader->u_matrix = vtxMatrix;
 
             std::array<int, 2> imageSizeScaledA = {{
-                (int)((*imagePosA).size[0] * properties.pattern.value.fromScale),
-                (int)((*imagePosA).size[1] * properties.pattern.value.fromScale)
+                (int)((*imagePosA).size[0] * properties.backgroundPattern.value.fromScale),
+                (int)((*imagePosA).size[1] * properties.backgroundPattern.value.fromScale)
             }};
             std::array<int, 2> imageSizeScaledB = {{
-                (int)((*imagePosB).size[0] * properties.pattern.value.toScale),
-                (int)((*imagePosB).size[1] * properties.pattern.value.toScale)
+                (int)((*imagePosB).size[0] * properties.backgroundPattern.value.toScale),
+                (int)((*imagePosB).size[1] * properties.backgroundPattern.value.toScale)
             }};
 
             patternShader->u_patternscale_a = {{
@@ -95,7 +95,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         } else {
             plainShader->u_matrix = vtxMatrix;
-            Color color = properties.color;
+            Color color = properties.backgroundColor;
             plainShader->u_color = color;
         }
 
