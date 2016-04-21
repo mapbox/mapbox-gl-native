@@ -18,8 +18,7 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    // TODO: make explicit
-    /* explicit */ Function(const T& constant)
+    explicit Function(const T& constant)
         : stops({{ 0, constant }}) {}
 
     explicit Function(const Stops& stops_, float base_)
@@ -42,8 +41,7 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    // TODO: make explicit
-    /* explicit */ Function(const T& constant)
+    explicit Function(const T& constant)
         : stops({{ 0, constant }}) {}
 
     explicit Function(const Stops& stops_)
