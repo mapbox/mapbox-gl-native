@@ -90,8 +90,4 @@ TEST(CustomLayer, Basic) {
         }, new TestLayer());
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
-
-    // Custom layer should be preserved when switching styles
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
 }
