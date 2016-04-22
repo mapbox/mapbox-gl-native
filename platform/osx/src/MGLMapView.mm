@@ -450,6 +450,9 @@ public:
     [self.calloutForSelectedAnnotation close];
     self.calloutForSelectedAnnotation = nil;
     
+    // Removing the annotations unregisters any outstanding KVO observers.
+    [self removeAnnotations:self.annotations];
+    
     if (_mbglMap) {
         delete _mbglMap;
         _mbglMap = nullptr;

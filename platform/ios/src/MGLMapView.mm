@@ -508,6 +508,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
     
+    // Removing the annotations unregisters any outstanding KVO observers.
+    [self removeAnnotations:self.annotations];
+    
     [self validateDisplayLink];
 
     if (_mbglMap)
