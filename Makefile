@@ -21,6 +21,10 @@ RUN = +$(MAKE) -f scripts/main.mk
 default:
 	@printf "You must specify a valid target\n"
 
+# Depend on gyp includes plus directories, so that projects are regenerated when
+# files are added or removed.
+GYP_DEPENDENCIES = mbgl.gypi test/test.gypi bin/*.gypi $(shell find src include -type d)
+
 #### OS X targets ##############################################################
 
 OSX_OUTPUT_PATH = build/osx
@@ -34,7 +38,7 @@ $(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configu
 $(OSX_OUTPUT_PATH)/mbgl.xcconfig: $(OSX_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@
 
-$(OSX_PROJ_PATH): platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi $(OSX_OUTPUT_PATH)/mbgl.xcconfig mbgl.gypi test/test.gypi bin/*.gypi
+$(OSX_PROJ_PATH): platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi $(OSX_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
 	./deps/run_gyp -f xcode --depth=. --generator-output=$(OSX_OUTPUT_PATH) $<
 
 osx: $(OSX_PROJ_PATH)
@@ -69,7 +73,7 @@ $(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configu
 $(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@
 
-$(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS_OUTPUT_PATH)/mbgl.xcconfig mbgl.gypi test/test.gypi
+$(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
 	./deps/run_gyp -f xcode --depth=. --generator-output=$(IOS_OUTPUT_PATH) $<
 
 ios: $(IOS_PROJ_PATH)
