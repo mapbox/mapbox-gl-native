@@ -149,7 +149,7 @@ ifneq (,$(shell which gdb))
 endif
 
 test-%: Makefile/test
-	$(GDB) $(PLATFORM_OUTPUT)/$(BUILDTYPE)/test --gtest_filter=$*
+	$(GDB) $(PLATFORM_OUTPUT)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
 
 check: Makefile/test
 	./scripts/collect-coverage.sh
