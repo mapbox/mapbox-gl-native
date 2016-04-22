@@ -37,7 +37,8 @@ bool CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
     hasTransitions |= paint.circleTranslateAnchor.calculate(parameters);
     hasTransitions |= paint.circleBlur.calculate(parameters);
 
-    passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
+    passes = (paint.circleRadius > 0 && paint.circleColor.value[3] > 0 && paint.circleOpacity > 0)
+        ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }

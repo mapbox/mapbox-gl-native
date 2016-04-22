@@ -286,7 +286,7 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
 
     const float fontScale = layout.textSize / glyphSize;
     const float textBoxScale = tilePixelRatio * fontScale;
-    const float textMaxBoxScale = tilePixelRatio * layout.textMaxSize / glyphSize;
+    const float textMaxBoxScale = tilePixelRatio * textMaxSize / glyphSize;
     const float iconBoxScale = tilePixelRatio * layout.iconSize;
     const float symbolSpacing = tilePixelRatio * layout.symbolSpacing;
     const bool avoidEdges = layout.symbolAvoidEdges && layout.symbolPlacement != SymbolPlacementType::Line;

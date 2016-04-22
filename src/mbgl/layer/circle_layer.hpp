@@ -14,10 +14,6 @@ public:
     PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> circleTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<float> circleBlur { 0 };
-
-    bool isVisible() const {
-        return circleRadius > 0 && circleColor.value[3] > 0 && circleOpacity > 0;
-    }
 };
 
 class CircleLayer : public StyleLayer {

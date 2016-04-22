@@ -44,10 +44,6 @@ public:
     LayoutProperty<bool> textAllowOverlap { false };
     LayoutProperty<bool> textIgnorePlacement { false };
     LayoutProperty<bool> textOptional { false };
-
-    // Special case.
-    float iconMaxSize = 1.0f;
-    float textMaxSize = 16.0f;
 };
 
 class SymbolPaintProperties {
@@ -67,15 +63,6 @@ public:
     PaintProperty<float> textHaloBlur { 0.0f };
     PaintProperty<std::array<float, 2>> textTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> textTranslateAnchor { TranslateAnchorType::Map };
-
-    // Special case
-    float iconSize = 1.0f;
-    float textSize = 16.0f;
-
-    bool isVisible() const {
-        return (iconOpacity > 0 && (iconColor.value[3] > 0 || iconHaloColor.value[3] > 0) && iconSize > 0)
-            || (textOpacity > 0 && (textColor.value[3] > 0 || textHaloColor.value[3] > 0) && textSize > 0);
-    }
 };
 
 class SymbolLayer : public StyleLayer {
@@ -93,6 +80,9 @@ public:
 
     SymbolLayoutProperties layout;
     SymbolPaintProperties paint;
+
+    float iconSize = 1.0f;
+    float textSize = 16.0f;
 
     SpriteAtlas* spriteAtlas = nullptr;
 };

@@ -27,13 +27,6 @@ public:
     PaintProperty<float> lineOffset { 0 };
     PaintProperty<std::vector<float>, Faded<std::vector<float>>> lineDasharray { {} };
     PaintProperty<std::string, Faded<std::string>> linePattern { "" };
-
-    // Special case
-    float dashLineWidth = 1;
-
-    bool isVisible() const {
-        return lineOpacity > 0 && lineColor.value[3] > 0 && lineWidth > 0;
-    }
 };
 
 class LineLayer : public StyleLayer {
@@ -51,6 +44,8 @@ public:
 
     LineLayoutProperties layout;
     LinePaintProperties paint;
+
+    float dashLineWidth = 1;
 };
 
 template <>

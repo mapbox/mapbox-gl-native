@@ -48,7 +48,7 @@ bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
     StyleCalculationParameters dashArrayParams = parameters;
     dashArrayParams.z = std::floor(dashArrayParams.z);
     paint.lineWidth.calculate(dashArrayParams);
-    paint.dashLineWidth = paint.lineWidth;
+    dashLineWidth = paint.lineWidth;
 
     bool hasTransitions = false;
 
@@ -63,7 +63,8 @@ bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
     hasTransitions |= paint.lineDasharray.calculate(parameters);
     hasTransitions |= paint.linePattern.calculate(parameters);
 
-    passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
+    passes = (paint.lineOpacity > 0 && paint.lineColor.value[3] > 0 && paint.lineWidth > 0)
+        ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }
