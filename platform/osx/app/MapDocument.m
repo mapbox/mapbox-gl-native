@@ -213,9 +213,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     }
     if (appDelegate.pendingMinimumZoomLevel >= 0) {
         self.mapView.zoomLevel = MAX(appDelegate.pendingMinimumZoomLevel, self.mapView.zoomLevel);
+        appDelegate.pendingMaximumZoomLevel = -1;
     }
     if (appDelegate.pendingMaximumZoomLevel >= 0) {
         self.mapView.zoomLevel = MIN(appDelegate.pendingMaximumZoomLevel, self.mapView.zoomLevel);
+        appDelegate.pendingMaximumZoomLevel = -1;
     }
     
     // Temporarily set the display name to the default center coordinate instead
