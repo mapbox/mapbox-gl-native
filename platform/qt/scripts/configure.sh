@@ -46,3 +46,9 @@ function print_qt_flags {
         CONFIG+="    'qt_rcc%': '$(pkg-config QtCore --variable=rcc_location)',"$LN
     fi
 }
+
+CONFIGURE_SUPLATFORM=platform/qt/scripts/configure-${SUBPLATFORM}.sh
+
+if [ -f $CONFIGURE_SUPLATFORM ]; then
+   source $CONFIGURE_SUPLATFORM
+fi

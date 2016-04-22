@@ -16,37 +16,44 @@ else
   export SUBPLATFORM ?= $(shell uname -m)
 endif
 
-ifneq ($(PLATFORM),node)
-  export MASON_PLATFORM = $(PLATFORM)
-  export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
-  export PLATFORM_SLUG = $(PLATFORM)-$(SUBPLATFORM)
-else ifeq ($(shell uname -s), Darwin)
-  export MASON_PLATFORM = osx
-  export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
-  export PLATFORM_SLUG = node-osx-$(SUBPLATFORM)
-else ifeq ($(shell uname -s), Linux)
-  export MASON_PLATFORM = linux
-  export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
-  export PLATFORM_SLUG = node-linux-$(SUBPLATFORM)
+ifeq ($(PLATFORM),node)
+  ifeq ($(shell uname -s), Darwin)
+    export MASON_PLATFORM ?= osx
+    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
+    export PLATFORM_SLUG = node-osx-$(SUBPLATFORM)
+  else ifeq ($(shell uname -s), Linux)
+    export MASON_PLATFORM ?= linux
+    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
+    export PLATFORM_SLUG = node-linux-$(SUBPLATFORM)
+  endif
 endif
-
-export PLATFORM_OUTPUT = ./build/$(PLATFORM_SLUG)
-export PLATFORM_CONFIG_INPUT = platform/$(MASON_PLATFORM)/scripts/configure.sh
-export PLATFORM_CONFIG_OUTPUT = $(PLATFORM_OUTPUT)/config.gypi
 
 ifeq ($(PLATFORM),qt)
   ifeq ($(shell uname -s), Darwin)
-    export MASON_PLATFORM = osx
-    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
-    export PLATFORM_SLUG = qt-osx-$(SUBPLATFORM)
-    export PLATFORM_CONFIG_INPUT = platform/qt/scripts/configure.sh
+    export MASON_PLATFORM ?= osx
+
+    ifneq ($(MASON_PLATFORM), osx)
+      export GYP_FLAVOR_SUFFIX = -$(MASON_PLATFORM)
+    endif
   else ifeq ($(shell uname -s), Linux)
-    export MASON_PLATFORM = linux
-    export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
-    export PLATFORM_SLUG = qt-linux-$(SUBPLATFORM)
-    export PLATFORM_CONFIG_INPUT = platform/qt/scripts/configure.sh
+    export MASON_PLATFORM ?= linux
   endif
+
+  export MASON_PLATFORM_VERSION = $(SUBPLATFORM)
+  export PLATFORM_SLUG = qt-$(MASON_PLATFORM)-$(SUBPLATFORM)
+  export PLATFORM_CONFIG_INPUT = platform/qt/scripts/configure.sh
+
+  # Cross compilation support
+  ENV = $(shell MASON_PLATFORM_VERSION=$(SUBPLATFORM) ./platform/qt/scripts/toolchain.sh)
 endif
+
+# Defaults if not set
+export PLATFORM_OUTPUT ?= ./build/$(PLATFORM_SLUG)
+export PLATFORM_CONFIG_INPUT ?= platform/$(MASON_PLATFORM)/scripts/configure.sh
+export PLATFORM_CONFIG_OUTPUT ?= $(PLATFORM_OUTPUT)/config.gypi
+export MASON_PLATFORM ?= $(PLATFORM)
+export MASON_PLATFORM_VERSION ?= $(SUBPLATFORM)
+export PLATFORM_SLUG ?= $(PLATFORM)-$(SUBPLATFORM)
 
 ifneq (,$(findstring clang,$(CXX)))
 	CXX_HOST = "clang"
