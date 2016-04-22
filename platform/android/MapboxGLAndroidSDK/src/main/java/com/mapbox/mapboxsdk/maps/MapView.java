@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -881,6 +882,67 @@ public class MapView extends FrameLayout {
     }
 
     //
+    // User marker location drawable management
+    //
+
+    /**
+     * Set the user location view default drawable .
+     */
+    void setUserLocationDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationDrawable(drawable);
+    }
+
+    /**
+     * Set the user location view default drawable and its shadow.
+     */
+    void setUserLocationDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationDrawable(drawable, shadowDrawable);
+    }
+
+    /**
+     * Set the user location view bearing drawable.
+     */
+    void setUserLocationBearingDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationBearingDrawable(drawable);
+    }
+
+    /**
+     * Set the user location view bearing drawable and its shadow.
+     */
+    void setUserLocationBearingDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationBearingDrawable(drawable, shadowDrawable);
+    }
+
+    /**
+     * Set the stale user location view drawable.
+     */
+    void setUserLocationStaleDrawable(Drawable drawable) {
+        mUserLocationView.setUserLocationStaleDrawable(drawable);
+    }
+
+    /**
+     * Set the stale user location view drawable and its shadow.
+     */
+    void setUserLocationStaleDrawable(Drawable drawable, Drawable shadowDrawable) {
+        mUserLocationView.setUserLocationStaleDrawable(drawable, shadowDrawable);
+    }
+
+    /**
+     * Set the offset of the user location view shadow
+     */
+    void setUserLocationShadowOffset(int x, int y) {
+        mUserLocationView.setUserLocationShadowOffset(x, y);
+    }
+
+    /**
+     * Change the accuracy color
+     * @param color int real color (not a @ColorRes)
+     */
+    void setUserLocationAccuracyColor(int color) {
+        mUserLocationView.setUserLocationAccuracyColor(color);
+    }
+
+    //
     // Projection
     //
 
@@ -1648,9 +1710,7 @@ public class MapView extends FrameLayout {
             }
 
             // reset tracking modes if gesture occurs
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                resetTrackingModes();
-            }
+            resetTrackingModesIfRequired();
 
             // Fling the map
             float ease = 0.25f;
@@ -1686,10 +1746,9 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
+
 
             // Cancel any animation
             mNativeMapView.cancelTransitions();
@@ -1718,10 +1777,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PINCH_START, detector.getFocusX(), detector.getFocusY());
@@ -1803,10 +1860,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_ROTATION_START, detector.getFocusX(), detector.getFocusY());
@@ -1884,10 +1939,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
-            if (mMapboxMap.getTrackingSettings().isDismissTrackingOnGesture()) {
-                // reset tracking modes if gesture occurs
-                resetTrackingModes();
-            }
+            // reset tracking modes if gesture occurs
+            resetTrackingModesIfRequired();
 
             mBeginTime = detector.getEventTime();
             trackGestureEvent(MapboxEvent.GESTURE_PITCH_START, detector.getFocusX(), detector.getFocusY());
@@ -2367,11 +2420,28 @@ public class MapView extends FrameLayout {
                 ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void resetTrackingModes() {
+    private void resetTrackingModesIfRequired() {
+        TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
+        if (trackingSettings.isDismissLocationTrackingOnGesture()) {
+            resetLocationTrackingMode();
+        }
+        if (trackingSettings.isDismissBearingTrackingOnGesture()) {
+            resetBearingTrackingMode();
+        }
+    }
+
+    private void resetLocationTrackingMode() {
         try {
             TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
             trackingSettings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_NONE);
-            trackingSettings.setMyBearingTrackingMode(MyBearingTracking.NONE);
+        } catch (SecurityException ignore) {
+            // User did not accept location permissions
+        }
+    }
+
+    private void resetBearingTrackingMode() {
+        try {
+            setMyBearingTrackingMode(MyBearingTracking.NONE);
         } catch (SecurityException ignore) {
             // User did not accept location permissions
         }
