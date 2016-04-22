@@ -54,12 +54,19 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(restoreState:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
-    self.styleIndex = -1;
-    [self cycleStyles:self];
-
     [self restoreState:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
     
-    if ( ! [MGLAccountManager accessToken].length)
+    if ([MGLAccountManager accessToken].length)
+    {
+        self.styleIndex = -1;
+        [self cycleStyles:self];
+    }
+    else
     {
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Access Token" message:@"Enter your Mapbox access token to load Mapbox-hosted tiles and styles:" preferredStyle:UIAlertControllerStyleAlert];
         [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField)
@@ -76,6 +83,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             NSString *accessToken = textField.text;
             [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:MBXMapboxAccessTokenDefaultsKey];
             [MGLAccountManager setAccessToken:accessToken];
+            
+            self.styleIndex = -1;
+            [self cycleStyles:self];
             [self.mapView reloadStyle:self];
         }];
         [alertController addAction:OKAction];
