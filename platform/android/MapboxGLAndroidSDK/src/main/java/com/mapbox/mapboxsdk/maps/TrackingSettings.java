@@ -100,8 +100,19 @@ public class TrackingSettings {
      * Returns if the tracking modes will be dismissed when a gesture occurs.
      *
      * @return True to indicate the tracking modes will be dismissed.
-     */
+     * @deprecated use @link #isAllDismissTrackingOnGestureinstead
+    */
+    @Deprecated
     public boolean isDismissTrackingOnGesture() {
+        return dismissLocationTrackingOnGesture && dismissBearingTrackingOnGesture;
+    }
+
+    /**
+     * Returns if all tracking modes will be dismissed when a gesture occurs.
+     *
+     * @return True to indicate that location and bearing tracking will be dismissed.
+     */
+    public boolean isAllDismissTrackingOnGesture() {
         return dismissLocationTrackingOnGesture && dismissBearingTrackingOnGesture;
     }
 
@@ -119,22 +130,77 @@ public class TrackingSettings {
     /**
      * Set the dismissal of the tracking modes if a gesture occurs.
      *
-     * @param dismissTrackingOnGesture True to dismiss the tracking modes.
+     * @param dismissTrackingOnGesture True to dismiss all the tracking modes.
      */
     public void setDismissAllTrackingOnGesture(boolean dismissTrackingOnGesture) {
         dismissLocationTrackingOnGesture = dismissTrackingOnGesture;
         dismissBearingTrackingOnGesture = dismissTrackingOnGesture;
-        validateGesturesForTrackingModes();
+        validateAllGesturesForTrackingModes();
     }
 
-    private void validateGesturesForTrackingModes() {
+    /**
+     * Set the dismissal of the tracking modes if a gesture occurs.
+     *
+     * @param dismissLocationTrackingOnGesture True to dismiss the location tracking mode.
+     */
+    public void setDismissLocationTrackingOnGesture(boolean dismissLocationTrackingOnGesture) {
+        this.dismissLocationTrackingOnGesture = dismissLocationTrackingOnGesture;
+        validateGesturesForLocationTrackingMode();
+    }
+
+    /**
+     * Returns if the location tracking will be disabled when a gesture occurs
+     *
+     * @return True if location tracking will be disabled.
+     */
+    public boolean isDismissLocationTrackingOnGesture() {
+        return dismissLocationTrackingOnGesture;
+    }
+
+    /**
+     * Set the dismissal of the bearing tracking modes if a gesture occurs.
+     *
+     * @param dismissBearingTrackingOnGesture True to dimsiss the bearinf tracking mode
+     */
+    public void setDismissBearingTrackingOnGesture(boolean dismissBearingTrackingOnGesture) {
+        this.dismissBearingTrackingOnGesture = dismissBearingTrackingOnGesture;
+        validateGesturesForBearingTrackingMode();
+    }
+
+    /**
+     * Returns if bearing will disabled when a gesture occurs
+     *
+     * @return True if bearing tracking will be disabled
+     */
+    public boolean isDismissBearingTrackingOnGesture() {
+        return dismissBearingTrackingOnGesture;
+    }
+
+    /**
+     * Returns if location tracking is disabled
+     *
+     * @return True if location tracking is disabled.
+     */
+    public boolean isLocationTrackingDisabled() {
+        return myLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
+    }
+
+    /**
+     * Retyrns uf bearing tracking is disabled
+     *
+     * @return True if bearing tracking will be disabled.
+     */
+    public boolean isBearingTrackingDisabled() {
+        return myBearingTrackingMode == MyBearingTracking.NONE;
+    }
+
+    private void validateAllGesturesForTrackingModes() {
         validateGesturesForBearingTrackingMode();
         validateGesturesForLocationTrackingMode();
     }
 
     private void validateGesturesForLocationTrackingMode() {
         int myLocationTrackingMode = getMyLocationTrackingMode();
-
         if (!dismissLocationTrackingOnGesture) {
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
                 uiSettings.setScrollGesturesEnabled(true);
@@ -157,32 +223,5 @@ public class TrackingSettings {
         } else {
             uiSettings.setRotateGesturesEnabled(true);
         }
-    }
-
-    public void setDismissLocationTrackingOnGesture(boolean dismissLocationTrackingOnGesture) {
-        this.dismissLocationTrackingOnGesture = dismissLocationTrackingOnGesture;
-        validateGesturesForLocationTrackingMode();
-    }
-
-    public boolean isDismissLocationTrackingOnGesture() {
-        return dismissLocationTrackingOnGesture;
-    }
-
-    public void setDismissBearingTrackingOnGesture(boolean dismissBearingTrackingOnGesture) {
-        this.dismissBearingTrackingOnGesture = dismissBearingTrackingOnGesture;
-        validateGesturesForBearingTrackingMode();
-    }
-
-    public boolean isDismissBearingTrackingOnGesture() {
-        return dismissBearingTrackingOnGesture;
-    }
-
-    /**
-     * Return if location tracking is disabled
-     *
-     * @return True if location tracking is disabled.
-     */
-    public boolean isLocationTrackingDisabled() {
-        return myLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }
