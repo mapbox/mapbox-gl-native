@@ -2,7 +2,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
-#include <mbgl/text/font_stack.hpp>
+#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
@@ -53,8 +53,8 @@ TEST(GlyphStore, LoadingSuccess) {
         if (!test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}, {256, 511}}))
             return;
 
-        auto fontStack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_FALSE(fontStack->getSDFs().empty());
+        auto glyphSet = test.glyphStore.getGlyphSet("Test Stack");
+        ASSERT_FALSE(glyphSet->getSDFs().empty());
 
         test.end();
     };
@@ -83,8 +83,8 @@ TEST(GlyphStore, LoadingFail) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "Failed by the test case");
 
-        auto stack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_TRUE(stack->getSDFs().empty());
+        auto glyphSet = test.glyphStore.getGlyphSet("Test Stack");
+        ASSERT_TRUE(glyphSet->getSDFs().empty());
         ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
 
         test.end();
@@ -112,8 +112,8 @@ TEST(GlyphStore, LoadingCorrupted) {
         EXPECT_TRUE(error != nullptr);
         EXPECT_EQ(util::toString(error), "pbf unknown field type exception");
 
-        auto stack = test.glyphStore.getFontStack("Test Stack");
-        ASSERT_TRUE(stack->getSDFs().empty());
+        auto glyphSet = test.glyphStore.getGlyphSet("Test Stack");
+        ASSERT_TRUE(glyphSet->getSDFs().empty());
         ASSERT_FALSE(test.glyphStore.hasGlyphRanges("Test Stack", {{0, 255}}));
 
         test.end();

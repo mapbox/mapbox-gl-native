@@ -23,7 +23,7 @@ public:
     void addGlyphs(uintptr_t tileUID,
                    const std::u32string& text,
                    const std::string& stackName,
-                   const FontStack&,
+                   const GlyphSet&,
                    GlyphPositions&);
     void removeGlyphs(uintptr_t tileUID);
 
