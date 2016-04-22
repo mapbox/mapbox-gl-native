@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		52BECB0A1CC5A26F009CD791 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */; };
+		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
+		DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */; };
 		DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E961CC2E3400062CAFB /* AppDelegate.m */; };
 		DA839E9A1CC2E3400062CAFB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E991CC2E3400062CAFB /* main.m */; };
 		DA839E9D1CC2E3400062CAFB /* MapDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E9C1CC2E3400062CAFB /* MapDocument.m */; };
@@ -18,7 +21,6 @@
 		DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = DAE6C2E11CC304F900DB3429 /* Credits.rtf */; };
 		DAE6C2ED1CC3050F00DB3429 /* DroppedPinAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E41CC3050F00DB3429 /* DroppedPinAnnotation.m */; };
 		DAE6C2EE1CC3050F00DB3429 /* LocationCoordinate2DTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E61CC3050F00DB3429 /* LocationCoordinate2DTransformer.m */; };
-		DAE6C2EF1CC3050F00DB3429 /* NSValue+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2E81CC3050F00DB3429 /* NSValue+Additions.m */; };
 		DAE6C2F01CC3050F00DB3429 /* OfflinePackNameValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2EA1CC3050F00DB3429 /* OfflinePackNameValueTransformer.m */; };
 		DAE6C2F11CC3050F00DB3429 /* TimeIntervalTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE6C2EC1CC3050F00DB3429 /* TimeIntervalTransformer.m */; };
 		DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3281CC30DB200DB3429 /* Mapbox.framework */; };
@@ -134,6 +136,9 @@
 
 /* Begin PBXFileReference section */
 		52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLCoordinateFormatter.h; path = include/MGLCoordinateFormatter.h; sourceTree = "<group>"; };
+		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatter.m; path = src/MGLCoordinateFormatter.m; sourceTree = "<group>"; };
+		DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatterTests.m; path = ../../darwin/test/MGLCoordinateFormatterTests.m; sourceTree = "<group>"; };
 		DA839E921CC2E3400062CAFB /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA839E951CC2E3400062CAFB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DA839E961CC2E3400062CAFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -150,8 +155,6 @@
 		DAE6C2E41CC3050F00DB3429 /* DroppedPinAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DroppedPinAnnotation.m; sourceTree = "<group>"; };
 		DAE6C2E51CC3050F00DB3429 /* LocationCoordinate2DTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCoordinate2DTransformer.h; sourceTree = "<group>"; };
 		DAE6C2E61CC3050F00DB3429 /* LocationCoordinate2DTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationCoordinate2DTransformer.m; sourceTree = "<group>"; };
-		DAE6C2E71CC3050F00DB3429 /* NSValue+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+Additions.h"; sourceTree = "<group>"; };
-		DAE6C2E81CC3050F00DB3429 /* NSValue+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+Additions.m"; sourceTree = "<group>"; };
 		DAE6C2E91CC3050F00DB3429 /* OfflinePackNameValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OfflinePackNameValueTransformer.h; sourceTree = "<group>"; };
 		DAE6C2EA1CC3050F00DB3429 /* OfflinePackNameValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OfflinePackNameValueTransformer.m; sourceTree = "<group>"; };
 		DAE6C2EB1CC3050F00DB3429 /* TimeIntervalTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeIntervalTransformer.h; sourceTree = "<group>"; };
@@ -222,7 +225,7 @@
 		DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = mapbox.pdf; path = src/resources/mapbox.pdf; sourceTree = SOURCE_ROOT; };
 		DAE6C3BD1CC31F2E00DB3429 /* MGLAnnotationCallout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MGLAnnotationCallout.xib; path = src/resources/MGLAnnotationCallout.xib; sourceTree = SOURCE_ROOT; };
 		DAE6C3C11CC31F4500DB3429 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mapbox.h; sourceTree = "<group>"; };
-		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = "../../build/osx/mbgl.xcconfig"; sourceTree = "<group>"; };
+		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/osx/mbgl.xcconfig; sourceTree = "<group>"; };
 		DAE6C3C61CC3499100DB3429 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
 		DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflinePackTests.m; path = ../../darwin/test/MGLOfflinePackTests.m; sourceTree = "<group>"; };
@@ -297,8 +300,6 @@
 				DA839E9B1CC2E3400062CAFB /* MapDocument.h */,
 				DA839E9C1CC2E3400062CAFB /* MapDocument.m */,
 				DA839E9E1CC2E3400062CAFB /* MapDocument.xib */,
-				DAE6C2E71CC3050F00DB3429 /* NSValue+Additions.h */,
-				DAE6C2E81CC3050F00DB3429 /* NSValue+Additions.m */,
 				DAE6C2E91CC3050F00DB3429 /* OfflinePackNameValueTransformer.h */,
 				DAE6C2EA1CC3050F00DB3429 /* OfflinePackNameValueTransformer.m */,
 				DAE6C2EB1CC3050F00DB3429 /* TimeIntervalTransformer.h */,
@@ -350,6 +351,7 @@
 		DAE6C3371CC30DB200DB3429 /* SDK Tests */ = {
 			isa = PBXGroup;
 			children = (
+				DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */,
 				DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */,
 				DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */,
 				DAE6C3CA1CC34BD800DB3429 /* MGLOfflineRegionTests.m */,
@@ -368,6 +370,8 @@
 				DAE6C36A1CC31E2A00DB3429 /* MGLAccountManager_Private.h */,
 				DAE6C36B1CC31E2A00DB3429 /* MGLAccountManager.m */,
 				DAE6C34B1CC31E0400DB3429 /* MGLAnnotation.h */,
+				DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */,
+				DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */,
 				DAE6C34C1CC31E0400DB3429 /* MGLGeometry.h */,
 				DAE6C36C1CC31E2A00DB3429 /* MGLGeometry_Private.h */,
 				DAE6C36D1CC31E2A00DB3429 /* MGLGeometry.mm */,
@@ -475,6 +479,7 @@
 				DAE6C3661CC31E0400DB3429 /* MGLShape.h in Headers */,
 				DAE6C3C21CC31F4500DB3429 /* Mapbox.h in Headers */,
 				DAE6C3641CC31E0400DB3429 /* MGLPolygon.h in Headers */,
+				DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				DAE6C3621CC31E0400DB3429 /* MGLOverlay.h in Headers */,
 				DAE6C3651CC31E0400DB3429 /* MGLPolyline.h in Headers */,
 				DAE6C39A1CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.h in Headers */,
@@ -635,7 +640,6 @@
 				DAE6C2EE1CC3050F00DB3429 /* LocationCoordinate2DTransformer.m in Sources */,
 				DAE6C2F11CC3050F00DB3429 /* TimeIntervalTransformer.m in Sources */,
 				DA839E9A1CC2E3400062CAFB /* main.m in Sources */,
-				DAE6C2EF1CC3050F00DB3429 /* NSValue+Additions.m in Sources */,
 				DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */,
 				DAE6C2F01CC3050F00DB3429 /* OfflinePackNameValueTransformer.m in Sources */,
 			);
@@ -659,6 +663,7 @@
 				DAE6C3BA1CC31EF300DB3429 /* MGLOpenGLLayer.mm in Sources */,
 				DAE6C38A1CC31E2A00DB3429 /* MGLMultiPoint.mm in Sources */,
 				DAE6C3961CC31E2A00DB3429 /* MGLTypes.m in Sources */,
+				DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				DAE6C3881CC31E2A00DB3429 /* MGLMapCamera.mm in Sources */,
 				DAE6C3911CC31E2A00DB3429 /* MGLPolygon.mm in Sources */,
 				DAE6C39B1CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.m in Sources */,
@@ -679,6 +684,7 @@
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DAE6C3D51CC34C9900DB3429 /* MGLOfflineStorageTests.m in Sources */,
 				DAE6C3D31CC34C9900DB3429 /* MGLOfflinePackTests.m in Sources */,
+				DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

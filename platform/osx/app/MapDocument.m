@@ -2,7 +2,6 @@
 
 #import "AppDelegate.h"
 #import "DroppedPinAnnotation.h"
-#import "NSValue+Additions.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -222,7 +221,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     
     // Temporarily set the display name to the default center coordinate instead
     // of “Untitled” until the binding kicks in.
-    NSValue *coordinateValue = [NSValue valueWithCLLocationCoordinate2D:self.mapView.centerCoordinate];
+    NSValue *coordinateValue = [NSValue valueWithMGLCoordinate:self.mapView.centerCoordinate];
     self.displayName = [[NSValueTransformer valueTransformerForName:@"LocationCoordinate2DTransformer"]
                         transformedValue:coordinateValue];
 }

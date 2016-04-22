@@ -1,7 +1,5 @@
 #import "TimeIntervalTransformer.h"
 
-#import "NSValue+Additions.h"
-
 @implementation TimeIntervalTransformer
 
 + (Class)transformedValueClass {

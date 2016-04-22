@@ -450,7 +450,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
                                  toCoordinateFromView:self.mapView];
         point.title = @"Dropped Marker";
-        point.subtitle = [NSString stringWithFormat:@"lat: %.3f, lon: %.3f", point.coordinate.latitude, point.coordinate.longitude];
+        point.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:point.coordinate];
         [self.mapView addAnnotation:point];
         [self.mapView selectAnnotation:point animated:YES];
     }

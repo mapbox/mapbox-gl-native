@@ -63,6 +63,7 @@ custom_categories:
       - MGLCoordinateBoundsIsEmpty
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
+      - MGLCoordinateFormatter
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
       - MGLCoordinateSpanMake
@@ -70,3 +71,4 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
+      - NSValue(MGLGeometryAdditions)

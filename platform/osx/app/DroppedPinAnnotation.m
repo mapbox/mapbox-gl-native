@@ -2,21 +2,27 @@
 
 #import "LocationCoordinate2DTransformer.h"
 #import "TimeIntervalTransformer.h"
-#import "NSValue+Additions.h"
+
+#import <Mapbox/Mapbox.h>
+
+static MGLCoordinateFormatter *DroppedPinCoordinateFormatter;
 
 @implementation DroppedPinAnnotation {
     NSTimer *_timer;
     NSTimeInterval _priorShownTimeInterval;
     NSDate *_dateShown;
     
-    NSValueTransformer *_coordinateTransformer;
     NSValueTransformer *_timeIntervalTransformer;
+}
+
++ (void)initialize {
+    if (self == [DroppedPinAnnotation class]) {
+        DroppedPinCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
+    }
 }
 
 - (instancetype)init {
     if (self = [super init]) {
-        _coordinateTransformer = [NSValueTransformer valueTransformerForName:
-                                  NSStringFromClass([LocationCoordinate2DTransformer class])];
         _timeIntervalTransformer = [NSValueTransformer valueTransformerForName:
                                     NSStringFromClass([TimeIntervalTransformer class])];
         [self update:nil];
@@ -54,8 +60,7 @@
 }
 
 - (void)update:(NSTimer *)timer {
-    NSString *coordinate = [_coordinateTransformer transformedValue:
-                            [NSValue valueWithCLLocationCoordinate2D:self.coordinate]];
+    NSString *coordinate = [DroppedPinCoordinateFormatter stringFromCoordinate:self.coordinate];
     NSString *elapsedTime = [_timeIntervalTransformer transformedValue:@(self.elapsedShownTime)];
     self.subtitle = [NSString stringWithFormat:@"%@\nSelected for %@", coordinate, elapsedTime];
 }
