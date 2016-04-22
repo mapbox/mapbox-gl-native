@@ -111,6 +111,10 @@ private:
 
 public:
     SymbolLayoutProperties layout;
+
+    float iconMaxSize = 1.0f;
+    float textMaxSize = 16.0f;
+
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
 

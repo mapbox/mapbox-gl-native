@@ -81,8 +81,8 @@ void Painter::renderLine(LineBucket& bucket, const LineLayer& layer, const TileI
         LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, glObjectStore);
         LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, glObjectStore);
 
-        const float widthA = posA.width * properties.lineDasharray.value.fromScale * properties.dashLineWidth;
-        const float widthB = posB.width * properties.lineDasharray.value.toScale * properties.dashLineWidth;
+        const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.dashLineWidth;
+        const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.dashLineWidth;
 
         float scaleXA = 1.0 / id.pixelsToTileUnits(widthA, state.getIntegerZoom());
         float scaleYA = -posA.height / 2.0;

@@ -103,10 +103,12 @@ bool SymbolLayer::recalculate(const StyleCalculationParameters& parameters) {
     // text-size and icon-size are layout properties but they also need to be evaluated as paint properties:
     layout.iconSize.calculate(parameters);
     layout.textSize.calculate(parameters);
-    paint.iconSize = layout.iconSize;
-    paint.textSize = layout.textSize;
+    iconSize = layout.iconSize;
+    textSize = layout.textSize;
 
-    passes = paint.isVisible() ? RenderPass::Translucent : RenderPass::None;
+    passes = ((paint.iconOpacity > 0 && (paint.iconColor.value[3] > 0 || paint.iconHaloColor.value[3] > 0) && iconSize > 0)
+           || (paint.textOpacity > 0 && (paint.textColor.value[3] > 0 || paint.textHaloColor.value[3] > 0) && textSize > 0))
+        ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
 }
@@ -157,8 +159,8 @@ std::unique_ptr<Bucket> SymbolLayer::createBucket(StyleBucketParameters& paramet
 
     bucket->layout.iconSize.calculate(StyleCalculationParameters(18));
     bucket->layout.textSize.calculate(StyleCalculationParameters(18));
-    bucket->layout.iconMaxSize = bucket->layout.iconSize;
-    bucket->layout.textMaxSize = bucket->layout.textSize;
+    bucket->iconMaxSize = bucket->layout.iconSize;
+    bucket->textMaxSize = bucket->layout.textSize;
     bucket->layout.iconSize.calculate(StyleCalculationParameters(p.z + 1));
     bucket->layout.textSize.calculate(StyleCalculationParameters(p.z + 1));
 
