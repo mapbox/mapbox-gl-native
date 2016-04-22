@@ -11,6 +11,7 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLAnnotationImage.h"
 #import "MGLCalloutView.h"
 #import "MGLCoordinateFormatter.h"
+#import "MGLDirectionFormatter.h"
 #import "MGLMapCamera.h"
 #import "MGLGeometry.h"
 #import "MGLMapView.h"

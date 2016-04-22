@@ -11,6 +11,9 @@
 		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
 		DA35A2A81CC9F41600E826B2 /* MGLCoordinateFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */; };
+		DA35A2AD1CCA091800E826B2 /* MGLDirectionFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2AB1CCA091800E826B2 /* MGLDirectionFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA35A2AE1CCA091800E826B2 /* MGLDirectionFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2AC1CCA091800E826B2 /* MGLDirectionFormatter.m */; };
+		DA35A2B61CCA14D700E826B2 /* MGLDirectionFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2B51CCA14D700E826B2 /* MGLDirectionFormatterTests.m */; };
 		DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E961CC2E3400062CAFB /* AppDelegate.m */; };
 		DA839E9A1CC2E3400062CAFB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E991CC2E3400062CAFB /* main.m */; };
 		DA839E9D1CC2E3400062CAFB /* MapDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E9C1CC2E3400062CAFB /* MapDocument.m */; };
@@ -139,6 +142,9 @@
 		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLCoordinateFormatter.h; path = include/MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatter.m; path = src/MGLCoordinateFormatter.m; sourceTree = "<group>"; };
 		DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatterTests.m; path = ../../darwin/test/MGLCoordinateFormatterTests.m; sourceTree = "<group>"; };
+		DA35A2AB1CCA091800E826B2 /* MGLDirectionFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLDirectionFormatter.h; path = include/MGLDirectionFormatter.h; sourceTree = "<group>"; };
+		DA35A2AC1CCA091800E826B2 /* MGLDirectionFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLDirectionFormatter.m; path = src/MGLDirectionFormatter.m; sourceTree = "<group>"; };
+		DA35A2B51CCA14D700E826B2 /* MGLDirectionFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLDirectionFormatterTests.m; path = ../../darwin/test/MGLDirectionFormatterTests.m; sourceTree = "<group>"; };
 		DA839E921CC2E3400062CAFB /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA839E951CC2E3400062CAFB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DA839E961CC2E3400062CAFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -352,6 +358,7 @@
 			isa = PBXGroup;
 			children = (
 				DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */,
+				DA35A2B51CCA14D700E826B2 /* MGLDirectionFormatterTests.m */,
 				DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */,
 				DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */,
 				DAE6C3CA1CC34BD800DB3429 /* MGLOfflineRegionTests.m */,
@@ -372,6 +379,8 @@
 				DAE6C34B1CC31E0400DB3429 /* MGLAnnotation.h */,
 				DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */,
 				DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */,
+				DA35A2AB1CCA091800E826B2 /* MGLDirectionFormatter.h */,
+				DA35A2AC1CCA091800E826B2 /* MGLDirectionFormatter.m */,
 				DAE6C34C1CC31E0400DB3429 /* MGLGeometry.h */,
 				DAE6C36C1CC31E2A00DB3429 /* MGLGeometry_Private.h */,
 				DAE6C36D1CC31E2A00DB3429 /* MGLGeometry.mm */,
@@ -495,6 +504,7 @@
 				DAE6C3B91CC31EF300DB3429 /* MGLOpenGLLayer.h in Headers */,
 				DAE6C3891CC31E2A00DB3429 /* MGLMultiPoint_Private.h in Headers */,
 				DAE6C3A51CC31E9400DB3429 /* MGLMapView+IBAdditions.h in Headers */,
+				DA35A2AD1CCA091800E826B2 /* MGLDirectionFormatter.h in Headers */,
 				DAE6C3671CC31E0400DB3429 /* MGLStyle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -672,6 +682,7 @@
 				DAE6C3851CC31E2A00DB3429 /* MGLAccountManager.m in Sources */,
 				DAE6C3921CC31E2A00DB3429 /* MGLPolyline.mm in Sources */,
 				DAE6C3B51CC31EF300DB3429 /* MGLCompassCell.m in Sources */,
+				DA35A2AE1CCA091800E826B2 /* MGLDirectionFormatter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -681,6 +692,7 @@
 			files = (
 				DAE6C3D41CC34C9900DB3429 /* MGLOfflineRegionTests.m in Sources */,
 				DAE6C3D61CC34C9900DB3429 /* MGLStyleTests.mm in Sources */,
+				DA35A2B61CCA14D700E826B2 /* MGLDirectionFormatterTests.m in Sources */,
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DAE6C3D51CC34C9900DB3429 /* MGLOfflineStorageTests.m in Sources */,
 				DAE6C3D31CC34C9900DB3429 /* MGLOfflinePackTests.m in Sources */,

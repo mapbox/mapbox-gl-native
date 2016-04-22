@@ -69,6 +69,8 @@ custom_categories:
       - MGLCoordinateSpanMake
       - MGLCoordinateSpanZero
       - MGLDegreesFromRadians
+      - MGLDirectionFormatter
+      - MGLDirectionFormatterOrigin
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
       - NSValue(MGLGeometryAdditions)
