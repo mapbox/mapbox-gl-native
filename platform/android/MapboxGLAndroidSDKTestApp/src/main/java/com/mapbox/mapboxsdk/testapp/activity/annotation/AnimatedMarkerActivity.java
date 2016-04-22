@@ -112,10 +112,14 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     }
 
     private class LatLngEvaluator implements TypeEvaluator<LatLng> {
+
+        private LatLng mLatLng = new LatLng();
+
         @Override
         public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
-            return new LatLng(startValue.getLatitude() + (endValue.getLatitude() - startValue.getLatitude()) * fraction,
-                    startValue.getLongitude() + (endValue.getLongitude() - startValue.getLongitude()) * fraction);
+            mLatLng.setLatitude(startValue.getLatitude() + (endValue.getLatitude() - startValue.getLatitude()) * fraction);
+            mLatLng.setLongitude(startValue.getLongitude() + (endValue.getLongitude() - startValue.getLongitude()) * fraction);
+            return mLatLng;
         }
     }
 }

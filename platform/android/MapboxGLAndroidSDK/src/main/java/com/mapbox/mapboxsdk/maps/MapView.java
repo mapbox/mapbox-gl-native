@@ -888,22 +888,17 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return new LatLng();
         }
-        float x = point.x;
-        float y = point.y;
-
-        return mNativeMapView.latLngForPixel(new PointF(x / mScreenDensity, y / mScreenDensity));
+        point.set(point.x / mScreenDensity, point.y / mScreenDensity);
+        return mNativeMapView.latLngForPixel(point);
     }
 
     PointF toScreenLocation(@NonNull LatLng location) {
         if (mDestroyed) {
             return new PointF();
         }
-        PointF point = mNativeMapView.pixelForLatLng(location);
-
-        float x = point.x * mScreenDensity;
-        float y = point.y * mScreenDensity;
-
-        return new PointF(x, y);
+        PointF  pointF = mNativeMapView.pixelForLatLng(location);
+        pointF.set(pointF.x * mScreenDensity, pointF.y * mScreenDensity);
+        return pointF;
     }
 
     //
