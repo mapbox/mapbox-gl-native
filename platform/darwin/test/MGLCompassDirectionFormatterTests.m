@@ -1,27 +1,21 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
-static NSString * const MGLTestLocaleIdentifier = @"en-US";
-
-@interface MGLDirectionFormatterTests : XCTestCase
+@interface MGLCompassDirectionFormatterTests : XCTestCase
 
 @end
 
-@implementation MGLDirectionFormatterTests
+@implementation MGLCompassDirectionFormatterTests
 
-- (void)testAbsoluteDirections {
-    MGLDirectionFormatter *shortFormatter = [[MGLDirectionFormatter alloc] init];
-    XCTAssertEqual(shortFormatter.origin, MGLDirectionFormatterOriginNorth, @"Reference point should be north by default.");
+- (void)testCompassDirections {
+    MGLCompassDirectionFormatter *shortFormatter = [[MGLCompassDirectionFormatter alloc] init];
     shortFormatter.unitStyle = NSFormattingUnitStyleShort;
-    shortFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
-    MGLDirectionFormatter *mediumFormatter = [[MGLDirectionFormatter alloc] init];
+    MGLCompassDirectionFormatter *mediumFormatter = [[MGLCompassDirectionFormatter alloc] init];
     XCTAssertEqual(mediumFormatter.unitStyle, NSFormattingUnitStyleMedium, @"Unit style should be medium by default.");
-    mediumFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
-    MGLDirectionFormatter *longFormatter = [[MGLDirectionFormatter alloc] init];
+    MGLCompassDirectionFormatter *longFormatter = [[MGLCompassDirectionFormatter alloc] init];
     longFormatter.unitStyle = NSFormattingUnitStyleLong;
-    longFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
     XCTAssertEqualObjects(@"NW", [shortFormatter stringFromDirection:-45]);
     XCTAssertEqualObjects(@"northwest", [mediumFormatter stringFromDirection:-45]);
@@ -66,46 +60,6 @@ static NSString * const MGLTestLocaleIdentifier = @"en-US";
     XCTAssertEqualObjects(@"N", [shortFormatter stringFromDirection:720]);
     XCTAssertEqualObjects(@"north", [mediumFormatter stringFromDirection:720]);
     XCTAssertEqualObjects([mediumFormatter stringFromDirection:720], [longFormatter stringFromDirection:720]);
-}
-
-- (void)testRelativeDirections {
-    MGLDirectionFormatter *shortFormatter = [[MGLDirectionFormatter alloc] init];
-    shortFormatter.origin = MGLDirectionFormatterOriginStraightAhead;
-    shortFormatter.unitStyle = NSFormattingUnitStyleShort;
-    shortFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
-    
-    MGLDirectionFormatter *mediumFormatter = [[MGLDirectionFormatter alloc] init];
-    mediumFormatter.origin = MGLDirectionFormatterOriginStraightAhead;
-    mediumFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
-    
-    MGLDirectionFormatter *longFormatter = [[MGLDirectionFormatter alloc] init];
-    longFormatter.origin = MGLDirectionFormatterOriginStraightAhead;
-    longFormatter.unitStyle = NSFormattingUnitStyleLong;
-    longFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
-    
-    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:-90]);
-    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:-90]);
-    XCTAssertEqualObjects(@"nine o’clock", [longFormatter stringFromDirection:-90]);
-    
-    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:0]);
-    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:0]);
-    XCTAssertEqualObjects(@"twelve o’clock", [longFormatter stringFromDirection:0]);
-    
-    XCTAssertEqualObjects(@"2:00", [shortFormatter stringFromDirection:45]);
-    XCTAssertEqualObjects(@"2 o’clock", [mediumFormatter stringFromDirection:45]);
-    XCTAssertEqualObjects(@"two o’clock", [longFormatter stringFromDirection:45]);
-    
-    XCTAssertEqualObjects(@"3:00", [shortFormatter stringFromDirection:90]);
-    XCTAssertEqualObjects(@"3 o’clock", [mediumFormatter stringFromDirection:90]);
-    XCTAssertEqualObjects(@"three o’clock", [longFormatter stringFromDirection:90]);
-    
-    XCTAssertEqualObjects(@"6:00", [shortFormatter stringFromDirection:180]);
-    XCTAssertEqualObjects(@"6 o’clock", [mediumFormatter stringFromDirection:180]);
-    XCTAssertEqualObjects(@"six o’clock", [longFormatter stringFromDirection:180]);
-    
-    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:270]);
-    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:270]);
-    XCTAssertEqualObjects(@"nine o’clock", [longFormatter stringFromDirection:270]);
 }
 
 @end

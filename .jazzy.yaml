@@ -57,6 +57,8 @@ custom_categories:
       - NSValue(MGLOfflinePackAdditions)
   - name: Geometry
     children:
+      - MGLClockDirectionFormatter
+      - MGLCompassDirectionFormatter
       - MGLCoordinateBounds
       - MGLCoordinateBoundsEqualToCoordinateBounds
       - MGLCoordinateBoundsGetCoordinateSpan
@@ -69,8 +71,6 @@ custom_categories:
       - MGLCoordinateSpanMake
       - MGLCoordinateSpanZero
       - MGLDegreesFromRadians
-      - MGLDirectionFormatter
-      - MGLDirectionFormatterOrigin
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
       - NSValue(MGLGeometryAdditions)

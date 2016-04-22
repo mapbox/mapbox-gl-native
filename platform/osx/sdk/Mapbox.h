@@ -9,7 +9,8 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import <Mapbox/MGLAccountManager.h>
 #import <Mapbox/MGLAnnotation.h>
 #import <Mapbox/MGLAnnotationImage.h>
-#import <Mapbox/MGLDirectionFormatter.h>
+#import <Mapbox/MGLClockDirectionFormatter.h>
+#import <Mapbox/MGLCompassDirectionFormatter.h>
 #import <Mapbox/MGLCoordinateFormatter.h>
 #import <Mapbox/MGLGeometry.h>
 #import <Mapbox/MGLMapCamera.h>

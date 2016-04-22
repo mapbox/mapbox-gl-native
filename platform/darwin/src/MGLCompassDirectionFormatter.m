@@ -1,63 +1,18 @@
-#import "MGLDirectionFormatter.h"
+#import "MGLCompassDirectionFormatter.h"
 
 #define wrap(value, min, max) \
     (fmod((fmod((value - min), (max - min)) + (max - min)), (max - min)) + min)
 
-@implementation MGLDirectionFormatter {
-    NSNumberFormatter *_numberFormatter;
-}
+@implementation MGLCompassDirectionFormatter
 
 - (instancetype)init {
     if (self = [super init]) {
         _unitStyle = NSFormattingUnitStyleMedium;
-        _numberFormatter = [[NSNumberFormatter alloc] init];
     }
     return self;
 }
 
-- (NSLocale *)locale {
-    return _numberFormatter.locale;
-}
-
-- (void)setLocale:(NSLocale *)locale {
-    _numberFormatter.locale = locale;
-}
-
 - (NSString *)stringFromDirection:(CLLocationDirection)direction {
-    if (self.origin == MGLDirectionFormatterOriginNorth) {
-        return [self stringFromAbsoluteDirection:direction];
-    } else {
-        return [self stringFromRelativeDirection:direction];
-    }
-}
-
-- (NSString *)stringFromRelativeDirection:(CLLocationDirection)direction {
-    NSInteger hour = round(-wrap(-direction, -360, 0) / 360 * 12);
-    NSString *format;
-    NSNumberFormatterStyle style = NSNumberFormatterDecimalStyle;
-    switch (self.unitStyle) {
-        case NSFormattingUnitStyleShort:
-            format = NSLocalizedString(@"%@:00", @"Relative heading format, short style");
-            break;
-            
-        case NSFormattingUnitStyleMedium:
-            format = NSLocalizedString(@"%@ o’clock", @"Relative heading format, medium style");
-            
-            break;
-            
-        case NSFormattingUnitStyleLong:
-            format = NSLocalizedString(@"%@ o’clock", @"Relative heading format, long style");
-            style = NSNumberFormatterSpellOutStyle;
-            break;
-            
-        default:
-            break;
-    }
-    _numberFormatter.numberStyle = style;
-    return [NSString stringWithFormat:format, [_numberFormatter stringFromNumber:@(hour)]];
-}
-
-- (NSString *)stringFromAbsoluteDirection:(CLLocationDirection)direction {
     static NS_ARRAY_OF(NSString *) *shortStrings;
     static NS_ARRAY_OF(NSString *) *longStrings;
     static dispatch_once_t onceToken;
@@ -138,7 +93,7 @@
             NSLocalizedString(@"north by west", @"North by west, long"),
         ];
         
-        NSAssert(shortStrings.count == longStrings.count, @"Long and short direction string arrays must have the same size.");
+        NSAssert(shortStrings.count == longStrings.count, @"Long and short compass direction string arrays must have the same size.");
     });
     
     NSInteger cardinalPoint = round(wrap(direction, 0, 360) / 360 * shortStrings.count);
