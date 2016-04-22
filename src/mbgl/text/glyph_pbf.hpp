@@ -3,6 +3,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <atomic>
@@ -12,14 +13,13 @@
 
 namespace mbgl {
 
-class GlyphSet;
 class AsyncRequest;
 class FileSource;
 
 class GlyphPBF : private util::noncopyable {
 public:
-    GlyphPBF(GlyphStore* store,
-             const std::string& fontStack,
+    GlyphPBF(GlyphStore*,
+             const FontStack&,
              const GlyphRange&,
              GlyphStore::Observer*,
              FileSource&);

@@ -35,6 +35,7 @@ inline std::array<T, 2> interpolate(const std::array<T, 2>& a, const std::array<
 // fake interpolations that just return the first value
 template<> inline bool interpolate(const bool a, const bool, const double) { return a; }
 template<> inline std::vector<float> interpolate(const std::vector<float> a, const std::vector<float>, const double) { return a; }
+template<> inline std::vector<std::string> interpolate(const std::vector<std::string> a, const std::vector<std::string>, const double) { return a; }
 template<> inline std::string interpolate(const std::string a, const std::string, const double) { return a; }
 template<> inline TranslateAnchorType interpolate(const TranslateAnchorType a, const TranslateAnchorType, const double) { return a; }
 template<> inline RotateAnchorType interpolate(const RotateAnchorType a, const RotateAnchorType, const double) { return a; }

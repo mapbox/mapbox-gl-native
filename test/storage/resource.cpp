@@ -40,7 +40,7 @@ TEST(Resource, Tile) {
 
 TEST(Resource, Glyphs) {
     using namespace mbgl;
-    Resource resource = Resource::glyphs("http://example.com/{fontstack}/{range}", "stack", {0, 255});
+    Resource resource = Resource::glyphs("http://example.com/{fontstack}/{range}", {{"stack"}}, {0, 255});
     EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
     EXPECT_EQ("http://example.com/stack/0-255", resource.url);
 }

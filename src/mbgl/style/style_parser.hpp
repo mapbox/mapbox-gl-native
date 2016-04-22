@@ -1,6 +1,7 @@
 #ifndef MBGL_STYLE_STYLE_PARSER
 #define MBGL_STYLE_STYLE_PARSER
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/source/source.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -29,7 +30,7 @@ public:
     std::vector<std::unique_ptr<StyleLayer>> layers;
 
     // Statically evaluate layer properties to determine what font stacks are used.
-    std::vector<std::string> fontStacks() const;
+    std::vector<FontStack> fontStacks() const;
 
     static std::unique_ptr<SourceInfo> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
     static std::unique_ptr<SourceInfo> parseTileJSON(const JSValue&);

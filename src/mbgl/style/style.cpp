@@ -330,16 +330,16 @@ void Style::setObserver(Observer* observer_) {
     observer = observer_;
 }
 
-void Style::onGlyphsLoaded(const std::string& fontStack, const GlyphRange& glyphRange) {
+void Style::onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) {
     shouldReparsePartialTiles = true;
     observer->onGlyphsLoaded(fontStack, glyphRange);
     observer->onResourceLoaded();
 }
 
-void Style::onGlyphsError(const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
+void Style::onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load glyph range %d-%d for font stack %s: %s",
-               glyphRange.first, glyphRange.second, fontStack.c_str(), util::toString(error).c_str());
+               glyphRange.first, glyphRange.second, fontStackToString(fontStack).c_str(), util::toString(error).c_str());
     observer->onGlyphsError(fontStack, glyphRange, error);
     observer->onResourceError(error);
 }

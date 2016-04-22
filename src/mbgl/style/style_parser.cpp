@@ -492,12 +492,12 @@ void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
     layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
 }
 
-std::vector<std::string> StyleParser::fontStacks() const {
-    std::set<std::string> result;
+std::vector<FontStack> StyleParser::fontStacks() const {
+    std::set<FontStack> result;
 
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>()) {
-            LayoutProperty<std::string> property = layer->as<SymbolLayer>()->layout.textFont;
+            LayoutProperty<FontStack> property = layer->as<SymbolLayer>()->layout.textFont;
             if (property.parsedValue) {
                 for (const auto& stop : property.parsedValue->getStops()) {
                     result.insert(stop.second);
@@ -508,7 +508,7 @@ std::vector<std::string> StyleParser::fontStacks() const {
         }
     }
 
-    return std::vector<std::string>(result.begin(), result.end());
+    return std::vector<FontStack>(result.begin(), result.end());
 }
 
 } // namespace mbgl

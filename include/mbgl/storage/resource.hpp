@@ -3,6 +3,7 @@
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <string>
 
@@ -42,7 +43,7 @@ public:
                          int32_t y,
                          int8_t z);
     static Resource glyphs(const std::string& urlTemplate,
-                           const std::string& fontStack,
+                           const FontStack& fontStack,
                            const std::pair<uint16_t, uint16_t>& glyphRange);
     static Resource spriteImage(const std::string& base, float pixelRatio);
     static Resource spriteJSON(const std::string& base, float pixelRatio);

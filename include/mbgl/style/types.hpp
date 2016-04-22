@@ -5,12 +5,21 @@
 
 #include <string>
 #include <array>
+#include <vector>
 
 namespace mbgl {
 
 // Stores a premultiplied color, with all four channels ranging from 0..1
-typedef std::array<float, 4> Color;
+using Color = std::array<float, 4>;
 
+// An array of font names
+using FontStack = std::vector<std::string>;
+
+std::string fontStackToString(const FontStack&);
+
+struct FontStackHash {
+    std::size_t operator()(const FontStack&) const;
+};
 
 template <typename T>
 struct Faded {

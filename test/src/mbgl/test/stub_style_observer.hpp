@@ -10,11 +10,11 @@ namespace mbgl {
  */
 class StubStyleObserver : public Style::Observer {
 public:
-    void onGlyphsLoaded(const std::string& fontStack, const GlyphRange& glyphRange) override {
+    void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
     }
 
-    void onGlyphsError(const std::string& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
+    void onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
         if (glyphsError) glyphsError(fontStack, glyphRange, error);
     }
 
@@ -50,8 +50,8 @@ public:
         if (resourceError) resourceError(error);
     };
 
-    std::function<void (const std::string& fontStack, const GlyphRange&)> glyphsLoaded;
-    std::function<void (const std::string& fontStack, const GlyphRange&, std::exception_ptr)> glyphsError;
+    std::function<void (const FontStack&, const GlyphRange&)> glyphsLoaded;
+    std::function<void (const FontStack&, const GlyphRange&, std::exception_ptr)> glyphsError;
     std::function<void ()> spriteLoaded;
     std::function<void (std::exception_ptr)> spriteError;
     std::function<void (Source&)> sourceLoaded;

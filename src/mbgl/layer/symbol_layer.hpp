@@ -28,7 +28,7 @@ public:
 
     LayoutProperty<RotationAlignmentType> textRotationAlignment { RotationAlignmentType::Viewport };
     LayoutProperty<std::string> textField { "" };
-    LayoutProperty<std::string> textFont { "Open Sans Regular, Arial Unicode MS Regular" };
+    LayoutProperty<std::vector<std::string>> textFont { { "Open Sans Regular", "Arial Unicode MS Regular" } };
     LayoutProperty<float> textSize { 16.0f };
     LayoutProperty<float> textMaxWidth { 10.0f /* em */ };
     LayoutProperty<float> textLineHeight { 1.2f /* em */ };

@@ -24,7 +24,7 @@ GlyphAtlas::~GlyphAtlas() {
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,
-                           const std::string& stackName,
+                           const FontStack& fontStack,
                            const GlyphSet& glyphSet,
                            GlyphPositions& face)
 {
@@ -40,19 +40,19 @@ void GlyphAtlas::addGlyphs(uintptr_t tileUID,
         }
 
         const SDFGlyph& sdf = sdf_it->second;
-        Rect<uint16_t> rect = addGlyph(tileUID, stackName, sdf);
+        Rect<uint16_t> rect = addGlyph(tileUID, fontStack, sdf);
         face.emplace(chr, Glyph{rect, sdf.metrics});
     }
 }
 
 Rect<uint16_t> GlyphAtlas::addGlyph(uintptr_t tileUID,
-                                    const std::string& stackName,
+                                    const FontStack& fontStack,
                                     const SDFGlyph& glyph)
 {
     // Use constant value for now.
     const uint8_t buffer = 3;
 
-    std::map<uint32_t, GlyphValue>& face = index[stackName];
+    std::map<uint32_t, GlyphValue>& face = index[fontStack];
     std::map<uint32_t, GlyphValue>::iterator it = face.find(glyph.id);
 
     // The glyph is already in this texture.

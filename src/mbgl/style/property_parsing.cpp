@@ -32,28 +32,6 @@ optional<float> parseProperty(const char* name, const JSValue& value) {
 
 template <>
 optional<std::string> parseProperty(const char* name, const JSValue& value) {
-    if (std::string { "text-font" } == name) {
-        if (!value.IsArray()) {
-            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", name);
-            return {};
-        }
-
-        std::string result = "";
-        for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
-            const JSValue& stop = value[i];
-            if (stop.IsString()) {
-                result += stop.GetString();
-                if (i < value.Size()-1) {
-                    result += ",";
-                }
-            } else {
-                Log::Warning(Event::ParseStyle, "text-font members must be strings");
-                return {};
-            }
-        }
-        return result;
-    }
-
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
@@ -203,6 +181,29 @@ optional<std::vector<float>> parseProperty(const char* name, const JSValue& valu
         }
 
         result.push_back(part.GetDouble());
+    }
+
+    return result;
+}
+
+template <>
+optional<std::vector<std::string>> parseProperty(const char* name, const JSValue& value) {
+    if (!value.IsArray()) {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", name);
+        return {};
+    }
+
+    std::vector<std::string> result;
+
+    for (rapidjson::SizeType i = 0; i < value.Size(); ++i) {
+        const JSValue& part = value[i];
+
+        if (!part.IsString()) {
+            Log::Warning(Event::ParseStyle, "value of '%s' must be an array of strings", name);
+            return {};
+        }
+
+        result.push_back({ part.GetString(), part.GetStringLength() });
     }
 
     return result;
@@ -360,6 +361,10 @@ template<> optional<Function<float>> parseProperty(const char* name, const JSVal
 
 template<> optional<Function<Color>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<Color>(name, value);
+}
+
+template<> optional<Function<std::vector<std::string>>> parseProperty(const char* name, const JSValue& value) {
+    return parseFunction<std::vector<std::string>>(name, value);
 }
 
 template <typename T>

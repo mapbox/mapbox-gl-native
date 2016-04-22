@@ -128,8 +128,8 @@ private:
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStore::Observer implementation.
-    void onGlyphsLoaded(const std::string& fontStack, const GlyphRange&) override;
-    void onGlyphsError(const std::string& fontStack, const GlyphRange&, std::exception_ptr) override;
+    void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
+    void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
 
     // SpriteStore::Observer implementation.
     void onSpriteLoaded() override;

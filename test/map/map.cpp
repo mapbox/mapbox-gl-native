@@ -32,7 +32,7 @@ TEST(Map, Offline) {
     fileSource.put(Resource::spriteJSON(prefix + "/offline/sprite", 1.0), expiredItem("offline/sprite.json"));
     fileSource.put(Resource::spriteImage(prefix + "/offline/sprite", 1.0), expiredItem("offline/sprite.png"));
     fileSource.put(Resource::tile(prefix + "/offline/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0), expiredItem("offline/0-0-0.vector.pbf"));
-    fileSource.put(Resource::glyphs(prefix + "/offline/{fontstack}/{range}.pbf", "Helvetica", {0, 255}), expiredItem("offline/glyph.pbf"));
+    fileSource.put(Resource::glyphs(prefix + "/offline/{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("offline/glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     Map map(view, fileSource, MapMode::Still);

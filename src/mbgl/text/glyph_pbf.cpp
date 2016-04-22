@@ -61,7 +61,7 @@ void parseGlyphPBF(mbgl::GlyphSet& glyphSet, const std::string& data) {
 namespace mbgl {
 
 GlyphPBF::GlyphPBF(GlyphStore* store,
-                   const std::string& fontStack,
+                   const FontStack& fontStack,
                    const GlyphRange& glyphRange,
                    GlyphStore::Observer* observer_,
                    FileSource& fileSource)

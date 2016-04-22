@@ -14,9 +14,10 @@ template <> inline bool defaultStopsValue() { return true; }
 template <> inline float defaultStopsValue() { return 1.0f; }
 template <> inline Color defaultStopsValue() { return {{ 0, 0, 0, 1 }}; }
 template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
+template <> inline std::vector<std::string> defaultStopsValue() { return {{}}; }
 template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
 
-template <> inline std:: string defaultStopsValue() { return {}; }
+template <> inline std::string defaultStopsValue() { return {}; }
 template <> inline TranslateAnchorType defaultStopsValue() { return {}; };
 template <> inline RotateAnchorType defaultStopsValue() { return {}; };
 template <> inline LineCapType defaultStopsValue() { return {}; };
@@ -79,6 +80,7 @@ template class Function<bool>;
 template class Function<float>;
 template class Function<Color>;
 template class Function<std::vector<float>>;
+template class Function<std::vector<std::string>>;
 template class Function<std::array<float, 2>>;
 
 template class Function<std::string>;
