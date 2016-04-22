@@ -8,6 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MGLAnnotationView;
 @class MGLAnnotationImage;
 @class MGLUserLocation;
 @class MGLPolyline;
@@ -931,6 +932,8 @@ IB_DESIGNABLE
  */
 - (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
 
+- (nullable MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier;
+
 #pragma mark Managing Annotation Selections
 
 /**
@@ -1150,6 +1153,8 @@ IB_DESIGNABLE
 - (void)mapView:(MGLMapView *)mapView didChangeUserTrackingMode:(MGLUserTrackingMode)mode animated:(BOOL)animated;
 
 #pragma mark Managing the Display of Annotations
+
+- (nullable MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
  Returns an image object to use for the marker for the specified point annotation object.

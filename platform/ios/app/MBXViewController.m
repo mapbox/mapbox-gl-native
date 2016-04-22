@@ -3,6 +3,7 @@
 #import "MBXAppDelegate.h"
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
+#import "MBXAnnotationView.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -16,6 +17,8 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = 12.9810816, .longitude = 77.6368034 },
     { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
+
+static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXViewControllerAnnotationViewReuseIdentifer";
 
 @interface MBXDroppedPinAnnotation : MGLPointAnnotation
 @end
@@ -461,7 +464,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
                                  toCoordinateFromView:self.mapView];
         point.title = @"Dropped Pin";
         point.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:point.coordinate];
-        [self.mapView addAnnotation:point];
+        // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
         [self.mapView selectAnnotation:point animated:YES];
     }
 }
@@ -607,6 +610,21 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 }
 
 #pragma mark - MGLMapViewDelegate
+
+- (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
+{
+    MBXAnnotationView *annotationView = (MBXAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
+    if (!annotationView)
+    {
+        annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
+        annotationView.frame = CGRectMake(0, 0, 40, 40);
+        annotationView.centerColor = [UIColor whiteColor];
+    } else {
+        // orange indicates that the annotation view was reused
+        annotationView.centerColor = [UIColor orangeColor];
+    }
+    return annotationView;
+}
 
 - (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
 {

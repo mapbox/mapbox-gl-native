@@ -6,6 +6,7 @@ FOUNDATION_EXPORT double MapboxVersionNumber;
 /// Project version string for Mapbox.
 FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 
+#import "MGLAnnotationView.h"
 #import "MGLAccountManager.h"
 #import "MGLAnnotation.h"
 #import "MGLAnnotationImage.h"
