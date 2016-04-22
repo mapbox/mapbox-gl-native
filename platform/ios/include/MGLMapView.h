@@ -733,6 +733,31 @@ IB_DESIGNABLE
 - (void)flyToCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration peakAltitude:(CLLocationDistance)peakAltitude completionHandler:(nullable void (^)(void))completion;
 
 /**
+ Returns the camera that best fits the given coordinate bounds.
+ 
+ @param bounds The coordinate bounds to fit to the receiver’s viewport.
+ @return A camera object centered on the same location as the coordinate
+    bounds with zoom level as high (close to the ground) as possible while still
+    including the entire coordinate bounds. The camera object uses the current
+    direction and pitch.
+ */
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds;
+
+/**
+ Returns the camera that best fits the given coordinate bounds, optionally with
+ some additional padding on each side.
+ 
+ @param bounds The coordinate bounds to fit to the receiver’s viewport.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the same location as the coordinate bounds
+    with zoom level as high (close to the ground) as possible while still
+    including the entire coordinate bounds. The camera object uses the current
+    direction and pitch.
+ */
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
+
+/**
  The distance from the edges of the map view’s frame to the edges of the map
  view’s logical viewport.
  

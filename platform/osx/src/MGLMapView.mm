@@ -1003,14 +1003,8 @@ public:
 }
 
 - (MGLMapCamera *)camera {
-    CGFloat pitch = _mbglMap->getPitch();
-    CLLocationDistance altitude = MGLAltitudeForZoomLevel(self.zoomLevel, pitch,
-                                                          self.centerCoordinate.latitude,
-                                                          self.frame.size);
-    return [MGLMapCamera cameraLookingAtCenterCoordinate:self.centerCoordinate
-                                            fromDistance:altitude
-                                                   pitch:pitch
-                                                 heading:self.direction];
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    return [self cameraForCameraOptions:_mbglMap->getCameraOptions(padding)];
 }
 
 - (void)setCamera:(MGLMapCamera *)camera {
@@ -1140,6 +1134,31 @@ public:
         [self didChangeValueForKey:@"visibleCoordinateBounds"];
     };
     _mbglMap->easeTo(cameraOptions, animationOptions);
+}
+
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds {
+    return [self cameraThatFitsCoordinateBounds:bounds edgePadding:NSEdgeInsetsZero];
+}
+
+- (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets {
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
+    return [self cameraForCameraOptions:cameraOptions];
+}
+
+- (MGLMapCamera *)cameraForCameraOptions:(const mbgl::CameraOptions &)cameraOptions {
+    CLLocationCoordinate2D centerCoordinate = MGLLocationCoordinate2DFromLatLng(cameraOptions.center ? *cameraOptions.center : _mbglMap->getLatLng());
+    double zoomLevel = cameraOptions.zoom ? *cameraOptions.zoom : self.zoomLevel;
+    CLLocationDirection direction = cameraOptions.angle ? *cameraOptions.angle : self.direction;
+    CGFloat pitch = cameraOptions.pitch ? *cameraOptions.pitch : _mbglMap->getPitch();
+    CLLocationDistance altitude = MGLAltitudeForZoomLevel(zoomLevel, pitch,
+                                                          centerCoordinate.latitude,
+                                                          self.frame.size);
+    return [MGLMapCamera cameraLookingAtCenterCoordinate:centerCoordinate
+                                            fromDistance:altitude
+                                                   pitch:pitch
+                                                 heading:direction];
 }
 
 - (void)setAutomaticallyAdjustsContentInsets:(BOOL)automaticallyAdjustsContentInsets {

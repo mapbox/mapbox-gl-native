@@ -69,6 +69,7 @@ public:
     bool isPanning() const;
 
     // Camera
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions&);
     void flyTo(const CameraOptions&, const AnimationOptions&);
@@ -90,8 +91,8 @@ public:
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
     void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>);
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>);
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&, optional<EdgeInsets>) const;
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, optional<EdgeInsets>) const;
     void resetZoom();
     void setMinZoom(const double minZoom);
     double getMinZoom() const;

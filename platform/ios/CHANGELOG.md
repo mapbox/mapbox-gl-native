@@ -13,6 +13,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Rendering now occurs on the main thread, fixing a hang when calling `-[MGLMapView styleURL]` before the map view has fully loaded or while the application is in the background. ([#2909](https://github.com/mapbox/mapbox-gl-native/pull/2909))
 - Added category methods on NSValue for converting to and from the structure types defined in MGLGeometry.h. ([#4802](https://github.com/mapbox/mapbox-gl-native/pull/4802))
 - Added NSFormatter subclasses for converting geographic coordinates and directions into display strings. ([#4802](https://github.com/mapbox/mapbox-gl-native/pull/4802))
+- Added a new method, `-[MGLMapView cameraThatFitsCoordinateBounds:]`, to get a camera that you can pass into `-setCamera:` that fits the given coordinate bounds. ([#4790](https://github.com/mapbox/mapbox-gl-native/pull/4790))
 - Added a `-reloadStyle:` action to MGLMapView to force a reload of the current style. ([#4728](https://github.com/mapbox/mapbox-gl-native/pull/4728))
 - A more specific user agent string is now sent with style and tile requests. ([#4012](https://github.com/mapbox/mapbox-gl-native/pull/4012))
 - Mapbox Telemetry is automatically disabled while the host application is running in the iOS Simulator. ([#4726](https://github.com/mapbox/mapbox-gl-native/pull/4726))

@@ -62,6 +62,16 @@ bool Transform::resize(const std::array<uint16_t, 2> size) {
 
 #pragma mark - Camera
 
+CameraOptions Transform::getCameraOptions(optional<EdgeInsets> padding) const {
+    CameraOptions camera;
+    camera.center = getLatLng(padding);
+    camera.padding = padding;
+    camera.zoom = getZoom();
+    camera.angle = getAngle();
+    camera.pitch = getPitch();
+    return camera;
+}
+
 /**
  * Change any combination of center, zoom, bearing, and pitch, without
  * a transition. The map will retain the current values for any options

@@ -375,6 +375,10 @@ bool Map::isPanning() const {
 }
 
 #pragma mark -
+    
+CameraOptions Map::getCameraOptions(optional<EdgeInsets> padding) const {
+    return impl->transform.getCameraOptions(padding);
+}
 
 void Map::jumpTo(const CameraOptions& camera) {
     impl->transform.jumpTo(camera);
@@ -466,7 +470,7 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> 
     update(Update::RecalculateStyle);
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) {
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) const {
     AnnotationSegment segment = {
         bounds.northwest(),
         bounds.southwest(),
@@ -476,7 +480,7 @@ CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<Ed
     return cameraForLatLngs(segment, padding);
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) {
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) const {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;

@@ -26,6 +26,8 @@ public:
     bool resize(std::array<uint16_t, 2> size);
 
     // Camera
+    /** Returns the current camera options. */
+    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
     
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);

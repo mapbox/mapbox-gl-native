@@ -284,7 +284,6 @@
 		DA839E891CC2E3400062CAFB = {
 			isa = PBXGroup;
 			children = (
-				DAE6C3C31CC31F6900DB3429 /* Configuration */,
 				DA839E941CC2E3400062CAFB /* Demo App */,
 				DAE6C3291CC30DB200DB3429 /* SDK */,
 				DAE6C3371CC30DB200DB3429 /* SDK Tests */,
@@ -459,13 +458,6 @@
 				DAE6C3B01CC31EF300DB3429 /* MGLOpenGLLayer.mm */,
 			);
 			name = Kit;
-			sourceTree = "<group>";
-		};
-		DAE6C3C31CC31F6900DB3429 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Configuration;
 			sourceTree = "<group>";
 		};
 		DAE6C3C41CC31F7800DB3429 /* Configuration */ = {
