@@ -1,4 +1,5 @@
 #import "MGLMapView.h"
+#import <GLKit/GLKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -9,7 +10,10 @@ typedef void (^MGLCustomStyleLayerDrawingHandler)(CGSize size,
                                                   double zoomLevel,
                                                   CLLocationDirection direction,
                                                   CGFloat pitch,
-                                                  CGFloat perspectiveSkew);
+                                                  CGFloat perspectiveSkew,
+						  GLKMatrix4 projMatrix,
+						  GLKMatrix4 nativeMatrix,
+						  GLKMatrix4 extrudeMatrix);
 
 typedef void (^MGLCustomStyleLayerCompletionHandler)(void);
 
