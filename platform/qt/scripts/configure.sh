@@ -12,6 +12,10 @@ VARIANT_VERSION=1.1.0
 ZLIB_VERSION=system
 WEBP_VERSION=0.5.0
 
+function print_default_flags {
+    CONFIG+="    'cflags': $(quote_flags -fvisibility=hidden),"$LN
+}
+
 if [ "$MASON_PLATFORM" == "osx" ]; then
     function print_opengl_flags {
         CONFIG+="    'opengl_cflags%': [],"$LN
