@@ -3,8 +3,8 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/text/font_stack.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/pbf.hpp>
 #include <mbgl/util/string.hpp>
@@ -13,7 +13,7 @@
 
 namespace {
 
-void parseGlyphPBF(mbgl::FontStack& stack, const std::string& data) {
+void parseGlyphPBF(mbgl::GlyphSet& glyphSet, const std::string& data) {
     mbgl::pbf glyphs_pbf(reinterpret_cast<const uint8_t *>(data.data()), data.size());
 
     while (glyphs_pbf.next()) {
@@ -45,7 +45,7 @@ void parseGlyphPBF(mbgl::FontStack& stack, const std::string& data) {
                         }
                     }
 
-                    stack.insert(glyph.id, glyph);
+                    glyphSet.insert(glyph.id, glyph);
                 } else {
                     fontstack_pbf.skip();
                 }
@@ -77,7 +77,7 @@ GlyphPBF::GlyphPBF(GlyphStore* store,
             observer->onGlyphsLoaded(fontStack, glyphRange);
         } else {
             try {
-                parseGlyphPBF(**store->getFontStack(fontStack), *res.data);
+                parseGlyphPBF(**store->getGlyphSet(fontStack), *res.data);
             } catch (...) {
                 observer->onGlyphsError(fontStack, glyphRange, std::current_exception());
                 return;

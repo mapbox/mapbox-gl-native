@@ -53,15 +53,15 @@ bool GlyphStore::hasGlyphRanges(const std::string& fontStackName, const std::set
     return hasRanges;
 }
 
-util::exclusive<FontStack> GlyphStore::getFontStack(const std::string& fontStack) {
-    auto lock = std::make_unique<std::lock_guard<std::mutex>>(stacksMutex);
+util::exclusive<GlyphSet> GlyphStore::getGlyphSet(const std::string& fontStack) {
+    auto lock = std::make_unique<std::lock_guard<std::mutex>>(glyphSetsMutex);
 
-    auto it = stacks.find(fontStack);
-    if (it == stacks.end()) {
-        it = stacks.emplace(fontStack, std::make_unique<FontStack>()).first;
+    auto it = glyphSets.find(fontStack);
+    if (it == glyphSets.end()) {
+        it = glyphSets.emplace(fontStack, std::make_unique<GlyphSet>()).first;
     }
 
-    // FIXME: We lock all FontStacks, but what we should
+    // FIXME: We lock all GlyphSets, but what we should
     // really do is lock only the one we are returning.
     return { it->second.get(), std::move(lock) };
 }

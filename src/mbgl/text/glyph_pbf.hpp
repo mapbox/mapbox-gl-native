@@ -12,7 +12,7 @@
 
 namespace mbgl {
 
-class FontStack;
+class GlyphSet;
 class AsyncRequest;
 class FileSource;
 

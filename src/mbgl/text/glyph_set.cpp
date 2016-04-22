@@ -1,11 +1,12 @@
-#include <mbgl/text/font_stack.hpp>
-#include <cassert>
+#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/math.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 
-void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
+void GlyphSet::insert(uint32_t id, const SDFGlyph &glyph) {
     auto it = sdfs.find(id);
     if (it == sdfs.end()) {
         // Glyph doesn't exist yet.
@@ -25,11 +26,11 @@ void FontStack::insert(uint32_t id, const SDFGlyph &glyph) {
     }
 }
 
-const std::map<uint32_t, SDFGlyph> &FontStack::getSDFs() const {
+const std::map<uint32_t, SDFGlyph> &GlyphSet::getSDFs() const {
     return sdfs;
 }
 
-const Shaping FontStack::getShaping(const std::u32string &string, const float maxWidth,
+const Shaping GlyphSet::getShaping(const std::u32string &string, const float maxWidth,
                                     const float lineHeight, const float horizontalAlign,
                                     const float verticalAlign, const float justify,
                                     const float spacing, const vec2<float> &translate) const {
@@ -84,7 +85,7 @@ void justifyLine(std::vector<PositionedGlyph> &positionedGlyphs, const std::map<
     }
 }
 
-void FontStack::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
+void GlyphSet::lineWrap(Shaping &shaping, const float lineHeight, const float maxWidth,
                          const float horizontalAlign, const float verticalAlign,
                          const float justify, const vec2<float> &translate) const {
     uint32_t lastSafeBreak = 0;

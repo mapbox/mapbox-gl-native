@@ -11,7 +11,7 @@
 #include <mbgl/text/get_anchors.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/text/font_stack.hpp>
+#include <mbgl/text/glyph_set.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
@@ -225,7 +225,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
         layout.textJustify == TextJustifyType::Left ? 0 :
         0.5;
 
-    auto fontStack = glyphStore.getFontStack(layout.textFont);
+    auto glyphSet = glyphStore.getGlyphSet(layout.textFont);
 
     for (const auto& feature : features) {
         if (feature.geometry.empty()) continue;
@@ -236,7 +236,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
         // if feature has text, shape the text
         if (feature.label.length()) {
-            shapedText = fontStack->getShaping(
+            shapedText = glyphSet->getShaping(
                 /* string */ feature.label,
                 /* maxWidth: ems */ layout.symbolPlacement != SymbolPlacementType::Line ?
                     layout.textMaxWidth * 24 : 0,
@@ -249,7 +249,7 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
 
             // Add the glyphs we need for this label to the glyph atlas.
             if (shapedText) {
-                glyphAtlas.addGlyphs(tileUID, feature.label, layout.textFont, **fontStack, face);
+                glyphAtlas.addGlyphs(tileUID, feature.label, layout.textFont, **glyphSet, face);
             }
         }
 

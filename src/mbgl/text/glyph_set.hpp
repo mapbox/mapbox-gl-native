@@ -1,12 +1,12 @@
-#ifndef MBGL_TEXT_FONT_STACK
-#define MBGL_TEXT_FONT_STACK
+#ifndef MBGL_TEXT_GLYPH_SET
+#define MBGL_TEXT_GLYPH_SET
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/vec.hpp>
 
 namespace mbgl {
 
-class FontStack {
+class GlyphSet {
 public:
     void insert(uint32_t id, const SDFGlyph &glyph);
     const std::map<uint32_t, SDFGlyph> &getSDFs() const;

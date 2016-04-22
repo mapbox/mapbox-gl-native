@@ -1,7 +1,5 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 
-#include <mbgl/text/font_stack.hpp>
-
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_object_store.hpp>
 #include <mbgl/platform/log.hpp>
@@ -27,12 +25,12 @@ GlyphAtlas::~GlyphAtlas() {
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,
                            const std::string& stackName,
-                           const FontStack& fontStack,
+                           const GlyphSet& glyphSet,
                            GlyphPositions& face)
 {
     std::lock_guard<std::mutex> lock(mtx);
 
-    const std::map<uint32_t, SDFGlyph>& sdfs = fontStack.getSDFs();
+    const std::map<uint32_t, SDFGlyph>& sdfs = glyphSet.getSDFs();
 
     for (uint32_t chr : text)
     {
