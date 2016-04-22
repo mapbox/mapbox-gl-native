@@ -43,6 +43,10 @@
 		DA35A2BC1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2BA1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2C51CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */; };
 		DA35A2C61CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */; };
+		DA35A2C91CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2C71CCAAAD200E826B2 /* NSValue+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2C71CCAAAD200E826B2 /* NSValue+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */; };
+		DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */; };
 		DA4A26941CB6E337000B7809 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC9561CB6C1C2006E619F /* Main.storyboard */; };
 		DA4A26951CB6E337000B7809 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC95B1CB6C1C2006E619F /* LaunchScreen.storyboard */; };
 		DA8847D91CBAF91600AB86E3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -293,6 +297,9 @@
 		DA35A2BA1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLClockDirectionFormatter.h; path = include/MGLClockDirectionFormatter.h; sourceTree = "<group>"; };
 		DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLClockDirectionFormatterTests.m; path = ../../darwin/test/MGLClockDirectionFormatterTests.m; sourceTree = "<group>"; };
 		DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCompassDirectionFormatterTests.m; path = ../../darwin/test/MGLCompassDirectionFormatterTests.m; sourceTree = "<group>"; };
+		DA35A2C71CCAAAD200E826B2 /* NSValue+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSValue+MGLAdditions.h"; path = "include/NSValue+MGLAdditions.h"; sourceTree = "<group>"; };
+		DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSValue+MGLAdditions.m"; path = "src/NSValue+MGLAdditions.m"; sourceTree = "<group>"; };
+		DA35A2D11CCAB25200E826B2 /* jazzy.yml */ = {isa = PBXFileReference; lastKnownFileType = text; path = jazzy.yml; sourceTree = "<group>"; };
 		DA4A26961CB6E795000B7809 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA8847D21CBAF91600AB86E3 /* Mapbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA8847D61CBAF91600AB86E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -359,7 +366,7 @@
 		DA88484C1CBAFB9800AB86E3 /* MGLUserLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLUserLocation.m; path = src/MGLUserLocation.m; sourceTree = "<group>"; };
 		DA88484D1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLUserLocationAnnotationView.h; path = src/MGLUserLocationAnnotationView.h; sourceTree = "<group>"; };
 		DA88484E1CBAFB9800AB86E3 /* MGLUserLocationAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLUserLocationAnnotationView.m; path = src/MGLUserLocationAnnotationView.m; sourceTree = "<group>"; };
-		DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mapbox.h; sourceTree = "<group>"; };
+		DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mapbox.h; path = ../include/Mapbox.h; sourceTree = "<group>"; };
 		DA8848631CBAFCC100AB86E3 /* Compass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Compass.png; sourceTree = "<group>"; };
 		DA8848641CBAFCC100AB86E3 /* Compass@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Compass@2x.png"; sourceTree = "<group>"; };
 		DA8848651CBAFCC100AB86E3 /* Compass@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Compass@3x.png"; sourceTree = "<group>"; };
@@ -605,6 +612,8 @@
 				DA8848161CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m */,
 				DA8848171CBAFA6200AB86E3 /* NSString+MGLAdditions.h */,
 				DA8848181CBAFA6200AB86E3 /* NSString+MGLAdditions.m */,
+				DA35A2C71CCAAAD200E826B2 /* NSValue+MGLAdditions.h */,
+				DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */,
 				DA8848911CBB049300AB86E3 /* reachability */,
 			);
 			name = Foundation;
@@ -736,6 +745,7 @@
 		DAC07C951CBB2CAD000CB309 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				DA35A2D11CCAB25200E826B2 /* jazzy.yml */,
 				DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */,
 			);
 			name = Configuration;
@@ -766,6 +776,7 @@
 				DA88483E1CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */,
 				DA8847EF1CBAFA5100AB86E3 /* MGLAccountManager.h in Headers */,
 				DA8848511CBAFB9800AB86E3 /* MGLAPIClient.h in Headers */,
+				DA35A2C91CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
 				DA8847F41CBAFA5100AB86E3 /* MGLOfflinePack.h in Headers */,
@@ -805,6 +816,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				DA35A29F1CC9E94C00E826B2 /* MGLCoordinateFormatter.h in Headers */,
@@ -1081,6 +1093,7 @@
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
 				DA8848281CBAFA6200AB86E3 /* MGLShape.m in Sources */,
 				DA35A2B31CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
+				DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
@@ -1117,6 +1130,7 @@
 				DAA4E41D1CBB730400178DFB /* MGLGeometry.mm in Sources */,
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
 				DA35A2B41CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
+				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */,

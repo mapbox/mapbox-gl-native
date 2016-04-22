@@ -202,17 +202,3 @@ void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
         [pack.delegate offlinePack:pack didReceiveMaximumAllowedMapboxTiles:limit];
     });
 }
-
-@implementation NSValue (MGLOfflinePackAdditions)
-
-+ (NSValue *)valueWithMGLOfflinePackProgress:(MGLOfflinePackProgress)progress {
-    return [NSValue value:&progress withObjCType:@encode(MGLOfflinePackProgress)];
-}
-
-- (MGLOfflinePackProgress)MGLOfflinePackProgressValue {
-    MGLOfflinePackProgress progress;
-    [self getValue:&progress];
-    return progress;
-}
-
-@end

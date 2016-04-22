@@ -1,9 +1,20 @@
+#import <Foundation/Foundation.h>
+
+/// Project version number for Mapbox.
+FOUNDATION_EXPORT double MapboxVersionNumber;
+
+/// Project version string for Mapbox.
+FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
+
 #import "MGLAccountManager.h"
 #import "MGLAnnotation.h"
 #import "MGLAnnotationImage.h"
 #import "MGLCalloutView.h"
-#import "MGLGeometry.h"
+#import "MGLClockDirectionFormatter.h"
+#import "MGLCompassDirectionFormatter.h"
+#import "MGLCoordinateFormatter.h"
 #import "MGLMapCamera.h"
+#import "MGLGeometry.h"
 #import "MGLMapView.h"
 #import "MGLMapView+IBAdditions.h"
 #import "MGLMapView+MGLCustomStyleLayerAdditions.h"
@@ -20,3 +31,4 @@
 #import "MGLTilePyramidOfflineRegion.h"
 #import "MGLTypes.h"
 #import "MGLUserLocation.h"
+#import "NSValue+MGLAdditions.h"

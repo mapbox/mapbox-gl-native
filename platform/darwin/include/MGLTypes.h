@@ -17,10 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 /** Indicates an error occurred in the Mapbox SDK. */
 extern NSString * const MGLErrorDomain;
 
+/** Error constants for the Mapbox SDK. */
 typedef NS_ENUM(NSInteger, MGLErrorCode) {
+    /** An unknown error occurred. */
     MGLErrorCodeUnknown = -1,
+    /** The resource could not be found. */
     MGLErrorCodeNotFound = 1,
+    /** The connection received an invalid server response. */
     MGLErrorCodeBadServerResponse = 2,
+    /** An attempt to establish a connection failed. */
     MGLErrorCodeConnectionFailed = 3,
 };
 

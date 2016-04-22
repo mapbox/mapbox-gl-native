@@ -29,3 +29,4 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import <Mapbox/MGLStyle.h>
 #import <Mapbox/MGLTilePyramidOfflineRegion.h>
 #import <Mapbox/MGLTypes.h>
+#import <Mapbox/NSValue+MGLAdditions.h>

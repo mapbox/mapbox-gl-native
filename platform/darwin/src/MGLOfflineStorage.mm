@@ -5,6 +5,7 @@
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
+#import "NSValue+MGLAdditions.h"
 
 #include <mbgl/util/string.hpp>
 

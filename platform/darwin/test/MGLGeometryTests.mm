@@ -1,6 +1,7 @@
-#import "../../darwin/src/MGLGeometry_Private.h"
-
+#import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
+
+#import "../../darwin/src/MGLGeometry_Private.h"
 
 @interface MGLGeometryTests : XCTestCase
 @end

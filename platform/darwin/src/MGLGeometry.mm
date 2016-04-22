@@ -44,38 +44,3 @@ double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLoc
     CGFloat mapPixelWidthAtZoom = std::cos(MGLRadiansFromDegrees(latitude)) * mbgl::util::M2PI * mbgl::util::EARTH_RADIUS_M / metersPerPixel;
     return ::log2(mapPixelWidthAtZoom / mbgl::util::tileSize);
 }
-
-@implementation NSValue (MGLGeometryAdditions)
-
-+ (instancetype)valueWithMGLCoordinate:(CLLocationCoordinate2D)coordinate {
-    return [self valueWithBytes:&coordinate objCType:@encode(CLLocationCoordinate2D)];
-}
-
-- (CLLocationCoordinate2D)MGLCoordinateValue {
-    CLLocationCoordinate2D coordinate;
-    [self getValue:&coordinate];
-    return coordinate;
-}
-
-+ (instancetype)valueWithMGLCoordinateSpan:(MGLCoordinateSpan)span {
-    return [self valueWithBytes:&span objCType:@encode(MGLCoordinateSpan)];
-}
-
-- (MGLCoordinateSpan)MGLCoordinateSpanValue {
-    MGLCoordinateSpan span;
-    [self getValue:&span];
-    return span;
-}
-
-+ (instancetype)valueWithMGLCoordinateBounds:(MGLCoordinateBounds)bounds {
-    return [self valueWithBytes:&bounds objCType:@encode(MGLCoordinateBounds)];
-}
-
-- (MGLCoordinateBounds)MGLCoordinateBoundsValue {
-    MGLCoordinateBounds bounds;
-    [self getValue:&bounds];
-    return bounds;
-}
-
-@end
-

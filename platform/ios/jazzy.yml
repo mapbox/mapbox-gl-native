@@ -15,10 +15,11 @@ umbrella_header: platform/ios/include/Mapbox.h
 framework_root: platform/darwin/include
 
 custom_categories:
-  - name: Map
+  - name: Maps
     children:
       - MGLAccountManager
       - MGLMapCamera
+      - MGLMapDebugMaskOptions
       - MGLMapView
       - MGLMapViewDelegate
       - MGLStyle
@@ -37,7 +38,7 @@ custom_categories:
       - MGLOverlay
       - MGLShape
       - MGLUserLocation
-  - name: Offline Storage
+  - name: Offline Maps
     children:
       - MGLOfflineRegion
       - MGLOfflineStorage
@@ -54,7 +55,6 @@ custom_categories:
       - MGLOfflinePackState
       - MGLOfflinePackStateUserInfoKey
       - MGLTilePyramidOfflineRegion
-      - NSValue(MGLOfflinePackAdditions)
   - name: Geometry
     children:
       - MGLClockDirectionFormatter
@@ -73,4 +73,3 @@ custom_categories:
       - MGLDegreesFromRadians
       - MGLRadiansFromDegrees
       - MGLStringFromCoordinateBounds
-      - NSValue(MGLGeometryAdditions)
