@@ -57,8 +57,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                MyLocationViewSettings locationViewSettings = mapboxMap.getMyLocationViewSettings();
-                locationViewSettings.setPadding(0, (int) getResources().getDimension(R.dimen.locationview_padding_top), 0, 0);
+                // disable dismissal when a gesture occurs
+                mMapboxMap.getTrackingSettings().setDismissTrackingOnGesture(false);
+                mMapboxMap.getTrackingSettings().setDismissBearingTrackingOnGesture(false);
 
                 mapboxMap.setOnMyLocationChangeListener(MyLocationTrackingModeActivity.this);
 
@@ -209,16 +210,22 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean state;
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
             case R.id.action_toggle_dismissible_tracking:
-                boolean state = !item.isChecked();
-                mMapboxMap.getTrackingSettings().setDismissTrackingOnGesture(state);
+                state = !item.isChecked();
+                mMapboxMap.getTrackingSettings().setDismissLocationTrackingOnGesture(state);
                 Toast.makeText(this, "Dismiss tracking mode on gesture = " + state, Toast.LENGTH_SHORT).show();
                 item.setChecked(state);
                 return true;
+            case R.id.action_toggle_dismissible_bearing:
+                state = !item.isChecked();
+                mMapboxMap.getTrackingSettings().setDismissBearingTrackingOnGesture(state);
+                Toast.makeText(this, "Dismiss bearing mode on gesture = " + state, Toast.LENGTH_SHORT).show();
+                item.setChecked(state);
             default:
                 return super.onOptionsItemSelected(item);
         }

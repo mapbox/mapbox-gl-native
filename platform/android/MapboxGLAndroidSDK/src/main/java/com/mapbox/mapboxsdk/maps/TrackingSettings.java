@@ -109,8 +109,19 @@ public class TrackingSettings {
      * Set the dismissal of the tracking modes if a gesture occurs.
      *
      * @param dismissTrackingOnGesture True to dismiss the tracking modes.
+     * @deprecated use @link #setDismissAllTrackingOnGesture instead
      */
+    @Deprecated
     public void setDismissTrackingOnGesture(boolean dismissTrackingOnGesture) {
+        setDismissAllTrackingOnGesture(dismissTrackingOnGesture);
+    }
+
+    /**
+     * Set the dismissal of the tracking modes if a gesture occurs.
+     *
+     * @param dismissTrackingOnGesture True to dismiss the tracking modes.
+     */
+    public void setDismissAllTrackingOnGesture(boolean dismissTrackingOnGesture) {
         dismissLocationTrackingOnGesture = dismissTrackingOnGesture;
         dismissBearingTrackingOnGesture = dismissTrackingOnGesture;
         validateGesturesForTrackingModes();
@@ -171,7 +182,7 @@ public class TrackingSettings {
      *
      * @return True if location tracking is disabled.
      */
-    public boolean isLocationTrackingDisabled(){
+    public boolean isLocationTrackingDisabled() {
         return myLocationTrackingMode == MyLocationTracking.TRACKING_NONE;
     }
 }
