@@ -237,10 +237,10 @@
 		DAE6C3AE1CC31EF300DB3429 /* MGLMapView+IBAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "MGLMapView+IBAdditions.m"; path = "src/MGLMapView+IBAdditions.m"; sourceTree = SOURCE_ROOT; };
 		DAE6C3AF1CC31EF300DB3429 /* MGLOpenGLLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGLOpenGLLayer.h; path = src/MGLOpenGLLayer.h; sourceTree = SOURCE_ROOT; };
 		DAE6C3B01CC31EF300DB3429 /* MGLOpenGLLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOpenGLLayer.mm; path = src/MGLOpenGLLayer.mm; sourceTree = SOURCE_ROOT; };
-		DAE6C3BB1CC31F2E00DB3429 /* default_marker.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = default_marker.pdf; path = src/resources/default_marker.pdf; sourceTree = SOURCE_ROOT; };
-		DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = mapbox.pdf; path = src/resources/mapbox.pdf; sourceTree = SOURCE_ROOT; };
-		DAE6C3BD1CC31F2E00DB3429 /* MGLAnnotationCallout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MGLAnnotationCallout.xib; path = src/resources/MGLAnnotationCallout.xib; sourceTree = SOURCE_ROOT; };
-		DAE6C3C11CC31F4500DB3429 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mapbox.h; sourceTree = "<group>"; };
+		DAE6C3BB1CC31F2E00DB3429 /* default_marker.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = default_marker.pdf; sourceTree = "<group>"; };
+		DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = mapbox.pdf; path = sdk/mapbox.pdf; sourceTree = SOURCE_ROOT; };
+		DAE6C3BD1CC31F2E00DB3429 /* MGLAnnotationCallout.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MGLAnnotationCallout.xib; path = sdk/MGLAnnotationCallout.xib; sourceTree = SOURCE_ROOT; };
+		DAE6C3C11CC31F4500DB3429 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mapbox.h; path = ../include/Mapbox.h; sourceTree = "<group>"; };
 		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/osx/mbgl.xcconfig; sourceTree = "<group>"; };
 		DAE6C3C61CC3499100DB3429 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
