@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class GeocoderActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(getString(R.string.mapbox_access_token));
-        mapView.setStyle(Style.MAPBOX_STREETS);
+        mapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
         mapView.onCreate(savedInstanceState);
 
         final ImageView dropPinView = new ImageView(this);

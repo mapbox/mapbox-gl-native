@@ -9,20 +9,31 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
-public class DebugModeActivity  extends AppCompatActivity {
+public class DebugModeActivity extends AppCompatActivity {
 
     private static final String TAG = "DebugModeActivity";
 
     private MapView mapView;
     private MapboxMap mapboxMap;
 
-    private String currentStyle = Style.MAPBOX_STREETS;
+    private int currentStyleIndex = 0;
+
+    private static final String[] STYLES = new String[]{
+            Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION),
+            Style.getOutdoorsStyleUrl(AppConstant.STYLE_VERSION),
+            Style.getLightStyleUrl(AppConstant.STYLE_VERSION),
+            Style.getDarkStyleUrl(AppConstant.STYLE_VERSION),
+            Style.getSatelliteStyleUrl(AppConstant.STYLE_VERSION),
+            Style.getSatelliteStreetsStyleUrl(AppConstant.STYLE_VERSION)
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +52,7 @@ public class DebugModeActivity  extends AppCompatActivity {
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setTag(true);
         mapView.setAccessToken(getString(R.string.mapbox_access_token));
+        mapView.setStyleUrl(STYLES[currentStyleIndex]);
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -65,20 +77,13 @@ public class DebugModeActivity  extends AppCompatActivity {
         fabStyles.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentStyle.equals(Style.MAPBOX_STREETS)) {
-                    currentStyle = Style.EMERALD;
-                } else if (currentStyle.equals(Style.EMERALD)) {
-                    currentStyle = Style.DARK;
-                } else if (currentStyle.equals(Style.DARK)) {
-                    currentStyle = Style.LIGHT;
-                } else if (currentStyle.equals(Style.LIGHT)) {
-                    currentStyle = Style.SATELLITE;
-                } else if (currentStyle.equals(Style.SATELLITE)) {
-                    currentStyle = Style.SATELLITE_STREETS;
-                } else {
-                    currentStyle = Style.MAPBOX_STREETS;
+                if (mapboxMap != null) {
+                    currentStyleIndex++;
+                    if (currentStyleIndex == STYLES.length) {
+                        currentStyleIndex = 0;
+                    }
+                    mapboxMap.setStyleUrl(STYLES[currentStyleIndex]);
                 }
-                mapboxMap.setStyle(currentStyle);
             }
         });
     }

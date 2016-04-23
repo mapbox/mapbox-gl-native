@@ -17,6 +17,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class PolygonActivity extends AppCompatActivity {
         MapboxMapOptions options = new MapboxMapOptions()
                 .attributionTintColor(Color.RED)
                 .accessToken(getString(R.string.mapbox_access_token))
-                .styleUrl(Style.MAPBOX_STREETS)
+                .styleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION))
                 .camera(new CameraPosition.Builder()
                         .target(new LatLng(45.520486, -122.673541))
                         .zoom(12)

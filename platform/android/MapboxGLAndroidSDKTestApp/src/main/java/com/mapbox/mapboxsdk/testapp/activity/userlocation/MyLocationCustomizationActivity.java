@@ -22,6 +22,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class MyLocationCustomizationActivity extends AppCompatActivity implements LocationListener {
 
@@ -48,7 +49,7 @@ public class MyLocationCustomizationActivity extends AppCompatActivity implement
 
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
         mapboxMapOptions.accessToken(getString(R.string.mapbox_access_token));
-        mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
+        mapboxMapOptions.styleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
         mapboxMapOptions.locationEnabled(true);
         mapboxMapOptions.camera(new CameraPosition.Builder()
                 .target(location != null ? new LatLng(location) : new LatLng(0, 0))
