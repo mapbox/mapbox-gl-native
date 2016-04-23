@@ -26,13 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSFormattingUnitStyle unitStyle;
 
 /**
- The locale of the receiver.
- 
- The locale determines the output language and numeral system of the output.
- */
-@property (copy) NSLocale *locale;
-
-/**
  Returns a clock position string for the provided value.
  
  @param direction The heading, measured in degrees, where 0° means “straight

@@ -201,6 +201,8 @@
 		DABFB8711CBE9A0F00D62B32 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848381CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848391CBAFB8500AB86E3 /* MGLUserLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DAF9E8901CCBF7DC004C7E73 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DAF9E88E1CCBF7DC004C7E73 /* Foundation.strings */; };
+		DAF9E8931CCBFA03004C7E73 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -413,6 +415,8 @@
 		DABCABBF1CB80717000A7C39 /* locations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locations.cpp; sourceTree = "<group>"; };
 		DABCABC01CB80717000A7C39 /* locations.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = locations.hpp; sourceTree = "<group>"; };
 		DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/ios/mbgl.xcconfig; sourceTree = "<group>"; };
+		DAF9E88F1CCBF7DC004C7E73 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DAF9E8921CCBFA03004C7E73 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -660,7 +664,9 @@
 		DA8848621CBAFCC100AB86E3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				DAF9E88E1CCBF7DC004C7E73 /* Foundation.strings */,
 				DA89632C1CC4ECD300684375 /* Localizable.strings */,
+				DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */,
 				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
 				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
 				DA8848631CBAFCC100AB86E3 /* Compass.png */,
@@ -1027,10 +1033,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA89632F1CC4EE3300684375 /* Localizable.strings in Resources */,
+				DAF9E8901CCBF7DC004C7E73 /* Foundation.strings in Resources */,
 				DA8848731CBAFCC100AB86E3 /* mapbox.png in Resources */,
 				DA8848741CBAFCC100AB86E3 /* mapbox@2x.png in Resources */,
 				DA88487A1CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der in Resources */,
 				DA88486D1CBAFCC100AB86E3 /* Compass.png in Resources */,
+				DAF9E8931CCBFA03004C7E73 /* Foundation.stringsdict in Resources */,
 				DA8848721CBAFCC100AB86E3 /* default_marker@3x.png in Resources */,
 				DA88487C1CBAFD5C00AB86E3 /* star_tilestream_net.der in Resources */,
 				DA88486F1CBAFCC100AB86E3 /* Compass@3x.png in Resources */,
@@ -1229,6 +1237,22 @@
 				DABCABB91CB80692000A7C39 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DAF9E88E1CCBF7DC004C7E73 /* Foundation.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAF9E88F1CCBF7DC004C7E73 /* Base */,
+			);
+			name = Foundation.strings;
+			sourceTree = "<group>";
+		};
+		DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAF9E8921CCBFA03004C7E73 /* en */,
+			);
+			name = Foundation.stringsdict;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

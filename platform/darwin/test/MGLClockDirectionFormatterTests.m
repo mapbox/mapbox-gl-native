@@ -12,38 +12,43 @@ static NSString * const MGLTestLocaleIdentifier = @"en-US";
 - (void)testClockDirections {
     MGLClockDirectionFormatter *shortFormatter = [[MGLClockDirectionFormatter alloc] init];
     shortFormatter.unitStyle = NSFormattingUnitStyleShort;
-    shortFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
     MGLClockDirectionFormatter *mediumFormatter = [[MGLClockDirectionFormatter alloc] init];
-    mediumFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
     MGLClockDirectionFormatter *longFormatter = [[MGLClockDirectionFormatter alloc] init];
     longFormatter.unitStyle = NSFormattingUnitStyleLong;
-    longFormatter.locale = [NSLocale localeWithLocaleIdentifier:MGLTestLocaleIdentifier];
     
-    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:-90]);
-    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:-90]);
-    XCTAssertEqualObjects(@"nine o’clock", [longFormatter stringFromDirection:-90]);
+    CLLocationDirection direction;
     
-    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:0]);
-    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:0]);
-    XCTAssertEqualObjects(@"twelve o’clock", [longFormatter stringFromDirection:0]);
+    direction = -90;
+    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"9 o’clock", [longFormatter stringFromDirection:direction]);
     
-    XCTAssertEqualObjects(@"2:00", [shortFormatter stringFromDirection:45]);
-    XCTAssertEqualObjects(@"2 o’clock", [mediumFormatter stringFromDirection:45]);
-    XCTAssertEqualObjects(@"two o’clock", [longFormatter stringFromDirection:45]);
+    direction = 0;
+    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [longFormatter stringFromDirection:direction]);
     
-    XCTAssertEqualObjects(@"3:00", [shortFormatter stringFromDirection:90]);
-    XCTAssertEqualObjects(@"3 o’clock", [mediumFormatter stringFromDirection:90]);
-    XCTAssertEqualObjects(@"three o’clock", [longFormatter stringFromDirection:90]);
+    direction = 45;
+    XCTAssertEqualObjects(@"2:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"2 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"2 o’clock", [longFormatter stringFromDirection:direction]);
     
-    XCTAssertEqualObjects(@"6:00", [shortFormatter stringFromDirection:180]);
-    XCTAssertEqualObjects(@"6 o’clock", [mediumFormatter stringFromDirection:180]);
-    XCTAssertEqualObjects(@"six o’clock", [longFormatter stringFromDirection:180]);
+    direction = 90;
+    XCTAssertEqualObjects(@"3:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"3 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"3 o’clock", [longFormatter stringFromDirection:direction]);
     
-    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:270]);
-    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:270]);
-    XCTAssertEqualObjects(@"nine o’clock", [longFormatter stringFromDirection:270]);
+    direction = 180;
+    XCTAssertEqualObjects(@"6:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"6 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"6 o’clock", [longFormatter stringFromDirection:direction]);
+    
+    direction = 270;
+    XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"9 o’clock", [longFormatter stringFromDirection:direction]);
 }
 
 @end

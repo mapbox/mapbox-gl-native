@@ -127,8 +127,9 @@ idocument:
 
 igenstrings:
 	genstrings -u -o platform/ios/app/Base.lproj platform/ios/app/*.{m,mm}
+	genstrings -u -o platform/ios/resources/Base.lproj platform/darwin/src/*.{m,mm}
 	genstrings -u -o platform/ios/resources/Base.lproj platform/ios/src/*.{m,mm}
-	-find platform/ios/ -path '*/Base.lproj/Localizable.strings' -exec \
+	-find platform/{darwin,ios}/ -path '*/Base.lproj/*.strings' -exec \
 		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
 
 #### Android targets #####################################################

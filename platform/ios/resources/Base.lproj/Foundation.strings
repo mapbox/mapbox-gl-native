@@ -1,0 +1,269 @@
+/* Degrees-minutes format, long */
+"%@ and %@" = "%1$@ and %2$@";
+
+/* Latitude-longitude format, long */
+"%@ by %@" = "%1$@ by %2$@";
+
+/* East longitude format, long
+   East longitude format, medium */
+"%@ east" = "%@ east";
+
+/* North latitude format, long
+   North latitude format, medium */
+"%@ north" = "%@ north";
+
+/* Clock position format, long style
+   Clock position format, medium style */
+"%@ o’clock" = "%@ o’clock";
+
+/* South latitude format, long
+   South latitude format, medium */
+"%@ south" = "%@ south";
+
+/* West longitude format, long
+   West longitude format, medium */
+"%@ west" = "%@ west";
+
+/* Degrees-minutes format, medium
+   Degrees-minutes format, short */
+"%@%@" = "%1$@%2$@";
+
+/* Degrees-minutes-seconds format, medium
+   Degrees-minutes-seconds format, short */
+"%@%@%@" = "%1$@%2$@%3$@";
+
+/* Latitude-longitude format, medium
+   Latitude-longitude format, short */
+"%@, %@" = "%1$@, %2$@";
+
+/* Degrees-minutes-seconds format, long */
+"%@, %@, and %@" = "%1$@, %2$@, and %3$@";
+
+/* Clock position format, short style */
+"%@:00" = "%@:00";
+
+/* East longitude format, short */
+"%@E" = "%@E";
+
+/* North latitude format, short */
+"%@N" = "%@N";
+
+/* South latitude format, short */
+"%@S" = "%@S";
+
+/* West longitude format, short */
+"%@W" = "%@W";
+
+/* Degrees format, long */
+"%d degree(s)" = "%d degree(s)";
+
+/* Minutes format, long */
+"%d minute(s)" = "%d minute(s)";
+
+/* Seconds format, long */
+"%d second(s)" = "%d second(s)";
+
+/* Degrees format, medium
+   Degrees format, short */
+"%d°" = "%d°";
+
+/* Minutes format, medium
+   Minutes format, short */
+"%d′" = "%d′";
+
+/* Seconds format, medium
+   Seconds format, short */
+"%d″" = "%d″";
+
+/* East, short */
+"E" = "E";
+
+/* East, long */
+"east" = "east";
+
+/* East by north, long */
+"east by north" = "east by north";
+
+/* East by south, long */
+"east by south" = "east by south";
+
+/* East-northeast, long */
+"east-northeast" = "east-northeast";
+
+/* East-southeast, long */
+"east-southeast" = "east-southeast";
+
+/* East-northeast, short */
+"ENE" = "ENE";
+
+/* East-southeast, short */
+"ESE" = "ESE";
+
+/* East by north, short */
+"E×N" = "E×N";
+
+/* East by south, short */
+"E×S" = "E×S";
+
+/* North, short */
+"N" = "N";
+
+/* Northeast, short */
+"NE" = "NE";
+
+/* Northeast by east, short */
+"NE×E" = "NE×E";
+
+/* Northeast by north, short */
+"NE×N" = "NE×N";
+
+/* North-northeast, short */
+"NNE" = "NNE";
+
+/* North-northwest, short */
+"NNW" = "NNW";
+
+/* North, long */
+"north" = "north";
+
+/* North by east, long */
+"north by east" = "north by east";
+
+/* North by west, long */
+"north by west" = "north by west";
+
+/* North-northeast, long */
+"north-northeast" = "north-northeast";
+
+/* North-northwest, long */
+"north-northwest" = "north-northwest";
+
+/* Northeast, long */
+"northeast" = "northeast";
+
+/* Northeast by east, long */
+"northeast by east" = "northeast by east";
+
+/* Northeast by north, long */
+"northeast by north" = "northeast by north";
+
+/* Northwest, long */
+"northwest" = "northwest";
+
+/* Northwest by north, long */
+"northwest by north" = "northwest by north";
+
+/* Northwest by west, long */
+"northwest by west" = "northwest by west";
+
+/* Northwest, short */
+"NW" = "NW";
+
+/* Northwest by north, short */
+"NW×N" = "NW×N";
+
+/* Northwest by west, short */
+"NW×W" = "NW×W";
+
+/* North by east, short */
+"N×E" = "N×E";
+
+/* North by west, short */
+"N×W" = "N×W";
+
+/* South, short */
+"S" = "S";
+
+/* Southeast, short */
+"SE" = "SE";
+
+/* Southeast by east, short */
+"SE×E" = "SE×E";
+
+/* Southeast by south, short */
+"SE×S" = "SE×S";
+
+/* South, long */
+"south" = "south";
+
+/* South by east, long */
+"south by east" = "south by east";
+
+/* South by west, long */
+"south by west" = "south by west";
+
+/* South-southeast, long */
+"south-southeast" = "south-southeast";
+
+/* South-southwest, long */
+"south-southwest" = "south-southwest";
+
+/* Southeast, long */
+"southeast" = "southeast";
+
+/* Southeast by east, long */
+"southeast by east" = "southeast by east";
+
+/* Southeast by south, long */
+"southeast by south" = "southeast by south";
+
+/* Southwest, long */
+"southwest" = "southwest";
+
+/* Southwest by south, long */
+"southwest by south" = "southwest by south";
+
+/* Southwest by west, long */
+"southwest by west" = "southwest by west";
+
+/* South-southeast, short */
+"SSE" = "SSE";
+
+/* South-southwest, short */
+"SSW" = "SSW";
+
+/* Southwest, short */
+"SW" = "SW";
+
+/* Southwest by south, short */
+"SW×S" = "SW×S";
+
+/* Southwest by west, short */
+"SW×W" = "SW×W";
+
+/* South by east, short */
+"S×E" = "S×E";
+
+/* South by west, short */
+"S×W" = "S×W";
+
+/* West, short */
+"W" = "W";
+
+/* West, long */
+"west" = "west";
+
+/* West by north, long */
+"west by north" = "west by north";
+
+/* West by south, long */
+"west by south" = "west by south";
+
+/* West-northwest, long */
+"west-northwest" = "west-northwest";
+
+/* West-southwest, long */
+"west-southwest" = "west-southwest";
+
+/* West-northwest, short */
+"WNW" = "WNW";
+
+/* West-southwest, short */
+"WSW" = "WSW";
+
+/* West by north, short */
+"W×N" = "W×N";
+
+/* West by south, short */
+"W×S" = "W×S";
+

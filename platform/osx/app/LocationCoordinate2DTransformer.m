@@ -25,7 +25,7 @@
     if (![value isKindOfClass:[NSValue class]]) {
         return nil;
     }
-    return [_coordinateFormatter stringForObjectValue:value];
+    return [_coordinateFormatter stringForObjectValue:value].localizedCapitalizedString;
 }
 
 @end

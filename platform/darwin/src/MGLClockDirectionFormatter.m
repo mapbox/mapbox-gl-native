@@ -13,41 +13,31 @@
     if (self = [super init]) {
         _unitStyle = NSFormattingUnitStyleMedium;
         _numberFormatter = [[NSNumberFormatter alloc] init];
+        _numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
     }
     return self;
-}
-
-- (NSLocale *)locale {
-    return _numberFormatter.locale;
-}
-
-- (void)setLocale:(NSLocale *)locale {
-    _numberFormatter.locale = locale;
 }
 
 - (NSString *)stringFromDirection:(CLLocationDirection)direction {
     NSInteger hour = round(-wrap(-direction, -360, 0) / 360 * 12);
     NSString *format;
-    NSNumberFormatterStyle style = NSNumberFormatterDecimalStyle;
     switch (self.unitStyle) {
         case NSFormattingUnitStyleShort:
-            format = NSLocalizedString(@"%@:00", @"Clock position format, short style");
+            format = NSLocalizedStringFromTable(@"%@:00", @"Foundation", @"Clock position format, short style");
             break;
             
         case NSFormattingUnitStyleMedium:
-            format = NSLocalizedString(@"%@ o’clock", @"Clock position format, medium style");
+            format = NSLocalizedStringFromTable(@"%@ o’clock", @"Foundation", @"Clock position format, medium style");
             
             break;
             
         case NSFormattingUnitStyleLong:
-            format = NSLocalizedString(@"%@ o’clock", @"Clock position format, long style");
-            style = NSNumberFormatterSpellOutStyle;
+            format = NSLocalizedStringFromTable(@"%@ o’clock", @"Foundation", @"Clock position format, long style");
             break;
             
         default:
             break;
     }
-    _numberFormatter.numberStyle = style;
     return [NSString stringWithFormat:format, [_numberFormatter stringFromNumber:@(hour)]];
 }
 
