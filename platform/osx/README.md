@@ -8,3 +8,5 @@ This SDK is analogous to the Mapbox iOS SDK, and much of the iOS SDK documentati
 
 * [Integrating the Mapbox OS X SDK into your application](INSTALL.md)
 * [Contributing to the Mapbox OS X SDK](DEVELOPING.md)
+
+<img alt="" src="screenshot.png" width="645">
