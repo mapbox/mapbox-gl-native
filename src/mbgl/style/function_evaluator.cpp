@@ -1,4 +1,4 @@
-#include <mbgl/style/function.hpp>
+#include <mbgl/style/function_evaluator.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -29,7 +29,9 @@ template <> inline TextTransformType defaultStopsValue() { return {}; };
 template <> inline RotationAlignmentType defaultStopsValue() { return {}; };
 
 template <typename T>
-T Function<T>::evaluate(const StyleCalculationParameters& parameters) const {
+T NormalFunctionEvaluator<T>::operator()(const Function<T>& fn, const StyleCalculationParameters& parameters) const {
+    float base = fn.getBase();
+    const std::vector<std::pair<float, T>>& stops = fn.getStops();
     float z = parameters.z;
     bool smaller = false;
     float smaller_z = 0.0f;
@@ -76,23 +78,23 @@ T Function<T>::evaluate(const StyleCalculationParameters& parameters) const {
     }
 }
 
-template class Function<bool>;
-template class Function<float>;
-template class Function<Color>;
-template class Function<std::vector<float>>;
-template class Function<std::vector<std::string>>;
-template class Function<std::array<float, 2>>;
+template class NormalFunctionEvaluator<bool>;
+template class NormalFunctionEvaluator<float>;
+template class NormalFunctionEvaluator<Color>;
+template class NormalFunctionEvaluator<std::vector<float>>;
+template class NormalFunctionEvaluator<std::vector<std::string>>;
+template class NormalFunctionEvaluator<std::array<float, 2>>;
 
-template class Function<std::string>;
-template class Function<TranslateAnchorType>;
-template class Function<RotateAnchorType>;
-template class Function<LineCapType>;
-template class Function<LineJoinType>;
-template class Function<SymbolPlacementType>;
-template class Function<TextAnchorType>;
-template class Function<TextJustifyType>;
-template class Function<TextTransformType>;
-template class Function<RotationAlignmentType>;
+template class NormalFunctionEvaluator<std::string>;
+template class NormalFunctionEvaluator<TranslateAnchorType>;
+template class NormalFunctionEvaluator<RotateAnchorType>;
+template class NormalFunctionEvaluator<LineCapType>;
+template class NormalFunctionEvaluator<LineJoinType>;
+template class NormalFunctionEvaluator<SymbolPlacementType>;
+template class NormalFunctionEvaluator<TextAnchorType>;
+template class NormalFunctionEvaluator<TextJustifyType>;
+template class NormalFunctionEvaluator<TextTransformType>;
+template class NormalFunctionEvaluator<RotationAlignmentType>;
 
 template <typename T>
 inline size_t getBiggestStopLessThan(const std::vector<std::pair<float, T>>& stops, float z) {
@@ -105,9 +107,10 @@ inline size_t getBiggestStopLessThan(const std::vector<std::pair<float, T>>& sto
 }
 
 template <typename T>
-Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& parameters) const {
+Faded<T> CrossFadedFunctionEvaluator<T>::operator()(const Function<T>& fn, const StyleCalculationParameters& parameters) const {
     Faded<T> result;
 
+    const std::vector<std::pair<float, T>>& stops = fn.getStops();
     float z = parameters.z;
     const float fraction = z - std::floor(z);
     std::chrono::duration<float> d = parameters.defaultFadeDuration;
@@ -136,7 +139,7 @@ Faded<T> Function<Faded<T>>::evaluate(const StyleCalculationParameters& paramete
     return result;
 }
 
-template class Function<Faded<std::string>>;
-template class Function<Faded<std::vector<float>>>;
+template class CrossFadedFunctionEvaluator<std::string>;
+template class CrossFadedFunctionEvaluator<std::vector<float>>;
 
 } // namespace mbgl

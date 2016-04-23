@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <mbgl/style/types.hpp>
+#include <mbgl/style/function_evaluator.hpp>
 
 namespace mbgl {
 namespace util {

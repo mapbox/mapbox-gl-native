@@ -21,18 +21,6 @@ struct FontStackHash {
     std::size_t operator()(const FontStack&) const;
 };
 
-template <typename T>
-struct Faded {
-    Faded() = default;
-    Faded(const T& v) : to(v) {}
-
-    T from;
-    float fromScale = 0;
-    T to;
-    float toScale = 0;
-    float t = 0;
-};
-
 // -------------------------------------------------------------------------------------------------
 
 enum class SourceType : uint8_t {
