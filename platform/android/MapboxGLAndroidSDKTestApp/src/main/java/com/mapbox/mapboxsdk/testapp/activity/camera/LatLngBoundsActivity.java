@@ -19,6 +19,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class LatLngBoundsActivity extends AppCompatActivity {
 
@@ -43,7 +44,7 @@ public class LatLngBoundsActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(getString(R.string.mapbox_access_token));
-        mMapView.setStyle(Style.DARK);
+        mMapView.setStyleUrl(Style.getDarkStyleUrl(AppConstant.STYLE_VERSION));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -78,8 +79,6 @@ public class LatLngBoundsActivity extends AppCompatActivity {
                 Log.v(MapboxConstants.TAG, mapboxMap.getProjection().getVisibleRegion().latLngBounds.toString());
             }
         });
-
-
     }
 
     @Override

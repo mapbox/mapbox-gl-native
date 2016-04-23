@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegionError;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineDownloadRegionDialog;
 import com.mapbox.mapboxsdk.testapp.model.other.OfflineListRegionsDialog;
 
@@ -77,7 +78,7 @@ public class OfflineActivity extends AppCompatActivity
         // Set up map
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setAccessToken(getString(R.string.mapbox_access_token));
-        mMapView.setStyle(Style.MAPBOX_STREETS);
+        mMapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

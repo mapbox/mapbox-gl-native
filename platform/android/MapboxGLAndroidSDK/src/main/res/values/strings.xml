@@ -11,10 +11,11 @@
     <string name="infoWindowAddress">Address</string>
 
     <!-- these are public -->
-    <string name="style_mapbox_streets">mapbox://styles/mapbox/streets-v8</string>
+    <!-- {@deprecated Use Style.getXStyleUrl(int version) instead.} -->
+    <string name="style_mapbox_streets">mapbox://styles/mapbox/streets-v9</string>
     <string name="style_emerald">mapbox://styles/mapbox/emerald-v8</string>
-    <string name="style_light">mapbox://styles/mapbox/light-v8</string>
-    <string name="style_dark">mapbox://styles/mapbox/dark-v8</string>
-    <string name="style_satellite">mapbox://styles/mapbox/satellite-v8</string>
-    <string name="style_satellite_streets">mapbox://styles/mapbox/satellite-hybrid-v8</string>
+    <string name="style_light">mapbox://styles/mapbox/light-v9</string>
+    <string name="style_dark">mapbox://styles/mapbox/dark-v9</string>
+    <string name="style_satellite">mapbox://styles/mapbox/satellite-v9</string>
+    <string name="style_satellite_streets">mapbox://styles/mapbox/satellite-hybrid-v9</string>
 </resources>

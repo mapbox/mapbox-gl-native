@@ -17,6 +17,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class ManualZoomActivity extends AppCompatActivity {
 
@@ -39,7 +40,7 @@ public class ManualZoomActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.manualZoomMapView);
         mMapView.setAccessToken(getString(R.string.mapbox_access_token));
-        mMapView.setStyleUrl(Style.SATELLITE_STREETS);
+        mMapView.setStyleUrl(Style.getSatelliteStyleUrl(AppConstant.STYLE_VERSION));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
