@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_END
 
 - (NSString *)title
 {
-    return _title ?: NSLocalizedString(@"You Are Here", @"Default user location annotation title");
+    return _title ?: NSLocalizedStringWithDefaultValue(@"USER_DOT_TITLE", nil, nil, @"You Are Here", @"Default user location annotation title");
 }
 
 - (NSString *)description

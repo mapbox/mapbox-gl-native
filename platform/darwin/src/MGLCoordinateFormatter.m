@@ -22,27 +22,27 @@
     NSString *stringFormat;
     switch (self.unitStyle) {
         case NSFormattingUnitStyleShort:
-            positiveLatitudeFormat = NSLocalizedStringFromTable(@"%@N", @"Foundation", @"North latitude format, short");
-            negativeLatitudeFormat = NSLocalizedStringFromTable(@"%@S", @"Foundation", @"South latitude format, short");
-            positiveLongitudeFormat = NSLocalizedStringFromTable(@"%@E", @"Foundation", @"East longitude format, short");
-            negativeLongitudeFormat = NSLocalizedStringFromTable(@"%@W", @"Foundation", @"West longitude format, short");
-            stringFormat = NSLocalizedStringFromTable(@"%@, %@", @"Foundation", @"Latitude-longitude format, short");
+            positiveLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_N_SHORT", @"Foundation", nil, @"%@N", @"North latitude format, short: {latitude}");
+            negativeLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_S_SHORT", @"Foundation", nil, @"%@S", @"South latitude format, short: {latitude}");
+            positiveLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_E_SHORT", @"Foundation", nil, @"%@E", @"East longitude format, short: {longitude}");
+            negativeLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_W_SHORT", @"Foundation", nil, @"%@W", @"West longitude format, short: {longitude}");
+            stringFormat = NSLocalizedStringWithDefaultValue(@"COORD_FMT_SHORT", @"Foundation", nil, @"%@, %@", @"Coordinate pair format, short: {latitude}, {longitude}");
             break;
             
         case NSFormattingUnitStyleMedium:
-            positiveLatitudeFormat = NSLocalizedStringFromTable(@"%@ north", @"Foundation", @"North latitude format, medium");
-            negativeLatitudeFormat = NSLocalizedStringFromTable(@"%@ south", @"Foundation", @"South latitude format, medium");
-            positiveLongitudeFormat = NSLocalizedStringFromTable(@"%@ east", @"Foundation", @"East longitude format, medium");
-            negativeLongitudeFormat = NSLocalizedStringFromTable(@"%@ west", @"Foundation", @"West longitude format, medium");
-            stringFormat = NSLocalizedStringFromTable(@"%@, %@", @"Foundation", @"Latitude-longitude format, medium");
+            positiveLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_N_MEDIUM", @"Foundation", nil, @"%@ north", @"North latitude format, medium: {latitude}");
+            negativeLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_S_MEDIUM", @"Foundation", nil, @"%@ south", @"South latitude format, medium: {latitude}");
+            positiveLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_E_MEDIUM", @"Foundation", nil, @"%@ east", @"East longitude format, medium: {longitude}");
+            negativeLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_W_MEDIUM", @"Foundation", nil, @"%@ west", @"West longitude format, medium: {longitude}");
+            stringFormat = NSLocalizedStringWithDefaultValue(@"COORD_FMT_MEDIUM", @"Foundation", nil, @"%@, %@", @"Coordinate pair format, medium: {latitude}, {longitude}");
             break;
             
         case NSFormattingUnitStyleLong:
-            positiveLatitudeFormat = NSLocalizedStringFromTable(@"%@ north", @"Foundation", @"North latitude format, long");
-            negativeLatitudeFormat = NSLocalizedStringFromTable(@"%@ south", @"Foundation", @"South latitude format, long");
-            positiveLongitudeFormat = NSLocalizedStringFromTable(@"%@ east", @"Foundation", @"East longitude format, long");
-            negativeLongitudeFormat = NSLocalizedStringFromTable(@"%@ west", @"Foundation", @"West longitude format, long");
-            stringFormat = NSLocalizedStringFromTable(@"%@ by %@", @"Foundation", @"Latitude-longitude format, long");
+            positiveLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_N_LONG", @"Foundation", nil, @"%@ north", @"North latitude format, long: {latitude}");
+            negativeLatitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_S_LONG", @"Foundation", nil, @"%@ south", @"South latitude format, long: {latitude}");
+            positiveLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_E_LONG", @"Foundation", nil, @"%@ east", @"East longitude format, long: {longitude}");
+            negativeLongitudeFormat = NSLocalizedStringWithDefaultValue(@"COORD_W_LONG", @"Foundation", nil, @"%@ west", @"West longitude format, long: {longitude}");
+            stringFormat = NSLocalizedStringWithDefaultValue(@"COORD_FMT_LONG", @"Foundation", nil, @"%@ by %@", @"Coordinate pair format, long: {latitude}, {longitude}");
             break;
     }
     NSString *latitudeString = [self stringFromLocationDegrees:coordinate.latitude
@@ -65,27 +65,27 @@
     NSString *degreesMinutesSecondsFormat;
     switch (self.unitStyle) {
         case NSFormattingUnitStyleShort:
-            degreesFormat = NSLocalizedStringFromTable(@"%d°", @"Foundation", @"Degrees format, short");
-            minutesFormat = NSLocalizedStringFromTable(@"%d′", @"Foundation", @"Minutes format, short");
-            secondsFormat = NSLocalizedStringFromTable(@"%d″", @"Foundation", @"Seconds format, short");
-            degreesMinutesFormat = NSLocalizedStringFromTable(@"%@%@", @"Foundation", @"Degrees-minutes format, short");
-            degreesMinutesSecondsFormat = NSLocalizedStringFromTable(@"%@%@%@", @"Foundation", @"Degrees-minutes-seconds format, short");
+            degreesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DEG_SHORT", @"Foundation", nil, @"%d°", @"Degrees format, short: {degrees}");
+            minutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_MIN_SHORT", @"Foundation", nil, @"%d′", @"Minutes format, short: {minutes}");
+            secondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_SEC_SHORT", @"Foundation", nil, @"%d″", @"Seconds format, short: {seconds}");
+            degreesMinutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DM_SHORT", @"Foundation", nil, @"%@%@", @"Coordinate format, short: {degrees}{minutes}");
+            degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_SHORT", @"Foundation", nil, @"%@%@%@", @"Coordinate format, short: {degrees}{minutes}{seconds}");
             break;
             
         case NSFormattingUnitStyleMedium:
-            degreesFormat = NSLocalizedStringFromTable(@"%d°", @"Foundation", @"Degrees format, medium");
-            minutesFormat = NSLocalizedStringFromTable(@"%d′", @"Foundation", @"Minutes format, medium");
-            secondsFormat = NSLocalizedStringFromTable(@"%d″", @"Foundation", @"Seconds format, medium");
-            degreesMinutesFormat = NSLocalizedStringFromTable(@"%@%@", @"Foundation", @"Degrees-minutes format, medium");
-            degreesMinutesSecondsFormat = NSLocalizedStringFromTable(@"%@%@%@", @"Foundation", @"Degrees-minutes-seconds format, medium");
+            degreesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DEG_MEDIUM", @"Foundation", nil, @"%d°", @"Degrees format, medium: {degrees}");
+            minutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_MIN_MEDIUM", @"Foundation", nil, @"%d′", @"Minutes format, medium: {minutes}");
+            secondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_SEC_MEDIUM", @"Foundation", nil, @"%d″", @"Seconds format, medium: {seconds}");
+            degreesMinutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DM_MEDIUM", @"Foundation", nil, @"%@%@", @"Coordinate format, medium: {degrees}{minutes}");
+            degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_MEDIUM", @"Foundation", nil, @"%@%@%@", @"Coordinate format, medium: {degrees}{minutes}{seconds}");
             break;
             
         case NSFormattingUnitStyleLong:
-            degreesFormat = NSLocalizedStringFromTable(@"%d degree(s)", @"Foundation", @"Degrees format, long");
-            minutesFormat = NSLocalizedStringFromTable(@"%d minute(s)", @"Foundation", @"Minutes format, long");
-            secondsFormat = NSLocalizedStringFromTable(@"%d second(s)", @"Foundation", @"Seconds format, long");
-            degreesMinutesFormat = NSLocalizedStringFromTable(@"%@ and %@", @"Foundation", @"Degrees-minutes format, long");
-            degreesMinutesSecondsFormat = NSLocalizedStringFromTable(@"%@, %@, and %@", @"Foundation", @"Degrees-minutes-seconds format, long");
+            degreesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DEG_LONG", @"Foundation", nil, @"%d degree(s)", @"Degrees format, long");
+            minutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_MIN_LONG", @"Foundation", nil, @"%d minute(s)", @"Minutes format, long");
+            secondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_SEC_LONG", @"Foundation", nil, @"%d second(s)", @"Seconds format, long");
+            degreesMinutesFormat = NSLocalizedStringWithDefaultValue(@"COORD_DM_LONG", @"Foundation", nil, @"%@ and %@", @"Coordinate format, long: {degrees}{minutes}");
+            degreesMinutesSecondsFormat = NSLocalizedStringWithDefaultValue(@"COORD_DMS_LONG", @"Foundation", nil, @"%@, %@, and %@", @"Coordinate format, long: {degrees}{minutes}{seconds}");
             break;
     }
     

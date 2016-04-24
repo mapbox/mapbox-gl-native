@@ -54,7 +54,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
-        self.accessibilityLabel = NSLocalizedString(@"User location", @"Accessibility label");
+        self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"USER_DOT_A11Y_LABEL", nil, nil, @"User location", @"Accessibility label");
     }
     return self;
 }

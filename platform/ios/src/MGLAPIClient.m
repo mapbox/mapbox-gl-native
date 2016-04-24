@@ -47,8 +47,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         NSError *statusError = nil;
         if (httpResponse.statusCode >= 400) {
-            NSString *description = [NSString stringWithFormat:NSLocalizedString(@"The session data task failed. Original request was: %@", nil), dataTask.originalRequest];
-            NSString *reason = [NSString stringWithFormat:NSLocalizedString(@"The status code was %ld", nil), (long)httpResponse.statusCode];
+            NSString *description = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"API_CLIENT_400_DESC", nil, nil, @"The session data task failed. Original request was: %@", nil), dataTask.originalRequest];
+            NSString *reason = [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"API_CLIENT_400_REASON", nil, nil, @"The status code was %ld", nil), (long)httpResponse.statusCode];
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description,
                                        NSLocalizedFailureReasonErrorKey: reason};
             statusError = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];

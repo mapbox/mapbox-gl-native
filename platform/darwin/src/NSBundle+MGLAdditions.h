@@ -23,6 +23,10 @@ NS_ASSUME_NONNULL_BEGIN
 #define NSLocalizedStringFromTable(key, tbl, comment) \
     [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:@"" table:(tbl)]
 
+#undef NSLocalizedStringWithDefaultValue
+#define NSLocalizedStringWithDefaultValue(key, tbl, bundle, val, comment) \
+    [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:(val) table:(tbl)]
+
 @interface NSBundle (MGLAdditions)
 
 /// Returns the bundle containing the SDK’s classes and Info.plist file.
