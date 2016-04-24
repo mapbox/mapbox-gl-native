@@ -33,7 +33,7 @@ rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
 jazzy \
-    --config platform/ios/jazzy.yml
+    --config platform/ios/jazzy.yml \
     --sdk iphonesimulator \
     --swift-version $SWIFT_VERSION \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \

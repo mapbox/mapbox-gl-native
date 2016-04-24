@@ -11,8 +11,8 @@ head: |
 objc: Yes
 skip_undocumented: Yes
 hide_documentation_coverage: Yes
-umbrella_header: platform/ios/include/Mapbox.h
-framework_root: platform/darwin/include
+umbrella_header: src/Mapbox.h
+framework_root: ../darwin/src
 
 custom_categories:
   - name: Maps
