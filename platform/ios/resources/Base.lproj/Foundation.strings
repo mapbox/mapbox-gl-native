@@ -13,6 +13,18 @@
 /* East, short */
 "COMPASS_E_SHORT" = "E";
 
+/* East by north, long */
+"COMPASS_EbN_LONG" = "east by north";
+
+/* East by north, short */
+"COMPASS_EbN_SHORT" = "EbN";
+
+/* East by south, long */
+"COMPASS_EbS_LONG" = "east by south";
+
+/* East by south, short */
+"COMPASS_EbS_SHORT" = "EbS";
+
 /* East-northeast, long */
 "COMPASS_ENE_LONG" = "east-northeast";
 
@@ -25,23 +37,23 @@
 /* East-southeast, short */
 "COMPASS_ESE_SHORT" = "ESE";
 
-/* East by north, long */
-"COMPASS_ExN_LONG" = "east by north";
-
-/* East by north, short */
-"COMPASS_ExN_SHORT" = "E×N";
-
-/* East by south, long */
-"COMPASS_ExS_LONG" = "east by south";
-
-/* East by south, short */
-"COMPASS_ExS_SHORT" = "E×S";
-
 /* North, long */
 "COMPASS_N_LONG" = "north";
 
 /* North, short */
 "COMPASS_N_SHORT" = "N";
+
+/* North by east, long */
+"COMPASS_NbE_LONG" = "north by east";
+
+/* North by east, short */
+"COMPASS_NbE_SHORT" = "NbE";
+
+/* North by west, long */
+"COMPASS_NbW_LONG" = "north by west";
+
+/* North by west, short */
+"COMPASS_NbW_SHORT" = "NbW";
 
 /* Northeast, long */
 "COMPASS_NE_LONG" = "northeast";
@@ -50,16 +62,16 @@
 "COMPASS_NE_SHORT" = "NE";
 
 /* Northeast by east, long */
-"COMPASS_NExE_LONG" = "northeast by east";
+"COMPASS_NEbE_LONG" = "northeast by east";
 
 /* Northeast by east, short */
-"COMPASS_NExE_SHORT" = "NE×E";
+"COMPASS_NEbE_SHORT" = "NEbE";
 
 /* Northeast by north, long */
-"COMPASS_NExN_LONG" = "northeast by north";
+"COMPASS_NEbN_LONG" = "northeast by north";
 
 /* Northeast by north, short */
-"COMPASS_NExN_SHORT" = "NE×N";
+"COMPASS_NEbN_SHORT" = "NEbN";
 
 /* North-northeast, long */
 "COMPASS_NNE_LONG" = "north-northeast";
@@ -80,34 +92,34 @@
 "COMPASS_NW_SHORT" = "NW";
 
 /* Northwest by north, long */
-"COMPASS_NWxN_LONG" = "northwest by north";
+"COMPASS_NWbN_LONG" = "northwest by north";
 
 /* Northwest by north, short */
-"COMPASS_NWxN_SHORT" = "NW×N";
+"COMPASS_NWbN_SHORT" = "NWbN";
 
 /* Northwest by west, long */
-"COMPASS_NWxW_LONG" = "northwest by west";
+"COMPASS_NWbW_LONG" = "northwest by west";
 
 /* Northwest by west, short */
-"COMPASS_NWxW_SHORT" = "NW×W";
-
-/* North by east, long */
-"COMPASS_NxE_LONG" = "north by east";
-
-/* North by east, short */
-"COMPASS_NxE_SHORT" = "N×E";
-
-/* North by west, long */
-"COMPASS_NxW_LONG" = "north by west";
-
-/* North by west, short */
-"COMPASS_NxW_SHORT" = "N×W";
+"COMPASS_NWbW_SHORT" = "NWbW";
 
 /* South, long */
 "COMPASS_S_LONG" = "south";
 
 /* South, short */
 "COMPASS_S_SHORT" = "S";
+
+/* South by east, long */
+"COMPASS_SbE_LONG" = "south by east";
+
+/* South by east, short */
+"COMPASS_SbE_SHORT" = "SbE";
+
+/* South by west, long */
+"COMPASS_SbW_LONG" = "south by west";
+
+/* South by west, short */
+"COMPASS_SbW_SHORT" = "SbW";
 
 /* Southeast, long */
 "COMPASS_SE_LONG" = "southeast";
@@ -116,16 +128,16 @@
 "COMPASS_SE_SHORT" = "SE";
 
 /* Southeast by east, long */
-"COMPASS_SExE_LONG" = "southeast by east";
+"COMPASS_SEbE_LONG" = "southeast by east";
 
 /* Southeast by east, short */
-"COMPASS_SExE_SHORT" = "SE×E";
+"COMPASS_SEbE_SHORT" = "SEbE";
 
 /* Southeast by south, long */
-"COMPASS_SExS_LONG" = "southeast by south";
+"COMPASS_SEbS_LONG" = "southeast by south";
 
 /* Southeast by south, short */
-"COMPASS_SExS_SHORT" = "SE×S";
+"COMPASS_SEbS_SHORT" = "SEbS";
 
 /* South-southeast, long */
 "COMPASS_SSE_LONG" = "south-southeast";
@@ -146,34 +158,34 @@
 "COMPASS_SW_SHORT" = "SW";
 
 /* Southwest by south, long */
-"COMPASS_SWxS_LONG" = "southwest by south";
+"COMPASS_SWbS_LONG" = "southwest by south";
 
 /* Southwest by south, short */
-"COMPASS_SWxS_SHORT" = "SW×S";
+"COMPASS_SWbS_SHORT" = "SWbS";
 
 /* Southwest by west, long */
-"COMPASS_SWxW_LONG" = "southwest by west";
+"COMPASS_SWbW_LONG" = "southwest by west";
 
 /* Southwest by west, short */
-"COMPASS_SWxW_SHORT" = "SW×W";
-
-/* South by east, long */
-"COMPASS_SxE_LONG" = "south by east";
-
-/* South by east, short */
-"COMPASS_SxE_SHORT" = "S×E";
-
-/* South by west, long */
-"COMPASS_SxW_LONG" = "south by west";
-
-/* South by west, short */
-"COMPASS_SxW_SHORT" = "S×W";
+"COMPASS_SWbW_SHORT" = "SWbW";
 
 /* West, long */
 "COMPASS_W_LONG" = "west";
 
 /* West, short */
 "COMPASS_W_SHORT" = "W";
+
+/* West by north, long */
+"COMPASS_WbN_LONG" = "west by north";
+
+/* West by north, short */
+"COMPASS_WbN_SHORT" = "WbN";
+
+/* West by south, long */
+"COMPASS_WbS_LONG" = "west by south";
+
+/* West by south, short */
+"COMPASS_WbS_SHORT" = "WbS";
 
 /* West-northwest, long */
 "COMPASS_WNW_LONG" = "west-northwest";
@@ -186,18 +198,6 @@
 
 /* West-southwest, short */
 "COMPASS_WSW_SHORT" = "WSW";
-
-/* West by north, long */
-"COMPASS_WxN_LONG" = "west by north";
-
-/* West by north, short */
-"COMPASS_WxN_SHORT" = "W×N";
-
-/* West by south, long */
-"COMPASS_WxS_LONG" = "west by south";
-
-/* West by south, short */
-"COMPASS_WxS_SHORT" = "W×S";
 
 /* Degrees format, long */
 "COORD_DEG_LONG" = "%d degree(s)";

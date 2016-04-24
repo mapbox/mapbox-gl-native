@@ -35,7 +35,7 @@
     XCTAssertEqualObjects(@"north", [longFormatter stringFromDirection:direction]);
     
     direction = 10;
-    XCTAssertEqualObjects(@"N×E", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"NbE", [shortFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"north by east", [mediumFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"north by east", [longFormatter stringFromDirection:direction]);
     
