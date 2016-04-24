@@ -137,6 +137,22 @@
 		DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89339F1CCC951200E68420 /* Localizable.strings */; };
 		DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BA1CCD2CA100E68420 /* Foundation.strings */; };
 		DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */; };
+		DA8933DB1CCD31D400E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BA1CCD2CA100E68420 /* Foundation.strings */; };
+		DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */; };
+		DA8933DD1CCD31D400E68420 /* api_mapbox_com-digicert.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */; };
+		DA8933DE1CCD31D400E68420 /* api_mapbox_com-geotrust.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */; };
+		DA8933DF1CCD31D400E68420 /* star_tilestream_net.der in Resources */ = {isa = PBXBuildFile; fileRef = DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */; };
+		DA8933E01CCD31DF00E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89339F1CCC951200E68420 /* Localizable.strings */; };
+		DA8933E11CCD31DF00E68420 /* Compass.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848631CBAFCC100AB86E3 /* Compass.png */; };
+		DA8933E21CCD31DF00E68420 /* Compass@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848641CBAFCC100AB86E3 /* Compass@2x.png */; };
+		DA8933E31CCD31DF00E68420 /* Compass@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848651CBAFCC100AB86E3 /* Compass@3x.png */; };
+		DA8933E41CCD31DF00E68420 /* default_marker.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848661CBAFCC100AB86E3 /* default_marker.png */; };
+		DA8933E51CCD31DF00E68420 /* default_marker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848671CBAFCC100AB86E3 /* default_marker@2x.png */; };
+		DA8933E61CCD31DF00E68420 /* default_marker@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848681CBAFCC100AB86E3 /* default_marker@3x.png */; };
+		DA8933E71CCD31DF00E68420 /* mapbox.png in Resources */ = {isa = PBXBuildFile; fileRef = DA8848691CBAFCC100AB86E3 /* mapbox.png */; };
+		DA8933E81CCD31DF00E68420 /* mapbox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA88486A1CBAFCC100AB86E3 /* mapbox@2x.png */; };
+		DA8933E91CCD31DF00E68420 /* mapbox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = DA88486B1CBAFCC100AB86E3 /* mapbox@3x.png */; };
+		DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = DA8933EF1CCD387900E68420 /* strip-frameworks.sh */; };
 		DA8963371CC549A100684375 /* glyphs in Resources */ = {isa = PBXBuildFile; fileRef = DA8963331CC549A100684375 /* glyphs */; };
 		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
 		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
@@ -393,6 +409,9 @@
 		DA8933A01CCC951200E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA8933BB1CCD2CA100E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA8933BE1CCD2CAD00E68420 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA8933D51CCD306400E68420 /* Mapbox.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mapbox.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA8933EF1CCD387900E68420 /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "framework/strip-frameworks.sh"; sourceTree = SOURCE_ROOT; };
+		DA8933F11CCD3FD700E68420 /* Info-static.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-static.plist"; sourceTree = "<group>"; };
 		DA8963331CC549A100684375 /* glyphs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glyphs; sourceTree = "<group>"; };
 		DA8963341CC549A100684375 /* sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sprites; sourceTree = "<group>"; };
 		DA8963351CC549A100684375 /* styles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = styles; sourceTree = "<group>"; };
@@ -485,6 +504,7 @@
 				DA8847D21CBAF91600AB86E3 /* Mapbox.framework */,
 				DAA4E4131CBB71D400178DFB /* libMapbox.a */,
 				DA2E88511CC036F400F24E7B /* test.xctest */,
+				DA8933D51CCD306400E68420 /* Mapbox.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -563,6 +583,7 @@
 				DA8848331CBAFB2A00AB86E3 /* Kit */,
 				DA8848621CBAFCC100AB86E3 /* Kit Resources */,
 				DA8847D61CBAF91600AB86E3 /* Info.plist */,
+				DA8933F11CCD3FD700E68420 /* Info-static.plist */,
 			);
 			name = SDK;
 			path = framework;
@@ -663,6 +684,9 @@
 			isa = PBXGroup;
 			children = (
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
+				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
+				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
+				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
 				DA8848631CBAFCC100AB86E3 /* Compass.png */,
 				DA8848641CBAFCC100AB86E3 /* Compass@2x.png */,
 				DA8848651CBAFCC100AB86E3 /* Compass@3x.png */,
@@ -672,6 +696,7 @@
 				DA8848691CBAFCC100AB86E3 /* mapbox.png */,
 				DA88486A1CBAFCC100AB86E3 /* mapbox@2x.png */,
 				DA88486B1CBAFCC100AB86E3 /* mapbox@3x.png */,
+				DA8933EF1CCD387900E68420 /* strip-frameworks.sh */,
 			);
 			name = "Kit Resources";
 			path = resources;
@@ -714,9 +739,6 @@
 			children = (
 				DA8933BA1CCD2CA100E68420 /* Foundation.strings */,
 				DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */,
-				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
-				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
-				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
 			);
 			name = "Foundation Resources";
 			path = ../../darwin/resources;
@@ -924,6 +946,21 @@
 			productReference = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		DA8933D41CCD306400E68420 /* bundle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA8933D81CCD306400E68420 /* Build configuration list for PBXNativeTarget "bundle" */;
+			buildPhases = (
+				DA8933D31CCD306400E68420 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bundle;
+			productName = bundle;
+			productReference = DA8933D51CCD306400E68420 /* Mapbox.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		DAA4E4121CBB71D400178DFB /* static */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DAA4E4191CBB71D500178DFB /* Build configuration list for PBXNativeTarget "static" */;
@@ -980,6 +1017,9 @@
 					DA8847D11CBAF91600AB86E3 = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					DA8933D41CCD306400E68420 = {
+						CreatedOnToolsVersion = 7.3;
+					};
 					DAA4E4121CBB71D400178DFB = {
 						CreatedOnToolsVersion = 7.3;
 					};
@@ -1005,6 +1045,7 @@
 				DABCABA71CB80692000A7C39 /* bench */,
 				DA8847D11CBAF91600AB86E3 /* dynamic */,
 				DAA4E4121CBB71D400178DFB /* static */,
+				DA8933D41CCD306400E68420 /* bundle */,
 				DA2E88501CC036F400F24E7B /* test */,
 			);
 		};
@@ -1049,9 +1090,32 @@
 				DA88486E1CBAFCC100AB86E3 /* Compass@2x.png in Resources */,
 				DA8848701CBAFCC100AB86E3 /* default_marker.png in Resources */,
 				DA8848711CBAFCC100AB86E3 /* default_marker@2x.png in Resources */,
+				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DA8848751CBAFCC100AB86E3 /* mapbox@3x.png in Resources */,
 				DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA8933D31CCD306400E68420 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA8933E01CCD31DF00E68420 /* Localizable.strings in Resources */,
+				DA8933E11CCD31DF00E68420 /* Compass.png in Resources */,
+				DA8933E21CCD31DF00E68420 /* Compass@2x.png in Resources */,
+				DA8933E31CCD31DF00E68420 /* Compass@3x.png in Resources */,
+				DA8933E41CCD31DF00E68420 /* default_marker.png in Resources */,
+				DA8933E51CCD31DF00E68420 /* default_marker@2x.png in Resources */,
+				DA8933E61CCD31DF00E68420 /* default_marker@3x.png in Resources */,
+				DA8933E71CCD31DF00E68420 /* mapbox.png in Resources */,
+				DA8933E81CCD31DF00E68420 /* mapbox@2x.png in Resources */,
+				DA8933E91CCD31DF00E68420 /* mapbox@3x.png in Resources */,
+				DA8933DB1CCD31D400E68420 /* Foundation.strings in Resources */,
+				DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */,
+				DA8933DD1CCD31D400E68420 /* api_mapbox_com-digicert.der in Resources */,
+				DA8933DE1CCD31D400E68420 /* api_mapbox_com-geotrust.der in Resources */,
+				DA8933DF1CCD31D400E68420 /* star_tilestream_net.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1259,6 +1323,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_COMMIT_HASH = deadbeef;
+				CURRENT_SEMANTIC_VERSION = 1.0.0;
+				CURRENT_SHORT_VERSION = 1.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1305,6 +1372,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_COMMIT_HASH = deadbeef;
+				CURRENT_SEMANTIC_VERSION = 1.0.0;
+				CURRENT_SHORT_VERSION = 1.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1455,6 +1525,28 @@
 			};
 			name = Release;
 		};
+		DA8933D91CCD306400E68420 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "framework/Info-static.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
+				PRODUCT_NAME = Mapbox;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		DA8933DA1CCD306400E68420 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = "framework/Info-static.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
+				PRODUCT_NAME = Mapbox;
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
 		DAA4E41A1CBB71D500178DFB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
@@ -1574,6 +1666,15 @@
 			buildConfigurations = (
 				DA8847DB1CBAF91600AB86E3 /* Debug */,
 				DA8847DC1CBAF91600AB86E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA8933D81CCD306400E68420 /* Build configuration list for PBXNativeTarget "bundle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA8933D91CCD306400E68420 /* Debug */,
+				DA8933DA1CCD306400E68420 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
