@@ -1,18 +1,13 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -152,27 +147,8 @@ public class MarkerTest {
 
     @Test
     public void testParcelable() {
-        MarkerOptions object = new MarkerOptions().position(new LatLng(0, 0)).snippet("s").title("t");
-        Parcel parcel = MockParcel.obtain(object);
-        object.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        MarkerOptions parceable = MarkerOptions.CREATOR.createFromParcel(parcel);
-        assertEquals("parcel should match initial object", object, parceable);
-    }
-
-    @Test
-    public void testParcelableArray() {
-        MarkerOptions[] objects = new MarkerOptions[]{new MarkerOptions().position(new LatLng(0, 0)), new MarkerOptions().position(new LatLng(1, 1))};
-        Parcel parcel = MockParcel.obtain(objects);
-        parcel.writeParcelableArray(objects, 0);
-        parcel.setDataPosition(0);
-        MarkerOptions[] parcelableArray = (MarkerOptions[]) parcel.readParcelableArray(LatLng.class.getClassLoader());
-        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
-    }
-
-    @Test
-    public void testDescribeContents() {
-        MarkerOptions object = new MarkerOptions().position(new LatLng(0, 0)).snippet("s").title("t");
-        assertEquals("contents should be 0", 1034152.0, object.describeContents(), 0);
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng()).title("t").snippet("s");
+        Parcelable parcelable = MockParcel.obtain(markerOptions);
+        assertEquals("Parcel should match original object", parcelable, markerOptions);
     }
 }

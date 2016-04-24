@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.camera;
 
 import android.content.res.TypedArray;
-import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MathConstants;
@@ -12,7 +12,6 @@ import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -156,32 +155,8 @@ public class CameraPositionTest {
 
     @Test
     public void testParcelable() {
-        LatLng latLng = new LatLng(1, 2);
-        CameraPosition object = new CameraPosition(latLng, 3, 4, 5);
-        Parcel parcel = MockParcel.obtain(object);
-        object.writeToParcel(parcel, 0);
-        parcel.setDataPosition(0);
-        CameraPosition parceable = CameraPosition.CREATOR.createFromParcel(parcel);
-        assertEquals("parcel should match initial object", object, parceable);
-    }
-
-    @Test
-    public void testParcelableArray() {
-        LatLng latLng = new LatLng(1, 2);
-        CameraPosition object1 = new CameraPosition(latLng, 3, 4, 5);
-        CameraPosition object2 = new CameraPosition(latLng, 9, 9, 9);
-        CameraPosition[] objects = new CameraPosition[]{object1, object2};
-        Parcel parcel = MockParcel.obtain(objects);
-        parcel.writeParcelableArray(objects, 0);
-        parcel.setDataPosition(0);
-        CameraPosition[] parcelableArray = (CameraPosition[]) parcel.readParcelableArray(CameraPosition.class.getClassLoader());
-        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
-    }
-
-    @Test
-    public void testDescribeContents() {
-        LatLng latLng = new LatLng(1, 2);
-        CameraPosition object = new CameraPosition(latLng, 3, 4, 5);
-        assertEquals("contents should be 0", 0, object.describeContents());
+        CameraPosition object = new CameraPosition(new LatLng(1, 2), 3, 4, 5);
+        Parcelable parcelable = MockParcel.obtain(object);
+        assertEquals("Parcel should match original object", parcelable, object);
     }
 }

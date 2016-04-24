@@ -56,7 +56,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
 
     @Override
     public int describeContents() {
-        return hashCode();
+        return 0;
     }
 
     @Override

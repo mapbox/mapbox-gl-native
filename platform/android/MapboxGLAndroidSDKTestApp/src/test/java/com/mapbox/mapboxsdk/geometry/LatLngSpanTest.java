@@ -1,13 +1,11 @@
 package com.mapbox.mapboxsdk.geometry;
 
-import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.mapbox.mapboxsdk.geometry.LatLngSpan;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -61,22 +59,7 @@ public class LatLngSpanTest {
     @Test
     public void testParcelable() {
         LatLngSpan object = new LatLngSpan(1, 2);
-        Parcel parcel = MockParcel.obtain(object);
-        LatLngSpan parcelable = LatLngSpan.CREATOR.createFromParcel(parcel);
-        assertEquals("parcel should match initial object", object, parcelable);
-    }
-
-    @Test
-    public void testParcelableArray() {
-        LatLngSpan[] objects = new LatLngSpan[]{new LatLngSpan(1, 2), new LatLngSpan(2, 2)};
-        Parcel parcel = MockParcel.obtain(objects);
-        LatLngSpan[] parcelableArray = (LatLngSpan[]) parcel.readParcelableArray(LatLngSpan.class.getClassLoader());
-        assertArrayEquals("parcel should match initial object", objects, parcelableArray);
-    }
-
-    @Test
-    public void testDescribeContents() {
-        LatLngSpan latLngSpan = new LatLngSpan(1.2, 3.4);
-        assertEquals("contents should be 0", 0, latLngSpan.describeContents(), DELTA);
+        Parcelable parcel = MockParcel.obtain(object);
+        assertEquals("parcel should match initial object", object, parcel);
     }
 }
