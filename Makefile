@@ -119,7 +119,7 @@ iframework: $(IOS_PROJ_PATH)
 	./platform/ios/scripts/package.sh
 
 ifabric: $(IOS_PROJ_PATH)
-	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES \
+	BITCODE=$(BITCODE) FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO BUNDLE_RESOURCES=YES \
 	./platform/ios/scripts/package.sh
 
 idocument:
