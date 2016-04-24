@@ -1,5 +1,7 @@
 #import "MGLAttributionButton.h"
 
+#import "NSBundle+MGLAdditions.h"
+
 @implementation MGLAttributionButton {
     NSTrackingRectTag _trackingAreaTag;
 }
@@ -10,8 +12,7 @@
         self.bezelStyle = NSRegularSquareBezelStyle;
         
         // Start with a copyright symbol. The whole string will be mini.
-        NSMutableAttributedString *attributedTitle = [[NSMutableAttributedString alloc] initWithString:@"© "
-                                                                                            attributes:@{
+        NSMutableAttributedString *attributedTitle = [[NSMutableAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COPYRIGHT_PREFIX", nil, nil, @"© ", @"Copyright notice prefix") attributes:@{
             NSFontAttributeName: [NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSMiniControlSize]],
         }];
         // Append the specified title, underlining it like a hyperlink.

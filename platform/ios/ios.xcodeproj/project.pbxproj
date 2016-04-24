@@ -135,7 +135,8 @@
 		DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88488D1CBB047F00AB86E3 /* reachability.h */; };
 		DA8848901CBB048E00AB86E3 /* reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88488F1CBB048E00AB86E3 /* reachability.m */; };
 		DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89339F1CCC951200E68420 /* Localizable.strings */; };
-		DA8933A41CCC95B000E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA89339D1CCC951200E68420 /* Foundation.strings */; };
+		DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BA1CCD2CA100E68420 /* Foundation.strings */; };
+		DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */; };
 		DA8963371CC549A100684375 /* glyphs in Resources */ = {isa = PBXBuildFile; fileRef = DA8963331CC549A100684375 /* glyphs */; };
 		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
 		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
@@ -201,7 +202,6 @@
 		DABFB8711CBE9A0F00D62B32 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848381CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848391CBAFB8500AB86E3 /* MGLUserLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DAF9E8931CCBFA03004C7E73 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -390,8 +390,9 @@
 		DA88488A1CBB037E00AB86E3 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
 		DA88488D1CBB047F00AB86E3 /* reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reachability.h; path = ../../include/mbgl/platform/darwin/reachability.h; sourceTree = "<group>"; };
 		DA88488F1CBB048E00AB86E3 /* reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = reachability.m; path = src/reachability.m; sourceTree = "<group>"; };
-		DA89339E1CCC951200E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA8933A01CCC951200E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA8933BB1CCD2CA100E68420 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA8933BE1CCD2CAD00E68420 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA8963331CC549A100684375 /* glyphs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glyphs; sourceTree = "<group>"; };
 		DA8963341CC549A100684375 /* sprites */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sprites; sourceTree = "<group>"; };
 		DA8963351CC549A100684375 /* styles */ = {isa = PBXFileReference; lastKnownFileType = folder; path = styles; sourceTree = "<group>"; };
@@ -414,7 +415,6 @@
 		DABCABBF1CB80717000A7C39 /* locations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locations.cpp; sourceTree = "<group>"; };
 		DABCABC01CB80717000A7C39 /* locations.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = locations.hpp; sourceTree = "<group>"; };
 		DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/ios/mbgl.xcconfig; sourceTree = "<group>"; };
-		DAF9E8921CCBFA03004C7E73 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -559,8 +559,9 @@
 			children = (
 				DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */,
 				DA8847DE1CBAFA3E00AB86E3 /* Foundation */,
+				DA8933B91CCD2C6700E68420 /* Foundation Resources */,
 				DA8848331CBAFB2A00AB86E3 /* Kit */,
-				DA8848621CBAFCC100AB86E3 /* Resources */,
+				DA8848621CBAFCC100AB86E3 /* Kit Resources */,
 				DA8847D61CBAF91600AB86E3 /* Info.plist */,
 			);
 			name = SDK;
@@ -658,14 +659,10 @@
 			path = src;
 			sourceTree = SOURCE_ROOT;
 		};
-		DA8848621CBAFCC100AB86E3 /* Resources */ = {
+		DA8848621CBAFCC100AB86E3 /* Kit Resources */ = {
 			isa = PBXGroup;
 			children = (
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
-				DA89339D1CCC951200E68420 /* Foundation.strings */,
-				DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */,
-				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
-				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
 				DA8848631CBAFCC100AB86E3 /* Compass.png */,
 				DA8848641CBAFCC100AB86E3 /* Compass@2x.png */,
 				DA8848651CBAFCC100AB86E3 /* Compass@3x.png */,
@@ -675,9 +672,8 @@
 				DA8848691CBAFCC100AB86E3 /* mapbox.png */,
 				DA88486A1CBAFCC100AB86E3 /* mapbox@2x.png */,
 				DA88486B1CBAFCC100AB86E3 /* mapbox@3x.png */,
-				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
 			);
-			name = Resources;
+			name = "Kit Resources";
 			path = resources;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -711,6 +707,19 @@
 			);
 			name = reachability;
 			path = ..;
+			sourceTree = "<group>";
+		};
+		DA8933B91CCD2C6700E68420 /* Foundation Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DA8933BA1CCD2CA100E68420 /* Foundation.strings */,
+				DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */,
+				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
+				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
+				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
+			);
+			name = "Foundation Resources";
+			path = ../../darwin/resources;
 			sourceTree = "<group>";
 		};
 		DA8963321CC5498400684375 /* Fixtures */ = {
@@ -1029,12 +1038,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA8848731CBAFCC100AB86E3 /* mapbox.png in Resources */,
+				DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */,
 				DA8848741CBAFCC100AB86E3 /* mapbox@2x.png in Resources */,
 				DA88487A1CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der in Resources */,
 				DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */,
-				DA8933A41CCC95B000E68420 /* Foundation.strings in Resources */,
 				DA88486D1CBAFCC100AB86E3 /* Compass.png in Resources */,
-				DAF9E8931CCBFA03004C7E73 /* Foundation.stringsdict in Resources */,
 				DA8848721CBAFCC100AB86E3 /* default_marker@3x.png in Resources */,
 				DA88487C1CBAFD5C00AB86E3 /* star_tilestream_net.der in Resources */,
 				DA88486F1CBAFCC100AB86E3 /* Compass@3x.png in Resources */,
@@ -1043,6 +1051,7 @@
 				DA8848711CBAFCC100AB86E3 /* default_marker@2x.png in Resources */,
 				DA8848751CBAFCC100AB86E3 /* mapbox@3x.png in Resources */,
 				DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */,
+				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1195,14 +1204,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		DA89339D1CCC951200E68420 /* Foundation.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA89339E1CCC951200E68420 /* Base */,
-			);
-			name = Foundation.strings;
-			sourceTree = "<group>";
-		};
 		DA89339F1CCC951200E68420 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1211,20 +1212,28 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
+		DA8933BA1CCD2CA100E68420 /* Foundation.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA8933BB1CCD2CA100E68420 /* Base */,
+			);
+			name = Foundation.strings;
+			sourceTree = "<group>";
+		};
+		DA8933BD1CCD2CAD00E68420 /* Foundation.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA8933BE1CCD2CAD00E68420 /* en */,
+			);
+			name = Foundation.stringsdict;
+			sourceTree = "<group>";
+		};
 		DABCABB81CB80692000A7C39 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				DABCABB91CB80692000A7C39 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		DAF9E8911CCBFA03004C7E73 /* Foundation.stringsdict */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DAF9E8921CCBFA03004C7E73 /* en */,
-			);
-			name = Foundation.stringsdict;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

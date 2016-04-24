@@ -60,6 +60,14 @@ test-osx: osx node_modules/express
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(OSX_WORK_PATH) -scheme CI test | xcpretty
 
+genstrings:
+	genstrings -u -o platform/osx/sdk/Base.lproj platform/darwin/src/*.{m,mm}
+	genstrings -u -o platform/osx/sdk/Base.lproj platform/osx/src/*.{m,mm}
+	genstrings -u -o platform/ios/resources/Base.lproj platform/ios/src/*.{m,mm}
+	mv platform/osx/sdk/Base.lproj/Foundation.strings platform/darwin/resources/Base.lproj/
+	-find platform/{darwin,ios,osx}/ -path '*/Base.lproj/*.strings' -exec \
+		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
+
 #### iOS targets ##############################################################
 
 IOS_OUTPUT_PATH = build/ios
@@ -124,12 +132,6 @@ ifabric: $(IOS_PROJ_PATH)
 
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
-
-ilocalize:
-	genstrings -u -o platform/ios/resources/Base.lproj platform/darwin/src/*.{m,mm}
-	genstrings -u -o platform/ios/resources/Base.lproj platform/ios/src/*.{m,mm}
-	-find platform/ios/ -path '*/Base.lproj/*.strings' -exec \
-		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
 
 #### Android targets #####################################################
 

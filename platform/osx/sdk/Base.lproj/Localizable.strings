@@ -1,0 +1,30 @@
+/* Linked part of copyright notice */
+"COPYRIGHT_MAPBOX" = "Mapbox";
+
+/* Copyright notice link */
+"COPYRIGHT_MAPBOX_LINK" = "https://www.mapbox.com/about/maps/";
+
+/* Linked part of copyright notice */
+"COPYRIGHT_OSM" = "OpenStreetMap";
+
+/* Copyright notice link */
+"COPYRIGHT_OSM_LINK" = "http://www.openstreetmap.org/about/";
+
+/* Copyright notice prefix */
+"COPYRIGHT_PREFIX" = "© ";
+
+/* Accessibility title */
+"MAP_A11Y_TITLE" = "Mapbox";
+
+/* Label of Zoom In button */
+"ZOOM_IN_LABEL" = "+";
+
+/* Tooltip of Zoom In button */
+"ZOOM_IN_TOOLTIP" = "Zoom In";
+
+/* Label of Zoom Out button; U+2212 MINUS SIGN */
+"ZOOM_OUT_LABEL" = "−";
+
+/* Tooltip of Zoom Out button */
+"ZOOM_OUT_TOOLTIP" = "Zoom Out";
+
