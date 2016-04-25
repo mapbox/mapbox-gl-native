@@ -46,26 +46,11 @@ enum class VisibilityType : bool {
     None,
 };
 
-MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
-    { VisibilityType::Visible, "visible" },
-    { VisibilityType::None, "none" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class LineCapType : uint8_t {
     Round,
     Butt,
     Square,
 };
-
-MBGL_DEFINE_ENUM_CLASS(LineCapTypeClass, LineCapType, {
-    { LineCapType::Round, "round" },
-    { LineCapType::Butt, "butt" },
-    { LineCapType::Square, "square" },
-});
-
-// -------------------------------------------------------------------------------------------------
 
 enum class LineJoinType : uint8_t {
     Miter,
@@ -76,77 +61,31 @@ enum class LineJoinType : uint8_t {
     FlipBevel
 };
 
-MBGL_DEFINE_ENUM_CLASS(LineJoinTypeClass, LineJoinType, {
-    { LineJoinType::Miter, "miter" },
-    { LineJoinType::Bevel, "bevel" },
-    { LineJoinType::Round, "round" },
-    { LineJoinType::FakeRound, "fakeround" },
-    { LineJoinType::FlipBevel, "flipbevel" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class TranslateAnchorType : bool {
     Map,
     Viewport
 };
-
-MBGL_DEFINE_ENUM_CLASS(TranslateAnchorTypeClass, TranslateAnchorType, {
-    { TranslateAnchorType::Map, "map" },
-    { TranslateAnchorType::Viewport, "viewport" },
-});
-
-// -------------------------------------------------------------------------------------------------
 
 enum class RotateAnchorType : bool {
     Map,
     Viewport,
 };
 
-MBGL_DEFINE_ENUM_CLASS(RotateAnchorTypeClass, RotateAnchorType, {
-    { RotateAnchorType::Map, "map" },
-    { RotateAnchorType::Viewport, "viewport" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class SymbolPlacementType : bool {
     Point,
     Line,
 };
-
-MBGL_DEFINE_ENUM_CLASS(SymbolPlacementTypeClass, SymbolPlacementType, {
-    { SymbolPlacementType::Point, "point" },
-    { SymbolPlacementType::Line, "line" },
-});
-
-// -------------------------------------------------------------------------------------------------
 
 enum class RotationAlignmentType : bool {
     Map,
     Viewport,
 };
 
-MBGL_DEFINE_ENUM_CLASS(RotationAlignmentTypeClass, RotationAlignmentType, {
-    { RotationAlignmentType::Map, "map" },
-    { RotationAlignmentType::Viewport, "viewport" },
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class TextJustifyType : uint8_t {
     Center,
     Left,
     Right
 };
-
-MBGL_DEFINE_ENUM_CLASS(TextJustifyTypeClass, TextJustifyType, {
-    { TextJustifyType::Center, "center" },
-    { TextJustifyType::Left, "left" },
-    { TextJustifyType::Right, "right" },
-});
-
-// -------------------------------------------------------------------------------------------------
 
 enum class TextAnchorType : uint8_t {
     Center,
@@ -160,31 +99,11 @@ enum class TextAnchorType : uint8_t {
     BottomRight
 };
 
-MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
-    { TextAnchorType::Center, "center" },
-    { TextAnchorType::Left, "left" },
-    { TextAnchorType::Right, "right" },
-    { TextAnchorType::Top, "top" },
-    { TextAnchorType::Bottom, "bottom" },
-    { TextAnchorType::TopLeft, "top-left" },
-    { TextAnchorType::TopRight, "top-right" },
-    { TextAnchorType::BottomLeft, "bottom-left" },
-    { TextAnchorType::BottomRight, "bottom-right" }
-});
-
-// -------------------------------------------------------------------------------------------------
-
 enum class TextTransformType : uint8_t {
     None,
     Uppercase,
     Lowercase,
 };
-
-MBGL_DEFINE_ENUM_CLASS(TextTransformTypeClass, TextTransformType, {
-    { TextTransformType::None, "none" },
-    { TextTransformType::Uppercase, "uppercase" },
-    { TextTransformType::Lowercase, "lowercase" },
-});
 
 /**
  * Initialize any GL state needed by the custom layer. This method is called once, from the

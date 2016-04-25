@@ -481,6 +481,11 @@ void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::u
     layer->parsePaints(value);
 }
 
+MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
+    { VisibilityType::Visible, "visible" },
+    { VisibilityType::None, "none" },
+});
+
 void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
     if (!value.HasMember("visibility")) {
         return;
