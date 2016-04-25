@@ -14,8 +14,9 @@ xcuserdata
 /test/fixtures/*/*_actual.*
 /test/fixtures/api/1.png
 /test/fixtures/api/2.png
-/test/fixtures/database/*.db
-/test/fixtures/offline/v3.db
+/test/fixtures/offline_database/offline.db
+/test/fixtures/offline_database/invalid.db
+/test/fixtures/offline_database/v3.db
 /test/fixtures/**/actual.png
 /test/fixtures/**/diff.png
 /test/output

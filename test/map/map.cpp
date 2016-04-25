@@ -21,24 +21,24 @@ TEST(Map, Offline) {
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/"s + path));
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/offline/"s + path));
         response.expires = SystemClock::from_time_t(0);
         return response;
     };
 
-    const std::string prefix = "http://127.0.0.1:3000";
-    fileSource.put(Resource::style(prefix + "/offline/style.json"), expiredItem("offline/style.json"));
-    fileSource.put(Resource::source(prefix + "/offline/streets.json"), expiredItem("offline/streets.json"));
-    fileSource.put(Resource::spriteJSON(prefix + "/offline/sprite", 1.0), expiredItem("offline/sprite.json"));
-    fileSource.put(Resource::spriteImage(prefix + "/offline/sprite", 1.0), expiredItem("offline/sprite.png"));
-    fileSource.put(Resource::tile(prefix + "/offline/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0), expiredItem("offline/0-0-0.vector.pbf"));
-    fileSource.put(Resource::glyphs(prefix + "/offline/{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("offline/glyph.pbf"));
+    const std::string prefix = "http://127.0.0.1:3000/";
+    fileSource.put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
+    fileSource.put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
+    fileSource.put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
+    fileSource.put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
+    fileSource.put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0), expiredItem("0-0-0.vector.pbf"));
+    fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
     Map map(view, fileSource, MapMode::Still);
-    map.setStyleURL(prefix + "/offline/style.json");
+    map.setStyleURL(prefix + "style.json");
 
-    test::checkImage("test/fixtures/offline",
+    test::checkImage("test/fixtures/map/offline",
                      test::render(map),
                      0.0015,
                      0.1);
