@@ -42,52 +42,52 @@ const std::string& CircleLayer::getSourceLayer() const {
 
 // Paint properties
 
-Function<float> CircleLayer::getCircleRadius() const {
-    return impl->paint.circleRadius.values.at(ClassID::Default);
+PropertyValue<float> CircleLayer::getCircleRadius() const {
+    return impl->paint.circleRadius.get();
 }
 
-void CircleLayer::setCircleRadius(Function<float> value) {
-    impl->paint.circleRadius.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleRadius(PropertyValue<float> value) {
+    impl->paint.circleRadius.set(value);
 }
 
-Function<Color> CircleLayer::getCircleColor() const {
-    return impl->paint.circleColor.values.at(ClassID::Default);
+PropertyValue<Color> CircleLayer::getCircleColor() const {
+    return impl->paint.circleColor.get();
 }
 
-void CircleLayer::setCircleColor(Function<Color> value) {
-    impl->paint.circleColor.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleColor(PropertyValue<Color> value) {
+    impl->paint.circleColor.set(value);
 }
 
-Function<float> CircleLayer::getCircleBlur() const {
-    return impl->paint.circleBlur.values.at(ClassID::Default);
+PropertyValue<float> CircleLayer::getCircleBlur() const {
+    return impl->paint.circleBlur.get();
 }
 
-void CircleLayer::setCircleBlur(Function<float> value) {
-    impl->paint.circleBlur.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleBlur(PropertyValue<float> value) {
+    impl->paint.circleBlur.set(value);
 }
 
-Function<float> CircleLayer::getCircleOpacity() const {
-    return impl->paint.circleOpacity.values.at(ClassID::Default);
+PropertyValue<float> CircleLayer::getCircleOpacity() const {
+    return impl->paint.circleOpacity.get();
 }
 
-void CircleLayer::setCircleOpacity(Function<float> value) {
-    impl->paint.circleOpacity.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleOpacity(PropertyValue<float> value) {
+    impl->paint.circleOpacity.set(value);
 }
 
-Function<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
-    return impl->paint.circleTranslate.values.at(ClassID::Default);
+PropertyValue<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
+    return impl->paint.circleTranslate.get();
 }
 
-void CircleLayer::setCircleTranslate(Function<std::array<float, 2>> value) {
-    impl->paint.circleTranslate.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleTranslate(PropertyValue<std::array<float, 2>> value) {
+    impl->paint.circleTranslate.set(value);
 }
 
-Function<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
-    return impl->paint.circleTranslateAnchor.values.at(ClassID::Default);
+PropertyValue<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
+    return impl->paint.circleTranslateAnchor.get();
 }
 
-void CircleLayer::setCircleTranslateAnchor(Function<TranslateAnchorType> value) {
-    impl->paint.circleTranslateAnchor.values.emplace(ClassID::Default, value);
+void CircleLayer::setCircleTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+    impl->paint.circleTranslateAnchor.set(value);
 }
 
 } // namespace mbgl

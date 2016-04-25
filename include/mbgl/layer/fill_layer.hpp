@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
 
@@ -19,26 +20,26 @@ public:
 
     // Paint properties
 
-    Function<bool> getFillAntialias() const;
-    void setFillAntialias(Function<bool>);
+    PropertyValue<bool> getFillAntialias() const;
+    void setFillAntialias(PropertyValue<bool>);
 
-    Function<float> getFillOpacity() const;
-    void setFillOpacity(Function<float>);
+    PropertyValue<float> getFillOpacity() const;
+    void setFillOpacity(PropertyValue<float>);
 
-    Function<Color> getFillColor() const;
-    void setFillColor(Function<Color>);
+    PropertyValue<Color> getFillColor() const;
+    void setFillColor(PropertyValue<Color>);
 
-    Function<Color> getFillOutlineColor() const;
-    void setFillOutlineColor(Function<Color>);
+    PropertyValue<Color> getFillOutlineColor() const;
+    void setFillOutlineColor(PropertyValue<Color>);
 
-    Function<std::array<float, 2>> getFillTranslate() const;
-    void setFillTranslate(Function<std::array<float, 2>>);
+    PropertyValue<std::array<float, 2>> getFillTranslate() const;
+    void setFillTranslate(PropertyValue<std::array<float, 2>>);
 
-    Function<TranslateAnchorType> getFillTranslateAnchor() const;
-    void setFillTranslateAnchor(Function<TranslateAnchorType>);
+    PropertyValue<TranslateAnchorType> getFillTranslateAnchor() const;
+    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>);
 
-    Function<std::string> getFillPattern() const;
-    void setFillPattern(Function<std::string>);
+    PropertyValue<std::string> getFillPattern() const;
+    void setFillPattern(PropertyValue<std::string>);
 
     // Private implementation
 

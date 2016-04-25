@@ -6,7 +6,6 @@
 #include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/layer/background_layer.hpp>
 #include <mbgl/layer/layer_impl.hpp>
-#include <mbgl/layer/symbol_layer_impl.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -670,13 +669,15 @@ std::vector<FontStack> StyleParser::fontStacks() const {
 
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>()) {
-            LayoutProperty<FontStack> property = layer->as<SymbolLayer>()->impl->layout.textFont;
-            if (property.parsedValue) {
-                for (const auto& stop : property.parsedValue->getStops()) {
+            PropertyValue<FontStack> textFont = layer->as<SymbolLayer>()->getTextFont();
+            if (textFont.isUndefined()) {
+                result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
+            } else if (textFont.isConstant()) {
+                result.insert(textFont.asConstant());
+            } else if (textFont.isFunction()) {
+                for (const auto& stop : textFont.asFunction().getStops()) {
                     result.insert(stop.second);
                 }
-            } else {
-                result.insert(property.value);
             }
         }
     }

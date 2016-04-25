@@ -1,4 +1,4 @@
-#include <mbgl/style/function_evaluator.hpp>
+#include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/interpolate.hpp>
@@ -30,7 +30,7 @@ template <> inline TextTransformType defaultStopsValue() { return {}; };
 template <> inline RotationAlignmentType defaultStopsValue() { return {}; };
 
 template <typename T>
-T NormalFunctionEvaluator<T>::operator()(const Function<T>& fn, const StyleCalculationParameters& parameters) const {
+T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
     float base = fn.getBase();
     const std::vector<std::pair<float, T>>& stops = fn.getStops();
     float z = parameters.z;
@@ -79,68 +79,65 @@ T NormalFunctionEvaluator<T>::operator()(const Function<T>& fn, const StyleCalcu
     }
 }
 
-template class NormalFunctionEvaluator<bool>;
-template class NormalFunctionEvaluator<float>;
-template class NormalFunctionEvaluator<Color>;
-template class NormalFunctionEvaluator<std::vector<float>>;
-template class NormalFunctionEvaluator<std::vector<std::string>>;
-template class NormalFunctionEvaluator<std::array<float, 2>>;
+template class PropertyEvaluator<bool>;
+template class PropertyEvaluator<float>;
+template class PropertyEvaluator<Color>;
+template class PropertyEvaluator<std::vector<float>>;
+template class PropertyEvaluator<std::vector<std::string>>;
+template class PropertyEvaluator<std::array<float, 2>>;
 
-template class NormalFunctionEvaluator<std::string>;
-template class NormalFunctionEvaluator<TranslateAnchorType>;
-template class NormalFunctionEvaluator<RotateAnchorType>;
-template class NormalFunctionEvaluator<LineCapType>;
-template class NormalFunctionEvaluator<LineJoinType>;
-template class NormalFunctionEvaluator<SymbolPlacementType>;
-template class NormalFunctionEvaluator<TextAnchorType>;
-template class NormalFunctionEvaluator<TextJustifyType>;
-template class NormalFunctionEvaluator<TextTransformType>;
-template class NormalFunctionEvaluator<RotationAlignmentType>;
+template class PropertyEvaluator<std::string>;
+template class PropertyEvaluator<TranslateAnchorType>;
+template class PropertyEvaluator<RotateAnchorType>;
+template class PropertyEvaluator<LineCapType>;
+template class PropertyEvaluator<LineJoinType>;
+template class PropertyEvaluator<SymbolPlacementType>;
+template class PropertyEvaluator<TextAnchorType>;
+template class PropertyEvaluator<TextJustifyType>;
+template class PropertyEvaluator<TextTransformType>;
+template class PropertyEvaluator<RotationAlignmentType>;
 
 template <typename T>
-inline size_t getBiggestStopLessThan(const std::vector<std::pair<float, T>>& stops, float z) {
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Undefined&) const {
+    return calculate(defaultValue, defaultValue, defaultValue);
+}
+
+template <typename T>
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
+    return calculate(constant, constant, constant);
+}
+
+template <typename T>
+inline T getBiggestStopLessThan(const Function<T>& function, float z) {
+    const auto& stops = function.getStops();
     for (uint32_t i = 0; i < stops.size(); i++) {
         if (stops[i].first > z) {
-            return i == 0 ? i : i - 1;
+            return stops[i == 0 ? i : i - 1].second;
         }
     }
-    return stops.size() - 1;
+    return stops.at(stops.size() - 1).second;
 }
 
 template <typename T>
-Faded<T> CrossFadedFunctionEvaluator<T>::operator()(const Function<T>& fn, const StyleCalculationParameters& parameters) const {
-    Faded<T> result;
-
-    const std::vector<std::pair<float, T>>& stops = fn.getStops();
-    float z = parameters.z;
-    const float fraction = z - std::floor(z);
-    std::chrono::duration<float> d = parameters.defaultFadeDuration;
-    float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
-    float fromScale = 1.0f;
-    float toScale = 1.0f;
-    size_t from, to;
-
-    if (z > parameters.zoomHistory.lastIntegerZoom) {
-        result.t = fraction + (1.0f - fraction) * t;
-        from = getBiggestStopLessThan(stops, z - 1.0f);
-        to = getBiggestStopLessThan(stops, z);
-        fromScale *= 2.0f;
-
-    } else {
-        result.t = 1 - (1 - t) * fraction;
-        to = getBiggestStopLessThan(stops, z);
-        from = getBiggestStopLessThan(stops, z + 1.0f);
-        fromScale /= 2.0f;
-    }
-
-    result.from = stops[from].second;
-    result.to = stops[to].second;
-    result.fromScale = fromScale;
-    result.toScale = toScale;
-    return result;
+Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Function<T>& function) const {
+    return calculate(getBiggestStopLessThan(function, parameters.z - 1.0f),
+                     getBiggestStopLessThan(function, parameters.z),
+                     getBiggestStopLessThan(function, parameters.z + 1.0f));
 }
 
-template class CrossFadedFunctionEvaluator<std::string>;
-template class CrossFadedFunctionEvaluator<std::vector<float>>;
+template <typename T>
+Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, const T& max) const {
+    const float z = parameters.z;
+    const float fraction = z - std::floor(z);
+    const std::chrono::duration<float> d = parameters.defaultFadeDuration;
+    const float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
+
+    return z > parameters.zoomHistory.lastIntegerZoom
+        ? Faded<T> { min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }
+        : Faded<T> { max, mid, 0.5f, 1.0f, 1 - (1 - t) * fraction };
+}
+
+template class CrossFadedPropertyEvaluator<std::string>;
+template class CrossFadedPropertyEvaluator<std::vector<float>>;
 
 } // namespace mbgl

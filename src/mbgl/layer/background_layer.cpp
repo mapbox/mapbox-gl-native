@@ -28,28 +28,28 @@ std::unique_ptr<Layer> BackgroundLayer::Impl::clone() const {
 
 // Paint properties
 
-Function<Color> BackgroundLayer::getBackgroundColor() const {
-    return impl->paint.backgroundColor.values.at(ClassID::Default);
+PropertyValue<Color> BackgroundLayer::getBackgroundColor() const {
+    return impl->paint.backgroundColor.get();
 }
 
-void BackgroundLayer::setBackgroundColor(Function<Color> value) {
-    impl->paint.backgroundColor.values.emplace(ClassID::Default, value);
+void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value) {
+    impl->paint.backgroundColor.set(value);
 }
 
-Function<std::string> BackgroundLayer::getBackgroundPattern() const {
-    return impl->paint.backgroundPattern.values.at(ClassID::Default);
+PropertyValue<std::string> BackgroundLayer::getBackgroundPattern() const {
+    return impl->paint.backgroundPattern.get();
 }
 
-void BackgroundLayer::setBackgroundPattern(Function<std::string> value) {
-    impl->paint.backgroundPattern.values.emplace(ClassID::Default, value);
+void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value) {
+    impl->paint.backgroundPattern.set(value);
 }
 
-Function<float> BackgroundLayer::getBackgroundOpacity() const {
-    return impl->paint.backgroundOpacity.values.at(ClassID::Default);
+PropertyValue<float> BackgroundLayer::getBackgroundOpacity() const {
+    return impl->paint.backgroundOpacity.get();
 }
 
-void BackgroundLayer::setBackgroundOpacity(Function<float> value) {
-    impl->paint.backgroundOpacity.values.emplace(ClassID::Default, value);
+void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value) {
+    impl->paint.backgroundOpacity.set(value);
 }
 
 } // namespace mbgl

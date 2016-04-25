@@ -37,60 +37,60 @@ const std::string& RasterLayer::getSourceID() const {
 
 // Paint properties
 
-Function<float> RasterLayer::getRasterOpacity() const {
-    return impl->paint.rasterOpacity.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterOpacity() const {
+    return impl->paint.rasterOpacity.get();
 }
 
-void RasterLayer::setRasterOpacity(Function<float> value) {
-    impl->paint.rasterOpacity.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterOpacity(PropertyValue<float> value) {
+    impl->paint.rasterOpacity.set(value);
 }
 
-Function<float> RasterLayer::getRasterHueRotate() const {
-    return impl->paint.rasterHueRotate.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterHueRotate() const {
+    return impl->paint.rasterHueRotate.get();
 }
 
-void RasterLayer::setRasterHueRotate(Function<float> value) {
-    impl->paint.rasterHueRotate.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterHueRotate(PropertyValue<float> value) {
+    impl->paint.rasterHueRotate.set(value);
 }
 
-Function<float> RasterLayer::getRasterBrightnessMin() const {
-    return impl->paint.rasterBrightnessMin.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterBrightnessMin() const {
+    return impl->paint.rasterBrightnessMin.get();
 }
 
-void RasterLayer::setRasterBrightnessMin(Function<float> value) {
-    impl->paint.rasterBrightnessMin.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterBrightnessMin(PropertyValue<float> value) {
+    impl->paint.rasterBrightnessMin.set(value);
 }
 
-Function<float> RasterLayer::getRasterBrightnessMax() const {
-    return impl->paint.rasterBrightnessMax.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterBrightnessMax() const {
+    return impl->paint.rasterBrightnessMax.get();
 }
 
-void RasterLayer::setRasterBrightnessMax(Function<float> value) {
-    impl->paint.rasterBrightnessMax.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterBrightnessMax(PropertyValue<float> value) {
+    impl->paint.rasterBrightnessMax.set(value);
 }
 
-Function<float> RasterLayer::getRasterSaturation() const {
-    return impl->paint.rasterSaturation.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterSaturation() const {
+    return impl->paint.rasterSaturation.get();
 }
 
-void RasterLayer::setRasterSaturation(Function<float> value) {
-    impl->paint.rasterSaturation.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterSaturation(PropertyValue<float> value) {
+    impl->paint.rasterSaturation.set(value);
 }
 
-Function<float> RasterLayer::getRasterContrast() const {
-    return impl->paint.rasterContrast.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterContrast() const {
+    return impl->paint.rasterContrast.get();
 }
 
-void RasterLayer::setRasterContrast(Function<float> value) {
-    impl->paint.rasterContrast.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterContrast(PropertyValue<float> value) {
+    impl->paint.rasterContrast.set(value);
 }
 
-Function<float> RasterLayer::getRasterFadeDuration() const {
-    return impl->paint.rasterFadeDuration.values.at(ClassID::Default);
+PropertyValue<float> RasterLayer::getRasterFadeDuration() const {
+    return impl->paint.rasterFadeDuration.get();
 }
 
-void RasterLayer::setRasterFadeDuration(Function<float> value) {
-    impl->paint.rasterFadeDuration.values.emplace(ClassID::Default, value);
+void RasterLayer::setRasterFadeDuration(PropertyValue<float> value) {
+    impl->paint.rasterFadeDuration.set(value);
 }
 
 } // namespace mbgl

@@ -18,7 +18,7 @@ public:
     bool recalculate(const StyleCalculationParameters&);
 
     PaintProperty<Color> backgroundColor { {{ 0, 0, 0, 1 }} };
-    PaintProperty<std::string, CrossFadedFunctionEvaluator> backgroundPattern { "" };
+    PaintProperty<std::string, CrossFadedPropertyEvaluator> backgroundPattern { "" };
     PaintProperty<float> backgroundOpacity { 1 };
 };
 

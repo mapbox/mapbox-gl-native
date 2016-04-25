@@ -27,9 +27,6 @@ public:
     using Stop = std::pair<float, T>;
     using Stops = std::vector<Stop>;
 
-    Function(const T& constant)
-        : stops({{ 0, constant }}) {}
-
     explicit Function(const Stops& stops_, float base_)
         : base(base_), stops(stops_) {}
 

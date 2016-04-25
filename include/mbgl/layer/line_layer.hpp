@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
 
 #include <vector>
 
@@ -21,49 +22,49 @@ public:
 
     // Layout properties
 
-    Function<LineCapType> getLineCap() const;
-    void setLineCap(Function<LineCapType>);
+    PropertyValue<LineCapType> getLineCap() const;
+    void setLineCap(PropertyValue<LineCapType>);
 
-    Function<LineJoinType> getLineJoin() const;
-    void setLineJoin(Function<LineJoinType>);
+    PropertyValue<LineJoinType> getLineJoin() const;
+    void setLineJoin(PropertyValue<LineJoinType>);
 
-    Function<float> getLineMiterLimit() const;
-    void setLineMiterLimit(Function<float>);
+    PropertyValue<float> getLineMiterLimit() const;
+    void setLineMiterLimit(PropertyValue<float>);
 
-    Function<float> getLineRoundLimit() const;
-    void setLineRoundLimit(Function<float>);
+    PropertyValue<float> getLineRoundLimit() const;
+    void setLineRoundLimit(PropertyValue<float>);
 
     // Paint properties
 
-    Function<float> getLineOpacity() const;
-    void setLineOpacity(Function<float>);
+    PropertyValue<float> getLineOpacity() const;
+    void setLineOpacity(PropertyValue<float>);
 
-    Function<Color> getLineColor() const;
-    void setLineColor(Function<Color>);
+    PropertyValue<Color> getLineColor() const;
+    void setLineColor(PropertyValue<Color>);
 
-    Function<std::array<float, 2>> getLineTranslate() const;
-    void setLineTranslate(Function<std::array<float, 2>>);
+    PropertyValue<std::array<float, 2>> getLineTranslate() const;
+    void setLineTranslate(PropertyValue<std::array<float, 2>>);
 
-    Function<TranslateAnchorType> getLineTranslateAnchor() const;
-    void setLineTranslateAnchor(Function<TranslateAnchorType>);
+    PropertyValue<TranslateAnchorType> getLineTranslateAnchor() const;
+    void setLineTranslateAnchor(PropertyValue<TranslateAnchorType>);
 
-    Function<float> getLineWidth() const;
-    void setLineWidth(Function<float>);
+    PropertyValue<float> getLineWidth() const;
+    void setLineWidth(PropertyValue<float>);
 
-    Function<float> getLineGapWidth() const;
-    void setLineGapWidth(Function<float>);
+    PropertyValue<float> getLineGapWidth() const;
+    void setLineGapWidth(PropertyValue<float>);
 
-    Function<float> getLineOffset() const;
-    void setLineOffset(Function<float>);
+    PropertyValue<float> getLineOffset() const;
+    void setLineOffset(PropertyValue<float>);
 
-    Function<float> getLineBlur() const;
-    void setLineBlur(Function<float>);
+    PropertyValue<float> getLineBlur() const;
+    void setLineBlur(PropertyValue<float>);
 
-    Function<std::vector<float>> getLineDasharray() const;
-    void setLineDasharray(Function<std::vector<float>>);
+    PropertyValue<std::vector<float>> getLineDasharray() const;
+    void setLineDasharray(PropertyValue<std::vector<float>>);
 
-    Function<std::string> getLinePattern() const;
-    void setLinePattern(Function<std::string>);
+    PropertyValue<std::string> getLinePattern() const;
+    void setLinePattern(PropertyValue<std::string>);
 
     // Private implementation
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
 
@@ -19,23 +20,23 @@ public:
 
     // Paint properties
 
-    Function<float> getCircleRadius() const;
-    void setCircleRadius(Function<float>);
+    PropertyValue<float> getCircleRadius() const;
+    void setCircleRadius(PropertyValue<float>);
 
-    Function<Color> getCircleColor() const;
-    void setCircleColor(Function<Color>);
+    PropertyValue<Color> getCircleColor() const;
+    void setCircleColor(PropertyValue<Color>);
 
-    Function<float> getCircleBlur() const;
-    void setCircleBlur(Function<float>);
+    PropertyValue<float> getCircleBlur() const;
+    void setCircleBlur(PropertyValue<float>);
 
-    Function<float> getCircleOpacity() const;
-    void setCircleOpacity(Function<float>);
+    PropertyValue<float> getCircleOpacity() const;
+    void setCircleOpacity(PropertyValue<float>);
 
-    Function<std::array<float, 2>> getCircleTranslate() const;
-    void setCircleTranslate(Function<std::array<float, 2>>);
+    PropertyValue<std::array<float, 2>> getCircleTranslate() const;
+    void setCircleTranslate(PropertyValue<std::array<float, 2>>);
 
-    Function<TranslateAnchorType> getCircleTranslateAnchor() const;
-    void setCircleTranslateAnchor(Function<TranslateAnchorType>);
+    PropertyValue<TranslateAnchorType> getCircleTranslateAnchor() const;
+    void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>);
 
     // Private implementation
 

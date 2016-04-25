@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
 
@@ -13,14 +14,14 @@ public:
 
     // Paint properties
 
-    Function<Color> getBackgroundColor() const;
-    void setBackgroundColor(Function<Color>);
+    PropertyValue<Color> getBackgroundColor() const;
+    void setBackgroundColor(PropertyValue<Color>);
 
-    Function<std::string> getBackgroundPattern() const;
-    void setBackgroundPattern(Function<std::string>);
+    PropertyValue<std::string> getBackgroundPattern() const;
+    void setBackgroundPattern(PropertyValue<std::string>);
 
-    Function<float> getBackgroundOpacity() const;
-    void setBackgroundOpacity(Function<float>);
+    PropertyValue<float> getBackgroundOpacity() const;
+    void setBackgroundOpacity(PropertyValue<float>);
 
     // Private implementation
 

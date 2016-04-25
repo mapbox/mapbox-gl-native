@@ -36,8 +36,8 @@ public:
     PaintProperty<float> lineGapWidth { 0 };
     PaintProperty<float> lineOffset { 0 };
     PaintProperty<float> lineBlur { 0 };
-    PaintProperty<std::vector<float>, CrossFadedFunctionEvaluator> lineDasharray { {  } };
-    PaintProperty<std::string, CrossFadedFunctionEvaluator> linePattern { "" };
+    PaintProperty<std::vector<float>, CrossFadedPropertyEvaluator> lineDasharray { {  } };
+    PaintProperty<std::string, CrossFadedPropertyEvaluator> linePattern { "" };
 };
 
 } // namespace mbgl

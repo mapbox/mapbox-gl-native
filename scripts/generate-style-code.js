@@ -77,10 +77,12 @@ const layerHpp = ejs.compile(`<%
 #pragma once
 
 #include <mbgl/style/layer.hpp>
-<% if (type === 'line' || type === 'symbol') { %>
-#include <vector>
-<% } -%>
+#include <mbgl/style/property_value.hpp>
 
+<% if (type === 'line' || type === 'symbol') { -%>
+#include <vector>
+
+<% } -%>
 namespace mbgl {
 
 class <%- camelize(type) %>Layer : public Layer {
@@ -106,16 +108,16 @@ public:
     // Layout properties
 
 <% for (const property of layoutProperties) { -%>
-    Function<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(Function<<%- propertyType(property) %>>);
+    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
 
 <% } -%>
 <% } -%>
     // Paint properties
 
 <% for (const property of paintProperties) { -%>
-    Function<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(Function<<%- propertyType(property) %>>);
+    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
 
 <% } -%>
     // Private implementation
@@ -194,23 +196,23 @@ const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
 // Layout properties
 
 <% for (const property of layoutProperties) { -%>
-Function<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return *impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.parsedValue;
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.get();
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(Function<<%- propertyType(property) %>> value) {
-    impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.parsedValue = value;
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+    impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
 }
 <% } -%>
 
 // Paint properties
 <% for (const property of paintProperties) { %>
-Function<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.values.at(ClassID::Default);
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get();
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(Function<<%- propertyType(property) %>> value) {
-    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.values.emplace(ClassID::Default, value);
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
 }
 <% } -%>
 
@@ -255,7 +257,7 @@ public:
 
 <% for (const property of paintProperties) { -%>
 <% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
-    PaintProperty<<%- propertyType(property) %>, CrossFadedFunctionEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
+    PaintProperty<<%- propertyType(property) %>, CrossFadedPropertyEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
 <% } else if (property.name === 'fill-outline-color') { -%>
     PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { {{ 0, 0, 0, -1 }} };
 <% } else { -%>

@@ -39,336 +39,336 @@ const std::string& SymbolLayer::getSourceLayer() const {
 
 // Layout properties
 
-Function<SymbolPlacementType> SymbolLayer::getSymbolPlacement() const {
-    return *impl->layout.symbolPlacement.parsedValue;
+PropertyValue<SymbolPlacementType> SymbolLayer::getSymbolPlacement() const {
+    return impl->layout.symbolPlacement.get();
 }
 
-void SymbolLayer::setSymbolPlacement(Function<SymbolPlacementType> value) {
-    impl->layout.symbolPlacement.parsedValue = value;
+void SymbolLayer::setSymbolPlacement(PropertyValue<SymbolPlacementType> value) {
+    impl->layout.symbolPlacement.set(value);
 }
-Function<float> SymbolLayer::getSymbolSpacing() const {
-    return *impl->layout.symbolSpacing.parsedValue;
-}
-
-void SymbolLayer::setSymbolSpacing(Function<float> value) {
-    impl->layout.symbolSpacing.parsedValue = value;
-}
-Function<bool> SymbolLayer::getSymbolAvoidEdges() const {
-    return *impl->layout.symbolAvoidEdges.parsedValue;
+PropertyValue<float> SymbolLayer::getSymbolSpacing() const {
+    return impl->layout.symbolSpacing.get();
 }
 
-void SymbolLayer::setSymbolAvoidEdges(Function<bool> value) {
-    impl->layout.symbolAvoidEdges.parsedValue = value;
+void SymbolLayer::setSymbolSpacing(PropertyValue<float> value) {
+    impl->layout.symbolSpacing.set(value);
 }
-Function<bool> SymbolLayer::getIconAllowOverlap() const {
-    return *impl->layout.iconAllowOverlap.parsedValue;
-}
-
-void SymbolLayer::setIconAllowOverlap(Function<bool> value) {
-    impl->layout.iconAllowOverlap.parsedValue = value;
-}
-Function<bool> SymbolLayer::getIconIgnorePlacement() const {
-    return *impl->layout.iconIgnorePlacement.parsedValue;
+PropertyValue<bool> SymbolLayer::getSymbolAvoidEdges() const {
+    return impl->layout.symbolAvoidEdges.get();
 }
 
-void SymbolLayer::setIconIgnorePlacement(Function<bool> value) {
-    impl->layout.iconIgnorePlacement.parsedValue = value;
+void SymbolLayer::setSymbolAvoidEdges(PropertyValue<bool> value) {
+    impl->layout.symbolAvoidEdges.set(value);
 }
-Function<bool> SymbolLayer::getIconOptional() const {
-    return *impl->layout.iconOptional.parsedValue;
-}
-
-void SymbolLayer::setIconOptional(Function<bool> value) {
-    impl->layout.iconOptional.parsedValue = value;
-}
-Function<RotationAlignmentType> SymbolLayer::getIconRotationAlignment() const {
-    return *impl->layout.iconRotationAlignment.parsedValue;
+PropertyValue<bool> SymbolLayer::getIconAllowOverlap() const {
+    return impl->layout.iconAllowOverlap.get();
 }
 
-void SymbolLayer::setIconRotationAlignment(Function<RotationAlignmentType> value) {
-    impl->layout.iconRotationAlignment.parsedValue = value;
+void SymbolLayer::setIconAllowOverlap(PropertyValue<bool> value) {
+    impl->layout.iconAllowOverlap.set(value);
 }
-Function<float> SymbolLayer::getIconSize() const {
-    return *impl->layout.iconSize.parsedValue;
-}
-
-void SymbolLayer::setIconSize(Function<float> value) {
-    impl->layout.iconSize.parsedValue = value;
-}
-Function<std::string> SymbolLayer::getIconImage() const {
-    return *impl->layout.iconImage.parsedValue;
+PropertyValue<bool> SymbolLayer::getIconIgnorePlacement() const {
+    return impl->layout.iconIgnorePlacement.get();
 }
 
-void SymbolLayer::setIconImage(Function<std::string> value) {
-    impl->layout.iconImage.parsedValue = value;
+void SymbolLayer::setIconIgnorePlacement(PropertyValue<bool> value) {
+    impl->layout.iconIgnorePlacement.set(value);
 }
-Function<float> SymbolLayer::getIconRotate() const {
-    return *impl->layout.iconRotate.parsedValue;
-}
-
-void SymbolLayer::setIconRotate(Function<float> value) {
-    impl->layout.iconRotate.parsedValue = value;
-}
-Function<float> SymbolLayer::getIconPadding() const {
-    return *impl->layout.iconPadding.parsedValue;
+PropertyValue<bool> SymbolLayer::getIconOptional() const {
+    return impl->layout.iconOptional.get();
 }
 
-void SymbolLayer::setIconPadding(Function<float> value) {
-    impl->layout.iconPadding.parsedValue = value;
+void SymbolLayer::setIconOptional(PropertyValue<bool> value) {
+    impl->layout.iconOptional.set(value);
 }
-Function<bool> SymbolLayer::getIconKeepUpright() const {
-    return *impl->layout.iconKeepUpright.parsedValue;
-}
-
-void SymbolLayer::setIconKeepUpright(Function<bool> value) {
-    impl->layout.iconKeepUpright.parsedValue = value;
-}
-Function<std::array<float, 2>> SymbolLayer::getIconOffset() const {
-    return *impl->layout.iconOffset.parsedValue;
+PropertyValue<RotationAlignmentType> SymbolLayer::getIconRotationAlignment() const {
+    return impl->layout.iconRotationAlignment.get();
 }
 
-void SymbolLayer::setIconOffset(Function<std::array<float, 2>> value) {
-    impl->layout.iconOffset.parsedValue = value;
+void SymbolLayer::setIconRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+    impl->layout.iconRotationAlignment.set(value);
 }
-Function<RotationAlignmentType> SymbolLayer::getTextRotationAlignment() const {
-    return *impl->layout.textRotationAlignment.parsedValue;
-}
-
-void SymbolLayer::setTextRotationAlignment(Function<RotationAlignmentType> value) {
-    impl->layout.textRotationAlignment.parsedValue = value;
-}
-Function<std::string> SymbolLayer::getTextField() const {
-    return *impl->layout.textField.parsedValue;
+PropertyValue<float> SymbolLayer::getIconSize() const {
+    return impl->layout.iconSize.get();
 }
 
-void SymbolLayer::setTextField(Function<std::string> value) {
-    impl->layout.textField.parsedValue = value;
+void SymbolLayer::setIconSize(PropertyValue<float> value) {
+    impl->layout.iconSize.set(value);
 }
-Function<std::vector<std::string>> SymbolLayer::getTextFont() const {
-    return *impl->layout.textFont.parsedValue;
-}
-
-void SymbolLayer::setTextFont(Function<std::vector<std::string>> value) {
-    impl->layout.textFont.parsedValue = value;
-}
-Function<float> SymbolLayer::getTextSize() const {
-    return *impl->layout.textSize.parsedValue;
+PropertyValue<std::string> SymbolLayer::getIconImage() const {
+    return impl->layout.iconImage.get();
 }
 
-void SymbolLayer::setTextSize(Function<float> value) {
-    impl->layout.textSize.parsedValue = value;
+void SymbolLayer::setIconImage(PropertyValue<std::string> value) {
+    impl->layout.iconImage.set(value);
 }
-Function<float> SymbolLayer::getTextMaxWidth() const {
-    return *impl->layout.textMaxWidth.parsedValue;
-}
-
-void SymbolLayer::setTextMaxWidth(Function<float> value) {
-    impl->layout.textMaxWidth.parsedValue = value;
-}
-Function<float> SymbolLayer::getTextLineHeight() const {
-    return *impl->layout.textLineHeight.parsedValue;
+PropertyValue<float> SymbolLayer::getIconRotate() const {
+    return impl->layout.iconRotate.get();
 }
 
-void SymbolLayer::setTextLineHeight(Function<float> value) {
-    impl->layout.textLineHeight.parsedValue = value;
+void SymbolLayer::setIconRotate(PropertyValue<float> value) {
+    impl->layout.iconRotate.set(value);
 }
-Function<float> SymbolLayer::getTextLetterSpacing() const {
-    return *impl->layout.textLetterSpacing.parsedValue;
-}
-
-void SymbolLayer::setTextLetterSpacing(Function<float> value) {
-    impl->layout.textLetterSpacing.parsedValue = value;
-}
-Function<TextJustifyType> SymbolLayer::getTextJustify() const {
-    return *impl->layout.textJustify.parsedValue;
+PropertyValue<float> SymbolLayer::getIconPadding() const {
+    return impl->layout.iconPadding.get();
 }
 
-void SymbolLayer::setTextJustify(Function<TextJustifyType> value) {
-    impl->layout.textJustify.parsedValue = value;
+void SymbolLayer::setIconPadding(PropertyValue<float> value) {
+    impl->layout.iconPadding.set(value);
 }
-Function<TextAnchorType> SymbolLayer::getTextAnchor() const {
-    return *impl->layout.textAnchor.parsedValue;
-}
-
-void SymbolLayer::setTextAnchor(Function<TextAnchorType> value) {
-    impl->layout.textAnchor.parsedValue = value;
-}
-Function<float> SymbolLayer::getTextMaxAngle() const {
-    return *impl->layout.textMaxAngle.parsedValue;
+PropertyValue<bool> SymbolLayer::getIconKeepUpright() const {
+    return impl->layout.iconKeepUpright.get();
 }
 
-void SymbolLayer::setTextMaxAngle(Function<float> value) {
-    impl->layout.textMaxAngle.parsedValue = value;
+void SymbolLayer::setIconKeepUpright(PropertyValue<bool> value) {
+    impl->layout.iconKeepUpright.set(value);
 }
-Function<float> SymbolLayer::getTextRotate() const {
-    return *impl->layout.textRotate.parsedValue;
-}
-
-void SymbolLayer::setTextRotate(Function<float> value) {
-    impl->layout.textRotate.parsedValue = value;
-}
-Function<float> SymbolLayer::getTextPadding() const {
-    return *impl->layout.textPadding.parsedValue;
+PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
+    return impl->layout.iconOffset.get();
 }
 
-void SymbolLayer::setTextPadding(Function<float> value) {
-    impl->layout.textPadding.parsedValue = value;
+void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
+    impl->layout.iconOffset.set(value);
 }
-Function<bool> SymbolLayer::getTextKeepUpright() const {
-    return *impl->layout.textKeepUpright.parsedValue;
-}
-
-void SymbolLayer::setTextKeepUpright(Function<bool> value) {
-    impl->layout.textKeepUpright.parsedValue = value;
-}
-Function<TextTransformType> SymbolLayer::getTextTransform() const {
-    return *impl->layout.textTransform.parsedValue;
+PropertyValue<RotationAlignmentType> SymbolLayer::getTextRotationAlignment() const {
+    return impl->layout.textRotationAlignment.get();
 }
 
-void SymbolLayer::setTextTransform(Function<TextTransformType> value) {
-    impl->layout.textTransform.parsedValue = value;
+void SymbolLayer::setTextRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+    impl->layout.textRotationAlignment.set(value);
 }
-Function<std::array<float, 2>> SymbolLayer::getTextOffset() const {
-    return *impl->layout.textOffset.parsedValue;
-}
-
-void SymbolLayer::setTextOffset(Function<std::array<float, 2>> value) {
-    impl->layout.textOffset.parsedValue = value;
-}
-Function<bool> SymbolLayer::getTextAllowOverlap() const {
-    return *impl->layout.textAllowOverlap.parsedValue;
+PropertyValue<std::string> SymbolLayer::getTextField() const {
+    return impl->layout.textField.get();
 }
 
-void SymbolLayer::setTextAllowOverlap(Function<bool> value) {
-    impl->layout.textAllowOverlap.parsedValue = value;
+void SymbolLayer::setTextField(PropertyValue<std::string> value) {
+    impl->layout.textField.set(value);
 }
-Function<bool> SymbolLayer::getTextIgnorePlacement() const {
-    return *impl->layout.textIgnorePlacement.parsedValue;
-}
-
-void SymbolLayer::setTextIgnorePlacement(Function<bool> value) {
-    impl->layout.textIgnorePlacement.parsedValue = value;
-}
-Function<bool> SymbolLayer::getTextOptional() const {
-    return *impl->layout.textOptional.parsedValue;
+PropertyValue<std::vector<std::string>> SymbolLayer::getTextFont() const {
+    return impl->layout.textFont.get();
 }
 
-void SymbolLayer::setTextOptional(Function<bool> value) {
-    impl->layout.textOptional.parsedValue = value;
+void SymbolLayer::setTextFont(PropertyValue<std::vector<std::string>> value) {
+    impl->layout.textFont.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextSize() const {
+    return impl->layout.textSize.get();
+}
+
+void SymbolLayer::setTextSize(PropertyValue<float> value) {
+    impl->layout.textSize.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextMaxWidth() const {
+    return impl->layout.textMaxWidth.get();
+}
+
+void SymbolLayer::setTextMaxWidth(PropertyValue<float> value) {
+    impl->layout.textMaxWidth.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextLineHeight() const {
+    return impl->layout.textLineHeight.get();
+}
+
+void SymbolLayer::setTextLineHeight(PropertyValue<float> value) {
+    impl->layout.textLineHeight.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextLetterSpacing() const {
+    return impl->layout.textLetterSpacing.get();
+}
+
+void SymbolLayer::setTextLetterSpacing(PropertyValue<float> value) {
+    impl->layout.textLetterSpacing.set(value);
+}
+PropertyValue<TextJustifyType> SymbolLayer::getTextJustify() const {
+    return impl->layout.textJustify.get();
+}
+
+void SymbolLayer::setTextJustify(PropertyValue<TextJustifyType> value) {
+    impl->layout.textJustify.set(value);
+}
+PropertyValue<TextAnchorType> SymbolLayer::getTextAnchor() const {
+    return impl->layout.textAnchor.get();
+}
+
+void SymbolLayer::setTextAnchor(PropertyValue<TextAnchorType> value) {
+    impl->layout.textAnchor.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextMaxAngle() const {
+    return impl->layout.textMaxAngle.get();
+}
+
+void SymbolLayer::setTextMaxAngle(PropertyValue<float> value) {
+    impl->layout.textMaxAngle.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextRotate() const {
+    return impl->layout.textRotate.get();
+}
+
+void SymbolLayer::setTextRotate(PropertyValue<float> value) {
+    impl->layout.textRotate.set(value);
+}
+PropertyValue<float> SymbolLayer::getTextPadding() const {
+    return impl->layout.textPadding.get();
+}
+
+void SymbolLayer::setTextPadding(PropertyValue<float> value) {
+    impl->layout.textPadding.set(value);
+}
+PropertyValue<bool> SymbolLayer::getTextKeepUpright() const {
+    return impl->layout.textKeepUpright.get();
+}
+
+void SymbolLayer::setTextKeepUpright(PropertyValue<bool> value) {
+    impl->layout.textKeepUpright.set(value);
+}
+PropertyValue<TextTransformType> SymbolLayer::getTextTransform() const {
+    return impl->layout.textTransform.get();
+}
+
+void SymbolLayer::setTextTransform(PropertyValue<TextTransformType> value) {
+    impl->layout.textTransform.set(value);
+}
+PropertyValue<std::array<float, 2>> SymbolLayer::getTextOffset() const {
+    return impl->layout.textOffset.get();
+}
+
+void SymbolLayer::setTextOffset(PropertyValue<std::array<float, 2>> value) {
+    impl->layout.textOffset.set(value);
+}
+PropertyValue<bool> SymbolLayer::getTextAllowOverlap() const {
+    return impl->layout.textAllowOverlap.get();
+}
+
+void SymbolLayer::setTextAllowOverlap(PropertyValue<bool> value) {
+    impl->layout.textAllowOverlap.set(value);
+}
+PropertyValue<bool> SymbolLayer::getTextIgnorePlacement() const {
+    return impl->layout.textIgnorePlacement.get();
+}
+
+void SymbolLayer::setTextIgnorePlacement(PropertyValue<bool> value) {
+    impl->layout.textIgnorePlacement.set(value);
+}
+PropertyValue<bool> SymbolLayer::getTextOptional() const {
+    return impl->layout.textOptional.get();
+}
+
+void SymbolLayer::setTextOptional(PropertyValue<bool> value) {
+    impl->layout.textOptional.set(value);
 }
 
 // Paint properties
 
-Function<float> SymbolLayer::getIconOpacity() const {
-    return impl->paint.iconOpacity.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getIconOpacity() const {
+    return impl->paint.iconOpacity.get();
 }
 
-void SymbolLayer::setIconOpacity(Function<float> value) {
-    impl->paint.iconOpacity.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconOpacity(PropertyValue<float> value) {
+    impl->paint.iconOpacity.set(value);
 }
 
-Function<Color> SymbolLayer::getIconColor() const {
-    return impl->paint.iconColor.values.at(ClassID::Default);
+PropertyValue<Color> SymbolLayer::getIconColor() const {
+    return impl->paint.iconColor.get();
 }
 
-void SymbolLayer::setIconColor(Function<Color> value) {
-    impl->paint.iconColor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconColor(PropertyValue<Color> value) {
+    impl->paint.iconColor.set(value);
 }
 
-Function<Color> SymbolLayer::getIconHaloColor() const {
-    return impl->paint.iconHaloColor.values.at(ClassID::Default);
+PropertyValue<Color> SymbolLayer::getIconHaloColor() const {
+    return impl->paint.iconHaloColor.get();
 }
 
-void SymbolLayer::setIconHaloColor(Function<Color> value) {
-    impl->paint.iconHaloColor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconHaloColor(PropertyValue<Color> value) {
+    impl->paint.iconHaloColor.set(value);
 }
 
-Function<float> SymbolLayer::getIconHaloWidth() const {
-    return impl->paint.iconHaloWidth.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getIconHaloWidth() const {
+    return impl->paint.iconHaloWidth.get();
 }
 
-void SymbolLayer::setIconHaloWidth(Function<float> value) {
-    impl->paint.iconHaloWidth.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconHaloWidth(PropertyValue<float> value) {
+    impl->paint.iconHaloWidth.set(value);
 }
 
-Function<float> SymbolLayer::getIconHaloBlur() const {
-    return impl->paint.iconHaloBlur.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getIconHaloBlur() const {
+    return impl->paint.iconHaloBlur.get();
 }
 
-void SymbolLayer::setIconHaloBlur(Function<float> value) {
-    impl->paint.iconHaloBlur.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconHaloBlur(PropertyValue<float> value) {
+    impl->paint.iconHaloBlur.set(value);
 }
 
-Function<std::array<float, 2>> SymbolLayer::getIconTranslate() const {
-    return impl->paint.iconTranslate.values.at(ClassID::Default);
+PropertyValue<std::array<float, 2>> SymbolLayer::getIconTranslate() const {
+    return impl->paint.iconTranslate.get();
 }
 
-void SymbolLayer::setIconTranslate(Function<std::array<float, 2>> value) {
-    impl->paint.iconTranslate.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconTranslate(PropertyValue<std::array<float, 2>> value) {
+    impl->paint.iconTranslate.set(value);
 }
 
-Function<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor() const {
-    return impl->paint.iconTranslateAnchor.values.at(ClassID::Default);
+PropertyValue<TranslateAnchorType> SymbolLayer::getIconTranslateAnchor() const {
+    return impl->paint.iconTranslateAnchor.get();
 }
 
-void SymbolLayer::setIconTranslateAnchor(Function<TranslateAnchorType> value) {
-    impl->paint.iconTranslateAnchor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setIconTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+    impl->paint.iconTranslateAnchor.set(value);
 }
 
-Function<float> SymbolLayer::getTextOpacity() const {
-    return impl->paint.textOpacity.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getTextOpacity() const {
+    return impl->paint.textOpacity.get();
 }
 
-void SymbolLayer::setTextOpacity(Function<float> value) {
-    impl->paint.textOpacity.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextOpacity(PropertyValue<float> value) {
+    impl->paint.textOpacity.set(value);
 }
 
-Function<Color> SymbolLayer::getTextColor() const {
-    return impl->paint.textColor.values.at(ClassID::Default);
+PropertyValue<Color> SymbolLayer::getTextColor() const {
+    return impl->paint.textColor.get();
 }
 
-void SymbolLayer::setTextColor(Function<Color> value) {
-    impl->paint.textColor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextColor(PropertyValue<Color> value) {
+    impl->paint.textColor.set(value);
 }
 
-Function<Color> SymbolLayer::getTextHaloColor() const {
-    return impl->paint.textHaloColor.values.at(ClassID::Default);
+PropertyValue<Color> SymbolLayer::getTextHaloColor() const {
+    return impl->paint.textHaloColor.get();
 }
 
-void SymbolLayer::setTextHaloColor(Function<Color> value) {
-    impl->paint.textHaloColor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextHaloColor(PropertyValue<Color> value) {
+    impl->paint.textHaloColor.set(value);
 }
 
-Function<float> SymbolLayer::getTextHaloWidth() const {
-    return impl->paint.textHaloWidth.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getTextHaloWidth() const {
+    return impl->paint.textHaloWidth.get();
 }
 
-void SymbolLayer::setTextHaloWidth(Function<float> value) {
-    impl->paint.textHaloWidth.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextHaloWidth(PropertyValue<float> value) {
+    impl->paint.textHaloWidth.set(value);
 }
 
-Function<float> SymbolLayer::getTextHaloBlur() const {
-    return impl->paint.textHaloBlur.values.at(ClassID::Default);
+PropertyValue<float> SymbolLayer::getTextHaloBlur() const {
+    return impl->paint.textHaloBlur.get();
 }
 
-void SymbolLayer::setTextHaloBlur(Function<float> value) {
-    impl->paint.textHaloBlur.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextHaloBlur(PropertyValue<float> value) {
+    impl->paint.textHaloBlur.set(value);
 }
 
-Function<std::array<float, 2>> SymbolLayer::getTextTranslate() const {
-    return impl->paint.textTranslate.values.at(ClassID::Default);
+PropertyValue<std::array<float, 2>> SymbolLayer::getTextTranslate() const {
+    return impl->paint.textTranslate.get();
 }
 
-void SymbolLayer::setTextTranslate(Function<std::array<float, 2>> value) {
-    impl->paint.textTranslate.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextTranslate(PropertyValue<std::array<float, 2>> value) {
+    impl->paint.textTranslate.set(value);
 }
 
-Function<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor() const {
-    return impl->paint.textTranslateAnchor.values.at(ClassID::Default);
+PropertyValue<TranslateAnchorType> SymbolLayer::getTextTranslateAnchor() const {
+    return impl->paint.textTranslateAnchor.get();
 }
 
-void SymbolLayer::setTextTranslateAnchor(Function<TranslateAnchorType> value) {
-    impl->paint.textTranslateAnchor.values.emplace(ClassID::Default, value);
+void SymbolLayer::setTextTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+    impl->paint.textTranslateAnchor.set(value);
 }
 
 } // namespace mbgl

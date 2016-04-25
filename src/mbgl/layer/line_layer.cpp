@@ -39,115 +39,115 @@ const std::string& LineLayer::getSourceLayer() const {
 
 // Layout properties
 
-Function<LineCapType> LineLayer::getLineCap() const {
-    return *impl->layout.lineCap.parsedValue;
+PropertyValue<LineCapType> LineLayer::getLineCap() const {
+    return impl->layout.lineCap.get();
 }
 
-void LineLayer::setLineCap(Function<LineCapType> value) {
-    impl->layout.lineCap.parsedValue = value;
+void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
+    impl->layout.lineCap.set(value);
 }
-Function<LineJoinType> LineLayer::getLineJoin() const {
-    return *impl->layout.lineJoin.parsedValue;
-}
-
-void LineLayer::setLineJoin(Function<LineJoinType> value) {
-    impl->layout.lineJoin.parsedValue = value;
-}
-Function<float> LineLayer::getLineMiterLimit() const {
-    return *impl->layout.lineMiterLimit.parsedValue;
+PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
+    return impl->layout.lineJoin.get();
 }
 
-void LineLayer::setLineMiterLimit(Function<float> value) {
-    impl->layout.lineMiterLimit.parsedValue = value;
+void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
+    impl->layout.lineJoin.set(value);
 }
-Function<float> LineLayer::getLineRoundLimit() const {
-    return *impl->layout.lineRoundLimit.parsedValue;
+PropertyValue<float> LineLayer::getLineMiterLimit() const {
+    return impl->layout.lineMiterLimit.get();
 }
 
-void LineLayer::setLineRoundLimit(Function<float> value) {
-    impl->layout.lineRoundLimit.parsedValue = value;
+void LineLayer::setLineMiterLimit(PropertyValue<float> value) {
+    impl->layout.lineMiterLimit.set(value);
+}
+PropertyValue<float> LineLayer::getLineRoundLimit() const {
+    return impl->layout.lineRoundLimit.get();
+}
+
+void LineLayer::setLineRoundLimit(PropertyValue<float> value) {
+    impl->layout.lineRoundLimit.set(value);
 }
 
 // Paint properties
 
-Function<float> LineLayer::getLineOpacity() const {
-    return impl->paint.lineOpacity.values.at(ClassID::Default);
+PropertyValue<float> LineLayer::getLineOpacity() const {
+    return impl->paint.lineOpacity.get();
 }
 
-void LineLayer::setLineOpacity(Function<float> value) {
-    impl->paint.lineOpacity.values.emplace(ClassID::Default, value);
+void LineLayer::setLineOpacity(PropertyValue<float> value) {
+    impl->paint.lineOpacity.set(value);
 }
 
-Function<Color> LineLayer::getLineColor() const {
-    return impl->paint.lineColor.values.at(ClassID::Default);
+PropertyValue<Color> LineLayer::getLineColor() const {
+    return impl->paint.lineColor.get();
 }
 
-void LineLayer::setLineColor(Function<Color> value) {
-    impl->paint.lineColor.values.emplace(ClassID::Default, value);
+void LineLayer::setLineColor(PropertyValue<Color> value) {
+    impl->paint.lineColor.set(value);
 }
 
-Function<std::array<float, 2>> LineLayer::getLineTranslate() const {
-    return impl->paint.lineTranslate.values.at(ClassID::Default);
+PropertyValue<std::array<float, 2>> LineLayer::getLineTranslate() const {
+    return impl->paint.lineTranslate.get();
 }
 
-void LineLayer::setLineTranslate(Function<std::array<float, 2>> value) {
-    impl->paint.lineTranslate.values.emplace(ClassID::Default, value);
+void LineLayer::setLineTranslate(PropertyValue<std::array<float, 2>> value) {
+    impl->paint.lineTranslate.set(value);
 }
 
-Function<TranslateAnchorType> LineLayer::getLineTranslateAnchor() const {
-    return impl->paint.lineTranslateAnchor.values.at(ClassID::Default);
+PropertyValue<TranslateAnchorType> LineLayer::getLineTranslateAnchor() const {
+    return impl->paint.lineTranslateAnchor.get();
 }
 
-void LineLayer::setLineTranslateAnchor(Function<TranslateAnchorType> value) {
-    impl->paint.lineTranslateAnchor.values.emplace(ClassID::Default, value);
+void LineLayer::setLineTranslateAnchor(PropertyValue<TranslateAnchorType> value) {
+    impl->paint.lineTranslateAnchor.set(value);
 }
 
-Function<float> LineLayer::getLineWidth() const {
-    return impl->paint.lineWidth.values.at(ClassID::Default);
+PropertyValue<float> LineLayer::getLineWidth() const {
+    return impl->paint.lineWidth.get();
 }
 
-void LineLayer::setLineWidth(Function<float> value) {
-    impl->paint.lineWidth.values.emplace(ClassID::Default, value);
+void LineLayer::setLineWidth(PropertyValue<float> value) {
+    impl->paint.lineWidth.set(value);
 }
 
-Function<float> LineLayer::getLineGapWidth() const {
-    return impl->paint.lineGapWidth.values.at(ClassID::Default);
+PropertyValue<float> LineLayer::getLineGapWidth() const {
+    return impl->paint.lineGapWidth.get();
 }
 
-void LineLayer::setLineGapWidth(Function<float> value) {
-    impl->paint.lineGapWidth.values.emplace(ClassID::Default, value);
+void LineLayer::setLineGapWidth(PropertyValue<float> value) {
+    impl->paint.lineGapWidth.set(value);
 }
 
-Function<float> LineLayer::getLineOffset() const {
-    return impl->paint.lineOffset.values.at(ClassID::Default);
+PropertyValue<float> LineLayer::getLineOffset() const {
+    return impl->paint.lineOffset.get();
 }
 
-void LineLayer::setLineOffset(Function<float> value) {
-    impl->paint.lineOffset.values.emplace(ClassID::Default, value);
+void LineLayer::setLineOffset(PropertyValue<float> value) {
+    impl->paint.lineOffset.set(value);
 }
 
-Function<float> LineLayer::getLineBlur() const {
-    return impl->paint.lineBlur.values.at(ClassID::Default);
+PropertyValue<float> LineLayer::getLineBlur() const {
+    return impl->paint.lineBlur.get();
 }
 
-void LineLayer::setLineBlur(Function<float> value) {
-    impl->paint.lineBlur.values.emplace(ClassID::Default, value);
+void LineLayer::setLineBlur(PropertyValue<float> value) {
+    impl->paint.lineBlur.set(value);
 }
 
-Function<std::vector<float>> LineLayer::getLineDasharray() const {
-    return impl->paint.lineDasharray.values.at(ClassID::Default);
+PropertyValue<std::vector<float>> LineLayer::getLineDasharray() const {
+    return impl->paint.lineDasharray.get();
 }
 
-void LineLayer::setLineDasharray(Function<std::vector<float>> value) {
-    impl->paint.lineDasharray.values.emplace(ClassID::Default, value);
+void LineLayer::setLineDasharray(PropertyValue<std::vector<float>> value) {
+    impl->paint.lineDasharray.set(value);
 }
 
-Function<std::string> LineLayer::getLinePattern() const {
-    return impl->paint.linePattern.values.at(ClassID::Default);
+PropertyValue<std::string> LineLayer::getLinePattern() const {
+    return impl->paint.linePattern.get();
 }
 
-void LineLayer::setLinePattern(Function<std::string> value) {
-    impl->paint.linePattern.values.emplace(ClassID::Default, value);
+void LineLayer::setLinePattern(PropertyValue<std::string> value) {
+    impl->paint.linePattern.set(value);
 }
 
 } // namespace mbgl

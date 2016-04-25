@@ -23,7 +23,7 @@ public:
     PaintProperty<Color> fillOutlineColor { {{ 0, 0, 0, -1 }} };
     PaintProperty<std::array<float, 2>> fillTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> fillTranslateAnchor { TranslateAnchorType::Map };
-    PaintProperty<std::string, CrossFadedFunctionEvaluator> fillPattern { "" };
+    PaintProperty<std::string, CrossFadedPropertyEvaluator> fillPattern { "" };
 };
 
 } // namespace mbgl

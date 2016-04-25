@@ -2,7 +2,7 @@
 
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_parsing.hpp>
-#include <mbgl/style/function_evaluator.hpp>
+#include <mbgl/style/property_evaluator.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_cascade_parameters.hpp>
 #include <mbgl/style/style_calculation_parameters.hpp>
@@ -15,20 +15,27 @@
 
 namespace mbgl {
 
-template <class T, template <class S> class Evaluator = NormalFunctionEvaluator>
+template <class T, template <class S> class Evaluator = PropertyEvaluator>
 class PaintProperty {
 public:
-    using Fn = Function<T>;
     using Result = typename Evaluator<T>::ResultType;
 
-    explicit PaintProperty(T fallbackValue)
-        : value(fallbackValue) {
-        values.emplace(ClassID::Fallback, Fn(fallbackValue));
+    explicit PaintProperty(T defaultValue_)
+        : defaultValue(defaultValue_) {
+        values.emplace(ClassID::Fallback, defaultValue_);
     }
 
     PaintProperty(const PaintProperty& other)
         : values(other.values),
           transitions(other.transitions) {
+    }
+
+    const PropertyValue<T>& get() const {
+        return values.at(ClassID::Default);
+    }
+
+    void set(const PropertyValue<T>& value_) {
+        values.emplace(ClassID::Default, value_);
     }
 
     void parse(const char* name, const JSValue& layer) {
@@ -49,15 +56,13 @@ public:
             ClassID classID = isClass ? ClassDictionary::Get().lookup(paintName.substr(6)) : ClassID::Default;
 
             if (it->value.HasMember(name)) {
-                auto v = parseProperty<T>(name, it->value[name]);
-                if (v) {
-                    values.emplace(classID, *v);
+                if (auto v = parseProperty<T>(name, it->value[name])) {
+                    values.emplace(classID, v);
                 }
             }
 
             if (it->value.HasMember(transitionName.c_str())) {
-                auto v = parsePropertyTransition(name, it->value[transitionName.c_str()]);
-                if (v) {
+                if (auto v = parsePropertyTransition(name, it->value[transitionName.c_str()])) {
                     transitions.emplace(classID, *v);
                 }
             }
@@ -92,52 +97,54 @@ public:
 
     bool calculate(const StyleCalculationParameters& parameters) {
         assert(cascaded);
-        value = cascaded->calculate(parameters);
+        Evaluator<T> evaluator(parameters, defaultValue);
+        value = cascaded->calculate(evaluator, parameters.now);
         return cascaded->prior.operator bool();
     }
 
+    // TODO: remove / privatize
     operator T() const { return value; }
+    Result value;
 
-    std::map<ClassID, Fn> values;
+private:
+    T defaultValue;
+    std::map<ClassID, PropertyValue<T>> values;
     std::map<ClassID, PropertyTransition> transitions;
 
     struct CascadedValue {
         CascadedValue(std::unique_ptr<CascadedValue> prior_,
                       TimePoint begin_,
                       TimePoint end_,
-                      Fn value_)
+                      PropertyValue<T> value_)
             : prior(std::move(prior_)),
               begin(begin_),
               end(end_),
               value(std::move(value_)) {
         }
 
-        Result calculate(const StyleCalculationParameters& parameters) {
-            Evaluator<T> evaluator;
-            Result final = evaluator(value, parameters);
+        Result calculate(const Evaluator<T>& evaluator, const TimePoint& now) {
+            Result final = PropertyValue<T>::visit(value, evaluator);
             if (!prior) {
                 // No prior value.
                 return final;
-            } else if (parameters.now >= end) {
+            } else if (now >= end) {
                 // Transition from prior value is now complete.
                 prior.reset();
                 return final;
             } else {
                 // Interpolate between recursively-calculated prior value and final.
-                float t = std::chrono::duration<float>(parameters.now - begin) / (end - begin);
-                return util::interpolate(prior->calculate(parameters), final, t);
+                float t = std::chrono::duration<float>(now - begin) / (end - begin);
+                return util::interpolate(prior->calculate(evaluator, now), final, t);
             }
         }
 
         std::unique_ptr<CascadedValue> prior;
         TimePoint begin;
         TimePoint end;
-        Fn value;
+        PropertyValue<T> value;
     };
 
     std::unique_ptr<CascadedValue> cascaded;
-
-    Result value;
 };
 
 } // namespace mbgl

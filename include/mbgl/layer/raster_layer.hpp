@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
 
@@ -18,26 +19,26 @@ public:
 
     // Paint properties
 
-    Function<float> getRasterOpacity() const;
-    void setRasterOpacity(Function<float>);
+    PropertyValue<float> getRasterOpacity() const;
+    void setRasterOpacity(PropertyValue<float>);
 
-    Function<float> getRasterHueRotate() const;
-    void setRasterHueRotate(Function<float>);
+    PropertyValue<float> getRasterHueRotate() const;
+    void setRasterHueRotate(PropertyValue<float>);
 
-    Function<float> getRasterBrightnessMin() const;
-    void setRasterBrightnessMin(Function<float>);
+    PropertyValue<float> getRasterBrightnessMin() const;
+    void setRasterBrightnessMin(PropertyValue<float>);
 
-    Function<float> getRasterBrightnessMax() const;
-    void setRasterBrightnessMax(Function<float>);
+    PropertyValue<float> getRasterBrightnessMax() const;
+    void setRasterBrightnessMax(PropertyValue<float>);
 
-    Function<float> getRasterSaturation() const;
-    void setRasterSaturation(Function<float>);
+    PropertyValue<float> getRasterSaturation() const;
+    void setRasterSaturation(PropertyValue<float>);
 
-    Function<float> getRasterContrast() const;
-    void setRasterContrast(Function<float>);
+    PropertyValue<float> getRasterContrast() const;
+    void setRasterContrast(PropertyValue<float>);
 
-    Function<float> getRasterFadeDuration() const;
-    void setRasterFadeDuration(Function<float>);
+    PropertyValue<float> getRasterFadeDuration() const;
+    void setRasterFadeDuration(PropertyValue<float>);
 
     // Private implementation
 
