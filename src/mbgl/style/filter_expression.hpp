@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-typedef mapbox::util::variant<
+typedef variant<
     struct NullExpression,
     struct EqualsExpression,
     struct NotEqualsExpression,

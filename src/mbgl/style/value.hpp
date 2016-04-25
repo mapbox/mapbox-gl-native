@@ -1,7 +1,7 @@
 #ifndef MBGL_STYLE_VALUE
 #define MBGL_STYLE_VALUE
 
-#include <mapbox/variant.hpp>
+#include <mbgl/util/variant.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
 #include <cstdlib>
@@ -9,7 +9,7 @@
 
 namespace mbgl {
 
-typedef mapbox::util::variant<bool, int64_t, uint64_t, double, std::string> Value;
+typedef variant<bool, int64_t, uint64_t, double, std::string> Value;
 
 std::string toString(const Value &value);
 

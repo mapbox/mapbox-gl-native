@@ -1,11 +1,10 @@
 #ifndef MBGL_MAP_TILE_WORKER
 #define MBGL_MAP_TILE_WORKER
 
-#include <mapbox/variant.hpp>
-
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/variant.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/text/placement_config.hpp>
 
@@ -34,7 +33,7 @@ public:
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
 };
 
-using TileParseResult = mapbox::util::variant<
+using TileParseResult = variant<
     TileParseResultBuckets, // success
     std::exception_ptr>;    // error
 
