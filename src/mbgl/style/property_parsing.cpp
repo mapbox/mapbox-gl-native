@@ -58,6 +58,11 @@ optional<Color> parseProperty(const char* name, const JSValue& value) {
                   css_color.a}};
 }
 
+MBGL_DEFINE_ENUM_CLASS(TranslateAnchorTypeClass, TranslateAnchorType, {
+    { TranslateAnchorType::Map, "map" },
+    { TranslateAnchorType::Viewport, "viewport" },
+});
+
 template <>
 optional<TranslateAnchorType> parseProperty(const char* name, const JSValue& value) {
     if (!value.IsString()) {
@@ -67,6 +72,11 @@ optional<TranslateAnchorType> parseProperty(const char* name, const JSValue& val
 
     return { TranslateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
+
+MBGL_DEFINE_ENUM_CLASS(RotateAnchorTypeClass, RotateAnchorType, {
+    { RotateAnchorType::Map, "map" },
+    { RotateAnchorType::Viewport, "viewport" },
+});
 
 template <>
 optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, const JSValue& value) {
@@ -78,6 +88,12 @@ optional<RotateAnchorType> parseProperty<RotateAnchorType>(const char* name, con
     return { RotateAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
+MBGL_DEFINE_ENUM_CLASS(LineCapTypeClass, LineCapType, {
+    { LineCapType::Round, "round" },
+    { LineCapType::Butt, "butt" },
+    { LineCapType::Square, "square" },
+});
+
 template <>
 optional<LineCapType> parseProperty<LineCapType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
@@ -87,6 +103,14 @@ optional<LineCapType> parseProperty<LineCapType>(const char* name, const JSValue
 
     return { LineCapTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
+
+MBGL_DEFINE_ENUM_CLASS(LineJoinTypeClass, LineJoinType, {
+    { LineJoinType::Miter, "miter" },
+    { LineJoinType::Bevel, "bevel" },
+    { LineJoinType::Round, "round" },
+    { LineJoinType::FakeRound, "fakeround" },
+    { LineJoinType::FlipBevel, "flipbevel" },
+});
 
 template <>
 optional<LineJoinType> parseProperty<LineJoinType>(const char* name, const JSValue& value) {
@@ -98,6 +122,11 @@ optional<LineJoinType> parseProperty<LineJoinType>(const char* name, const JSVal
     return { LineJoinTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
+MBGL_DEFINE_ENUM_CLASS(SymbolPlacementTypeClass, SymbolPlacementType, {
+    { SymbolPlacementType::Point, "point" },
+    { SymbolPlacementType::Line, "line" },
+});
+
 template <>
 optional<SymbolPlacementType> parseProperty<SymbolPlacementType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
@@ -107,6 +136,18 @@ optional<SymbolPlacementType> parseProperty<SymbolPlacementType>(const char* nam
 
     return { SymbolPlacementTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
+
+MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
+    { TextAnchorType::Center, "center" },
+    { TextAnchorType::Left, "left" },
+    { TextAnchorType::Right, "right" },
+    { TextAnchorType::Top, "top" },
+    { TextAnchorType::Bottom, "bottom" },
+    { TextAnchorType::TopLeft, "top-left" },
+    { TextAnchorType::TopRight, "top-right" },
+    { TextAnchorType::BottomLeft, "bottom-left" },
+    { TextAnchorType::BottomRight, "bottom-right" }
+});
 
 template <>
 optional<TextAnchorType> parseProperty<TextAnchorType>(const char* name, const JSValue& value) {
@@ -118,6 +159,12 @@ optional<TextAnchorType> parseProperty<TextAnchorType>(const char* name, const J
     return { TextAnchorTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
+MBGL_DEFINE_ENUM_CLASS(TextJustifyTypeClass, TextJustifyType, {
+    { TextJustifyType::Center, "center" },
+    { TextJustifyType::Left, "left" },
+    { TextJustifyType::Right, "right" },
+});
+
 template <>
 optional<TextJustifyType> parseProperty<TextJustifyType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
@@ -128,6 +175,12 @@ optional<TextJustifyType> parseProperty<TextJustifyType>(const char* name, const
     return { TextJustifyTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
+MBGL_DEFINE_ENUM_CLASS(TextTransformTypeClass, TextTransformType, {
+    { TextTransformType::None, "none" },
+    { TextTransformType::Uppercase, "uppercase" },
+    { TextTransformType::Lowercase, "lowercase" },
+});
+
 template <>
 optional<TextTransformType> parseProperty<TextTransformType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
@@ -137,6 +190,11 @@ optional<TextTransformType> parseProperty<TextTransformType>(const char* name, c
 
     return { TextTransformTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
+
+MBGL_DEFINE_ENUM_CLASS(RotationAlignmentTypeClass, RotationAlignmentType, {
+    { RotationAlignmentType::Map, "map" },
+    { RotationAlignmentType::Viewport, "viewport" },
+});
 
 template <>
 optional<RotationAlignmentType> parseProperty<RotationAlignmentType>(const char* name, const JSValue& value) {
