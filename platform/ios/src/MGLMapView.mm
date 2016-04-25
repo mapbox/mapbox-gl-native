@@ -17,6 +17,7 @@
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/math/wrap.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/image.hpp>
@@ -5004,14 +5005,14 @@ void MGLFinishCustomStyleLayer(void *context)
 {
     NSAssert(identifier, @"Style layer needs an identifier");
     MGLCustomStyleLayerHandlers *context = new MGLCustomStyleLayerHandlers(preparation, drawing, completion);
-    _mbglMap->addCustomLayer(identifier.UTF8String, MGLPrepareCustomStyleLayer,
-                             MGLDrawCustomStyleLayer, MGLFinishCustomStyleLayer,
-                             context, otherIdentifier.UTF8String);
+    _mbglMap->addLayer(std::make_unique<mbgl::CustomLayer>(identifier.UTF8String, MGLPrepareCustomStyleLayer,
+                                                           MGLDrawCustomStyleLayer, MGLFinishCustomStyleLayer, context),
+                       otherIdentifier ? mbgl::optional<std::string>(otherIdentifier.UTF8String) : mbgl::optional<std::string>());
 }
 
 - (void)removeCustomStyleLayerWithIdentifier:(NSString *)identifier
 {
-    _mbglMap->removeCustomLayer(identifier.UTF8String);
+    _mbglMap->removeLayer(identifier.UTF8String);
 }
 
 - (void)setCustomStyleLayersNeedDisplay

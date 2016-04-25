@@ -4,6 +4,7 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
@@ -556,20 +557,20 @@ void QMapboxGL::addCustomLayer(const QString &id,
         void *context_,
         char *before)
 {
-    d_ptr->mapObj->addCustomLayer(
+    d_ptr->mapObj->addLayer(std::make_unique<mbgl::CustomLayer>(
             id.toStdString(),
             reinterpret_cast<mbgl::CustomLayerInitializeFunction>(initFn),
             // This cast is safe as long as both mbgl:: and QMapbox::
             // CustomLayerRenderParameters members remains the same.
             (mbgl::CustomLayerRenderFunction)renderFn,
             reinterpret_cast<mbgl::CustomLayerDeinitializeFunction>(deinitFn),
-            context_,
-            before == NULL ? nullptr : before);
+            context_),
+            before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
 void QMapboxGL::removeCustomLayer(const QString& id)
 {
-    d_ptr->mapObj->removeCustomLayer(id.toStdString());
+    d_ptr->mapObj->removeLayer(id.toStdString());
 }
 
 void QMapboxGL::render()

@@ -9,7 +9,6 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/property_transition.hpp>
 
 #include <cstdint>
@@ -23,6 +22,7 @@ namespace mbgl {
 class FileSource;
 class View;
 class SpriteImage;
+class Layer;
 struct CameraOptions;
 struct AnimationOptions;
 
@@ -146,13 +146,8 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
-    void addCustomLayer(const std::string& id,
-                        CustomLayerInitializeFunction,
-                        CustomLayerRenderFunction,
-                        CustomLayerDeinitializeFunction,
-                        void* context,
-                        const char* before = nullptr);
-    void removeCustomLayer(const std::string& id);
+    void addLayer(std::unique_ptr<Layer>, const optional<std::string>& beforeLayerID = {});
+    void removeLayer(const std::string& layerID);
 
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});

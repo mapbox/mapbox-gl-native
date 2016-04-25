@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <GLES2/gl2.h>
 
-#include <mbgl/style/types.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 
 static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
 static const GLchar * fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";

@@ -740,24 +740,17 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
 
 #pragma mark - Style API
 
-void Map::addCustomLayer(const std::string& id,
-                         CustomLayerInitializeFunction initialize,
-                         CustomLayerRenderFunction render_,
-                         CustomLayerDeinitializeFunction deinitialize,
-                         void* context_,
-                         const char* before) {
+void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
     impl->view.activate();
 
-    impl->style->addLayer(
-        std::make_unique<CustomLayer>(id, initialize, render_, deinitialize, context_),
-        before ? std::string(before) : optional<std::string>());
+    impl->style->addLayer(std::move(layer), before);
     impl->updateFlags |= Update::Classes;
     impl->asyncUpdate.send();
 
     impl->view.deactivate();
 }
 
-void Map::removeCustomLayer(const std::string& id) {
+void Map::removeLayer(const std::string& id) {
     impl->view.activate();
 
     impl->style->removeLayer(id);

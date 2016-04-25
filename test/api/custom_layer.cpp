@@ -77,7 +77,7 @@ TEST(CustomLayer, Basic) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addCustomLayer(
+    map.addLayer(std::make_unique<CustomLayer>(
         "custom",
         [] (void* context) {
             reinterpret_cast<TestLayer*>(context)->initialize();
@@ -87,7 +87,7 @@ TEST(CustomLayer, Basic) {
         },
         [] (void* context) {
             delete reinterpret_cast<TestLayer*>(context);
-        }, new TestLayer());
+        }, new TestLayer()));
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
 }

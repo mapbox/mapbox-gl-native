@@ -14,6 +14,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/platform/event.hpp>
 #include <mbgl/platform/log.hpp>
@@ -1111,20 +1112,20 @@ void nativeAddCustomLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddCustomLayer");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().addCustomLayer(
+    nativeMapView->getMap().addLayer(std::make_unique<mbgl::CustomLayer>(
         std_string_from_jstring(env, reinterpret_cast<jni::jstring*>(jni::GetField<jni::jobject*>(*env, customLayer, *customLayerIdId))),
         reinterpret_cast<mbgl::CustomLayerInitializeFunction>(jni::GetField<jlong>(*env, customLayer, *customLayerInitializeFunctionId)),
         reinterpret_cast<mbgl::CustomLayerRenderFunction>(jni::GetField<jlong>(*env, customLayer, *customLayerRenderFunctionId)),
         reinterpret_cast<mbgl::CustomLayerDeinitializeFunction>(jni::GetField<jlong>(*env, customLayer, *customLayerDeinitializeFunctionId)),
-        reinterpret_cast<void*>(jni::GetField<jlong>(*env, customLayer, *customLayerContextId)),
-        before ? std_string_from_jstring(env, before).c_str() : nullptr);
+        reinterpret_cast<void*>(jni::GetField<jlong>(*env, customLayer, *customLayerContextId))),
+        before ? mbgl::optional<std::string>(std_string_from_jstring(env, before)) : mbgl::optional<std::string>());
 }
 
 void nativeRemoveCustomLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveCustomLayer");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().removeCustomLayer(std_string_from_jstring(env, id));
+    nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
 }
 
 // Offline calls begin
