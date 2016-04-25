@@ -1,4 +1,5 @@
 #include <mbgl/storage/network_status.hpp>
+#include <mbgl/util/default_styles.hpp>
 
 #include <QMapbox>
 
@@ -27,6 +28,20 @@ Q_DECL_EXPORT void setNetworkMode(NetworkMode mode)
         mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Offline);
         break;
     }
+}
+
+Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles()
+{
+    static QList<QPair<QString, QString>> styles;
+
+    if (styles.isEmpty()) {
+        for (auto style : mbgl::util::default_styles::orderedStyles) {
+            styles.append(QPair<QString, QString>(
+                QString::fromStdString(style.url), QString::fromStdString(style.name)));
+        }
+    }
+
+    return styles;
 }
 
 }

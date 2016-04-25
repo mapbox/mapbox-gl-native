@@ -39,6 +39,8 @@ struct Q_DECL_EXPORT CameraOptions {
     QVariant pitch;   // double
 };
 
+Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles();
+
 Q_DECL_EXPORT NetworkMode networkMode();
 Q_DECL_EXPORT void setNetworkMode(NetworkMode);
 
