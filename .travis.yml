@@ -98,7 +98,7 @@ matrix:
       env: FLAVOR=qt4 BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
       addons: *qt4
       script:
-        - make test-qt
+        - make qt-app test-qt
 
     # Qt 5 - Release
     - language: cpp
@@ -106,7 +106,7 @@ matrix:
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
       addons: *qt5
       script:
-        - make test-qt
+        - make qt-app test-qt
 
 cache:
   directories:
