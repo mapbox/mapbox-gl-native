@@ -25,8 +25,8 @@ public:
     PaintProperty<float> lineGapWidth { 0 };
     PaintProperty<float> lineBlur { 0 };
     PaintProperty<float> lineOffset { 0 };
-    PaintProperty<std::vector<float>, Faded<std::vector<float>>> lineDasharray { {} };
-    PaintProperty<std::string, Faded<std::string>> linePattern { "" };
+    PaintProperty<std::vector<float>, CrossFadedFunctionEvaluator> lineDasharray { {} };
+    PaintProperty<std::string, CrossFadedFunctionEvaluator> linePattern { "" };
 };
 
 class LineLayer : public StyleLayer {

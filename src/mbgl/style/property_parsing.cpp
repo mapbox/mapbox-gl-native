@@ -363,50 +363,12 @@ template<> optional<Function<Color>> parseProperty(const char* name, const JSVal
     return parseFunction<Color>(name, value);
 }
 
+template<> optional<Function<std::vector<float>>> parseProperty(const char* name, const JSValue& value) {
+    return parseFunction<std::vector<float>>(name, value);
+}
+
 template<> optional<Function<std::vector<std::string>>> parseProperty(const char* name, const JSValue& value) {
     return parseFunction<std::vector<std::string>>(name, value);
-}
-
-template <typename T>
-optional<Function<Faded<T>>> parseFadedFunction(const JSValue& value) {
-    if (!value.HasMember("stops")) {
-        Log::Warning(Event::ParseStyle, "function must specify a function type");
-        return {};
-    }
-
-    auto stops = parseStops<T>("", value["stops"]);
-
-    if (!stops) {
-        return {};
-    }
-
-    return Function<Faded<T>>(*stops);
-}
-
-template <>
-optional<Function<Faded<std::vector<float>>>> parseProperty(const char* name, const JSValue& value) {
-    if (value.IsObject()) {
-        return parseFadedFunction<std::vector<float>>(value);
-    }
-
-    auto constant = parseProperty<std::vector<float>>(name, value);
-    if (!constant) {
-        return {};
-    }
-    return Function<Faded<std::vector<float>>>(*constant);
-}
-
-template <>
-optional<Function<Faded<std::string>>> parseProperty(const char* name, const JSValue& value) {
-    if (value.IsObject()) {
-        return parseFadedFunction<std::string>(value);
-    }
-
-    auto constant = parseProperty<std::string>(name, value);
-    if (!constant) {
-        return {};
-    }
-    return Function<Faded<std::string>>(*constant);
 }
 
 } // namespace mbgl

@@ -10,7 +10,7 @@ class BackgroundPaintProperties {
 public:
     PaintProperty<float> backgroundOpacity { 1.0f };
     PaintProperty<Color> backgroundColor { {{ 0, 0, 0, 1 }} };
-    PaintProperty<std::string, Faded<std::string>> backgroundPattern { "" };
+    PaintProperty<std::string, CrossFadedFunctionEvaluator> backgroundPattern { "" };
 };
 
 class BackgroundLayer : public StyleLayer {
