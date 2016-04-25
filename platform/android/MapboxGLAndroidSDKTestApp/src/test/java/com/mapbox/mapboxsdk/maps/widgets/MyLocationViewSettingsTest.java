@@ -23,13 +23,13 @@ public class MyLocationViewSettingsTest {
     MapView mMapView = mock(MapView.class);
 
     @InjectMocks
-    UserLocationView userLocationView = mock(UserLocationView.class);
+    MyLocationView myLocationView = mock(MyLocationView.class);
 
     MyLocationViewSettings locationViewSettings;
 
     @Before
     public void beforeTest() {
-        locationViewSettings = new MyLocationViewSettings(mMapView, userLocationView);
+        locationViewSettings = new MyLocationViewSettings(mMapView, myLocationView);
     }
 
     @Test

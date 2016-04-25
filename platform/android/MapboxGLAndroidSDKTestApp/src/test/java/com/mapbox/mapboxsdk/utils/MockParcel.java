@@ -18,6 +18,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyByte;
 import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Matchers.anyFloat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -51,9 +52,8 @@ public class MockParcel {
             Method myMethod = creatorClass.getDeclaredMethod("createFromParcel", Parcel.class);
             return (Parcelable) myMethod.invoke(fieldValue, parcel);
         } catch (Exception e) {
-            assertNotNull("Exception occurred:" + e.getLocalizedMessage(), null);
+            return null;
         }
-        return null;
     }
 
     public static void testParcelableArray(@NonNull Parcelable object) {
@@ -139,15 +139,39 @@ public class MockParcel {
                     return null;
                 }
             };
+            Answer<Void> writeIntArrayAnswer = new Answer<Void>() {
+                @Override
+                public Void answer(InvocationOnMock invocation) throws Throwable {
+                    int[] parameters = (int[]) invocation.getArguments()[0];
+                    if (parameters != null) {
+                        objects.add(parameters.length);
+                        for (Object o : parameters) {
+                            objects.add(o);
+                        }
+                    } else {
+                        objects.add(-1);
+                    }
+                    return null;
+                }
+            };
             doAnswer(writeValueAnswer).when(mockedParcel).writeByte(anyByte());
             doAnswer(writeValueAnswer).when(mockedParcel).writeLong(anyLong());
             doAnswer(writeValueAnswer).when(mockedParcel).writeString(anyString());
+            doAnswer(writeValueAnswer).when(mockedParcel).writeInt(anyInt());
+            doAnswer(writeIntArrayAnswer).when(mockedParcel).writeIntArray(any(int[].class));
             doAnswer(writeValueAnswer).when(mockedParcel).writeDouble(anyDouble());
+            doAnswer(writeValueAnswer).when(mockedParcel).writeFloat(anyFloat());
             doAnswer(writeValueAnswer).when(mockedParcel).writeParcelable(any(Parcelable.class), eq(0));
             doAnswer(writeArrayAnswer).when(mockedParcel).writeParcelableArray(any(Parcelable[].class), eq(0));
         }
 
         private void setupReads() {
+            when(mockedParcel.readInt()).then(new Answer<Integer>() {
+                @Override
+                public Integer answer(InvocationOnMock invocation) throws Throwable {
+                    return (Integer) objects.get(position++);
+                }
+            });
             when(mockedParcel.readByte()).thenAnswer(new Answer<Byte>() {
                 @Override
                 public Byte answer(InvocationOnMock invocation) throws Throwable {
@@ -172,6 +196,12 @@ public class MockParcel {
                     return (Double) objects.get(position++);
                 }
             });
+            when(mockedParcel.readFloat()).thenAnswer(new Answer<Float>() {
+                @Override
+                public Float answer(InvocationOnMock invocation) throws Throwable {
+                    return (Float) objects.get(position++);
+                }
+            });
             when(mockedParcel.readParcelable(Parcelable.class.getClassLoader())).thenAnswer(new Answer<Parcelable>() {
                 @Override
                 public Parcelable answer(InvocationOnMock invocation) throws Throwable {
@@ -191,6 +221,22 @@ public class MockParcel {
                     for (int i = 0; i < size; i++) {
                         array[i] = objects.get(position++);
                     }
+                    return array;
+                }
+            });
+            when(mockedParcel.createIntArray()).then(new Answer<int[]>() {
+                @Override
+                public int[] answer(InvocationOnMock invocation) throws Throwable {
+                    int size = (Integer) objects.get(position++);
+                    if (size == -1) {
+                        return null;
+                    }
+
+                    int[] array = new int[size];
+                    for (int i = 0; i < size; i++) {
+                        array[i] = (Integer) objects.get(position++);
+                    }
+
                     return array;
                 }
             });

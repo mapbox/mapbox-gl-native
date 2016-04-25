@@ -140,7 +140,7 @@
         <activity
             android:name=".activity.userlocation.MyLocationCustomisationActivity"
             android:description="@string/description_user_location_customization"
-            android:label="@string/activity_user_tracking_mode">
+            android:label="@string/activity_user_tracking_customization">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_userlocation" />

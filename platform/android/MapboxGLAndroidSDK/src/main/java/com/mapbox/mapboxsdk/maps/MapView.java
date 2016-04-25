@@ -82,7 +82,8 @@ import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
-import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
@@ -127,7 +128,7 @@ public class MapView extends FrameLayout {
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
-    private UserLocationView mUserLocationView;
+    private MyLocationView mMyLocationView;
 
     private CopyOnWriteArrayList<OnMapChangedListener> mOnMapChangedListener;
     private ZoomButtonsController mZoomButtonsController;
@@ -224,8 +225,8 @@ public class MapView extends FrameLayout {
         // Connectivity
         onConnectivityChanged(isConnected());
 
-        mUserLocationView = (UserLocationView) view.findViewById(R.id.userLocationView);
-        mUserLocationView.setMapboxMap(mMapboxMap);
+        mMyLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
+        mMyLocationView.setMapboxMap(mMapboxMap);
 
         mCompassView = (CompassView) view.findViewById(R.id.compassView);
         mCompassView.setMapboxMap(mMapboxMap);
@@ -264,6 +265,22 @@ public class MapView extends FrameLayout {
             mMapboxMap.setStyleUrl(style);
         }
 
+        // MyLocationView
+        MyLocationViewSettings myLocationViewSettings = mMapboxMap.getMyLocationViewSettings();
+        myLocationViewSettings.setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
+        myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable());
+        if(options.getMyLocationForegroundTintColor()!=-1) {
+            myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
+        }
+        if(options.getMyLocationBackgroundTintColor()!=-1) {
+            myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
+        }
+        myLocationViewSettings.setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
+        myLocationViewSettings.setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
+        int[] myLocationPadding = options.getMyLocationBackgroundPadding();
+        if (myLocationPadding != null) {
+            myLocationViewSettings.setPadding(myLocationPadding[0], myLocationPadding[1], myLocationPadding[2], myLocationPadding[3]);
+        }
         mMapboxMap.setMyLocationEnabled(options.getLocationEnabled());
 
         // Enable gestures
@@ -276,6 +293,8 @@ public class MapView extends FrameLayout {
         uiSettings.setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
         uiSettings.setTiltGesturesEnabled(options.getTiltGesturesEnabled());
         uiSettings.setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
+
+        // Ui Controls
         uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
 
         // Zoom
@@ -525,7 +544,7 @@ public class MapView extends FrameLayout {
         getContext().unregisterReceiver(mConnectivityReceiver);
         mConnectivityReceiver = null;
 
-        mUserLocationView.onPause();
+        mMyLocationView.onPause();
     }
 
     /**
@@ -538,7 +557,7 @@ public class MapView extends FrameLayout {
         getContext().registerReceiver(mConnectivityReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         mNativeMapView.update();
-        mUserLocationView.onResume();
+        mMyLocationView.onResume();
 
         if (mStyleUrl == null) {
             // user has failed to supply a style url
@@ -590,7 +609,7 @@ public class MapView extends FrameLayout {
         if (duration != null) {
             actualDuration = duration;
         }
-        mUserLocationView.setTilt(pitch);
+        mMyLocationView.setTilt(pitch);
         mNativeMapView.setPitch(pitch, actualDuration);
     }
 
@@ -1329,7 +1348,7 @@ public class MapView extends FrameLayout {
             }
 
             mCompassView.update(getDirection());
-            mUserLocationView.update();
+            mMyLocationView.update();
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();
             }
@@ -1557,7 +1576,7 @@ public class MapView extends FrameLayout {
                         zoom(true, e.getX(), e.getY());
                     } else {
                         // Zoom in on user location view
-                        zoom(true, mUserLocationView.getCenterX(), mUserLocationView.getCenterY());
+                        zoom(true, mMyLocationView.getCenterX(), mMyLocationView.getCenterY());
                     }
                     break;
             }
@@ -1790,8 +1809,8 @@ public class MapView extends FrameLayout {
                     mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
                 } else {
                     // around user location view
-                    float x = mUserLocationView.getX() + mUserLocationView.getWidth() / 2;
-                    float y = mUserLocationView.getY() + mUserLocationView.getHeight() / 2;
+                    float x = mMyLocationView.getX() + mMyLocationView.getWidth() / 2;
+                    float y = mMyLocationView.getY() + mMyLocationView.getHeight() / 2;
                     mNativeMapView.scaleBy(detector.getScaleFactor(), x / mScreenDensity, y / mScreenDensity);
                 }
             }
@@ -1871,8 +1890,8 @@ public class MapView extends FrameLayout {
                         detector.getFocusY() / mScreenDensity);
             } else {
                 // around center userlocation
-                float x = mUserLocationView.getX() + mUserLocationView.getWidth() / 2;
-                float y = mUserLocationView.getY() + mUserLocationView.getHeight() / 2;
+                float x = mMyLocationView.getX() + mMyLocationView.getWidth() / 2;
+                float y = mMyLocationView.getY() + mMyLocationView.getHeight() / 2;
                 mNativeMapView.setBearing(bearing, x / mScreenDensity, y / mScreenDensity);
             }
             return true;
@@ -2336,18 +2355,20 @@ public class MapView extends FrameLayout {
     //
 
     void setMyLocationEnabled(boolean enabled) {
-        mUserLocationView.setEnabled(enabled);
+        mMyLocationView.setEnabled(enabled);
     }
 
     Location getMyLocation() {
-        return mUserLocationView.getLocation();
+        return mMyLocationView.getLocation();
     }
 
     void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
         LocationServices.getLocationServices(getContext()).addLocationListener(new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                listener.onMyLocationChange(location);
+                if(listener!=null) {
+                    listener.onMyLocationChange(location);
+                }
             }
         });
     }
@@ -2356,7 +2377,7 @@ public class MapView extends FrameLayout {
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && !mMapboxMap.isMyLocationEnabled()) {
             mMapboxMap.setMyLocationEnabled(true);
         }
-        mUserLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+        mMyLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
         MapboxMap.OnMyLocationTrackingModeChangeListener listener = mMapboxMap.getOnMyLocationTrackingModeChangeListener();
         if (listener != null) {
             listener.onMyLocationTrackingModeChange(myLocationTrackingMode);
@@ -2367,7 +2388,7 @@ public class MapView extends FrameLayout {
         if (myBearingTrackingMode != MyBearingTracking.NONE && !mMapboxMap.isMyLocationEnabled()) {
             mMapboxMap.setMyLocationEnabled(true);
         }
-        mUserLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
+        mMyLocationView.setMyBearingTrackingMode(myBearingTrackingMode);
         MapboxMap.OnMyBearingTrackingModeChangeListener listener = mMapboxMap.getOnMyBearingTrackingModeChangeListener();
         if (listener != null) {
             listener.onMyBearingTrackingModeChange(myBearingTrackingMode);
@@ -2512,8 +2533,8 @@ public class MapView extends FrameLayout {
         mMapboxMap = mapboxMap;
     }
 
-    UserLocationView getUserLocationView() {
-        return mUserLocationView;
+    MyLocationView getUserLocationView() {
+        return mMyLocationView;
     }
 
     @UiThread

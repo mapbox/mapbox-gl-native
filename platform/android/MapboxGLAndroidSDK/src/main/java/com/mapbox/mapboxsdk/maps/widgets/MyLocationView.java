@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -29,6 +28,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -44,9 +44,9 @@ import java.lang.ref.WeakReference;
 /**
  * UI element overlaid on a map to show the user's location.
  */
-public class UserLocationView extends View {
+public class MyLocationView extends View {
 
-    private UserLocationBehaviour userLocationBehaviour;
+    private MyLocationBehaviour myLocationBehaviour;
     private MapboxMap mapboxMap;
     private Projection projection;
     private int maxSize;
@@ -89,17 +89,17 @@ public class UserLocationView extends View {
     private GpsLocationListener userLocationListener;
     private CompassListener compassListener;
 
-    public UserLocationView(Context context) {
+    public MyLocationView(Context context) {
         super(context);
         init(context);
     }
 
-    public UserLocationView(Context context, AttributeSet attrs) {
+    public MyLocationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public UserLocationView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MyLocationView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
@@ -108,22 +108,22 @@ public class UserLocationView extends View {
         setEnabled(false);
 
         // behavioural model
-        userLocationBehaviour = new UserLocationBehaviourFactory().getBehaviouralModel(MyLocationTracking.TRACKING_NONE);
+        myLocationBehaviour = new MyLocationBehaviourFactory().getBehaviouralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
         maxSize = (int) context.getResources().getDimension(R.dimen.userlocationview_size);
 
         // default implementation
         setShadowDrawable(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_shadow));
-        setShadowDrawableTint(ColorUtils.getPrimaryDarkColor(context));
-
         setForegroundDrawables(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_normal), ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_bearing));
-        setForegroundDrawableTint(ColorUtils.getPrimaryColor(context));
-
-        accuracyPaint.setColor(ColorUtils.getAccentColor(context));
-        accuracyPaint.setAlpha(100);
+        setAccuracyTint(ColorUtils.getAccentColor(context));
+        setAccuracyAlpha(100);
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
+        if (defaultDrawable == null || bearingDrawable == null) {
+            Log.e(MapboxConstants.TAG, "Not setting foreground drawables MyLocationView: default = " + defaultDrawable + " bearing = " + bearingDrawable);
+            return;
+        }
         if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
@@ -146,6 +146,9 @@ public class UserLocationView extends View {
     }
 
     public final void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
+        if (drawable == null) {
+            return;
+        }
         backgroundDrawable = drawable;
         backgroundOffsetLeft = left;
         backgroundOffsetTop = top;
@@ -163,7 +166,9 @@ public class UserLocationView extends View {
     }
 
     public final void setAccuracyTint(@ColorInt int color) {
+        int alpha = accuracyPaint.getAlpha();
         accuracyPaint.setColor(color);
+        accuracyPaint.setAlpha(alpha);
     }
 
     public final void setAccuracyAlpha(@IntRange(from = 0, to = 255) int alpha) {
@@ -278,7 +283,7 @@ public class UserLocationView extends View {
 
     public void update() {
         if (isEnabled()) {
-            userLocationBehaviour.invalidate();
+            myLocationBehaviour.invalidate();
         } else {
             setVisibility(View.INVISIBLE);
         }
@@ -336,7 +341,7 @@ public class UserLocationView extends View {
         }
 
         this.location = location;
-        userLocationBehaviour.updateLatLng(location);
+        myLocationBehaviour.updateLatLng(location);
     }
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
@@ -357,12 +362,12 @@ public class UserLocationView extends View {
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         this.myLocationTrackingMode = myLocationTrackingMode;
 
-        UserLocationBehaviourFactory factory = new UserLocationBehaviourFactory();
-        userLocationBehaviour = factory.getBehaviouralModel(myLocationTrackingMode);
+        MyLocationBehaviourFactory factory = new MyLocationBehaviourFactory();
+        myLocationBehaviour = factory.getBehaviouralModel(myLocationTrackingMode);
 
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && location != null) {
             // center map directly if we have a location fix
-            userLocationBehaviour.updateLatLng(location);
+            myLocationBehaviour.updateLatLng(location);
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
         }
         invalidate();
@@ -400,10 +405,10 @@ public class UserLocationView extends View {
 
     private static class GpsLocationListener implements LocationListener {
 
-        private WeakReference<UserLocationView> mUserLocationView;
+        private WeakReference<MyLocationView> mUserLocationView;
 
-        public GpsLocationListener(UserLocationView userLocationView) {
-            mUserLocationView = new WeakReference<>(userLocationView);
+        public GpsLocationListener(MyLocationView myLocationView) {
+            mUserLocationView = new WeakReference<>(myLocationView);
         }
 
         /**
@@ -413,7 +418,7 @@ public class UserLocationView extends View {
          */
         @Override
         public void onLocationChanged(Location location) {
-            UserLocationView locationView = mUserLocationView.get();
+            MyLocationView locationView = mUserLocationView.get();
             if (locationView != null) {
                 locationView.setLocation(location);
             }
@@ -511,14 +516,14 @@ public class UserLocationView extends View {
 
     private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
 
-        private UserLocationBehaviour behaviour;
+        private MyLocationBehaviour behaviour;
         private double fromLat;
         private double fromLng;
         private double toLat;
         private double toLng;
 
-        private MarkerCoordinateAnimatorListener(UserLocationBehaviour userLocationBehaviour, LatLng from, LatLng to) {
-            behaviour = userLocationBehaviour;
+        private MarkerCoordinateAnimatorListener(MyLocationBehaviour myLocationBehaviour, LatLng from, LatLng to) {
+            behaviour = myLocationBehaviour;
             fromLat = from.getLatitude();
             fromLng = from.getLongitude();
             toLat = to.getLatitude();
@@ -535,18 +540,18 @@ public class UserLocationView extends View {
         }
     }
 
-    private class UserLocationBehaviourFactory {
+    private class MyLocationBehaviourFactory {
 
-        public UserLocationBehaviour getBehaviouralModel(@MyLocationTracking.Mode int mode) {
+        public MyLocationBehaviour getBehaviouralModel(@MyLocationTracking.Mode int mode) {
             if (mode == MyLocationTracking.TRACKING_NONE) {
-                return new UserLocationShowBehaviour();
+                return new MyLocationShowBehaviour();
             } else {
-                return new UserLocationTrackingBehaviour();
+                return new MyLocationTrackingBehaviour();
             }
         }
     }
 
-    private abstract class UserLocationBehaviour {
+    private abstract class MyLocationBehaviour {
 
         abstract void updateLatLng(@NonNull Location location);
 
@@ -564,7 +569,7 @@ public class UserLocationView extends View {
                 accuracyAnimator.end();
             }
 
-            accuracyAnimator = ValueAnimator.ofFloat(accuracy, location.getAccuracy());
+            accuracyAnimator = ValueAnimator.ofFloat(accuracy * 10, location.getAccuracy() * 10);
             accuracyAnimator.setDuration(750);
             accuracyAnimator.start();
             accuracy = location.getAccuracy();
@@ -573,7 +578,7 @@ public class UserLocationView extends View {
         abstract void invalidate();
     }
 
-    private class UserLocationTrackingBehaviour extends UserLocationBehaviour {
+    private class MyLocationTrackingBehaviour extends MyLocationBehaviour {
 
         @Override
         void updateLatLng(@NonNull Location location) {
@@ -581,7 +586,6 @@ public class UserLocationView extends View {
                 // first location fix
                 latLng = new LatLng(location);
                 locationUpdateTimestamp = SystemClock.elapsedRealtime();
-                return;
             }
 
             // updateLatLng timestamp
@@ -630,19 +634,18 @@ public class UserLocationView extends View {
             UiSettings uiSettings = mapboxMap.getUiSettings();
             setX((uiSettings.getWidth() - getWidth() + mapPadding[0] - mapPadding[2]) / 2 + (contentPadding[0] - contentPadding[2]) / 2);
             setY((uiSettings.getHeight() - getHeight() - mapPadding[3] + mapPadding[1]) / 2 + (contentPadding[1] - contentPadding[3]) / 2);
-            UserLocationView.this.invalidate();
+            MyLocationView.this.invalidate();
         }
     }
 
-    private class UserLocationShowBehaviour extends UserLocationBehaviour {
+    private class MyLocationShowBehaviour extends MyLocationBehaviour {
 
         @Override
         void updateLatLng(@NonNull final Location location) {
             if (latLng == null) {
-                // first location updateLatLng
+                // first location update
                 latLng = new LatLng(location);
                 locationUpdateTimestamp = SystemClock.elapsedRealtime();
-                return;
             }
 
             // update LatLng location
@@ -701,7 +704,7 @@ public class UserLocationView extends View {
                 setX((screenLocation.x - getWidth() / 2));
                 setY((screenLocation.y - getHeight() / 2));
             }
-            UserLocationView.this.invalidate();
+            MyLocationView.this.invalidate();
         }
     }
 }

@@ -1,34 +1,47 @@
 <resources>
     <!-- these are public -->
     <declare-styleable name="MapView">
+
+        <!--Configuration-->
+        <attr name="access_token" format="string" />
+        <attr name="style_url" format="string" />
+
+        <!--Camera-->
         <attr name="center_longitude" format="float" />
         <attr name="center_latitude" format="float" />
         <attr name="zoom" format="float" />
-        <attr name="zoom_max" format="float" />
-        <attr name="zoom_min" format="float" />
         <attr name="direction" format="float" />
         <attr name="tilt" format="float" />
+
+        <!--Zoom-->
+        <attr name="zoom_max" format="float" />
+        <attr name="zoom_min" format="float" />
+
+        <!--Gestures-->
         <attr name="zoom_enabled" format="boolean" />
         <attr name="scroll_enabled" format="boolean" />
         <attr name="rotate_enabled" format="boolean" />
         <attr name="tilt_enabled" format="boolean" />
-        <attr name="zoom_controls_enabled" format="boolean" />
         <attr name="debug_active" format="boolean" />
-        <attr name="style_url" format="string" />
-        <attr name="access_token" format="string" />
-        <attr name="style_classes" format="string" />
 
-        <!-- My Location-->
+        <!--UI-Controls-->
+        <attr name="zoom_controls_enabled" format="boolean" />
+
+        <!--MyLocation-->
         <attr name="my_location_enabled" format="boolean" />
-        <attr name="my_location_tint" format="color" />
         <attr name="my_location_foreground" format="reference" />
+        <attr name="my_location_foreground_bearing" format="reference" />
+        <attr name="my_location_foreground_tint" format="color" />
         <attr name="my_location_background" format="reference" />
-        <attr name="my_location_background_left" format="integer" />
-        <attr name="my_location_background_top" format="integer" />
-        <attr name="my_location_background_right" format="integer" />
-        <attr name="my_location_background_bottom" format="integer" />
+        <attr name="my_location_background_tint" format="color" />
+        <attr name="my_location_background_left" format="dimension" />
+        <attr name="my_location_background_top" format="dimension" />
+        <attr name="my_location_background_right" format="dimension" />
+        <attr name="my_location_background_bottom" format="dimension" />
+        <attr name="my_location_accuracy_tint" format="color" />
+        <attr name="my_location_accuracy_alpha" format="integer" />
 
-        <!-- Compass -->
+        <!--Compass-->
         <attr name="compass_enabled" format="boolean" />
         <attr name="compass_gravity">
             <flag name="top" value="0x30" />
@@ -50,6 +63,8 @@
         <attr name="compass_margin_top" format="dimension" />
         <attr name="compass_margin_right" format="dimension" />
         <attr name="compass_margin_bottom" format="dimension" />
+
+        <!--Logo-->
         <attr name="logo_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />
@@ -72,6 +87,7 @@
         <attr name="logo_margin_bottom" format="dimension" />
         <attr name="logo_enabled" format="boolean" />
 
+        <!--Attribution-->
         <attr name="attribution_gravity">
             <flag name="top" value="0x30" />
             <flag name="bottom" value="0x50" />

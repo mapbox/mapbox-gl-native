@@ -4,13 +4,12 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.maps.MapView;
 
 public class MyLocationViewSettings {
 
     private MapView mapView;
-    private UserLocationView userLocationView;
+    private MyLocationView myLocationView;
 
     //
     // State
@@ -42,7 +41,7 @@ public class MyLocationViewSettings {
     // Accuracy
     //
 
-    private int arruracyAlpha;
+    private int accuracyAlpha;
 
     @ColorInt
     private int accuracyTintColor;
@@ -53,9 +52,9 @@ public class MyLocationViewSettings {
 
     private int[] padding = new int[4];
 
-    public MyLocationViewSettings(MapView mapView, UserLocationView userLocationView) {
+    public MyLocationViewSettings(MapView mapView, MyLocationView myLocationView) {
         this.mapView = mapView;
-        this.userLocationView = userLocationView;
+        this.myLocationView = myLocationView;
     }
 
     public boolean isEnabled() {
@@ -64,13 +63,13 @@ public class MyLocationViewSettings {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        userLocationView.setEnabled(enabled);
+        myLocationView.setEnabled(enabled);
     }
 
     public void setForegroundDrawable(Drawable foregroundDrawable, Drawable foregroundBearingDrawable) {
         this.foregroundDrawable = foregroundDrawable;
         this.foregroundBearingDrawable = foregroundBearingDrawable;
-        userLocationView.setForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
+        myLocationView.setForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
     }
 
     public Drawable getForegroundDrawable() {
@@ -83,7 +82,7 @@ public class MyLocationViewSettings {
 
     public void setForegroundTintColor(@ColorInt int foregroundTintColor) {
         this.foregroundTintColor = foregroundTintColor;
-        userLocationView.setForegroundDrawableTint(foregroundTintColor);
+        myLocationView.setForegroundDrawableTint(foregroundTintColor);
     }
 
     public int getForegroundTintColor() {
@@ -92,7 +91,7 @@ public class MyLocationViewSettings {
 
     public void setBackgroundDrawable(Drawable backgroundDrawable) {
         this.backgroundDrawable = backgroundDrawable;
-        userLocationView.setShadowDrawable(backgroundDrawable);
+        myLocationView.setShadowDrawable(backgroundDrawable);
     }
 
     public Drawable getBackgroundDrawable() {
@@ -101,7 +100,7 @@ public class MyLocationViewSettings {
 
     public void setBackgroundTintColor(@ColorInt int backgroundTintColor) {
         this.backgroundTintColor = backgroundTintColor;
-        userLocationView.setShadowDrawableTint(backgroundTintColor);
+        myLocationView.setShadowDrawableTint(backgroundTintColor);
     }
 
     public int getBackgroundTintColor() {
@@ -110,7 +109,7 @@ public class MyLocationViewSettings {
 
     public void setBackgroundOffset(int left, int top, int right, int bottom) {
         backgroundOffset = new int[]{left, top, right, bottom};
-        userLocationView.setShadowDrawable(backgroundDrawable, left, top, right, bottom);
+        myLocationView.setShadowDrawable(backgroundDrawable, left, top, right, bottom);
     }
 
     public int[] getBackgroundOffset() {
@@ -119,7 +118,7 @@ public class MyLocationViewSettings {
 
     public void setPadding(int left, int top, int right, int bottom) {
         padding = new int[]{left, top, right, bottom};
-        userLocationView.setContentPadding(padding);
+        myLocationView.setContentPadding(padding);
         mapView.invalidateContentPadding();
     }
 
@@ -128,12 +127,12 @@ public class MyLocationViewSettings {
     }
 
     public int getAccuracyAlpha() {
-        return arruracyAlpha;
+        return accuracyAlpha;
     }
 
     public void setAccuracyAlpha(@IntRange(from = 0, to = 255) int arruracyAlpha) {
-        this.arruracyAlpha = arruracyAlpha;
-        userLocationView.setAccuracyAlpha(arruracyAlpha);
+        this.accuracyAlpha = arruracyAlpha;
+        myLocationView.setAccuracyAlpha(arruracyAlpha);
     }
 
     public int getAccuracyTintColor() {
@@ -142,7 +141,6 @@ public class MyLocationViewSettings {
 
     public void setAccuracyTintColor(@ColorInt int accuracyTintColor) {
         this.accuracyTintColor = accuracyTintColor;
-        userLocationView.setAccuracyTint(accuracyTintColor);
+        myLocationView.setAccuracyTint(accuracyTintColor);
     }
-
 }

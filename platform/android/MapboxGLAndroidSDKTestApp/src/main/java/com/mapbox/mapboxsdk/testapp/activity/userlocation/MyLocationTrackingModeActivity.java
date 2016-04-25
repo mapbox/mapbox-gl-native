@@ -21,12 +21,15 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
+
+import java.util.Locale;
 
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
 
@@ -58,7 +61,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 mMapboxMap = mapboxMap;
 
                 // disable dismissal when a gesture occurs
-                mMapboxMap.getTrackingSettings().setDismissTrackingOnGesture(false);
+                mMapboxMap.getTrackingSettings().setDismissLocationTrackingOnGesture(false);
                 mMapboxMap.getTrackingSettings().setDismissBearingTrackingOnGesture(false);
 
                 mapboxMap.setOnMyLocationChangeListener(MyLocationTrackingModeActivity.this);
@@ -74,7 +77,6 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 mBearingSpinner = (Spinner) findViewById(R.id.spinner_bearing);
                 mBearingSpinner.setAdapter(bearingTrackingAdapter);
                 mBearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
-
 
                 mapboxMap.setOnMyLocationTrackingModeChangeListener(new MapboxMap.OnMyLocationTrackingModeChangeListener() {
                     @Override
@@ -97,8 +99,21 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                         }
                     }
                 });
+
+
+                mLocation = LocationServices.getLocationServices(MyLocationTrackingModeActivity.this).getLastLocation();
+                if(mLocation!=null){
+                    setInitialPosition(new LatLng(mLocation));
+                }
             }
         });
+    }
+
+    private void setInitialPosition(LatLng latLng){
+        mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+        mMapboxMap.setMyLocationEnabled(true);
+        mLocationSpinner.setEnabled(true);
+        mBearingSpinner.setEnabled(true);
     }
 
     @Override
@@ -106,10 +121,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         if (location != null) {
             if (mLocation == null) {
                 // initial location to reposition map
-                mMapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
-                mMapboxMap.setMyLocationEnabled(true);
-                mLocationSpinner.setEnabled(true);
-                mBearingSpinner.setEnabled(true);
+                setInitialPosition(new LatLng(location));
             }
             mLocation = location;
             showSnackBar();
@@ -120,15 +132,15 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         String desc = "Loc Chg: ";
         boolean noInfo = true;
         if (mLocation.hasSpeed()) {
-            desc += String.format("Spd = %.1f km/h ", mLocation.getSpeed() * 3.6f);
+            desc += String.format(Locale.getDefault(), "Spd = %.1f km/h ", mLocation.getSpeed() * 3.6f);
             noInfo = false;
         }
         if (mLocation.hasAltitude()) {
-            desc += String.format("Alt = %.0f m ", mLocation.getAltitude());
+            desc += String.format(Locale.getDefault(), "Alt = %.0f m ", mLocation.getAltitude());
             noInfo = false;
         }
-        if(mLocation.hasAccuracy()){
-            desc += String.format("Acc = %.0f m",mLocation.getAccuracy());
+        if (mLocation.hasAccuracy()) {
+            desc += String.format(Locale.getDefault(), "Acc = %.0f m", mLocation.getAccuracy());
         }
 
         if (noInfo) {

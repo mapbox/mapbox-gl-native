@@ -5,7 +5,7 @@ import android.support.annotation.UiThread;
 
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 /**
  * Settings for the user location and bearing tracking of a MapboxMap.
@@ -67,7 +67,7 @@ public class TrackingSettings {
      * </p>
      * Shows the direction the user is heading.
      * <p>
-     * When location tracking is disabled the direction of {@link UserLocationView}  is rotated
+     * When location tracking is disabled the direction of {@link MyLocationView}  is rotated
      * When location tracking is enabled the {@link MapView} is rotated based on bearing value.
      * </p>
      * See {@link MyBearingTracking} for different values.
