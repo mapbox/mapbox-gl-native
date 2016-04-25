@@ -74,7 +74,6 @@
           '<@(sqlite_cflags)',
           '<@(variant_cflags)',
           '<@(webp_cflags)',
-          '-Wno-error', # TODO: eliminate
           '-fPIC',
         ],
         'ldflags': [

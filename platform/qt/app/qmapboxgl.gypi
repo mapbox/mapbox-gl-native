@@ -27,7 +27,6 @@
         'cflags': [
           '<@(opengl_cflags)',
           '<@(qt_cflags)',
-          '-Wno-error',  # TODO: eliminate
           '-fPIC',
         ],
         'ldflags': [
