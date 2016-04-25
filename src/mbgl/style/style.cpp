@@ -175,7 +175,7 @@ void Style::cascade(const TimePoint& timePoint, MapMode mode) {
 
     const StyleCascadeParameters parameters {
         classIDs,
-        timePoint,
+        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
         mode == MapMode::Continuous ? transitionProperties.value_or(immediateTransition) : immediateTransition
     };
 
@@ -195,7 +195,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
 
     const StyleCalculationParameters parameters {
         z,
-        timePoint,
+        mode == MapMode::Continuous ? timePoint : Clock::time_point::max(),
         zoomHistory,
         mode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Duration::zero()
     };
