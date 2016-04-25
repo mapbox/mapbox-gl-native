@@ -139,7 +139,10 @@
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
-            'xcode_settings': { 'OTHER_LDFLAGS': [ '-all_load' ] }
+            'xcode_settings': {
+              'OTHER_LDFLAGS': [ '-all_load' ],
+              'LD_DYLIB_INSTALL_NAME': '@executable_path/libqmapboxgl.so.<(qtlibversion)',
+            }
           }]
         ],
       },
