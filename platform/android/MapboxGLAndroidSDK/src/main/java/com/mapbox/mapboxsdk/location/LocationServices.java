@@ -9,13 +9,10 @@ import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-
 import com.mapbox.mapboxsdk.telemetry.TelemetryLocationReceiver;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LostApiClient;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Manages locational updates. Contains methods to register and unregister location listeners.
@@ -30,7 +27,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
     private LostApiClient locationClient;
     private Location lastLocation;
 
-    private List<LocationListener> locationListeners;
+    private CopyOnWriteArrayList<LocationListener> locationListeners;
 
     private boolean isGPSEnabled;
 
@@ -42,7 +39,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
         this.context = context;
         // Setup location services
         locationClient = new LostApiClient.Builder(context).build();
-        locationListeners = new ArrayList<>();
+        locationListeners = new CopyOnWriteArrayList<>();
     }
 
     /**
