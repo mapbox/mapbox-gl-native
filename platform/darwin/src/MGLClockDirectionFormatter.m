@@ -19,7 +19,10 @@
 }
 
 - (NSString *)stringFromDirection:(CLLocationDirection)direction {
-    NSInteger hour = round(-wrap(-direction, -360, 0) / 360 * 12);
+    NSInteger hour = round(wrap(direction, 0, 360) / 360 * 12);
+    if (hour == 0) {
+        hour = 12;
+    }
     NSString *format;
     switch (self.unitStyle) {
         case NSFormattingUnitStyleShort:

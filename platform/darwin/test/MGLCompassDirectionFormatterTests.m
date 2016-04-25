@@ -64,7 +64,17 @@
     XCTAssertEqualObjects(@"west", [mediumFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"west", [longFormatter stringFromDirection:direction]);
     
+    direction = 359.34951805867024;
+    XCTAssertEqualObjects(@"N", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"north", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"north", [longFormatter stringFromDirection:direction]);
+    
     direction = 360;
+    XCTAssertEqualObjects(@"N", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"north", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"north", [longFormatter stringFromDirection:direction]);
+    
+    direction = 360.1;
     XCTAssertEqualObjects(@"N", [shortFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"north", [mediumFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"north", [longFormatter stringFromDirection:direction]);

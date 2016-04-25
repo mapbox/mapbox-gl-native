@@ -49,6 +49,26 @@ static NSString * const MGLTestLocaleIdentifier = @"en-US";
     XCTAssertEqualObjects(@"9:00", [shortFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"9 o’clock", [mediumFormatter stringFromDirection:direction]);
     XCTAssertEqualObjects(@"9 o’clock", [longFormatter stringFromDirection:direction]);
+    
+    direction = 359.34951805867024;
+    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [longFormatter stringFromDirection:direction]);
+    
+    direction = 360;
+    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [longFormatter stringFromDirection:direction]);
+    
+    direction = 360.1;
+    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [longFormatter stringFromDirection:direction]);
+    
+    direction = 720;
+    XCTAssertEqualObjects(@"12:00", [shortFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [mediumFormatter stringFromDirection:direction]);
+    XCTAssertEqualObjects(@"12 o’clock", [longFormatter stringFromDirection:direction]);
 }
 
 @end

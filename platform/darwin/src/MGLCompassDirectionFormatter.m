@@ -98,7 +98,7 @@
         NSAssert(shortStrings.count == longStrings.count, @"Long and short compass direction string arrays must have the same size.");
     });
     
-    NSInteger cardinalPoint = round(wrap(direction, 0, 360) / 360 * shortStrings.count);
+    NSInteger cardinalPoint = wrap(round(wrap(direction, 0, 360) / 360 * shortStrings.count), 0, shortStrings.count);
     switch (self.unitStyle) {
         case NSFormattingUnitStyleShort:
             return shortStrings[cardinalPoint];
