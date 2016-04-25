@@ -140,7 +140,6 @@
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
-            'libraries': [ '-framework OpenGL' ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '-all_load' ] }
           }]
         ],

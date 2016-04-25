@@ -10,7 +10,7 @@
       ],
 
       'dependencies': [
-        'platform-lib',
+        'qt-lib',
       ],
 
       'sources': [
@@ -21,7 +21,6 @@
 
       'include_dirs': [
         '../include',
-        '../../../include',
       ],
 
       'variables': {
@@ -41,7 +40,7 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags)' ],
-            'OTHER_LDFLAGS': [ '<@(ldflags)', '-framework OpenGL' ],
+            'OTHER_LDFLAGS': [ '<@(ldflags)' ],
           },
         }, {
           'cflags_cc': [ '<@(cflags)' ],
