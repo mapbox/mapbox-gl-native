@@ -80,30 +80,15 @@ private:
 
 }
 
-//TEST(OfflineDatabase, NonexistentDirectory) {
-//    using namespace mbgl;
-//
-//    Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//    OfflineDatabase db("test/fixtures/404/offline.db");
-//
-//    db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//        EXPECT_FALSE(bool(res));
-//    });
-//
-//    auto observer = Log::removeObserver();
-//    EXPECT_EQ(1ul, dynamic_cast<FixtureLogObserver*>(observer.get())->count({ EventSeverity::Error, Event::Database, 14, "unable to open database file" }));
-//}
-
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     using namespace mbgl;
 
-    createDir("test/fixtures/database");
-    deleteFile("test/fixtures/database/offline.db");
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/offline.db");
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    OfflineDatabase db("test/fixtures/database/offline.db");
+    OfflineDatabase db("test/fixtures/offline_database/offline.db");
     EXPECT_FALSE(bool(db.get({ Resource::Unknown, "mapbox://test" })));
 
     Log::removeObserver();
@@ -112,9 +97,9 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
     using namespace mbgl;
 
-    createDir("test/fixtures/database");
-    deleteFile("test/fixtures/database/offline.db");
-    std::string path("test/fixtures/database/offline.db");
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/offline.db");
+    std::string path("test/fixtures/offline_database/offline.db");
 
     {
         sqlite3* db = nullptr;
@@ -134,149 +119,18 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
     using namespace mbgl;
 
-    createDir("test/fixtures/database");
-    deleteFile("test/fixtures/database/invalid.db");
-    writeFile("test/fixtures/database/invalid.db", "this is an invalid file");
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/invalid.db");
+    writeFile("test/fixtures/offline_database/invalid.db", "this is an invalid file");
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
-    OfflineDatabase db("test/fixtures/database/invalid.db");
+    OfflineDatabase db("test/fixtures/offline_database/invalid.db");
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
     EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
 }
-
-//TEST(OfflineDatabase, DatabaseLockedRead) {
-//    using namespace mbgl;
-//
-//    // Create a locked file.
-//    createDir("test/fixtures/database");
-//    deleteFile("test/fixtures/database/locked.db");
-//    FileLock guard("test/fixtures/database/locked.db");
-//
-//    OfflineDatabase db("test/fixtures/database/locked.db");
-//
-//    {
-//        // First request should fail.
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            EXPECT_FALSE(bool(res));
-//        });
-//
-//        // Make sure that we got a few "database locked" errors
-//        auto observer = Log::removeObserver();
-//        auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-//        EXPECT_EQ(4ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
-//    }
-//
-//    // Then, unlock the file and try again.
-//    guard.unlock();
-//
-//    {
-//        // First, try getting a file (the cache value should not exist).
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            EXPECT_FALSE(bool(res));
-//        });
-//
-//        // Make sure that we got a no errors
-//        Log::removeObserver();
-//    }
-//}
-//
-//TEST(OfflineDatabase, DatabaseLockedWrite) {
-//    using namespace mbgl;
-//
-//    // Create a locked file.
-//    createDir("test/fixtures/database");
-//    deleteFile("test/fixtures/database/locked.db");
-//    FileLock guard("test/fixtures/database/locked.db");
-//
-//    OfflineDatabase db("test/fixtures/database/locked.db");
-//
-//    {
-//        // Adds a file (which should fail).
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        db.put({ Resource::Unknown, "mapbox://test" }, Response());
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            EXPECT_FALSE(bool(res));
-//        });
-//
-//        auto observer = Log::removeObserver();
-//        auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-//        EXPECT_EQ(8ul, flo->count({ EventSeverity::Error, Event::Database, 5, "database is locked" }));
-//    }
-//
-//    // Then, unlock the file and try again.
-//    guard.unlock();
-//
-//    {
-//        // Then, set a file and obtain it again.
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        Response response;
-//        response.data = std::make_shared<std::string>("Demo");
-//        db.put({ Resource::Unknown, "mapbox://test" }, response);
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            ASSERT_TRUE(bool(res));
-//            ASSERT_TRUE(res->data.get());
-//            EXPECT_EQ("Demo", *res->data);
-//        });
-//
-//        // Make sure that we got a no errors
-//        Log::removeObserver();
-//    }
-//}
-//
-//TEST(OfflineDatabase, DatabaseDeleted) {
-//    using namespace mbgl;
-//
-//    // Create a locked file.
-//    createDir("test/fixtures/database");
-//    deleteFile("test/fixtures/database/locked.db");
-//
-//    OfflineDatabase db("test/fixtures/database/locked.db");
-//
-//    {
-//        // Adds a file.
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        Response response;
-//        response.data = std::make_shared<std::string>("Demo");
-//        db.put({ Resource::Unknown, "mapbox://test" }, response);
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            ASSERT_TRUE(bool(res));
-//            ASSERT_TRUE(res->data.get());
-//            EXPECT_EQ("Demo", *res->data);
-//        });
-//
-//        Log::removeObserver();
-//    }
-//
-//    deleteFile("test/fixtures/database/locked.db");
-//
-//    {
-//        // Adds a file.
-//        Log::setObserver(std::make_unique<FixtureLogObserver>());
-//
-//        Response response;
-//        response.data = std::make_shared<std::string>("Demo");
-//        db.put({ Resource::Unknown, "mapbox://test" }, response);
-//        db.get({ Resource::Unknown, "mapbox://test" }, [] (optional<Response> res) {
-//            ASSERT_TRUE(bool(res));
-//            ASSERT_TRUE(res->data.get());
-//            EXPECT_EQ("Demo", *res->data);
-//        });
-//
-//        auto observer = Log::removeObserver();
-//        auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-//        EXPECT_EQ(1ul, flo->count({ EventSeverity::Error, Event::Database, 8, "attempt to write a readonly database" }));
-//    }
-//}
 
 TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
     using namespace mbgl;
@@ -491,11 +345,11 @@ TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     using namespace mbgl;
 
-    createDir("test/fixtures/database");
-    deleteFile("test/fixtures/database/offline.db");
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/offline.db");
 
-    OfflineDatabase db1("test/fixtures/database/offline.db");
-    OfflineDatabase db2("test/fixtures/database/offline.db");
+    OfflineDatabase db1("test/fixtures/offline_database/offline.db");
+    OfflineDatabase db2("test/fixtures/offline_database/offline.db");
 
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
@@ -671,18 +525,18 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
 
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
-    deleteFile("test/fixtures/offline/v3.db");
-    writeFile("test/fixtures/offline/v3.db", util::read_file("test/fixtures/offline/v2.db"));
+    deleteFile("test/fixtures/offline_database/v3.db");
+    writeFile("test/fixtures/offline_database/v3.db", util::read_file("test/fixtures/offline_database/v2.db"));
 
     {
-        OfflineDatabase db("test/fixtures/offline/v3.db", 0);
+        OfflineDatabase db("test/fixtures/offline_database/v3.db", 0);
         auto regions = db.listRegions();
         for (auto& region : regions) {
             db.deleteRegion(std::move(region));
         }
     }
 
-    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline/v3.db"));
-    EXPECT_LT(databasePageCount("test/fixtures/offline/v3.db"),
-              databasePageCount("test/fixtures/offline/v2.db"));
+    EXPECT_EQ(3, databaseUserVersion("test/fixtures/offline_database/v3.db"));
+    EXPECT_LT(databasePageCount("test/fixtures/offline_database/v3.db"),
+              databasePageCount("test/fixtures/offline_database/v2.db"));
 }

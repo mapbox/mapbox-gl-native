@@ -4,11 +4,11 @@
   "sources": {
     "mapbox": {
       "type": "vector",
-      "url": "http://127.0.0.1:3000/offline/streets.json"
+      "url": "http://127.0.0.1:3000/streets.json"
     }
   },
-  "glyphs": "http://127.0.0.1:3000/offline/{fontstack}/{range}.pbf",
-  "sprite": "http://127.0.0.1:3000/offline/sprite",
+  "glyphs": "http://127.0.0.1:3000/{fontstack}/{range}.pbf",
+  "sprite": "http://127.0.0.1:3000/sprite",
   "layers": [{
     "id": "background",
     "type": "background",

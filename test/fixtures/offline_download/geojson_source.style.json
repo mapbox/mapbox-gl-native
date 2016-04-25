@@ -3,7 +3,7 @@
   "sources": {
     "geojson": {
       "type": "geojson",
-      "data": "http://127.0.0.1:3000/offline/geojson.json"
+      "data": "http://127.0.0.1:3000/geojson.json"
     }
   },
   "layers": []
