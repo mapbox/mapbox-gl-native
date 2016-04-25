@@ -6,11 +6,11 @@
 	<array>
 		<dict>
 			<key>Title</key>
-			<string>Privacy Settings</string>
+			<string>TELEMETRY_GROUP_TITLE</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>FooterText</key>
-			<string>This setting allows the application to share anonymized location and usage data with Mapbox.</string>
+			<string>TELEMETRY_GROUP_FOOTER</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
@@ -18,7 +18,7 @@
 			<key>Key</key>
 			<string>MGLMapboxMetricsEnabled</string>
 			<key>Title</key>
-			<string>Mapbox Telemetry</string>
+			<string>TELEMETRY_SWITCH_TITLE</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>TrueValue</key>
