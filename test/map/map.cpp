@@ -8,15 +8,20 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/layer/background_layer.hpp>
 
 using namespace mbgl;
 using namespace std::literals::string_literals;
 
-TEST(Map, Offline) {
+struct MapTest {
     util::RunLoop runLoop;
+    std::shared_ptr<HeadlessDisplay> display { std::make_shared<mbgl::HeadlessDisplay>() };
+    HeadlessView view { display, 1 };
+    StubFileSource fileSource;
+};
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
+TEST(Map, Offline) {
+    MapTest test;
     DefaultFileSource fileSource(":memory:", ".");
 
     auto expiredItem = [] (const std::string& path) {
@@ -35,7 +40,7 @@ TEST(Map, Offline) {
     fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
-    Map map(view, fileSource, MapMode::Still);
+    Map map(test.view, fileSource, MapMode::Still);
     map.setStyleURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
@@ -47,13 +52,36 @@ TEST(Map, Offline) {
 }
 
 TEST(Map, DoubleStyleLoad) {
-    util::RunLoop runLoop;
+    MapTest test;
 
-    std::shared_ptr<HeadlessDisplay> display = std::make_shared<HeadlessDisplay>();
-    HeadlessView view(display, 1, 512, 512);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource);
+    Map map(test.view, test.fileSource, MapMode::Still);
     map.setStyleJSON("", "");
     map.setStyleJSON("", "");
+}
+
+TEST(Map, AddLayer) {
+    MapTest test;
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+
+    auto layer = std::make_unique<BackgroundLayer>("background");
+    layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
+    map.addLayer(std::move(layer));
+
+    test::checkImage("test/fixtures/map/add_layer", test::render(map));
+}
+
+TEST(Map, RemoveLayer) {
+    MapTest test;
+
+    Map map(test.view, test.fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+
+    auto layer = std::make_unique<BackgroundLayer>("background");
+    layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
+    map.addLayer(std::move(layer));
+    map.removeLayer("background");
+
+    test::checkImage("test/fixtures/map/remove_layer", test::render(map));
 }
