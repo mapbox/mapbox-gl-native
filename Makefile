@@ -64,9 +64,9 @@ genstrings:
 	genstrings -u -o platform/osx/sdk/Base.lproj platform/darwin/src/*.{m,mm}
 	genstrings -u -o platform/osx/sdk/Base.lproj platform/osx/src/*.{m,mm}
 	genstrings -u -o platform/ios/resources/Base.lproj platform/ios/src/*.{m,mm}
-	mv platform/osx/sdk/Base.lproj/Foundation.strings platform/darwin/resources/Base.lproj/
-	-find platform/{darwin,ios,osx}/ -path '*/Base.lproj/*.strings' -exec \
+	-find platform/ios/resources platform/osx/sdk -path '*/Base.lproj/*.strings' -exec \
 		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
+	mv platform/osx/sdk/Base.lproj/Foundation.strings platform/darwin/resources/Base.lproj/
 
 #### iOS targets ##############################################################
 
