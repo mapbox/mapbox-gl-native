@@ -181,6 +181,22 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     }
 }
 
+- (void)updateFrameWithSize:(CGFloat)size
+{
+    CGSize newSize = CGSizeMake(size, size);
+    if (CGSizeEqualToSize(self.frame.size, newSize))
+    {
+        return;
+    }
+
+    // Update frame size, keeping the existing center point.
+    CGPoint oldCenter = self.center;
+    CGRect newFrame = self.frame;
+    newFrame.size = newSize;
+    [self setFrame:newFrame];
+    [self setCenter:oldCenter];
+}
+
 - (void)drawPuck
 {
     if ( ! _puckModeActivated)
@@ -193,6 +209,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         _haloLayer = nil;
         _dotBorderLayer = nil;
         _dotLayer = nil;
+
+        [self updateFrameWithSize:MGLUserLocationAnnotationPuckSize];
     }
 
     // background dot (white with black shadow)
@@ -268,6 +286,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         _puckDot = nil;
         _puckArrow = nil;
+
+        [self updateFrameWithSize:MGLUserLocationAnnotationDotSize];
     }
     
     BOOL showHeadingIndicator = _mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
