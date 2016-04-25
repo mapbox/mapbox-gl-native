@@ -14,7 +14,7 @@ class AsyncRequest;
 class RasterBucket;
 class GeometryTileLoader;
 
-using RasterTileParseResult = mapbox::util::variant<
+using RasterTileParseResult = variant<
     std::unique_ptr<Bucket>, // success
     std::exception_ptr>;     // error
 

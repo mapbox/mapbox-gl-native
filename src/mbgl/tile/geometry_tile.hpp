@@ -1,14 +1,13 @@
 #ifndef MBGL_MAP_GEOMETRY_TILE
 #define MBGL_MAP_GEOMETRY_TILE
 
-#include <mapbox/variant.hpp>
-
 #include <mbgl/style/value.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
 #include <mbgl/util/constants.hpp>
 
 #include <cstdint>

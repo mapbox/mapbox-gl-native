@@ -1,10 +1,9 @@
 #ifndef MBGL_SPRITE_PARSER
 #define MBGL_SPRITE_PARSER
 
-#include <mapbox/variant.hpp>
-
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/variant.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <string>
@@ -29,7 +28,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage&,
 using Sprites = std::map<std::string, SpriteImagePtr>;
 
 
-using SpriteParseResult = mapbox::util::variant<
+using SpriteParseResult = variant<
     Sprites,             // success
     std::exception_ptr>; // error
 
