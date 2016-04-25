@@ -138,6 +138,8 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
+    
+    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${STATIC_SETTINGS_DIR}
 else
     if [[ ${BUILD_STATIC} == true ]]; then
         step "Assembling static library for iOS Simulator…"
@@ -160,6 +162,8 @@ else
                 ${OUTPUT}/dynamic/
         fi
     fi
+    
+    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${STATIC_SETTINGS_DIR}
 fi
 
 if [[ "${GCC_GENERATE_DEBUGGING_SYMBOLS}" == false ]]; then
@@ -188,7 +192,6 @@ fi
 
 step "Copying library resources…"
 cp -pv LICENSE.md ${STATIC_SETTINGS_DIR}
-cp -rv platform/ios/framework/Settings.bundle ${STATIC_SETTINGS_DIR}
 if [[ ${BUILD_STATIC} == true ]]; then
     cp -pv "${STATIC_BUNDLE_DIR}/${NAME}.bundle/Info.plist" "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundlePackageType -string FMWK "${OUTPUT}/static/${NAME}.framework/Info.plist"
