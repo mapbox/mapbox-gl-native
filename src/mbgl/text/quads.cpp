@@ -2,7 +2,7 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/geometry/anchor.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/symbol_layer_properties.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/constants.hpp>
 #include <cassert>

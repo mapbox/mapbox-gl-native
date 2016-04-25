@@ -16,15 +16,12 @@ void FillAnnotationImpl::updateStyle(Style& style) const {
     if (style.getLayer(layerID))
         return;
 
-    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>();
+    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>(layerID);
+    layer->setSource(AnnotationManager::SourceID, layerID);
 
-    layer->paint.fillOpacity = annotation.opacity;
-    layer->paint.fillColor = annotation.color;
-    layer->paint.fillOutlineColor = annotation.outlineColor;
-
-    layer->id = layerID;
-    layer->source = AnnotationManager::SourceID;
-    layer->sourceLayer = layer->id;
+    layer->setFillOpacity(annotation.opacity);
+    layer->setFillColor(annotation.color);
+    layer->setFillOutlineColor(annotation.outlineColor);
 
     style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 }

@@ -1,156 +1,153 @@
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
 #include <mbgl/layer/line_layer.hpp>
-#include <mbgl/style/style_bucket_parameters.hpp>
-#include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/layer/line_layer_impl.hpp>
 
 namespace mbgl {
 
-std::unique_ptr<StyleLayer> LineLayer::clone() const {
+LineLayer::LineLayer(const std::string& layerID)
+    : Layer(Type::Line, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+}
+
+LineLayer::LineLayer(const Impl& other)
+    : Layer(Type::Line, std::make_unique<Impl>(other))
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+}
+
+LineLayer::~LineLayer() = default;
+
+std::unique_ptr<Layer> LineLayer::Impl::clone() const {
     return std::make_unique<LineLayer>(*this);
 }
 
-void LineLayer::parseLayout(const JSValue& value) {
-    layout.lineCap.parse("line-cap", value);
-    layout.lineJoin.parse("line-join", value);
-    layout.lineMiterLimit.parse("line-miter-limit", value);
-    layout.lineRoundLimit.parse("line-round-limit", value);
+// Source
+
+void LineLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
+    impl->source = sourceID;
+    impl->sourceLayer = sourceLayer;
 }
 
-void LineLayer::parsePaints(const JSValue& layer) {
-    paint.lineOpacity.parse("line-opacity", layer);
-    paint.lineColor.parse("line-color", layer);
-    paint.lineTranslate.parse("line-translate", layer);
-    paint.lineTranslateAnchor.parse("line-translate-anchor", layer);
-    paint.lineWidth.parse("line-width", layer);
-    paint.lineGapWidth.parse("line-gap-width", layer);
-    paint.lineOffset.parse("line-offset", layer);
-    paint.lineBlur.parse("line-blur", layer);
-    paint.lineDasharray.parse("line-dasharray", layer);
-    paint.linePattern.parse("line-pattern", layer);
+const std::string& LineLayer::getSourceID() const {
+    return impl->source;
 }
 
-void LineLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.lineOpacity.cascade(parameters);
-    paint.lineColor.cascade(parameters);
-    paint.lineTranslate.cascade(parameters);
-    paint.lineTranslateAnchor.cascade(parameters);
-    paint.lineWidth.cascade(parameters);
-    paint.lineGapWidth.cascade(parameters);
-    paint.lineOffset.cascade(parameters);
-    paint.lineBlur.cascade(parameters);
-    paint.lineDasharray.cascade(parameters);
-    paint.linePattern.cascade(parameters);
+const std::string& LineLayer::getSourceLayer() const {
+    return impl->sourceLayer;
 }
 
-bool LineLayer::recalculate(const StyleCalculationParameters& parameters) {
-    // for scaling dasharrays
-    StyleCalculationParameters dashArrayParams = parameters;
-    dashArrayParams.z = std::floor(dashArrayParams.z);
-    paint.lineWidth.calculate(dashArrayParams);
-    dashLineWidth = paint.lineWidth;
+// Layout properties
 
-    bool hasTransitions = false;
-
-    hasTransitions |= paint.lineOpacity.calculate(parameters);
-    hasTransitions |= paint.lineColor.calculate(parameters);
-    hasTransitions |= paint.lineTranslate.calculate(parameters);
-    hasTransitions |= paint.lineTranslateAnchor.calculate(parameters);
-    hasTransitions |= paint.lineWidth.calculate(parameters);
-    hasTransitions |= paint.lineGapWidth.calculate(parameters);
-    hasTransitions |= paint.lineOffset.calculate(parameters);
-    hasTransitions |= paint.lineBlur.calculate(parameters);
-    hasTransitions |= paint.lineDasharray.calculate(parameters);
-    hasTransitions |= paint.linePattern.calculate(parameters);
-
-    passes = (paint.lineOpacity > 0 && paint.lineColor.value[3] > 0 && paint.lineWidth > 0)
-        ? RenderPass::Translucent : RenderPass::None;
-
-    return hasTransitions;
+Function<LineCapType> LineLayer::getLineCap() const {
+    return *impl->layout.lineCap.parsedValue;
 }
 
-std::unique_ptr<Bucket> LineLayer::createBucket(StyleBucketParameters& parameters) const {
-    auto bucket = std::make_unique<LineBucket>(parameters.tileID.overscaleFactor());
-
-    bucket->layout = layout;
-
-    StyleCalculationParameters p(parameters.tileID.overscaledZ);
-    bucket->layout.lineCap.calculate(p);
-    bucket->layout.lineJoin.calculate(p);
-    bucket->layout.lineMiterLimit.calculate(p);
-    bucket->layout.lineRoundLimit.calculate(p);
-
-    auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
-    });
-
-    return std::move(bucket);
+void LineLayer::setLineCap(Function<LineCapType> value) {
+    impl->layout.lineCap.parsedValue = value;
+}
+Function<LineJoinType> LineLayer::getLineJoin() const {
+    return *impl->layout.lineJoin.parsedValue;
 }
 
-
-float LineLayer::getLineWidth() const {
-    if (paint.lineGapWidth > 0) {
-        return paint.lineGapWidth + 2 * paint.lineWidth;
-    } else {
-        return paint.lineWidth;
-    }
+void LineLayer::setLineJoin(Function<LineJoinType> value) {
+    impl->layout.lineJoin.parsedValue = value;
+}
+Function<float> LineLayer::getLineMiterLimit() const {
+    return *impl->layout.lineMiterLimit.parsedValue;
 }
 
-optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {
-    if (offset == 0) return {};
-
-    GeometryCollection newRings;
-    Point<double> zero(0, 0);
-    for (const auto& ring : rings) {
-        newRings.emplace_back();
-        auto& newRing = newRings.back();
-
-        for (auto i = ring.begin(); i != ring.end(); i++) {
-            auto& p = *i;
-
-            Point<double> aToB = i == ring.begin() ?
-                zero :
-                util::perp(util::unit(convertPoint<double>(p - *(i - 1))));
-            Point<double> bToC = i + 1 == ring.end() ?
-                zero :
-                util::perp(util::unit(convertPoint<double>(*(i + 1) - p)));
-            Point<double> extrude = util::unit(aToB + bToC);
-
-            const double cosHalfAngle = extrude.x * bToC.x + extrude.y * bToC.y;
-            extrude *= (1.0 / cosHalfAngle);
-
-            newRing.push_back(convertPoint<int16_t>(extrude * offset) + p);
-        }
-    }
-
-    return newRings;
+void LineLayer::setLineMiterLimit(Function<float> value) {
+    impl->layout.lineMiterLimit.parsedValue = value;
+}
+Function<float> LineLayer::getLineRoundLimit() const {
+    return *impl->layout.lineRoundLimit.parsedValue;
 }
 
-float LineLayer::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.lineTranslate;
-    return getLineWidth() / 2.0 + std::abs(paint.lineOffset) + util::length(translate[0], translate[1]);
+void LineLayer::setLineRoundLimit(Function<float> value) {
+    impl->layout.lineRoundLimit.parsedValue = value;
 }
 
-bool LineLayer::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
-        const GeometryCollection& geometry,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+// Paint properties
 
-    const float halfWidth = getLineWidth() / 2.0 * pixelsToTileUnits;
+Function<float> LineLayer::getLineOpacity() const {
+    return impl->paint.lineOpacity.values.at(ClassID::Default);
+}
 
-    auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.lineTranslate, paint.lineTranslateAnchor, bearing, pixelsToTileUnits);
-    auto offsetGeometry = offsetLine(geometry, paint.lineOffset * pixelsToTileUnits);
+void LineLayer::setLineOpacity(Function<float> value) {
+    impl->paint.lineOpacity.values.emplace(ClassID::Default, value);
+}
 
-    return util::multiPolygonIntersectsBufferedMultiLine(
-            translatedQueryGeometry.value_or(queryGeometry),
-            offsetGeometry.value_or(geometry),
-            halfWidth);
+Function<Color> LineLayer::getLineColor() const {
+    return impl->paint.lineColor.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineColor(Function<Color> value) {
+    impl->paint.lineColor.values.emplace(ClassID::Default, value);
+}
+
+Function<std::array<float, 2>> LineLayer::getLineTranslate() const {
+    return impl->paint.lineTranslate.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineTranslate(Function<std::array<float, 2>> value) {
+    impl->paint.lineTranslate.values.emplace(ClassID::Default, value);
+}
+
+Function<TranslateAnchorType> LineLayer::getLineTranslateAnchor() const {
+    return impl->paint.lineTranslateAnchor.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineTranslateAnchor(Function<TranslateAnchorType> value) {
+    impl->paint.lineTranslateAnchor.values.emplace(ClassID::Default, value);
+}
+
+Function<float> LineLayer::getLineWidth() const {
+    return impl->paint.lineWidth.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineWidth(Function<float> value) {
+    impl->paint.lineWidth.values.emplace(ClassID::Default, value);
+}
+
+Function<float> LineLayer::getLineGapWidth() const {
+    return impl->paint.lineGapWidth.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineGapWidth(Function<float> value) {
+    impl->paint.lineGapWidth.values.emplace(ClassID::Default, value);
+}
+
+Function<float> LineLayer::getLineOffset() const {
+    return impl->paint.lineOffset.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineOffset(Function<float> value) {
+    impl->paint.lineOffset.values.emplace(ClassID::Default, value);
+}
+
+Function<float> LineLayer::getLineBlur() const {
+    return impl->paint.lineBlur.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineBlur(Function<float> value) {
+    impl->paint.lineBlur.values.emplace(ClassID::Default, value);
+}
+
+Function<std::vector<float>> LineLayer::getLineDasharray() const {
+    return impl->paint.lineDasharray.values.at(ClassID::Default);
+}
+
+void LineLayer::setLineDasharray(Function<std::vector<float>> value) {
+    impl->paint.lineDasharray.values.emplace(ClassID::Default, value);
+}
+
+Function<std::string> LineLayer::getLinePattern() const {
+    return impl->paint.linePattern.values.at(ClassID::Default);
+}
+
+void LineLayer::setLinePattern(Function<std::string> value) {
+    impl->paint.linePattern.values.emplace(ClassID::Default, value);
 }
 
 } // namespace mbgl

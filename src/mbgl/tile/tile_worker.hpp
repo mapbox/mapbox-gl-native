@@ -23,7 +23,7 @@ class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 class Bucket;
-class StyleLayer;
+class Layer;
 class SymbolLayer;
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
@@ -51,7 +51,7 @@ public:
                const MapMode);
     ~TileWorker();
 
-    TileParseResult parseAllLayers(std::vector<std::unique_ptr<StyleLayer>>,
+    TileParseResult parseAllLayers(std::vector<std::unique_ptr<Layer>>,
                                    std::unique_ptr<const GeometryTile> geometryTile,
                                    PlacementConfig);
 
@@ -62,7 +62,7 @@ public:
 
 private:
     TileParseResult prepareResult(const PlacementConfig& config);
-    void parseLayer(const StyleLayer*);
+    void parseLayer(const Layer*);
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
     std::unique_ptr<CollisionTile> placeLayers(PlacementConfig);
 
@@ -77,7 +77,7 @@ private:
 
     bool partialParse = false;
 
-    std::vector<std::unique_ptr<StyleLayer>> layers;
+    std::vector<std::unique_ptr<Layer>> layers;
 
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTile> geometryTile;

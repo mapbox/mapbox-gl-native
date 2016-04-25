@@ -69,9 +69,9 @@ public:
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
 
-    std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
-    StyleLayer* getLayer(const std::string& id) const;
-    void addLayer(std::unique_ptr<StyleLayer>,
+    std::vector<std::unique_ptr<Layer>> getLayers() const;
+    Layer* getLayer(const std::string& id) const;
+    void addLayer(std::unique_ptr<Layer>,
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
@@ -101,11 +101,11 @@ public:
 
 private:
     std::vector<std::unique_ptr<Source>> sources;
-    std::vector<std::unique_ptr<StyleLayer>> layers;
+    std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::string> classes;
     optional<PropertyTransition> transitionProperties;
 
-    std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
+    std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;

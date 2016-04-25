@@ -21,7 +21,7 @@ void CircleBucket::upload(gl::ObjectStore& store) {
 }
 
 void CircleBucket::render(Painter& painter,
-                        const StyleLayer& layer,
+                        const Layer& layer,
                         const UnwrappedTileID& tileID,
                         const mat4& matrix) {
     painter.renderCircle(*this, *layer.as<CircleLayer>(), tileID, matrix);

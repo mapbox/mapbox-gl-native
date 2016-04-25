@@ -16,7 +16,7 @@
 
 namespace mbgl {
 
-class StyleLayer;
+class Layer;
 class Worker;
 class DebugBucket;
 class TransformState;
@@ -29,7 +29,7 @@ public:
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
-    virtual Bucket* getBucket(const StyleLayer&) = 0;
+    virtual Bucket* getBucket(const Layer&) = 0;
 
     virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
     virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}

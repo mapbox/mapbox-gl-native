@@ -5,6 +5,8 @@
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/layer/raster_layer.hpp>
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/layer_impl.hpp>
+#include <mbgl/layer/symbol_layer_impl.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -331,7 +333,7 @@ void StyleParser::parseLayers(const JSValue& value) {
             continue;
         }
 
-        layersMap.emplace(layerID, std::pair<const JSValue&, std::unique_ptr<StyleLayer>> { layerValue, nullptr });
+        layersMap.emplace(layerID, std::pair<const JSValue&, std::unique_ptr<Layer>> { layerValue, nullptr });
         ids.push_back(layerID);
     }
 
@@ -352,7 +354,7 @@ void StyleParser::parseLayers(const JSValue& value) {
     }
 }
 
-void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<StyleLayer>& layer) {
+void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::unique_ptr<Layer>& layer) {
     if (layer) {
         // Skip parsing this again. We already have a valid layer definition.
         return;
@@ -386,15 +388,13 @@ void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::u
                    it->second.second);
         stack.pop_front();
 
-        StyleLayer* reference = it->second.second.get();
+        Layer* reference = it->second.second.get();
         if (!reference) {
             return;
         }
 
-        layer = reference->clone();
-        layer->id = id;
-        layer->ref = ref;
-
+        layer = reference->copy(id, ref);
+        layer->baseImpl->parsePaints(value);
     } else {
         // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
         if (!value.HasMember("type")) {
@@ -411,75 +411,75 @@ void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::u
         std::string type { typeVal.GetString(), typeVal.GetStringLength() };
 
         if (type == "fill") {
-            layer = std::make_unique<FillLayer>();
+            layer = std::make_unique<FillLayer>(id);
         } else if (type == "line") {
-            layer = std::make_unique<LineLayer>();
+            layer = std::make_unique<LineLayer>(id);
         } else if (type == "circle") {
-            layer = std::make_unique<CircleLayer>();
+            layer = std::make_unique<CircleLayer>(id);
         } else if (type == "symbol") {
-            layer = std::make_unique<SymbolLayer>();
+            layer = std::make_unique<SymbolLayer>(id);
         } else if (type == "raster") {
-            layer = std::make_unique<RasterLayer>();
+            layer = std::make_unique<RasterLayer>(id);
         } else if (type == "background") {
-            layer = std::make_unique<BackgroundLayer>();
+            layer = std::make_unique<BackgroundLayer>(id);
         } else {
             Log::Warning(Event::ParseStyle, "unknown type '%s' for layer '%s'", type.c_str(), id.c_str());
             return;
         }
 
-        layer->id = id;
+        Layer::Impl* impl = layer->baseImpl.get();
 
         if (value.HasMember("source")) {
             const JSValue& value_source = value["source"];
             if (value_source.IsString()) {
-                layer->source = { value_source.GetString(), value_source.GetStringLength() };
-                auto source_it = sourcesMap.find(layer->source);
+                impl->source = { value_source.GetString(), value_source.GetStringLength() };
+                auto source_it = sourcesMap.find(impl->source);
                 if (source_it == sourcesMap.end()) {
-                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", layer->source.c_str(), layer->id.c_str());
+                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", impl->source.c_str(), impl->id.c_str());
                 }
             } else {
-                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", impl->id.c_str());
             }
         }
 
         if (value.HasMember("source-layer")) {
             const JSValue& value_source_layer = value["source-layer"];
             if (value_source_layer.IsString()) {
-                layer->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
+                impl->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
             } else {
-                Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", impl->id.c_str());
             }
         }
 
         if (value.HasMember("filter")) {
-            layer->filter = parseFilter(value["filter"]);
+            impl->filter = parseFilter(value["filter"]);
         }
 
         if (value.HasMember("minzoom")) {
             const JSValue& min_zoom = value["minzoom"];
             if (min_zoom.IsNumber()) {
-                layer->minZoom = min_zoom.GetDouble();
+                impl->minZoom = min_zoom.GetDouble();
             } else {
-                Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", impl->id.c_str());
             }
         }
 
         if (value.HasMember("maxzoom")) {
             const JSValue& max_zoom = value["maxzoom"];
             if (max_zoom.IsNumber()) {
-                layer->maxZoom = max_zoom.GetDouble();
+                impl->maxZoom = max_zoom.GetDouble();
             } else {
-                Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", layer->id.c_str());
+                Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", impl->id.c_str());
             }
         }
 
         if (value.HasMember("layout")) {
             parseVisibility(*layer, value["layout"]);
-            layer->parseLayout(value["layout"]);
+            impl->parseLayout(value["layout"]);
         }
-    }
 
-    layer->parsePaints(value);
+        impl->parsePaints(value);
+    }
 }
 
 MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
@@ -487,15 +487,16 @@ MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
     { VisibilityType::None, "none" },
 });
 
-void StyleParser::parseVisibility(StyleLayer& layer, const JSValue& value) {
+void StyleParser::parseVisibility(Layer& layer, const JSValue& value) {
+    Layer::Impl& impl = *layer.baseImpl;
     if (!value.HasMember("visibility")) {
         return;
     } else if (!value["visibility"].IsString()) {
         Log::Warning(Event::ParseStyle, "value of 'visibility' must be a string");
-        layer.visibility = VisibilityType::Visible;
+        impl.visibility = VisibilityType::Visible;
         return;
     }
-    layer.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
+    impl.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
 }
 
 Value parseFeatureType(const Value& value) {
@@ -669,7 +670,7 @@ std::vector<FontStack> StyleParser::fontStacks() const {
 
     for (const auto& layer : layers) {
         if (layer->is<SymbolLayer>()) {
-            LayoutProperty<FontStack> property = layer->as<SymbolLayer>()->layout.textFont;
+            LayoutProperty<FontStack> property = layer->as<SymbolLayer>()->impl->layout.textFont;
             if (property.parsedValue) {
                 for (const auto& stop : property.parsedValue->getStops()) {
                     result.insert(stop.second);

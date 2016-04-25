@@ -2,6 +2,7 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/layer/raster_layer.hpp>
+#include <mbgl/layer/raster_layer_impl.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 
 using namespace mbgl;
@@ -12,7 +13,7 @@ void Painter::renderRaster(RasterBucket& bucket,
                            const mat4& matrix) {
     if (pass != RenderPass::Translucent) return;
 
-    const RasterPaintProperties& properties = layer.paint;
+    const RasterPaintProperties& properties = layer.impl->paint;
 
     if (bucket.hasData()) {
         config.program = rasterShader->getID();

@@ -1,7 +1,9 @@
 #include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/layer/fill_layer.hpp>
 
 namespace mbgl {
 
@@ -16,19 +18,21 @@ void StyleSourcedAnnotationImpl::updateStyle(Style& style) const {
     if (style.getLayer(layerID))
         return;
 
-    const StyleLayer* sourceLayer = style.getLayer(annotation.layerID);
+    const Layer* sourceLayer = style.getLayer(annotation.layerID);
     if (!sourceLayer)
         return;
 
-    std::unique_ptr<StyleLayer> layer = sourceLayer->clone();
-
-    layer->id = layerID;
-    layer->ref = "";
-    layer->source = AnnotationManager::SourceID;
-    layer->sourceLayer = layer->id;
-    layer->visibility = VisibilityType::Visible;
-
-    style.addLayer(std::move(layer), sourceLayer->id);
+    if (sourceLayer->is<LineLayer>()) {
+        std::unique_ptr<Layer> layer = sourceLayer->copy(layerID, "");
+        layer->as<LineLayer>()->setSource(AnnotationManager::SourceID, layerID);
+        layer->as<LineLayer>()->setVisibility(VisibilityType::Visible);
+        style.addLayer(std::move(layer), sourceLayer->getID());
+    } else if (sourceLayer->is<FillLayer>()) {
+        std::unique_ptr<Layer> layer = sourceLayer->copy(layerID, "");
+        layer->as<FillLayer>()->setSource(AnnotationManager::SourceID, layerID);
+        layer->as<FillLayer>()->setVisibility(VisibilityType::Visible);
+        style.addLayer(std::move(layer), sourceLayer->getID());
+    }
 }
 
 const ShapeAnnotationGeometry& StyleSourcedAnnotationImpl::geometry() const {

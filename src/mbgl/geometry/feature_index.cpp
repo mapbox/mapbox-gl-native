@@ -1,6 +1,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/layer/layer_impl.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
@@ -116,7 +117,7 @@ void FeatureIndex::addFeature(
         auto styleLayer = style.getLayer(layerID);
         if (!styleLayer ||
             (!styleLayer->is<SymbolLayer>() &&
-             !styleLayer->queryIntersectsGeometry(queryGeometry, geometryTileFeature->getGeometries(), bearing, pixelsToTileUnits))) {
+             !styleLayer->baseImpl->queryIntersectsGeometry(queryGeometry, geometryTileFeature->getGeometries(), bearing, pixelsToTileUnits))) {
             continue;
         }
 

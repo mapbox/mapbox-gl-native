@@ -11,7 +11,7 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
 #include <mbgl/style/style_query_parameters.hpp>
 #include <mbgl/platform/log.hpp>

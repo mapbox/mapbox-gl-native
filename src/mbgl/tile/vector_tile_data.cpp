@@ -1,6 +1,6 @@
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/layer_impl.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
@@ -139,8 +139,8 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
     return true;
 }
 
-Bucket* VectorTileData::getBucket(const StyleLayer& layer) {
-    const auto it = buckets.find(layer.bucketName());
+Bucket* VectorTileData::getBucket(const Layer& layer) {
+    const auto it = buckets.find(layer.baseImpl->bucketName());
     if (it == buckets.end()) {
         return nullptr;
     }

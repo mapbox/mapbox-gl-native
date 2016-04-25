@@ -7,11 +7,12 @@
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/layer_impl.hpp>
 #include <mbgl/style/style_render_parameters.hpp>
 
 #include <mbgl/layer/background_layer.hpp>
 #include <mbgl/layer/custom_layer.hpp>
+#include <mbgl/layer/custom_layer_impl.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -239,9 +240,9 @@ void Painter::renderPass(RenderPass pass_,
         currentLayer = i;
 
         const auto& item = *it;
-        const StyleLayer& layer = item.layer;
+        const Layer& layer = item.layer;
 
-        if (!layer.hasRenderPass(pass))
+        if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
         if (pass == RenderPass::Translucent) {
@@ -258,12 +259,12 @@ void Painter::renderPass(RenderPass pass_,
             MBGL_DEBUG_GROUP("background");
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
-            MBGL_DEBUG_GROUP(layer.id + " - custom");
+            MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
-            layer.as<CustomLayer>()->render(state);
+            layer.as<CustomLayer>()->impl->render(state);
             config.setDirty();
         } else {
-            MBGL_DEBUG_GROUP(layer.id + " - " + util::toString(item.tile->id));
+            MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }

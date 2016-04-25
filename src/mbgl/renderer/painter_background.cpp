@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/background_layer_impl.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -12,7 +13,7 @@ using namespace mbgl;
 void Painter::renderBackground(const BackgroundLayer& layer) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
-    const BackgroundPaintProperties& properties = layer.paint;
+    const BackgroundPaintProperties& properties = layer.impl->paint;
 
     bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
     optional<SpriteAtlasPosition> imagePosA;

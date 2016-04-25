@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/function.hpp>
 #include <mbgl/style/property_transition.hpp>
 
 #include <mbgl/util/rapidjson.hpp>

@@ -296,6 +296,9 @@ tidy: compdb
 
 #### Miscellaneous targets #####################################################
 
+style-code:
+	node scripts/generate-style-code.js
+
 clean:
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build \

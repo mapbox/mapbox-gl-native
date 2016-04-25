@@ -21,7 +21,7 @@ public:
     ~FillBucket() override;
 
     void upload(gl::ObjectStore&) override;
-    void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
+    void render(Painter&, const Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 

@@ -27,7 +27,7 @@ public:
 
     ~VectorTileData();
 
-    Bucket* getBucket(const StyleLayer&) override;
+    Bucket* getBucket(const Layer&) override;
 
     bool parsePending(std::function<void(std::exception_ptr)> callback) override;
 

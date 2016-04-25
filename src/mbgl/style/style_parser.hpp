@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/source/source.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -13,9 +13,6 @@
 #include <forward_list>
 
 namespace mbgl {
-
-class StyleLayer;
-class Source;
 
 Filter parseFilter(const JSValue&);
 
@@ -29,7 +26,7 @@ public:
     std::string glyphURL;
 
     std::vector<std::unique_ptr<Source>> sources;
-    std::vector<std::unique_ptr<StyleLayer>> layers;
+    std::vector<std::unique_ptr<Layer>> layers;
 
     // Statically evaluate layer properties to determine what font stacks are used.
     std::vector<FontStack> fontStacks() const;
@@ -42,11 +39,11 @@ public:
 private:
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);
-    void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<StyleLayer>&);
-    void parseVisibility(StyleLayer&, const JSValue& value);
+    void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<Layer>&);
+    void parseVisibility(Layer&, const JSValue& value);
 
     std::unordered_map<std::string, const Source*> sourcesMap;
-    std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<StyleLayer>>> layersMap;
+    std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<Layer>>> layersMap;
 
     // Store a stack of layer IDs we're parsing right now. This is to prevent reference cycles.
     std::forward_list<std::string> stack;

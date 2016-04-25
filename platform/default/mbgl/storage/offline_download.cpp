@@ -4,7 +4,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/style_parser.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/style/function.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {

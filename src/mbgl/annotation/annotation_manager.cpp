@@ -7,6 +7,7 @@
 #include <mbgl/source/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/symbol_layer_impl.hpp>
 
 #include <boost/function_output_iterator.hpp>
 
@@ -108,13 +109,13 @@ void AnnotationManager::updateStyle(Style& style) {
         source->enabled = true;
         style.addSource(std::move(source));
 
-        std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>();
-        layer->id = PointLayerID;
-        layer->source = SourceID;
-        layer->sourceLayer = PointLayerID;
-        layer->layout.iconImage = std::string("{sprite}");
-        layer->layout.iconAllowOverlap = true;
-        layer->spriteAtlas = &spriteAtlas;
+        std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>(PointLayerID);
+
+        layer->setSource(SourceID, PointLayerID);
+        layer->setIconImage({"{sprite}"});
+        layer->setIconAllowOverlap(true);
+
+        layer->impl->spriteAtlas = &spriteAtlas;
 
         style.addLayer(std::move(layer));
     }

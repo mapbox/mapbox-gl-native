@@ -2,7 +2,6 @@
 
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_parsing.hpp>
-#include <mbgl/style/function.hpp>
 #include <mbgl/style/function_evaluator.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_cascade_parameters.hpp>
@@ -97,7 +96,6 @@ public:
         return cascaded->prior.operator bool();
     }
 
-    void operator=(const T& v) { values.emplace(ClassID::Default, Fn(v)); }
     operator T() const { return value; }
 
     std::map<ClassID, Fn> values;

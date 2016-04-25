@@ -2,6 +2,7 @@
 #include <mbgl/renderer/circle_bucket.hpp>
 
 #include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/layer/circle_layer_impl.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
 
@@ -20,7 +21,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     config.depthMask = GL_FALSE;
     setDepthSublayer(0);
 
-    const CirclePaintProperties& properties = layer.paint;
+    const CirclePaintProperties& properties = layer.impl->paint;
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 

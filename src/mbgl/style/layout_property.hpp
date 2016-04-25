@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/style/property_parsing.hpp>
-#include <mbgl/style/function.hpp>
 #include <mbgl/style/function_evaluator.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
@@ -27,7 +26,6 @@ public:
         }
     }
 
-    void operator=(const T& v) { value = v; }
     operator T() const { return value; }
 
     optional<Function<T>> parsedValue;

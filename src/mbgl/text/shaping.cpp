@@ -1,5 +1,5 @@
 #include <mbgl/text/shaping.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/layer/symbol_layer_properties.hpp>
 
 namespace mbgl {
 

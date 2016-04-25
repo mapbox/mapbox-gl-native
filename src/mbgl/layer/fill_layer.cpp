@@ -1,90 +1,101 @@
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
 #include <mbgl/layer/fill_layer.hpp>
-#include <mbgl/style/style_bucket_parameters.hpp>
-#include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/layer/fill_layer_impl.hpp>
 
 namespace mbgl {
 
-std::unique_ptr<StyleLayer> FillLayer::clone() const {
+FillLayer::FillLayer(const std::string& layerID)
+    : Layer(Type::Fill, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+}
+
+FillLayer::FillLayer(const Impl& other)
+    : Layer(Type::Fill, std::make_unique<Impl>(other))
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+}
+
+FillLayer::~FillLayer() = default;
+
+std::unique_ptr<Layer> FillLayer::Impl::clone() const {
     return std::make_unique<FillLayer>(*this);
 }
 
-void FillLayer::parsePaints(const JSValue& layer) {
-    paint.fillAntialias.parse("fill-antialias", layer);
-    paint.fillOpacity.parse("fill-opacity", layer);
-    paint.fillColor.parse("fill-color", layer);
-    paint.fillOutlineColor.parse("fill-outline-color", layer);
-    paint.fillTranslate.parse("fill-translate", layer);
-    paint.fillTranslateAnchor.parse("fill-translate-anchor", layer);
-    paint.fillPattern.parse("fill-pattern", layer);
+// Source
+
+void FillLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
+    impl->source = sourceID;
+    impl->sourceLayer = sourceLayer;
 }
 
-void FillLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.fillAntialias.cascade(parameters);
-    paint.fillOpacity.cascade(parameters);
-    paint.fillColor.cascade(parameters);
-    paint.fillOutlineColor.cascade(parameters);
-    paint.fillTranslate.cascade(parameters);
-    paint.fillTranslateAnchor.cascade(parameters);
-    paint.fillPattern.cascade(parameters);
+const std::string& FillLayer::getSourceID() const {
+    return impl->source;
 }
 
-bool FillLayer::recalculate(const StyleCalculationParameters& parameters) {
-    bool hasTransitions = false;
-
-    hasTransitions |= paint.fillAntialias.calculate(parameters);
-    hasTransitions |= paint.fillOpacity.calculate(parameters);
-    hasTransitions |= paint.fillColor.calculate(parameters);
-    hasTransitions |= paint.fillOutlineColor.calculate(parameters);
-    hasTransitions |= paint.fillTranslate.calculate(parameters);
-    hasTransitions |= paint.fillTranslateAnchor.calculate(parameters);
-    hasTransitions |= paint.fillPattern.calculate(parameters);
-
-    passes = RenderPass::None;
-
-    if (paint.fillAntialias) {
-        passes |= RenderPass::Translucent;
-    }
-
-    if (!paint.fillPattern.value.from.empty() || (paint.fillColor.value[3] * paint.fillOpacity) < 1.0f) {
-        passes |= RenderPass::Translucent;
-    } else {
-        passes |= RenderPass::Opaque;
-    }
-
-    return hasTransitions;
+const std::string& FillLayer::getSourceLayer() const {
+    return impl->sourceLayer;
 }
 
-std::unique_ptr<Bucket> FillLayer::createBucket(StyleBucketParameters& parameters) const {
-    auto bucket = std::make_unique<FillBucket>();
+// Layout properties
 
-    auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
-    });
 
-    return std::move(bucket);
+// Paint properties
+
+Function<bool> FillLayer::getFillAntialias() const {
+    return impl->paint.fillAntialias.values.at(ClassID::Default);
 }
 
-float FillLayer::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.fillTranslate;
-    return util::length(translate[0], translate[1]);
+void FillLayer::setFillAntialias(Function<bool> value) {
+    impl->paint.fillAntialias.values.emplace(ClassID::Default, value);
 }
 
-bool FillLayer::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
-        const GeometryCollection& geometry,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+Function<float> FillLayer::getFillOpacity() const {
+    return impl->paint.fillOpacity.values.at(ClassID::Default);
+}
 
-    auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.fillTranslate, paint.fillTranslateAnchor, bearing, pixelsToTileUnits);
+void FillLayer::setFillOpacity(Function<float> value) {
+    impl->paint.fillOpacity.values.emplace(ClassID::Default, value);
+}
 
-    return util::multiPolygonIntersectsMultiPolygon(translatedQueryGeometry.value_or(queryGeometry), geometry);
+Function<Color> FillLayer::getFillColor() const {
+    return impl->paint.fillColor.values.at(ClassID::Default);
+}
+
+void FillLayer::setFillColor(Function<Color> value) {
+    impl->paint.fillColor.values.emplace(ClassID::Default, value);
+}
+
+Function<Color> FillLayer::getFillOutlineColor() const {
+    return impl->paint.fillOutlineColor.values.at(ClassID::Default);
+}
+
+void FillLayer::setFillOutlineColor(Function<Color> value) {
+    impl->paint.fillOutlineColor.values.emplace(ClassID::Default, value);
+}
+
+Function<std::array<float, 2>> FillLayer::getFillTranslate() const {
+    return impl->paint.fillTranslate.values.at(ClassID::Default);
+}
+
+void FillLayer::setFillTranslate(Function<std::array<float, 2>> value) {
+    impl->paint.fillTranslate.values.emplace(ClassID::Default, value);
+}
+
+Function<TranslateAnchorType> FillLayer::getFillTranslateAnchor() const {
+    return impl->paint.fillTranslateAnchor.values.at(ClassID::Default);
+}
+
+void FillLayer::setFillTranslateAnchor(Function<TranslateAnchorType> value) {
+    impl->paint.fillTranslateAnchor.values.emplace(ClassID::Default, value);
+}
+
+Function<std::string> FillLayer::getFillPattern() const {
+    return impl->paint.fillPattern.values.at(ClassID::Default);
+}
+
+void FillLayer::setFillPattern(Function<std::string> value) {
+    impl->paint.fillPattern.values.emplace(ClassID::Default, value);
 }
 
 } // namespace mbgl

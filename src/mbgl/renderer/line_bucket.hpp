@@ -5,7 +5,7 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/layer/line_layer_impl.hpp>
 
 #include <vector>
 
@@ -26,7 +26,7 @@ public:
     ~LineBucket() override;
 
     void upload(gl::ObjectStore&) override;
-    void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
+    void render(Painter&, const Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 

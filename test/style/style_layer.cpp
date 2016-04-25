@@ -1,24 +1,18 @@
 #include <mbgl/test/util.hpp>
-
-#include <mbgl/style/style_layer.hpp>
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/background_layer_impl.hpp>
 
 using namespace mbgl;
 
-TEST(StyleLayer, Create) {
-    std::unique_ptr<StyleLayer> layer = std::make_unique<BackgroundLayer>();
-    EXPECT_TRUE(reinterpret_cast<BackgroundLayer*>(layer.get()));
-}
-
-TEST(StyleLayer, Clone) {
-    std::unique_ptr<StyleLayer> layer = std::make_unique<BackgroundLayer>();
-    std::unique_ptr<StyleLayer> clone = layer->clone();
+TEST(Layer, Clone) {
+    std::unique_ptr<Layer> layer = std::make_unique<BackgroundLayer>("id");
+    std::unique_ptr<Layer> clone = layer->baseImpl->clone();
     EXPECT_NE(layer.get(), clone.get());
-    EXPECT_TRUE(reinterpret_cast<BackgroundLayer*>(layer.get()));
+    EXPECT_TRUE(reinterpret_cast<BackgroundLayer::Impl*>(clone->baseImpl.get()));
 }
 
-TEST(StyleLayer, CloneCopiesBaseProperties) {
-    std::unique_ptr<BackgroundLayer> layer = std::make_unique<BackgroundLayer>();
-    layer->id = "test";
-    EXPECT_EQ("test", layer->clone()->id);
+TEST(Layer, CloneCopiesBaseProperties) {
+    std::unique_ptr<BackgroundLayer> layer = std::make_unique<BackgroundLayer>("id");
+    layer->impl->id = "test";
+    EXPECT_EQ("test", layer->baseImpl->clone()->getID());
 }

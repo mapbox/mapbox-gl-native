@@ -1,81 +1,93 @@
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
 #include <mbgl/layer/circle_layer.hpp>
-#include <mbgl/style/style_bucket_parameters.hpp>
-#include <mbgl/renderer/circle_bucket.hpp>
-#include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/util/math.hpp>
-#include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/layer/circle_layer_impl.hpp>
 
 namespace mbgl {
 
-std::unique_ptr<StyleLayer> CircleLayer::clone() const {
+CircleLayer::CircleLayer(const std::string& layerID)
+    : Layer(Type::Circle, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+}
+
+CircleLayer::CircleLayer(const Impl& other)
+    : Layer(Type::Circle, std::make_unique<Impl>(other))
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+}
+
+CircleLayer::~CircleLayer() = default;
+
+std::unique_ptr<Layer> CircleLayer::Impl::clone() const {
     return std::make_unique<CircleLayer>(*this);
 }
 
-void CircleLayer::parsePaints(const JSValue& layer) {
-    paint.circleRadius.parse("circle-radius", layer);
-    paint.circleColor.parse("circle-color", layer);
-    paint.circleOpacity.parse("circle-opacity", layer);
-    paint.circleTranslate.parse("circle-translate", layer);
-    paint.circleTranslateAnchor.parse("circle-translate-anchor", layer);
-    paint.circleBlur.parse("circle-blur", layer);
+// Source
+
+void CircleLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
+    impl->source = sourceID;
+    impl->sourceLayer = sourceLayer;
 }
 
-void CircleLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.circleRadius.cascade(parameters);
-    paint.circleColor.cascade(parameters);
-    paint.circleOpacity.cascade(parameters);
-    paint.circleTranslate.cascade(parameters);
-    paint.circleTranslateAnchor.cascade(parameters);
-    paint.circleBlur.cascade(parameters);
+const std::string& CircleLayer::getSourceID() const {
+    return impl->source;
 }
 
-bool CircleLayer::recalculate(const StyleCalculationParameters& parameters) {
-    bool hasTransitions = false;
-
-    hasTransitions |= paint.circleRadius.calculate(parameters);
-    hasTransitions |= paint.circleColor.calculate(parameters);
-    hasTransitions |= paint.circleOpacity.calculate(parameters);
-    hasTransitions |= paint.circleTranslate.calculate(parameters);
-    hasTransitions |= paint.circleTranslateAnchor.calculate(parameters);
-    hasTransitions |= paint.circleBlur.calculate(parameters);
-
-    passes = (paint.circleRadius > 0 && paint.circleColor.value[3] > 0 && paint.circleOpacity > 0)
-        ? RenderPass::Translucent : RenderPass::None;
-
-    return hasTransitions;
+const std::string& CircleLayer::getSourceLayer() const {
+    return impl->sourceLayer;
 }
 
-std::unique_ptr<Bucket> CircleLayer::createBucket(StyleBucketParameters& parameters) const {
-    auto bucket = std::make_unique<CircleBucket>(parameters.mode);
+// Layout properties
 
-    auto& name = bucketName();
-    parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = feature.getGeometries();
-        bucket->addGeometry(geometries);
-        parameters.featureIndex.insert(geometries, index, layerName, name);
-    });
 
-    return std::move(bucket);
+// Paint properties
+
+Function<float> CircleLayer::getCircleRadius() const {
+    return impl->paint.circleRadius.values.at(ClassID::Default);
 }
 
-float CircleLayer::getQueryRadius() const {
-    const std::array<float, 2>& translate = paint.circleTranslate;
-    return paint.circleRadius + util::length(translate[0], translate[1]);
+void CircleLayer::setCircleRadius(Function<float> value) {
+    impl->paint.circleRadius.values.emplace(ClassID::Default, value);
 }
 
-bool CircleLayer::queryIntersectsGeometry(
-        const GeometryCollection& queryGeometry,
-        const GeometryCollection& geometry,
-        const float bearing,
-        const float pixelsToTileUnits) const {                
+Function<Color> CircleLayer::getCircleColor() const {
+    return impl->paint.circleColor.values.at(ClassID::Default);
+}
 
-    auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
-            queryGeometry, paint.circleTranslate, paint.circleTranslateAnchor, bearing, pixelsToTileUnits);
+void CircleLayer::setCircleColor(Function<Color> value) {
+    impl->paint.circleColor.values.emplace(ClassID::Default, value);
+}
 
-    auto circleRadius = paint.circleRadius * pixelsToTileUnits;
+Function<float> CircleLayer::getCircleBlur() const {
+    return impl->paint.circleBlur.values.at(ClassID::Default);
+}
 
-    return util::multiPolygonIntersectsBufferedMultiPoint(
-            translatedQueryGeometry.value_or(queryGeometry), geometry, circleRadius);
+void CircleLayer::setCircleBlur(Function<float> value) {
+    impl->paint.circleBlur.values.emplace(ClassID::Default, value);
+}
+
+Function<float> CircleLayer::getCircleOpacity() const {
+    return impl->paint.circleOpacity.values.at(ClassID::Default);
+}
+
+void CircleLayer::setCircleOpacity(Function<float> value) {
+    impl->paint.circleOpacity.values.emplace(ClassID::Default, value);
+}
+
+Function<std::array<float, 2>> CircleLayer::getCircleTranslate() const {
+    return impl->paint.circleTranslate.values.at(ClassID::Default);
+}
+
+void CircleLayer::setCircleTranslate(Function<std::array<float, 2>> value) {
+    impl->paint.circleTranslate.values.emplace(ClassID::Default, value);
+}
+
+Function<TranslateAnchorType> CircleLayer::getCircleTranslateAnchor() const {
+    return impl->paint.circleTranslateAnchor.values.at(ClassID::Default);
+}
+
+void CircleLayer::setCircleTranslateAnchor(Function<TranslateAnchorType> value) {
+    impl->paint.circleTranslateAnchor.values.emplace(ClassID::Default, value);
 }
 
 } // namespace mbgl

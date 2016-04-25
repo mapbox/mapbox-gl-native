@@ -4,7 +4,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 
 #include <cassert>
@@ -30,7 +30,7 @@ public:
     }
 
     void parseGeometryTile(TileWorker* worker,
-                           std::vector<std::unique_ptr<StyleLayer>> layers,
+                           std::vector<std::unique_ptr<Layer>> layers,
                            std::unique_ptr<GeometryTile> tile,
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
@@ -79,7 +79,7 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 
 std::unique_ptr<AsyncRequest>
 Worker::parseGeometryTile(TileWorker& worker,
-                          std::vector<std::unique_ptr<StyleLayer>> layers,
+                          std::vector<std::unique_ptr<Layer>> layers,
                           std::unique_ptr<GeometryTile> tile,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {

@@ -1,4 +1,7 @@
 #include <mbgl/style/property_parsing.hpp>
+#include <mbgl/style/property_transition.hpp>
+
+#include <mbgl/platform/log.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
 

@@ -1,50 +1,96 @@
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
 #include <mbgl/layer/raster_layer.hpp>
-#include <mbgl/renderer/bucket.hpp>
+#include <mbgl/layer/raster_layer_impl.hpp>
 
 namespace mbgl {
 
-std::unique_ptr<StyleLayer> RasterLayer::clone() const {
+RasterLayer::RasterLayer(const std::string& layerID)
+    : Layer(Type::Raster, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+}
+
+RasterLayer::RasterLayer(const Impl& other)
+    : Layer(Type::Raster, std::make_unique<Impl>(other))
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+}
+
+RasterLayer::~RasterLayer() = default;
+
+std::unique_ptr<Layer> RasterLayer::Impl::clone() const {
     return std::make_unique<RasterLayer>(*this);
 }
 
-void RasterLayer::parsePaints(const JSValue& layer) {
-    paint.rasterOpacity.parse("raster-opacity", layer);
-    paint.rasterHueRotate.parse("raster-hue-rotate", layer);
-    paint.rasterBrightnessMin.parse("raster-brightness-min", layer);
-    paint.rasterBrightnessMax.parse("raster-brightness-max", layer);
-    paint.rasterSaturation.parse("raster-saturation", layer);
-    paint.rasterContrast.parse("raster-contrast", layer);
-    paint.rasterFadeDuration.parse("raster-fade-duration", layer);
+// Source
+
+void RasterLayer::setSource(const std::string& sourceID) {
+    impl->source = sourceID;
 }
 
-void RasterLayer::cascade(const StyleCascadeParameters& parameters) {
-    paint.rasterOpacity.cascade(parameters);
-    paint.rasterHueRotate.cascade(parameters);
-    paint.rasterBrightnessMin.cascade(parameters);
-    paint.rasterBrightnessMax.cascade(parameters);
-    paint.rasterSaturation.cascade(parameters);
-    paint.rasterContrast.cascade(parameters);
-    paint.rasterFadeDuration.cascade(parameters);
+const std::string& RasterLayer::getSourceID() const {
+    return impl->source;
 }
 
-bool RasterLayer::recalculate(const StyleCalculationParameters& parameters) {
-    bool hasTransitions = false;
+// Layout properties
 
-    hasTransitions |= paint.rasterOpacity.calculate(parameters);
-    hasTransitions |= paint.rasterHueRotate.calculate(parameters);
-    hasTransitions |= paint.rasterBrightnessMin.calculate(parameters);
-    hasTransitions |= paint.rasterBrightnessMax.calculate(parameters);
-    hasTransitions |= paint.rasterSaturation.calculate(parameters);
-    hasTransitions |= paint.rasterContrast.calculate(parameters);
-    hasTransitions |= paint.rasterFadeDuration.calculate(parameters);
 
-    passes = paint.rasterOpacity > 0 ? RenderPass::Translucent : RenderPass::None;
+// Paint properties
 
-    return hasTransitions;
+Function<float> RasterLayer::getRasterOpacity() const {
+    return impl->paint.rasterOpacity.values.at(ClassID::Default);
 }
 
-std::unique_ptr<Bucket> RasterLayer::createBucket(StyleBucketParameters&) const {
-    return nullptr;
+void RasterLayer::setRasterOpacity(Function<float> value) {
+    impl->paint.rasterOpacity.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterHueRotate() const {
+    return impl->paint.rasterHueRotate.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterHueRotate(Function<float> value) {
+    impl->paint.rasterHueRotate.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterBrightnessMin() const {
+    return impl->paint.rasterBrightnessMin.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterBrightnessMin(Function<float> value) {
+    impl->paint.rasterBrightnessMin.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterBrightnessMax() const {
+    return impl->paint.rasterBrightnessMax.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterBrightnessMax(Function<float> value) {
+    impl->paint.rasterBrightnessMax.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterSaturation() const {
+    return impl->paint.rasterSaturation.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterSaturation(Function<float> value) {
+    impl->paint.rasterSaturation.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterContrast() const {
+    return impl->paint.rasterContrast.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterContrast(Function<float> value) {
+    impl->paint.rasterContrast.values.emplace(ClassID::Default, value);
+}
+
+Function<float> RasterLayer::getRasterFadeDuration() const {
+    return impl->paint.rasterFadeDuration.values.at(ClassID::Default);
+}
+
+void RasterLayer::setRasterFadeDuration(Function<float> value) {
+    impl->paint.rasterFadeDuration.values.emplace(ClassID::Default, value);
 }
 
 } // namespace mbgl

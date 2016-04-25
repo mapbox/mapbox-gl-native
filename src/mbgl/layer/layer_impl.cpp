@@ -1,16 +1,16 @@
-#include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/layer_impl.hpp>
 
 namespace mbgl {
 
-const std::string& StyleLayer::bucketName() const {
+const std::string& Layer::Impl::bucketName() const {
     return ref.empty() ? id : ref;
 }
 
-bool StyleLayer::hasRenderPass(RenderPass pass) const {
+bool Layer::Impl::hasRenderPass(RenderPass pass) const {
     return bool(passes & pass);
 }
 
-bool StyleLayer::needsRendering() const {
+bool Layer::Impl::needsRendering() const {
     return passes != RenderPass::None && visibility != VisibilityType::None;
 }
 

@@ -104,7 +104,7 @@ void FillBucket::upload(gl::ObjectStore& store) {
 }
 
 void FillBucket::render(Painter& painter,
-                        const StyleLayer& layer,
+                        const Layer& layer,
                         const UnwrappedTileID& tileID,
                         const mat4& matrix) {
     painter.renderFill(*this, *layer.as<FillLayer>(), tileID, matrix);

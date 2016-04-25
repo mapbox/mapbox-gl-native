@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/layer/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/shader/outlinepattern_shader.hpp>
@@ -13,7 +14,7 @@ void Painter::renderFill(FillBucket& bucket,
                          const FillLayer& layer,
                          const UnwrappedTileID& tileID,
                          const mat4& matrix) {
-    const FillPaintProperties& properties = layer.paint;
+    const FillPaintProperties& properties = layer.impl->paint;
     mat4 vtxMatrix =
         translatedMatrix(matrix, properties.fillTranslate, tileID, properties.fillTranslateAnchor);
 
