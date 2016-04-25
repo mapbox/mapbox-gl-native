@@ -41,6 +41,7 @@
                         <barButtonItem key="leftBarButtonItem" image="settings.png" id="Jw8-JP-CaZ" userLabel="Map Settings">
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Map settings"/>
+                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXSettingsButton"/>
                             </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
@@ -174,6 +175,9 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ONr-CS-J5X">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXNavigationBar"/>
+                        </userDefinedRuntimeAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
