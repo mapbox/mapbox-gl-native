@@ -17,13 +17,15 @@
 
 - (void)testDropPin {
     XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    NSPredicate *isAbsent = [NSPredicate predicateWithFormat:@"exists == NO"];
     
     // Drop a pin.
     XCUIElement *mapProxyElement = mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"];
     XCTAssertFalse(mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"].exists, @"Map proxy element should be absent until opening callout view.");
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == true"] evaluatedWithObject:mapProxyElement handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapProxyElement handler:nil];
     [mapElement pressForDuration:1.1];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
     
     // Inspect the callout view.
     NSString *annotationTitle = @"Dropped Pin";
@@ -38,7 +40,7 @@
     XCTAssertTrue(calloutRightAccessoryButton.exists, @"Callout right accessory button should be present after opening callout.");
     
     // Close the callout view by tapping on the map proxy element. Note that the map proxy element has a gaping hole in the middle to accommodate the callout view.
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == false"] evaluatedWithObject:mapProxyElement handler:nil];
+    [self expectationForPredicate:isAbsent evaluatedWithObject:mapProxyElement handler:nil];
     XCUICoordinate *coordinate = [[mapProxyElement coordinateWithNormalizedOffset:CGVectorMake(0, 0)] coordinateWithOffset:CGVectorMake(100, 100)];
     [coordinate tap];
     [self waitForExpectationsWithTimeout:2 handler:nil];
@@ -57,15 +59,17 @@
 
 - (void)testFrameWithGestures {
     XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    NSPredicate *isAbsent = [NSPredicate predicateWithFormat:@"exists == NO"];
     
     // Drop a pin.
     XCUIElement *mapProxyElement = mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"];
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == true"] evaluatedWithObject:mapProxyElement handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapProxyElement handler:nil];
     [mapElement pressForDuration:1.1];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     
     // Close the callout view.
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == false"] evaluatedWithObject:mapProxyElement handler:nil];
+    [self expectationForPredicate:isAbsent evaluatedWithObject:mapProxyElement handler:nil];
     XCUICoordinate *coordinate = [[mapProxyElement coordinateWithNormalizedOffset:CGVectorMake(0, 0)] coordinateWithOffset:CGVectorMake(100, 100)];
     [coordinate tap];
     [self waitForExpectationsWithTimeout:2 handler:nil];
@@ -97,24 +101,57 @@
 
 - (void)testRemoveAnnotations {
     XCUIApplication *app = [[XCUIApplication alloc] init];
+    NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    NSPredicate *isAbsent = [NSPredicate predicateWithFormat:@"exists == NO"];
     
     // Drop a pin.
     XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
     XCUIElement *mapProxyElement = mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"];
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == true"] evaluatedWithObject:mapProxyElement handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapProxyElement handler:nil];
     [mapElement pressForDuration:1.1];
     [self waitForExpectationsWithTimeout:1 handler:nil];
     
     // Remove all annotations, closing the callout view.
     [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
     [app.sheets[@"Map Settings"] swipeUp];
-    XCUIElementQuery *settingsCollectionViewsQuery = app.sheets[@"Map Settings"].collectionViews;
-    XCUIElement *removeAnnotationsButton = settingsCollectionViewsQuery.buttons[@"Remove Annotations"];
-    [self expectationForPredicate:[NSPredicate predicateWithFormat:@"exists == false"] evaluatedWithObject:mapProxyElement handler:nil];
-    [removeAnnotationsButton tap];
+    [self expectationForPredicate:isAbsent evaluatedWithObject:mapProxyElement handler:nil];
+    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Remove Annotations"] tap];
     [self waitForExpectationsWithTimeout:2 handler:nil];
     
     XCTAssertFalse(mapElement.buttons[@"MGLMapViewAnnotation 0"].exists, @"Annotation should be gone after removing all annotations.");
+}
+
+- (void)testAddHundredPoints {
+    XCUIApplication *app = [[XCUIApplication alloc] init];
+    NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
+    
+    // Add 100 points.
+    XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    XCUIElement *lastAnnotationElement = mapElement.buttons[@"MGLMapViewAnnotation 99"];
+    [self expectationForPredicate:exists evaluatedWithObject:lastAnnotationElement handler:nil];
+    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Add 100 Points"] tap];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
+    
+    XCTAssertGreaterThanOrEqual(mapElement.buttons.count, 100, @"Adding 100 points should leave at least 100 buttons visible within the map.");
+}
+
+- (void)testTourWorld {
+    XCUIApplication *app = [[XCUIApplication alloc] init];
+    NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
+    
+    // Start the world tour.
+    XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Washington, D.C."] handler:nil];
+    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Start World Tour"] tap];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"San Francisco"] handler:nil];
+    [self waitForExpectationsWithTimeout:15 handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Bangalore"] handler:nil];
+    [self waitForExpectationsWithTimeout:20 handler:nil];
+    [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Ayacucho"] handler:nil];
+    [self waitForExpectationsWithTimeout:20 handler:nil];
 }
 
 @end
