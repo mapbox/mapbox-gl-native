@@ -38,7 +38,7 @@
 "INFO_A11Y_LABEL" = "About this map";
 
 /* Accessibility label */
-"LOGO_A11Y_LABEL" = "Mapbox logo";
+"LOGO_A11Y_LABEL" = "Mapbox";
 
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Map";

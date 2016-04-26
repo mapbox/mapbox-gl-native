@@ -411,7 +411,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     //
     UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
     _logoView = [[UIImageView alloc] initWithImage:logo];
-    _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox logo", @"Accessibility label");
+    _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
+    _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
@@ -1881,7 +1882,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return 2 /* selectedAnnotationCalloutView, mapViewProxyAccessibilityElement */;
     }
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-    return visibleAnnotations.size() + 3 /* compass, userLocationAnnotationView, attributionButton */;
+    NSInteger count = visibleAnnotations.size() + 2 /* compass, userLocationAnnotationView, attributionButton */;
+    if (self.userLocationAnnotationView)
+    {
+        count++;
+    }
+    return count;
 }
 
 - (id)accessibilityElementAtIndex:(NSInteger)index
@@ -1907,7 +1913,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         return self.compassView;
     }
-    if (index == 1)
+    if ( ! self.userLocationAnnotationView)
+    {
+        index++;
+    }
+    else if (index == 1)
     {
         return self.userLocationAnnotationView;
     }
@@ -1993,13 +2003,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
     if (element == self.attributionButton)
     {
-        return visibleAnnotations.size();
+        return !!self.userLocationAnnotationView + visibleAnnotations.size();
     }
     std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
     auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(),
                                   ((MGLAnnotationAccessibilityElement *)element).tag);
-    if (foundElement == visibleAnnotations.end()) return NSNotFound;
-    else return std::distance(visibleAnnotations.begin(), foundElement) + 2 /* compass, userLocationAnnotationView */;
+    if (foundElement == visibleAnnotations.end())
+    {
+        return NSNotFound;
+    }
+    return !!self.userLocationAnnotationView + std::distance(visibleAnnotations.begin(), foundElement) + 1 /* compass */;
 }
 
 - (MGLMapViewProxyAccessibilityElement *)mapViewProxyAccessibilityElement
