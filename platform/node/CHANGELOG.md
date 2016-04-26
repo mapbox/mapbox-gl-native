@@ -1,3 +1,7 @@
+# 3.1.2
+
+- Fixes a race condition with animated transitions ([#4836](https://github.com/mapbox/mapbox-gl-native/pull/4836))
+
 # 3.1.1
 
 - Moves node-pre-gyp from `bundledDependencies` to `preinstall` ([#4680](https://github.com/mapbox/mapbox-gl-native/pull/4680))
