@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -36,6 +37,7 @@ import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -112,8 +114,12 @@ public class UserLocationView extends View {
 
         // default implementation
         setShadowDrawable(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_shadow));
+        setShadowDrawableTint(ColorUtils.getPrimaryDarkColor(context));
+
         setForegroundDrawables(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_normal), ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_bearing));
-        accuracyPaint.setColor(ContextCompat.getColor(context, R.color.mapbox_blue));
+        setForegroundDrawableTint(ColorUtils.getPrimaryColor(context));
+
+        accuracyPaint.setColor(ColorUtils.getAccentColor(context));
         accuracyPaint.setAlpha(100);
     }
 

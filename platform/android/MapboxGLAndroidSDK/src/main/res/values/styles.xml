@@ -4,7 +4,6 @@
     <!-- these are public -->
     <style name="AttributionAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
         <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:background">@color/mapbox_blue</item>
     </style>
 
 </resources>

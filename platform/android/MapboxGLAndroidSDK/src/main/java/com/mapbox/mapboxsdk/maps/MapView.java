@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -86,6 +87,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
+import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -311,6 +313,7 @@ public class MapView extends FrameLayout {
         }
 
         // Attribution
+        ColorUtils.setTintList(mAttributionsView);
         uiSettings.setAttributionEnabled(options.getAttributionEnabled());
         uiSettings.setAttributionGravity(options.getAttributionGravity());
         int[] attributionMargins = options.getAttributionMargins();
@@ -2561,7 +2564,8 @@ public class MapView extends FrameLayout {
             AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AttributionAlertDialogStyle);
             builder.setTitle(R.string.attributionsDialogTitle);
             builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
-            builder.show();
+            AlertDialog dialog = builder.show();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(ColorUtils.getPrimaryColor(context)));
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url
