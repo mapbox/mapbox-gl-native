@@ -8,6 +8,7 @@ class ViewSettings {
     private boolean enabled;
     private int gravity;
     private int[]margins;
+    private int tintColor;
 
     public ViewSettings() {
         margins = new int[4];
@@ -35,5 +36,13 @@ class ViewSettings {
 
     public void setMargins(int[] margins) {
         this.margins = margins;
+    }
+
+    public int getTintColor() {
+        return tintColor;
+    }
+
+    public void setTintColor(int tintColor) {
+        this.tintColor = tintColor;
     }
 }

@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.Color;
 import android.view.Gravity;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -68,6 +69,12 @@ public class MapboxMapOptionsTest {
     public void testLogoMargins() {
         assertTrue(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[]{0, 1, 2, 3}).getLogoMargins()));
         assertFalse(Arrays.equals(new int[]{0, 1, 2, 3}, new MapboxMapOptions().logoMargins(new int[]{0, 0, 0, 0}).getLogoMargins()));
+    }
+
+    @Test
+    public void testAttributionTintColor() {
+        assertEquals(-1, new MapboxMapOptions().getAttributionTintColor());
+        assertEquals(Color.RED, new MapboxMapOptions().attributionTintColor(Color.RED).getAttributionTintColor());
     }
 
     @Test
@@ -166,6 +173,5 @@ public class MapboxMapOptionsTest {
         assertEquals("test", new MapboxMapOptions().accessToken("test").getAccessToken());
         assertNotEquals("nottest", new MapboxMapOptions().accessToken("test").getStyle());
     }
-    
 }
 

@@ -59,43 +59,32 @@ public class ColorUtils {
     /**
      * Returns a color state list associated with a theme based on a {@link Context}
      *
-     * @param context The context used to style the color attributes.
+     * @param color The color used for tinting.
      * @return A ColorStateList object containing the primary color of a theme
      */
     @NonNull
-    public static ColorStateList getSelector(@NonNull Context context) {
+    public static ColorStateList getSelector(@ColorInt int color) {
         return new ColorStateList(
                 new int[][]{
                         new int[]{android.R.attr.state_pressed},
                         new int[]{}
                 },
                 new int[]{
-                        getPrimaryColor(context),
-                        getPrimaryColor(context)
+                        color,
+                        color
                 }
         );
     }
 
     /**
-     * Set a primary color tint list to the {@link Drawable} of an {@link ImageView}.
+     * Set a color tint list to the {@link Drawable} of an {@link ImageView}.
      *
      * @param imageView The view to set the default tint list.
+     * @param tintColor The color to tint.
      */
-    public static void setTintList(@NonNull ImageView imageView) {
+    public static void setTintList(@NonNull ImageView imageView, @ColorInt int tintColor) {
         Drawable originalDrawable = imageView.getDrawable();
         Drawable wrappedDrawable = DrawableCompat.wrap(originalDrawable);
-        DrawableCompat.setTintList(wrappedDrawable, getSelector(imageView.getContext()));
+        DrawableCompat.setTintList(wrappedDrawable, getSelector(tintColor));
     }
-
-    /**
-     * Set a primary color tint to a {@link Drawable}.
-     *
-     * @param context  The context used to style the color attributes.
-     * @param drawable The drawable to tint.
-     */
-    public static void setTint(@NonNull Context context, @NonNull Drawable drawable) {
-        Drawable wrappedDrawable = DrawableCompat.wrap(drawable);
-        DrawableCompat.setTint(wrappedDrawable, ColorUtils.getPrimaryColor(context));
-    }
-
 }

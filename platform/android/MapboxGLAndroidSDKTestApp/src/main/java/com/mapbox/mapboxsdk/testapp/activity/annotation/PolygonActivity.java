@@ -41,6 +41,7 @@ public class PolygonActivity extends AppCompatActivity {
 
         // configure inital map state
         MapboxMapOptions options = new MapboxMapOptions()
+                .attributionTintColor(Color.RED)
                 .accessToken(getString(R.string.mapbox_access_token))
                 .styleUrl(Style.MAPBOX_STREETS)
                 .camera(new CameraPosition.Builder()

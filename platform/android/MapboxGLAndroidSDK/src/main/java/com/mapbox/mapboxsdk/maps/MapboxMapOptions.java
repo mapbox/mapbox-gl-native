@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -40,6 +41,8 @@ public class MapboxMapOptions implements Parcelable {
     private int logoGravity = Gravity.BOTTOM | Gravity.START;
     private int logoMargins[];
 
+    @ColorInt
+    private int attributionTintColor = -1;
     private boolean attributionEnabled = true;
     private int attributionGravity = Gravity.BOTTOM;
     private int attributionMargins[];
@@ -79,6 +82,7 @@ public class MapboxMapOptions implements Parcelable {
         attributionEnabled = in.readByte() != 0;
         attributionGravity = in.readInt();
         attributionMargins = in.createIntArray();
+        attributionTintColor = in.readInt();
 
         minZoom = in.readFloat();
         maxZoom = in.readFloat();
@@ -137,6 +141,7 @@ public class MapboxMapOptions implements Parcelable {
                     , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_right, DIMENSION_SIXTEEN_DP) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_logo_margin_bottom, DIMENSION_SIXTEEN_DP) * screenDensity)});
 
+            mapboxMapOptions.attributionTintColor(typedArray.getColor(R.styleable.MapView_attribution_tint, -1));
             mapboxMapOptions.attributionEnabled(typedArray.getBoolean(R.styleable.MapView_attribution_enabled, true));
             mapboxMapOptions.attributionGravity(typedArray.getInt(R.styleable.MapView_attribution_gravity, Gravity.BOTTOM));
             mapboxMapOptions.attributionMargins(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_left, DIMENSION_SEVENTY_SIX_DP) * screenDensity)
@@ -313,6 +318,17 @@ public class MapboxMapOptions implements Parcelable {
      */
     public MapboxMapOptions attributionMargins(int[] margins) {
         attributionMargins = margins;
+        return this;
+    }
+
+    /**
+     * Specifies the tint color of the attribution for a map view
+     *
+     * @param color integer resembling a color
+     * @return This
+     */
+    public MapboxMapOptions attributionTintColor(@ColorInt int color) {
+        attributionTintColor = color;
         return this;
     }
 
@@ -553,6 +569,11 @@ public class MapboxMapOptions implements Parcelable {
         return attributionMargins;
     }
 
+    @ColorInt
+    public int getAttributionTintColor() {
+        return attributionTintColor;
+    }
+
     /**
      * Get the current configured user location view state for a map view.
      *
@@ -603,6 +624,7 @@ public class MapboxMapOptions implements Parcelable {
         dest.writeByte((byte) (attributionEnabled ? 1 : 0));
         dest.writeInt(attributionGravity);
         dest.writeIntArray(attributionMargins);
+        dest.writeInt(attributionTintColor);
 
         dest.writeFloat(minZoom);
         dest.writeFloat(maxZoom);

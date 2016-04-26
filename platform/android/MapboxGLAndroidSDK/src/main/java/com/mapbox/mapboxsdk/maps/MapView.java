@@ -20,7 +20,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -83,7 +82,6 @@ import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.maps.widgets.UserLocationView;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
@@ -266,24 +264,18 @@ public class MapView extends FrameLayout {
             mMapboxMap.setStyleUrl(style);
         }
 
-
         mMapboxMap.setMyLocationEnabled(options.getLocationEnabled());
 
         // Enable gestures
         UiSettings uiSettings = mMapboxMap.getUiSettings();
-
         uiSettings.setZoomGesturesEnabled(options.getZoomGesturesEnabled());
         uiSettings.setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
-
         uiSettings.setScrollGesturesEnabled(options.getScrollGesturesEnabled());
         uiSettings.setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
-
         uiSettings.setRotateGesturesEnabled(options.getRotateGesturesEnabled());
         uiSettings.setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
-
         uiSettings.setTiltGesturesEnabled(options.getTiltGesturesEnabled());
         uiSettings.setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
-
         uiSettings.setZoomControlsEnabled(options.getZoomControlsEnabled());
 
         // Zoom
@@ -313,7 +305,6 @@ public class MapView extends FrameLayout {
         }
 
         // Attribution
-        ColorUtils.setTintList(mAttributionsView);
         uiSettings.setAttributionEnabled(options.getAttributionEnabled());
         uiSettings.setAttributionGravity(options.getAttributionGravity());
         int[] attributionMargins = options.getAttributionMargins();
@@ -325,6 +316,10 @@ public class MapView extends FrameLayout {
             int seventySixDp = (int) resources.getDimension(R.dimen.seventy_six_dp);
             uiSettings.setAttributionMargins(seventySixDp, sevenDp, sevenDp, sevenDp);
         }
+
+        int attributionTintColor = options.getAttributionTintColor();
+        uiSettings.setAttributionTintColor(attributionTintColor != -1 ?
+                attributionTintColor : ColorUtils.getPrimaryColor(getContext()));
     }
 
     //
@@ -906,7 +901,7 @@ public class MapView extends FrameLayout {
         if (mDestroyed || location == null) {
             return new PointF();
         }
-        PointF  pointF = mNativeMapView.pixelForLatLng(location);
+        PointF pointF = mNativeMapView.pixelForLatLng(location);
         pointF.set(pointF.x * mScreenDensity, pointF.y * mScreenDensity);
         return pointF;
     }
@@ -2459,6 +2454,13 @@ public class MapView extends FrameLayout {
         mAttributionsView.setVisibility(visibility);
     }
 
+    void setAtttibutionTintColor(int tintColor) {
+        ColorUtils.setTintList(mAttributionsView, tintColor);
+    }
+
+    int getAttributionTintColor(){
+        return mMapboxMap.getUiSettings().getAttributionTintColor();
+    }
 
     //
     // Custom layer
@@ -2565,7 +2567,7 @@ public class MapView extends FrameLayout {
             builder.setTitle(R.string.attributionsDialogTitle);
             builder.setAdapter(new ArrayAdapter<>(context, R.layout.attribution_list_item, items), this);
             AlertDialog dialog = builder.show();
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(ColorUtils.getPrimaryColor(context)));
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(mMapView.getAttributionTintColor()));
         }
 
         // Called when someone selects an attribution, 'Improve this map' adds location data to the url

@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.view.Gravity;
@@ -239,11 +240,11 @@ public class UiSettings {
 
     /**
      * <p>
-     * Enables or disables the Mapbox logo.
+     * Enables or disables the attribution.
      * </p>
-     * By default, the compass is enabled.
+     * By default, the attribution is enabled.
      *
-     * @param enabled True to enable the logo; false to disable the logo.
+     * @param enabled True to enable the attribution; false to disable the attribution.
      */
     public void setAttributionEnabled(boolean enabled) {
         attributionSettings.setEnabled(enabled);
@@ -251,9 +252,9 @@ public class UiSettings {
     }
 
     /**
-     * Returns whether the logo is enabled.
+     * Returns whether the attribution is enabled.
      *
-     * @return True if the logo is enabled; false if the logo is disabled.
+     * @return True if the attribution is enabled; false if the attribution is disabled.
      */
     public boolean isAttributionEnabled() {
         return attributionSettings.isEnabled();
@@ -261,10 +262,9 @@ public class UiSettings {
 
     /**
      * <p>
-     * Sets the gravity of the logo view. Use this to change the corner of the map view that the
-     * Mapbox logo is displayed in.
+     * Sets the gravity of the attribution.
      * </p>
-     * By default, the logo is in the bottom left corner.
+     * By default, the attribution is in the bottom left corner next to the Mapbox logo.
      *
      * @param gravity One of the values from {@link Gravity}.
      * @see Gravity
@@ -284,8 +284,7 @@ public class UiSettings {
     }
 
     /**
-     * Sets the margins of the logo view. Use this to change the distance of the Mapbox logo from the
-     * map view edge.
+     * Sets the margins of the attribution view.
      *
      * @param left   The left margin in pixels.
      * @param top    The top margin in pixels.
@@ -298,7 +297,29 @@ public class UiSettings {
     }
 
     /**
-     * Returns the left side margin of the logo
+     * <p>
+     * Sets the tint of the attribution view. Use this to change the color of the attribution.
+     * </p>
+     * By default, the logo is tinted with the primary color of your theme.
+     *
+     * @param tintColor Color to tint the attribution.
+     */
+    public void setAttributionTintColor(@ColorInt int tintColor) {
+        attributionSettings.setTintColor(tintColor);
+        mapView.setAtttibutionTintColor(tintColor);
+    }
+
+    /**
+     * Returns the tint color value of the attribution view.
+     *
+     * @return The tint color
+     */
+    public int getAttributionTintColor() {
+        return attributionSettings.getTintColor();
+    }
+
+    /**
+     * Returns the left side margin of the attribution view.
      *
      * @return The left margin in pixels
      */
@@ -307,7 +328,7 @@ public class UiSettings {
     }
 
     /**
-     * Returns the top side margin of the logo
+     * Returns the top side margin of the attribution view.
      *
      * @return The top margin in pixels
      */
@@ -316,7 +337,7 @@ public class UiSettings {
     }
 
     /**
-     * Returns the right side margin of the logo
+     * Returns the right side margin of the attribution view.
      *
      * @return The right margin in pixels
      */
@@ -548,10 +569,20 @@ public class UiSettings {
         mapView.setAttributionMargins(getAttributionMarginLeft(), getAttributionMarginTop(), getAttributionMarginRight(), getAttributionMarginBottom());
     }
 
+    /**
+     * Returns the view settings related to the My Location View
+     *
+     * @return viewSettings used for My Location view.
+     */
     public MyLocationViewSettings getMyLocationViewSettings() {
         return myLocationViewSettings;
     }
 
+    /**
+     * Replaces the currenlty used view settings related to the My Location View.
+     *
+     * @param myLocationViewSettings The settings to be used.
+     */
     public void setMyLocationViewSettings(MyLocationViewSettings myLocationViewSettings) {
         this.myLocationViewSettings = myLocationViewSettings;
     }
