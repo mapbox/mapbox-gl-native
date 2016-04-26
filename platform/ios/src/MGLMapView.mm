@@ -434,7 +434,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
-    _compassView.isAccessibilityElement = YES;
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
@@ -4278,12 +4277,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (void)updateCompass
 {
-    CLLocationDirection degrees = mbgl::util::wrap(-self.direction, 0., 360.);
-    self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(degrees));
+    CLLocationDirection direction = self.direction;
+    CLLocationDirection plateDirection = mbgl::util::wrap(-direction, 0., 360.);
+    self.compassView.transform = CGAffineTransformMakeRotation(MGLRadiansFromDegrees(plateDirection));
     
-    self.compassView.accessibilityValue = [_accessibilityCompassFormatter stringFromDirection:self.direction];
+    self.compassView.isAccessibilityElement = direction > 0;
+    self.compassView.accessibilityValue = [_accessibilityCompassFormatter stringFromDirection:direction];
 
-    if (_mbglMap->getBearing() && self.compassView.alpha < 1)
+    if (direction > 0 && self.compassView.alpha < 1)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
@@ -4294,7 +4295,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                          }
                          completion:nil];
     }
-    else if (_mbglMap->getBearing() == 0 && self.compassView.alpha > 0)
+    else if (direction == 0 && self.compassView.alpha > 0)
     {
         [UIView animateWithDuration:MGLAnimationDuration
                               delay:0
