@@ -1,14 +1,16 @@
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/layer/background_layer.hpp>
-#include <mbgl/layer/background_layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderBackground(const BackgroundLayer& layer) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
@@ -106,4 +108,6 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
     }
+}
+
 }

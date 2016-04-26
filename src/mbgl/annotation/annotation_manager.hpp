@@ -18,7 +18,10 @@ class AnnotationTile;
 class AnnotationTileMonitor;
 class SymbolAnnotationImpl;
 class ShapeAnnotationImpl;
+
+namespace style {
 class Style;
+}
 
 class AnnotationManager : private util::noncopyable {
 public:
@@ -36,7 +39,7 @@ public:
     double getTopOffsetPixelsForIcon(const std::string& name);
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
-    void updateStyle(Style&);
+    void updateStyle(style::Style&);
 
     void addTileMonitor(AnnotationTileMonitor&);
     void removeTileMonitor(AnnotationTileMonitor&);

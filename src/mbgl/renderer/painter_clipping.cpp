@@ -1,5 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/string.hpp>

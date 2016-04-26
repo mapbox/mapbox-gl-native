@@ -23,8 +23,11 @@ class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
 class Bucket;
+
+namespace style {
 class Layer;
 class SymbolLayer;
+}
 
 // We're using this class to shuttle the resulting buckets from the worker thread to the MapContext
 // thread. This class is movable-only because the vector contains movable-only value elements.
@@ -51,7 +54,7 @@ public:
                const MapMode);
     ~TileWorker();
 
-    TileParseResult parseAllLayers(std::vector<std::unique_ptr<Layer>>,
+    TileParseResult parseAllLayers(std::vector<std::unique_ptr<style::Layer>>,
                                    std::unique_ptr<const GeometryTile> geometryTile,
                                    PlacementConfig);
 
@@ -62,7 +65,7 @@ public:
 
 private:
     TileParseResult prepareResult(const PlacementConfig& config);
-    void parseLayer(const Layer*);
+    void parseLayer(const style::Layer*);
     void insertBucket(const std::string& name, std::unique_ptr<Bucket>);
     std::unique_ptr<CollisionTile> placeLayers(PlacementConfig);
 
@@ -77,14 +80,14 @@ private:
 
     bool partialParse = false;
 
-    std::vector<std::unique_ptr<Layer>> layers;
+    std::vector<std::unique_ptr<style::Layer>> layers;
 
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTile> geometryTile;
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.
-    std::list<std::pair<const SymbolLayer*, std::unique_ptr<Bucket>>> pending;
+    std::list<std::pair<const style::SymbolLayer*, std::unique_ptr<Bucket>>> pending;
 
     // Contains buckets that have been parsed, but still need placement.
     // They will be placed when all buckets have been parsed.

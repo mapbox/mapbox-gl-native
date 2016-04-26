@@ -9,7 +9,7 @@ class StyleSourcedAnnotationImpl : public ShapeAnnotationImpl {
 public:
     StyleSourcedAnnotationImpl(const AnnotationID, const StyleSourcedAnnotation&, const uint8_t maxZoom);
 
-    void updateStyle(Style&) const final;
+    void updateStyle(style::Style&) const final;
     const ShapeAnnotationGeometry& geometry() const final;
 
 private:

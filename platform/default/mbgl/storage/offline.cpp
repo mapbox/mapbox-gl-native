@@ -1,6 +1,6 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/source/source_info.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -23,9 +23,9 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
     }
 }
 
-std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const SourceInfo& info) const {
-    double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), info.minZoom);
-    double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), info.maxZoom);
+std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
+    double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), tileset.minZoom);
+    double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), tileset.maxZoom);
 
     assert(minZ >= 0);
     assert(maxZ >= 0);

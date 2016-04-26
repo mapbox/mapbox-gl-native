@@ -2,7 +2,7 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/style_parser.hpp>
+#include <mbgl/style/parser.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 
 #include <rapidjson/document.h>
@@ -10,6 +10,7 @@
 #include <map>
 
 using namespace mbgl;
+using namespace mbgl::style;
 
 typedef std::multimap<std::string, mbgl::Value> Properties;
 

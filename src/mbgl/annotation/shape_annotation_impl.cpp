@@ -10,6 +10,7 @@
 
 namespace mbgl {
 
+using namespace style;
 namespace geojsonvt = mapbox::geojsonvt;
 
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_, const uint8_t maxZoom_)

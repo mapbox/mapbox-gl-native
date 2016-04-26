@@ -2,44 +2,9 @@
 
 #include <mbgl/util/enum.hpp>
 
-#include <string>
-#include <array>
-#include <vector>
-#include <utility>
-
 namespace mbgl {
 
-// Stores a premultiplied color, with all four channels ranging from 0..1
-using Color = std::array<float, 4>;
-
-// An array of font names
-using FontStack = std::vector<std::string>;
-
-std::string fontStackToString(const FontStack&);
-
-struct FontStackHash {
-    std::size_t operator()(const FontStack&) const;
-};
-
-template <typename T>
-class Function {
-public:
-    using Stop = std::pair<float, T>;
-    using Stops = std::vector<Stop>;
-
-    explicit Function(const Stops& stops_, float base_)
-        : base(base_), stops(stops_) {}
-
-    float getBase() const { return base; }
-    const std::vector<std::pair<float, T>>& getStops() const { return stops; }
-
-private:
-    float base = 1;
-    std::vector<std::pair<float, T>> stops;
-};
-
-// -------------------------------------------------------------------------------------------------
-
+// TODO: should be in public source.hpp header and style namespace
 enum class SourceType : uint8_t {
     Vector,
     Raster,
@@ -56,7 +21,7 @@ MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
     { SourceType::Annotations, "annotations" },
 });
 
-// -------------------------------------------------------------------------------------------------
+namespace style {
 
 enum class VisibilityType : bool {
     Visible,
@@ -122,5 +87,5 @@ enum class TextTransformType : uint8_t {
     Lowercase,
 };
 
+} // namespace style
 } // namespace mbgl
-

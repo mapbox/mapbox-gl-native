@@ -1,5 +1,5 @@
 #include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>

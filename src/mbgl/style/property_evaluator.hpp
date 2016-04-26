@@ -4,15 +4,16 @@
 #include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {
+namespace style {
 
-class StyleCalculationParameters;
+class CalculationParameters;
 
 template <typename T>
 class PropertyEvaluator {
 public:
     using ResultType = T;
 
-    PropertyEvaluator(const StyleCalculationParameters& parameters_, const T& defaultValue_)
+    PropertyEvaluator(const CalculationParameters& parameters_, const T& defaultValue_)
         : parameters(parameters_),
           defaultValue(defaultValue_) {}
 
@@ -21,7 +22,7 @@ public:
     T operator()(const Function<T>&) const;
 
 private:
-    const StyleCalculationParameters& parameters;
+    const CalculationParameters& parameters;
     T defaultValue;
 };
 
@@ -39,7 +40,7 @@ class CrossFadedPropertyEvaluator {
 public:
     using ResultType = Faded<T>;
 
-    CrossFadedPropertyEvaluator(const StyleCalculationParameters& parameters_, const T& defaultValue_)
+    CrossFadedPropertyEvaluator(const CalculationParameters& parameters_, const T& defaultValue_)
         : parameters(parameters_),
           defaultValue(defaultValue_) {}
 
@@ -50,13 +51,15 @@ public:
 private:
     Faded<T> calculate(const T& min, const T& mid, const T& max) const;
 
-    const StyleCalculationParameters& parameters;
+    const CalculationParameters& parameters;
     T defaultValue;
 };
 
+} // namespace style
+
 namespace util {
 template <typename T>
-struct Interpolator<Faded<T>>
+struct Interpolator<style::Faded<T>>
     : Uninterpolated {};
 }
 

@@ -2,7 +2,7 @@
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_store.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <atomic>

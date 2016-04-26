@@ -12,7 +12,7 @@
 namespace mbgl {
 
 class TileID;
-class SourceInfo;
+class Tileset;
 
 /*
  * An offline region defined by a style URL, geographic bounding box, zoom range, and
@@ -30,7 +30,7 @@ public:
     OfflineTilePyramidRegionDefinition(const std::string&, const LatLngBounds&, double, double, float);
 
     /* Private */
-    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const SourceInfo&) const;
+    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Tileset&) const;
 
     const std::string styleURL;
     const LatLngBounds bounds;

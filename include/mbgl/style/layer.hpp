@@ -1,5 +1,4 @@
-#ifndef MBGL_LAYER
-#define MBGL_LAYER
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/style/types.hpp>
@@ -7,6 +6,7 @@
 #include <memory>
 
 namespace mbgl {
+namespace style {
 
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
@@ -79,6 +79,5 @@ protected:
     Layer(Type, std::unique_ptr<Impl>);
 };
 
+} // namespace style
 } // namespace mbgl
-
-#endif

@@ -7,26 +7,28 @@
 
 namespace mbgl {
 
-    struct SpriteAtlasElement;
+struct SpriteAtlasElement;
 
-    class PositionedIcon {
-        public:
-            inline explicit PositionedIcon() {}
-            inline explicit PositionedIcon(const SpriteAtlasElement& _image,
-                    float _top, float _bottom, float _left, float _right) :
-                image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
+namespace style {
+class SymbolLayoutProperties;
+}
 
-            optional<SpriteAtlasElement> image;
-            float top = 0;
-            float bottom = 0;
-            float left = 0;
-            float right = 0;
+class PositionedIcon {
+    public:
+        inline explicit PositionedIcon() {}
+        inline explicit PositionedIcon(const SpriteAtlasElement& _image,
+                float _top, float _bottom, float _left, float _right) :
+            image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
 
-            operator bool() const { return image && (*image).pos.hasArea(); }
-    };
+        optional<SpriteAtlasElement> image;
+        float top = 0;
+        float bottom = 0;
+        float left = 0;
+        float right = 0;
 
-    class SymbolLayoutProperties;
+        operator bool() const { return image && (*image).pos.hasArea(); }
+};
 
-    PositionedIcon shapeIcon(const SpriteAtlasElement& image, const SymbolLayoutProperties&);
+PositionedIcon shapeIcon(const SpriteAtlasElement& image, const style::SymbolLayoutProperties&);
 
 } // namespace mbgl

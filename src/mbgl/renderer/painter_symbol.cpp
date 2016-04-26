@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
@@ -10,7 +11,9 @@
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderSDF(SymbolBucket &bucket,
                         const UnwrappedTileID &tileID,
@@ -256,4 +259,6 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     }
 
     config.activeTexture = GL_TEXTURE0;
+}
+
 }

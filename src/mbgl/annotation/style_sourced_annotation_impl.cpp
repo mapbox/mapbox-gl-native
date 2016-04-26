@@ -2,12 +2,12 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layer.hpp>
-#include <mbgl/layer/line_layer.hpp>
-#include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 
 namespace mbgl {
 
-namespace geojsonvt = mapbox::geojsonvt;
+using namespace style;
 
 StyleSourcedAnnotationImpl::StyleSourcedAnnotationImpl(const AnnotationID id_, const StyleSourcedAnnotation& annotation_, const uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),

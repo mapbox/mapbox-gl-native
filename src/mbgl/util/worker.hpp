@@ -40,7 +40,7 @@ public:
                             std::function<void(RasterTileParseResult)> callback);
 
     Request parseGeometryTile(TileWorker&,
-                              std::vector<std::unique_ptr<Layer>>,
+                              std::vector<std::unique_ptr<style::Layer>>,
                               std::unique_ptr<GeometryTile>,
                               PlacementConfig,
                               std::function<void(TileParseResult)> callback);

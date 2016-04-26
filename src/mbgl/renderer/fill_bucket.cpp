@@ -1,5 +1,5 @@
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
@@ -12,21 +12,23 @@
 
 #include <cassert>
 
-struct GeometryTooLongException : std::exception {};
-
-using namespace mbgl;
-
 namespace mapbox {
 namespace util {
-template <> struct nth<0, GeometryCoordinate> {
-    inline static int64_t get(const GeometryCoordinate& t) { return t.x; };
+template <> struct nth<0, mbgl::GeometryCoordinate> {
+    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
 };
 
-template <> struct nth<1, GeometryCoordinate> {
-    inline static int64_t get(const GeometryCoordinate& t) { return t.y; };
+template <> struct nth<1, mbgl::GeometryCoordinate> {
+    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
 };
 }
 }
+
+namespace mbgl {
+
+using namespace style;
+
+struct GeometryTooLongException : std::exception {};
 
 FillBucket::FillBucket() {
 }
@@ -164,4 +166,6 @@ void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& sto
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
+}
+
 }

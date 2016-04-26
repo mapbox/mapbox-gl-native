@@ -1,6 +1,6 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
@@ -30,6 +30,8 @@
 #include <mbgl/math/minmax.hpp>
 
 namespace mbgl {
+
+using namespace style;
 
 SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
         const Shaping& shapedText, const PositionedIcon& shapedIcon,

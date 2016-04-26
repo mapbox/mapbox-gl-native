@@ -2,10 +2,11 @@
 #include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/util/io.hpp>
 
 using namespace mbgl;
+using namespace mbgl::style;
 
 TEST(Style, UnusedSource) {
     util::RunLoop loop;

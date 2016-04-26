@@ -1,5 +1,5 @@
 #include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/line_shader.hpp>
@@ -11,7 +11,9 @@
 
 #include <cassert>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 LineBucket::LineBucket(uint32_t overscaling_) : overscaling(overscaling_) {
 }
@@ -504,4 +506,6 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader, gl::ObjectStore& st
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
+}
+
 }

@@ -3,9 +3,9 @@
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/property_transition.hpp>
-#include <mbgl/style/style_cascade_parameters.hpp>
-#include <mbgl/style/style_calculation_parameters.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/cascade_parameters.hpp>
+#include <mbgl/style/calculation_parameters.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -14,6 +14,7 @@
 #include <utility>
 
 namespace mbgl {
+namespace style {
 
 template <class T, template <class S> class Evaluator = PropertyEvaluator>
 class PaintProperty {
@@ -62,14 +63,14 @@ public:
             }
 
             if (it->value.HasMember(transitionName.c_str())) {
-                if (auto v = parsePropertyTransition(name, it->value[transitionName.c_str()])) {
+                if (auto v = parseTransitionOptions(name, it->value[transitionName.c_str()])) {
                     transitions.emplace(classID, *v);
                 }
             }
         }
     }
 
-    void cascade(const StyleCascadeParameters& params) {
+    void cascade(const CascadeParameters& params) {
         const bool overrideTransition = !params.transition.delay && !params.transition.duration;
         Duration delay = params.transition.delay.value_or(Duration::zero());
         Duration duration = params.transition.duration.value_or(Duration::zero());
@@ -79,7 +80,7 @@ public:
                 continue;
 
             if (overrideTransition && transitions.find(classID) != transitions.end()) {
-                const PropertyTransition& transition = transitions[classID];
+                const TransitionOptions& transition = transitions[classID];
                 if (transition.delay) delay = *transition.delay;
                 if (transition.duration) duration = *transition.duration;
             }
@@ -95,7 +96,7 @@ public:
         assert(cascaded);
     }
 
-    bool calculate(const StyleCalculationParameters& parameters) {
+    bool calculate(const CalculationParameters& parameters) {
         assert(cascaded);
         Evaluator<T> evaluator(parameters, defaultValue);
         value = cascaded->calculate(evaluator, parameters.now);
@@ -109,7 +110,7 @@ public:
 private:
     T defaultValue;
     std::map<ClassID, PropertyValue<T>> values;
-    std::map<ClassID, PropertyTransition> transitions;
+    std::map<ClassID, TransitionOptions> transitions;
 
     struct CascadedValue {
         CascadedValue(std::unique_ptr<CascadedValue> prior_,
@@ -147,4 +148,5 @@ private:
     std::unique_ptr<CascadedValue> cascaded;
 };
 
+} // namespace style
 } // namespace mbgl

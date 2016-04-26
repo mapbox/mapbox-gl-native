@@ -1,8 +1,8 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layer.hpp>
-#include <mbgl/layer/layer_impl.hpp>
-#include <mbgl/layer/symbol_layer.hpp>
+#include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
@@ -59,7 +59,7 @@ void FeatureIndex::query(
         const optional<std::vector<std::string>>& filterLayerIDs,
         const GeometryTile& geometryTile,
         const CanonicalTileID& tileID,
-        const Style& style) const {
+        const style::Style& style) const {
 
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
 
@@ -94,7 +94,7 @@ void FeatureIndex::addFeature(
     const optional<std::vector<std::string>>& filterLayerIDs,
     const GeometryTile& geometryTile,
     const CanonicalTileID& tileID,
-    const Style& style,
+    const style::Style& style,
     const float bearing,
     const float pixelsToTileUnits) const {
 
@@ -116,7 +116,7 @@ void FeatureIndex::addFeature(
 
         auto styleLayer = style.getLayer(layerID);
         if (!styleLayer ||
-            (!styleLayer->is<SymbolLayer>() &&
+            (!styleLayer->is<style::SymbolLayer>() &&
              !styleLayer->baseImpl->queryIntersectsGeometry(queryGeometry, geometryTileFeature->getGeometries(), bearing, pixelsToTileUnits))) {
             continue;
         }
@@ -128,7 +128,7 @@ void FeatureIndex::addFeature(
 optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
         const GeometryCollection& queryGeometry,
         const std::array<float, 2>& translate,
-        const TranslateAnchorType anchorType,
+        const style::TranslateAnchorType anchorType,
         const float bearing,
         const float pixelsToTileUnits) {
     if (translate[0] == 0 && translate[1] == 0) {
@@ -136,7 +136,7 @@ optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
     }
 
     GeometryCoordinate translateVec(translate[0] * pixelsToTileUnits, translate[1] * pixelsToTileUnits);
-    if (anchorType == TranslateAnchorType::Viewport) {
+    if (anchorType == style::TranslateAnchorType::Viewport) {
         translateVec = util::rotate(translateVec, -bearing);
     }
 

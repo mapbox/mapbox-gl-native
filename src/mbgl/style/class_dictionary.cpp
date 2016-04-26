@@ -3,6 +3,7 @@
 #include <pthread.h>
 
 namespace mbgl {
+namespace style {
 
 ClassDictionary::ClassDictionary() {}
 
@@ -46,4 +47,5 @@ ClassID ClassDictionary::normalize(ClassID id) {
     }
 }
 
+} // namespace style
 } // namespace mbgl

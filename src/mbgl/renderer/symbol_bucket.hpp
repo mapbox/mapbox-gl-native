@@ -13,7 +13,7 @@
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/layer/symbol_layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 #include <memory>
 #include <map>
@@ -46,7 +46,7 @@ class SymbolInstance {
     public:
         explicit SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
                 const Shaping& shapedText, const PositionedIcon& shapedIcon,
-                const SymbolLayoutProperties& layout, const bool inside, const uint32_t index,
+                const style::SymbolLayoutProperties&, const bool inside, const uint32_t index,
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
                 const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
@@ -70,7 +70,7 @@ public:
     ~SymbolBucket() override;
 
     void upload(gl::ObjectStore&) override;
-    void render(Painter&, const Layer&, const UnwrappedTileID&, const mat4&) override;
+    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;
@@ -87,7 +87,7 @@ public:
     void drawIcons(IconShader&, gl::ObjectStore&);
     void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
-    void parseFeatures(const GeometryTileLayer&, const Filter&);
+    void parseFeatures(const GeometryTileLayer&, const style::Filter&);
     bool needsDependencies(GlyphStore&, SpriteStore&);
     void placeFeatures(CollisionTile&) override;
 
@@ -109,7 +109,7 @@ private:
             const bool keepUpright, const bool alongLine, const float placementAngle);
 
 public:
-    SymbolLayoutProperties layout;
+    style::SymbolLayoutProperties layout;
 
     float iconMaxSize = 1.0f;
     float textMaxSize = 16.0f;

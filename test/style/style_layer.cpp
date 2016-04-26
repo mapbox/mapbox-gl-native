@@ -1,8 +1,9 @@
 #include <mbgl/test/util.hpp>
-#include <mbgl/layer/background_layer.hpp>
-#include <mbgl/layer/background_layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/background_layer_impl.hpp>
 
 using namespace mbgl;
+using namespace mbgl::style;
 
 TEST(Layer, Clone) {
     std::unique_ptr<Layer> layer = std::make_unique<BackgroundLayer>("id");

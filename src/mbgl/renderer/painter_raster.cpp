@@ -1,11 +1,13 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/layer/raster_layer.hpp>
-#include <mbgl/layer/raster_layer_impl.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderRaster(RasterBucket& bucket,
                            const RasterLayer& layer,
@@ -65,4 +67,6 @@ std::array<float, 3> Painter::spinWeights(float spin) {
         (std::sqrt(3.0f) * s - c + 1) / 3
     }};
     return spin_weights;
+}
+
 }

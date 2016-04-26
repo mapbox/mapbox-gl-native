@@ -1,18 +1,17 @@
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/tile/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/layer/layer_impl.hpp>
-#include <mbgl/style/style_render_parameters.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
-#include <mbgl/layer/background_layer.hpp>
-#include <mbgl/layer/custom_layer.hpp>
-#include <mbgl/layer/custom_layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/custom_layer_impl.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -46,7 +45,9 @@
 #include <algorithm>
 #include <iostream>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 Painter::Painter(const TransformState& state_, gl::ObjectStore& store_)
     : state(state_),
@@ -307,4 +308,6 @@ void Painter::setDepthSublayer(int n) {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
     config.depthRange = { nearDepth, farDepth };
+}
+
 }

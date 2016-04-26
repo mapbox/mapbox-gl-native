@@ -8,9 +8,10 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/layer/background_layer.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
 
 using namespace mbgl;
+using namespace mbgl::style;
 using namespace std::literals::string_literals;
 
 struct MapTest {

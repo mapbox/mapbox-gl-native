@@ -9,16 +9,19 @@
 
 namespace mbgl {
 
-class Style;
 class AnnotationTile;
 class CanonicalTileID;
+
+namespace style {
+class Style;
+}
 
 class ShapeAnnotationImpl {
 public:
     ShapeAnnotationImpl(const AnnotationID, const uint8_t maxZoom);
     virtual ~ShapeAnnotationImpl() = default;
 
-    virtual void updateStyle(Style&) const = 0;
+    virtual void updateStyle(style::Style&) const = 0;
     virtual const ShapeAnnotationGeometry& geometry() const = 0;
 
     void updateTile(const CanonicalTileID&, AnnotationTile&);

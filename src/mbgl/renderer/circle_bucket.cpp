@@ -2,10 +2,12 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
-#include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/util/constants.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 CircleBucket::CircleBucket(MapMode mode_) : mode(mode_) {
 }
@@ -96,4 +98,6 @@ void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
         vertexIndex += group->vertex_length * vertexBuffer_.itemSize;
         elementsIndex += group->elements_length * elementsBuffer_.itemSize;
     }
+}
+
 }

@@ -9,7 +9,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 #include <cstdint>
 #include <string>
@@ -22,9 +22,12 @@ namespace mbgl {
 class FileSource;
 class View;
 class SpriteImage;
-class Layer;
 struct CameraOptions;
 struct AnimationOptions;
+
+namespace style {
+class Layer;
+}
 
 class Map : private util::noncopyable {
 public:
@@ -47,9 +50,9 @@ public:
     void update(Update update);
 
     // Styling
-    void addClass(const std::string&, const PropertyTransition& = {});
-    void removeClass(const std::string&, const PropertyTransition& = {});
-    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
+    void addClass(const std::string&, const style::TransitionOptions& = {});
+    void removeClass(const std::string&, const style::TransitionOptions& = {});
+    void setClasses(const std::vector<std::string>&, const style::TransitionOptions& = {});
 
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
@@ -146,7 +149,7 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
-    void addLayer(std::unique_ptr<Layer>, const optional<std::string>& beforeLayerID = {});
+    void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
     // Feature queries

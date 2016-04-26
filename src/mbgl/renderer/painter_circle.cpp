@@ -1,12 +1,14 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/circle_bucket.hpp>
 
-#include <mbgl/layer/circle_layer.hpp>
-#include <mbgl/layer/circle_layer_impl.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer_impl.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderCircle(CircleBucket& bucket,
                            const CircleLayer& layer,
@@ -42,4 +44,6 @@ void Painter::renderCircle(CircleBucket& bucket,
     circleShader->u_opacity = properties.circleOpacity;
 
     bucket.drawCircles(*circleShader, store);
+}
+
 }

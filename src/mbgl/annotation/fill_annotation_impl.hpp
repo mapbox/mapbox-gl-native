@@ -9,7 +9,7 @@ class FillAnnotationImpl : public ShapeAnnotationImpl {
 public:
     FillAnnotationImpl(const AnnotationID, const FillAnnotation&, const uint8_t maxZoom);
 
-    void updateStyle(Style&) const final;
+    void updateStyle(style::Style&) const final;
     const ShapeAnnotationGeometry& geometry() const final;
 
 private:

@@ -1,14 +1,16 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/layer/fill_layer.hpp>
-#include <mbgl/layer/fill_layer_impl.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/shader/outlinepattern_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderFill(FillBucket& bucket,
                          const FillLayer& layer,
@@ -194,4 +196,6 @@ void Painter::renderFill(FillBucket& bucket,
         setDepthSublayer(2);
         bucket.drawVertices(*outlineShader, store);
     }
+}
+
 }

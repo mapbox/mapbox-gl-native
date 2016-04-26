@@ -30,7 +30,7 @@ public:
     }
 
     void parseGeometryTile(TileWorker* worker,
-                           std::vector<std::unique_ptr<Layer>> layers,
+                           std::vector<std::unique_ptr<style::Layer>> layers,
                            std::unique_ptr<GeometryTile> tile,
                            PlacementConfig config,
                            std::function<void(TileParseResult)> callback) {
@@ -79,7 +79,7 @@ Worker::parseRasterTile(std::unique_ptr<RasterBucket> bucket,
 
 std::unique_ptr<AsyncRequest>
 Worker::parseGeometryTile(TileWorker& worker,
-                          std::vector<std::unique_ptr<Layer>> layers,
+                          std::vector<std::unique_ptr<style::Layer>> layers,
                           std::unique_ptr<GeometryTile> tile,
                           PlacementConfig config,
                           std::function<void(TileParseResult)> callback) {

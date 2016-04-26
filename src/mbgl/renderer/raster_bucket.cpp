@@ -1,9 +1,11 @@
 #include <mbgl/renderer/raster_bucket.hpp>
-#include <mbgl/layer/raster_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/renderer/painter.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 RasterBucket::RasterBucket(gl::TexturePool& texturePool)
 : raster(texturePool) {
@@ -39,4 +41,6 @@ bool RasterBucket::hasData() const {
 
 bool RasterBucket::needsClipping() const {
     return false;
+}
+
 }

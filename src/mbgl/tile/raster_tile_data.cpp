@@ -1,5 +1,5 @@
 #include <mbgl/tile/raster_tile_data.hpp>
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -61,7 +61,7 @@ RasterTileData::~RasterTileData() {
     cancel();
 }
 
-Bucket* RasterTileData::getBucket(const Layer&) {
+Bucket* RasterTileData::getBucket(const style::Layer&) {
     return bucket.get();
 }
 

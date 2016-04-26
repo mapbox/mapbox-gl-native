@@ -1,13 +1,14 @@
 #pragma once
 
-#include <mbgl/style/style_observer.hpp>
+#include <mbgl/style/observer.hpp>
 
-namespace mbgl {
+using namespace mbgl;
+using namespace mbgl::style;
 
 /**
- * An implementation of StyleObserver that forwards all methods to dynamically-settable lambas.
+ * An implementation of style::Observer that forwards all methods to dynamically-settable lambas.
  */
-class StubStyleObserver : public StyleObserver {
+class StubStyleObserver : public style::Observer {
 public:
     void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
@@ -61,5 +62,3 @@ public:
     std::function<void ()> resourceLoaded;
     std::function<void (std::exception_ptr)> resourceError;
 };
-
-} // namespace mbgl

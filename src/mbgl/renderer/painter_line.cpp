@@ -1,7 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/layer/line_layer.hpp>
-#include <mbgl/layer/line_layer_impl.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
@@ -9,7 +9,9 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/mat2.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderLine(LineBucket& bucket,
                          const LineLayer& layer,
@@ -160,4 +162,6 @@ void Painter::renderLine(LineBucket& bucket,
 
         bucket.drawLines(*lineShader, store);
     }
+}
+
 }

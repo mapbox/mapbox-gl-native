@@ -80,11 +80,14 @@ const layerHpp = ejs.compile(`<%
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 
+#include <mbgl/util/color.hpp>
+
 <% if (type === 'line' || type === 'symbol') { -%>
 #include <vector>
 
 <% } -%>
 namespace mbgl {
+namespace style {
 
 class <%- camelize(type) %>Layer : public Layer {
 public:
@@ -138,6 +141,7 @@ inline bool Layer::is<<%- camelize(type) %>Layer>() const {
     return type == Type::<%- camelize(type) %>;
 }
 
+} // namespace style
 } // namespace mbgl
 `, {strict: true});
 
@@ -148,10 +152,11 @@ const layerCpp = ejs.compile(`<%
 -%>
 // This file is generated. Edit scripts/generate-style-code.js, then run \`make style-code\`.
 
-#include <mbgl/layer/<%- type %>_layer.hpp>
-#include <mbgl/layer/<%- type %>_layer_impl.hpp>
+#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/layers/<%- type %>_layer_impl.hpp>
 
 namespace mbgl {
+namespace style {
 
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
     : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
@@ -230,6 +235,7 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue
 }
 <% } -%>
 
+} // namespace style
 } // namespace mbgl
 `, {strict: true});
 
@@ -247,15 +253,16 @@ const propertiesHpp = ejs.compile(`<%
 #include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
+namespace style {
 
-class StyleCascadeParameters;
-class StyleCalculationParameters;
+class CascadeParameters;
+class CalculationParameters;
 
 <% if (layoutProperties.length) { -%>
 class <%- camelize(type) %>LayoutProperties {
 public:
     void parse(const JSValue&);
-    void recalculate(const StyleCalculationParameters&);
+    void recalculate(const CalculationParameters&);
 
 <% for (const property of layoutProperties) { -%>
     LayoutProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
@@ -266,8 +273,8 @@ public:
 class <%- camelize(type) %>PaintProperties {
 public:
     void parse(const JSValue&);
-    void cascade(const StyleCascadeParameters&);
-    bool recalculate(const StyleCalculationParameters&);
+    void cascade(const CascadeParameters&);
+    bool recalculate(const CalculationParameters&);
 
 <% for (const property of paintProperties) { -%>
 <% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
@@ -280,6 +287,7 @@ public:
 <% } -%>
 };
 
+} // namespace style
 } // namespace mbgl
 `, {strict: true});
 
@@ -290,9 +298,10 @@ const propertiesCpp = ejs.compile(`<%
 -%>
 // This file is generated. Edit scripts/generate-style-code.js, then run \`make style-code\`.
 
-#include <mbgl/layer/<%- type %>_layer_properties.hpp>
+#include <mbgl/style/layers/<%- type %>_layer_properties.hpp>
 
 namespace mbgl {
+namespace style {
 
 <% if (layoutProperties.length) { -%>
 void <%- camelize(type) %>LayoutProperties::parse(const JSValue& value) {
@@ -301,7 +310,7 @@ void <%- camelize(type) %>LayoutProperties::parse(const JSValue& value) {
 <% } -%>
 }
 
-void <%- camelize(type) %>LayoutProperties::recalculate(const StyleCalculationParameters& parameters) {
+void <%- camelize(type) %>LayoutProperties::recalculate(const CalculationParameters& parameters) {
 <% for (const property of layoutProperties) { -%>
     <%- camelizeWithLeadingLowercase(property.name) %>.calculate(parameters);
 <% } -%>
@@ -314,13 +323,13 @@ void <%- camelize(type) %>PaintProperties::parse(const JSValue& value) {
 <% } -%>
 }
 
-void <%- camelize(type) %>PaintProperties::cascade(const StyleCascadeParameters& parameters) {
+void <%- camelize(type) %>PaintProperties::cascade(const CascadeParameters& parameters) {
 <% for (const property of paintProperties) { -%>
     <%- camelizeWithLeadingLowercase(property.name) %>.cascade(parameters);
 <% } -%>
 }
 
-bool <%- camelize(type) %>PaintProperties::recalculate(const StyleCalculationParameters& parameters) {
+bool <%- camelize(type) %>PaintProperties::recalculate(const CalculationParameters& parameters) {
     bool hasTransitions = false;
 
 <% for (const property of paintProperties) { -%>
@@ -330,6 +339,7 @@ bool <%- camelize(type) %>PaintProperties::recalculate(const StyleCalculationPar
     return hasTransitions;
 }
 
+} // namespace style
 } // namespace mbgl
 `, {strict: true});
 
@@ -354,9 +364,9 @@ for (const type of spec.layer.type.values) {
     paintProperties: paintProperties,
   };
 
-  fs.writeFileSync(`include/mbgl/layer/${type}_layer.hpp`, layerHpp(layer));
-  fs.writeFileSync(`src/mbgl/layer/${type}_layer.cpp`, layerCpp(layer));
+  fs.writeFileSync(`include/mbgl/style/layers/${type}_layer.hpp`, layerHpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer.cpp`, layerCpp(layer));
 
-  fs.writeFileSync(`src/mbgl/layer/${type}_layer_properties.hpp`, propertiesHpp(layer));
-  fs.writeFileSync(`src/mbgl/layer/${type}_layer_properties.cpp`, propertiesCpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer_properties.hpp`, propertiesHpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer_properties.cpp`, propertiesCpp(layer));
 }

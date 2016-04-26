@@ -1,12 +1,14 @@
 #include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/style_calculation_parameters.hpp>
+#include <mbgl/style/calculation_parameters.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/color.hpp>
 
 #include <cmath>
 
 namespace mbgl {
+namespace style {
 
 template <typename T>
 inline T defaultStopsValue();
@@ -140,4 +142,5 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
 template class CrossFadedPropertyEvaluator<std::string>;
 template class CrossFadedPropertyEvaluator<std::vector<float>>;
 
+} // namespace style
 } // namespace mbgl

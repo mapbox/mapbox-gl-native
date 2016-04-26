@@ -3,7 +3,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/style/style_parser.hpp>
+#include <mbgl/style/parser.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
@@ -46,7 +46,7 @@ void OfflineDownload::setState(OfflineRegionDownloadState state) {
     observer->statusChanged(status);
 }
 
-std::vector<Resource> OfflineDownload::spriteResources(const StyleParser& parser) const {
+std::vector<Resource> OfflineDownload::spriteResources(const style::Parser& parser) const {
     std::vector<Resource> result;
 
     if (!parser.spriteURL.empty()) {
@@ -57,7 +57,7 @@ std::vector<Resource> OfflineDownload::spriteResources(const StyleParser& parser
     return result;
 }
 
-std::vector<Resource> OfflineDownload::glyphResources(const StyleParser& parser) const {
+std::vector<Resource> OfflineDownload::glyphResources(const style::Parser& parser) const {
     std::vector<Resource> result;
 
     if (!parser.glyphURL.empty()) {
@@ -71,11 +71,11 @@ std::vector<Resource> OfflineDownload::glyphResources(const StyleParser& parser)
     return result;
 }
 
-std::vector<Resource> OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const SourceInfo& info) const {
+std::vector<Resource> OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
     std::vector<Resource> result;
 
-    for (const auto& tile : definition.tileCover(type, tileSize, info)) {
-        result.push_back(Resource::tile(info.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
+    for (const auto& tile : definition.tileCover(type, tileSize, tileset)) {
+        result.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
     }
 
     return result;
@@ -94,7 +94,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         return result;
     }
 
-    StyleParser parser;
+    style::Parser parser;
     parser.parse(*styleResponse->data);
 
     result.requiredResourceCountIsPrecise = true;
@@ -103,14 +103,14 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         switch (source->type) {
         case SourceType::Vector:
         case SourceType::Raster:
-            if (source->getInfo()) {
-                result.requiredResourceCount += tileResources(source->type, source->tileSize, *source->getInfo()).size();
+            if (source->getTileset()) {
+                result.requiredResourceCount += tileResources(source->type, source->tileSize, *source->getTileset()).size();
             } else {
                 result.requiredResourceCount += 1;
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(source->url));
                 if (sourceResponse) {
                     result.requiredResourceCount += tileResources(source->type, source->tileSize,
-                        *StyleParser::parseTileJSON(*sourceResponse->data, source->url, source->type, source->tileSize)).size();
+                        *style::parseTileJSON(*sourceResponse->data, source->url, source->type, source->tileSize)).size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -144,7 +144,7 @@ void OfflineDownload::activateDownload() {
     ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
-        StyleParser parser;
+        style::Parser parser;
         parser.parse(*styleResponse.data);
 
         for (const auto& source : parser.sources) {
@@ -155,14 +155,14 @@ void OfflineDownload::activateDownload() {
             switch (type) {
             case SourceType::Vector:
             case SourceType::Raster:
-                if (source->getInfo()) {
-                    ensureTiles(type, tileSize, *source->getInfo());
+                if (source->getTileset()) {
+                    ensureTiles(type, tileSize, *source->getTileset());
                 } else {
                     status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=] (Response sourceResponse) {
-                        ensureTiles(type, tileSize, *StyleParser::parseTileJSON(*sourceResponse.data, url, type, tileSize));
+                        ensureTiles(type, tileSize, *style::parseTileJSON(*sourceResponse.data, url, type, tileSize));
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {
@@ -198,7 +198,7 @@ void OfflineDownload::deactivateDownload() {
     requests.clear();
 }
 
-void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const SourceInfo& info) {
+void OfflineDownload::ensureTiles(SourceType type, uint16_t tileSize, const Tileset& info) {
     for (const auto& resource : tileResources(type, tileSize, info)) {
         ensureResource(resource);
     }

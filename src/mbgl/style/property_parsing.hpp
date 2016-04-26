@@ -2,10 +2,11 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/color.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -14,6 +15,7 @@
 #include <vector>
 
 namespace mbgl {
+namespace style {
 
 template <typename T>
 optional<T> parseConstant(const char* name, const JSValue&);
@@ -104,6 +106,7 @@ PropertyValue<T> parseProperty(const char* name, const JSValue& value) {
     return Function<T>(stops, base);
 }
 
-optional<PropertyTransition> parsePropertyTransition(const char * name, const JSValue&);
+optional<TransitionOptions> parseTransitionOptions(const char * name, const JSValue&);
 
+} // namespace style
 } // namespace mbgl

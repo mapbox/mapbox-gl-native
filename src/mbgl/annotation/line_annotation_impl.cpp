@@ -1,11 +1,11 @@
 #include <mbgl/annotation/line_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 
 namespace mbgl {
 
-namespace geojsonvt = mapbox::geojsonvt;
+using namespace style;
 
 LineAnnotationImpl::LineAnnotationImpl(const AnnotationID id_, const LineAnnotation& annotation_, const uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),

@@ -2,12 +2,13 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/style/style_calculation_parameters.hpp>
+#include <mbgl/style/calculation_parameters.hpp>
 
 using namespace mbgl;
+using namespace mbgl::style;
 
 float evaluate(PropertyValue<float> value, float zoom) {
-    return PropertyValue<float>::visit(value, PropertyEvaluator<float>(StyleCalculationParameters(zoom), 0));
+    return PropertyValue<float>::visit(value, PropertyEvaluator<float>(CalculationParameters(zoom), 0));
 }
 
 TEST(Function, Constant) {

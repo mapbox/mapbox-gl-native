@@ -1,6 +1,6 @@
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/layer/layer_impl.hpp>
+#include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
@@ -14,7 +14,7 @@ namespace mbgl {
 VectorTileData::VectorTileData(const OverscaledTileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
                                std::string sourceID,
-                               Style& style_,
+                               style::Style& style_,
                                const MapMode mode_,
                                const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
@@ -139,7 +139,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
     return true;
 }
 
-Bucket* VectorTileData::getBucket(const Layer& layer) {
+Bucket* VectorTileData::getBucket(const style::Layer& layer) {
     const auto it = buckets.find(layer.baseImpl->bucketName());
     if (it == buckets.end()) {
         return nullptr;
