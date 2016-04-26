@@ -27,6 +27,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
+    private FloatingActionButton locationToggleFAB;
 
     private static final int PERMISSIONS_LOCATION = 0;
 
@@ -55,7 +56,7 @@ public class MyLocationToggleActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton locationToggleFAB = (FloatingActionButton) findViewById(R.id.fabLocationToggle);
+        locationToggleFAB = (FloatingActionButton) findViewById(R.id.fabLocationToggle);
         locationToggleFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +139,11 @@ public class MyLocationToggleActivity extends AppCompatActivity {
                     }
                 }
             });
+            locationToggleFAB.setImageResource(R.drawable.ic_location_disabled_24dp);
+        } else {
+            locationToggleFAB.setImageResource(R.drawable.ic_my_location_24dp);
         }
+
         mapboxMap.setMyLocationEnabled(enabled);
     }
 
