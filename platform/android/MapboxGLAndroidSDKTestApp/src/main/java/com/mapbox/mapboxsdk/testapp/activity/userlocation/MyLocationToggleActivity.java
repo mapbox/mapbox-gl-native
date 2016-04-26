@@ -16,7 +16,29 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     private MapboxMap mapboxMap;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_my_location_toggle);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        mapView = (MapView) findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap map) {
+                mapboxMap = map;
+            }
+        });
+    }
 
     @Override
     public void onResume() {
@@ -28,7 +50,9 @@ public class MyLocationToggleActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         mapView.onPause();
+    }
 
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
