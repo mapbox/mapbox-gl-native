@@ -3738,6 +3738,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         duration = MAX([newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp], MGLUserLocationAnimationDuration);
     }
     [self updateUserLocationAnnotationViewAnimatedWithDuration:duration];
+    
+    if (self.userTrackingMode == MGLUserTrackingModeNone &&
+        self.userLocationAnnotationView.accessibilityElementIsFocused &&
+        [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+    {
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.userLocationAnnotationView);
+    }
 }
 
 - (void)didUpdateLocationWithUserTrackingAnimated:(BOOL)animated
@@ -4109,7 +4116,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
             if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)])
             {
-                UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+                if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+                {
+                    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+                }
                 BOOL animated = change == mbgl::MapChangeRegionDidChangeAnimated;
                 [self.delegate mapView:self regionDidChangeAnimated:animated];
             }
@@ -4257,8 +4267,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             [self deselectAnnotation:self.selectedAnnotation animated:YES];
         }
     }
-    
-    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 /// Intended center point of the user location annotation view with respect to

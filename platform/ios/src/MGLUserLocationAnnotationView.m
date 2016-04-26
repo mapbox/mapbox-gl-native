@@ -57,7 +57,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
-        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
+        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable | UIAccessibilityTraitUpdatesFrequently;
         
         _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
         _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
@@ -115,6 +115,16 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 - (void)accessibilityDecrement
 {
     [self.mapView accessibilityDecrement];
+}
+
+- (void)setHidden:(BOOL)hidden
+{
+    BOOL oldValue = super.hidden;
+    [super setHidden:hidden];
+    if (oldValue != hidden)
+    {
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+    }
 }
 
 - (void)setTintColor:(UIColor *)tintColor
