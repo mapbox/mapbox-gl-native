@@ -553,7 +553,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:numberOfAnnotations];
     for (NSUInteger i = 0; i < numberOfAnnotations; i++)
     {
-        MGLPointAnnotation *annotation = [[MGLPointAnnotation alloc] init];
+        MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
         annotation.coordinate = WorldTourDestinations[i];
         [annotations addObject:annotation];
     }
