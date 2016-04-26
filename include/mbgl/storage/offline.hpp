@@ -93,9 +93,14 @@ public:
     uint64_t completedResourceCount = 0;
 
     /**
-     * The cumulative size, in bytes, of all resources that have been fully downloaded.
+     * The cumulative size, in bytes, of all resources (inclusive of tiles) that have been fully downloaded.
      */
     uint64_t completedResourceSize = 0;
+    
+    /**
+     * The cumulative size, in bytes, of all tiles that have been fully downloaded.
+     */
+    uint64_t completedTileSize = 0;
 
     /**
      * The number of resources that are known to be required for this region. See the

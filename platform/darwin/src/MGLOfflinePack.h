@@ -60,9 +60,13 @@ typedef struct MGLOfflinePackProgress {
      */
     uint64_t countOfResourcesCompleted;
     /**
-     The cumulative size of the downloaded resources on disk, measured in bytes.
+     The cumulative size of the downloaded resources (inclusive of tiles) on disk, measured in bytes.
      */
     uint64_t countOfBytesCompleted;
+    /**
+     The cumulative size of the downloaded tiles on disk, measured in bytes.
+     */
+    uint64_t countOfTileBytesCompleted;
     /**
      The minimum number of resources that must be downloaded in order to view
      the pack’s full region without any omissions.
