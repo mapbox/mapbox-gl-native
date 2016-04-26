@@ -1848,6 +1848,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 #pragma mark - Accessibility -
 
+- (NSString *)accessibilityValue
+{
+    double zoomLevel = round(self.zoomLevel - 1);
+    return [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE", nil, nil, @"Zoom %dx\n%ld annotation(s) visible", @"Map accessibility value"), (int)zoomLevel, (long)self.accessibilityAnnotationCount];
+}
+
 - (CGRect)accessibilityFrame
 {
     CGRect frame = [super accessibilityFrame];
@@ -1881,13 +1887,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         return 2 /* selectedAnnotationCalloutView, mapViewProxyAccessibilityElement */;
     }
-    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-    NSInteger count = visibleAnnotations.size() + 2 /* compass, userLocationAnnotationView, attributionButton */;
+    NSInteger count = self.accessibilityAnnotationCount + 2 /* compass, attributionButton */;
     if (self.userLocationAnnotationView)
     {
         count++;
     }
     return count;
+}
+
+- (NSInteger)accessibilityAnnotationCount
+{
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+    return visibleAnnotations.size();
 }
 
 - (id)accessibilityElementAtIndex:(NSInteger)index
@@ -2045,6 +2056,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     _mbglMap->scaleBy(scaleFactor, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
     [self unrotateIfNeededForGesture];
+    
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
 }
 
 #pragma mark - Geography -

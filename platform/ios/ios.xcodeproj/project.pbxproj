@@ -220,6 +220,8 @@
 		DABFB8711CBE9A0F00D62B32 /* MGLMapView+MGLCustomStyleLayerAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848381CBAFB8500AB86E3 /* MGLMapView+MGLCustomStyleLayerAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848391CBAFB8500AB86E3 /* MGLUserLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */; };
+		DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -459,6 +461,7 @@
 		DABCABBF1CB80717000A7C39 /* locations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locations.cpp; sourceTree = "<group>"; };
 		DABCABC01CB80717000A7C39 /* locations.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = locations.hpp; sourceTree = "<group>"; };
 		DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/ios/mbgl.xcconfig; sourceTree = "<group>"; };
+		DAC49C5E1CD02BC9009E1AA3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = Base; path = Base.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -720,6 +723,7 @@
 			isa = PBXGroup;
 			children = (
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
+				DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */,
 				DA8848771CBAFD5C00AB86E3 /* api_mapbox_com-digicert.der */,
 				DA8848781CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der */,
 				DA8848791CBAFD5C00AB86E3 /* star_tilestream_net.der */,
@@ -1160,6 +1164,7 @@
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DA8848751CBAFCC100AB86E3 /* mapbox@3x.png in Resources */,
 				DA88487B1CBAFD5C00AB86E3 /* api_mapbox_com-geotrust.der in Resources */,
+				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1181,6 +1186,7 @@
 				DA8933DB1CCD31D400E68420 /* Foundation.strings in Resources */,
 				DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */,
 				DA8933DD1CCD31D400E68420 /* api_mapbox_com-digicert.der in Resources */,
+				DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933DE1CCD31D400E68420 /* api_mapbox_com-geotrust.der in Resources */,
 				DA8933DF1CCD31D400E68420 /* star_tilestream_net.der in Resources */,
 			);
@@ -1388,6 +1394,14 @@
 				DABCABB91CB80692000A7C39 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAC49C5E1CD02BC9009E1AA3 /* Base */,
+			);
+			name = Localizable.stringsdict;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
