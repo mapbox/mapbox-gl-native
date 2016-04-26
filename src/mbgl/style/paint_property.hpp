@@ -51,14 +51,14 @@ public:
             ClassID classID = isClass ? ClassDictionary::Get().lookup(paintName.substr(6)) : ClassID::Default;
 
             if (it->value.HasMember(name)) {
-                auto v = parseProperty<Fn>(name, it->value[name]);
+                auto v = parseProperty<T>(name, it->value[name]);
                 if (v) {
                     values.emplace(classID, *v);
                 }
             }
 
             if (it->value.HasMember(transitionName.c_str())) {
-                auto v = parseProperty<PropertyTransition>(name, it->value[transitionName.c_str()]);
+                auto v = parsePropertyTransition(name, it->value[transitionName.c_str()]);
                 if (v) {
                     transitions.emplace(classID, *v);
                 }
