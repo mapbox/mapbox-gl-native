@@ -1,4 +1,4 @@
-#import <XCTest/XCTest.h>
+#import "MGLUITests.h"
 
 @interface MGLAnnotationTests : XCTestCase
 
@@ -12,7 +12,18 @@
     self.continueAfterFailure = NO;
     
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [[[XCUIApplication alloc] init] launch];
+    XCUIApplication *app = [[XCUIApplication alloc] init];
+    
+    // Bypass the access token prompt.
+    NSMutableDictionary <NSString *, NSString *> *environment = app.launchEnvironment.mutableCopy;
+    environment[@"MAPBOX_ACCESS_TOKEN"] = MGLUITestsBogusAccessToken;
+    app.launchEnvironment = environment;
+    
+    [app launch];
+    
+    // Reset the viewport.
+    [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
+    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Reset Position"] tap];
 }
 
 - (void)testDropPin {
