@@ -129,6 +129,7 @@ public class MapView extends FrameLayout {
     private ImageView mLogoView;
     private ImageView mAttributionsView;
     private MyLocationView mMyLocationView;
+    private LocationListener mMyLocationListener;
 
     private CopyOnWriteArrayList<OnMapChangedListener> mOnMapChangedListener;
     private ZoomButtonsController mZoomButtonsController;
@@ -2359,14 +2360,20 @@ public class MapView extends FrameLayout {
     }
 
     void setOnMyLocationChangeListener(@Nullable final MapboxMap.OnMyLocationChangeListener listener) {
-        LocationServices.getLocationServices(getContext()).addLocationListener(new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if (listener != null) {
-                    listener.onMyLocationChange(location);
+        if (listener != null) {
+            mMyLocationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (listener != null) {
+                        listener.onMyLocationChange(location);
+                    }
                 }
-            }
-        });
+            };
+            LocationServices.getLocationServices(getContext()).addLocationListener(mMyLocationListener);
+        } else {
+            LocationServices.getLocationServices(getContext()).removeLocationListener(mMyLocationListener);
+            mMyLocationListener = null;
+        }
     }
 
     void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
