@@ -262,22 +262,25 @@ optional<std::vector<std::string>> parseConstant(const char* name, const JSValue
 }
 
 optional<PropertyTransition> parsePropertyTransition(const char *, const JSValue& value) {
-    PropertyTransition transition;
-    if (value.IsObject()) {
-        bool parsed = false;
-        if (value.HasMember("duration") && value["duration"].IsNumber()) {
-            transition.duration.emplace(Milliseconds(value["duration"].GetUint()));
-            parsed = true;
-        }
-        if (value.HasMember("delay") && value["delay"].IsNumber()) {
-            transition.delay.emplace(Milliseconds(value["delay"].GetUint()));
-            parsed = true;
-        }
-        if (!parsed) {
-            return {};
-        }
+    if (!value.IsObject()) {
+        return {};
     }
-    return transition;
+
+    optional<Duration> duration;
+    if (value.HasMember("duration") && value["duration"].IsNumber()) {
+        duration.emplace(Milliseconds(value["duration"].GetUint()));
+    }
+
+    optional<Duration> delay;
+    if (value.HasMember("delay") && value["delay"].IsNumber()) {
+        delay.emplace(Milliseconds(value["delay"].GetUint()));
+    }
+
+    if (!duration && !delay) {
+        return {};
+    }
+
+    return PropertyTransition(duration, delay);
 }
 
 } // namespace mbgl
