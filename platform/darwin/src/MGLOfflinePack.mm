@@ -153,6 +153,7 @@ private:
     MGLOfflinePackProgress progress;
     progress.countOfResourcesCompleted = status.completedResourceCount;
     progress.countOfBytesCompleted = status.completedResourceSize;
+    progress.countOfTileBytesCompleted = status.completedTileSize;
     progress.countOfResourcesExpected = status.requiredResourceCount;
     progress.maximumResourcesExpected = status.requiredResourceCountIsPrecise ? status.requiredResourceCount : UINT64_MAX;
     self.progress = progress;
