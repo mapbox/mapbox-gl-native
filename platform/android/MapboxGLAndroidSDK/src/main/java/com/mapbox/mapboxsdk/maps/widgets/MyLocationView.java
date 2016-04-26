@@ -146,14 +146,15 @@ public class MyLocationView extends View {
     }
 
     public final void setShadowDrawable(Drawable drawable, int left, int top, int right, int bottom) {
-        if (drawable == null) {
-            return;
+        if (drawable != null) {
+            backgroundDrawable = drawable;
         }
-        backgroundDrawable = drawable;
+
         backgroundOffsetLeft = left;
         backgroundOffsetTop = top;
         backgroundOffsetRight = right;
         backgroundOffsetBottom = bottom;
+
         invalidateBounds();
     }
 

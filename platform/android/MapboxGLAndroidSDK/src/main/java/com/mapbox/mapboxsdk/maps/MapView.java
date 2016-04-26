@@ -268,19 +268,15 @@ public class MapView extends FrameLayout {
         // MyLocationView
         MyLocationViewSettings myLocationViewSettings = mMapboxMap.getMyLocationViewSettings();
         myLocationViewSettings.setForegroundDrawable(options.getMyLocationForegroundDrawable(), options.getMyLocationForegroundBearingDrawable());
-        myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable());
-        if(options.getMyLocationForegroundTintColor()!=-1) {
+        myLocationViewSettings.setBackgroundDrawable(options.getMyLocationBackgroundDrawable(), options.getMyLocationBackgroundPadding());
+        if (options.getMyLocationForegroundTintColor() != -1) {
             myLocationViewSettings.setForegroundTintColor(options.getMyLocationForegroundTintColor());
         }
-        if(options.getMyLocationBackgroundTintColor()!=-1) {
+        if (options.getMyLocationBackgroundTintColor() != -1) {
             myLocationViewSettings.setBackgroundTintColor(options.getMyLocationBackgroundTintColor());
         }
         myLocationViewSettings.setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
         myLocationViewSettings.setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
-        int[] myLocationPadding = options.getMyLocationBackgroundPadding();
-        if (myLocationPadding != null) {
-            myLocationViewSettings.setPadding(myLocationPadding[0], myLocationPadding[1], myLocationPadding[2], myLocationPadding[3]);
-        }
         mMapboxMap.setMyLocationEnabled(options.getLocationEnabled());
 
         // Enable gestures
@@ -2366,7 +2362,7 @@ public class MapView extends FrameLayout {
         LocationServices.getLocationServices(getContext()).addLocationListener(new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if(listener!=null) {
+                if (listener != null) {
                     listener.onMyLocationChange(location);
                 }
             }
@@ -2479,7 +2475,7 @@ public class MapView extends FrameLayout {
         ColorUtils.setTintList(mAttributionsView, tintColor);
     }
 
-    int getAttributionTintColor(){
+    int getAttributionTintColor() {
         return mMapboxMap.getUiSettings().getAttributionTintColor();
     }
 

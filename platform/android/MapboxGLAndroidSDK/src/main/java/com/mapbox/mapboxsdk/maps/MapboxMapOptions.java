@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,9 +9,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 
 import com.mapbox.mapboxsdk.R;
@@ -174,10 +171,8 @@ public class MapboxMapOptions implements Parcelable {
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * screenDensity)});
 
             mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
-            mapboxMapOptions.myLocationForegroundDrawable(typedArray.getDrawable(R.styleable.MapView_my_location_foreground));
-            mapboxMapOptions.myLocationForegroundBearingDrawable(typedArray.getDrawable(R.styleable.MapView_my_location_foreground_bearing));
+            mapboxMapOptions.myLocationForegroundDrawables(typedArray.getDrawable(R.styleable.MapView_my_location_foreground), typedArray.getDrawable(R.styleable.MapView_my_location_foreground_bearing));
             mapboxMapOptions.myLocationBackgroundDrawable(typedArray.getDrawable(R.styleable.MapView_my_location_background));
-            mapboxMapOptions.myLocationForegroundDrawable(typedArray.getDrawable(R.styleable.MapView_my_location_foreground));
             mapboxMapOptions.myLocationForegroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_foreground_tint, -1));
             mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, -1));
             mapboxMapOptions.myLocationBackgroundPadding(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_my_location_background_left, 0) * screenDensity)
@@ -435,19 +430,13 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     *
      * @param myLocationForegroundDrawable
-     * @return This
-     */
-    public MapboxMapOptions myLocationForegroundDrawable(Drawable myLocationForegroundDrawable) {
-        this.myLocationForegroundDrawable = myLocationForegroundDrawable;
-        return this;
-    }
-
-    /**
      * @param myLocationBearingDrawable
      * @return This
      */
-    public MapboxMapOptions myLocationForegroundBearingDrawable(Drawable myLocationBearingDrawable) {
+    public MapboxMapOptions myLocationForegroundDrawables(Drawable myLocationForegroundDrawable, Drawable myLocationBearingDrawable ) {
+        this.myLocationForegroundDrawable = myLocationForegroundDrawable;
         this.myLocationForegroundBearingDrawable = myLocationBearingDrawable;
         return this;
     }

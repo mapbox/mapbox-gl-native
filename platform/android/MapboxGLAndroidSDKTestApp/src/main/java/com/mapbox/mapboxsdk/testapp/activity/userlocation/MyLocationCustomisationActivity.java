@@ -1,9 +1,11 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,12 +58,17 @@ public class MyLocationCustomisationActivity extends AppCompatActivity implement
                 .tilt(25)
                 .build());
 
+        mapboxMapOptions.myLocationForegroundDrawables(ContextCompat.getDrawable(this, R.drawable.ic_chelsea),
+                ContextCompat.getDrawable(this, R.drawable.ic_chelsea));
+        mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_arsenal));
         mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
         mapboxMapOptions.myLocationBackgroundTintColor(Color.YELLOW);
-//              mapboxMapOptions.myLocationBackgroundPadding(new int[]{32, 32, 0, 0});
+        mapboxMapOptions.myLocationBackgroundPadding(new int[]{0, 0,
+                (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding),
+                (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding)});
 
-//        mapboxMapOptions.myLocationAccuracyTint(Color.RED);
-//        mapboxMapOptions.myLocationAccuracyAlpha(155);
+        mapboxMapOptions.myLocationAccuracyTint(Color.RED);
+        mapboxMapOptions.myLocationAccuracyAlpha(155);
 
         mapView = new MapView(this, mapboxMapOptions);
         ViewGroup parent = (ViewGroup) findViewById(R.id.container);

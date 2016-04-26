@@ -89,9 +89,14 @@ public class MyLocationViewSettings {
         return foregroundTintColor;
     }
 
-    public void setBackgroundDrawable(Drawable backgroundDrawable) {
+    public void setBackgroundDrawable(Drawable backgroundDrawable, int[] padding) {
         this.backgroundDrawable = backgroundDrawable;
-        myLocationView.setShadowDrawable(backgroundDrawable);
+        this.backgroundOffset = padding;
+        if (padding != null && padding.length == 4) {
+            myLocationView.setShadowDrawable(backgroundDrawable, padding[0], padding[1], padding[2], padding[3]);
+        } else {
+            myLocationView.setShadowDrawable(backgroundDrawable);
+        }
     }
 
     public Drawable getBackgroundDrawable() {
@@ -105,11 +110,6 @@ public class MyLocationViewSettings {
 
     public int getBackgroundTintColor() {
         return backgroundTintColor;
-    }
-
-    public void setBackgroundOffset(int left, int top, int right, int bottom) {
-        backgroundOffset = new int[]{left, top, right, bottom};
-        myLocationView.setShadowDrawable(backgroundDrawable, left, top, right, bottom);
     }
 
     public int[] getBackgroundOffset() {
