@@ -26,12 +26,16 @@
       'variables': {
         'cflags': [
           '<@(opengl_cflags)',
-          '<@(qt_cflags)',
+          '<@(qt_core_cflags)',
+          '<@(qt_gui_cflags)',
+          '<@(qt_opengl_cflags)',
           '-fPIC',
         ],
         'ldflags': [
           '<@(opengl_ldflags)',
-          '<@(qt_ldflags)'
+          '<@(qt_core_ldflags)',
+          '<@(qt_gui_ldflags)',
+          '<@(qt_opengl_ldflags)',
         ],
       },
 

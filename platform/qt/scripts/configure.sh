@@ -31,8 +31,15 @@ fi
 function print_qt_flags {
     mason install Qt system
 
-    CONFIG+="    'qt_cflags%': $(quote_flags $(mason cflags Qt system "QtCore QtGui QtOpenGL QtNetwork")),"$LN
-    CONFIG+="    'qt_ldflags%': $(quote_flags $(mason ldflags Qt system "QtCore QtGui QtOpenGL QtNetwork")),"$LN
+    CONFIG+="    'qt_core_cflags%': $(quote_flags $(mason cflags Qt system "QtCore")),"$LN
+    CONFIG+="    'qt_gui_cflags%': $(quote_flags $(mason cflags Qt system "QtGui")),"$LN
+    CONFIG+="    'qt_opengl_cflags%': $(quote_flags $(mason cflags Qt system "QtOpenGL")),"$LN
+    CONFIG+="    'qt_network_cflags%': $(quote_flags $(mason cflags Qt system "QtNetwork")),"$LN
+
+    CONFIG+="    'qt_core_ldflags%': $(quote_flags $(mason ldflags Qt system "QtCore")),"$LN
+    CONFIG+="    'qt_gui_ldflags%': $(quote_flags $(mason ldflags Qt system "QtGui")),"$LN
+    CONFIG+="    'qt_opengl_ldflags%': $(quote_flags $(mason ldflags Qt system "QtOpenGL")),"$LN
+    CONFIG+="    'qt_network_ldflags%': $(quote_flags $(mason ldflags Qt system "QtNetwork")),"$LN
 
     QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
     if hash moc 2>/dev/null && hash rcc 2>/dev/null; then
