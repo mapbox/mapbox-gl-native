@@ -59,7 +59,7 @@ You can generate JaCoCo reports from espresso tests by
 - running the gradle task `createMockDebugCoverageReport` when executing tests.
 
 ## Running Espresso test automatically on AWS Device Farm
-To automatically execute Espresso tests as part of our CI build, we have created a Python [script](https://github.com/mapbox/mapbox-gl-native/blob/aws-devicelab/android/scripts/devicefarm.py).
+To automatically execute Espresso tests as part of our CI build, we have created a Python script called [`devicefarm.py`](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/tests/scripts/devicefarm.py).
 
 This script is responsible for:
  - uploading an APK + test APK
