@@ -91,7 +91,7 @@ To instead run the tests in Xcode:
 
 1. Run `make iproj` to set up the workspace.
 1. Change the scheme to “test (platform project)” and press Command-R to run core unit tests.
-1. Change the scheme to “CI” and press Command-U to run SDK integration tests.
+1. Change the scheme to “iosapp” and press Command-U to run SDK unit and UI tests.
 
 ## Access tokens
 
