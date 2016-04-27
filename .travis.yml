@@ -20,7 +20,7 @@ addons_shortcuts:
   addons_qt5: &qt5
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev' ]
+      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev' ]
 
 env:
   global:

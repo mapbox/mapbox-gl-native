@@ -42,6 +42,14 @@ function print_qt_flags {
     CONFIG+="    'qt_network_ldflags%': $(quote_flags $(mason ldflags Qt system "QtNetwork")),"$LN
 
     QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
+    if [ ${QT_VERSION_MAJOR} -gt 4 ]; then
+        CONFIG+="    'qt_qml_cflags%': $(quote_flags $(mason cflags Qt system "QtQml")), "$LN
+        CONFIG+="    'qt_quick_cflags%': $(quote_flags $(mason cflags Qt system "QtQuick")), "$LN
+
+        CONFIG+="    'qt_qml_ldflags%': $(quote_flags $(mason ldflags Qt system "QtQml")), "$LN
+        CONFIG+="    'qt_quick_ldflags%': $(quote_flags $(mason ldflags Qt system "QtQuick")), "$LN
+    fi
+
     if hash moc 2>/dev/null && hash rcc 2>/dev/null; then
         CONFIG+="    'qt_moc%': '$(which moc)',"$LN
         CONFIG+="    'qt_rcc%': '$(which rcc)',"$LN

@@ -46,6 +46,7 @@
         '../default/webp_reader.cpp',
         'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
+        'include/qquickmapboxgl.hpp',
         'qmapbox.qrc',
         'src/async_task.cpp',
         'src/async_task_impl.hpp',
@@ -57,6 +58,9 @@
         'src/qmapbox.cpp',
         'src/qmapboxgl.cpp',
         'src/qmapboxgl_p.hpp',
+        'src/qquickmapboxgl.cpp',
+        'src/qquickmapboxglrenderer.cpp',
+        'src/qquickmapboxglrenderer.hpp',
         'src/run_loop.cpp',
         'src/run_loop_impl.hpp',
         'src/timer.cpp',
@@ -106,6 +110,18 @@
       ],
 
       'conditions': [
+        ['qt_version == 5', {
+          'variables': {
+            'cflags': [
+              '<@(qt_quick_cflags)',
+            ],
+            'ldflags': [
+              '<@(qt_quick_ldflags)',
+            ],
+          },
+        }, {
+          'sources/': [ [ 'exclude', 'qquick*' ] ],
+        }],
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags)' ],

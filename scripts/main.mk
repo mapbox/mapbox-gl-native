@@ -89,6 +89,9 @@ $(PLATFORM_CONFIG_OUTPUT): .mason configure $(PLATFORM_CONFIG_INPUT)
 GYP_FLAGS += -I$(PLATFORM_CONFIG_OUTPUT)
 GYP_FLAGS += -Dcoverage=$(ENABLE_COVERAGE)
 GYP_FLAGS += -Dcxx_host=$(CXX_HOST)
+ifeq ($(PLATFORM),qt)
+  GYP_FLAGS += -Dqt_version=$(shell qmake -query QT_VERSION | cut -d. -f1)
+endif
 GYP_FLAGS += -Goutput_dir=.
 GYP_FLAGS += --depth=.
 GYP_FLAGS += --generator-output=$(PLATFORM_OUTPUT)
