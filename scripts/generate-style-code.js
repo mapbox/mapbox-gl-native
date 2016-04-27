@@ -77,6 +77,7 @@ const layerHpp = ejs.compile(`<%
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 
 <% if (type === 'line' || type === 'symbol') { -%>
@@ -102,6 +103,9 @@ public:
     void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+
+    void setFilter(const Filter&);
+    const Filter& getFilter() const;
 
 <% } -%>
 <% if (layoutProperties.length) { -%>
@@ -190,6 +194,16 @@ const std::string& <%- camelize(type) %>Layer::getSourceID() const {
 
 const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
     return impl->sourceLayer;
+}
+
+// Filter
+
+void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& <%- camelize(type) %>Layer::getFilter() const {
+    return impl->filter;
 }
 <% } -%>
 

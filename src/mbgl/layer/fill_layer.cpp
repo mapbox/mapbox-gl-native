@@ -37,6 +37,16 @@ const std::string& FillLayer::getSourceLayer() const {
     return impl->sourceLayer;
 }
 
+// Filter
+
+void FillLayer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& FillLayer::getFilter() const {
+    return impl->filter;
+}
+
 // Layout properties
 
 

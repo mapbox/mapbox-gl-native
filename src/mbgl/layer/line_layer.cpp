@@ -37,6 +37,16 @@ const std::string& LineLayer::getSourceLayer() const {
     return impl->sourceLayer;
 }
 
+// Filter
+
+void LineLayer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& LineLayer::getFilter() const {
+    return impl->filter;
+}
+
 // Layout properties
 
 PropertyValue<LineCapType> LineLayer::getLineCap() const {

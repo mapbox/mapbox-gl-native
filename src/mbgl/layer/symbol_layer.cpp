@@ -37,6 +37,16 @@ const std::string& SymbolLayer::getSourceLayer() const {
     return impl->sourceLayer;
 }
 
+// Filter
+
+void SymbolLayer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& SymbolLayer::getFilter() const {
+    return impl->filter;
+}
+
 // Layout properties
 
 PropertyValue<SymbolPlacementType> SymbolLayer::getSymbolPlacement() const {

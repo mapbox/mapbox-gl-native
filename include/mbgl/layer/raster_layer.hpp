@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 
 namespace mbgl {

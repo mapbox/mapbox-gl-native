@@ -3,6 +3,7 @@
 #pragma once
 
 #include <mbgl/style/layer.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
 
 namespace mbgl {
@@ -17,6 +18,9 @@ public:
     void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+
+    void setFilter(const Filter&);
+    const Filter& getFilter() const;
 
     // Paint properties
 

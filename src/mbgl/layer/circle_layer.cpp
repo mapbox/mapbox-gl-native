@@ -37,6 +37,16 @@ const std::string& CircleLayer::getSourceLayer() const {
     return impl->sourceLayer;
 }
 
+// Filter
+
+void CircleLayer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& CircleLayer::getFilter() const {
+    return impl->filter;
+}
+
 // Layout properties
 
 
