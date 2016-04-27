@@ -55,12 +55,13 @@ typedef NS_ENUM (NSInteger, MGLOfflinePackState) {
  */
 typedef struct MGLOfflinePackProgress {
     /**
-     The number of resources that have been completely downloaded and are ready
-     to use offline.
+     The number of resources, including tiles, that have been completely
+     downloaded and are ready to use offline.
      */
     uint64_t countOfResourcesCompleted;
     /**
-     The cumulative size of the downloaded resources (inclusive of tiles) on disk, measured in bytes.
+     The cumulative size of the downloaded resources on disk, including tiles,
+     measured in bytes.
      */
     uint64_t countOfBytesCompleted;
     /**
