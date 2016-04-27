@@ -314,7 +314,7 @@ public class MyLocationView extends View {
             Location lastLocation = locationServices.getLastLocation();
 
             if (lastLocation != null) {
-                location = lastLocation;
+                setLocation(lastLocation);
             }
 
             if (userLocationListener == null) {
