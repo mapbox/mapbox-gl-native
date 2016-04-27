@@ -5,7 +5,7 @@
     'coverage': 0,
   },
   'includes': [
-    '../../build/osx/config.gypi',
+    '../../build/osx-x86_64/config.gypi',
     '../../mbgl.gypi',
     '../../test/test.gypi',
     '../../bin/glfw.gypi',

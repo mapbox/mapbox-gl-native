@@ -48,12 +48,12 @@ ifeq ($(PLATFORM),qt)
 endif
 
 # Defaults if not set
+export PLATFORM_SLUG ?= $(PLATFORM)-$(SUBPLATFORM)
 export PLATFORM_OUTPUT ?= ./build/$(PLATFORM_SLUG)
 export PLATFORM_CONFIG_INPUT ?= platform/$(MASON_PLATFORM)/scripts/configure.sh
 export PLATFORM_CONFIG_OUTPUT ?= $(PLATFORM_OUTPUT)/config.gypi
 export MASON_PLATFORM ?= $(PLATFORM)
 export MASON_PLATFORM_VERSION ?= $(SUBPLATFORM)
-export PLATFORM_SLUG ?= $(PLATFORM)-$(SUBPLATFORM)
 
 ifneq (,$(findstring clang,$(CXX)))
 	CXX_HOST = "clang"
