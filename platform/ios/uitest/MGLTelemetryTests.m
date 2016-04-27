@@ -1,25 +1,10 @@
-#import "MGLUITests.h"
+#import "MGLUITestCase.h"
 
-@interface MGLTelemetryTests : XCTestCase
+@interface MGLTelemetryTests : MGLUITestCase
 
 @end
 
 @implementation MGLTelemetryTests
-
-- (void)setUp {
-    [super setUp];
-    
-    self.continueAfterFailure = NO;
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    XCUIApplication *app = [[XCUIApplication alloc] init];
-    
-    // Bypass the access token prompt.
-    NSMutableDictionary <NSString *, NSString *> *environment = app.launchEnvironment.mutableCopy;
-    environment[@"MAPBOX_ACCESS_TOKEN"] = MGLUITestsBogusAccessToken;
-    app.launchEnvironment = environment;
-    
-    [app launch];
-}
 
 - (void)testOptOut {
     XCUIApplication *app = [[XCUIApplication alloc] init];

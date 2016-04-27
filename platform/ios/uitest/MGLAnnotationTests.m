@@ -1,30 +1,10 @@
-#import "MGLUITests.h"
+#import "MGLUITestCase.h"
 
-@interface MGLAnnotationTests : XCTestCase
+@interface MGLAnnotationTests : MGLUITestCase
 
 @end
 
 @implementation MGLAnnotationTests
-
-- (void)setUp {
-    [super setUp];
-    
-    self.continueAfterFailure = NO;
-    
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    XCUIApplication *app = [[XCUIApplication alloc] init];
-    
-    // Bypass the access token prompt.
-    NSMutableDictionary <NSString *, NSString *> *environment = app.launchEnvironment.mutableCopy;
-    environment[@"MAPBOX_ACCESS_TOKEN"] = MGLUITestsBogusAccessToken;
-    app.launchEnvironment = environment;
-    
-    [app launch];
-    
-    // Reset the viewport.
-    [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
-    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Reset Position"] tap];
-}
 
 - (void)testDropPin {
     XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
@@ -116,7 +96,7 @@
     NSPredicate *isAbsent = [NSPredicate predicateWithFormat:@"exists == NO"];
     
     // Drop a pin.
-    XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    XCUIElement *mapElement = app.otherElements[@"MGLMapView"];
     XCUIElement *mapProxyElement = mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"];
     [self expectationForPredicate:exists evaluatedWithObject:mapProxyElement handler:nil];
     [mapElement pressForDuration:1.1];
@@ -138,7 +118,7 @@
     [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
     
     // Add 100 points.
-    XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    XCUIElement *mapElement = app.otherElements[@"MGLMapView"];
     XCUIElement *lastAnnotationElement = mapElement.buttons[@"MGLMapViewAnnotation 99"];
     [self expectationForPredicate:exists evaluatedWithObject:lastAnnotationElement handler:nil];
     [app.sheets[@"Map Settings"].collectionViews.buttons[@"Add 100 Points"] tap];
@@ -153,7 +133,7 @@
     [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
     
     // Start the world tour.
-    XCUIElement *mapElement = [[XCUIApplication alloc] init].otherElements[@"MGLMapView"];
+    XCUIElement *mapElement = app.otherElements[@"MGLMapView"];
     [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Washington, D.C."] handler:nil];
     [app.sheets[@"Map Settings"].collectionViews.buttons[@"Start World Tour"] tap];
     [self waitForExpectationsWithTimeout:5 handler:nil];
