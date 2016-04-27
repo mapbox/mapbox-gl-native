@@ -10,6 +10,7 @@
     XCUIApplication *app = [[XCUIApplication alloc] init];
     NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
     NSPredicate *isAbsent = [NSPredicate predicateWithFormat:@"exists == NO"];
+    NSPredicate *hittable = [NSPredicate predicateWithFormat:@"hittable == YES"];
     
     XCUIElement *userLocationAnnotationElement = app.buttons[@"MGLUserLocationAnnotationView"];
     XCTAssertFalse(userLocationAnnotationElement.exists, @"User dot should be hidden by default.");
@@ -18,11 +19,16 @@
     XCTAssertEqualObjects(userTrackingModeElement.value, @"Off", @"User tracking mode should be off by default.");
     
     // Change to user location tracking mode.
-    [self expectationForPredicate:exists evaluatedWithObject:userLocationAnnotationElement handler:nil];
+    [self expectationForPredicate:hittable evaluatedWithObject:userLocationAnnotationElement handler:nil];
+    __block CGRect userDotAnnotationFrame;
+    [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nonnull evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        // The user dot happens to lie underneath the Settings button until it is shown.
+        userDotAnnotationFrame = userLocationAnnotationElement.frame;
+        return CGRectContainsPoint(userDotAnnotationFrame, CGPointMake(190, 368));
+    }] evaluatedWithObject:userLocationAnnotationElement handler:nil];
     [userTrackingModeElement tap];
     XCTAssertEqualObjects(userTrackingModeElement.value, @"Follow location", @"User location tracking mode should be on after tapping the user tracking mode button.");
     [self waitForExpectationsWithTimeout:3 handler:nil];
-    CGRect userDotAnnotationFrame = userLocationAnnotationElement.frame;
     
     // Open the user dot’s callout view.
     XCUIElement *titleText = app.staticTexts[@"You Are Here"];
