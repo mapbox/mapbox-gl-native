@@ -31,6 +31,9 @@ fi
 function print_qt_flags {
     mason install Qt system
 
+    QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
+    CONFIG+="    'qt_version_major%': ['${QT_VERSION_MAJOR}'],"$LN
+
     CONFIG+="    'qt_core_cflags%': $(quote_flags $(mason cflags Qt system "QtCore")),"$LN
     CONFIG+="    'qt_gui_cflags%': $(quote_flags $(mason cflags Qt system "QtGui")),"$LN
     CONFIG+="    'qt_opengl_cflags%': $(quote_flags $(mason cflags Qt system "QtOpenGL")),"$LN
@@ -41,7 +44,6 @@ function print_qt_flags {
     CONFIG+="    'qt_opengl_ldflags%': $(quote_flags $(mason ldflags Qt system "QtOpenGL")),"$LN
     CONFIG+="    'qt_network_ldflags%': $(quote_flags $(mason ldflags Qt system "QtNetwork")),"$LN
 
-    QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
     if [ ${QT_VERSION_MAJOR} -gt 4 ]; then
         CONFIG+="    'qt_qml_cflags%': $(quote_flags $(mason cflags Qt system "QtQml")), "$LN
         CONFIG+="    'qt_quick_cflags%': $(quote_flags $(mason cflags Qt system "QtQuick")), "$LN

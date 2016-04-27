@@ -11,7 +11,7 @@
     'qtlibversion': '1.0.0',
   },
   'conditions': [
-    ['qt_version == 5', {
+    ['<(qt_version_major) == 5', {
       'includes': [ 'qmlapp/qquickmapboxgl.gypi' ],
     }],
   ],
@@ -115,7 +115,7 @@
       ],
 
       'conditions': [
-        ['qt_version == 5', {
+        ['<(qt_version_major) == 5', {
           'variables': {
             'cflags': [
               '<@(qt_quick_cflags)',
