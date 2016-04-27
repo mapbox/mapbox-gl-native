@@ -49,6 +49,12 @@ public:
     VisibilityType getVisibility() const;
     void setVisibility(VisibilityType);
 
+    // Zoom range
+    float getMinZoom() const;
+    void setMinZoom(float) const;
+    float getMaxZoom() const;
+    void setMaxZoom(float) const;
+
     // Create a new layer with the specified `id` and `ref`. All other properties
     // are copied from this layer.
     std::unique_ptr<Layer> copy(const std::string& id,

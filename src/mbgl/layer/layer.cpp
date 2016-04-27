@@ -21,6 +21,22 @@ void Layer::setVisibility(VisibilityType value) {
     baseImpl->visibility = value;
 }
 
+float Layer::getMinZoom() const {
+    return baseImpl->minZoom;
+}
+
+void Layer::setMinZoom(float minZoom) const {
+    baseImpl->minZoom = minZoom;
+}
+
+float Layer::getMaxZoom() const {
+    return baseImpl->maxZoom;
+}
+
+void Layer::setMaxZoom(float maxZoom) const {
+    baseImpl->maxZoom = maxZoom;
+}
+
 std::unique_ptr<Layer> Layer::copy(const std::string& id,
                                    const std::string& ref) const {
     std::unique_ptr<Layer> result = baseImpl->clone();
