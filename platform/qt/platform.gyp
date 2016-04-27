@@ -118,9 +118,11 @@
         ['<(qt_version_major) == 5', {
           'variables': {
             'cflags': [
+              '<@(qt_positioning_cflags)',
               '<@(qt_quick_cflags)',
             ],
             'ldflags': [
+              '<@(qt_positioning_ldflags)',
               '<@(qt_quick_ldflags)',
             ],
           },

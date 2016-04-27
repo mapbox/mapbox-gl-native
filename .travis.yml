@@ -115,6 +115,8 @@ matrix:
       compiler: ": linux-gcc49-release"
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
       addons: *qt5
+      before_install:
+        - sudo apt-get install -y qtpositioning5-dev
       script:
         - make qt-app qt-qml-app
 

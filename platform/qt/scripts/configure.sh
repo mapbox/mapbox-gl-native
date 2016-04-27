@@ -47,9 +47,11 @@ function print_qt_flags {
     if [ ${QT_VERSION_MAJOR} -gt 4 ]; then
         CONFIG+="    'qt_qml_cflags%': $(quote_flags $(mason cflags Qt system "QtQml")), "$LN
         CONFIG+="    'qt_quick_cflags%': $(quote_flags $(mason cflags Qt system "QtQuick")), "$LN
+        CONFIG+="    'qt_positioning_cflags%': $(quote_flags $(mason cflags Qt system "QtPositioning")),"$LN
 
         CONFIG+="    'qt_qml_ldflags%': $(quote_flags $(mason ldflags Qt system "QtQml")), "$LN
         CONFIG+="    'qt_quick_ldflags%': $(quote_flags $(mason ldflags Qt system "QtQuick")), "$LN
+        CONFIG+="    'qt_positioning_ldflags%': $(quote_flags $(mason ldflags Qt system "QtPositioning")),"$LN
     fi
 
     if hash moc 2>/dev/null && hash rcc 2>/dev/null; then
