@@ -227,6 +227,7 @@
 		DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */; };
 		DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */; };
 		DAC49C611CD03A96009E1AA3 /* MGLUITestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC49C601CD03A96009E1AA3 /* MGLUITestCase.m */; };
+		DAC49C641CD1678F009E1AA3 /* MGLUserLocationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DAC49C631CD1678F009E1AA3 /* MGLUserLocationTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -479,8 +480,9 @@
 		DABCABBF1CB80717000A7C39 /* locations.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locations.cpp; sourceTree = "<group>"; };
 		DABCABC01CB80717000A7C39 /* locations.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = locations.hpp; sourceTree = "<group>"; };
 		DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/ios/mbgl.xcconfig; sourceTree = "<group>"; };
-		DAC49C621CD07D74009E1AA3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAC49C601CD03A96009E1AA3 /* MGLUITestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUITestCase.m; sourceTree = "<group>"; };
+		DAC49C621CD07D74009E1AA3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DAC49C631CD1678F009E1AA3 /* MGLUserLocationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -649,6 +651,7 @@
 				DA4A0DEF1CCE82500045352A /* MGLAnnotationTests.m */,
 				DA6A65961CCF429800F21F6B /* MGLGestureTests.m */,
 				DA6A65B81CCF5DB900F21F6B /* MGLTelemetryTests.m */,
+				DAC49C631CD1678F009E1AA3 /* MGLUserLocationTests.m */,
 				DA4A0DF11CCE82500045352A /* Info.plist */,
 			);
 			name = "UI Tests";
@@ -1312,6 +1315,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAC49C641CD1678F009E1AA3 /* MGLUserLocationTests.m in Sources */,
 				DAC49C611CD03A96009E1AA3 /* MGLUITestCase.m in Sources */,
 				DA6A65971CCF429800F21F6B /* MGLGestureTests.m in Sources */,
 				DA6A65B91CCF5DB900F21F6B /* MGLTelemetryTests.m in Sources */,

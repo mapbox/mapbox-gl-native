@@ -60,6 +60,8 @@
                             <barButtonItem image="TrackingLocationOffMask.png" id="CQ1-GP-M6x" userLabel="User Tracking Mode">
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="User tracking mode"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXUserTrackingModeButton"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityValue" value="Off"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="locateUser:" destination="WaX-pd-UZQ" id="XgF-DB-z3f"/>
@@ -68,6 +70,7 @@
                             <barButtonItem systemItem="organize" id="5IK-vz-jKQ" userLabel="Offline Packs">
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Offline packs"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXOfflinePacksButton"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <segue destination="7q0-lI-zqb" kind="show" identifier="ShowOfflinePacks" id="xjx-0t-0LD"/>
