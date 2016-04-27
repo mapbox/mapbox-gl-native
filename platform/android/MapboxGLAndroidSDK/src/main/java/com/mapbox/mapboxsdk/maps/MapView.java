@@ -16,6 +16,7 @@ import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -2542,13 +2543,18 @@ public class MapView extends FrameLayout {
 
     @UiThread
     void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-        final TextureView textureView = (TextureView) findViewById(R.id.textureView);
+        TextureView textureView = (TextureView) findViewById(R.id.textureView);
         final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
-        if (canUseBitmap) {
-            callback.onSnapshotReady(textureView.getBitmap(bitmap));
-        } else {
-            callback.onSnapshotReady(textureView.getBitmap());
-        }
+
+        setDrawingCacheEnabled(true);
+        Bitmap content = Bitmap.createBitmap(getDrawingCache());
+        setDrawingCacheEnabled(false);
+
+        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
+        canvas.drawBitmap(content, new Matrix(), null);
+        callback.onSnapshotReady(output);
     }
 
     //

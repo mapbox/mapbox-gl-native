@@ -37,7 +37,6 @@ public class SnapshotActivity extends AppCompatActivity {
         }
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setAccessToken(getString(R.string.mapbox_access_token));
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
