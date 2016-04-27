@@ -51,6 +51,8 @@
 		DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C81CCAAAD200E826B2 /* NSValue+MGLAdditions.m */; };
 		DA4A0DF01CCE82500045352A /* MGLAnnotationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA4A0DEF1CCE82500045352A /* MGLAnnotationTests.m */; };
 		DA6A65971CCF429800F21F6B /* MGLGestureTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6A65961CCF429800F21F6B /* MGLGestureTests.m */; };
+		DA6A65B71CCF583C00F21F6B /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
+		DA6A65B91CCF5DB900F21F6B /* MGLTelemetryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6A65B81CCF5DB900F21F6B /* MGLTelemetryTests.m */; };
 		DA821D061CCC6D59007508D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */; };
 		DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA821D051CCC6D59007508D4 /* Main.storyboard */; };
 		DA8847D91CBAF91600AB86E3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
@@ -359,6 +361,7 @@
 		DA4A26961CB6E795000B7809 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA6A65961CCF429800F21F6B /* MGLGestureTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLGestureTests.m; sourceTree = "<group>"; };
 		DA6A65981CCF42FE00F21F6B /* MGLUITests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUITests.h; sourceTree = "<group>"; };
+		DA6A65B81CCF5DB900F21F6B /* MGLTelemetryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryTests.m; sourceTree = "<group>"; };
 		DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DA821D051CCC6D59007508D4 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		DA8847D21CBAF91600AB86E3 /* Mapbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -499,6 +502,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA6A65B71CCF583C00F21F6B /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -641,6 +645,7 @@
 				DA6A65981CCF42FE00F21F6B /* MGLUITests.h */,
 				DA4A0DEF1CCE82500045352A /* MGLAnnotationTests.m */,
 				DA6A65961CCF429800F21F6B /* MGLGestureTests.m */,
+				DA6A65B81CCF5DB900F21F6B /* MGLTelemetryTests.m */,
 				DA4A0DF11CCE82500045352A /* Info.plist */,
 			);
 			name = "UI Tests";
@@ -1305,6 +1310,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA6A65971CCF429800F21F6B /* MGLGestureTests.m in Sources */,
+				DA6A65B91CCF5DB900F21F6B /* MGLTelemetryTests.m in Sources */,
 				DA4A0DF01CCE82500045352A /* MGLAnnotationTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
