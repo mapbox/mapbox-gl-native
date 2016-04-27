@@ -136,6 +136,10 @@ static const struct {
 
 - (void)restoreState:(__unused NSNotification *)notification
 {
+    if ([[[NSProcessInfo processInfo] environment][@"MAPBOX_CLEAN_START"] boolValue]) {
+        return;
+    }
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
     MGLMapCamera *camera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;

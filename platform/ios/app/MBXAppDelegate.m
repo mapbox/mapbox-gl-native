@@ -22,6 +22,11 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
         }
         [MGLAccountManager setAccessToken:accessToken];
     }
+    
+    // Speed things up if we’re being run by a UI test bundle.
+    if ([[[NSProcessInfo processInfo] environment][@"MAPBOX_DISABLE_ANIMATIONS"] boolValue]) {
+        [UIView setAnimationsEnabled:NO];
+    }
 
     return YES;
 }
