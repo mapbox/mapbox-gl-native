@@ -1860,7 +1860,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (NSString *)accessibilityValue
 {
-    double zoomLevel = round(self.zoomLevel - 1);
+    double zoomLevel = round(self.zoomLevel + 1);
     return [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE", nil, nil, @"Zoom %dx\n%ld annotation(s) visible", @"Map accessibility value"), (int)zoomLevel, (long)self.accessibilityAnnotationCount];
 }
 

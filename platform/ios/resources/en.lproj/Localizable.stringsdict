@@ -5,22 +5,18 @@
 	<key>MAP_A11Y_VALUE</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@count@</string>
+		<string>Zoom %dx
+%#@count@ visible</string>
 		<key>count</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>ld</string>
-			<key>zero</key>
-			<string>Zoom %dx
-no annotations visible</string>
 			<key>one</key>
-			<string>Zoom %dx
-%d annotation visible</string>
+			<string>%d annotation</string>
 			<key>other</key>
-			<string>Zoom %dx
-%d annotations visible</string>
+			<string>%d annotations</string>
 		</dict>
 	</dict>
 </dict>
