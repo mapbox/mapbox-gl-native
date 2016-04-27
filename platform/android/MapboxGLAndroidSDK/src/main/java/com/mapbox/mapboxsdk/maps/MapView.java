@@ -446,6 +446,13 @@ public class MapView extends FrameLayout {
                             iterator.remove();
                         }
                     }
+                } else if (change == REGION_IS_CHANGING) {
+                    LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
+                    long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
+                    Log.v(MapboxConstants.TAG, "Region is changing ane we are seeing: "+ids.length+ " point annotations");
+//                    for (long id : ids) {
+//                        Log.v(MapboxConstants.TAG, "Marker: "+id);
+//                    }
                 }
             }
         });
@@ -1317,6 +1324,8 @@ public class MapView extends FrameLayout {
             if (mDestroyed) {
                 return;
             }
+
+            Log.v(MapboxConstants.TAG, "SurfaceTexture has been updated");
 
             mCompassView.update(getDirection());
             mMyLocationView.update();
