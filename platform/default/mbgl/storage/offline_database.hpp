@@ -92,6 +92,9 @@ private:
     // Return value is true iff the resource was previously unused by any other regions.
     bool markUsed(int64_t regionID, const Resource&);
 
+    std::pair<int64_t, int64_t> getCompletedResourceCountAndSize(int64_t regionID);
+    std::pair<int64_t, int64_t> getCompletedTileCountAndSize(int64_t regionID);
+
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;

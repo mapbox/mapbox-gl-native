@@ -608,31 +608,37 @@ OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
 OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
     OfflineRegionStatus result;
 
-    Statement stmtRes = getStatement(
-        "SELECT COUNT(*), SUM(size) FROM ( "
-        "  SELECT LENGTH(data) as size "
-        "  FROM region_resources, resources "
-        "  WHERE region_id = ?1 "
-        "  AND resource_id = resources.id "
-        ") ");
-    stmtRes->bind(1, regionID);
-    stmtRes->run();
+    std::tie(result.completedResourceCount, result.completedResourceSize)
+        = getCompletedResourceCountAndSize(regionID);
+    std::tie(result.completedTileCount, result.completedTileSize)
+        = getCompletedTileCountAndSize(regionID);
 
-    Statement stmtTile = getStatement(
-                                  "SELECT COUNT(*), SUM(size) FROM ( "
-                                  "  SELECT LENGTH(data) as size "
-                                  "  FROM region_tiles, tiles "
-                                  "  WHERE region_id = ?1 "
-                                  "  AND tile_id = tiles.id "
-                                  ") ");
-    stmtTile->bind(1, regionID);
-    stmtTile->run();
-    
-    result.completedTileSize  = stmtTile->get<int64_t>(1);
-    result.completedResourceCount = stmtTile->get<int64_t>(0) + stmtRes->get<int64_t>(0);
-    result.completedResourceSize  = result.completedTileSize + stmtRes->get<int64_t>(1);
+    result.completedResourceCount += result.completedTileCount;
+    result.completedResourceSize += result.completedTileSize;
 
     return result;
+}
+
+std::pair<int64_t, int64_t> OfflineDatabase::getCompletedResourceCountAndSize(int64_t regionID) {
+    Statement stmt = getStatement(
+        "SELECT COUNT(*), SUM(LENGTH(data)) "
+        "FROM region_resources, resources "
+        "WHERE region_id = ?1 "
+        "AND resource_id = resources.id ");
+    stmt->bind(1, regionID);
+    stmt->run();
+    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
+}
+
+std::pair<int64_t, int64_t> OfflineDatabase::getCompletedTileCountAndSize(int64_t regionID) {
+    Statement stmt = getStatement(
+        "SELECT COUNT(*), SUM(LENGTH(data)) "
+        "FROM region_tiles, tiles "
+        "WHERE region_id = ?1 "
+        "AND tile_id = tiles.id ");
+    stmt->bind(1, regionID);
+    stmt->run();
+    return { stmt->get<int64_t>(0), stmt->get<int64_t>(1) };
 }
 
 template <class T>

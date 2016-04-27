@@ -449,6 +449,40 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
 }
 
+TEST(OfflineDatabase, GetRegionCompletedStatus) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+    OfflineRegionDefinition definition { "http://example.com/style", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 2.0 };
+    OfflineRegionMetadata metadata;
+    OfflineRegion region = db.createRegion(definition, metadata);
+
+    OfflineRegionStatus status1 = db.getRegionCompletedStatus(region.getID());
+    EXPECT_EQ(0, status1.completedResourceCount);
+    EXPECT_EQ(0, status1.completedResourceSize);
+    EXPECT_EQ(0, status1.completedTileCount);
+    EXPECT_EQ(0, status1.completedTileSize);
+
+    Response response;
+    response.data = std::make_shared<std::string>("data");
+
+    uint64_t styleSize = db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
+
+    OfflineRegionStatus status2 = db.getRegionCompletedStatus(region.getID());
+    EXPECT_EQ(1, status2.completedResourceCount);
+    EXPECT_EQ(styleSize, status2.completedResourceSize);
+    EXPECT_EQ(0, status2.completedTileCount);
+    EXPECT_EQ(0, status2.completedTileSize);
+
+    uint64_t tileSize = db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0), response);
+
+    OfflineRegionStatus status3 = db.getRegionCompletedStatus(region.getID());
+    EXPECT_EQ(2, status3.completedResourceCount);
+    EXPECT_EQ(styleSize + tileSize, status3.completedResourceSize);
+    EXPECT_EQ(1, status3.completedTileCount);
+    EXPECT_EQ(tileSize, status3.completedTileSize);
+}
+
 TEST(OfflineDatabase, OfflineMapboxTileCount) {
     using namespace mbgl;
 
