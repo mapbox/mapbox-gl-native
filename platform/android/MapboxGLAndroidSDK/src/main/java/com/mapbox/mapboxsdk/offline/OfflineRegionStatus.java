@@ -13,15 +13,27 @@ public class OfflineRegionStatus {
     @OfflineRegion.DownloadState private int downloadState = OfflineRegion.STATE_INACTIVE;
 
     /**
-     * The number of resources that have been fully downloaded and are ready for
-     * offline access.
+     * The number of resources (inclusive of tiles) that have been fully downloaded
+     * and are ready for offline access.
      */
     private long completedResourceCount = 0;
 
     /**
-     * The cumulative size, in bytes, of all resources that have been fully downloaded.
+     * The cumulative size, in bytes, of all resources (inclusive of tiles) that have
+     * been fully downloaded.
      */
     private long completedResourceSize = 0;
+
+    /**
+     * The number of tiles that have been fully downloaded and are ready for
+     * offline access.
+     */
+    private long completedTileCount = 0;
+
+    /**
+     * The cumulative size, in bytes, of all tiles that have been fully downloaded.
+     */
+    private long completedTileSize = 0;
 
     /**
      * The number of resources that are known to be required for this region. See the
@@ -71,6 +83,14 @@ public class OfflineRegionStatus {
 
     public long getCompletedResourceSize() {
         return completedResourceSize;
+    }
+
+    public long getCompletedTileCount() {
+        return completedTileCount;
+    }
+
+    public long getCompletedTileSize() {
+        return completedTileSize;
     }
 
     public long getRequiredResourceCount() {
