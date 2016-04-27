@@ -1,7 +1,7 @@
+import QtPositioning 5.2
 import QtQuick 2.4
 import QtQuick.Controls 1.3
-import QtQuick.Window 2.2
-import QtQuick.Dialogs 1.2
+
 import QQuickMapboxGL 1.0
 
 ApplicationWindow {
@@ -13,21 +13,18 @@ ApplicationWindow {
 
     Rectangle {
         id: rect
-        width: 800
-        height: 600
+        width: parent.width * .8
+        height: parent.height * .8
         anchors.centerIn: parent
-
-        NumberAnimation on x {
-            from: 0;
-            to: 100;
-            loops: Animation.Infinite;
-            duration: 1000;
-        }
 
         QQuickMapboxGL {
             id: map
             anchors.fill: parent
-        } // QQuickMapboxGL
 
-    } // Rectangle
+            center: QtPositioning.coordinate(60.170448, 24.942046)
+            zoomLevel: 14
+            minimumZoomLevel: 8
+            maximumZoomLevel: 16
+        }
+    }
 }
