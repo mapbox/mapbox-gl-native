@@ -61,10 +61,7 @@ function print_opengl_flags {
 }
 
 function print_qt_flags {
-    CONFIG+="    'qt_cflags%': [], "$LN
-    CONFIG+="    'qt_ldflags%': [],  "$LN
-    CONFIG+="    'qt_moc%': [],  "$LN
-    CONFIG+="    'qt_rcc%': [],  "$LN
+    :
 }
 
 # Load dependencies

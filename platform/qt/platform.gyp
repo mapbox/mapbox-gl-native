@@ -28,7 +28,7 @@
       ],
 
       'includes': [
-        '../../platform/qt/qt.gypi',
+        'qt.gypi',
       ],
 
       'sources': [
