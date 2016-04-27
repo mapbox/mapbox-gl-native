@@ -188,6 +188,14 @@ qt-app:
 run-qt-app: qt-app
 	$(RUN) PLATFORM=qt run-qt-app
 
+.PHONY: qt-qml-app
+qt-qml-app:
+	$(RUN) PLATFORM=qt Makefile/qt-qml-app
+
+.PHONY: run-qt-qml-app
+run-qt-qml-app: qt-qml-app
+	$(RUN) PLATFORM=qt run-qt-qml-app
+
 .PHONY: test-qt
 test-qt: node_modules/express
 	$(RUN) PLATFORM=qt test-*

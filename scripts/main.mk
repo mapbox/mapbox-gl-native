@@ -151,6 +151,9 @@ run-glfw-app:
 run-qt-app:
 	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && ./qmapboxgl
 
+run-qt-qml-app:
+	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && ./qquickmapboxgl
+
 run-valgrind-glfw-app:
 	cd $(PLATFORM_OUTPUT)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
 

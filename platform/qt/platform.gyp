@@ -10,6 +10,11 @@
     ],
     'qtlibversion': '1.0.0',
   },
+  'conditions': [
+    ['qt_version == 5', {
+      'includes': [ 'qmlapp/qquickmapboxgl.gypi' ],
+    }],
+  ],
   'includes': [
     'app/qmapboxgl.gypi',
     '../../mbgl.gypi',
