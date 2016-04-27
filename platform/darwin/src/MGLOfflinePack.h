@@ -64,6 +64,11 @@ typedef struct MGLOfflinePackProgress {
      */
     uint64_t countOfBytesCompleted;
     /**
+     The number of tiles that have been completely downloaded and are ready
+     to use offline.
+     */
+    uint64_t countOfTilesCompleted;
+    /**
      The cumulative size of the downloaded tiles on disk, measured in bytes.
      */
     uint64_t countOfTileBytesCompleted;
