@@ -608,24 +608,29 @@ OfflineRegionDefinition OfflineDatabase::getRegionDefinition(int64_t regionID) {
 OfflineRegionStatus OfflineDatabase::getRegionCompletedStatus(int64_t regionID) {
     OfflineRegionStatus result;
 
-    Statement stmt = getStatement(
+    Statement stmtRes = getStatement(
         "SELECT COUNT(*), SUM(size) FROM ( "
         "  SELECT LENGTH(data) as size "
         "  FROM region_resources, resources "
         "  WHERE region_id = ?1 "
         "  AND resource_id = resources.id "
-        "  UNION ALL "
-        "  SELECT LENGTH(data) as size "
-        "  FROM region_tiles, tiles "
-        "  WHERE region_id = ?1 "
-        "  AND tile_id = tiles.id "
         ") ");
+    stmtRes->bind(1, regionID);
+    stmtRes->run();
 
-    stmt->bind(1, regionID);
-    stmt->run();
-
-    result.completedResourceCount = stmt->get<int64_t>(0);
-    result.completedResourceSize  = stmt->get<int64_t>(1);
+    Statement stmtTile = getStatement(
+                                  "SELECT COUNT(*), SUM(size) FROM ( "
+                                  "  SELECT LENGTH(data) as size "
+                                  "  FROM region_tiles, tiles "
+                                  "  WHERE region_id = ?1 "
+                                  "  AND tile_id = tiles.id "
+                                  ") ");
+    stmtTile->bind(1, regionID);
+    stmtTile->run();
+    
+    result.completedTileSize  = stmtTile->get<int64_t>(1);
+    result.completedResourceCount = stmtTile->get<int64_t>(0) + stmtRes->get<int64_t>(0);
+    result.completedResourceSize  = result.completedTileSize + stmtRes->get<int64_t>(1);
 
     return result;
 }
