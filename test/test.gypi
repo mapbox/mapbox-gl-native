@@ -59,10 +59,9 @@
         'style/source.cpp',
         'style/style.cpp',
         'style/style_layer.cpp',
-        'style/comparisons.cpp',
+        'style/filter.cpp',
         'style/functions.cpp',
         'style/style_parser.cpp',
-        'style/variant.cpp',
 
         'sprite/sprite_atlas.cpp',
         'sprite/sprite_image.cpp',

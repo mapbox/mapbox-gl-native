@@ -1,4 +1,5 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -26,6 +27,7 @@
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
@@ -99,8 +101,7 @@ bool SymbolBucket::needsClipping() const {
     return mode == MapMode::Still;
 }
 
-void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
-                                 const FilterExpression& filter) {
+void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& filter) {
     const bool has_text = !layout.textField.value.empty() && !layout.textFont.value.empty();
     const bool has_icon = !layout.iconImage.value.empty();
 
@@ -113,15 +114,27 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer,
     for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
 
-        GeometryTileFeatureExtractor extractor(*feature);
-        if (!evaluate(filter, extractor))
+        FilterEvaluator<GeometryTileFeatureExtractor> evaluator(*feature);
+        if (!Filter::visit(filter, evaluator))
             continue;
 
         SymbolFeature ft;
 
         auto getValue = [&feature](const std::string& key) -> std::string {
             auto value = feature->getValue(key);
-            return value ? toString(*value) : std::string();
+            if (!value)
+                return std::string();
+            if (value->is<std::string>())
+                return value->get<std::string>();
+            if (value->is<bool>())
+                return value->get<bool>() ? "true" : "false";
+            if (value->is<int64_t>())
+                return util::toString(value->get<int64_t>());
+            if (value->is<uint64_t>())
+                return util::toString(value->get<uint64_t>());
+            if (value->is<double>())
+                return util::toString(value->get<double>());
+            return "null";
         };
 
         if (has_text) {

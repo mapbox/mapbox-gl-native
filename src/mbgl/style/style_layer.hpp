@@ -2,7 +2,7 @@
 #define MBGL_STYLE_STYLE_LAYER
 
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -65,7 +65,7 @@ public:
     std::string ref;
     std::string source;
     std::string sourceLayer;
-    FilterExpression filter;
+    Filter filter;
     float minZoom = -std::numeric_limits<float>::infinity();
     float maxZoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;

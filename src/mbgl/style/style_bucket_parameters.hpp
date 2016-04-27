@@ -2,7 +2,7 @@
 #define STYLE_BUCKET_PARAMETERS
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/tile/tile_data.hpp>
 
 #include <functional>
@@ -42,7 +42,7 @@ public:
         return state == TileData::State::obsolete;
     }
 
-    void eachFilteredFeature(const FilterExpression&, std::function<void (const GeometryTileFeature&)>);
+    void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&)>);
 
     const TileID& tileID;
     const GeometryTileLayer& layer;
