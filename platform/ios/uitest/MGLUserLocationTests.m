@@ -28,7 +28,7 @@
     XCUIElement *titleText = app.staticTexts[@"You Are Here"];
     [self expectationForPredicate:exists evaluatedWithObject:titleText handler:nil];
     [userLocationAnnotationElement tap];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
     
     // Close the user dot’s callout view by tapping on the map proxy element. Note that the map proxy element has a gaping hole in the middle to accommodate the callout view.
     XCUIElement *mapProxyElement = app.buttons[@"MGLMapViewProxyAccessibilityElement"];

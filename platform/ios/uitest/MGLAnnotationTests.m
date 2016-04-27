@@ -100,7 +100,7 @@
     XCUIElement *mapProxyElement = mapElement.buttons[@"MGLMapViewProxyAccessibilityElement"];
     [self expectationForPredicate:exists evaluatedWithObject:mapProxyElement handler:nil];
     [mapElement pressForDuration:1.1];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
     
     // Remove all annotations, closing the callout view.
     [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
@@ -130,13 +130,17 @@
 - (void)testTourWorld {
     XCUIApplication *app = [[XCUIApplication alloc] init];
     NSPredicate *exists = [NSPredicate predicateWithFormat:@"exists == YES"];
+    
+    XCUIElement *settingsSheet = app.sheets[@"Map Settings"];
+    [self expectationForPredicate:exists evaluatedWithObject:settingsSheet handler:nil];
     [app.navigationBars[@"MBXNavigationBar"].buttons[@"MBXSettingsButton"] tap];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
     
     // Start the world tour.
     XCUIElement *mapElement = app.otherElements[@"MGLMapView"];
     [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Washington, D.C."] handler:nil];
-    [app.sheets[@"Map Settings"].collectionViews.buttons[@"Start World Tour"] tap];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    [settingsSheet.collectionViews.buttons[@"Start World Tour"] tap];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
     [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"San Francisco"] handler:nil];
     [self waitForExpectationsWithTimeout:15 handler:nil];
     [self expectationForPredicate:exists evaluatedWithObject:mapElement.buttons[@"Bangalore"] handler:nil];
