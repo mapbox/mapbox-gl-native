@@ -24,7 +24,7 @@ using namespace QMapbox;
 
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
-    , m_contextMode(QMapboxGLSettings::UniqueGLContext)
+    , m_contextMode(QMapboxGLSettings::SharedGLContext)
     , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
     , m_cacheDatabasePath(":memory:")
