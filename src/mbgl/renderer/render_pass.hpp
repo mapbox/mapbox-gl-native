@@ -1,8 +1,9 @@
 #ifndef MBGL_RENDERER_RENDER_PASS
 #define MBGL_RENDERER_RENDER_PASS
 
+#include <mbgl/util/traits.hpp>
+
 #include <cstdint>
-#include <type_traits>
 
 namespace mbgl {
 
@@ -13,8 +14,7 @@ enum class RenderPass : uint8_t {
 };
 
 constexpr inline RenderPass operator|(RenderPass a, RenderPass b) {
-    return static_cast<RenderPass>(static_cast<std::underlying_type<RenderPass>::type>(a) |
-                                   static_cast<std::underlying_type<RenderPass>::type>(b));
+    return static_cast<RenderPass>(mbgl::underlying_type(a) | mbgl::underlying_type(b));
 }
 
 inline RenderPass operator|=(RenderPass& a, RenderPass b) {
@@ -22,8 +22,7 @@ inline RenderPass operator|=(RenderPass& a, RenderPass b) {
 }
 
 constexpr inline RenderPass operator&(RenderPass a, RenderPass b) {
-    return static_cast<RenderPass>(static_cast<std::underlying_type<RenderPass>::type>(a) &
-                                   static_cast<std::underlying_type<RenderPass>::type>(b));
+    return static_cast<RenderPass>(mbgl::underlying_type(a) & mbgl::underlying_type(b));
 }
 
 } // namespace mbgl
