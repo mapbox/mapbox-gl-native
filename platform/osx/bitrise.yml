@@ -33,6 +33,8 @@ workflows:
             export BUILDTYPE=Debug
             make osx
             make test-osx
+            make linux
+            make test-linux
         - is_debug: 'yes'
     - slack:
         title: Post to Slack
