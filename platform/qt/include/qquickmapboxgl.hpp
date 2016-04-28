@@ -2,6 +2,7 @@
 #define QQUICKMAPBOXGL_H
 
 #include <QGeoCoordinate>
+#include <QGeoServiceProvider>
 #include <QGeoShape>
 #include <QQuickFramebufferObject>
 
@@ -11,10 +12,13 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 {
     Q_OBJECT
 
+    Q_ENUMS(QGeoServiceProvider::Error)
     Q_PROPERTY(qreal minimumZoomLevel READ minimumZoomLevel WRITE setMinimumZoomLevel NOTIFY minimumZoomLevelChanged)
     Q_PROPERTY(qreal maximumZoomLevel READ maximumZoomLevel WRITE setMaximumZoomLevel NOTIFY maximumZoomLevelChanged)
     Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QGeoCoordinate center READ center WRITE setCenter NOTIFY centerChanged)
+    Q_PROPERTY(QGeoServiceProvider::Error error READ error NOTIFY errorChanged)
+    Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
     Q_PROPERTY(QGeoShape visibleRegion READ visibleRegion WRITE setVisibleRegion)
     Q_PROPERTY(bool copyrightsVisible READ copyrightsVisible WRITE setCopyrightsVisible NOTIFY copyrightsVisibleChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
@@ -37,6 +41,9 @@ public:
 
     void setCenter(const QGeoCoordinate &center);
     QGeoCoordinate center() const;
+
+    QGeoServiceProvider::Error error() const;
+    QString errorString() const;
 
     void setVisibleRegion(const QGeoShape &shape);
     QGeoShape visibleRegion() const;
@@ -62,6 +69,7 @@ signals:
     void centerChanged(const QGeoCoordinate &coordinate);
 
     // Compatibility with Map QML Type, but no-op.
+    void errorChanged();
     void copyrightLinkActivated(const QString &link);
     void copyrightsVisibleChanged(bool visible);
     void colorChanged(const QColor &color);

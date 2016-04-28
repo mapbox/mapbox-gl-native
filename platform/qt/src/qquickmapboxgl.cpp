@@ -102,6 +102,15 @@ QGeoCoordinate QQuickMapboxGL::center() const
     return m_center;
 }
 
+QGeoServiceProvider::Error QQuickMapboxGL::error() const
+{
+    return QGeoServiceProvider::NoError;
+}
+
+QString QQuickMapboxGL::errorString() const
+{
+    return QString();
+}
 
 void QQuickMapboxGL::setVisibleRegion(const QGeoShape &shape)
 {
