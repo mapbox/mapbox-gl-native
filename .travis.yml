@@ -116,7 +116,7 @@ matrix:
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       before_install:
-        - sudo apt-get install -y qtpositioning5-dev
+        - sudo apt-get install -y qtpositioning5-dev qtlocation5-dev
       script:
         - make qt-app qt-qml-app
 
