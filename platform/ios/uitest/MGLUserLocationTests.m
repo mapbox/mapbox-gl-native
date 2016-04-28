@@ -28,7 +28,9 @@
     }] evaluatedWithObject:userLocationAnnotationElement handler:nil];
     [userTrackingModeElement tap];
     XCTAssertEqualObjects(userTrackingModeElement.value, @"Follow location", @"User location tracking mode should be on after tapping the user tracking mode button.");
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    [self waitForExpectationsWithTimeout:10 handler:^(NSError * _Nullable error) {
+        XCTAssertNil(error, @"There was an error: %@\nUser dot is at: %f,%f %fx%f", error, userDotAnnotationFrame.origin.x, userDotAnnotationFrame.origin.y, userDotAnnotationFrame.size.width, userDotAnnotationFrame.size.height);
+    }];
     
     // Open the user dot’s callout view.
     XCUIElement *titleText = app.staticTexts[@"You Are Here"];
