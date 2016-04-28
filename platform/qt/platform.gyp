@@ -115,6 +115,14 @@
       ],
 
       'conditions': [
+        ['<(qt_version_major) == 4', {
+          'variables': {
+            'cflags': [
+              # Qt4 generates code with unused variables.
+              '-Wno-unused-variable',
+            ],
+          },
+        }],
         ['<(qt_version_major) == 5', {
           'variables': {
             'cflags': [

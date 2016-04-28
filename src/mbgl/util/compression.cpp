@@ -6,11 +6,8 @@
 #include <cstring>
 #include <stdexcept>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-
 // Check zlib library version.
-const static bool zlibVersionCheck = []() {
+const static bool zlibVersionCheck __attribute__((unused)) = []() {
     const char *const version = zlibVersion();
     if (version[0] != ZLIB_VERSION[0]) {
         char message[96];
@@ -21,8 +18,6 @@ const static bool zlibVersionCheck = []() {
 
     return true;
 }();
-
-#pragma GCC diagnostic pop
 
 namespace mbgl {
 namespace util {

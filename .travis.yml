@@ -8,19 +8,19 @@ addons_shortcuts:
       sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
       packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev',
                   'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
-  addons_gcc49: &gcc49
+  addons_gcc5: &gcc5
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'libllvm3.4', 'xutils-dev',
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'libllvm3.4', 'xutils-dev',
                   'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
   addons_qt4: &qt4
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'mesa-utils', 'qt4-default' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-4.9', 'gcc-4.9', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev' ]
 
 env:
   global:
@@ -62,24 +62,24 @@ matrix:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
-    # GCC 4.9 - Debug - Coverage
+    # GCC 5 - Debug - Coverage
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc49-debug"
-      env: BUILDTYPE=Debug _CXX=g++-4.9 _CC=gcc-4.9 ENABLE_COVERAGE=1
-      addons: *gcc49
+      compiler: ": linux-gcc5-debug"
+      env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 ENABLE_COVERAGE=1
+      addons: *gcc5
       after_script:
         - ccache --show-stats
         - ./platform/linux/scripts/coveralls.sh
 
-    # GCC 4.9 - Release
+    # GCC 5 - Release
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc49-release"
-      env: BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
-      addons: *gcc49
+      compiler: ": linux-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      addons: *gcc5
 
     # Clang 3.5 - Debug
     - os: linux
@@ -101,8 +101,8 @@ matrix:
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc49-release"
-      env: FLAVOR=qt4 BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
+      compiler: ": linux-gcc5-release"
+      env: FLAVOR=qt4 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
       script:
         - make qt-app test-qt
@@ -112,8 +112,8 @@ matrix:
       sudo: required
       dist: trusty
       language: cpp
-      compiler: ": linux-gcc49-release"
-      env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-4.9 _CC=gcc-4.9
+      compiler: ": linux-gcc5-release"
+      env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       before_install:
         - sudo apt-get install -y qtpositioning5-dev

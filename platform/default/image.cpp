@@ -4,10 +4,7 @@
 
 #include <png.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-// Check png library version.
-const static bool png_version_check = []() {
+const static bool png_version_check __attribute__((unused)) = []() {
     const png_uint_32 version = png_access_version_number();
     if (version != PNG_LIBPNG_VER) {
         throw std::runtime_error(mbgl::util::sprintf<96>(
@@ -17,7 +14,7 @@ const static bool png_version_check = []() {
     }
     return true;
 }();
-#pragma GCC diagnostic pop
+
 namespace mbgl {
 
 std::string encodePNG(const PremultipliedImage& pre) {

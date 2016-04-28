@@ -12,7 +12,7 @@ mapbox_time "lcov_capture" \
     --quiet \
     --capture \
     --no-external \
-    --gcov-tool "gcov-4.9" \
+    --gcov-tool "gcov-5" \
     --directory "src/mbgl" \
     --directory "platform" \
     --directory "include/mbgl" \
