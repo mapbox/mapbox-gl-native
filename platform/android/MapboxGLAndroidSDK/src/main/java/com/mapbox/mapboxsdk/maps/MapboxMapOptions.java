@@ -174,7 +174,7 @@ public class MapboxMapOptions implements Parcelable {
 
             mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
             mapboxMapOptions.myLocationForegroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_foreground_tint, Color.TRANSPARENT));
-            mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, Color.TRANSPARENT));
+            mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, Color.WHITE));
 
             Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_foreground);
             if(foregroundDrawable==null){

@@ -52,7 +52,6 @@ public class MyLocationToggleActivity extends AppCompatActivity {
             @Override
             public void onMapReady(MapboxMap map) {
                 mapboxMap = map;
-                mapboxMap.setStyle(Style.MAPBOX_STREETS);
             }
         });
 
