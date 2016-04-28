@@ -11,8 +11,6 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
-#include <atomic>
-
 class GLFWView : public mbgl::View {
 public:
     GLFWView(bool fullscreen = false, bool benchmark = false);
@@ -95,7 +93,7 @@ private:
     mbgl::util::Timer frameTick;
 
     GLFWwindow *window = nullptr;
-    std::atomic_flag clean = ATOMIC_FLAG_INIT;
+    bool dirty = false;
 };
 
 #endif

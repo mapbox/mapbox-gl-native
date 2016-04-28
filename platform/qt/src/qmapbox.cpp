@@ -1,7 +1,12 @@
+#include <mbgl/gl/gl.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/default_styles.hpp>
 
 #include <QMapbox>
+
+#if QT_VERSION >= 0x050000
+#include <QOpenGLContext>
+#endif
 
 namespace QMapbox {
 
@@ -43,5 +48,15 @@ Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles()
 
     return styles;
 }
+
+#if QT_VERSION >= 0x050000
+Q_DECL_EXPORT void initializeGLExtensions()
+{
+    mbgl::gl::InitializeExtensions([](const char* name) {
+        QOpenGLContext* thisContext = QOpenGLContext::currentContext();
+        return thisContext->getProcAddress(name);
+    });
+}
+#endif
 
 }

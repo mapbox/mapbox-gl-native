@@ -9,6 +9,12 @@ else
   $(error Cannot determine host platform)
 endif
 
+ifeq ($(V), 1)
+  export XCPRETTY
+else
+  export XCPRETTY ?= | xcpretty
+endif
+
 ifneq (,$(wildcard .git/.))
 .mason:
 	git submodule update --init
@@ -45,7 +51,7 @@ osx: $(OSX_PROJ_PATH)
 	set -o pipefail && xcodebuild \
 	  -derivedDataPath $(OSX_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) \
-	  -workspace $(OSX_WORK_PATH) -scheme CI build | xcpretty
+	  -workspace $(OSX_WORK_PATH) -scheme CI build $(XCPRETTY)
 
 xproj: $(OSX_PROJ_PATH) $(OSX_WORK_PATH)
 	mkdir -p "$(OSX_USER_DATA_PATH)"
@@ -58,7 +64,7 @@ test-osx: osx node_modules/express
 	set -o pipefail && xcodebuild \
 	  -derivedDataPath $(OSX_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) \
-	  -workspace $(OSX_WORK_PATH) -scheme CI test | xcpretty
+	  -workspace $(OSX_WORK_PATH) -scheme CI test $(XCPRETTY)
 
 genstrings:
 	genstrings -u -o platform/osx/sdk/Base.lproj platform/darwin/src/*.{m,mm}
@@ -90,7 +96,7 @@ ios: $(IOS_PROJ_PATH)
 	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH) -scheme CI build | xcpretty
+	  -workspace $(IOS_WORK_PATH) -scheme CI build $(XCPRETTY)
 
 iproj: $(IOS_PROJ_PATH)
 	mkdir -p "$(IOS_USER_DATA_PATH)"
@@ -105,7 +111,7 @@ test-ios: ios
 	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH) -scheme CI test | xcpretty
+	  -workspace $(IOS_WORK_PATH) -scheme CI test $(XCPRETTY)
 
 ipackage: $(IOS_PROJ_PATH)
 	BITCODE=$(BITCODE) FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
