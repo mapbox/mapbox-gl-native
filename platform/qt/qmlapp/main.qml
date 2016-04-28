@@ -25,6 +25,9 @@ ApplicationWindow {
             zoomLevel: 14
             minimumZoomLevel: 8
             maximumZoomLevel: 16
+
+            color: "red"
+            copyrightsVisible: true
         }
     }
 }

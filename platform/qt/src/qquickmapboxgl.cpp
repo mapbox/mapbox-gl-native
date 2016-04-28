@@ -113,6 +113,29 @@ QGeoShape QQuickMapboxGL::visibleRegion() const
     return m_visibleRegion;
 }
 
+void QQuickMapboxGL::setCopyrightsVisible(bool)
+{
+    qWarning() << __PRETTY_FUNCTION__
+        << "Not implemented.";
+}
+
+bool QQuickMapboxGL::copyrightsVisible() const
+{
+    return false;
+}
+
+void QQuickMapboxGL::setColor(const QColor &)
+{
+    // TODO: can be made functional after landing #837
+    qWarning() << __PRETTY_FUNCTION__
+        << "Use Mapbox Studio to change the map background color.";
+}
+
+QColor QQuickMapboxGL::color() const
+{
+    return QColor();
+}
+
 int QQuickMapboxGL::swapSyncState()
 {
     int oldState = m_syncState;

@@ -16,6 +16,8 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QGeoCoordinate center READ center WRITE setCenter NOTIFY centerChanged)
     Q_PROPERTY(QGeoShape visibleRegion READ visibleRegion WRITE setVisibleRegion)
+    Q_PROPERTY(bool copyrightsVisible READ copyrightsVisible WRITE setCopyrightsVisible NOTIFY copyrightsVisibleChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:
     QQuickMapboxGL(QQuickItem *parent = 0);
@@ -39,6 +41,12 @@ public:
     void setVisibleRegion(const QGeoShape &shape);
     QGeoShape visibleRegion() const;
 
+    void setCopyrightsVisible(bool visible);
+    bool copyrightsVisible() const;
+
+    void setColor(const QColor &color);
+    QColor color() const;
+
     enum SyncState {
         NothingNeedsSync = 0x00,
         ZoomNeedsSync    = 0x01,
@@ -52,6 +60,11 @@ signals:
     void maximumZoomLevelChanged();
     void zoomLevelChanged(qreal zoomLevel);
     void centerChanged(const QGeoCoordinate &coordinate);
+
+    // Compatibility with Map QML Type, but no-op.
+    void copyrightLinkActivated(const QString &link);
+    void copyrightsVisibleChanged(bool visible);
+    void colorChanged(const QColor &color);
 
 private:
     qreal m_minimumZoomLevel = 0;
