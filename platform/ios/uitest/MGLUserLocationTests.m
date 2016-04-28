@@ -24,7 +24,7 @@
     [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nonnull evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
         // The user dot happens to lie underneath the Settings button until it is shown.
         userDotAnnotationFrame = userLocationAnnotationElement.frame;
-        return CGRectContainsPoint(userDotAnnotationFrame, CGPointMake(190, 368));
+        return userDotAnnotationFrame.origin.x > 100 && userDotAnnotationFrame.origin.y > 100;
     }] evaluatedWithObject:userLocationAnnotationElement handler:nil];
     [userTrackingModeElement tap];
     XCTAssertEqualObjects(userTrackingModeElement.value, @"Follow location", @"User location tracking mode should be on after tapping the user tracking mode button.");
