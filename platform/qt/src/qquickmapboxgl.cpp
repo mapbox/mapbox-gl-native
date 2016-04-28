@@ -23,6 +23,17 @@ QQuickFramebufferObject::Renderer *QQuickMapboxGL::createRenderer() const
     return new QQuickMapboxGLRenderer();
 }
 
+void QQuickMapboxGL::setPlugin(QDeclarativeGeoServiceProvider *)
+{
+    qWarning() << __PRETTY_FUNCTION__
+        << "Not implemented.";
+}
+
+QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
+{
+    return nullptr;
+}
+
 void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
 {
     zoom = qMax(0., zoom);

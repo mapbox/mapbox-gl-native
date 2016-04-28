@@ -6,6 +6,7 @@
 #include <QGeoShape>
 #include <QQuickFramebufferObject>
 
+class QDeclarativeGeoServiceProvider;
 class QQuickItem;
 
 class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
@@ -13,6 +14,7 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_OBJECT
 
     Q_ENUMS(QGeoServiceProvider::Error)
+    Q_PROPERTY(QDeclarativeGeoServiceProvider *plugin READ plugin WRITE setPlugin NOTIFY pluginChanged)
     Q_PROPERTY(qreal minimumZoomLevel READ minimumZoomLevel WRITE setMinimumZoomLevel NOTIFY minimumZoomLevelChanged)
     Q_PROPERTY(qreal maximumZoomLevel READ maximumZoomLevel WRITE setMaximumZoomLevel NOTIFY maximumZoomLevelChanged)
     Q_PROPERTY(qreal zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
@@ -29,6 +31,9 @@ public:
 
     // QQuickFramebufferObject implementation.
     virtual Renderer *createRenderer() const Q_DECL_FINAL;
+
+    void setPlugin(QDeclarativeGeoServiceProvider *plugin);
+    QDeclarativeGeoServiceProvider *plugin() const;
 
     void setMinimumZoomLevel(qreal minimumZoomLevel);
     qreal minimumZoomLevel() const;
@@ -69,6 +74,7 @@ signals:
     void centerChanged(const QGeoCoordinate &coordinate);
 
     // Compatibility with Map QML Type, but no-op.
+    void pluginChanged(QDeclarativeGeoServiceProvider *plugin);
     void errorChanged();
     void copyrightLinkActivated(const QString &link);
     void copyrightsVisibleChanged(bool visible);
