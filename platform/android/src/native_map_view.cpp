@@ -391,6 +391,11 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
     if (!firstTime) {
         firstTime = true;
 
+        oldDisplay = eglGetCurrentDisplay();
+        oldReadSurface = eglGetCurrentSurface(EGL_READ);
+        oldDrawSurface = eglGetCurrentSurface(EGL_DRAW);
+        oldContext = eglGetCurrentContext();
+
         if (!eglMakeCurrent(display, surface, surface, context)) {
             mbgl::Log::Error(mbgl::Event::OpenGL, "eglMakeCurrent() returned error %d",
                              eglGetError());
@@ -410,6 +415,12 @@ void NativeMapView::createSurface(ANativeWindow *window_) {
         mbgl::gl::InitializeExtensions([] (const char * name) {
              return reinterpret_cast<mbgl::gl::glProc>(eglGetProcAddress(name));
         });
+
+        if (!eglMakeCurrent(oldDisplay, oldDrawSurface, oldReadSurface, oldContext)) {
+                   mbgl::Log::Error(mbgl::Event::OpenGL,
+                                    "eglMakeCurrent(EGL_NO_CONTEXT) returned error %d", eglGetError());
+                   throw new std::runtime_error("eglMakeCurrent() failed");
+        }
     }
 }
 
