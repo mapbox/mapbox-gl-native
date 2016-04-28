@@ -21,6 +21,8 @@ ApplicationWindow {
             id: map
             anchors.fill: parent
 
+            style: "mapbox://styles/mapbox/streets-v8"
+
             center: QtPositioning.coordinate(60.170448, 24.942046)
             zoomLevel: 14
             minimumZoomLevel: 8

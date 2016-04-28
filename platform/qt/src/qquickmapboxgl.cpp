@@ -3,6 +3,7 @@
 #include <QQuickMapboxGL>
 
 #include <QQuickItem>
+#include <QString>
 #include <QtGlobal>
 
 QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
@@ -154,6 +155,25 @@ void QQuickMapboxGL::setColor(const QColor &)
 QColor QQuickMapboxGL::color() const
 {
     return QColor();
+}
+
+void QQuickMapboxGL::setStyle(const QString &styleUrl)
+{
+    if (m_style == styleUrl) {
+        return;
+    }
+
+    m_style = styleUrl;
+
+    m_syncState |= StyleNeedsSync;
+    update();
+
+    emit styleChanged();
+}
+
+QString QQuickMapboxGL::style() const
+{
+    return m_style;
 }
 
 int QQuickMapboxGL::swapSyncState()

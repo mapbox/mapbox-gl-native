@@ -13,6 +13,7 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 {
     Q_OBJECT
 
+    // Map QML Type interface implementation.
     Q_ENUMS(QGeoServiceProvider::Error)
     Q_PROPERTY(QDeclarativeGeoServiceProvider *plugin READ plugin WRITE setPlugin NOTIFY pluginChanged)
     Q_PROPERTY(qreal minimumZoomLevel READ minimumZoomLevel WRITE setMinimumZoomLevel NOTIFY minimumZoomLevelChanged)
@@ -24,6 +25,9 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
     Q_PROPERTY(QGeoShape visibleRegion READ visibleRegion WRITE setVisibleRegion)
     Q_PROPERTY(bool copyrightsVisible READ copyrightsVisible WRITE setCopyrightsVisible NOTIFY copyrightsVisibleChanged)
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+
+    // MapboxGL QML Type interface.
+    Q_PROPERTY(QString style READ style WRITE setStyle NOTIFY styleChanged)
 
 public:
     QQuickMapboxGL(QQuickItem *parent = 0);
@@ -59,10 +63,14 @@ public:
     void setColor(const QColor &color);
     QColor color() const;
 
+    void setStyle(const QString &style);
+    QString style() const;
+
     enum SyncState {
         NothingNeedsSync = 0x00,
         ZoomNeedsSync    = 0x01,
         CenterNeedsSync  = 0x02,
+        StyleNeedsSync   = 0x04,
     };
 
     int swapSyncState();
@@ -80,6 +88,8 @@ signals:
     void copyrightsVisibleChanged(bool visible);
     void colorChanged(const QColor &color);
 
+    void styleChanged();
+
 private:
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
@@ -87,6 +97,8 @@ private:
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;
+
+    QString m_style;
 
     int m_syncState = NothingNeedsSync;
 };
