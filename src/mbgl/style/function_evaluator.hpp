@@ -2,6 +2,7 @@
 #define MBGL_STYLE_FUNCTION_EVALUATOR
 
 #include <mbgl/style/function.hpp>
+#include <mbgl/util/interpolate.hpp>
 
 namespace mbgl {
 
@@ -32,6 +33,12 @@ public:
     using ResultType = Faded<T>;
     Faded<T> operator()(const Function<T>&, const StyleCalculationParameters&) const;
 };
+
+namespace util {
+template <typename T>
+struct Interpolator<Faded<T>>
+    : Uninterpolated {};
+}
 
 } // namespace mbgl
 
