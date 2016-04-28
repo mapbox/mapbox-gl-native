@@ -13,7 +13,7 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
-#include <mbgl/style/filter_expression.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 
 #include <memory>
@@ -88,8 +88,7 @@ public:
     void drawIcons(IconShader&, gl::GLObjectStore&);
     void drawCollisionBoxes(CollisionBoxShader&, gl::GLObjectStore&);
 
-    void parseFeatures(const GeometryTileLayer&,
-                       const FilterExpression&);
+    void parseFeatures(const GeometryTileLayer&, const Filter&);
     bool needsDependencies(GlyphStore&, SpriteStore&);
     void placeFeatures(CollisionTile&) override;
 

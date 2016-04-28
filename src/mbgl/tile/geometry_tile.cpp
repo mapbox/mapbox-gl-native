@@ -1,6 +1,4 @@
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/style/filter_expression.hpp>
-#include <mbgl/style/filter_expression_private.hpp>
 
 namespace mbgl {
 
@@ -11,7 +9,5 @@ optional<Value> GeometryTileFeatureExtractor::getValue(const std::string& key) c
 
     return feature.getValue(key);
 }
-
-template bool evaluate(const FilterExpression&, const GeometryTileFeatureExtractor&);
 
 } // namespace mbgl

@@ -4,6 +4,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/source/source.hpp>
+#include <mbgl/style/filter.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
 #include <vector>
@@ -16,6 +17,8 @@ namespace mbgl {
 
 class StyleLayer;
 class Source;
+
+Filter parseFilter(const JSValue&);
 
 class StyleParser {
 public:
