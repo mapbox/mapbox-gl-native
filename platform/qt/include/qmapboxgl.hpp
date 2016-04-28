@@ -31,7 +31,8 @@ public:
     };
 
     enum ConstrainMode {
-        ConstrainHeightOnly = 0,
+        NoConstrain = 0,
+        ConstrainHeightOnly,
         ConstrainWidthAndHeight
     };
 
@@ -89,19 +90,19 @@ public:
     // Reflects mbgl::MapChange.
     enum MapChange {
         MapChangeRegionWillChange = 0,
-        MapChangeRegionWillChangeAnimated = 1,
-        MapChangeRegionIsChanging = 2,
-        MapChangeRegionDidChange = 3,
-        MapChangeRegionDidChangeAnimated = 4,
-        MapChangeWillStartLoadingMap = 5,
-        MapChangeDidFinishLoadingMap = 6,
-        MapChangeDidFailLoadingMap = 7,
-        MapChangeWillStartRenderingFrame = 8,
-        MapChangeDidFinishRenderingFrame = 9,
-        MapChangeDidFinishRenderingFrameFullyRendered = 10,
-        MapChangeWillStartRenderingMap = 11,
-        MapChangeDidFinishRenderingMap = 12,
-        MapChangeDidFinishRenderingMapFullyRendered = 13
+        MapChangeRegionWillChangeAnimated,
+        MapChangeRegionIsChanging,
+        MapChangeRegionDidChange,
+        MapChangeRegionDidChangeAnimated,
+        MapChangeWillStartLoadingMap,
+        MapChangeDidFinishLoadingMap,
+        MapChangeDidFailLoadingMap,
+        MapChangeWillStartRenderingFrame,
+        MapChangeDidFinishRenderingFrame,
+        MapChangeDidFinishRenderingFrameFullyRendered,
+        MapChangeWillStartRenderingMap,
+        MapChangeDidFinishRenderingMap,
+        MapChangeDidFinishRenderingMapFullyRendered
     };
 
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());

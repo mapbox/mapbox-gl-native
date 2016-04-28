@@ -1,6 +1,7 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/default_styles.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <QMapbox>
 
@@ -8,31 +9,20 @@
 #include <QOpenGLContext>
 #endif
 
+// mbgl::MapMode
+static_assert(mbgl::underlying_type(QMapbox::Online) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Online), "error");
+static_assert(mbgl::underlying_type(QMapbox::Offline) == mbgl::underlying_type(mbgl::NetworkStatus::Status::Offline), "error");
+
 namespace QMapbox {
 
 Q_DECL_EXPORT NetworkMode networkMode()
 {
-    switch (mbgl::NetworkStatus::Get()) {
-    case mbgl::NetworkStatus::Status::Online:
-        return NetworkMode::Online;
-    case mbgl::NetworkStatus::Status::Offline:
-        return NetworkMode::Offline;
-    }
-
-    // Silence compile warnings, should never happen.
-    return NetworkMode::Online;
+    return static_cast<NetworkMode>(mbgl::NetworkStatus::Get());
 }
 
 Q_DECL_EXPORT void setNetworkMode(NetworkMode mode)
 {
-    switch (mode) {
-    case Online:
-        mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Online);
-        break;
-    case Offline:
-        mbgl::NetworkStatus::Set(mbgl::NetworkStatus::Status::Offline);
-        break;
-    }
+    mbgl::NetworkStatus::Set(static_cast<mbgl::NetworkStatus::Status>(mode));
 }
 
 Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles()
