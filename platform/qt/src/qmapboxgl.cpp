@@ -561,6 +561,7 @@ void QMapboxGL::removeCustomLayer(const QString& id)
 
 void QMapboxGL::render()
 {
+    d_ptr->dirty = false;
     d_ptr->mapObj->render();
 }
 
@@ -584,7 +585,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         static_cast<mbgl::ConstrainMode>(settings.constrainMode())))
 {
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()));
+    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
     connect(this, SIGNAL(mapRegionDidChange()), q_ptr, SIGNAL(mapRegionDidChange()));
 }
 
@@ -610,7 +611,10 @@ std::array<uint16_t, 2> QMapboxGLPrivate::getFramebufferSize() const
 
 void QMapboxGLPrivate::invalidate()
 {
-    emit needsRendering();
+    if (!dirty) {
+        emit needsRendering();
+        dirty = true;
+    }
 }
 
 void QMapboxGLPrivate::notifyMapChange(mbgl::MapChange change)
