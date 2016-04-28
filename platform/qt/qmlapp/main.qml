@@ -1,35 +1,220 @@
-import QtPositioning 5.2
-import QtQuick 2.4
-import QtQuick.Controls 1.3
+import QtGraphicalEffects 1.0
+import QtPositioning 5.0
+import QtQuick 2.0
+import QtQuick.Controls 1.0
+import QtQuick.Layouts 1.0
 
 import QQuickMapboxGL 1.0
 
 ApplicationWindow {
-    id: window
-    title: qsTr("Mapbox GL QML example")
+    title: "Mapbox GL QML example"
     width: 1024
     height: 768
     visible: true
 
-    Rectangle {
-        id: rect
-        width: parent.width * .8
-        height: parent.height * .8
-        anchors.centerIn: parent
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: 50
+        spacing: anchors.margins
 
-        QQuickMapboxGL {
-            id: map
-            anchors.fill: parent
+        Flipable {
+            id: flipable
 
-            style: "mapbox://styles/mapbox/streets-v8"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            center: QtPositioning.coordinate(60.170448, 24.942046)
-            zoomLevel: 14
-            minimumZoomLevel: 8
-            maximumZoomLevel: 16
+            transform: Rotation {
+                origin.x: flipable.width / 2
+                origin.y: flipable.height / 2
 
-            color: "red"
-            copyrightsVisible: true
+                axis.x: 0; axis.y: 1; axis.z: 0
+
+                angle: flipSlider.value
+            }
+
+            front: Rectangle {
+                anchors.fill: parent
+
+                QQuickMapboxGL {
+                    id: mapStreets
+
+                    anchors.fill: parent
+                    visible: false
+
+                    style: "mapbox://styles/mapbox/streets-v8"
+
+                    center: QtPositioning.coordinate(60.170448, 24.942046) // Helsinki
+                    zoomLevel: 14
+                    minimumZoomLevel: 4
+                    maximumZoomLevel: 16
+
+                    bearing: bearingSlider.value
+                    pitch: pitchSlider.value
+
+                    color: "red"
+                    copyrightsVisible: true
+
+                    Image {
+                        id: logo
+
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 20
+
+                        opacity: .75
+
+                        sourceSize.width: 80
+                        sourceSize.height: 80
+
+                        source: "icon.png"
+                    }
+                }
+
+                Rectangle {
+                    id: maskStreets
+
+                    anchors.fill: parent
+                    anchors.margins: 20
+
+                    radius: 30
+                    clip: true
+                    visible: false
+                }
+
+                OpacityMask {
+                    anchors.fill: maskStreets
+
+                    source: mapStreets
+                    maskSource: maskStreets
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    property var lastX: 0
+                    property var lastY: 0
+
+                    onWheel: mapStreets.zoomLevel += 0.2 * wheel.angleDelta.y / 120
+
+                    onPressed: {
+                        lastX = mouse.x
+                        lastY = mouse.y
+                    }
+
+                    onPositionChanged: {
+                        mapStreets.pan(mouse.x - lastX, mouse.y - lastY)
+
+                        lastX = mouse.x
+                        lastY = mouse.y
+                    }
+                }
+            }
+
+            back: Rectangle {
+                anchors.fill: parent
+
+                QQuickMapboxGL {
+                    id: mapSatellite
+
+                    anchors.fill: parent
+                    visible: false
+
+                    style: "mapbox://styles/mapbox/satellite-hybrid-v8"
+
+                    center: mapStreets.center
+                    zoomLevel: mapStreets.zoomLevel
+                    minimumZoomLevel: mapStreets.minimumZoomLevel
+                    maximumZoomLevel: mapStreets.maximumZoomLevel
+
+                    bearing: mapStreets.bearing
+                    pitch: mapStreets.pitch
+
+                    Image {
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.margins: logo.anchors.margins
+
+                        opacity: logo.opacity
+
+                        sourceSize.width: logo.sourceSize.width
+                        sourceSize.height: logo.sourceSize.height
+
+                        source: logo.source
+                    }
+                }
+
+                Rectangle {
+                    id: maskSatellite
+
+                    anchors.fill: parent
+                    anchors.margins: maskStreets.anchors.margins
+
+                    radius: maskStreets.radius
+                    clip: true
+                    visible: false
+                }
+
+                OpacityMask {
+                    anchors.fill: maskSatellite
+
+                    source: mapSatellite
+                    maskSource: maskSatellite
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    property var lastX: 0
+                    property var lastY: 0
+
+                    onWheel: mapStreets.zoomLevel += 0.2 * wheel.angleDelta.y / 120
+
+                    onPressed: {
+                        lastX = mouse.x
+                        lastY = mouse.y
+                    }
+
+                    onPositionChanged: {
+                        mapStreets.pan(mouse.x - lastX, mouse.y - lastY)
+
+                        lastX = mouse.x
+                        lastY = mouse.y
+                    }
+                }
+            }
+        }
+
+        Slider {
+            id: bearingSlider
+
+            Layout.fillHeight: true
+            orientation: Qt.Vertical
+
+            value: 0
+            minimumValue: 0
+            maximumValue: 180
+        }
+
+        Slider {
+            id: pitchSlider
+
+            Layout.fillHeight: true
+            orientation: Qt.Vertical
+
+            value: 0
+            minimumValue: 0
+            maximumValue: 60
+        }
+
+        Slider {
+            id: flipSlider
+
+            Layout.fillHeight: true
+            orientation: Qt.Vertical
+
+            value: 0
+            minimumValue: 0
+            maximumValue: 180
         }
     }
 }
