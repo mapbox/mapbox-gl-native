@@ -148,6 +148,14 @@
                 android:value="@string/category_userlocation" />
         </activity>
         <activity
+            android:name=".activity.userlocation.MyLocationDotColor"
+            android:description="@string/description_user_location_dot_color"
+            android:label="@string/activity_user_dot_color">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_userlocation" />
+        </activity>
+        <activity
             android:name=".activity.userlocation.MyLocationToggleActivity"
             android:description="@string/description_user_location_toggle"
             android:label="@string/activity_user_location_toggle">
