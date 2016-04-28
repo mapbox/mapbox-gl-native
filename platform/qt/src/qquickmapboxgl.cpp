@@ -45,6 +45,7 @@ void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
     }
 
     m_minimumZoomLevel = zoom;
+    setZoomLevel(m_zoomLevel); // Constrain.
 
     emit minimumZoomLevelChanged();
 }
@@ -64,6 +65,7 @@ void QQuickMapboxGL::setMaximumZoomLevel(qreal zoom)
     }
 
     m_maximumZoomLevel = zoom;
+    setZoomLevel(m_zoomLevel); // Constrain.
 
     emit maximumZoomLevelChanged();
 }
