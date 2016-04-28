@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QString>
@@ -22,6 +23,8 @@ MapWindow::MapWindow(const QMapboxGLSettings &settings)
 
     connect(&m_zoomAnimation, SIGNAL(finished()), this, SLOT(animationFinished()));
     connect(&m_zoomAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(animationValueChanged()));
+
+    setWindowIcon(QIcon(":icon.png"));
 }
 
 void MapWindow::selfTest()
