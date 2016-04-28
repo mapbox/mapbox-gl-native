@@ -584,9 +584,11 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         static_cast<mbgl::GLContextMode>(settings.contextMode()),
         static_cast<mbgl::ConstrainMode>(settings.constrainMode())))
 {
+    qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
+
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
     connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
-    connect(this, SIGNAL(mapRegionDidChange()), q_ptr, SIGNAL(mapRegionDidChange()));
+    connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
@@ -619,16 +621,7 @@ void QMapboxGLPrivate::invalidate()
 
 void QMapboxGLPrivate::notifyMapChange(mbgl::MapChange change)
 {
-    // Map thread.
-    switch (change) {
-    case mbgl::MapChangeRegionDidChange:
-    case mbgl::MapChangeRegionDidChangeAnimated:
-    case mbgl::MapChangeRegionIsChanging:
-        emit mapRegionDidChange();
-        break;
-    default:
-        break;
-    }
+    emit mapChanged(static_cast<QMapboxGL::MapChange>(change));
 }
 
 void QMapboxGLPrivate::connectionEstablished()

@@ -11,11 +11,6 @@
 #include <QObject>
 #include <QSize>
 
-#include <memory>
-
-class QMapboxGL;
-class QMapboxGLSettings;
-
 class QMapboxGLPrivate : public QObject, public mbgl::View
 {
     Q_OBJECT
@@ -50,8 +45,8 @@ public slots:
     void connectionEstablished();
 
 signals:
-    void mapRegionDidChange();
     void needsRendering();
+    void mapChanged(QMapboxGL::MapChange);
 };
 
 #endif // QMAPBOXGL_P_H

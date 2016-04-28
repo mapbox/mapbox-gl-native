@@ -75,6 +75,7 @@ class Q_DECL_EXPORT QMapboxGL : public QObject
     Q_PROPERTY(double zoom READ zoom WRITE setZoom)
     Q_PROPERTY(double bearing READ bearing WRITE setBearing)
     Q_PROPERTY(double pitch READ pitch WRITE setPitch)
+    Q_ENUMS(MapChange)
 
 public:
     // Determines the orientation of the map.
@@ -83,6 +84,24 @@ public:
         NorthRightwards,
         NorthDownwards,
         NorthLeftwards,
+    };
+
+    // Reflects mbgl::MapChange.
+    enum MapChange {
+        MapChangeRegionWillChange = 0,
+        MapChangeRegionWillChangeAnimated = 1,
+        MapChangeRegionIsChanging = 2,
+        MapChangeRegionDidChange = 3,
+        MapChangeRegionDidChangeAnimated = 4,
+        MapChangeWillStartLoadingMap = 5,
+        MapChangeDidFinishLoadingMap = 6,
+        MapChangeDidFailLoadingMap = 7,
+        MapChangeWillStartRenderingFrame = 8,
+        MapChangeDidFinishRenderingFrame = 9,
+        MapChangeDidFinishRenderingFrameFullyRendered = 10,
+        MapChangeWillStartRenderingMap = 11,
+        MapChangeDidFinishRenderingMap = 12,
+        MapChangeDidFinishRenderingMapFullyRendered = 13
     };
 
     QMapboxGL(QObject *parent = 0, const QMapboxGLSettings& = QMapboxGLSettings());
@@ -182,12 +201,14 @@ public slots:
 
 signals:
     void needsRendering();
-    void mapRegionDidChange();
+    void mapChanged(QMapboxGL::MapChange);
 
 private:
     Q_DISABLE_COPY(QMapboxGL)
 
     QMapboxGLPrivate *d_ptr;
 };
+
+Q_DECLARE_METATYPE(QMapboxGL::MapChange);
 
 #endif // QMAPBOXGL_H
