@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,6 +10,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 
@@ -65,8 +67,8 @@ public class MapboxMapOptions implements Parcelable {
     private Drawable myLocationForegroundDrawable;
     private Drawable myLocationForegroundBearingDrawable;
     private Drawable myLocationBackgroundDrawable;
-    private int myLocationForegroundTintColor = -1;
-    private int myLocationBackgroundTintColor = -1;
+    private int myLocationForegroundTintColor;
+    private int myLocationBackgroundTintColor;
     private int[] myLocationBackgroundPadding;
     private int myLocationAccuracyTintColor;
     private int myLocationAccuracyAlpha;
@@ -171,16 +173,32 @@ public class MapboxMapOptions implements Parcelable {
                     , (int) (typedArray.getDimension(R.styleable.MapView_attribution_margin_bottom, DIMENSION_SEVEN_DP) * screenDensity)});
 
             mapboxMapOptions.locationEnabled(typedArray.getBoolean(R.styleable.MapView_my_location_enabled, false));
-            mapboxMapOptions.myLocationForegroundDrawables(typedArray.getDrawable(R.styleable.MapView_my_location_foreground), typedArray.getDrawable(R.styleable.MapView_my_location_foreground_bearing));
-            mapboxMapOptions.myLocationBackgroundDrawable(typedArray.getDrawable(R.styleable.MapView_my_location_background));
-            mapboxMapOptions.myLocationForegroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_foreground_tint, -1));
-            mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, -1));
+            mapboxMapOptions.myLocationForegroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_foreground_tint, Color.TRANSPARENT));
+            mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, Color.TRANSPARENT));
+
+            Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_foreground);
+            if(foregroundDrawable==null){
+                foregroundDrawable = ContextCompat.getDrawable(context,R.drawable.ic_mylocationview_normal);
+            }
+
+            Drawable foregroundBearingDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_foreground_bearing);
+            if(foregroundBearingDrawable==null){
+                foregroundBearingDrawable = ContextCompat.getDrawable(context,R.drawable.ic_mylocationview_bearing);
+            }
+
+            Drawable backgroundDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_background);
+            if(backgroundDrawable==null){
+                backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_mylocationview_background);
+            }
+
+            mapboxMapOptions.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
+            mapboxMapOptions.myLocationBackgroundDrawable(backgroundDrawable);
             mapboxMapOptions.myLocationBackgroundPadding(new int[]{(int) (typedArray.getDimension(R.styleable.MapView_my_location_background_left, 0) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_my_location_background_top, 0) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_my_location_background_right, 0) * screenDensity)
                     , (int) (typedArray.getDimension(R.styleable.MapView_my_location_background_bottom, 0) * screenDensity)});
             mapboxMapOptions.myLocationAccuracyAlpha(typedArray.getInt(R.styleable.MapView_my_location_accuracy_alpha, 100));
-            mapboxMapOptions.myLocationAccuracyTint(typedArray.getColor(R.styleable.MapView_my_location_accuracy_tint, ColorUtils.getAccentColor(context)));
+            mapboxMapOptions.myLocationAccuracyTint(typedArray.getColor(R.styleable.MapView_my_location_accuracy_tint, ColorUtils.getPrimaryColor(context)));
         } finally {
             typedArray.recycle();
         }

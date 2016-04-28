@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -19,16 +20,13 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -37,7 +35,6 @@ import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -71,6 +68,9 @@ public class MyLocationView extends View {
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
     private Drawable backgroundDrawable;
+
+    private int foregroundTintColor;
+    private int backgroundTintColor;
 
     private Rect foregroundBounds;
     private Rect backgroundBounds;
@@ -106,38 +106,36 @@ public class MyLocationView extends View {
 
     private void init(Context context) {
         setEnabled(false);
-
-        // behavioural model
         myLocationBehaviour = new MyLocationBehaviourFactory().getBehaviouralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
-        maxSize = (int) context.getResources().getDimension(R.dimen.userlocationview_size);
-
-        // default implementation
-        setShadowDrawable(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_shadow));
-        setForegroundDrawables(ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_normal), ContextCompat.getDrawable(context, R.drawable.ic_userlocationview_bearing));
-        setAccuracyTint(ColorUtils.getAccentColor(context));
-        setAccuracyAlpha(100);
+        maxSize = (int) context.getResources().getDimension(R.dimen.my_locationview_size);
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
         if (defaultDrawable == null || bearingDrawable == null) {
-            Log.e(MapboxConstants.TAG, "Not setting foreground drawables MyLocationView: default = " + defaultDrawable + " bearing = " + bearingDrawable);
             return;
         }
         if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
+
+
         foregroundDrawable = defaultDrawable;
         foregroundBearingDrawable = bearingDrawable;
+        setForegroundDrawableTint(foregroundTintColor);
+
         invalidateBounds();
     }
 
     public final void setForegroundDrawableTint(@ColorInt int color) {
-        if (foregroundDrawable != null) {
-            foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        }
-        if (foregroundBearingDrawable != null) {
-            foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        if (color != Color.TRANSPARENT) {
+            foregroundTintColor = color;
+            if (foregroundDrawable != null) {
+                foregroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            }
+            if (foregroundBearingDrawable != null) {
+                foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            }
         }
     }
 
@@ -155,15 +153,19 @@ public class MyLocationView extends View {
         backgroundOffsetRight = right;
         backgroundOffsetBottom = bottom;
 
+        setShadowDrawableTint(backgroundTintColor);
+
         invalidateBounds();
     }
 
     public final void setShadowDrawableTint(@ColorInt int color) {
-        if (backgroundDrawable == null) {
-            return;
+        if (color != Color.TRANSPARENT) {
+            backgroundTintColor = color;
+            if (backgroundDrawable == null) {
+                return;
+            }
+            backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
-
-        backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 
     public final void setAccuracyTint(@ColorInt int color) {
