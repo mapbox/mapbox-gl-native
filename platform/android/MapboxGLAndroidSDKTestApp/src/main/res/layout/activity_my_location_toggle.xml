@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              xmlns:mapbox="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical">
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/coordinatorLayout"
+        android:id="@id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.mapbox.mapboxsdk.maps.MapView
-            android:id="@+id/mapView"
+            android:id="@id/mapView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            mapbox:access_token="@string/mapbox_access_token"
-            />
+            mapbox:my_location_background_tint="@android:color/white"
+            mapbox:access_token="@string/mapbox_access_token" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabLocationToggle"
