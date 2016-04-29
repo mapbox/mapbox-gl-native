@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -35,7 +34,6 @@ import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.UiSettings;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -43,7 +41,7 @@ import java.lang.ref.WeakReference;
  */
 public class MyLocationView extends View {
 
-    private MyLocationBehaviour myLocationBehaviour;
+    private MyLocationBehavior myLocationBehavior;
     private MapboxMap mapboxMap;
     private Projection projection;
     private int maxSize;
@@ -106,7 +104,7 @@ public class MyLocationView extends View {
 
     private void init(Context context) {
         setEnabled(false);
-        myLocationBehaviour = new MyLocationBehaviourFactory().getBehaviouralModel(MyLocationTracking.TRACKING_NONE);
+        myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
         maxSize = (int) context.getResources().getDimension(R.dimen.my_locationview_size);
     }
@@ -286,7 +284,7 @@ public class MyLocationView extends View {
 
     public void update() {
         if (isEnabled()) {
-            myLocationBehaviour.invalidate();
+            myLocationBehavior.invalidate();
         } else {
             setVisibility(View.INVISIBLE);
         }
@@ -344,7 +342,7 @@ public class MyLocationView extends View {
         }
 
         this.location = location;
-        myLocationBehaviour.updateLatLng(location);
+        myLocationBehavior.updateLatLng(location);
     }
 
     public void setMyBearingTrackingMode(@MyBearingTracking.Mode int myBearingTrackingMode) {
@@ -365,12 +363,12 @@ public class MyLocationView extends View {
     public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
         this.myLocationTrackingMode = myLocationTrackingMode;
 
-        MyLocationBehaviourFactory factory = new MyLocationBehaviourFactory();
-        myLocationBehaviour = factory.getBehaviouralModel(myLocationTrackingMode);
+        MyLocationBehaviorFactory factory = new MyLocationBehaviorFactory();
+        myLocationBehavior = factory.getBehavioralModel(myLocationTrackingMode);
 
         if (myLocationTrackingMode != MyLocationTracking.TRACKING_NONE && location != null) {
             // center map directly if we have a location fix
-            myLocationBehaviour.updateLatLng(location);
+            myLocationBehavior.updateLatLng(location);
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
         }
         invalidate();
@@ -519,14 +517,14 @@ public class MyLocationView extends View {
 
     private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
 
-        private MyLocationBehaviour behaviour;
+        private MyLocationBehavior behavior;
         private double fromLat;
         private double fromLng;
         private double toLat;
         private double toLng;
 
-        private MarkerCoordinateAnimatorListener(MyLocationBehaviour myLocationBehaviour, LatLng from, LatLng to) {
-            behaviour = myLocationBehaviour;
+        private MarkerCoordinateAnimatorListener(MyLocationBehavior myLocationBehavior, LatLng from, LatLng to) {
+            behavior = myLocationBehavior;
             fromLat = from.getLatitude();
             fromLng = from.getLongitude();
             toLat = to.getLatitude();
@@ -538,23 +536,23 @@ public class MyLocationView extends View {
             float frac = animation.getAnimatedFraction();
             double latitude = fromLat + (toLat - fromLat) * frac;
             double longitude = fromLng + (toLng - fromLng) * frac;
-            behaviour.updateLatLng(latitude, longitude);
+            behavior.updateLatLng(latitude, longitude);
             updateOnNextFrame();
         }
     }
 
-    private class MyLocationBehaviourFactory {
+    private class MyLocationBehaviorFactory {
 
-        public MyLocationBehaviour getBehaviouralModel(@MyLocationTracking.Mode int mode) {
+        public MyLocationBehavior getBehavioralModel(@MyLocationTracking.Mode int mode) {
             if (mode == MyLocationTracking.TRACKING_NONE) {
-                return new MyLocationShowBehaviour();
+                return new MyLocationShowBehavior();
             } else {
-                return new MyLocationTrackingBehaviour();
+                return new MyLocationTrackingBehavior();
             }
         }
     }
 
-    private abstract class MyLocationBehaviour {
+    private abstract class MyLocationBehavior {
 
         abstract void updateLatLng(@NonNull Location location);
 
@@ -581,7 +579,7 @@ public class MyLocationView extends View {
         abstract void invalidate();
     }
 
-    private class MyLocationTrackingBehaviour extends MyLocationBehaviour {
+    private class MyLocationTrackingBehavior extends MyLocationBehavior {
 
         @Override
         void updateLatLng(@NonNull Location location) {
@@ -641,7 +639,7 @@ public class MyLocationView extends View {
         }
     }
 
-    private class MyLocationShowBehaviour extends MyLocationBehaviour {
+    private class MyLocationShowBehavior extends MyLocationBehavior {
 
         @Override
         void updateLatLng(@NonNull final Location location) {

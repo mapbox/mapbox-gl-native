@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -25,7 +23,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
-public class MyLocationCustomisationActivity extends AppCompatActivity implements LocationListener {
+public class MyLocationCustomizationActivity extends AppCompatActivity implements LocationListener {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -35,7 +33,7 @@ public class MyLocationCustomisationActivity extends AppCompatActivity implement
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_location_customisation);
+        setContentView(R.layout.activity_my_location_customization);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

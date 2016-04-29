@@ -4,7 +4,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +15,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -26,10 +25,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-
-import java.util.Locale;
 
 public class MyLocationTrackingModeActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener, AdapterView.OnItemSelectedListener {
 
@@ -132,15 +128,15 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
         String desc = "Loc Chg: ";
         boolean noInfo = true;
         if (mLocation.hasSpeed()) {
-            desc += String.format(Locale.getDefault(), "Spd = %.1f km/h ", mLocation.getSpeed() * 3.6f);
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Spd = %.1f km/h ", mLocation.getSpeed() * 3.6f);
             noInfo = false;
         }
         if (mLocation.hasAltitude()) {
-            desc += String.format(Locale.getDefault(), "Alt = %.0f m ", mLocation.getAltitude());
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Alt = %.0f m ", mLocation.getAltitude());
             noInfo = false;
         }
         if (mLocation.hasAccuracy()) {
-            desc += String.format(Locale.getDefault(), "Acc = %.0f m", mLocation.getAccuracy());
+            desc += String.format(MapboxConstants.MAPBOX_LOCALE, "Acc = %.0f m", mLocation.getAccuracy());
         }
 
         if (noInfo) {

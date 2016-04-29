@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -63,7 +62,7 @@ public class MapboxEventManager {
 
     private final Vector<Hashtable<String, Object>> events = new Vector<>();
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", MapboxConstants.MAPBOX_LOCALE);
 
     private Context context = null;
     private String accessToken = null;
