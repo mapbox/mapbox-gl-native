@@ -7,18 +7,17 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <rapidjson/writer.h>
+#include <mbgl/util/constants.hpp>
 
 #include <cassert>
 #include <string>
 
 using namespace mbgl;
 
-FeatureIndex::FeatureIndex() {}
+FeatureIndex::FeatureIndex() : grid(util::EXTENT, 16, 0) {}
 
 void FeatureIndex::insert(const GeometryCollection& geometries, std::size_t index,
         const std::string& sourceLayerName, const std::string& bucketName) {
-
-    auto sortIndex = treeBoxes.size();
 
     for (auto& ring : geometries) {
 
@@ -35,18 +34,10 @@ void FeatureIndex::insert(const GeometryCollection& geometries, std::size_t inde
             maxY = util::max(maxY, y);
         }
 
-        treeBoxes.emplace_back(
-            TreeBox {
-                TreePoint { minX, minY },
-                TreePoint { maxX, maxY }
-            },
-            IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex }
-        );
+        grid.insert(
+                IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
+                { int32_t(minX), int32_t(minY), int32_t(maxX), int32_t(maxY) });
     }
-}
-
-void FeatureIndex::loadTree() {
-    tree.insert(treeBoxes.begin(), treeBoxes.end());
 }
 
 bool vectorContains(const std::vector<std::string>& vector, const std::string& s) {
@@ -61,8 +52,8 @@ bool vectorsIntersect(const std::vector<std::string>& vectorA, const std::vector
 }
 
 
-bool topDown(const FeatureTreeBox& a, const FeatureTreeBox& b) {
-    return std::get<1>(a).sortIndex > std::get<1>(b).sortIndex;
+bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
+    return a.sortIndex > b.sortIndex;
 }
 
 bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
@@ -97,19 +88,16 @@ void FeatureIndex::query(
         }
     }
 
-    TreeBox queryBox = {
-        TreePoint { minX - additionalRadius, minY - additionalRadius },
-        TreePoint { maxX + additionalRadius, maxY + additionalRadius }
-    };
+    std::vector<IndexedSubfeature> features = grid.query({
+        int(minX - additionalRadius),
+        int(minY - additionalRadius),
+        int(maxX + additionalRadius),
+        int(maxY + additionalRadius)
+    });
 
-    // query circle, line, fill features
-    std::vector<FeatureTreeBox> matchingBoxes;
-    tree.query(bgi::intersects(queryBox), std::back_inserter(matchingBoxes));
-    std::sort(matchingBoxes.begin(), matchingBoxes.end(), topDown);
-
+    std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
-    for (auto& matchingBox : matchingBoxes) {
-        auto& indexedFeature = std::get<1>(matchingBox);
+    for (auto& indexedFeature : features) {
 
         // If this feature is the same as the previous feature, skip it.
         if (indexedFeature.sortIndex == previousSortIndex) continue;

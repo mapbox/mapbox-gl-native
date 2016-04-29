@@ -95,7 +95,6 @@ TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
 
     if (result.state == TileData::State::parsed) {
         featureIndex->setCollisionTile(placeLayers(config));
-        featureIndex->loadTree();
         result.featureIndex = std::move(featureIndex);
         result.geometryTile = std::move(geometryTile);
     }
