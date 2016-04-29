@@ -30,7 +30,7 @@ targets.
 
  - Modern C++ compiler that supports `-std=c++14`
    - clang++ 3.5 or later _or_
-   - g++-4.9 or later
+   - g++-5 or later
  - Python 2.x (for build only)
  - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
  - [`libtool`](https://www.gnu.org/software/libtool/) (for build only)
