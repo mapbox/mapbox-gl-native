@@ -594,7 +594,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [_attributionButton removeObserver:self forKeyPath:@"hidden"];
     
     // Removing the annotations unregisters any outstanding KVO observers.
-    [self removeAnnotations:self.annotations];
+    NSArray *annotations = self.annotations;
+    if (annotations)
+    {
+        [self removeAnnotations:annotations];
+    }
     
     [self validateDisplayLink];
 
@@ -1567,7 +1571,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ([self.delegate respondsToSelector:@selector(mapView:annotation:calloutAccessoryControlTapped:)])
     {
         NSAssert([tap.view isKindOfClass:[UIControl class]], @"Tapped view %@ is not a UIControl", tap.view);
-        [self.delegate mapView:self annotation:self.selectedAnnotation
+        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        [self.delegate mapView:self annotation:selectedAnnotation
             calloutAccessoryControlTapped:(UIControl *)tap.view];
     }
 }
@@ -1581,7 +1587,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
-        [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
+        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
     }
 }
 
@@ -1589,7 +1597,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
-        [self.delegate mapView:self tapOnCalloutForAnnotation:self.selectedAnnotation];
+        id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+        NSAssert(selectedAnnotation, @"Selected annotation should not be nil.");
+        [self.delegate mapView:self tapOnCalloutForAnnotation:selectedAnnotation];
     }
 }
 
@@ -1960,7 +1970,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         annotationIndex = index - 2 /* compass, userLocationAnnotationView */;
     }
     MGLAnnotationTag annotationTag = visibleAnnotations[annotationIndex];
-    NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", index);
+    NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", (long)index);
     NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %u.", annotationTag);
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     id <MGLAnnotation> annotation = annotationContext.annotation;
@@ -3158,7 +3168,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations
 {
-    return (self.selectedAnnotation ? @[ self.selectedAnnotation ] : @[]);
+    id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
+    return (selectedAnnotation ? @[ selectedAnnotation ] : @[]);
 }
 
 - (void)setSelectedAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations
