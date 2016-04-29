@@ -43,13 +43,6 @@
         'cflags_cc': [
           '-Wno-unknown-pragmas', # We are using '#pragma mark', but it is only available on Darwin.
         ],
-        'conditions': [
-          ['cxx_host != "clang"', {
-            'cflags_cc': [
-              '-fabi-version=0',
-            ],
-          }],
-        ]
       }],
     ],
     'target_conditions': [
