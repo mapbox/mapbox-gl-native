@@ -102,7 +102,7 @@ std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     return properties;
 }
 
-uint64_t VectorTileFeature::getID() const {
+optional<uint64_t> VectorTileFeature::getID() const {
     return id;
 }
 

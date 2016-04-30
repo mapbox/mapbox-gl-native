@@ -13,6 +13,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <cstdint>
 #include <string>
@@ -108,7 +109,7 @@ public:
 
     RenderData getRenderData() const;
 
-    std::vector<std::string> queryRenderedFeatures(
+    std::vector<Feature> queryRenderedFeatures(
             const std::vector<TileCoordinate>& queryGeometry,
             const double zoom,
             const double bearing,

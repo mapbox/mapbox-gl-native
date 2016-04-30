@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/util/variant.hpp>
-#include <mbgl/util/value.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <string>
 #include <vector>

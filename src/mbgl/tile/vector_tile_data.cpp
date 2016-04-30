@@ -191,7 +191,7 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
 }
 
 void VectorTileData::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<std::string>>& result,
+        std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCollection& queryGeometry,
         const double bearing,
         const double tileSize,

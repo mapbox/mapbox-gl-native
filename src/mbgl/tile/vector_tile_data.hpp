@@ -4,6 +4,7 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <atomic>
 #include <memory>
@@ -37,7 +38,7 @@ public:
     bool hasData() const override;
 
     void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<std::string>>& result,
+            std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCollection& queryGeometry,
             const double bearing,
             const double tileSize,

@@ -30,7 +30,7 @@ void TileData::dumpDebugLogs() const {
 }
 
 void TileData::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<std::string>>&,
+        std::unordered_map<std::string, std::vector<Feature>>&,
         const GeometryCollection&,
         const double,
         const double,

@@ -7,6 +7,7 @@
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <forward_list>
 #include <vector>
@@ -72,7 +73,7 @@ public:
     std::forward_list<Tile *> getLoadedTiles() const;
     const std::vector<Tile*>& getTiles() const;
 
-    std::unordered_map<std::string, std::vector<std::string>> queryRenderedFeatures(
+    std::unordered_map<std::string, std::vector<Feature>> queryRenderedFeatures(
             const std::vector<TileCoordinate>& queryGeometry,
             const double zoom,
             const double bearing,

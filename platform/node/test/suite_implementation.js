@@ -51,8 +51,7 @@ module.exports = function (style, options, callback) {
         callback(err, pixels, results.map(prepareFeatures));
     });
 
-    function prepareFeatures(json) {
-        var r = JSON.parse(json);
+    function prepareFeatures(r) {
         delete r.layer;
         r.geometry = null;
         return r;

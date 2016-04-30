@@ -3,6 +3,7 @@
 
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/grid_index.hpp>
+#include <mbgl/util/feature.hpp>
 
 #include <vector>
 #include <string>
@@ -29,7 +30,7 @@ class FeatureIndex {
         void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketName);
 
         void query(
-                std::unordered_map<std::string, std::vector<std::string>>& result,
+                std::unordered_map<std::string, std::vector<Feature>>& result,
                 const GeometryCollection& queryGeometry,
                 const float bearing,
                 const double tileSize,
@@ -52,7 +53,7 @@ class FeatureIndex {
     private:
 
         void addFeature(
-                std::unordered_map<std::string, std::vector<std::string>>& result,
+                std::unordered_map<std::string, std::vector<Feature>>& result,
                 const IndexedSubfeature &indexedFeature,
                 const GeometryCollection& queryGeometry,
                 const optional<std::vector<std::string>>& filterLayerIDs,

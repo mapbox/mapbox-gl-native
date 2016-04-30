@@ -4,6 +4,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/feature.hpp>
 #include <mbgl/map/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
@@ -85,7 +86,7 @@ public:
     virtual void redoPlacement(const std::function<void()>&) {}
 
     virtual void queryRenderedFeatures(
-            std::unordered_map<std::string, std::vector<std::string>>& result,
+            std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCollection& queryGeometry,
             const double bearing,
             const double tileSize,

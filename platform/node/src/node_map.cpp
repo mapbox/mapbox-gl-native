@@ -1,5 +1,6 @@
 #include "node_map.hpp"
 #include "node_request.hpp"
+#include "node_feature.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
@@ -465,7 +466,7 @@ NAN_METHOD(NodeMap::QueryRenderedFeatures) {
     }
 
     try {
-        std::vector<std::string> result;
+        std::vector<mbgl::Feature> result;
 
         if (Nan::Get(posOrBox, 0).ToLocalChecked()->IsArray()) {
 
@@ -490,7 +491,7 @@ NAN_METHOD(NodeMap::QueryRenderedFeatures) {
 
         auto array = Nan::New<v8::Array>();
         for (unsigned int i = 0; i < result.size(); i++) {
-            array->Set(i, Nan::New<v8::String>(result[i]).ToLocalChecked());
+            array->Set(i, toJS(result[i]));
         }
         info.GetReturnValue().Set(array);
     } catch (const std::exception &ex) {

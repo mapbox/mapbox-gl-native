@@ -943,6 +943,7 @@
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
 					"$(variant_cflags)",
+					"$(geometry_cflags)",
 				);
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",
@@ -981,6 +982,7 @@
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
 					"$(variant_cflags)",
+					"$(geometry_cflags)",
 				);
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",

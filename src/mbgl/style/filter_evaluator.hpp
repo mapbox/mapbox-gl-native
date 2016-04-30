@@ -121,6 +121,16 @@ private:
                                          !std::is_arithmetic<T1>::value || std::is_same<T1, bool>::value, bool> {
             return false;
         }
+
+        bool operator()(const std::vector<Value>&,
+                        const std::vector<Value>&) const {
+            return false;
+        }
+
+        bool operator()(const std::unordered_map<std::string, Value>&,
+                        const std::unordered_map<std::string, Value>&) const {
+            return false;
+        }
     };
 
     template <class Op>

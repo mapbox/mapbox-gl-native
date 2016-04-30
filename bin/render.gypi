@@ -6,6 +6,7 @@
       'type': 'executable',
 
       'dependencies': [
+        'core',
         'platform-lib',
         'copy_certificate_bundle',
       ],

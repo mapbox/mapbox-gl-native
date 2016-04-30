@@ -5,7 +5,6 @@
     #import <UIKit/UIKit.h>
 #endif
 
-#import <mbgl/map/map.hpp>
 #import <mbgl/util/geo.hpp>
 
 /// Returns the smallest rectangle that contains both the given rectangle and

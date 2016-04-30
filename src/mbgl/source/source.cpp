@@ -498,13 +498,13 @@ struct TileQuery {
     double scale;
 };
 
-std::unordered_map<std::string, std::vector<std::string>> Source::queryRenderedFeatures(
+std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(
         const std::vector<TileCoordinate>& queryGeometry,
         const double zoom,
         const double bearing,
         const optional<std::vector<std::string>>& layerIDs) {
 
-    std::unordered_map<std::string, std::vector<std::string>> result;
+    std::unordered_map<std::string, std::vector<Feature>> result;
 
     double minX = std::numeric_limits<double>::infinity();
     double minY = std::numeric_limits<double>::infinity();

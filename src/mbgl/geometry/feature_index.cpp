@@ -5,8 +5,6 @@
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/util/get_geometries.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/util/rapidjson.hpp>
-#include <rapidjson/writer.h>
 #include <mbgl/util/constants.hpp>
 
 #include <cassert>
@@ -61,7 +59,7 @@ bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
 }
 
 void FeatureIndex::query(
-        std::unordered_map<std::string, std::vector<std::string>>& result,
+        std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCollection& queryGeometry,
         const float bearing,
         const double tileSize,
@@ -116,7 +114,7 @@ void FeatureIndex::query(
 }
 
 void FeatureIndex::addFeature(
-    std::unordered_map<std::string, std::vector<std::string>>& result,
+    std::unordered_map<std::string, std::vector<Feature>>& result,
     const IndexedSubfeature& indexedFeature,
     const GeometryCollection& queryGeometry,
     const optional<std::vector<std::string>>& filterLayerIDs,
@@ -131,8 +129,8 @@ void FeatureIndex::addFeature(
 
     auto sourceLayer = geometryTile.getLayer(indexedFeature.sourceLayerName);
     assert(sourceLayer);
-    auto feature = sourceLayer->getFeature(indexedFeature.index);
-    assert(feature);
+    auto geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
+    assert(geometryTileFeature);
 
     for (auto& layerID : layerIDs) {
 
@@ -142,49 +140,19 @@ void FeatureIndex::addFeature(
         if (!styleLayer) continue;
 
         if (!styleLayer->is<SymbolLayer>()) {
-            auto geometries = getGeometries(*feature);
+            auto geometries = getGeometries(*geometryTileFeature);
             if (!styleLayer->queryIntersectsGeometry(queryGeometry, geometries, bearing, pixelsToTileUnits)) continue;
         }
 
-        auto& layerResult = result[layerID];
+        Feature feature { mapbox::geometry::point<double>() };
+        feature.properties = geometryTileFeature->getProperties();
 
-        auto properties = feature->getProperties();
-        rapidjson::StringBuffer buffer;
-        buffer.Clear();
-        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-        writer.StartObject();
-        writer.Key("type");
-        writer.String("Feature");
-        auto id = feature->getID();
+        optional<uint64_t> id = geometryTileFeature->getID();
         if (id) {
-            writer.Key("id");
-            writer.Double(feature->getID());
+            feature.id = Value(*id);
         }
-        writer.Key("properties");
-        writer.StartObject();
-        for (auto& prop : properties) {
-            std::string key = prop.first;
-            Value& value = prop.second;
 
-            writer.Key(key.c_str());
-
-            if (value.is<std::string>()) {
-                writer.String(value.get<std::string>().c_str());
-            } else if (value.is<bool>()) {
-                writer.Bool(value.get<bool>());
-            } else if (value.is<int64_t>()) {
-                writer.Int64(value.get<int64_t>());
-            } else if (value.is<uint64_t>()) {
-                writer.Uint64(value.get<uint64_t>());
-            } else if (value.is<double>()) {
-                writer.Double(value.get<double>());
-            }
-        }
-        writer.EndObject();
-        writer.EndObject();
-
-        layerResult.push_back(buffer.GetString());
+        result[layerID].push_back(std::move(feature));
     }
 }
 

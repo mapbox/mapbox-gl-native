@@ -722,14 +722,14 @@ std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordina
     return queryGeometry;
 }
 
-std::vector<std::string> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
+std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
     auto queryGeometry = pointsToCoordinates({ point }, impl->transform.getState());
     return impl->style->queryRenderedFeatures(queryGeometry, impl->transform.getZoom(), impl->transform.getAngle(), layerIDs);
 }
 
-std::vector<std::string> Map::queryRenderedFeatures(const std::array<ScreenCoordinate, 2>& box, const optional<std::vector<std::string>>& layerIDs) {
+std::vector<Feature> Map::queryRenderedFeatures(const std::array<ScreenCoordinate, 2>& box, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
     std::vector<ScreenCoordinate> queryPoints {
