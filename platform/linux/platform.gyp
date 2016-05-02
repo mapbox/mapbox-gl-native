@@ -75,7 +75,6 @@
         '<@(nunicode_cflags)',
         '<@(sqlite_cflags)',
         '<@(rapidjson_cflags)',
-        '<@(variant_cflags)',
         '<@(libcurl_cflags)',
         '<@(libpng_cflags)',
         '<@(libjpeg-turbo_cflags)',

@@ -5,6 +5,9 @@
       'type': 'static_library',
       'standalone_static_library': 1,
       'hard_dependency': 1,
+      'dependencies': [
+        'core',
+      ],
 
       'include_dirs': [
         '../include',
@@ -87,7 +90,6 @@
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
-          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(gtest_ldflags)',

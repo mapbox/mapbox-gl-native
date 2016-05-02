@@ -70,7 +70,6 @@
           '<@(sqlite_cflags)',
           '<@(zlib_cflags)',
           '<@(rapidjson_cflags)',
-          '<@(variant_cflags)',
         ],
         'CLANG_ENABLE_OBJC_ARC': 'YES',
         'CLANG_ENABLE_MODULES': 'YES',

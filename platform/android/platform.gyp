@@ -51,7 +51,6 @@
         '<@(rapidjson_cflags)',
         '<@(nunicode_cflags)',
         '<@(sqlite_cflags)',
-        '<@(variant_cflags)',
         '<@(jni.hpp_cflags)',
         '<@(libzip_cflags)',
         '<@(libpng_cflags)',

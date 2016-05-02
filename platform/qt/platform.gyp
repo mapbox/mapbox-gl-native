@@ -83,7 +83,6 @@
           '<@(qt_network_cflags)',
           '<@(rapidjson_cflags)',
           '<@(sqlite_cflags)',
-          '<@(variant_cflags)',
           '<@(webp_cflags)',
           '-fPIC',
         ],

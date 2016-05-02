@@ -6,6 +6,7 @@
       'type': 'executable',
 
       'dependencies': [
+        'core',
         'platform-lib',
         'copy_certificate_bundle',
       ],
@@ -27,7 +28,6 @@
       'variables': {
         'cflags_cc': [
           '<@(glfw_cflags)',
-          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',

@@ -283,6 +283,17 @@
           }]
         ],
       },
+
+      'direct_dependent_settings': {
+        'cflags_cc': [
+          '<@(variant_cflags)',
+        ],
+        'xcode_settings': {
+          'OTHER_CPLUSPLUSFLAGS': [
+            '<@(variant_cflags)',
+          ],
+        },
+      },
     },
     {
       'target_name': 'copy_certificate_bundle',

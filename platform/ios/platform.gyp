@@ -113,7 +113,6 @@
           '<@(sqlite_cflags)',
           '<@(zlib_cflags)',
           '<@(rapidjson_cflags)',
-          '<@(variant_cflags)',
         ],
         'ldflags': [
           '<@(sqlite_ldflags)',
