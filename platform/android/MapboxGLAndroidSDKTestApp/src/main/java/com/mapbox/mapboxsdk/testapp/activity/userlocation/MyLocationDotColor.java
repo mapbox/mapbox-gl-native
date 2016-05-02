@@ -1,8 +1,13 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,8 +28,9 @@ public class MyLocationDotColor extends AppCompatActivity implements LocationLis
 
     private MapView mapView;
     private MapboxMap map;
-    private Location location;
     private boolean firstRun;
+
+    private static final int PERMISSIONS_LOCATION = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,8 +46,6 @@ public class MyLocationDotColor extends AppCompatActivity implements LocationLis
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        location = LocationServices.getLocationServices(this).getLastLocation();
-
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setAccessToken(getString(R.string.mapbox_access_token));
         mapView.onCreate(savedInstanceState);
@@ -51,25 +55,24 @@ public class MyLocationDotColor extends AppCompatActivity implements LocationLis
 
                 map = mapboxMap;
 
-                mapboxMap.setMyLocationEnabled(true);
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom((location != null ? new LatLng(location) : new LatLng(0, 0)), 15));
+                toggleGps(!mapboxMap.isMyLocationEnabled());
 
             }
         });
 
         // handle default button clicks
-        findViewById(R.id.defaultUserDotColoringButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.default_user_dot_coloring_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 map.getMyLocationViewSettings().setAccuracyTintColor(ContextCompat.getColor(MyLocationDotColor.this, R.color.my_location_ring));
-                map.getMyLocationViewSettings().setForegroundTintColor(ContextCompat.getColor(MyLocationDotColor.this, R.color.primaryDark));
+                map.getMyLocationViewSettings().setForegroundTintColor(ContextCompat.getColor(MyLocationDotColor.this, R.color.mapbox_blue));
 
             }
         });
 
         // handle tint user dot button clicks
-        findViewById(R.id.tintUserDotButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tint_user_dot_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -80,7 +83,7 @@ public class MyLocationDotColor extends AppCompatActivity implements LocationLis
         });
 
         // handle tint accuracy ring button clicks
-        findViewById(R.id.UserAccuracyRingTintButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.user_accuracy_ring_tint_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -140,6 +143,42 @@ public class MyLocationDotColor extends AppCompatActivity implements LocationLis
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @UiThread
+    public void toggleGps(boolean enableGps) {
+        if (enableGps) {
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+            } else {
+                enableLocation(true);
+            }
+        } else {
+            enableLocation(false);
+        }
+    }
+
+    private void enableLocation(boolean enabled) {
+        if (enabled) {
+            map.setMyLocationEnabled(true);
+            if (map.getMyLocation() != null) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(map.getMyLocation().getLatitude(), map.getMyLocation().getLongitude()), 15));
+            }
+        } else {
+            map.setMyLocationEnabled(false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableLocation(true);
+                }
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#1E8CAB</color>
-    <color name="primaryDark">#166B83</color>
+    <color name="primary_dark">#166B83</color>
     <color name="accent">#E55E5E</color>
     <color name="white">#F9F9F9</color>
     <color name="mapbox_green">#56B881</color>

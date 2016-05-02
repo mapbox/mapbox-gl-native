@@ -17,8 +17,7 @@
         android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:style_url="@string/style_mapbox_streets"
-        app:scroll_enabled="false" />
+        app:style_url="@string/style_mapbox_streets" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,21 +27,21 @@
         android:weightSum="3">
 
         <Button
-            android:id="@+id/defaultUserDotColoringButton"
+            android:id="@+id/default_user_dot_coloring_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/button_user_dot_default" />
 
         <Button
-            android:id="@+id/tintUserDotButton"
+            android:id="@+id/tint_user_dot_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/button_user_dot_tint" />
 
         <Button
-            android:id="@+id/UserAccuracyRingTintButton"
+            android:id="@+id/user_accuracy_ring_tint_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
