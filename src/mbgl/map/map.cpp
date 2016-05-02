@@ -523,7 +523,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
             padding->left / minScale,
             padding->bottom / minScale,
         };
-        centerPixel = centerPixel - paddedNEPixel - paddedSWPixel;
+        centerPixel = centerPixel + paddedNEPixel - paddedSWPixel;
     }
     centerPixel /= 2;
 
