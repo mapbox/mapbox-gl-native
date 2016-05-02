@@ -1508,6 +1508,10 @@ void setOfflineRegionObserver(JNIEnv *env, jni::jobject* offlineRegion_, jni::jo
                     break;
             }
 
+            // Create a new local reference frame (capacity 1 for the NewObject allocation below)
+            // to avoid a local reference table overflow (#4706)
+            jni::UniqueLocalFrame frame = jni::PushLocalFrame(*env2, 1);
+
             // Stats object
             jni::jobject* jstatus = &jni::NewObject(*env2, *offlineRegionStatusClass, *offlineRegionStatusConstructorId);
             jni::SetField<jint>(*env2, jstatus, *offlineRegionStatusDownloadStateId, downloadState);
