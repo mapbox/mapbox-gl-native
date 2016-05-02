@@ -1,5 +1,7 @@
 #include "qquickmapboxglrenderer.hpp"
 
+#include <mbgl/util/constants.hpp>
+
 #include <QQuickMapboxGL>
 
 #include <QQuickItem>
@@ -207,6 +209,27 @@ void QQuickMapboxGL::setBearing(qreal angle)
 qreal QQuickMapboxGL::bearing() const
 {
     return m_bearing;
+}
+
+void QQuickMapboxGL::setPitch(qreal angle)
+{
+    angle = qMin(qMax(0., angle), mbgl::util::PITCH_MAX * mbgl::util::RAD2DEG);
+
+    if (m_pitch == angle) {
+        return;
+    }
+
+    m_pitch = angle;
+
+    m_syncState |= PitchNeedsSync;
+    update();
+
+    emit pitchChanged(m_pitch);
+}
+
+qreal QQuickMapboxGL::pitch() const
+{
+    return m_pitch;
 }
 
 QPointF QQuickMapboxGL::swapPan()
