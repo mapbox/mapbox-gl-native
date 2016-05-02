@@ -96,30 +96,6 @@ struct vec2 {
 };
 
 template <typename T = double>
-struct vec3 {
-    T x, y, z;
-
-    inline vec3() = default;
-    inline vec3(const vec3& o) : x(o.x), y(o.y), z(o.z) {}
-    inline vec3(T x_, T y_, T z_) : x(x_), y(y_), z(z_) {}
-    inline bool operator==(const vec3& rhs) const {
-        return x == rhs.x && y == rhs.y && z == rhs.z;
-    }
-
-    template<typename U = T, typename std::enable_if<std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    explicit operator bool() const {
-        return !std::isnan(x) && !std::isnan(y) && !std::isnan(z);
-    }
-
-    template<typename U = T, typename std::enable_if<!std::numeric_limits<U>::has_quiet_NaN, int>::type = 0>
-    explicit operator bool() const {
-        return x != std::numeric_limits<T>::min()
-            && y != std::numeric_limits<T>::min()
-            && z != std::numeric_limits<T>::min();
-    }
-};
-
-template <typename T = double>
 struct vec4 {
     T x, y, z, w;
 
