@@ -329,7 +329,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     if ( ! styleURL)
     {
-        styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion];
+        styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
     }
 
     if ( ! [styleURL scheme])
