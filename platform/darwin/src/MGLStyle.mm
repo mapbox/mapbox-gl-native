@@ -13,7 +13,7 @@ static_assert(mbgl::util::default_styles::currentVersion == MGLStyleCurrentVersi
     + (NSURL *)name##StyleURL { \
         static dispatch_once_t onceToken; \
         dispatch_once(&onceToken, ^{ \
-            MGLStyleURL_##name = [self name##StyleURLWithVersion:MGLStyleCurrentVersion]; \
+            MGLStyleURL_##name = [self name##StyleURLWithVersion:8]; \
         }); \
         return MGLStyleURL_##name; \
     } \
