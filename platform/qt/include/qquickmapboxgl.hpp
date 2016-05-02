@@ -4,6 +4,7 @@
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QGeoShape>
+#include <QPointF>
 #include <QQuickFramebufferObject>
 
 class QDeclarativeGeoServiceProvider;
@@ -36,6 +37,7 @@ public:
     // QQuickFramebufferObject implementation.
     virtual Renderer *createRenderer() const Q_DECL_FINAL;
 
+    // Map QML Type interface implementation.
     void setPlugin(QDeclarativeGeoServiceProvider *plugin);
     QDeclarativeGeoServiceProvider *plugin() const;
 
@@ -63,14 +65,20 @@ public:
     void setColor(const QColor &color);
     QColor color() const;
 
+    Q_INVOKABLE void pan(int dx, int dy);
+
+    // MapboxGL QML Type interface.
     void setStyle(const QString &style);
     QString style() const;
+
+    QPointF swapPan();
 
     enum SyncState {
         NothingNeedsSync = 0x00,
         ZoomNeedsSync    = 0x01,
         CenterNeedsSync  = 0x02,
         StyleNeedsSync   = 0x04,
+        PanNeedsSync     = 0x08,
     };
 
     int swapSyncState();
@@ -94,6 +102,8 @@ private:
     qreal m_minimumZoomLevel = 0;
     qreal m_maximumZoomLevel = 20;
     qreal m_zoomLevel = 20;
+
+    QPointF m_pan = QPointF(0, 0);
 
     QGeoCoordinate m_center;
     QGeoShape m_visibleRegion;

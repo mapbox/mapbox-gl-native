@@ -159,6 +159,14 @@ QColor QQuickMapboxGL::color() const
     return QColor();
 }
 
+void QQuickMapboxGL::pan(int dx, int dy)
+{
+    m_pan += QPointF(dx, dy);
+
+    m_syncState |= PanNeedsSync;
+    update();
+}
+
 void QQuickMapboxGL::setStyle(const QString &styleUrl)
 {
     if (m_style == styleUrl) {
@@ -176,6 +184,15 @@ void QQuickMapboxGL::setStyle(const QString &styleUrl)
 QString QQuickMapboxGL::style() const
 {
     return m_style;
+}
+
+QPointF QQuickMapboxGL::swapPan()
+{
+    QPointF oldPan = m_pan;
+
+    m_pan = QPointF(0, 0);
+
+    return oldPan;
 }
 
 int QQuickMapboxGL::swapSyncState()

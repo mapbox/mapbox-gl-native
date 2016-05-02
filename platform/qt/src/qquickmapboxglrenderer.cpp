@@ -61,4 +61,8 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     if (syncStatus & QQuickMapboxGL::StyleNeedsSync) {
         m_map->setStyleURL(quickMap->style());
     }
+
+    if (syncStatus & QQuickMapboxGL::PanNeedsSync) {
+        m_map->moveBy(quickMap->swapPan());
+    }
 }
