@@ -27,12 +27,22 @@ MGL_DEFINE_STYLE(outdoors, outdoors)
 MGL_DEFINE_STYLE(light, light)
 MGL_DEFINE_STYLE(dark, dark)
 MGL_DEFINE_STYLE(satellite, satellite)
-MGL_DEFINE_STYLE(hybrid, satellite-hybrid)
+MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
 
 // Make sure all the styles listed in mbgl::util::default_styles::orderedStyles
 // are defined above and also declared in MGLStyle.h.
 static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
+
+// Hybrid has been renamed Satellite Streets, so the last Hybrid version is hard-coded here.
+static NSURL *MGLStyleURL_hybrid;
++ (NSURL *)hybridStyleURL {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        MGLStyleURL_hybrid = [NSURL URLWithString:@"mapbox://styles/mapbox/satellite-hybrid-v8"];
+    });
+    return MGLStyleURL_hybrid;
+}
 
 // Emerald is no longer getting new versions as a default style, so the current version is hard-coded here.
 static NSURL *MGLStyleURL_emerald;

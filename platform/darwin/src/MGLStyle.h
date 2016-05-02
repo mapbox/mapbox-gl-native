@@ -99,20 +99,20 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to version 8 of the Hybrid style.
+ Returns the URL to version 8 of the Satellite Streets style.
  
- Mapbox Hybrid combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels.
+ Mapbox Satellite Streets combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
  */
-+ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -hybridStyleURLWithVersion:.")));
++ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURLWithVersion:.")));
 
 /**
- Returns the URL to the given version of the Hybrid style.
+ Returns the URL to the given version of the Satellite Streets style.
  
- Mapbox Hybrid combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels.
+ Mapbox Satellite Streets combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
  
  @param version The style’s latest released version. The current version is given by `MGLStyleCurrentVersion`.
  */
-+ (NSURL *)hybridStyleURLWithVersion:(NSInteger)version;
++ (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
 - (instancetype)init NS_UNAVAILABLE;
 

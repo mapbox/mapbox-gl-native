@@ -479,7 +479,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             @"Light",
             @"Dark",
             @"Satellite",
-            @"Hybrid",
+            @"Satellite Streets",
         ];
         styleURLs = @[
             [MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion],
@@ -487,7 +487,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
             [MGLStyle lightStyleURLWithVersion:MGLStyleCurrentVersion],
             [MGLStyle darkStyleURLWithVersion:MGLStyleCurrentVersion],
             [MGLStyle satelliteStyleURLWithVersion:MGLStyleCurrentVersion],
-            [MGLStyle hybridStyleURLWithVersion:MGLStyleCurrentVersion],
+            [MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleCurrentVersion],
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
         

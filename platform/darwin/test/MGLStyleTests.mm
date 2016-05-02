@@ -32,7 +32,7 @@
     XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::light.url));
     XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::dark.url));
     XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::satellite.url));
-    XCTAssertEqualObjects([MGLStyle hybridStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::hybrid.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
     
     static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");

@@ -390,7 +390,7 @@
                                     <action selector="setStyle:" target="-1" id="GXt-oK-Hy1"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Hybrid" tag="6" keyEquivalent="6" id="9BL-00-HFt">
+                            <menuItem title="Satellite Streets" tag="6" keyEquivalent="6" id="9BL-00-HFt">
                                 <connections>
                                     <action selector="setStyle:" target="-1" id="oL4-AC-waq"/>
                                 </connections>
