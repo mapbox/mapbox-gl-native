@@ -65,4 +65,8 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
     if (syncStatus & QQuickMapboxGL::PanNeedsSync) {
         m_map->moveBy(quickMap->swapPan());
     }
+
+    if (syncStatus & QQuickMapboxGL::BearingNeedsSync) {
+        m_map->setBearing(quickMap->bearing());
+    }
 }

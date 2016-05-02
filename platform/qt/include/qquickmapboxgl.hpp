@@ -29,6 +29,7 @@ class Q_DECL_EXPORT QQuickMapboxGL : public QQuickFramebufferObject
 
     // MapboxGL QML Type interface.
     Q_PROPERTY(QString style READ style WRITE setStyle NOTIFY styleChanged)
+    Q_PROPERTY(qreal bearing READ bearing WRITE setBearing NOTIFY bearingChanged)
 
 public:
     QQuickMapboxGL(QQuickItem *parent = 0);
@@ -71,6 +72,9 @@ public:
     void setStyle(const QString &style);
     QString style() const;
 
+    void setBearing(qreal bearing);
+    qreal bearing() const;
+
     QPointF swapPan();
 
     enum SyncState {
@@ -79,6 +83,7 @@ public:
         CenterNeedsSync  = 0x02,
         StyleNeedsSync   = 0x04,
         PanNeedsSync     = 0x08,
+        BearingNeedsSync = 0x16,
     };
 
     int swapSyncState();
@@ -97,6 +102,7 @@ signals:
     void colorChanged(const QColor &color);
 
     void styleChanged();
+    void bearingChanged(qreal angle);
 
 private:
     qreal m_minimumZoomLevel = 0;
@@ -109,6 +115,7 @@ private:
     QGeoShape m_visibleRegion;
 
     QString m_style;
+    qreal m_bearing = 0;
 
     int m_syncState = NothingNeedsSync;
 };

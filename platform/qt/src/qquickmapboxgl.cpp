@@ -6,6 +6,8 @@
 #include <QString>
 #include <QtGlobal>
 
+#include <cmath>
+
 QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
     : QQuickFramebufferObject(parent_)
 {
@@ -184,6 +186,27 @@ void QQuickMapboxGL::setStyle(const QString &styleUrl)
 QString QQuickMapboxGL::style() const
 {
     return m_style;
+}
+
+void QQuickMapboxGL::setBearing(qreal angle)
+{
+    angle = std::fmod(angle, 360.);
+
+    if (m_bearing == angle) {
+        return;
+    }
+
+    m_bearing = angle;
+
+    m_syncState |= BearingNeedsSync;
+    update();
+
+    emit bearingChanged(m_bearing);
+}
+
+qreal QQuickMapboxGL::bearing() const
+{
+    return m_bearing;
 }
 
 QPointF QQuickMapboxGL::swapPan()
