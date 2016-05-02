@@ -2,29 +2,23 @@
 #define MBGL_UTIL_STRING
 
 #include <string>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#include <boost/lexical_cast.hpp>
-#pragma GCC diagnostic pop
+#include <cassert>
+#include <exception>
 
 namespace mbgl {
 namespace util {
 
-template <typename... Args>
-inline std::string toString(Args&&... args) {
-    return boost::lexical_cast<std::string>(::std::forward<Args>(args)...);
+template <class T>
+inline std::string toString(T t) {
+    return std::to_string(t);
 }
 
-// boost::lexical_cast() treats this as a character, but we are using it as number types.
 inline std::string toString(int8_t num) {
-    return boost::lexical_cast<std::string>(int(num));
+    return std::to_string(int(num));
 }
 
-// boost::lexical_cast() treats this as a character, but we are using it as number types.
 inline std::string toString(uint8_t num) {
-    return boost::lexical_cast<std::string>(unsigned(num));
+    return std::to_string(unsigned(num));
 }
 
 inline std::string toString(std::exception_ptr error) {
@@ -41,18 +35,6 @@ inline std::string toString(std::exception_ptr error) {
     } catch (...) {
         return "Unknown exception type";
     }
-}
-
-template<size_t max, typename... Args>
-inline std::string sprintf(const char *msg, Args... args) {
-    char res[max];
-    int len = snprintf(res, sizeof(res), msg, args...);
-    return std::string(res, len);
-}
-
-template<size_t max, typename... Args>
-inline std::string sprintf(const std::string &msg, Args... args) {
-    return sprintf<max>(msg.c_str(), args...);
 }
 
 } // namespace util

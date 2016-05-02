@@ -28,7 +28,6 @@
         'cflags_cc': [
           '<@(glfw_cflags)',
           '<@(variant_cflags)',
-          '<@(boost_cflags)',
         ],
         'ldflags': [
           '<@(glfw_ldflags)',
