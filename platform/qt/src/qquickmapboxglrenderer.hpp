@@ -1,15 +1,19 @@
 #ifndef QQUICKMAPBOXGLRENDERER_H
 #define QQUICKMAPBOXGLRENDERER_H
 
-#include <QScopedPointer>
+#include <QObject>
 #include <QQuickFramebufferObject>
+#include <QScopedPointer>
 
+class QGeoCoordinate;
+class QMapboxGL;
 class QOpenGLFramebufferObject;
 class QSize;
-class QMapboxGL;
 
-class QQuickMapboxGLRenderer : public QQuickFramebufferObject::Renderer
+class QQuickMapboxGLRenderer : public QObject, public QQuickFramebufferObject::Renderer
 {
+    Q_OBJECT
+
 public:
     QQuickMapboxGLRenderer();
     virtual ~QQuickMapboxGLRenderer();
@@ -18,6 +22,9 @@ public:
 
     virtual void render();
     virtual void synchronize(QQuickFramebufferObject *item);
+
+signals:
+    void centerChanged(const QGeoCoordinate &coordinate);
 
 private:
     bool m_initialized = false;

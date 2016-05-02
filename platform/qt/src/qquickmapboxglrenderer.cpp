@@ -42,7 +42,11 @@ void QQuickMapboxGLRenderer::render()
 void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
 {
     if (!m_initialized) {
-        QObject::connect(m_map.data(), SIGNAL(needsRendering()), item, SLOT(update()));
+        auto qquickMapbox = static_cast<QQuickMapboxGL*>(item);
+
+        QObject::connect(m_map.data(), &QMapboxGL::needsRendering, qquickMapbox, &QQuickMapboxGL::update);
+        QObject::connect(this, &QQuickMapboxGLRenderer::centerChanged, qquickMapbox, &QQuickMapboxGL::setCenter);
+
         m_initialized = true;
     }
 
@@ -64,6 +68,7 @@ void QQuickMapboxGLRenderer::synchronize(QQuickFramebufferObject *item)
 
     if (syncStatus & QQuickMapboxGL::PanNeedsSync) {
         m_map->moveBy(quickMap->swapPan());
+        emit centerChanged(QGeoCoordinate(m_map->latitude(), m_map->longitude()));
     }
 
     if (syncStatus & QQuickMapboxGL::BearingNeedsSync) {

@@ -51,7 +51,6 @@ public:
     void setZoomLevel(qreal zoomLevel);
     qreal zoomLevel() const;
 
-    void setCenter(const QGeoCoordinate &center);
     QGeoCoordinate center() const;
 
     QGeoServiceProvider::Error error() const;
@@ -103,6 +102,9 @@ signals:
 
     void styleChanged();
     void bearingChanged(qreal angle);
+
+public slots:
+    void setCenter(const QGeoCoordinate &center);
 
 private:
     qreal m_minimumZoomLevel = 0;
