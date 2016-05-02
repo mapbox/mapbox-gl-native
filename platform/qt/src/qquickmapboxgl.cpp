@@ -41,7 +41,7 @@ QDeclarativeGeoServiceProvider *QQuickMapboxGL::plugin() const
 
 void QQuickMapboxGL::setMinimumZoomLevel(qreal zoom)
 {
-    zoom = qMax(0., zoom);
+    zoom = qMax(mbgl::util::MIN_ZOOM, zoom);
     zoom = qMin(m_maximumZoomLevel, zoom);
 
     if (m_minimumZoomLevel == zoom) {
@@ -61,7 +61,7 @@ qreal QQuickMapboxGL::minimumZoomLevel() const
 
 void QQuickMapboxGL::setMaximumZoomLevel(qreal zoom)
 {
-    zoom = qMin(20., zoom);
+    zoom = qMin(mbgl::util::MAX_ZOOM, zoom);
     zoom = qMax(m_minimumZoomLevel, zoom);
 
     if (m_maximumZoomLevel == zoom) {
