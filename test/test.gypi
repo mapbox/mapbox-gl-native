@@ -85,6 +85,7 @@
         'cflags_cc': [
           '<@(gtest_cflags)',
           '<@(opengl_cflags)',
+          '<@(protozero_cflags)',
           '<@(boost_cflags)',
           '<@(sqlite_cflags)',
           '<@(geojsonvt_cflags)',
