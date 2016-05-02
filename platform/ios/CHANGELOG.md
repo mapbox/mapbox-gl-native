@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone.  If you’d like 
 
 ## 3.2.2
 
-- Existing MGLStyle class methods that return default style URLs have been deprecated in favor of new methods that require an explicit style version parameter. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
+- Existing MGLStyle class methods that return default style URLs have been deprecated in favor of new methods that require an explicit style version parameter. The deprecated, unversioned methods continue to return version 8 of the respective styles and will not be updated as new versions of the styles are released. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 - Deprecated `+[MGLStyle emeraldStyleURL]` with no replacement method. To use the Emerald style going forward, we recommend that you use the underlying URL. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 - Added `+[MGLStyle outdoorsStyleURLWithVersion:]` for the new Outdoors style. ([#4759](https://github.com/mapbox/mapbox-gl-native/pull/4759))
 

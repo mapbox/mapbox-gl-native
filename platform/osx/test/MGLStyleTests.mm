@@ -18,12 +18,12 @@
 - (void)testUnversionedStyleURLs {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle streetsStyleURL].absoluteString, @(mbgl::util::default_styles::streets.url));
+    XCTAssertEqualObjects([MGLStyle streetsStyleURL].absoluteString, @"mapbox://styles/mapbox/streets-v8");
     XCTAssertEqualObjects([MGLStyle emeraldStyleURL].absoluteString, @"mapbox://styles/mapbox/emerald-v8");
-    XCTAssertEqualObjects([MGLStyle lightStyleURL].absoluteString, @(mbgl::util::default_styles::light.url));
-    XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @(mbgl::util::default_styles::dark.url));
-    XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @(mbgl::util::default_styles::satellite.url));
-    XCTAssertEqualObjects([MGLStyle hybridStyleURL].absoluteString, @(mbgl::util::default_styles::hybrid.url));
+    XCTAssertEqualObjects([MGLStyle lightStyleURL].absoluteString, @"mapbox://styles/mapbox/light-v8");
+    XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @"mapbox://styles/mapbox/dark-v8");
+    XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-v8");
+    XCTAssertEqualObjects([MGLStyle hybridStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-hybrid-v8");
 #pragma clang diagnostic pop
 }
 

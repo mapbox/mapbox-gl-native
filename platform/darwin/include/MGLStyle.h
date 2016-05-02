@@ -19,7 +19,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 @interface MGLStyle : NSObject
 
 /**
- Returns the URL to the current version of the Streets style.
+ Returns the URL to version 8 of the Streets style.
  
  Mapbox Streets is a complete base map that balances nature, commerce, and infrastructure.
  */
@@ -35,7 +35,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the Emerald style.
+ Returns the URL to version 8 of the Emerald style.
  
  Mapbox Emerald is a versatile style with emphasis on road networks and public transportation.
  */
@@ -51,7 +51,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)outdoorsStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the Light style.
+ Returns the URL to version 8 of the Light style.
  
  Mapbox Light is a subtle, light-colored backdrop for data visualizations.
  */
@@ -67,7 +67,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)lightStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the Dark style.
+ Returns the URL to version 8 of the Dark style.
  
  Mapbox Dark is a subtle, dark-colored backdrop for data visualizations.
  */
@@ -83,7 +83,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)darkStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the Satellite style.
+ Returns the URL to version 8 of the Satellite style.
  
  Mapbox Satellite is a beautiful global satellite and aerial imagery layer.
  */
@@ -99,7 +99,7 @@ static const NSInteger MGLStyleCurrentVersion = 9;
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the Hybrid style.
+ Returns the URL to version 8 of the Hybrid style.
  
  Mapbox Hybrid combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels.
  */
