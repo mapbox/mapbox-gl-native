@@ -516,14 +516,17 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     ScreenCoordinate centerPixel = nePixel + swPixel;
     if (padding && *padding) {
         ScreenCoordinate paddedNEPixel = {
-            padding->right / minScale,
-            padding->top / minScale,
+            nePixel.x + padding->right / minScale,
+            nePixel.y + padding->top / minScale,
         };
         ScreenCoordinate paddedSWPixel = {
-            padding->left / minScale,
-            padding->bottom / minScale,
+            swPixel.x - padding->left / minScale,
+            swPixel.y - padding->bottom / minScale,
         };
-        centerPixel = centerPixel - paddedNEPixel - paddedSWPixel;
+        centerPixel = {
+            (paddedNEPixel.x + paddedSWPixel.x),
+            (paddedNEPixel.y + paddedSWPixel.y)
+        };
     }
     centerPixel /= 2;
 
