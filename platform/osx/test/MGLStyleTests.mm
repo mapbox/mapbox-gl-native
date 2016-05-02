@@ -1,6 +1,6 @@
 #import "MGLStyle.h"
 
-#import "NSBundle+MGLAdditions.h"
+#import "../../darwin/src/NSBundle+MGLAdditions.h"
 
 #import <mbgl/util/default_styles.hpp>
 
@@ -30,18 +30,18 @@
 - (void)testVersionedStyleURLs {
     // Test that all the default styles have publicly-declared MGLStyle class
     // methods and that the URLs all have the right values.
-    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::streets.url));
-    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::outdoors.url));
-    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::light.url));
-    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::dark.url));
-    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::satellite.url));
-    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleCurrentVersion].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
+    XCTAssertEqualObjects([MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::streets.url));
+    XCTAssertEqualObjects([MGLStyle outdoorsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::outdoors.url));
+    XCTAssertEqualObjects([MGLStyle lightStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::light.url));
+    XCTAssertEqualObjects([MGLStyle darkStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::dark.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::satellite.url));
+    XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:MGLStyleDefaultVersion].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
     
     static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");
 }
 
-- (void)testStyleURLComprehensiveness {
+- (void)testStyleURLDeclarations {
     // Make sure this test is comprehensive.
     const unsigned numImplicitArgs = 2 /* _cmd, self */;
     unsigned numMethods = 0;
@@ -66,12 +66,7 @@
                    mbgl::util::default_styles::numOrderedStyles, numVersionedMethods);
     
     // Test that all the versioned style methods are in the public header.
-    NSURL *styleHeaderURL = [[[NSBundle mgl_frameworkBundle].bundleURL
-                              URLByAppendingPathComponent:@"Headers" isDirectory:YES]
-                             URLByAppendingPathComponent:@"MGLStyle.h"];
-    NSError *styleHeaderError;
-    NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
-    XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
+    NSString *styleHeader = self.stringWithContentsOfStyleHeader;
     
     NSError *versionedMethodError;
     NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*;)RE");
@@ -79,6 +74,29 @@
     XCTAssertNil(versionedMethodError, @"Error compiling regular expression to search for versioned methods.");
     NSUInteger numVersionedMethodDeclarations = [versionedMethodExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
     XCTAssertEqual(numVersionedMethodDeclarations, numVersionedMethods);
+    
+    // Test that “current version is” statements are present and current for all versioned style methods.
+    NSError *versionError;
+    NSString *versionExpressionString = @(R"RE(the current version is `(\d+)`)RE");
+    NSRegularExpression *versionExpression = [NSRegularExpression regularExpressionWithPattern:versionExpressionString options:0 error:&versionError];
+    XCTAssertNil(versionError, @"Error compiling regular expression to search for current version statements.");
+    NSUInteger numVersionDeclarations = [versionExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
+    XCTAssertEqual(numVersionDeclarations, numVersionedMethods);
+    [versionExpression enumerateMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length) usingBlock:^(NSTextCheckingResult * _Nullable result, __unused NSMatchingFlags flags, __unused BOOL * _Nonnull stop) {
+        XCTAssertEqual(result.numberOfRanges, 2U, @"Regular expression should have one capture group.");
+        NSString *version = [styleHeader substringWithRange:[result rangeAtIndex:1]];
+        XCTAssertEqual([version integerValue], MGLStyleDefaultVersion, @"Versioned style URL method should document current version as %ld, not %ld.", MGLStyleDefaultVersion, version.integerValue);
+    }];
+}
+
+- (NSString *)stringWithContentsOfStyleHeader {
+    NSURL *styleHeaderURL = [[[NSBundle mgl_frameworkBundle].bundleURL
+                              URLByAppendingPathComponent:@"Headers" isDirectory:YES]
+                             URLByAppendingPathComponent:@"MGLStyle.h"];
+    NSError *styleHeaderError;
+    NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
+    XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
+    return styleHeader;
 }
 
 @end

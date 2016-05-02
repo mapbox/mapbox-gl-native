@@ -4,7 +4,7 @@
 
 @implementation MGLStyle
 
-static_assert(mbgl::util::default_styles::currentVersion == MGLStyleCurrentVersion, "mbgl::util::default_styles::currentVersion and MGLStyleCurrentVersion disagree.");
+static_assert(mbgl::util::default_styles::currentVersion == MGLStyleDefaultVersion, "mbgl::util::default_styles::currentVersion and MGLStyleDefaultVersion disagree.");
 
 /// @param name The style’s marketing name, written in lower camelCase.
 /// @param fileName The last path component in the style’s URL, excluding the version suffix.
