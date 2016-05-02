@@ -1587,7 +1587,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"$(boost_cflags)",
 					"$(sqlite_cflags)",
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
@@ -1627,7 +1626,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"$(boost_cflags)",
 					"$(sqlite_cflags)",
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
@@ -1680,7 +1678,6 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"$(boost_cflags)",
 					"$(sqlite_cflags)",
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
@@ -1710,7 +1707,6 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
-					"$(boost_cflags)",
 					"$(sqlite_cflags)",
 					"$(zlib_cflags)",
 					"$(rapidjson_cflags)",
