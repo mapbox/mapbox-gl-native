@@ -172,6 +172,7 @@
       'variables': {
         'cflags_cc': [
           '<@(opengl_cflags)',
+          '<@(protozero_cflags)',
           '<@(boost_cflags)',
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',

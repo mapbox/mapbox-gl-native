@@ -3,7 +3,7 @@
 
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/tile_id.hpp>
-#include <mbgl/util/pbf.hpp>
+#include <protozero/pbf_reader.hpp>
 
 #include <map>
 #include <unordered_map>
@@ -13,9 +13,12 @@ namespace mbgl {
 
 class VectorTileLayer;
 
+using pbf_iter_type = protozero::pbf_reader::const_uint32_iterator;
+using packed_iter_type = std::pair<pbf_iter_type,pbf_iter_type>;
+
 class VectorTileFeature : public GeometryTileFeature {
 public:
-    VectorTileFeature(pbf, const VectorTileLayer&);
+    VectorTileFeature(protozero::pbf_reader, const VectorTileLayer&);
 
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
@@ -28,13 +31,13 @@ private:
     const VectorTileLayer& layer;
     uint64_t id = 0;
     FeatureType type = FeatureType::Unknown;
-    pbf tags_pbf;
-    pbf geometry_pbf;
+    packed_iter_type tags_iter;
+    packed_iter_type geometry_iter;
 };
 
 class VectorTileLayer : public GeometryTileLayer {
 public:
-    VectorTileLayer(pbf);
+    VectorTileLayer(protozero::pbf_reader);
 
     std::size_t featureCount() const override { return features.size(); }
     util::ptr<const GeometryTileFeature> getFeature(std::size_t) const override;
@@ -49,7 +52,7 @@ private:
     std::map<std::string, uint32_t> keysMap;
     std::vector<std::reference_wrapper<const std::string>> keys;
     std::vector<Value> values;
-    std::vector<pbf> features;
+    std::vector<protozero::pbf_reader> features;
 };
 
 class VectorTile : public GeometryTile {

@@ -9,25 +9,24 @@
 
 namespace mbgl {
 
-Value parseValue(pbf data) {
+Value parseValue(protozero::pbf_reader data) {
     while (data.next())
     {
-        switch (data.tag)
-        {
+        switch (data.tag()) {
         case 1: // string_value
-            return data.string();
+            return data.get_string();
         case 2: // float_value
-            return static_cast<double>(data.float32());
+            return static_cast<double>(data.get_float());
         case 3: // double_value
-            return data.float64();
+            return data.get_double();
         case 4: // int_value
-            return data.varint<int64_t>();
+            return data.get_int64();
         case 5: // uint_value
-            return data.varint<uint64_t>();
+            return data.get_uint64();
         case 6: // sint_value
-            return data.svarint<int64_t>();
+            return data.get_sint64();
         case 7: // bool_value
-            return data.boolean();
+            return data.get_bool();
         default:
             data.skip();
             break;
@@ -36,19 +35,25 @@ Value parseValue(pbf data) {
     return false;
 }
 
-VectorTileFeature::VectorTileFeature(pbf feature_pbf, const VectorTileLayer& layer_)
+VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, const VectorTileLayer& layer_)
     : layer(layer_) {
     while (feature_pbf.next()) {
-        if (feature_pbf.tag == 1) { // id
-            id = feature_pbf.varint<uint64_t>();
-        } else if (feature_pbf.tag == 2) { // tags
-            tags_pbf = feature_pbf.message();
-        } else if (feature_pbf.tag == 3) { // type
-            type = (FeatureType)feature_pbf.varint();
-        } else if (feature_pbf.tag == 4) { // geometry
-            geometry_pbf = feature_pbf.message();
-        } else {
+        switch (feature_pbf.tag()) {
+        case 1: // id
+            id = feature_pbf.get_uint64();
+            break;
+        case 2: // tags
+            tags_iter = feature_pbf.get_packed_uint32();
+            break;
+        case 3: // type
+            type = static_cast<FeatureType>(feature_pbf.get_enum());
+            break;
+        case 4: // geometry
+            geometry_iter = feature_pbf.get_packed_uint32();
+            break;
+        default:
             feature_pbf.skip();
+            break;
         }
     }
 }
@@ -59,19 +64,20 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
         return optional<Value>();
     }
 
-    pbf tags = tags_pbf;
-    while (tags) {
-        uint32_t tag_key = tags.varint();
+    auto start_itr = tags_iter.first;
+    const auto & end_itr = tags_iter.second;
+    while (start_itr != end_itr) {
+        uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
 
         if (layer.keysMap.size() <= tag_key) {
             throw std::runtime_error("feature referenced out of range key");
         }
 
-        if (!tags) {
+        if (start_itr == end_itr) {
             throw std::runtime_error("uneven number of feature tag ids");
         }
 
-        uint32_t tag_val = tags.varint();
+        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);;
         if (layer.values.size() <= tag_val) {
             throw std::runtime_error("feature referenced out of range value");
         }
@@ -86,10 +92,11 @@ optional<Value> VectorTileFeature::getValue(const std::string& key) const {
 
 std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     std::unordered_map<std::string,Value> properties;
-    pbf tags = tags_pbf;
-    while (tags) {
-        uint32_t tag_key = tags.varint();
-        uint32_t tag_val = tags.varint();
+    auto start_itr = tags_iter.first;
+    const auto & end_itr = tags_iter.second;
+    while (start_itr != end_itr) {
+        uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
+        uint32_t tag_val = static_cast<uint32_t>(*start_itr++);
         properties[layer.keys.at(tag_key)] = layer.values.at(tag_val);
     }
     return properties;
@@ -100,7 +107,6 @@ uint64_t VectorTileFeature::getID() const {
 }
 
 GeometryCollection VectorTileFeature::getGeometries() const {
-    pbf data(geometry_pbf);
     uint8_t cmd = 1;
     uint32_t length = 0;
     int32_t x = 0;
@@ -111,9 +117,10 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     lines.emplace_back();
     GeometryCoordinates* line = &lines.back();
 
-    while (data.data < data.end) {
+    auto g_itr = geometry_iter;
+    while (g_itr.first != g_itr.second) {
         if (length == 0) {
-            uint32_t cmd_length = data.varint();
+            uint32_t cmd_length = static_cast<uint32_t>(*g_itr.first++);
             cmd = cmd_length & 0x7;
             length = cmd_length >> 3;
         }
@@ -121,8 +128,8 @@ GeometryCollection VectorTileFeature::getGeometries() const {
         --length;
 
         if (cmd == 1 || cmd == 2) {
-            x += data.svarint();
-            y += data.svarint();
+            x += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr.first++));
+            y += protozero::decode_zigzag32(static_cast<uint32_t>(*g_itr.first++));
 
             if (cmd == 1 && !line->empty()) { // moveTo
                 lines.emplace_back();
@@ -155,14 +162,10 @@ VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
 util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
     if (!parsed) {
         parsed = true;
-        pbf tile_pbf(reinterpret_cast<const unsigned char *>(data->c_str()), data->size());
-        while (tile_pbf.next()) {
-            if (tile_pbf.tag == 3) { // layer
-                util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.message());
-                layers.emplace(layer->name, layer);
-            } else {
-                tile_pbf.skip();
-            }
+        protozero::pbf_reader tile_pbf(*data);
+        while (tile_pbf.next(3)) {
+            util::ptr<VectorTileLayer> layer = std::make_shared<VectorTileLayer>(tile_pbf.get_message());
+            layers.emplace(layer->name, layer);
         }
     }
 
@@ -174,20 +177,27 @@ util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const
     return nullptr;
 }
 
-VectorTileLayer::VectorTileLayer(pbf layer_pbf) {
+VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
     while (layer_pbf.next()) {
-        if (layer_pbf.tag == 1) { // name
-            name = layer_pbf.string();
-        } else if (layer_pbf.tag == 2) { // feature
-            features.push_back(layer_pbf.message());
-        } else if (layer_pbf.tag == 3) { // keys
-            keysMap.emplace(layer_pbf.string(), keysMap.size());
-        } else if (layer_pbf.tag == 4) { // values
-            values.emplace_back(parseValue(layer_pbf.message()));
-        } else if (layer_pbf.tag == 5) { // extent
-            extent = layer_pbf.varint();
-        } else {
+        switch (layer_pbf.tag()) {
+        case 1: // name
+            name = layer_pbf.get_string();
+            break;
+        case 2: // feature
+            features.push_back(layer_pbf.get_message());
+            break;
+        case 3: // keys
+            keysMap.emplace(layer_pbf.get_string(), keysMap.size());
+            break;
+        case 4: // values
+            values.emplace_back(parseValue(layer_pbf.get_message()));
+            break;
+        case 5: // extent
+            extent = layer_pbf.get_uint32();
+            break;
+        default:
             layer_pbf.skip();
+            break;
         }
     }
 

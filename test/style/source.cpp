@@ -269,7 +269,7 @@ TEST(Source, VectorTileCorrupt) {
     test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(source.type, SourceType::Vector);
         EXPECT_EQ(std::string(tileID), "0/0/0");
-        EXPECT_EQ(util::toString(error), "pbf unknown field type exception");
+        EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
         test.end();
     };
 

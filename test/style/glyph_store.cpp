@@ -110,7 +110,7 @@ TEST(GlyphStore, LoadingCorrupted) {
         EXPECT_EQ(glyphRange, GlyphRange(0, 255));
 
         EXPECT_TRUE(error != nullptr);
-        EXPECT_EQ(util::toString(error), "pbf unknown field type exception");
+        EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
 
         auto glyphSet = test.glyphStore.getGlyphSet({{"Test Stack"}});
         ASSERT_TRUE(glyphSet->getSDFs().empty());
