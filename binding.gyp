@@ -67,14 +67,14 @@
 
           'link_settings': {
             'libraries': [
-              '<@(nunicode_ldflags)',
               '<@(nunicode_static_libs)',
-              '<@(webp_ldflags)',
+              '<@(nunicode_ldflags)',
               '<@(webp_static_libs)',
-              '<@(libpng_ldflags)',
+              '<@(webp_ldflags)',
               '<@(libpng_static_libs)',
-              '<@(libjpeg-turbo_ldflags)',
+              '<@(libpng_ldflags)',
               '<@(libjpeg-turbo_static_libs)',
+              '<@(libjpeg-turbo_ldflags)',
             ],
           },
         }]

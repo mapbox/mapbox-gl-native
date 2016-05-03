@@ -83,20 +83,20 @@
 
       'link_settings': {
         'libraries': [
-          '<@(nunicode_ldflags)',
           '<@(nunicode_static_libs)',
-          '<@(sqlite_ldflags)',
+          '<@(nunicode_ldflags)',
           '<@(sqlite_static_libs)',
-          '<@(zlib_ldflags)',
+          '<@(sqlite_ldflags)',
           '<@(zlib_static_libs)',
-          '<@(libcurl_ldflags)',
+          '<@(zlib_ldflags)',
           '<@(libcurl_static_libs)',
-          '<@(libpng_ldflags)',
+          '<@(libcurl_ldflags)',
           '<@(libpng_static_libs)',
-          '<@(libjpeg-turbo_ldflags)',
+          '<@(libpng_ldflags)',
           '<@(libjpeg-turbo_static_libs)',
-          '<@(webp_ldflags)',
+          '<@(libjpeg-turbo_ldflags)',
           '<@(webp_static_libs)',
+          '<@(webp_ldflags)',
          ],
       },
 
