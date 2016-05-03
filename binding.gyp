@@ -80,6 +80,10 @@
         }]
       ],
 
+      'ldflags': [
+        '-Wl,-z,now',
+      ],
+
       'xcode_settings': {
         'OTHER_LDFLAGS':[
           '-Wl,-bind_at_load'
