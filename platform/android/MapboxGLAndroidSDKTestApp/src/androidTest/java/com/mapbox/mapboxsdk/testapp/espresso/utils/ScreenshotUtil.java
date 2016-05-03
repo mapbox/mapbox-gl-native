@@ -43,15 +43,17 @@ public class ScreenshotUtil {
         }
 
         // Get a bitmap from the activity root view. When the drawing cache is enabled,
-        // the next call to getDrawingCache() will draw the view in a bitmap.
+//        // the next call to getDrawingCache() will draw the view in a bitmap.
         View rootView = activity.getWindow().getDecorView().getRootView();
-        rootView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
-        rootView.setDrawingCacheEnabled(false);
+//        rootView.setDrawingCacheEnabled(true);r
+//        rootView.setDrawingCacheEnabled(false);
+
+        Bitmap bitmap = null;
 
         // Add the SurfaceView bit (see getAllTextureViews() below)
         List<TextureView> tilingViews = getAllTextureViews(rootView);
         if (tilingViews.size() > 0) {
+            bitmap = Bitmap.createBitmap(tilingViews.get(0).getHeight(),tilingViews.get(0).getWidth(), Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
             for (TextureView TextureView : tilingViews) {
                 Bitmap b = TextureView.getBitmap(TextureView.getWidth(), TextureView.getHeight());
@@ -59,7 +61,7 @@ public class ScreenshotUtil {
                 TextureView.getLocationInWindow(location);
                 int[] location2 = new int[2];
                 TextureView.getLocationOnScreen(location2);
-                canvas.drawBitmap(b, location[0], location[1], null);
+                canvas.drawBitmap(b, 0,0, null);
             }
         }
 
@@ -71,7 +73,8 @@ public class ScreenshotUtil {
             outputStream = new FileOutputStream(outputFile);
             bitmap.compress(DEFAULT_IMAGE_FORMAT, DEFAULT_IMAGE_QUALITY, outputStream);
             outputStream.flush();
-        } catch (IOException e) {
+        } catch (Exception e) {
+
             e.printStackTrace();
         } finally {
             if (outputStream != null) {
@@ -122,7 +125,10 @@ public class ScreenshotUtil {
         }
 
         String externalPath = Environment.getExternalStorageDirectory().toString();
-        String path = externalPath + File.separator + SCREENSHOT_FOLDER + File.separator + filename;
+        String path = externalPath + File.separator + SCREENSHOT_FOLDER;
+        File dir = new File(path);
+        dir.mkdirs();
+        path += File.separator + filename;
         Log.d(LOG_TAG, "Screenshot path: " + path);
         return path;
     }
