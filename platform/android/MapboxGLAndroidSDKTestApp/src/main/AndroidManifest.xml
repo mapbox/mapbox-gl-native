@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".MapboxApplication"
@@ -84,6 +85,7 @@
         <activity
             android:name=".activity.camera.LatLngBoundsActivity"
             android:description="@string/description_visible_bounds"
+            android:screenOrientation="portrait"
             android:label="@string/activity_visible_coordinate_bounds">
             <meta-data
                 android:name="@string/category"
