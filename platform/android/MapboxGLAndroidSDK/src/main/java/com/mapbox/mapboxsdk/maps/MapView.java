@@ -23,6 +23,7 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
@@ -31,6 +32,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
@@ -65,7 +67,6 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -86,6 +87,7 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -109,7 +111,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * </p>
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
- *
  */
 public class MapView extends FrameLayout {
 
@@ -244,6 +245,8 @@ public class MapView extends FrameLayout {
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
             mMapboxMap.getUiSettings().setZoomControlsEnabled(true);
         }
+
+
     }
 
     private void setInitialState(MapboxMapOptions options) {
@@ -446,13 +449,8 @@ public class MapView extends FrameLayout {
                             iterator.remove();
                         }
                     }
-                } else if (change == REGION_IS_CHANGING) {
-                    LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-                    long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
-                    Log.v(MapboxConstants.TAG, "Region is changing ane we are seeing: "+ids.length+ " point annotations");
-//                    for (long id : ids) {
-//                        Log.v(MapboxConstants.TAG, "Marker: "+id);
-//                    }
+                } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
+                        new MarkerInBoundsTask().execute();
                 }
             }
         });
@@ -463,6 +461,60 @@ public class MapView extends FrameLayout {
             evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_LOAD);
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
             MapboxEventManager.getMapboxEventManager().pushEvent(evt);
+        }
+    }
+
+    private class MarkerInBoundsTask extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
+            long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
+            LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
+
+            MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
+
+            boolean found;
+            long key;
+
+            // introduce new markers
+            for (long id : ids) {
+                found = false;
+                for (int i = 0; i < markerViews.size(); i++) {
+                    key = markerViews.keyAt(i);
+
+                    if (id == key) {
+                        found = true;
+                    }
+                }
+
+                if (!found) {
+                    Log.v(MapboxConstants.TAG, "Adding " + id);
+//                            if(adapter!=null) {
+//                                mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
+//                            }
+                    markerViews.append(id, null);
+                } else {
+                    Log.v(MapboxConstants.TAG, "Already added " + id);
+                }
+            }
+
+            // clean up out of bound markers
+            for (int i = 0; i < markerViews.size(); i++) {
+                found = false;
+                key = markerViews.keyAt(i);
+                for (long id : ids) {
+                    if (id == key) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    Log.v(MapboxConstants.TAG, "Removing " + key);
+                    markerViews.remove(key);
+                }
+            }
+
+            Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
+            return null;
         }
     }
 
@@ -842,6 +894,11 @@ public class MapView extends FrameLayout {
     //
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
+     * <p>
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * <p>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
@@ -867,8 +924,13 @@ public class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     * <p>
      * Returns the current Mapbox access token used to load map styles and tiles.
-     *
+     * </p>
+     * 
      * @return The current Mapbox access token.
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
      */
@@ -1282,6 +1344,10 @@ public class MapView extends FrameLayout {
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
 
         private Surface mSurface;
+        private View mViewHolder;
+
+        private static final int VIEW_MARKERS_POOL_SIZE = 20;
+
 
         // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
@@ -1289,7 +1355,6 @@ public class MapView extends FrameLayout {
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             mNativeMapView.createSurface(mSurface = new Surface(surface));
             mNativeMapView.resizeFramebuffer(width, height);
-
             mHasSurface = true;
         }
 
@@ -1330,8 +1395,15 @@ public class MapView extends FrameLayout {
             mCompassView.update(getDirection());
             mMyLocationView.update();
 
-            for (MarkerView view : mMapboxMap.getMarkerViews()) {
-                view.update();
+            LongSparseArray<View> viewMarkers = mMapboxMap.getMarkerViews();
+            for (int i = 0; i < viewMarkers.size(); i++) {
+                mViewHolder = viewMarkers.valueAt(i);
+                if (mViewHolder != null) {
+                    Marker marker = (Marker) mMapboxMap.getAnnotation(viewMarkers.keyAt(i));
+                    PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
+                    mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
+                    mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
+                }
             }
 
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
@@ -2667,7 +2739,7 @@ public class MapView extends FrameLayout {
         private String mStyle;
         private boolean mDefaultStyle;
 
-        StyleInitializer(@NonNull  Context context) {
+        StyleInitializer(@NonNull Context context) {
             mStyle = Style.getMapboxStreetsUrl(context.getResources().getInteger(R.integer.style_version));
             mDefaultStyle = true;
         }

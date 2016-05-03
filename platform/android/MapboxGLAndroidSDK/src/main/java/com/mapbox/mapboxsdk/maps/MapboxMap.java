@@ -14,13 +14,15 @@ import android.util.Log;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
+
+import android.view.ViewGroup;
+
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -36,6 +38,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +64,7 @@ public class MapboxMap {
     private LongSparseArray<Annotation> mAnnotations;
 
     private List<Marker> mSelectedMarkers;
-    private List<MarkerView> mMarkerViews;
+    private LongSparseArray<View> mMarkerViews;
     private List<InfoWindow> mInfoWindows;
 
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
@@ -93,8 +96,8 @@ public class MapboxMap {
         mTrackingSettings = new TrackingSettings(mMapView, mUiSettings);
         mProjection = new Projection(mapView);
         mAnnotations = new LongSparseArray<>();
+        mMarkerViews = new LongSparseArray<>();
         mSelectedMarkers = new ArrayList<>();
-        mMarkerViews = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
     }
 
@@ -590,8 +593,12 @@ public class MapboxMap {
     //
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
-     *
+     * </p>
      * @param accessToken Your public Mapbox access token.
      * @see MapView#setAccessToken(String)
      * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
@@ -603,7 +610,12 @@ public class MapboxMap {
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     * <p>
      * Returns the current Mapbox access token used to load map styles and tiles.
+     * </p>
      *
      * @return The current Mapbox access token.
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
@@ -619,9 +631,8 @@ public class MapboxMap {
     // Annotations
     //
 
-    public void addMarkerView(MarkerView markerView){
-        markerView.setProjection(mProjection);
-        mMarkerViews.add(markerView);
+    public void addMarkerView(long key, View markerView) {
+        mMarkerViews.append(key, markerView);
         mMapView.addView(markerView);
     }
 
@@ -655,14 +666,6 @@ public class MapboxMap {
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
         Marker marker = prepareMarker(markerOptions);
-
-        if(mMarkerViewAdapter!=null){
-            MarkerView view = mMarkerViewAdapter.getView(marker);
-            if(view!=null) {
-                mMarkerViews.add(view);
-            }
-        }
-
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -682,11 +685,11 @@ public class MapboxMap {
      */
     @UiThread
     @NonNull
-    public List<Marker> addMarkers(@NonNull List<MarkerOptions> markerOptionsList) {
+    public List<Marker> addMarkers(@NonNull List<BaseMarkerOptions> markerOptionsList) {
         int count = markerOptionsList.size();
         List<Marker> markers = new ArrayList<>(count);
         if (count > 0) {
-            MarkerOptions markerOptions;
+            BaseMarkerOptions markerOptions;
             Marker marker;
             for (int i = 0; i < count; i++) {
                 markerOptions = markerOptionsList.get(i);
@@ -1021,18 +1024,6 @@ public class MapboxMap {
         return markers;
     }
 
-    @Nullable
-    public MarkerView getMarkerView(long id) {
-        MarkerView markerView = null;
-        List<Marker> markers = getMarkers();
-        for (Marker m : markers) {
-            if (m.getId() == id) {
-                markerView = m.getMarkerView();
-            }
-        }
-        return markerView;
-    }
-
     /**
      * Returns a list of all the polygons on the map.
      *
@@ -1165,8 +1156,12 @@ public class MapboxMap {
         return marker;
     }
 
-    public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter){
+    public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter) {
         mMarkerViewAdapter = markerViewAdapter;
+    }
+
+    public MarkerViewAdapter getMarkerViewAdapter() {
+        return mMarkerViewAdapter;
     }
 
     //
@@ -1225,7 +1220,7 @@ public class MapboxMap {
     }
 
     //  used by MapView
-    List<MarkerView> getMarkerViews(){
+    LongSparseArray<View> getMarkerViews() {
         return mMarkerViews;
     }
 
@@ -1240,12 +1235,13 @@ public class MapboxMap {
     /**
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     *
+     * <p>
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
      * frame from the viewport. For instance, if the only the top edge is inset, the
      * map center is effectively shifted downward.
+     * </p>
      *
      * @param left   The left margin in pixels.
      * @param top    The top margin in pixels.
@@ -1756,10 +1752,10 @@ public class MapboxMap {
         View getInfoWindow(@NonNull Marker marker);
     }
 
-    public interface MarkerViewAdapter {
+    public interface MarkerViewAdapter<U extends Marker> {
 
         @Nullable
-        MarkerView getView(@NonNull Marker marker);
+        View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
     }
 
     /**
