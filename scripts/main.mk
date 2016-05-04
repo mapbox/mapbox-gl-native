@@ -80,6 +80,7 @@ else
 .mason: ;
 endif
 
+.NOTPARALLEL: $(PLATFORM_CONFIG_OUTPUT)
 $(PLATFORM_CONFIG_OUTPUT): .mason configure $(PLATFORM_CONFIG_INPUT)
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Running configure...$(FORMAT_END)\n"
 	$(ENV) ./configure $(PLATFORM_CONFIG_INPUT) $(PLATFORM_CONFIG_OUTPUT)
