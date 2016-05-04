@@ -4,6 +4,7 @@
 
 #include <QQuickMapboxGL>
 
+#include <QDebug>
 #include <QQuickItem>
 #include <QString>
 #include <QtGlobal>

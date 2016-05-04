@@ -1,6 +1,7 @@
 #ifndef QQUICKMAPBOXGL_H
 #define QQUICKMAPBOXGL_H
 
+#include <QColor>
 #include <QGeoCoordinate>
 #include <QGeoServiceProvider>
 #include <QGeoShape>
