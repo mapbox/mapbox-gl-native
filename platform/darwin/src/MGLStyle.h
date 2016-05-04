@@ -21,7 +21,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns the URL to version 8 of the <a href="https://www.mapbox.com/maps/streets/">Mapbox Streets</a> style.
  
- Streets is a complete base map that balances nature, commerce, and infrastructure.
+ Streets is a general-purpose style with detailed road and transit networks.
  
  `MGLMapView` and `MGLTilePyramidOfflineRegion` use Mapbox Streets when no style is specified explicitly.
  */
@@ -30,7 +30,7 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns the URL to the given version of the <a href="https://www.mapbox.com/maps/streets/">Mapbox Streets</a> style.
  
- Streets is a complete base map that balances nature, commerce, and infrastructure.
+ Streets is a general-purpose style with detailed road and transit networks.
  
  `MGLMapView` and `MGLTilePyramidOfflineRegion` use Mapbox Streets when no style is specified explicitly.
  
@@ -41,14 +41,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns the URL to version 8 of the <a href="https://www.mapbox.com/blog/emerald-gl/">Mapbox Emerald</a> style.
  
- Emerald is a versatile style with emphasis on road networks and public transportation.
+ Emerald is a tactile style with subtle textures and dramatic hillshading.
  */
-+ (NSURL *)emeraldStyleURL __attribute__((deprecated("Use <mapbox://styles/mapbox/emerald-v8>.")));
++ (NSURL *)emeraldStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
  Returns the URL to the given version of the <a href="https://www.mapbox.com/maps/outdoors/">Mapbox Outdoors</a> style.
  
- Outdoors is a rugged style that emphasizes physical terrain and outdoor activities.
+ Outdoors is a general-purpose style tailored to outdoor activities.
  
  @param version The style’s latest released version. As of publication, the current version is `9`.
  */
@@ -89,14 +89,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns the URL to version 8 of the <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite</a> style.
  
- Satellite is a beautiful global satellite and aerial imagery layer.
+ Satellite is high-resolution satellite and aerial imagery.
  */
 + (NSURL *)satelliteStyleURL __attribute__((deprecated("Use -satelliteStyleURLWithVersion:.")));
 
 /**
  Returns the URL to the given version of the <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite</a> style.
  
- Satellite is a beautiful global satellite and aerial imagery layer.
+ Satellite is high-resolution satellite and aerial imagery.
  
  @param version The style’s latest released version. As of publication, the current version is `9`.
  */
@@ -105,14 +105,14 @@ static const NSInteger MGLStyleDefaultVersion = 9;
 /**
  Returns the URL to version 8 of the <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a> style.
  
- Satellite Streets combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
+ Satellite Streets combines the high-resolution satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
  */
 + (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURLWithVersion:.")));
 
 /**
  Returns the URL to the given version of the <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a> style.
  
- Satellite Streets combines the global satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
+ Satellite Streets combines the high-resolution satellite and aerial imagery of Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox Streets.
  
  @param version The style’s latest released version. As of publication, the current version is `9`.
  */
