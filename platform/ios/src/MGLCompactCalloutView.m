@@ -1,7 +1,5 @@
 #import "MGLCompactCalloutView.h"
 
-#import "MGLAnnotation.h"
-
 // Set defaults for custom tip drawing
 static CGFloat const tipHeight = 10.0;
 static CGFloat const tipWidth = 20.0;
@@ -12,17 +10,7 @@ static CGFloat const tipWidth = 20.0;
 
 @end
 
-@implementation MGLCompactCalloutView {
-    id <MGLAnnotation> _representedObject;
-    __unused UIView *_leftAccessoryView;/* unused */
-    __unused UIView *_rightAccessoryView;/* unused */
-    __weak id <MGLCalloutViewDelegate> _delegate;
-}
-
-@synthesize representedObject = _representedObject;
-@synthesize leftAccessoryView = _leftAccessoryView;/* unused */
-@synthesize rightAccessoryView = _rightAccessoryView;/* unused */
-@synthesize delegate = _delegate;
+@implementation MGLCompactCalloutView
 
 + (instancetype)calloutView
 {
@@ -53,8 +41,8 @@ static CGFloat const tipWidth = 20.0;
 
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated
 {
-    // Do not show a callout if there is no title set for the annotation
-    if (![self.representedObject respondsToSelector:@selector(title)])
+    // Do not show a callout if there is no title set
+    if (!self.title)
     {
         return;
     }
@@ -62,19 +50,11 @@ static CGFloat const tipWidth = 20.0;
     [view addSubview:self];
 
     // Prepare title label
-    [self.mainBody setTitle:self.representedObject.title forState:UIControlStateNormal];
+    [self.mainBody setTitle:self.title forState:UIControlStateNormal];
     [self.mainBody sizeToFit];
 
-    if ([self isCalloutTappable])
-    {
-        // Handle taps and eventually try to send them to the delegate (usually the map view)
-        [self.mainBody addTarget:self action:@selector(calloutTapped) forControlEvents:UIControlEventTouchUpInside];
-    }
-    else
-    {
-        // Disable tapping and highlighting
-        self.mainBody.userInteractionEnabled = NO;
-    }
+    // Disable tapping and highlighting
+    self.mainBody.userInteractionEnabled = NO;
 
     // Prepare our frame, adding extra space at the bottom for the tip
     CGFloat frameWidth = self.mainBody.bounds.size.width;
@@ -113,24 +93,6 @@ static CGFloat const tipWidth = 20.0;
     }
 }
 
-#pragma mark - Callout interaction handlers
-
-- (BOOL)isCalloutTappable
-{
-    if ([self.delegate respondsToSelector:@selector(calloutViewShouldHighlight:)]) {
-        return [self.delegate performSelector:@selector(calloutViewShouldHighlight:) withObject:self];
-    }
-
-    return NO;
-}
-
-- (void)calloutTapped
-{
-    if ([self isCalloutTappable] && [self.delegate respondsToSelector:@selector(calloutViewTapped:)])
-    {
-        [self.delegate performSelector:@selector(calloutViewTapped:) withObject:self];
-    }
-}
 
 #pragma mark - Custom view styling
 

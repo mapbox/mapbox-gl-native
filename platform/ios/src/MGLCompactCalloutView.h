@@ -7,4 +7,11 @@
 
 + (instancetype)calloutView;
 
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *subtitle;
+
+@property (nonatomic, strong) UIView *leftAccessoryView;
+@property (nonatomic, strong) UIView *rightAccessoryView;
+@property (nonatomic, strong) UIView *detailAccessoryView;
+
 @end
