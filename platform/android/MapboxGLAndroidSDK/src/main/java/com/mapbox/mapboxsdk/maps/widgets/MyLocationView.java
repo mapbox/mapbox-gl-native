@@ -135,6 +135,7 @@ public class MyLocationView extends View {
                 foregroundBearingDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
             }
         }
+        invalidate();
     }
 
     public final void setShadowDrawable(Drawable drawable) {
@@ -164,16 +165,19 @@ public class MyLocationView extends View {
             }
             backgroundDrawable.mutate().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         }
+        invalidate();
     }
 
     public final void setAccuracyTint(@ColorInt int color) {
         int alpha = accuracyPaint.getAlpha();
         accuracyPaint.setColor(color);
         accuracyPaint.setAlpha(alpha);
+        invalidate();
     }
 
     public final void setAccuracyAlpha(@IntRange(from = 0, to = 255) int alpha) {
         accuracyPaint.setAlpha(alpha);
+        invalidate();
     }
 
     private void invalidateBounds() {

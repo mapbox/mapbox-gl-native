@@ -24,7 +24,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
-public class MyLocationCustomizationActivity extends AppCompatActivity implements LocationListener {
+public class MyLocationDrawableActivity extends AppCompatActivity implements LocationListener {
 
     private MapView mapView;
     private MapboxMap mapboxMap;

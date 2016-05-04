@@ -140,7 +140,7 @@
                 android:value="@string/category_userlocation" />
         </activity>
         <activity
-            android:name=".activity.userlocation.MyLocationCustomizationActivity"
+            android:name=".activity.userlocation.MyLocationDrawableActivity"
             android:description="@string/description_user_location_customization"
             android:label="@string/activity_user_tracking_customization">
             <meta-data
@@ -148,7 +148,7 @@
                 android:value="@string/category_userlocation" />
         </activity>
         <activity
-            android:name=".activity.userlocation.MyLocationDotColor"
+            android:name=".activity.userlocation.MyLocationTintActivity"
             android:description="@string/description_user_location_dot_color"
             android:label="@string/activity_user_dot_color">
             <meta-data

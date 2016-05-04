@@ -37,7 +37,7 @@
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
     <string name="activity_user_tracking_customization">User location customization</string>
-    <string name="activity_user_dot_color">User location dot color</string>
+    <string name="activity_user_dot_color">User location tint color</string>
     <string name="activity_user_location_toggle">User location toggle</string>
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
@@ -48,7 +48,7 @@
     <!-- Description -->
     <string name="description_user_location_tracking">Tracks the location of the user</string>
     <string name="description_user_location_customization">Customize the location of the user</string>
-    <string name="description_user_location_dot_color">Customize the user dot color</string>
+    <string name="description_user_location_dot_color">Customize the user location color</string>
     <string name="description_user_location_toggle">Toggle location of the user on and off</string>
     <string name="description_custom_layer">Overlay a custom native layer on the map</string>
     <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
