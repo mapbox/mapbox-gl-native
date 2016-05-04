@@ -2,10 +2,6 @@
 	path = .mason
 	url = https://github.com/mapbox/mason.git
 
-[submodule "platform/ios/vendor/SMCalloutView"]
-	path = platform/ios/vendor/SMCalloutView
-	url = https://github.com/nfarina/calloutview.git
-
 [submodule "platform/ios/uitest/KIF"]
 	path = platform/ios/uitest/KIF
 	url = https://github.com/kif-framework/KIF.git
