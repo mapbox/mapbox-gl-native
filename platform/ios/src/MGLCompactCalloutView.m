@@ -39,7 +39,6 @@ static CGFloat const tipWidth = 20.0;
         // Create and add a subview to hold the callout’s text
         UIButton *mainBody = [UIButton buttonWithType:UIButtonTypeSystem];
         mainBody.backgroundColor = [self backgroundColorForCallout];
-        mainBody.tintColor = [UIColor whiteColor];
         mainBody.contentEdgeInsets = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
         mainBody.layer.cornerRadius = 4.0;
         self.mainBody = mainBody;
@@ -137,7 +136,7 @@ static CGFloat const tipWidth = 20.0;
 
 - (UIColor *)backgroundColorForCallout
 {
-    return [UIColor darkGrayColor];
+    return [UIColor whiteColor];
 }
 
 - (void)drawRect:(CGRect)rect
