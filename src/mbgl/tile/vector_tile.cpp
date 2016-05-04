@@ -96,6 +96,9 @@ std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     const auto & end_itr = tags_iter.second;
     while (start_itr != end_itr) {
         uint32_t tag_key = static_cast<uint32_t>(*start_itr++);
+        if (start_itr == end_itr) {
+            throw std::runtime_error("uneven number of feature tag ids");
+        }
         uint32_t tag_val = static_cast<uint32_t>(*start_itr++);
         properties[layer.keys.at(tag_key)] = layer.values.at(tag_val);
     }
