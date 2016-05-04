@@ -31,8 +31,8 @@ $ ./gradlew cC -p MapboxGLAndroidSDKTestApp
 Then:
 * Go to your AWS Console and choose Device Farm.
 * Create a new project, e.g. `MapboxGLAndroidSDKTestApp`
-* On step 1, upload the APK in `mapbox-gl-native/android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-unaligned.apk`
-* On step 2, choose Instrumentation, test filter is `com.mapbox.mapboxgl.testapp.MainActivityTest` and upload the APK in `mapbox-gl-native/android/java/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk`
+* On step 1, upload the APK in `mapbox-gl-native/platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-unaligned.apk`
+* On step 2, choose Instrumentation, test filter is `com.mapbox.mapboxgl.testapp.MainActivityTest` and upload the APK in `mapbox-gl-native/platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest-unaligned.apk`
 * On step 3, choose a device pool. E.g. Top Devices
 * On step 4, customize your device state (if needed)
 * Finally, confirm the configuration and run the tests.
