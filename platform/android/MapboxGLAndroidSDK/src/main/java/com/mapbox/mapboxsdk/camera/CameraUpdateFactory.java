@@ -229,7 +229,7 @@ public final class CameraUpdateFactory {
             RectF padding = getPadding();
 
             // Calculate the bounds of the possibly rotated shape with respect to the viewport
-            PointF nePixel = new PointF(Float.MIN_VALUE, Float.MIN_VALUE);
+            PointF nePixel = new PointF(-Float.MAX_VALUE, -Float.MAX_VALUE);
             PointF swPixel = new PointF(Float.MAX_VALUE, Float.MAX_VALUE);
             float viewportHeight = uiSettings.getHeight();
             for (LatLng latLng : getBounds().toLatLngs()) {
