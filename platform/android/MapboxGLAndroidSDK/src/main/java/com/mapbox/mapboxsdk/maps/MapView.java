@@ -94,9 +94,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -155,8 +157,9 @@ public class MapView extends FrameLayout {
     private StyleInitializer mStyleInitializer;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
-    private long nViewMarkerBoundsUpdateTime;
-    
+    private long mViewMarkerBoundsUpdateTime;
+    private boolean mViewMarkersUpdateRunning;
+
     @UiThread
     public MapView(@NonNull Context context) {
         super(context);
@@ -455,12 +458,11 @@ public class MapView extends FrameLayout {
 
                     long currentTime = SystemClock.elapsedRealtime();
 
-                    if (currentTime < nViewMarkerBoundsUpdateTime) {
+                    if (mViewMarkersUpdateRunning || currentTime < mViewMarkerBoundsUpdateTime) {
                         return;
                     }
-
-                    nViewMarkerBoundsUpdateTime = currentTime + 300;
-
+                    
+                    mViewMarkerBoundsUpdateTime = currentTime + 300;
                     new MarkerInBoundsTask().execute();
                 }
             }
@@ -475,14 +477,24 @@ public class MapView extends FrameLayout {
         }
     }
 
-    private class MarkerInBoundsTask extends AsyncTask<Void, Void, Void>{
+
+    public class MarkerInBoundsTask extends AsyncTask<Void, Void, MarkerInBoundsTask.Result> {
+
         @Override
-        protected Void doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mViewMarkersUpdateRunning = true;
+        }
+
+        @Override
+        protected Result doInBackground(Void... params) {
+            List<Marker> inBounds = new ArrayList<>();
+            Map<Marker, View> outBounds = new HashMap<>();
+
             LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
             long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
             LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
-
-            MapboxMap.MarkerViewAdapter adapter = mMapboxMap.getMarkerViewAdapter();
+            Log.v(MapboxConstants.TAG, "Annotations in bounds: " + ids.length);
 
             boolean found;
             long key;
@@ -499,11 +511,12 @@ public class MapView extends FrameLayout {
                 }
 
                 if (!found) {
-                    Log.v(MapboxConstants.TAG, "Adding " + id);
-//                            if(adapter!=null) {
-//                                mMapboxMap.addMarkerView(id, adapter.getView((Marker) mMapboxMap.getAnnotation(id), null, MapView.this));
-//                            }
-                    markerViews.append(id, null);
+                    Annotation annotation = mMapboxMap.getAnnotation(id);
+                    if (annotation instanceof Marker) {
+                        inBounds.add((Marker) annotation);
+                    } else {
+                        Log.v(MapboxConstants.TAG, "Not instance of Marker" + id);
+                    }
                 } else {
                     Log.v(MapboxConstants.TAG, "Already added " + id);
                 }
@@ -519,13 +532,42 @@ public class MapView extends FrameLayout {
                     }
                 }
                 if (!found) {
-                    Log.v(MapboxConstants.TAG, "Removing " + key);
-                    markerViews.remove(key);
+                    Annotation annotation = mMapboxMap.getAnnotation(key);
+                    if (annotation instanceof Marker) {
+                        outBounds.put((Marker) annotation, markerViews.get(key));
+                    } else {
+                        Log.v(MapboxConstants.TAG, "Not instance of Marker" + key);
+                    }
                 }
             }
 
-            Log.v(MapboxConstants.TAG, "Amount of annotations: " + markerViews.size());
-            return null;
+            return new Result(inBounds, outBounds);
+        }
+
+        @Override
+        protected void onPostExecute(Result result) {
+            super.onPostExecute(result);
+            mMapboxMap.setViewMarkersBoundsTaskResult(result);
+            mViewMarkersUpdateRunning = false;
+            Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
+        }
+
+        public class Result {
+            private List<Marker> inBounds;
+            private Map<Marker, View> outBounds;
+
+            public Result(List<Marker> inBounds, Map<Marker, View> outBounds) {
+                this.inBounds = inBounds;
+                this.outBounds = outBounds;
+            }
+
+            public List<Marker> getInBounds() {
+                return inBounds;
+            }
+
+            public Map<Marker, View> getOutBounds() {
+                return outBounds;
+            }
         }
     }
 

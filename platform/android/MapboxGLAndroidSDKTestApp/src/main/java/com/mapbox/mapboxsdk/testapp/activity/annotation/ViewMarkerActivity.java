@@ -52,10 +52,10 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         List<BaseMarkerOptions> countries = new ArrayList<>();
-        countries.add(new CountryMarkerOptions().abbrevName("ch").flagRes(R.drawable.ic_china).position(new LatLng(31.230416, 121.473701)));
-        countries.add(new CountryMarkerOptions().abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.907192, -77.036871)));
-        countries.add(new CountryMarkerOptions().abbrevName("br").flagRes(R.drawable.ic_brazil).position(new LatLng(-15.798200, -47.922363)));
-        countries.add(new CountryMarkerOptions().abbrevName("de").flagRes(R.drawable.ic_germany).position(new LatLng(52.520007, 13.404954)));
+        countries.add(new CountryMarkerOptions().title("China").abbrevName("ch").flagRes(R.drawable.ic_china).position(new LatLng(31.230416, 121.473701)));
+        countries.add(new CountryMarkerOptions().title("United States").abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.907192, -77.036871)));
+        countries.add(new CountryMarkerOptions().title("Brazil").abbrevName("br").flagRes(R.drawable.ic_brazil).position(new LatLng(-15.798200, -47.922363)));
+        countries.add(new CountryMarkerOptions().title("Germany").abbrevName("de").flagRes(R.drawable.ic_germany).position(new LatLng(52.520007, 13.404954)));
         mapboxMap.addMarkers(countries);
 
         mapboxMap.setMarkerViewAdapter(new CountryAdapter(this));
