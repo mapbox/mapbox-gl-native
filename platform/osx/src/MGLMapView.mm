@@ -26,7 +26,6 @@
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/util/constants.hpp>
 #import <mbgl/util/math.hpp>
-#import <mbgl/util/std.hpp>
 #import <mbgl/util/chrono.hpp>
 
 #import <map>
