@@ -25,6 +25,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
@@ -115,6 +116,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MapView extends FrameLayout {
 
     private MapboxMap mMapboxMap;
+    private boolean mInitialLoad;
+    private boolean mDestroyed;
 
     private List<Icon> mIcons;
     private int mAverageIconHeight;
@@ -149,12 +152,11 @@ public class MapView extends FrameLayout {
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
 
-    private List<OnMapReadyCallback> mOnMapReadyCallbackList;
-    private boolean mInitialLoad;
-    private boolean mDestroyed;
-
     private StyleInitializer mStyleInitializer;
 
+    private List<OnMapReadyCallback> mOnMapReadyCallbackList;
+    private long nViewMarkerBoundsUpdateTime;
+    
     @UiThread
     public MapView(@NonNull Context context) {
         super(context);
@@ -450,7 +452,16 @@ public class MapView extends FrameLayout {
                         }
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
-                        new MarkerInBoundsTask().execute();
+
+                    long currentTime = SystemClock.elapsedRealtime();
+
+                    if (currentTime < nViewMarkerBoundsUpdateTime) {
+                        return;
+                    }
+
+                    nViewMarkerBoundsUpdateTime = currentTime + 300;
+
+                    new MarkerInBoundsTask().execute();
                 }
             }
         });
