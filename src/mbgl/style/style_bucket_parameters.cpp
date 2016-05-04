@@ -10,7 +10,7 @@ void StyleBucketParameters::eachFilteredFeature(const Filter& filter,
     for (std::size_t i = 0; !cancelled() && i < layer.featureCount(); i++) {
         auto feature = layer.getFeature(i);
 
-        FilterEvaluator<GeometryTileFeatureExtractor> evaluator(*feature);
+        FilterEvaluator evaluator(*feature);
         if (!Filter::visit(filter, evaluator))
             continue;
 

@@ -80,17 +80,6 @@ public:
     virtual std::unique_ptr<AsyncRequest> monitorTile(const Callback&) = 0;
 };
 
-class GeometryTileFeatureExtractor {
-public:
-    GeometryTileFeatureExtractor(const GeometryTileFeature& feature_)
-        : feature(feature_) {}
-
-    optional<Value> getValue(const std::string& key) const;
-
-private:
-    const GeometryTileFeature& feature;
-};
-
 } // namespace mbgl
 
 #endif

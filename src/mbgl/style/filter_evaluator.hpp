@@ -1,54 +1,53 @@
 #pragma once
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 
 #include <type_traits>
 
 namespace mbgl {
 
-template <class Extractor>
 class FilterEvaluator {
 public:
-    FilterEvaluator(const Extractor& extractor_)
-        : extractor(extractor_) {}
+    FilterEvaluator(const GeometryTileFeature& feature_)
+        : feature(feature_) {}
 
     bool operator()(const NullFilter&) const {
         return true;
     }
 
     bool operator()(const EqualsFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return actual && equal(*actual, filter.value);
     }
 
     bool operator()(const NotEqualsFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return !actual || !equal(*actual, filter.value);
     }
 
     bool operator()(const LessThanFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ < rhs_; });
     }
 
     bool operator()(const LessThanEqualsFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ <= rhs_; });
     }
 
     bool operator()(const GreaterThanFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ > rhs_; });
     }
 
     bool operator()(const GreaterThanEqualsFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ >= rhs_; });
     }
 
     bool operator()(const InFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         if (!actual)
             return false;
         for (const auto& v: filter.values) {
@@ -60,7 +59,7 @@ public:
     }
 
     bool operator()(const NotInFilter& filter) const {
-        optional<Value> actual = extractor.getValue(filter.key);
+        optional<Value> actual = getValue(filter.key);
         if (!actual)
             return true;
         for (const auto& v: filter.values) {
@@ -99,6 +98,12 @@ public:
     }
 
 private:
+    optional<Value> getValue(const std::string& key) const {
+        return key == "$type"
+            ? optional<Value>(uint64_t(feature.getType()))
+            : feature.getValue(key);
+    }
+
     template <class Op>
     struct Comparator {
         const Op& op;
@@ -142,7 +147,7 @@ private:
         return compare(lhs, rhs, [] (const auto& lhs_, const auto& rhs_) { return lhs_ == rhs_; });
     }
 
-    const Extractor& extractor;
+    const GeometryTileFeature& feature;
 };
 
 } // namespace mbgl

@@ -13,24 +13,26 @@ using namespace mbgl;
 
 typedef std::multimap<std::string, mbgl::Value> Properties;
 
-class Extractor {
+class StubFeature : public GeometryTileFeature {
 public:
-    inline Extractor(const Properties& properties_, FeatureType type_)
+    inline StubFeature(const Properties& properties_, FeatureType type_)
         : properties(properties_)
         , type(type_)
     {}
 
-    optional<Value> getValue(const std::string &key) const {
-        if (key == "$type")
-            return Value(uint64_t(type));
+    optional<Value> getValue(const std::string &key) const override {
         auto it = properties.find(key);
         if (it == properties.end())
             return optional<Value>();
         return it->second;
     }
 
-    FeatureType getType() const {
+    FeatureType getType() const override {
         return type;
+    }
+
+    GeometryCollection getGeometries() const override {
+        return GeometryCollection();
     }
 
 private:
@@ -45,7 +47,8 @@ Filter parse(const char * expression) {
 }
 
 bool evaluate(const Filter& filter, const Properties& properties, FeatureType type = FeatureType::Unknown) {
-    FilterEvaluator<Extractor> evaluator({properties, type});
+    StubFeature feature(properties, type);
+    FilterEvaluator evaluator(feature);
     return Filter::visit(filter, evaluator);
 }
 
