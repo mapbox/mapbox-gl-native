@@ -7,7 +7,6 @@
 #import "MGLTViewController.h"
 
 #import <CoreLocation/CoreLocation.h>
-#import <KIF/UIAutomationHelper.h>
 
 @interface MapViewTests : KIFTestCase <MGLMapViewDelegate>
 
@@ -50,7 +49,7 @@
 
 - (void)approveLocationIfNeeded {
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        [UIAutomationHelper acknowledgeSystemAlert];
+        [tester acknowledgeSystemAlert];
         [tester waitForTimeInterval:1];
     }
     XCTAssertTrue([CLLocationManager locationServicesEnabled]);
@@ -375,9 +374,9 @@
 
 - (void)testBottomLayoutGuide {
     CGRect logoBugFrame, toolbarFrame, attributionButtonFrame;
-    UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox logo"];
+    UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox"];
     UIToolbar *toolbar = tester.viewController.navigationController.toolbar;
-    UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Attribution info"];
+    UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"About this map"];
 
     tester.viewController.navigationController.toolbarHidden = NO;
 
@@ -406,8 +405,8 @@
     [tester.viewController insetMapView];
     [tester waitForAnimationsToFinish];
     
-    UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox logo"];
-    UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Attribution info"];
+    UIView *logoBug = (UIView *)[tester waitForViewWithAccessibilityLabel:@"Mapbox"];
+    UIView *attributionButton = (UIView *)[tester waitForViewWithAccessibilityLabel:@"About this map"];
     
     CGRect mapViewFrame = [tester.mapView.superview convertRect:tester.mapView.frame toView:nil];
     

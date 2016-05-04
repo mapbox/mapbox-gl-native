@@ -11,7 +11,7 @@
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
 		DA482C801C12582600772FE3 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; };
 		DA482C811C12582600772FE3 /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA482C7F1C12582600772FE3 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DAABF7511CBC78EC005B1825 /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAABF7501CBC78EC005B1825 /* libKIF.a */; };
+		DA9C551D1CD9DFCD000A15C6 /* libKIF.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DA9C551B1CD9DFA7000A15C6 /* libKIF.a */; };
 		DD043363196DBBD500E6F39D /* MGLTAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */; };
 		DD043364196DBBD500E6F39D /* MGLTViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043360196DBBD500E6F39D /* MGLTViewController.m */; };
 		DD043366196DBBE000E6F39D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DD043365196DBBE000E6F39D /* main.m */; };
@@ -55,7 +55,7 @@
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
 		DA482C7F1C12582600772FE3 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAABF7501CBC78EC005B1825 /* libKIF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKIF.a; path = "KIF/build/Debug-iphonesimulator/libKIF.a"; sourceTree = "<group>"; };
+		DA9C551B1CD9DFA7000A15C6 /* libKIF.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKIF.a; path = "../../../build/ios/Build/Products/Debug-iphonesimulator/libKIF.a"; sourceTree = "<group>"; };
 		DADD9EB51BD16D8B00DA9161 /* Compatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Compatibility.h; path = OHHTTPStubs/OHHTTPStubs/Sources/Compatibility.h; sourceTree = SOURCE_ROOT; };
 		DD043323196DB9BC00E6F39D /* Mapbox GL Tests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL Tests.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD04335F196DBBD500E6F39D /* MGLTAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLTAppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -107,7 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DD0580E81ACB628200B112C9 /* IOKit.framework in Frameworks */,
-				DAABF7511CBC78EC005B1825 /* libKIF.a in Frameworks */,
+				DA9C551D1CD9DFCD000A15C6 /* libKIF.a in Frameworks */,
 				DD0E6F841B0190E200DC035A /* libOCMock.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,9 +137,9 @@
 		DD043325196DB9BC00E6F39D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DA9C551B1CD9DFA7000A15C6 /* libKIF.a */,
 				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
 				DD0580E71ACB628200B112C9 /* IOKit.framework */,
-				DAABF7501CBC78EC005B1825 /* libKIF.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -480,11 +480,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
-					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -500,7 +495,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/OCMock",
-					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -519,11 +513,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Mapbox GL Tests.app/Mapbox GL Tests";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/../../../build/ios/pkg/dynamic/",
-					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = "KIF_XCTEST=1";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -535,7 +524,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/OCMock",
-					"$(PROJECT_DIR)/KIF/build/Debug-iphonesimulator",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
