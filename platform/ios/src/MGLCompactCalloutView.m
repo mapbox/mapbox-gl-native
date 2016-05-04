@@ -146,7 +146,7 @@ static CGFloat const tipWidth = 20.0;
 
     CGFloat tipLeft = rect.origin.x + (rect.size.width / 2.0) - (tipWidth / 2.0);
     CGPoint tipBottom = CGPointMake(rect.origin.x + (rect.size.width / 2.0), rect.origin.y + rect.size.height);
-    CGFloat heightWithoutTip = rect.size.height - tipHeight;
+    CGFloat heightWithoutTip = rect.size.height - tipHeight - 1;
 
     CGContextRef currentContext = UIGraphicsGetCurrentContext();
 
