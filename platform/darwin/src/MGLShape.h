@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
 #import "MGLCalloutView.h"
 #endif
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSString *subtitle;
 
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
 
 @property (nonatomic) BOOL canShowCallout;
 
