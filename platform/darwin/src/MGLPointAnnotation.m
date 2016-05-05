@@ -3,8 +3,11 @@
 @implementation MGLPointAnnotation
 
 @synthesize coordinate;
+
+#if TARGET_OS_IPHONE
 @synthesize canShowCallout;
 @synthesize calloutView;
+#endif
 
 - (NSString *)description
 {
@@ -12,8 +15,11 @@
             NSStringFromClass([self class]), (void *)self,
             self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
             self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle,
-            coordinate.latitude, coordinate.longitude,
-            canShowCallout ? @"yes" : @"no", calloutView];
+            coordinate.latitude, coordinate.longitude
+#if TARGET_OS_IPHONE
+            , canShowCallout ? @"yes" : @"no", calloutView
+#endif
+            ];
 }
 
 @end
