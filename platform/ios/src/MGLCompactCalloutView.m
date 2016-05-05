@@ -26,7 +26,7 @@ static CGFloat const tipWidth = 20.0;
 
         // Create and add a subview to hold the callout’s text
         UIButton *mainBody = [UIButton buttonWithType:UIButtonTypeSystem];
-        mainBody.backgroundColor = [self backgroundColorForCallout];
+        mainBody.backgroundColor = [UIColor whiteColor];
         mainBody.contentEdgeInsets = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
         mainBody.layer.cornerRadius = 4.0;
         self.mainBody = mainBody;
@@ -96,16 +96,9 @@ static CGFloat const tipWidth = 20.0;
 
 #pragma mark - Custom view styling
 
-- (UIColor *)backgroundColorForCallout
-{
-    return [UIColor whiteColor];
-}
-
 - (void)drawRect:(CGRect)rect
 {
     // Draw the pointed tip at the bottom
-    UIColor *fillColor = [self backgroundColorForCallout];
-
     CGFloat tipLeft = rect.origin.x + (rect.size.width / 2.0) - (tipWidth / 2.0);
     CGPoint tipBottom = CGPointMake(rect.origin.x + (rect.size.width / 2.0), rect.origin.y + rect.size.height);
     CGFloat heightWithoutTip = rect.size.height - tipHeight - 1;
@@ -118,7 +111,7 @@ static CGFloat const tipWidth = 20.0;
     CGPathAddLineToPoint(tipPath, NULL, tipLeft + tipWidth, heightWithoutTip);
     CGPathCloseSubpath(tipPath);
 
-    [fillColor setFill];
+    [self.mainBody.backgroundColor setFill];
     CGContextAddPath(currentContext, tipPath);
     CGContextFillPath(currentContext);
     CGPathRelease(tipPath);
