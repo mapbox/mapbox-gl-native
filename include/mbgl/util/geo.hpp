@@ -48,8 +48,6 @@ public:
 
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const TileID& id);
-
-    ScreenCoordinate project() const;
 };
 
 inline bool operator==(const LatLng& a, const LatLng& b) {
