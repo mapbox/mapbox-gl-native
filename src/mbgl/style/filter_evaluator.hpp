@@ -97,6 +97,14 @@ public:
         return true;
     }
 
+    bool operator()(const HasFilter& filter) const {
+        return bool(getValue(filter.key));
+    }
+
+    bool operator()(const NotHasFilter& filter) const {
+        return !getValue(filter.key);
+    }
+
 private:
     optional<Value> getValue(const std::string& key) const {
         return key == "$type"

@@ -534,6 +534,25 @@ Value parseValue(const JSValue& value) {
 }
 
 template <class Expression>
+Filter parseUnaryFilter(const JSValue& value) {
+    Filter empty;
+
+    if (value.Size() < 2) {
+        Log::Warning(Event::ParseStyle, "filter expression must have 2 elements");
+        return empty;
+    }
+
+    if (!value[1u].IsString()) {
+        Log::Warning(Event::ParseStyle, "filter expression key must be a string");
+        return empty;
+    }
+
+    Expression expression;
+    expression.key = { value[1u].GetString(), value[1u].GetStringLength() };
+    return expression;
+}
+
+template <class Expression>
 Filter parseBinaryFilter(const JSValue& value) {
     Filter empty;
 
@@ -635,8 +654,12 @@ Filter parseFilter(const JSValue& value) {
         return parseCompoundFilter<AnyFilter>(value);
     } else if (op == "none") {
         return parseCompoundFilter<NoneFilter>(value);
+    } else if (op == "has") {
+        return parseUnaryFilter<HasFilter>(value);
+    } else if (op == "!has") {
+       return parseUnaryFilter<NotHasFilter>(value);
     } else {
-        Log::Warning(Event::ParseStyle, "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\"");
+        Log::Warning(Event::ParseStyle, "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\", \"has\", or \"!has\"");
         return empty;
     }
 }

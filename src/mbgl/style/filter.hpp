@@ -20,7 +20,9 @@ typedef variant<
     class NotInFilter,
     class AnyFilter,
     class AllFilter,
-    class NoneFilter
+    class NoneFilter,
+    class HasFilter,
+    class NotHasFilter
     > Filter;
 
 class NullFilter {};
@@ -86,6 +88,16 @@ public:
 class NoneFilter {
 public:
     std::vector<Filter> filters;
+};
+
+class HasFilter {
+public:
+    std::string key;
+};
+
+class NotHasFilter {
+public:
+    std::string key;
 };
 
 } // namespace mbgl

@@ -114,3 +114,25 @@ TEST(Filter, None) {
     ASSERT_FALSE(evaluate(parse("[\"none\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]"),
                           {{ std::string("foo"), int64_t(1) }}));
 }
+
+TEST(Filter, Has) {
+    ASSERT_TRUE(evaluate(parse("[\"has\", \"foo\"]"),
+                          {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(evaluate(parse("[\"has\", \"foo\"]"),
+                          {{ std::string("foo"), int64_t(0) }}));
+    ASSERT_TRUE(evaluate(parse("[\"has\", \"foo\"]"),
+                          {{ std::string("foo"), false }}));
+    ASSERT_FALSE(evaluate(parse("[\"has\", \"foo\"]"),
+                          {{}}));
+}
+
+TEST(Filter, NotHas) {
+    ASSERT_FALSE(evaluate(parse("[\"!has\", \"foo\"]"),
+                          {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(evaluate(parse("[\"!has\", \"foo\"]"),
+                          {{ std::string("foo"), int64_t(0) }}));
+    ASSERT_FALSE(evaluate(parse("[\"!has\", \"foo\"]"),
+                          {{ std::string("foo"), false }}));
+    ASSERT_TRUE(evaluate(parse("[\"!has\", \"foo\"]"),
+                          {{}}));
+}
