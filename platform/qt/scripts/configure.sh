@@ -35,6 +35,7 @@ function print_qt_flags {
 
     QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
     CONFIG+="    'qt_version_major%': ['${QT_VERSION_MAJOR}'],"$LN
+    CONFIG+="    'qt_image_decoders%': [0],"$LN
 
     CONFIG+="    'qt_core_cflags%': $(quote_flags $(mason cflags Qt system "QtCore")),"$LN
     CONFIG+="    'qt_gui_cflags%': $(quote_flags $(mason cflags Qt system "QtGui")),"$LN

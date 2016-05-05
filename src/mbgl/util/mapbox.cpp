@@ -153,12 +153,12 @@ std::string canonicalizeTileURL(const std::string& url, SourceType type, uint16_
     auto tileset = url.substr(tilesetStartIdx, tilesetEndIdx - tilesetStartIdx);
     auto extension = url.substr(extensionIdx + 1, queryIdx - extensionIdx - 1);
 
-#if !defined(__ANDROID__) && !defined(__APPLE__)
+#if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
     // Replace PNG with WebP.
     if (extension == "png") {
         extension = "webp";
     }
-#endif // !defined(__ANDROID__) && !defined(__APPLE__)
+#endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 
     std::string result = "mapbox://tiles/" + tileset + "/{z}/{x}/{y}";
 

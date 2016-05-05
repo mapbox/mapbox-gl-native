@@ -39,7 +39,6 @@
       'sources': [
         '../default/asset_file_source.cpp',
         '../default/default_file_source.cpp',
-        '../default/jpeg_reader.cpp',
         '../default/log_stderr.cpp',
         '../default/mbgl/storage/offline.cpp',
         '../default/mbgl/storage/offline_database.cpp',
@@ -48,7 +47,6 @@
         '../default/sqlite3.cpp',
         '../default/string_stdlib.cpp',
         '../default/thread.cpp',
-        '../default/webp_reader.cpp',
         'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
         'include/qquickmapboxgl.hpp',
@@ -75,7 +73,6 @@
       'variables': {
         'cflags': [
           '<@(boost_cflags)',
-          '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',
           '<@(opengl_cflags)',
           '<@(qt_core_cflags)',
@@ -83,25 +80,20 @@
           '<@(qt_network_cflags)',
           '<@(rapidjson_cflags)',
           '<@(sqlite_cflags)',
-          '<@(webp_cflags)',
           '-fPIC',
         ],
         'ldflags': [
-          '<@(libjpeg-turbo_ldflags)',
           '<@(nunicode_ldflags)',
           '<@(opengl_ldflags)',
           '<@(qt_core_ldflags)',
           '<@(qt_gui_ldflags)',
           '<@(qt_network_ldflags)',
           '<@(sqlite_ldflags)',
-          '<@(webp_ldflags)',
           '<@(zlib_ldflags)',
         ],
         'libraries': [
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
-          '<@(libjpeg-turbo_static_libs)',
-          '<@(webp_static_libs)',
           '<@(zlib_static_libs)',
         ],
       },
@@ -114,6 +106,26 @@
       ],
 
       'conditions': [
+        ['<(qt_image_decoders) == 0', {
+          'sources': [
+            '../default/jpeg_reader.cpp',
+            '../default/webp_reader.cpp',
+          ],
+          'variables': {
+            'cflags': [
+              '<@(libjpeg-turbo_cflags)',
+              '<@(webp_cflags)',
+            ],
+            'ldflags': [
+              '<@(libjpeg-turbo_ldflags)',
+              '<@(webp_ldflags)',
+            ],
+            'libraries': [
+              '<@(libjpeg-turbo_static_libs)',
+              '<@(webp_static_libs)',
+            ],
+          },
+        }],
         ['<(qt_version_major) == 4', {
           'variables': {
             'cflags': [

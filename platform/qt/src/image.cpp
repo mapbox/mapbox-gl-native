@@ -19,14 +19,16 @@ std::string encodePNG(const PremultipliedImage& pre) {
     return std::string(array.constData(), array.size());
 }
 
+#if !defined(QT_IMAGE_DECODERS)
 PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 PremultipliedImage decodeWebP(const uint8_t*, size_t);
+#endif
 
 PremultipliedImage decodeImage(const std::string& string) {
     const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
     const size_t size = string.size();
 
-    // FIXME: Use Qt WebP decoder plugin.
+#if !defined(QT_IMAGE_DECODERS)
     if (size >= 12) {
         uint32_t riff_magic = (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
         uint32_t webp_magic = (data[8] << 24) | (data[9] << 16) | (data[10] << 8) | data[11];
@@ -35,13 +37,13 @@ PremultipliedImage decodeImage(const std::string& string) {
         }
     }
 
-    // Use libjpeg-turbo rather than the built-in version of libjpeg.
     if (size >= 2) {
         uint16_t magic = ((data[0] << 8) | data[1]) & 0xffff;
         if (magic == 0xFFD8) {
             return decodeJPEG(data, size);
         }
     }
+#endif
 
     QImage image =
         QImage::fromData(data, size)
