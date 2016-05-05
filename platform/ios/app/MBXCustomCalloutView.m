@@ -10,16 +10,10 @@ static CGFloat const tipWidth = 10.0;
 @end
 
 @implementation MBXCustomCalloutView {
-    id <MGLAnnotation> _representedObject;
-    UIView *_leftAccessoryView;
-    UIView *_rightAccessoryView;
-    __weak id <MGLCalloutViewDelegate> _delegate;
+    NSString *_title;
 }
 
-@synthesize representedObject = _representedObject;
-@synthesize leftAccessoryView = _leftAccessoryView;
-@synthesize rightAccessoryView = _rightAccessoryView;
-@synthesize delegate = _delegate;
+@synthesize title = _title;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -40,16 +34,11 @@ static CGFloat const tipWidth = 10.0;
 
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated
 {
-    if ([self.delegate respondsToSelector:@selector(calloutViewWillAppear:)])
-    {
-        [self.delegate performSelector:@selector(calloutViewWillAppear:) withObject:self];
-    }
-    
     [view addSubview:self];
     // prepare title label
-    if ([self.representedObject respondsToSelector:@selector(title)])
+    if (_title)
     {
-        self.mainLabel.text = self.representedObject.title;
+        self.mainLabel.text = _title;
         [self.mainLabel sizeToFit];
     }
     // prepare our frame
@@ -59,17 +48,14 @@ static CGFloat const tipWidth = 10.0;
     CGFloat frameOriginY = rect.origin.y - frameHeight;
     self.frame = CGRectMake(frameOriginX, frameOriginY,
                             frameWidth, frameHeight);
-    
-    if ([self.delegate respondsToSelector:@selector(calloutViewDidAppear:)])
-    {
-        [self.delegate performSelector:@selector(calloutViewDidAppear:) withObject:self];
-    }
 }
 
 - (void)dismissCalloutAnimated:(BOOL)animated
 {
     if (self.superview)
+    {
         [self removeFromSuperview];
+    }
 }
 
 #pragma mark - internals
@@ -100,6 +86,5 @@ static CGFloat const tipWidth = 10.0;
     CGContextFillPath(ctxt);
     CGPathRelease(tipPath);
 }
-
 
 @end

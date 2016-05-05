@@ -3462,17 +3462,28 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         // build the callout
         UIView <MGLCalloutView> *calloutView;
-//        if ([self.delegate respondsToSelector:@selector(mapView:calloutViewForAnnotation:)])
-//        {
-//            calloutView = [self.delegate mapView:self calloutViewForAnnotation:annotation];
-//        }
+        if ([annotation respondsToSelector:@selector(calloutView)] && annotation.calloutView)
+        {
+            calloutView = annotation.calloutView;
+        }
         if (!calloutView)
         {
-            calloutView = [self calloutViewForAnnotation:annotation];
+            calloutView = [MGLCompactCalloutView calloutView];
         }
+
+        calloutView.tintColor = self.tintColor;
+
+        if ([calloutView respondsToSelector:@selector(title)])
+        {
+            calloutView.title = annotation.title;
+        }
+
+        if ([calloutView respondsToSelector:@selector(subtitle)])
+        {
+            calloutView.subtitle = annotation.subtitle;
+        }
+
         self.calloutViewForSelectedAnnotation = calloutView;
-
-
 
         // consult delegate for left and/or right accessory views
 //        if ([self.delegate respondsToSelector:@selector(mapView:leftCalloutAccessoryViewForAnnotation:)])
@@ -3501,9 +3512,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 //            }
 //        }
 
-        // set annotation delegate to handle taps on the callout view
-        //calloutView.delegate = self;
-
         // present popup
         [calloutView presentCalloutFromRect:positioningRect
                                      inView:self.glView
@@ -3521,16 +3529,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self.delegate mapView:self didSelectAnnotationView:annotationView];
     }
-}
-
-- (UIView <MGLCalloutView> *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
-{
-    MGLCompactCalloutView *calloutView = [MGLCompactCalloutView calloutView];
-    calloutView.title = annotation.title;
-    calloutView.subtitle = annotation.subtitle;
-    calloutView.tintColor = self.tintColor;
-
-    return calloutView;
 }
 
 /// Returns the rectangle that represents the annotation image of the annotation

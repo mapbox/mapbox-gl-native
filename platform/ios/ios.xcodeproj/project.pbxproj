@@ -26,6 +26,7 @@
 		40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */; };
 		554180421D2E97DE00012372 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 554180411D2E97DE00012372 /* OpenGLES.framework */; };
 		DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */; };
+		9686D6051CDAC6A200B6FA7B /* MBXCustomCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */; };
 		DA17BE301CC4BAC300402C41 /* MGLMapView_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */; };
 		DA17BE311CC4BDAA00402C41 /* MGLMapView_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = DA17BE2F1CC4BAC300402C41 /* MGLMapView_Internal.h */; };
 		DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */; };
@@ -1345,6 +1346,7 @@
 				DA1DC96B1CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m in Sources */,
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
+				9686D6051CDAC6A200B6FA7B /* MBXCustomCalloutView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
