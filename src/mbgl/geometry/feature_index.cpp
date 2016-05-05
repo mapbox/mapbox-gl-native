@@ -1,11 +1,12 @@
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
-#include <mbgl/util/get_geometries.hpp>
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/math.hpp>
+#include <mbgl/math/minmax.hpp>
 
 #include <cassert>
 #include <string>

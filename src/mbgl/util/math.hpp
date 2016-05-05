@@ -10,36 +10,7 @@
 namespace mbgl {
 namespace util {
 
-
-template <typename T>
-typename std::enable_if_t<std::is_integral<T>::value, T> max(T a, T b) {
-    return std::max(a, b);
-}
-
-template <typename T>
-typename std::enable_if_t<std::is_floating_point<T>::value, T> max(T a, T b) {
-    return ::fmax(a, b);
-}
-
-template <typename T, typename... Ts>
-typename std::enable_if_t<std::is_arithmetic<T>::value, T> max(T a, T b, Ts... args) {
-    return max(a, max(b, args...));
-}
-
-template <typename T>
-typename std::enable_if_t<std::is_integral<T>::value, T> min(T a, T b) {
-    return std::min(a, b);
-}
-
-template <typename T>
-typename std::enable_if_t<std::is_floating_point<T>::value, T> min(T a, T b) {
-    return ::fmin(a, b);
-}
-
-template <typename T, typename... Ts>
-typename std::enable_if_t<std::is_arithmetic<T>::value, T> min(T a, T b, Ts... args) {
-    return min(a, min(b, args...));
-}
+// TODO: split this file up into individual headers, following mbgl/math/*.hpp.
 
 // Find the angle of the two vectors, solving the formula for the cross product
 // a x b = |a||b|sin(θ) for θ.
@@ -128,19 +99,6 @@ inline T rotate(const T& a, S angle) {
     S x = cos * a.x - sin * a.y;
     S y = sin * a.x + cos * a.y;
     return T(x, y);
-}
-
-template <typename T>
-T clamp(T value, T min_, T max_) {
-    return max(min_, min(max_, value));
-}
-
-// Constrains n to the given range (including min, excluding max) via modular
-// arithmetic.
-template <typename T>
-T wrap(T value, T min, T max) {
-    T d = max - min;
-    return std::fmod((std::fmod((value - min), d) + d), d) + min;
 }
 
 template <typename T>

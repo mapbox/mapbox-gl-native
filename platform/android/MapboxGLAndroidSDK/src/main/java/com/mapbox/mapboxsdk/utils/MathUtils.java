@@ -27,7 +27,7 @@ public class MathUtils {
     /**
      * Constrains value to the given range (including min, excluding max) via modular arithmetic.
      *
-     * Same formula as used in Core GL (math.hpp)
+     * Same formula as used in Core GL (wrap.hpp)
      * std::fmod((std::fmod((value - min), d) + d), d) + min;
      *
      * @param value Value to wrap

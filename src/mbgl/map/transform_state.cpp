@@ -3,6 +3,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/math.hpp>
+#include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 
