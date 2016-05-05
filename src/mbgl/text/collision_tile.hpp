@@ -52,9 +52,9 @@ public:
 
 private:
     float findPlacementScale(float minPlacementScale,
-            const vec2<float>& anchor, const CollisionBox& box,
-            const vec2<float>& blockingAnchor, const CollisionBox& blocking);
-    Box getTreeBox(const vec2<float>& anchor, const CollisionBox& box, const float scale = 1.0);
+            const Point<float>& anchor, const CollisionBox& box,
+            const Point<float>& blockingAnchor, const CollisionBox& blocking);
+    Box getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale = 1.0);
 
     Tree tree;
     Tree ignoredTree;

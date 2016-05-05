@@ -1,5 +1,5 @@
 #include <mbgl/renderer/frame_history.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/minmax.hpp>
 
 using namespace mbgl;
 

@@ -6,7 +6,6 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/layer/line_layer.hpp>
 
 #include <vector>
@@ -45,10 +44,10 @@ private:
         uint16_t a, b, c;
     };
     void addCurrentVertex(const GeometryCoordinate& currentVertex, double& distance,
-            const vec2<double>& normal, float endLeft, float endRight, bool round,
+            const Point<double>& normal, double endLeft, double endRight, bool round,
             GLint startVertex, std::vector<LineBucket::TriangleElement>& triangleStore);
     void addPieSliceVertex(const GeometryCoordinate& currentVertex, double distance,
-            const vec2<double>& extrude, bool lineTurnsLeft, GLint startVertex,
+            const Point<double>& extrude, bool lineTurnsLeft, GLint startVertex,
             std::vector<TriangleElement>& triangleStore);
 
 public:

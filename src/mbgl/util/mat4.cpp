@@ -21,7 +21,6 @@
 // 3. This notice may not be removed or altered from any source distribution.
 
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/vec.hpp>
 
 #include <cmath>
 
@@ -336,11 +335,11 @@ void multiply(mat4& out, const mat4& a, const mat4& b) {
     out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
 }
 
-void transformMat4(vec4<double>& out, vec4<double>& a, mat4& m) {
-    out.x = m[0] * a.x + m[4] * a.y + m[8] * a.z + m[12] * a.w;
-    out.y = m[1] * a.x + m[5] * a.y + m[9] * a.z + m[13] * a.w;
-    out.z = m[2] * a.x + m[6] * a.y + m[10] * a.z + m[14] * a.w;
-    out.w = m[3] * a.x + m[7] * a.y + m[11] * a.z + m[15] * a.w;
+void transformMat4(vec4& out, const vec4& a, const mat4& m) {
+    out[0] = m[0] * a[0] + m[4] * a[1] + m[8] * a[2] + m[12] * a[3];
+    out[1] = m[1] * a[0] + m[5] * a[1] + m[9] * a[2] + m[13] * a[3];
+    out[2] = m[2] * a[0] + m[6] * a[1] + m[10] * a[2] + m[14] * a[3];
+    out[3] = m[3] * a[0] + m[7] * a[1] + m[11] * a[2] + m[15] * a[3];
 }
 
 } // namespace matrix

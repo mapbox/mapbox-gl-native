@@ -1549,6 +1549,10 @@
 				INFOPLIST_FILE = test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"$(geometry_cflags)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1562,6 +1566,10 @@
 				INFOPLIST_FILE = test/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"$(geometry_cflags)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

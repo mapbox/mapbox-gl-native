@@ -24,7 +24,6 @@
         'util/geo.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',
-        'util/math.cpp',
         'util/merge_lines.cpp',
         'util/run_loop.cpp',
         'util/text_conversions.cpp',
@@ -47,6 +46,9 @@
         'map/map.cpp',
         'map/tile.cpp',
         'map/transform.cpp',
+
+        'math/minmax.cpp',
+        'math/clamp.cpp',
 
         'storage/offline.cpp',
         'storage/offline_database.cpp',

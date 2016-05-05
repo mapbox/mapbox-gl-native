@@ -19,6 +19,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/layer/background_layer.hpp>
+#include <mbgl/math/minmax.hpp>
 
 #include <csscolorparser/csscolorparser.hpp>
 

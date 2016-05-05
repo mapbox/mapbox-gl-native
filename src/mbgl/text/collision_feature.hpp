@@ -1,7 +1,6 @@
 #ifndef MBGL_TEXT_COLLISION_FEATURE
 #define MBGL_TEXT_COLLISION_FEATURE
 
-#include <mbgl/util/vec.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -12,12 +11,12 @@
 namespace mbgl {
     class CollisionBox {
         public:
-            explicit CollisionBox(const vec2<float> &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale,
+            explicit CollisionBox(const Point<float> &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale,
                     const IndexedSubfeature& indexedFeature_ = { 0, "", "", 0 }) :
                 anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale), indexedFeature(indexedFeature_) {}
 
             // the box is centered around the anchor point
-            vec2<float> anchor;
+            Point<float> anchor;
 
             // distances to the edges from the anchor
             float x1;

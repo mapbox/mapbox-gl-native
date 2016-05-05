@@ -1,10 +1,10 @@
 #ifndef MBGL_MAP_GEOMETRY_TILE
 #define MBGL_MAP_GEOMETRY_TILE
 
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/ptr.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/variant.hpp>
@@ -28,7 +28,7 @@ enum class FeatureType : uint8_t {
 // Normalized vector tile coordinates.
 // Each geometry coordinate represents a point in a bidimensional space,
 // varying from -V...0...+V, where V is the maximum extent applicable.
-using GeometryCoordinate  = vec2<int16_t>;
+using GeometryCoordinate  = Point<int16_t>;
 using GeometryCoordinates = std::vector<GeometryCoordinate>;
 using GeometryCollection  = std::vector<GeometryCoordinates>;
 

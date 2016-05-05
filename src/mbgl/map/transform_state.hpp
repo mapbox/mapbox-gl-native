@@ -4,7 +4,6 @@
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/vec.hpp>
 #include <mbgl/util/mat4.hpp>
 
 #include <cstdint>

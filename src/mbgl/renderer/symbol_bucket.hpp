@@ -52,8 +52,7 @@ class SymbolInstance {
                 const float textBoxScale, const float textPadding, const float textAlongLine,
                 const float iconBoxScale, const float iconPadding, const float iconAlongLine,
                 const GlyphPositions& face, const IndexedSubfeature& indexedfeature);
-        float x;
-        float y;
+        Point<float> point;
         uint32_t index;
         bool hasText;
         bool hasIcon;
