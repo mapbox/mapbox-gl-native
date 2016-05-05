@@ -10,20 +10,23 @@
 #include <cassert>
 #include <string>
 
-using namespace mbgl;
+namespace mbgl {
 
-FeatureIndex::FeatureIndex() : grid(util::EXTENT, 16, 0) {}
+FeatureIndex::FeatureIndex()
+    : grid(util::EXTENT, 16, 0) {
+}
 
-void FeatureIndex::insert(const GeometryCollection& geometries, std::size_t index,
-        const std::string& sourceLayerName, const std::string& bucketName) {
-
-    for (auto& ring : geometries) {
-
+void FeatureIndex::insert(const GeometryCollection& geometries,
+                          std::size_t index,
+                          const std::string& sourceLayerName,
+                          const std::string& bucketName) {
+    for (const auto& ring : geometries) {
         float minX = std::numeric_limits<float>::infinity();
         float minY = std::numeric_limits<float>::infinity();
         float maxX = -std::numeric_limits<float>::infinity();
         float maxY = -std::numeric_limits<float>::infinity();
-        for (auto& p : ring) {
+
+        for (const auto& p : ring) {
             const float x = p.x;
             const float y = p.y;
             minX = util::min(minX, x);
@@ -38,23 +41,24 @@ void FeatureIndex::insert(const GeometryCollection& geometries, std::size_t inde
     }
 }
 
-bool vectorContains(const std::vector<std::string>& vector, const std::string& s) {
+static bool vectorContains(const std::vector<std::string>& vector, const std::string& s) {
     return std::find(vector.begin(), vector.end(), s) != vector.end();
 }
 
-bool vectorsIntersect(const std::vector<std::string>& vectorA, const std::vector<std::string>& vectorB) {
-    for (auto& a : vectorA) {
-        if (vectorContains(vectorB, a)) return true;;
+static bool vectorsIntersect(const std::vector<std::string>& vectorA, const std::vector<std::string>& vectorB) {
+    for (const auto& a : vectorA) {
+        if (vectorContains(vectorB, a)) {
+            return true;
+        }
     }
     return false;
 }
 
-
-bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
+static bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
     return a.sortIndex > b.sortIndex;
 }
 
-bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
+static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
     return a.sortIndex < b.sortIndex;
 }
 
@@ -77,8 +81,8 @@ void FeatureIndex::query(
     float maxX = -std::numeric_limits<float>::infinity();
     float maxY = -std::numeric_limits<float>::infinity();
 
-    for (auto& ring : queryGeometry) {
-        for (auto& p : ring) {
+    for (const auto& ring : queryGeometry) {
+        for (const auto& p : ring) {
             minX = util::min<float>(minX, p.x);
             minY = util::min<float>(minY, p.y);
             maxX = util::max<float>(maxX, p.x);
@@ -95,7 +99,7 @@ void FeatureIndex::query(
 
     std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
-    for (auto& indexedFeature : features) {
+    for (const auto& indexedFeature : features) {
 
         // If this feature is the same as the previous feature, skip it.
         if (indexedFeature.sortIndex == previousSortIndex) continue;
@@ -108,7 +112,7 @@ void FeatureIndex::query(
     assert(collisionTile);
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(minX, minY, maxX, maxY, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
-    for (auto& symbolFeature : symbolFeatures) {
+    for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTile, style, bearing, pixelsToTileUnits);
     }
 }
@@ -124,20 +128,25 @@ void FeatureIndex::addFeature(
     const float pixelsToTileUnits) const {
 
     auto& layerIDs = bucketLayerIDs.at(indexedFeature.bucketName);
-
-    if (filterLayerIDs && !vectorsIntersect(layerIDs, *filterLayerIDs)) return;
+    if (filterLayerIDs && !vectorsIntersect(layerIDs, *filterLayerIDs)) {
+        return;
+    }
 
     auto sourceLayer = geometryTile.getLayer(indexedFeature.sourceLayerName);
     assert(sourceLayer);
+
     auto geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
     assert(geometryTileFeature);
 
-    for (auto& layerID : layerIDs) {
-
-        if (filterLayerIDs && !vectorContains(*filterLayerIDs, layerID)) continue;
+    for (const auto& layerID : layerIDs) {
+        if (filterLayerIDs && !vectorContains(*filterLayerIDs, layerID)) {
+            continue;
+        }
 
         auto styleLayer = style.getLayer(layerID);
-        if (!styleLayer) continue;
+        if (!styleLayer) {
+            continue;
+        }
 
         if (!styleLayer->is<SymbolLayer>()) {
             auto geometries = geometryTileFeature->getGeometries();
@@ -162,20 +171,20 @@ optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
         const TranslateAnchorType anchorType,
         const float bearing,
         const float pixelsToTileUnits) {
-
-    if (translate[0] == 0 && translate[1] == 0) return {};
+    if (translate[0] == 0 && translate[1] == 0) {
+        return {};
+    }
 
     GeometryCoordinate translateVec(translate[0] * pixelsToTileUnits, translate[1] * pixelsToTileUnits);
-
     if (anchorType == TranslateAnchorType::Viewport) {
         translateVec = util::rotate(translateVec, -bearing);
     }
 
     GeometryCollection translated;
-    for (auto& ring : queryGeometry) {
+    for (const auto& ring : queryGeometry) {
         translated.emplace_back();
         auto& translatedRing = translated.back();
-        for (auto& p : ring) {
+        for (const auto& p : ring) {
             translatedRing.push_back(p - translateVec);
         }
     }
@@ -183,10 +192,11 @@ optional<GeometryCollection> FeatureIndex::translateQueryGeometry(
 }
 
 void FeatureIndex::addBucketLayerName(const std::string& bucketName, const std::string& layerID) {
-    auto& layerIDs = bucketLayerIDs[bucketName];
-    layerIDs.push_back(layerID);
+    bucketLayerIDs[bucketName].push_back(layerID);
 }
 
 void FeatureIndex::setCollisionTile(std::unique_ptr<CollisionTile> collisionTile_) {
     collisionTile = std::move(collisionTile_);
 }
+
+} // namespace mbgl

@@ -321,23 +321,20 @@ std::vector<Feature> Style::queryRenderedFeatures(
         const std::vector<TileCoordinate>& queryGeometry,
         const double zoom,
         const double bearing,
-        const optional<std::vector<std::string>>& layerIDs) {
+        const optional<std::vector<std::string>>& layerIDs) const {
     std::vector<std::unordered_map<std::string, std::vector<Feature>>> sourceResults;
     for (const auto& source : sources) {
         sourceResults.emplace_back(source->queryRenderedFeatures(queryGeometry, zoom, bearing, layerIDs));
     }
 
     std::vector<Feature> features;
-    auto featuresInserter = std::back_inserter(features);
 
     // Combine all results based on the style layer order.
-    for (auto& layerPtr : layers) {
-        auto& layerID = layerPtr->id;
-        for (auto& sourceResult : sourceResults) {
-            auto it = sourceResult.find(layerID);
+    for (const auto& layer : layers) {
+        for (const auto& sourceResult : sourceResults) {
+            auto it = sourceResult.find(layer->id);
             if (it != sourceResult.end()) {
-                auto& layerFeatures = it->second;
-                std::move(layerFeatures.begin(), layerFeatures.end(), featuresInserter);
+                std::move(it->second.begin(), it->second.end(), std::back_inserter(features));
             }
         }
     }

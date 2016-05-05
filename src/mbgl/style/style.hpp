@@ -113,7 +113,7 @@ public:
             const std::vector<TileCoordinate>& queryGeometry,
             const double zoom,
             const double bearing,
-            const optional<std::vector<std::string>>& layerIDs);
+            const optional<std::vector<std::string>>& layerIDs) const;
 
     float getQueryRadius() const;
 

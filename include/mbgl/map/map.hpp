@@ -165,7 +165,7 @@ public:
     void removeCustomLayer(const std::string& id);
 
     // Feature queries
-    std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});
+    std::vector<Feature> queryRenderedFeatures(const            ScreenCoordinate&,     const optional<std::vector<std::string>>& layerIDs = {});
     std::vector<Feature> queryRenderedFeatures(const std::array<ScreenCoordinate, 2>&, const optional<std::vector<std::string>>& layerIDs = {});
 
     // Memory

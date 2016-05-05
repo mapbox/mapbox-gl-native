@@ -346,7 +346,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         const std::vector<TileCoordinate>& queryGeometry,
         const double zoom,
         const double bearing,
-        const optional<std::vector<std::string>>& layerIDs) {
+        const optional<std::vector<std::string>>& layerIDs) const {
 
     std::unordered_map<std::string, std::vector<Feature>> result;
 
@@ -356,7 +356,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
     double maxY = -std::numeric_limits<double>::infinity();
     double z = queryGeometry[0].z;
 
-    for (auto& c : queryGeometry) {
+    for (const auto& c : queryGeometry) {
         minX = util::min(minX, c.x);
         minY = util::min(minY, c.y);
         maxX = util::max(maxX, c.x);
@@ -365,8 +365,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
 
     std::map<CanonicalTileID, TileQuery> tileQueries;
 
-    for (auto& tilePtr : tiles) {
-        auto& tile = tilePtr.second;
+    for (const auto& tilePtr : tiles) {
+        const auto& tile = tilePtr.second;
 
         auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, { minX, minY, z });
         auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, { maxX, maxY, z });
@@ -376,7 +376,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
 
         GeometryCoordinates tileSpaceQueryGeometry;
 
-        for (auto& c : queryGeometry) {
+        for (const auto& c : queryGeometry) {
             tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id.canonical, c));
         }
 
@@ -394,8 +394,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         }
     }
 
-
-    for (auto& it : tileQueries) {
+    for (const auto& it : tileQueries) {
         auto& tileQuery = std::get<1>(it);
         tileQuery.tileData.queryRenderedFeatures(result, tileQuery.queryGeometry, bearing, tileQuery.tileSize, tileQuery.scale, layerIDs);
     }
