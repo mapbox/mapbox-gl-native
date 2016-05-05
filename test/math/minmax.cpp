@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/minmax.hpp>
 
 using namespace mbgl;
 
@@ -19,9 +19,6 @@ TEST(Math, MinMaxFloatingPoint) {
     ASSERT_DOUBLE_EQ(maximumValue, util::max(double(NAN), maximumValue));
     ASSERT_DOUBLE_EQ(maximumValue, util::max(quietNAN, maximumValue));
     ASSERT_DOUBLE_EQ(10., util::max(8., 9., 10.));
-
-    ASSERT_DOUBLE_EQ(0., util::clamp(0., quietNAN, quietNAN));
-    ASSERT_DOUBLE_EQ(0., util::clamp(0., lowestValue, maximumValue));
 }
 
 TEST(Math, MinMaxIntegral) {
@@ -36,7 +33,4 @@ TEST(Math, MinMaxIntegral) {
 
     ASSERT_EQ(maximumValue, util::max(quietNAN, maximumValue));
     ASSERT_EQ(10, util::max(8, 9, 10));
-
-    ASSERT_EQ(0, util::clamp(0, quietNAN, quietNAN));
-    ASSERT_EQ(0, util::clamp(0, lowestValue, maximumValue));
 }

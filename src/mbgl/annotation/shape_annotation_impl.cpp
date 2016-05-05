@@ -4,11 +4,11 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/layer/line_layer.hpp>
 #include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 

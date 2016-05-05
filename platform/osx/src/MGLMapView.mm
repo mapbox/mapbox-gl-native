@@ -24,8 +24,8 @@
 #import <mbgl/sprite/sprite_image.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
+#import <mbgl/math/wrap.hpp>
 #import <mbgl/util/constants.hpp>
-#import <mbgl/util/math.hpp>
 #import <mbgl/util/chrono.hpp>
 
 #import <map>

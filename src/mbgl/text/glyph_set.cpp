@@ -1,6 +1,6 @@
 #include <mbgl/text/glyph_set.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/minmax.hpp>
 
 #include <cassert>
 

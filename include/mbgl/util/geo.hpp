@@ -1,7 +1,7 @@
 #ifndef MBGL_UTIL_GEO
 #define MBGL_UTIL_GEO
 
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/wrap.hpp>
 #include <mbgl/util/vec.hpp>
 #include <mbgl/util/constants.hpp>
 

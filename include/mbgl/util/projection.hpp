@@ -3,7 +3,7 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/math.hpp>
+#include <mbgl/math/clamp.hpp>
 
 #include <cmath>
 

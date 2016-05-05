@@ -6,9 +6,10 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/unitbezier.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/math/clamp.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/util/chrono.hpp>
 
 #include <cstdio>
 #include <cmath>

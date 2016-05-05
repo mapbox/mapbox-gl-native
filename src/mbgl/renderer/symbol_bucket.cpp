@@ -28,6 +28,7 @@
 #include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/math/minmax.hpp>
 
 namespace mbgl {
 
