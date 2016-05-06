@@ -20,7 +20,7 @@ addons_shortcuts:
   addons_qt5: &qt5
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:
   global:
@@ -115,8 +115,6 @@ matrix:
       compiler: ": linux-gcc5-release"
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
-      before_install:
-        - sudo apt-get install -y qtpositioning5-dev qtlocation5-dev
       script:
         - make qt-app qt-qml-app
 
