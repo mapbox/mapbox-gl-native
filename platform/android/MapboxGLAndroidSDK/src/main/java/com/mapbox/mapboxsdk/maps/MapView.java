@@ -152,11 +152,11 @@ public class MapView extends FrameLayout {
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
 
-    private String mStyleUrl;
-
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
     private boolean mInitialLoad;
     private boolean mDestroyed;
+
+    private StyleInitializer mStyleInitializer;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -188,6 +188,7 @@ public class MapView extends FrameLayout {
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
+        mStyleInitializer = new StyleInitializer();
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
         if (!isInEditMode()) {
@@ -258,13 +259,14 @@ public class MapView extends FrameLayout {
         }
 
         String accessToken = options.getAccessToken();
+        String style = options.getStyle();
         if (!TextUtils.isEmpty(accessToken)) {
             mMapboxMap.setAccessToken(accessToken);
-        }
-
-        String style = options.getStyle();
-        if (!TextUtils.isEmpty(style)) {
-            mMapboxMap.setStyleUrl(style);
+            if (style != null) {
+                setStyleUrl(style);
+            }
+        } else {
+            mStyleInitializer.setStyle(style, true);
         }
 
         // MyLocationView
@@ -470,7 +472,7 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
-        outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleUrl);
+        outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleInitializer.getStyle());
         outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
 
@@ -553,9 +555,9 @@ public class MapView extends FrameLayout {
         mNativeMapView.update();
         mMyLocationView.onResume();
 
-        if (mStyleUrl == null) {
+        if (mStyleInitializer.isDefaultStyle()) {
             // user has failed to supply a style url
-            setStyleUrl(Style.MAPBOX_STREETS);
+            setStyleUrl(mStyleInitializer.getStyle());
         }
     }
 
@@ -793,7 +795,7 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return;
         }
-        mStyleUrl = url;
+        mStyleInitializer.setStyle(url);
         mNativeMapView.setStyleUrl(url);
     }
 
@@ -827,7 +829,7 @@ public class MapView extends FrameLayout {
     @UiThread
     @NonNull
     public String getStyleUrl() {
-        return mStyleUrl;
+        return mStyleInitializer.getStyle();
     }
 
     //
@@ -2665,6 +2667,37 @@ public class MapView extends FrameLayout {
         public void run() {
             // invalidate camera position
             mapboxMap.getCameraPosition();
+        }
+    }
+
+    /**
+     * Class responsible for managing state of Style loading.
+     */
+    private class StyleInitializer {
+
+        private String mStyle;
+        private boolean mDefaultStyle;
+
+        public StyleInitializer() {
+            mStyle = Style.MAPBOX_STREETS;
+            mDefaultStyle = true;
+        }
+
+        void setStyle(@NonNull String style) {
+            setStyle(style, false);
+        }
+
+        void setStyle(@NonNull String style, boolean defaultStyle) {
+            mStyle = style;
+            mDefaultStyle = defaultStyle;
+        }
+
+        public String getStyle() {
+            return mStyle;
+        }
+
+        boolean isDefaultStyle() {
+            return mDefaultStyle;
         }
     }
 
