@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 
+import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -578,7 +579,7 @@ public class MapboxMapTest {
 
     @Test
     public void testAddMarkers() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a");
         MarkerOptions markerOptions2 = new MarkerOptions().title("b");
         markerList.add(markerOptions1);
@@ -591,14 +592,14 @@ public class MapboxMapTest {
 
     @Test
     public void testAddMarkersEmpty() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         mMapboxMap.addMarkers(markerList);
         assertEquals("Markers size should be 0", 0, mMapboxMap.getMarkers().size());
     }
 
     @Test
     public void testAddMarkersSingleMarker() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions = new MarkerOptions().title("a");
         markerList.add(markerOptions);
         mMapboxMap.addMarkers(markerList);
@@ -741,7 +742,7 @@ public class MapboxMapTest {
 
     @Test
     public void testRemoveAnnotations() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a");
         MarkerOptions markerOptions2 = new MarkerOptions().title("b");
         markerList.add(markerOptions1);
@@ -753,7 +754,7 @@ public class MapboxMapTest {
 
     @Test
     public void testClear() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a");
         MarkerOptions markerOptions2 = new MarkerOptions().title("b");
         markerList.add(markerOptions1);
@@ -765,7 +766,7 @@ public class MapboxMapTest {
 
     @Test
     public void testRemoveAnnotationsByList() {
-        List<MarkerOptions> markerList = new ArrayList<>();
+        List<BaseMarkerOptions> markerList = new ArrayList<>();
         MarkerOptions markerOptions1 = new MarkerOptions().title("a");
         MarkerOptions markerOptions2 = new MarkerOptions().title("b");
         markerList.add(markerOptions1);

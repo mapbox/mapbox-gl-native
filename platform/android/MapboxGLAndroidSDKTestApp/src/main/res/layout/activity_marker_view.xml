@@ -27,29 +27,10 @@
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@id/mapView"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 app:access_token="@string/mapbox_access_token"
                 app:style_url="@string/style_light"
-                android:layout_height="match_parent" />
-
-            <!--<android.support.design.widget.FloatingActionButton-->
-                <!--android:id="@id/fab"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="end|bottom"-->
-                <!--android:layout_marginBottom="82dp"-->
-                <!--android:layout_marginRight="@dimen/fab_margin"-->
-                <!--android:src="@drawable/ic_refresh_24dp"-->
-                <!--app:backgroundTint="@color/accent"-->
-                <!--app:layout_anchorGravity="top" />-->
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_layers_24dp"
-                app:backgroundTint="@color/primary" />
+                app:zoom="1" />
 
         </android.support.design.widget.CoordinatorLayout>
 
