@@ -7,6 +7,7 @@ using namespace mapbox::geometry;
 using Value = mbgl::Value;
 using Feature = mbgl::Feature;
 using Geometry = mbgl::Feature::geometry_type;
+using GeometryCollection = mapbox::geometry::geometry_collection<double>;
 using Properties = mbgl::Feature::property_map;
 
 template <class T>
@@ -48,7 +49,7 @@ private:
 };
 
 template <class T>
-struct ToCoordinates {
+struct ToCoordinatesOrGeometries {
 public:
     // Handles line_string, polygon, multi_point, multi_line_string, multi_polygon, and geometry_collection.
     template <class E>
@@ -117,8 +118,13 @@ v8::Local<v8::Object> toJS(const Geometry& geometry) {
 
     v8::Local<v8::Object> result = Nan::New<v8::Object>();
 
-    Nan::Set(result, Nan::New("type").ToLocalChecked(), Geometry::visit(geometry, ToType<double>()));
-    Nan::Set(result, Nan::New("coordinates").ToLocalChecked(), Geometry::visit(geometry, ToCoordinates<double>()));
+    Nan::Set(result,
+        Nan::New("type").ToLocalChecked(),
+        Geometry::visit(geometry, ToType<double>()));
+
+    Nan::Set(result,
+        Nan::New(geometry.is<GeometryCollection>() ? "geometries" : "coordinates").ToLocalChecked(),
+        Geometry::visit(geometry, ToCoordinatesOrGeometries<double>()));
 
     return scope.Escape(result);
 }
