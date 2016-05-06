@@ -735,7 +735,7 @@ public:
             std::string png = encodePNG(_mbglView->readStillImage());
             NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
             NSImage *image = [[NSImage alloc] initWithData:data];
-            [self printWithImage:image];
+            [self performSelector:@selector(printWithImage:) withObject:image afterDelay:0];
         }
 
 //        [self updateUserLocationAnnotationView];
