@@ -50,7 +50,7 @@ private:
 template <class T>
 struct ToCoordinates {
 public:
-    // Handles line_string, multi_point, multi_line_string, and multi_polygon.
+    // Handles line_string, polygon, multi_point, multi_line_string, multi_polygon, and geometry_collection.
     template <class E>
     v8::Local<v8::Object> operator()(const std::vector<E>& vector) {
         Nan::EscapableHandleScope scope;
@@ -69,23 +69,8 @@ public:
         return scope.Escape(result);
     }
 
-    v8::Local<v8::Object> operator()(const polygon<T>& polygon) {
-        Nan::EscapableHandleScope scope;
-        v8::Local<v8::Array> result = Nan::New<v8::Array>(1 + polygon.interior_rings.size());
-        Nan::Set(result, 0, operator()(polygon.exterior_ring));
-        for (std::size_t i = 0; i < polygon.interior_rings.size(); ++i) {
-            Nan::Set(result, i + 1, operator()(polygon.interior_rings[i]));
-        }
-        return scope.Escape(result);
-    }
-
-    v8::Local<v8::Object> operator()(const geometry_collection<T>& collection) {
-        Nan::EscapableHandleScope scope;
-        v8::Local<v8::Array> result = Nan::New<v8::Array>(collection.size());
-        for (std::size_t i = 0; i < collection.size(); ++i) {
-            Nan::Set(result, i, toJS(collection[i]));
-        }
-        return scope.Escape(result);
+    v8::Local<v8::Object> operator()(const geometry<T>& geometry) {
+        return toJS(geometry);
     }
 };
 
