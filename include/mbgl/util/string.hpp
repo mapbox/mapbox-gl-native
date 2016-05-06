@@ -10,7 +10,16 @@ namespace util {
 
 template <class T>
 inline std::string toString(T t) {
-    return std::to_string(t);
+    if (t - (int)t > 0.0 || t + (int)t < 0.0) {
+        std::string str = std::to_string(t);
+        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
+        if (str.back() == '.') {
+            str.pop_back();
+        }
+        return str;
+    } else {
+        return std::to_string(int(t));
+    }
 }
 
 inline std::string toString(int8_t num) {
