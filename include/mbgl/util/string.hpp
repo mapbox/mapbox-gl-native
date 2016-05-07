@@ -10,15 +10,19 @@ namespace util {
 
 template <class T>
 inline std::string toString(T t) {
-    if (t - (int)t > 0.0 || t + (int)t < 0.0) {
-        std::string str = std::to_string(t);
+    return std::to_string(t);
+}
+
+inline std::string toString(double num) {
+    if (num - (int)num > 0.0 || num + (int)num < 0.0) {
+        std::string str = std::to_string(num);
         str.erase(str.find_last_not_of('0') + 1, std::string::npos);
         if (str.back() == '.') {
             str.pop_back();
         }
         return str;
     } else {
-        return std::to_string(int(t));
+        return std::to_string(int(num));
     }
 }
 
