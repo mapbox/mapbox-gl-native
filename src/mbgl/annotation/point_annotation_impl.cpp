@@ -25,7 +25,7 @@ void PointAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationT
     projected *= std::pow(2, tileID.z);
     projected.x = std::fmod(projected.x, 1);
     projected.y = std::fmod(projected.y, 1);
-    projected *= double(GeometryTileFeature::defaultExtent);
+    projected *= double(util::EXTENT);
 
     layer.features.emplace_back(
         std::make_shared<const AnnotationTileFeature>(FeatureType::Point,

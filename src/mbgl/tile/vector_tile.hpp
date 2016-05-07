@@ -25,7 +25,6 @@ public:
     std::unordered_map<std::string,Value> getProperties() const override;
     optional<uint64_t> getID() const override;
     GeometryCollection getGeometries() const override;
-    uint32_t getExtent() const override;
 
 private:
     const VectorTileLayer& layer;

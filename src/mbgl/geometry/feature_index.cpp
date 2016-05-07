@@ -3,7 +3,6 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
@@ -141,7 +140,7 @@ void FeatureIndex::addFeature(
         if (!styleLayer) continue;
 
         if (!styleLayer->is<SymbolLayer>()) {
-            auto geometries = getGeometries(*geometryTileFeature);
+            auto geometries = geometryTileFeature->getGeometries();
             if (!styleLayer->queryIntersectsGeometry(queryGeometry, geometries, bearing, pixelsToTileUnits)) continue;
         }
 

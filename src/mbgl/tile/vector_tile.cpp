@@ -114,6 +114,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     uint32_t length = 0;
     int32_t x = 0;
     int32_t y = 0;
+    const float scale = float(util::EXTENT) / layer.extent;
 
     GeometryCollection lines;
 
@@ -139,7 +140,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
                 line = &lines.back();
             }
 
-            line->emplace_back(x, y);
+            line->emplace_back(::round(x * scale), ::round(y * scale));
 
         } else if (cmd == 7) { // closePolygon
             if (!line->empty()) {
@@ -152,10 +153,6 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     }
 
     return lines;
-}
-
-uint32_t VectorTileFeature::getExtent() const {
-    return layer.extent;
 }
 
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)

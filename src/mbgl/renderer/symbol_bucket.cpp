@@ -25,7 +25,6 @@
 #include <mbgl/util/merge_lines.hpp>
 #include <mbgl/util/clip_lines.hpp>
 #include <mbgl/util/std.hpp>
-#include <mbgl/util/get_geometries.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/math/minmax.hpp>
@@ -170,7 +169,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
 
             auto &multiline = ft.geometry;
 
-            GeometryCollection geometryCollection = getGeometries(*feature);
+            GeometryCollection geometryCollection = feature->getGeometries();
             for (auto& line : geometryCollection) {
                 multiline.emplace_back();
                 for (auto& point : line) {
