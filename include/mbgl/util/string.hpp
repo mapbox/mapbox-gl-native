@@ -4,7 +4,7 @@
 #include <string>
 #include <cassert>
 #include <exception>
-#include <cmath>
+#include <sstream>
 
 namespace mbgl {
 namespace util {
@@ -15,16 +15,9 @@ inline std::string toString(T t) {
 }
 
 inline std::string toString(double num) {
-    if (std::fmod(num, 1)) {
-        std::string str = std::to_string(num);
-        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
-        if (str.back() == '.') {
-            str.pop_back();
-        }
-        return str;
-    } else {
-        return std::to_string(int(num));
-    }
+    std::ostringstream formatted;
+    formatted << num;
+    return formatted.str();
 }
 
 inline std::string toString(int8_t num) {
