@@ -43,6 +43,7 @@ TEST(NumberConversions, number_to_string) {
     EXPECT_EQ("-32768.123457", util::toString(-32768.123456789));
 
     EXPECT_EQ("3.141593", util::toString(3.1415926535897932385128089594061862044327426701784));
+    EXPECT_EQ("-3.141593", util::toString(-3.1415926535897932385128089594061862044327426701784));
 
     EXPECT_EQ("0.000053", util::toString((long double)5.32e-5));
     EXPECT_EQ("0.000000", util::toString((long double)5.32e-40));
