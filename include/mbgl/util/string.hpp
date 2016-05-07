@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <exception>
+#include <cmath>
 
 namespace mbgl {
 namespace util {
@@ -14,7 +15,7 @@ inline std::string toString(T t) {
 }
 
 inline std::string toString(double num) {
-    if (num - (int)num > 0.0 || num + (int)num < 0.0) {
+    if (std::fmod(num, 1)) {
         std::string str = std::to_string(num);
         str.erase(str.find_last_not_of('0') + 1, std::string::npos);
         if (str.back() == '.') {
