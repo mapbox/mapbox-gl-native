@@ -1,34 +1,53 @@
 # Contributing to the Android SDK on Linux
 
-Install a build dependencies:
+_These instructions were tested on Ubuntu 16.04 LTS (aka Xenial Xerus)._
 
-    apt-get install -y make git build-essential automake \
-    libtool make cmake pkg-config lib32stdc++6 lib32z1
+Install the build dependencies:
 
-Install [Oracle JDK 7 (requires license agreement)](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+```
+$ sudo apt-get install -y android-tools-adb build-essential curl git \
+        lib32stdc++6 lib32z1 openjdk-8-jdk pkg-config python
+```
 
-    export JAVA_HOME="/dir/to/jdk1.7.0_71"
+Install the Android SDK. We recommend doing this by way of [Android command line tools for Linux](http://developer.android.com/sdk/index.html) but you can also achieve same results with the Android Studio package.
 
-Install the Android SDK. We recommend doing this by way of [Android Studio](https://developer.android.com/sdk/installing/studio.html).
+Unpack the SDK and make sure you have the proper environment variables set.
 
-    export ANDROID_HOME="/dir/to/android-sdk-linux"
+```
+$ export PATH=/path/to/android-sdk-linux/tools:$PATH
+$ export ANDROID_HOME=/path/to/android-sdk-linux
+```
 
-In the Android SDK Manager also select and install "Android Support Repository" and "Android Support Library" from "Extras":
+Update the Android SDK to the latest version:
 
-![image](https://cloud.githubusercontent.com/assets/98601/9915837/289f398e-5c6e-11e5-9a84-ed4d08d52d1f.png)
+```
+$ android update sdk -u
+```
 
 ## Setting Mapbox Access Token
 
 _The demo applications use Mapbox vector tiles, which require a Mapbox account and API access token. Obtain an access token on the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)._
 
-gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `"MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml` where the app will read it from.  Otherwise, you can edit `developer-config.xml` and add the value manually as `mapbox_access_token`.
+gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and save it to `platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml` where the app will read it from.  Otherwise, you can edit `developer-config.xml` and add the value manually as `mapbox_access_token`.
 
 ## Building
 
-Run:
+Checking out the code and initializing the git submodules:
 
-    make android
+```
+$ git clone https://github.com/mapbox/mapbox-gl-native.git
+$ cd mapbox-gl-native
+$ git submodule init
+$ git submodule update
+```
 
-You can then open `android` in Android Studio via "Import project (Eclipse ADT, Gradle, etc.)".
+Building a debug version will generated a self-signed test application that can be installed on the phone or emulator:
+
+```
+$ BUILDTYPE=Debug make android
+$ adb install -r platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk 
+```
+
+The debug version will emit considerable more log information (and run slower). Use simply `make android` to build a release version.
 
 **Next: get your app [running on a hardware Android Device](docs/ANDROID_DEVICE.md) or [simulator](docs/ANDROID_SIMULATOR.md)**
