@@ -49,5 +49,3 @@ $ adb install -r platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/Ma
 ```
 
 The debug version will emit considerable more log information (and run slower). Use simply `make android` to build a release version.
-
-**Next: get your app [running on a hardware Android Device](docs/ANDROID_DEVICE.md) or [simulator](docs/ANDROID_SIMULATOR.md)**
