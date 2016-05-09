@@ -394,10 +394,6 @@ public:
     clickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
     [self addGestureRecognizer:clickGestureRecognizer];
     
-    NSClickGestureRecognizer *secondaryClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleSecondaryClickGesture:)];
-    secondaryClickGestureRecognizer.buttonMask = 0x2;
-    [self addGestureRecognizer:secondaryClickGestureRecognizer];
-    
     NSClickGestureRecognizer *doubleClickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleClickGesture:)];
     doubleClickGestureRecognizer.numberOfClicksRequired = 2;
     doubleClickGestureRecognizer.delaysPrimaryMouseButtonEvents = NO;
@@ -1362,18 +1358,6 @@ public:
     }
 }
 
-/// Tap with two fingers (“right-click”) to zoom out.
-- (void)handleSecondaryClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
-    if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded) {
-        return;
-    }
-    
-    _mbglMap->cancelTransitions();
-    
-    NSPoint gesturePoint = [gestureRecognizer locationInView:self];
-    [self scaleBy:0.5 atPoint:gesturePoint animated:YES];
-}
-
 /// Double-click or double-tap to zoom in.
 - (void)handleDoubleClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
     if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded
@@ -1394,6 +1378,7 @@ public:
     
     _mbglMap->cancelTransitions();
     
+    // Tap with two fingers (“right-click”) to zoom out on mice but not trackpads.
     NSPoint gesturePoint = [self convertPoint:event.locationInWindow fromView:nil];
     [self scaleBy:0.5 atPoint:gesturePoint animated:YES];
 }
