@@ -5,22 +5,29 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarker;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -58,6 +65,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
+                mMapboxMap.setMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+
                 if (actionBar != null) {
                     ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
                     spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -67,8 +76,37 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 }
             }
         });
-
     }
+
+    private static class TextAdapter implements MapboxMap.MarkerViewAdapter<Marker> {
+
+        private LayoutInflater inflater;
+
+        public TextAdapter(@NonNull Context context) {
+            this.inflater = LayoutInflater.from(context);
+        }
+
+        @Nullable
+        @Override
+        public View getView(@NonNull Marker marker, @Nullable View convertView, @NonNull ViewGroup parent) {
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                viewHolder = new ViewHolder();
+                convertView = inflater.inflate(R.layout.view_text_marker, parent, false);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            viewHolder.title.setText(marker.getTitle());
+            return convertView;
+        }
+
+        private static class ViewHolder {
+            TextView title;
+        }
+    }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -155,7 +193,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     location = locations.get(i);
                     markerOptions.add(new MarkerOptions()
                             .position(location)
-                            .title("Marker")
+                            .title(String.valueOf(i))
                             .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
                 }
 
