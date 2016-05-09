@@ -7,14 +7,18 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -50,7 +54,9 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
+    public void onMapReady(final MapboxMap mapboxMap) {
+
+        // Add country markers
         List<BaseMarkerOptions> countries = new ArrayList<>();
         countries.add(new CountryMarkerOptions().title("China").abbrevName("ch").flagRes(R.drawable.ic_china).position(new LatLng(31.230416, 121.473701)));
         countries.add(new CountryMarkerOptions().title("United States").abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.907192, -77.036871)));
@@ -58,8 +64,16 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
         countries.add(new CountryMarkerOptions().title("Germany").abbrevName("de").flagRes(R.drawable.ic_germany).position(new LatLng(52.520007, 13.404954)));
         mapboxMap.addMarkers(countries);
 
+        // Add view marker adapter
         mapboxMap.setMarkerViewAdapter(new CountryAdapter(this));
+        mapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
+            @Override
+            public void onMarkerClick(@NonNull Marker marker, @NonNull View view) {
+                Log.d(MapboxConstants.TAG, "Country clicked " + ((CountryMarker) marker).getAbbrevName());
+            }
+        });
     }
+
 
     private static class CountryAdapter implements MapboxMap.MarkerViewAdapter<CountryMarker> {
 

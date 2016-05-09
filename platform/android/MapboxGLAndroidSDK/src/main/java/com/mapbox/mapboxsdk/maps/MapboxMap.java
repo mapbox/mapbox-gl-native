@@ -71,6 +71,7 @@ public class MapboxMap {
 
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
     private MapboxMap.MarkerViewAdapter mMarkerViewAdapter;
+    private OnMarkerViewClickListener mOnMarkerViewClickListener;
 
     private boolean mMyLocationEnabled;
     private boolean mAllowConcurrentMultipleInfoWindows;
@@ -648,12 +649,23 @@ public class MapboxMap {
         }
 
         List<Marker> inBoundsMarkers = result.getInBounds();
-        for (Marker marker : inBoundsMarkers) {
+        for (final Marker marker : inBoundsMarkers) {
             convertView = viewSimplePool.acquire();
             View adaptedView = mMarkerViewAdapter.getView(marker, convertView, mMapView);
-            mMarkerViews.append(marker.getId(), adaptedView);
-            if (convertView == null) {
-                mMapView.addView(adaptedView);
+            if(adaptedView!=null) {
+                adaptedView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(mOnMarkerViewClickListener!=null){
+                            mOnMarkerViewClickListener.onMarkerClick(marker, v);
+                        }
+                    }
+                });
+
+                mMarkerViews.append(marker.getId(), adaptedView);
+                if (convertView == null) {
+                    mMapView.addView(adaptedView);
+                }
             }
         }
     }
@@ -1183,6 +1195,14 @@ public class MapboxMap {
 
     public MarkerViewAdapter getMarkerViewAdapter() {
         return mMarkerViewAdapter;
+    }
+
+    public void setOnMarkerViewClickListener(@Nullable OnMarkerViewClickListener listener){
+        mOnMarkerViewClickListener = listener;
+    }
+
+    public OnMarkerViewClickListener getOnMarkerViewClickListener() {
+        return mOnMarkerViewClickListener;
     }
 
     //
@@ -1777,6 +1797,11 @@ public class MapboxMap {
 
         @Nullable
         View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
+    }
+
+    public interface OnMarkerViewClickListener{
+
+        void onMarkerClick(@NonNull Marker marker, @NonNull View view);
     }
 
     /**
