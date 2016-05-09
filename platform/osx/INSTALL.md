@@ -45,4 +45,4 @@ class ViewController: NSViewController {
 }
 ```
 
-The [Mapbox iOS SDK’s API documentation](https://www.mapbox.com/ios-sdk/api/) applies to the Mapbox OS X SDK with few differences, mostly around unimplemented features like user location tracking.
+Run `make xdocument` to generate complete API documentation. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox OS X SDK with few differences, mostly around unimplemented features like user location tracking.
