@@ -3142,9 +3142,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             }
             
             // Choose the first nearby annotation.
-            if (_annotationsNearbyLastTap.size())
+            if (nearbyAnnotations.size())
             {
-                hitAnnotationTag = _annotationsNearbyLastTap.front();
+                hitAnnotationTag = nearbyAnnotations.front();
             }
         }
     }

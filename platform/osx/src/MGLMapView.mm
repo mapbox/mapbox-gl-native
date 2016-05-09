@@ -1895,8 +1895,8 @@ public:
             }
             
             // Choose the first nearby annotation.
-            if (_annotationsNearbyLastClick.size()) {
-                hitAnnotationTag = _annotationsNearbyLastClick.front();
+            if (nearbyAnnotations.size()) {
+                hitAnnotationTag = nearbyAnnotations.front();
             }
         }
     }
