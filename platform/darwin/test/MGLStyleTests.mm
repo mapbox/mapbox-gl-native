@@ -74,7 +74,7 @@
     
     // Test that “current version is” statements are present and current for all versioned style methods.
     NSError *versionError;
-    NSString *versionExpressionString = @(R"RE(the current version is `(\d+)`)RE");
+    NSString *versionExpressionString = @(R"RE(current version is `(\d+)`)RE");
     NSRegularExpression *versionExpression = [NSRegularExpression regularExpressionWithPattern:versionExpressionString options:0 error:&versionError];
     XCTAssertNil(versionError, @"Error compiling regular expression to search for current version statements.");
     NSUInteger numVersionDeclarations = [versionExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
