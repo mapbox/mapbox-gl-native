@@ -405,7 +405,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 - (void)handlePressGesture:(NSPressGestureRecognizer *)gestureRecognizer {
     if (gestureRecognizer.state == NSGestureRecognizerStateBegan) {
         NSPoint location = [gestureRecognizer locationInView:self.mapView];
-        [self dropPinAtPoint:location];
+        if (!NSPointInRect([gestureRecognizer locationInView:self.mapView.compass], self.mapView.compass.bounds)
+            && !NSPointInRect([gestureRecognizer locationInView:self.mapView.zoomControls], self.mapView.zoomControls.bounds)
+            && !NSPointInRect([gestureRecognizer locationInView:self.mapView.attributionView], self.mapView.attributionView.bounds)) {
+            [self dropPinAtPoint:location];
+        }
     }
 }
 

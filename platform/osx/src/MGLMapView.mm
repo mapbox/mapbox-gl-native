@@ -1344,7 +1344,8 @@ public:
 
 /// Click or tap to select an annotation.
 - (void)handleClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
-    if (gestureRecognizer.state != NSGestureRecognizerStateEnded) {
+    if (gestureRecognizer.state != NSGestureRecognizerStateEnded
+        || [self subviewContainingGesture:gestureRecognizer]) {
         return;
     }
     
@@ -1375,7 +1376,8 @@ public:
 
 /// Double-click or double-tap to zoom in.
 - (void)handleDoubleClickGesture:(NSClickGestureRecognizer *)gestureRecognizer {
-    if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded) {
+    if (!self.zoomEnabled || gestureRecognizer.state != NSGestureRecognizerStateEnded
+        || [self subviewContainingGesture:gestureRecognizer]) {
         return;
     }
     
@@ -1459,6 +1461,20 @@ public:
             [self offsetCenterCoordinateBy:NSMakePoint(x, y) animated:NO];
         }
     }
+}
+
+/// Returns the subview that the gesture is located in.
+- (NSView *)subviewContainingGesture:(NSGestureRecognizer *)gestureRecognizer {
+    if (NSPointInRect([gestureRecognizer locationInView:self.compass], self.compass.bounds)) {
+        return self.compass;
+    }
+    if (NSPointInRect([gestureRecognizer locationInView:self.zoomControls], self.zoomControls.bounds)) {
+        return self.zoomControls;
+    }
+    if (NSPointInRect([gestureRecognizer locationInView:self.attributionView], self.attributionView.bounds)) {
+        return self.attributionView;
+    }
+    return nil;
 }
 
 #pragma mark Keyboard events
