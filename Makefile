@@ -66,6 +66,9 @@ test-osx: osx node_modules/express
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(OSX_WORK_PATH) -scheme CI test $(XCPRETTY)
 
+xdocument:
+	OUTPUT=$(OUTPUT) ./platform/osx/scripts/document.sh
+
 genstrings:
 	genstrings -u -o platform/osx/sdk/Base.lproj platform/darwin/src/*.{m,mm}
 	genstrings -u -o platform/osx/sdk/Base.lproj platform/osx/src/*.{m,mm}

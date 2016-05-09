@@ -542,6 +542,23 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		DAAA17961CE13BAE00731EFE /* docs */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "xdocument OUTPUT=build/osx/pkg/documentation";
+			buildConfigurationList = DAAA17991CE13BAE00731EFE /* Build configuration list for PBXLegacyTarget "docs" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = ../../;
+			dependencies = (
+			);
+			name = docs;
+			passBuildSettingsInEnvironment = 1;
+			productName = docs;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		DA839E911CC2E3400062CAFB /* osxapp */ = {
 			isa = PBXNativeTarget;
@@ -611,6 +628,9 @@
 					DA839E911CC2E3400062CAFB = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					DAAA17961CE13BAE00731EFE = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					DAE6C3271CC30DB200DB3429 = {
 						CreatedOnToolsVersion = 7.3;
 					};
@@ -635,6 +655,7 @@
 				DA839E911CC2E3400062CAFB /* osxapp */,
 				DAE6C3271CC30DB200DB3429 /* dynamic */,
 				DAE6C3301CC30DB200DB3429 /* test */,
+				DAAA17961CE13BAE00731EFE /* docs */,
 			);
 		};
 /* End PBXProject section */
@@ -908,6 +929,31 @@
 			};
 			name = Release;
 		};
+		DAAA17971CE13BAE00731EFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		DAAA17981CE13BAE00731EFE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		DAE6C33F1CC30DB200DB3429 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */;
@@ -1040,6 +1086,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		DAAA17991CE13BAE00731EFE /* Build configuration list for PBXLegacyTarget "docs" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAAA17971CE13BAE00731EFE /* Debug */,
+				DAAA17981CE13BAE00731EFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		DAE6C3431CC30DB200DB3429 /* Build configuration list for PBXNativeTarget "dynamic" */ = {
 			isa = XCConfigurationList;
