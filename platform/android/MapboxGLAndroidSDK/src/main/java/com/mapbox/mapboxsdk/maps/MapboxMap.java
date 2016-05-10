@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -71,6 +72,7 @@ public class MapboxMap {
 
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
     private MapboxMap.MarkerViewAdapter mMarkerViewAdapter;
+    private Bitmap mViewMarkerBitmap;
     private OnMarkerViewClickListener mOnMarkerViewClickListener;
 
     private boolean mMyLocationEnabled;
@@ -655,16 +657,23 @@ public class MapboxMap {
         for (final Marker marker : inBoundsMarkers) {
             convertView = viewSimplePool.acquire();
             View adaptedView = mMarkerViewAdapter.getView(marker, convertView, mMapView);
-            if(adaptedView!=null) {
+            if (adaptedView != null) {
+                // hack to hide old marker, todo replace with visibility
+                Icon icon = marker.getIcon();
+                if(mViewMarkerBitmap==null){
+                    Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                    mViewMarkerBitmap = Bitmap.createBitmap(icon.getBitmap().getWidth(), icon.getBitmap().getHeight(), conf);
+                }
+                marker.setIcon(IconFactory.recreate(icon.getId(), mViewMarkerBitmap));
                 adaptedView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
-                        if(mSelectedMarkers.contains(marker)){
+                        if (mSelectedMarkers.contains(marker)) {
                             return;
                         }
 
-                        if(mOnMarkerViewClickListener!=null){
+                        if (mOnMarkerViewClickListener != null) {
                             mOnMarkerViewClickListener.onMarkerClick(marker, v);
                         }
 
@@ -965,9 +974,9 @@ public class MapboxMap {
         mAnnotations.remove(id);
     }
 
-    private void removeMarkerView(long id){
+    private void removeMarkerView(long id) {
         View viewHolder = mMarkerViews.get(id);
-        if(viewHolder!=null) {
+        if (viewHolder != null) {
             viewHolder.setVisibility(View.GONE);
             viewSimplePool.release(viewHolder);
         }
@@ -1214,7 +1223,7 @@ public class MapboxMap {
 
     public void setMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter) {
         mMarkerViewAdapter = markerViewAdapter;
-        if(markerViewAdapter!=null){
+        if (markerViewAdapter != null) {
             mMapView.invalidateViewMarkers();
         }
     }
@@ -1223,7 +1232,7 @@ public class MapboxMap {
         return mMarkerViewAdapter;
     }
 
-    public void setOnMarkerViewClickListener(@Nullable OnMarkerViewClickListener listener){
+    public void setOnMarkerViewClickListener(@Nullable OnMarkerViewClickListener listener) {
         mOnMarkerViewClickListener = listener;
     }
 
@@ -1825,7 +1834,7 @@ public class MapboxMap {
         View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
     }
 
-    public interface OnMarkerViewClickListener{
+    public interface OnMarkerViewClickListener {
 
         void onMarkerClick(@NonNull Marker marker, @NonNull View view);
     }
