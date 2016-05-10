@@ -47,7 +47,7 @@ public:
     static const std::string PointLayerID;
 
 private:
-    std::unique_ptr<AnnotationTile> getTile(const TileID&);
+    std::unique_ptr<AnnotationTile> getTile(const CanonicalTileID&);
 
     AnnotationID nextID = 0;
     PointAnnotationImpl::Tree pointTree;

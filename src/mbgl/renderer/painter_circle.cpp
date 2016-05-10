@@ -3,8 +3,6 @@
 
 #include <mbgl/layer/circle_layer.hpp>
 
-#include <mbgl/map/tile_id.hpp>
-
 #include <mbgl/shader/circle_shader.hpp>
 
 using namespace mbgl;

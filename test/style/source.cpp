@@ -122,12 +122,12 @@ TEST(Source, RasterTileEmpty) {
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
+    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
         EXPECT_EQ("source", source.id);
         test.end();
     };
 
-    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
@@ -151,12 +151,12 @@ TEST(Source, VectorTileEmpty) {
         return response;
     };
 
-    test.observer.tileLoaded = [&] (Source& source, const TileID&, bool) {
+    test.observer.tileLoaded = [&] (Source& source, const OverscaledTileID&, bool) {
         EXPECT_EQ("source", source.id);
         test.end();
     };
 
-    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
@@ -182,9 +182,9 @@ TEST(Source, RasterTileFail) {
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(SourceType::Raster, source.type);
-        EXPECT_EQ("0/0/0", std::string(tileID));
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
@@ -211,9 +211,9 @@ TEST(Source, VectorTileFail) {
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(SourceType::Vector, source.type);
-        EXPECT_EQ("0/0/0", std::string(tileID));
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
@@ -238,9 +238,9 @@ TEST(Source, RasterTileCorrupt) {
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(source.type, SourceType::Raster);
-        EXPECT_EQ(std::string(tileID), "0/0/0");
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_TRUE(bool(error));
         // Not asserting on platform-specific error text.
         test.end();
@@ -266,9 +266,9 @@ TEST(Source, VectorTileCorrupt) {
         return response;
     };
 
-    test.observer.tileError = [&] (Source& source, const TileID& tileID, std::exception_ptr error) {
+    test.observer.tileError = [&] (Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(source.type, SourceType::Vector);
-        EXPECT_EQ(std::string(tileID), "0/0/0");
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ(util::toString(error), "unknown pbf field type exception");
         test.end();
     };
@@ -298,11 +298,11 @@ TEST(Source, RasterTileCancel) {
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const TileID&, bool) {
+    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, bool) {
         FAIL() << "Should never be called";
     };
 
-    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 
@@ -325,11 +325,11 @@ TEST(Source, VectorTileCancel) {
         return optional<Response>();
     };
 
-    test.observer.tileLoaded = [&] (Source&, const TileID&, bool) {
+    test.observer.tileLoaded = [&] (Source&, const OverscaledTileID&, bool) {
         FAIL() << "Should never be called";
     };
 
-    test.observer.tileError = [&] (Source&, const TileID&, std::exception_ptr) {
+    test.observer.tileError = [&] (Source&, const OverscaledTileID&, std::exception_ptr) {
         FAIL() << "Should never be called";
     };
 

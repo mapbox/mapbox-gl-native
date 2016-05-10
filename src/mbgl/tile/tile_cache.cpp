@@ -15,11 +15,9 @@ void TileCache::setSize(size_t size_) {
     }
 
     assert(orderedKeys.size() <= size);
-
-    tiles.reserve(size);
 }
 
-void TileCache::add(uint64_t key, std::shared_ptr<TileData> data) {
+void TileCache::add(const OverscaledTileID& key, std::shared_ptr<TileData> data) {
 
     // insert new or query existing data
     if (tiles.emplace(key, data).second) {
@@ -38,7 +36,7 @@ void TileCache::add(uint64_t key, std::shared_ptr<TileData> data) {
     assert(orderedKeys.size() <= size);
 };
 
-std::shared_ptr<TileData> TileCache::get(uint64_t key) {
+std::shared_ptr<TileData> TileCache::get(const OverscaledTileID& key) {
 
     std::shared_ptr<TileData> data;
 
@@ -53,7 +51,7 @@ std::shared_ptr<TileData> TileCache::get(uint64_t key) {
     return data;
 };
 
-bool TileCache::has(uint64_t key) {
+bool TileCache::has(const OverscaledTileID& key) {
     return tiles.find(key) != tiles.end();
 }
 

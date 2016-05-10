@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-VectorTileData::VectorTileData(const TileID& id_,
+VectorTileData::VectorTileData(const OverscaledTileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
                                std::string sourceID,
                                Style& style_,

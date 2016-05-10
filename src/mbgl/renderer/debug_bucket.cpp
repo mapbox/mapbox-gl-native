@@ -1,6 +1,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mbgl/gl/gl.hpp>
 
@@ -9,14 +10,14 @@
 
 using namespace mbgl;
 
-DebugBucket::DebugBucket(const TileID id, const TileData::State state_, optional<SystemTimePoint> modified_, optional<SystemTimePoint> expires_, MapDebugOptions debugMode_)
+DebugBucket::DebugBucket(const OverscaledTileID& id, const TileData::State state_, optional<SystemTimePoint> modified_, optional<SystemTimePoint> expires_, MapDebugOptions debugMode_)
     : state(state_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_) {
     double baseline = 200;
     if (debugMode & MapDebugOptions::ParseStatus) {
-        const std::string text = std::string(id) + " - " + TileData::StateToString(state);
+        const std::string text = util::toString(id) + " - " + TileData::StateToString(state);
         fontBuffer.addText(text.c_str(), 50, baseline, 5);
         baseline += 200;
     }

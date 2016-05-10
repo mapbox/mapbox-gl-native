@@ -9,7 +9,7 @@ PointAnnotationImpl::PointAnnotationImpl(const AnnotationID id_, const PointAnno
   point(point_) {
 }
 
-void PointAnnotationImpl::updateLayer(const TileID& tileID, AnnotationTileLayer& layer) const {
+void PointAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
     featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
 

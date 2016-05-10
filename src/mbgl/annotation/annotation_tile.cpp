@@ -29,7 +29,7 @@ util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) c
     return nullptr;
 }
 
-AnnotationTileMonitor::AnnotationTileMonitor(const TileID& tileID_, AnnotationManager& annotationManager_)
+AnnotationTileMonitor::AnnotationTileMonitor(const OverscaledTileID& tileID_, AnnotationManager& annotationManager_)
     : tileID(tileID_),
       annotationManager(annotationManager_) {
 }

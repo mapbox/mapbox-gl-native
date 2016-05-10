@@ -43,8 +43,8 @@ public:
         virtual void onSourceLoaded(Source&) {};
         virtual void onSourceError(Source&, std::exception_ptr) {};
 
-        virtual void onTileLoaded(Source&, const TileID&, bool /* isNewTile */) {};
-        virtual void onTileError(Source&, const TileID&, std::exception_ptr) {};
+        virtual void onTileLoaded(Source&, const OverscaledTileID&, bool /* isNewTile */) {};
+        virtual void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) {};
         virtual void onPlacementRedone() {};
     };
 
@@ -94,7 +94,7 @@ public:
     bool enabled = false;
 
 private:
-    void tileLoadingCallback(const TileID&,
+    void tileLoadingCallback(const OverscaledTileID&,
                              std::exception_ptr,
                              bool isNewTile);
     bool handlePartialTile(const TileID&);
@@ -115,7 +115,7 @@ private:
 
     std::map<TileID, std::unique_ptr<Tile>> tiles;
     std::vector<Tile*> tilePtrs;
-    std::map<TileID, std::weak_ptr<TileData>> tileDataMap;
+    std::map<OverscaledTileID, std::weak_ptr<TileData>> tileDataMap;
     TileCache cache;
 
     std::unique_ptr<AsyncRequest> req;

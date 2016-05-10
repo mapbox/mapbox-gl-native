@@ -17,7 +17,7 @@ class GLObjectStore;
 
 class DebugBucket : private util::noncopyable {
 public:
-    DebugBucket(TileID id, TileData::State,
+    DebugBucket(const OverscaledTileID& id, TileData::State,
                 optional<SystemTimePoint> modified,
                 optional<SystemTimePoint> expires,
                 MapDebugOptions);

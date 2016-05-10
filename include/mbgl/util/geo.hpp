@@ -11,7 +11,8 @@
 
 namespace mbgl {
 
-class TileID;
+class CanonicalTileID;
+class UnwrappedTileID;
 
 using ScreenCoordinate = mapbox::geometry::point<double>;
 
@@ -49,7 +50,8 @@ public:
     }
 
     // Constructs a LatLng object with the top left position of the specified tile.
-    LatLng(const TileID& id);
+    LatLng(const CanonicalTileID& id);
+    LatLng(const UnwrappedTileID& id);
 };
 
 inline bool operator==(const LatLng& a, const LatLng& b) {
@@ -100,7 +102,7 @@ public:
     }
 
     // Constructs a LatLngBounds object with the tile's exact boundaries.
-    LatLngBounds(const TileID&);
+    LatLngBounds(const CanonicalTileID&);
 
     double south() const { return sw.latitude; }
     double west()  const { return sw.longitude; }

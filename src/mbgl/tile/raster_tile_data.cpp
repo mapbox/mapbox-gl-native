@@ -8,7 +8,7 @@
 
 using namespace mbgl;
 
-RasterTileData::RasterTileData(const TileID& id_,
+RasterTileData::RasterTileData(const OverscaledTileID& id_,
                                float pixelRatio,
                                const std::string& urlTemplate,
                                gl::TexturePool &texturePool_,
@@ -20,7 +20,8 @@ RasterTileData::RasterTileData(const TileID& id_,
       worker(worker_) {
     state = State::loading;
 
-    const Resource resource = Resource::tile(urlTemplate, pixelRatio, id.x, id.y, id.sourceZ);
+    const Resource resource =
+        Resource::tile(urlTemplate, pixelRatio, id.canonical.x, id.canonical.y, id.canonical.z);
     req = fileSource.request(resource, [callback, this](Response res) {
         if (res.error) {
             callback(std::make_exception_ptr(std::runtime_error(res.error->message)));

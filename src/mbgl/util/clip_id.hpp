@@ -1,8 +1,6 @@
 #ifndef MBGL_UTIL_CLIP_IDS
 #define MBGL_UTIL_CLIP_IDS
 
-#include <mbgl/map/tile_id.hpp>
-
 #include <bitset>
 #include <string>
 #include <list>

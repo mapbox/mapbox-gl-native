@@ -4,7 +4,7 @@
 
 namespace mbgl {
 
-TileData::TileData(const TileID& id_)
+TileData::TileData(const OverscaledTileID& id_)
     : id(id_),
       state(State::initial) {
 }
@@ -25,7 +25,7 @@ const char* TileData::StateToString(const State state) {
 }
 
 void TileData::dumpDebugLogs() const {
-    Log::Info(Event::General, "TileData::id: %s", std::string(id).c_str());
+    Log::Info(Event::General, "TileData::id: %s", util::toString(id).c_str());
     Log::Info(Event::General, "TileData::state: %s", TileData::StateToString(state));
 }
 

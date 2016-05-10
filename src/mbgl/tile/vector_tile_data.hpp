@@ -19,7 +19,7 @@ class FeatureIndex;
 
 class VectorTileData : public TileData {
 public:
-    VectorTileData(const TileID&,
+    VectorTileData(const OverscaledTileID&,
                    std::unique_ptr<GeometryTileMonitor> monitor,
                    std::string sourceID,
                    Style&,

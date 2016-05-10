@@ -2,7 +2,7 @@
 #define MBGL_ANNOTATION_GEOJSON_VT_TILE
 
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/map/tile_id.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 #include <unordered_map>
 
@@ -56,7 +56,7 @@ private:
 
 class GeoJSONTileMonitor : public GeometryTileMonitor {
 public:
-    GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT*, const TileID&);
+    GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT*, const OverscaledTileID&);
     virtual ~GeoJSONTileMonitor();
 
     std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
@@ -67,7 +67,7 @@ private:
     void update();
 
 public:
-    const TileID tileID;
+    const OverscaledTileID tileID;
 
 private:
     mapbox::geojsonvt::GeoJSONVT* geojsonvt = nullptr;

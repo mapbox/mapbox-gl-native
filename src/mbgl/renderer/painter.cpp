@@ -35,6 +35,8 @@
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
 
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/mat3.hpp>
+#include <mbgl/util/string.hpp>
 
 #if defined(DEBUG)
 #include <mbgl/util/stopwatch.hpp>
@@ -252,7 +254,7 @@ void Painter::renderPass(RenderPass pass_,
             config.setDirty();
         } else {
             assert(item.tile->data);
-            MBGL_DEBUG_GROUP(layer.id + " - " + std::string(item.tile->data->id));
+            MBGL_DEBUG_GROUP(layer.id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }

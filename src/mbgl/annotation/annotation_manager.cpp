@@ -81,7 +81,7 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
     return result;
 }
 
-std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const TileID& tileID) {
+std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID& tileID) {
     if (pointAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
 
@@ -136,13 +136,13 @@ void AnnotationManager::updateStyle(Style& style) {
     obsoleteShapeAnnotationLayers.clear();
 
     for (auto& monitor : monitors) {
-        monitor->update(getTile(monitor->tileID));
+        monitor->update(getTile(monitor->tileID.canonical));
     }
 }
 
 void AnnotationManager::addTileMonitor(AnnotationTileMonitor& monitor) {
     monitors.insert(&monitor);
-    monitor.update(getTile(monitor.tileID));
+    monitor.update(getTile(monitor.tileID.canonical));
 }
 
 void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {

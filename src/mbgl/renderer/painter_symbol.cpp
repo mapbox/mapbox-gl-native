@@ -6,7 +6,6 @@
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
-#include <mbgl/map/tile_id.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>

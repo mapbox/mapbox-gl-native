@@ -395,7 +395,7 @@ void Style::onSourceError(Source& source, std::exception_ptr error) {
     observer->onResourceError(error);
 }
 
-void Style::onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) {
+void Style::onTileLoaded(Source& source, const OverscaledTileID& tileID, bool isNewTile) {
     if (isNewTile) {
         shouldReparsePartialTiles = true;
     }
@@ -404,10 +404,10 @@ void Style::onTileLoaded(Source& source, const TileID& tileID, bool isNewTile) {
     observer->onResourceLoaded();
 }
 
-void Style::onTileError(Source& source, const TileID& tileID, std::exception_ptr error) {
+void Style::onTileError(Source& source, const OverscaledTileID& tileID, std::exception_ptr error) {
     lastError = error;
     Log::Error(Event::Style, "Failed to load tile %s for source %s: %s",
-               std::string(tileID).c_str(), source.id.c_str(), util::toString(error).c_str());
+               util::toString(tileID).c_str(), source.id.c_str(), util::toString(error).c_str());
     observer->onTileError(source, tileID, error);
     observer->onResourceError(error);
 }

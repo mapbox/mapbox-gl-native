@@ -101,7 +101,8 @@ std::unique_ptr<GeoJSONTile> convertTile(const mapbox::geojsonvt::Tile& tile) {
     return std::make_unique<GeoJSONTile>(layer);
 }
 
-GeoJSONTileMonitor::GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT* geojsonvt_, const TileID& id)
+GeoJSONTileMonitor::GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT* geojsonvt_,
+                                       const OverscaledTileID& id)
     : tileID(id), geojsonvt(geojsonvt_) {
 }
 
@@ -119,7 +120,8 @@ void GeoJSONTileMonitor::setGeoJSONVT(mapbox::geojsonvt::GeoJSONVT* vt) {
 
 void GeoJSONTileMonitor::update() {
     if (geojsonvt) {
-        auto tile = convertTile(geojsonvt->getTile(tileID.sourceZ, tileID.x, tileID.y));
+        auto tile = convertTile(
+            geojsonvt->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y));
         callback(nullptr, std::move(tile), {}, {});
     }
 }

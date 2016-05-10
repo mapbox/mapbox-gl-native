@@ -13,7 +13,7 @@ namespace gl { class TexturePool; }
 
 class RasterTileData : public TileData {
 public:
-    RasterTileData(const TileID&,
+    RasterTileData(const OverscaledTileID&,
                    float pixelRatio,
                    const std::string& urlTemplate,
                    gl::TexturePool&,

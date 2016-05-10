@@ -148,8 +148,8 @@ private:
     // Source::Observer implementation.
     void onSourceLoaded(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
-    void onTileLoaded(Source&, const TileID&, bool isNewTile) override;
-    void onTileError(Source&, const TileID&, std::exception_ptr) override;
+    void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
+    void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
     void onPlacementRedone() override;
 
     Observer nullObserver;

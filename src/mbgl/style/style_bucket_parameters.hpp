@@ -20,7 +20,7 @@ class FeatureIndex;
 
 class StyleBucketParameters {
 public:
-    StyleBucketParameters(const TileID& tileID_,
+    StyleBucketParameters(const OverscaledTileID& tileID_,
                           const GeometryTileLayer& layer_,
                           const std::atomic<TileData::State>& state_,
                           uintptr_t tileUID_,
@@ -47,7 +47,7 @@ public:
 
     void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)>);
 
-    const TileID& tileID;
+    const OverscaledTileID& tileID;
     const GeometryTileLayer& layer;
     const std::atomic<TileData::State>& state;
     uintptr_t tileUID;

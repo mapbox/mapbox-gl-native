@@ -2,7 +2,7 @@
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/map/tile_id.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 using namespace mbgl;
 
@@ -87,19 +87,19 @@ TEST(LatLngBounds, Northwest) {
 
 TEST(LatLng, FromTileID) {
     for (int i = 0; i < 20; i++) {
-        const LatLng ll{ TileID(i, 0, 0, 0) };
+        const LatLng ll{ CanonicalTileID(i, 0, 0) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, ll.longitude);
         ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
 
     {
-        const LatLng ll{ TileID(0, 1, 0, 0) };
+        const LatLng ll{ UnwrappedTileID(0, 1, 0) };
         ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, ll.longitude);
         ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
 
     {
-        const LatLng ll{ TileID(0, -1, 0, 0) };
+        const LatLng ll{ UnwrappedTileID(0, -1, 0) };
         ASSERT_DOUBLE_EQ(-540, ll.longitude);
         ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, ll.latitude);
     }
@@ -135,7 +135,7 @@ TEST(LatLng, Boundaries) {
 
 TEST(LatLngBounds, FromTileID) {
     {
-        const LatLngBounds bounds{ TileID(0, 0, 0, 0) };
+        const LatLngBounds bounds{ CanonicalTileID(0, 0, 0) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
         ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
         ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, bounds.east());
@@ -143,7 +143,7 @@ TEST(LatLngBounds, FromTileID) {
     }
 
     {
-        const LatLngBounds bounds{ TileID(1, 0, 1, 0) };
+        const LatLngBounds bounds{ CanonicalTileID(1, 0, 1) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
         ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
         ASSERT_DOUBLE_EQ(0, bounds.east());
@@ -151,7 +151,7 @@ TEST(LatLngBounds, FromTileID) {
     }
 
     {
-        const LatLngBounds bounds{ TileID(1, 1, 1, 0) };
+        const LatLngBounds bounds{ CanonicalTileID(1, 1, 1) };
         ASSERT_DOUBLE_EQ(0, bounds.west());
         ASSERT_DOUBLE_EQ(-util::LATITUDE_MAX, bounds.south());
         ASSERT_DOUBLE_EQ(util::LONGITUDE_MAX, bounds.east());
@@ -159,7 +159,7 @@ TEST(LatLngBounds, FromTileID) {
     }
 
     {
-        const LatLngBounds bounds{ TileID(1, 0, 0, 0) };
+        const LatLngBounds bounds{ CanonicalTileID(1, 0, 0) };
         ASSERT_DOUBLE_EQ(-util::LONGITUDE_MAX, bounds.west());
         ASSERT_DOUBLE_EQ(0, bounds.south());
         ASSERT_DOUBLE_EQ(0, bounds.east());
