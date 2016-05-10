@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -27,7 +26,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarker;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 
@@ -65,8 +63,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                mMapboxMap.setMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
-
                 if (actionBar != null) {
                     ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(actionBar.getThemedContext(), R.array.bulk_marker_list, android.R.layout.simple_spinner_item);
                     spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -76,9 +72,22 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 }
             }
         });
+
+        final View fab = findViewById(R.id.fab);
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mMapboxMap != null) {
+                        fab.animate().alpha(0).start();
+                        mMapboxMap.setMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+                    }
+                }
+            });
+        }
     }
 
-    private static class TextAdapter implements MapboxMap.MarkerViewAdapter<Marker> {
+    public static class TextAdapter implements MapboxMap.MarkerViewAdapter<Marker> {
 
         private LayoutInflater inflater;
 
