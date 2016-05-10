@@ -3774,7 +3774,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     NSTimeInterval duration = MGLAnimationDuration;
     if (oldLocation && ! CGPointEqualToPoint(self.userLocationAnnotationView.center, CGPointZero))
     {
-        duration = MAX([newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp], MGLUserLocationAnimationDuration);
+        duration = MIN([newLocation.timestamp timeIntervalSinceDate:oldLocation.timestamp], MGLUserLocationAnimationDuration);
     }
     [self updateUserLocationAnnotationViewAnimatedWithDuration:duration];
     
