@@ -49,7 +49,6 @@ ifeq ($(PLATFORM),qt)
 endif
 
 # Defaults if not set
-export CXX11ABI ?= ""
 export PLATFORM_OUTPUT ?= ./build/$(PLATFORM_SLUG)
 export PLATFORM_CONFIG_INPUT ?= platform/$(MASON_PLATFORM)/scripts/configure.sh
 export PLATFORM_CONFIG_OUTPUT ?= $(PLATFORM_OUTPUT)/config.gypi
