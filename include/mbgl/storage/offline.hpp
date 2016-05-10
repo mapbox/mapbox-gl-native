@@ -30,7 +30,7 @@ public:
     OfflineTilePyramidRegionDefinition(const std::string&, const LatLngBounds&, double, double, float);
 
     /* Private */
-    std::vector<TileID> tileCover(SourceType, uint16_t tileSize, const SourceInfo&) const;
+    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const SourceInfo&) const;
 
     const std::string styleURL;
     const LatLngBounds bounds;

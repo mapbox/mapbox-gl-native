@@ -282,9 +282,11 @@ RenderData Style::getRenderData() const {
             continue;
         }
 
-        for (auto tile : source->getTiles()) {
-            if (!tile->data || !tile->data->isReady())
+        for (auto& pair : source->getTiles()) {
+            auto& tile = pair.second;
+            if (!tile.data.isReady()) {
                 continue;
+            }
 
             // We're not clipping symbol layers, so when we have both parents and children of symbol
             // layers, we drop all children in favor of their parent to avoid duplicate labels.
@@ -295,7 +297,7 @@ RenderData Style::getRenderData() const {
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
                 for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
-                    if (tile->data->id.isChildOf(it->tile->data->id)) {
+                    if (tile.data.id.isChildOf(it->tile->data.id)) {
                         skip = true;
                         break;
                     }
@@ -305,9 +307,9 @@ RenderData Style::getRenderData() const {
                 }
             }
 
-            auto bucket = tile->data->getBucket(*layer);
+            auto bucket = tile.data.getBucket(*layer);
             if (bucket) {
-                result.order.emplace_back(*layer, tile, bucket);
+                result.order.emplace_back(*layer, &tile, bucket);
             }
         }
     }

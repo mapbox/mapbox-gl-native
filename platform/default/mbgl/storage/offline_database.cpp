@@ -4,7 +4,6 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/tile_id.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include "sqlite3.hpp"

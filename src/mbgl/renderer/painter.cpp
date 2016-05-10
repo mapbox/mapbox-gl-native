@@ -153,8 +153,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         for (const auto& source : sources) {
             if (source->type == SourceType::Vector || source->type == SourceType::GeoJSON ||
                 source->type == SourceType::Annotations) {
-                auto renderables = source->getRenderables();
-                generator.update(renderables);
+                source->updateClipIDs(generator);
             }
             source->updateMatrices(projMatrix, state);
         }
@@ -253,7 +252,6 @@ void Painter::renderPass(RenderPass pass_,
             layer.as<CustomLayer>()->render(state);
             config.setDirty();
         } else {
-            assert(item.tile->data);
             MBGL_DEBUG_GROUP(layer.id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);

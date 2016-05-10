@@ -55,12 +55,11 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     config.depthMask = GL_FALSE;
     setDepthSublayer(0);
 
-    auto tileIDs = tileCover(state, state.getIntegerZoom(), state.getIntegerZoom());
+    auto tileIDs = util::tileCover(state, state.getIntegerZoom());
 
-    for (auto &id: tileIDs) {
+    for (auto& id : tileIDs) {
         mat4 vtxMatrix;
-        const UnwrappedTileID tileID(id.z, id.x, id.y);
-        state.matrixFor(vtxMatrix, tileID);
+        state.matrixFor(vtxMatrix, id);
         matrix::multiply(vtxMatrix, projMatrix, vtxMatrix);
 
         if (isPatterned) {
@@ -84,11 +83,15 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
                 1.0f / id.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
             }};
 
-            float offsetAx = (std::fmod(util::tileSize, imageSizeScaledA[0]) * id.x) / (float)imageSizeScaledA[0];
-            float offsetAy = (std::fmod(util::tileSize, imageSizeScaledA[1]) * id.y) / (float)imageSizeScaledA[1];
+            float offsetAx = (std::fmod(util::tileSize, imageSizeScaledA[0]) * id.canonical.x) /
+                             (float)imageSizeScaledA[0];
+            float offsetAy = (std::fmod(util::tileSize, imageSizeScaledA[1]) * id.canonical.y) /
+                             (float)imageSizeScaledA[1];
 
-            float offsetBx = (std::fmod(util::tileSize, imageSizeScaledB[0]) * id.x) / (float)imageSizeScaledB[0];
-            float offsetBy = (std::fmod(util::tileSize, imageSizeScaledB[1]) * id.y) / (float)imageSizeScaledB[1];
+            float offsetBx = (std::fmod(util::tileSize, imageSizeScaledB[0]) * id.canonical.x) /
+                             (float)imageSizeScaledB[0];
+            float offsetBy = (std::fmod(util::tileSize, imageSizeScaledB[1]) * id.canonical.y) /
+                             (float)imageSizeScaledB[1];
 
             patternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};

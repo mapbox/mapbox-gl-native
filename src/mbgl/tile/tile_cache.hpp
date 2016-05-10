@@ -17,13 +17,13 @@ public:
 
     void setSize(size_t);
     size_t getSize() const { return size; };
-    void add(const OverscaledTileID& key, std::shared_ptr<TileData> data);
-    std::shared_ptr<TileData> get(const OverscaledTileID& key);
+    void add(const OverscaledTileID& key, std::unique_ptr<TileData> data);
+    std::unique_ptr<TileData> get(const OverscaledTileID& key);
     bool has(const OverscaledTileID& key);
     void clear();
 
 private:
-    std::map<OverscaledTileID, std::shared_ptr<TileData>> tiles;
+    std::map<OverscaledTileID, std::unique_ptr<TileData>> tiles;
     std::list<OverscaledTileID> orderedKeys;
 
     size_t size;

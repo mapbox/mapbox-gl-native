@@ -35,6 +35,8 @@
 
         'algorithm/covered_by_children.cpp',
         'algorithm/generate_clip_ids.cpp',
+        'algorithm/mock.hpp',
+        'algorithm/update_renderables.cpp',
 
         'api/annotations.cpp',
         'api/api_misuse.cpp',
@@ -46,7 +48,6 @@
         'geometry/binpack.cpp',
 
         'map/map.cpp',
-        'map/tile.cpp',
         'map/transform.cpp',
 
         'math/minmax.cpp',
