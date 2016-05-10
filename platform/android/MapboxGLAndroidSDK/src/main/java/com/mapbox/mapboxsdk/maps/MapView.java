@@ -250,8 +250,6 @@ public class MapView extends FrameLayout {
         if (!context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)) {
             mMapboxMap.getUiSettings().setZoomControlsEnabled(true);
         }
-
-
     }
 
     private void setInitialState(MapboxMapOptions options) {
@@ -479,19 +477,19 @@ public class MapView extends FrameLayout {
         }
 
         mViewMarkerBoundsUpdateTime = currentTime + 300;
-        new ViewMarkerInBoundsTask().execute();
-    }
+//        new ViewMarkerInBoundsTask().execute();
+//    }
 
-    public class ViewMarkerInBoundsTask extends AsyncTask<Void, Void, ViewMarkerInBoundsTask.Result> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+//    public class ViewMarkerInBoundsTask extends AsyncTask<Void, Void, ViewMarkerInBoundsTask.Result> {
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
             mViewMarkersUpdateRunning = true;
-        }
+//        }
 
-        @Override
-        protected Result doInBackground(Void... params) {
+//        @Override
+//        protected Result doInBackground(Void... params) {
             List<Marker> inBounds = new ArrayList<>();
             Map<Marker, View> outBounds = new HashMap<>();
 
@@ -544,13 +542,14 @@ public class MapView extends FrameLayout {
                     }
                 }
             }
+        Result result = new Result(inBounds, outBounds);
 
-            return new Result(inBounds, outBounds);
-        }
+//            return new Result(inBounds, outBounds);
+//        }
 
-        @Override
-        protected void onPostExecute(Result result) {
-            super.onPostExecute(result);
+//        @Override
+//        protected void onPostExecute(Result result) {
+//            super.onPostExecute(result);
             mMapboxMap.setViewMarkersBoundsTaskResult(result);
             mViewMarkersUpdateRunning = false;
             Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
@@ -573,7 +572,7 @@ public class MapView extends FrameLayout {
                 return outBounds;
             }
         }
-    }
+//    }
 
     /**
      * You must call this method from the parent's {@link android.app.Activity#onSaveInstanceState(Bundle)}

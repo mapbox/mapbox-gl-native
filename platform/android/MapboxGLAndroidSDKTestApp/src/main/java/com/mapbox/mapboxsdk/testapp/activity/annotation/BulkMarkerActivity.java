@@ -74,6 +74,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         });
 
         final View fab = findViewById(R.id.fab);
+        final TextView viewCountView = (TextView) findViewById(R.id.countView);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -81,6 +82,22 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     if (mMapboxMap != null) {
                         fab.animate().alpha(0).start();
                         mMapboxMap.setMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+                        mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                            @Override
+                            public void onMapChanged(@MapView.MapChange int change) {
+                                if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
+                                    if (mMapboxMap.getMarkerViewAdapter() != null) {
+                                        viewCountView.setText("ViewCache size " + (mMapView.getChildCount()-5));
+                                    }
+                                }
+                            }
+                        });
+                        mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
+                            @Override
+                            public void onMarkerClick(@NonNull Marker marker, @NonNull View view) {
+                                mMapboxMap.selectMarker(marker);
+                            }
+                        });
                     }
                 }
             });

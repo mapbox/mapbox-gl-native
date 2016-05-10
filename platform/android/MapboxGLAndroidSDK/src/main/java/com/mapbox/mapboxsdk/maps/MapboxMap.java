@@ -638,7 +638,7 @@ public class MapboxMap {
     // Annotations
     //
 
-    void setViewMarkersBoundsTaskResult(MapView.ViewMarkerInBoundsTask.Result result) {
+    void setViewMarkersBoundsTaskResult(MapView.Result result) {
         Map<Marker, View> outBoundsMarker = result.getOutBounds();
         View convertView;
 
@@ -660,11 +660,13 @@ public class MapboxMap {
             if (adaptedView != null) {
                 // hack to hide old marker, todo replace with visibility
                 Icon icon = marker.getIcon();
-                if(mViewMarkerBitmap==null){
-                    Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-                    mViewMarkerBitmap = Bitmap.createBitmap(icon.getBitmap().getWidth(), icon.getBitmap().getHeight(), conf);
+                if(!icon.getBitmap().equals(mViewMarkerBitmap)) {
+                    if (mViewMarkerBitmap == null) {
+                        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                        mViewMarkerBitmap = Bitmap.createBitmap(icon.getBitmap().getWidth(), icon.getBitmap().getHeight(), conf);
+                    }
+                    marker.setIcon(IconFactory.recreate(icon.getId(), mViewMarkerBitmap));
                 }
-                marker.setIcon(IconFactory.recreate(icon.getId(), mViewMarkerBitmap));
                 adaptedView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

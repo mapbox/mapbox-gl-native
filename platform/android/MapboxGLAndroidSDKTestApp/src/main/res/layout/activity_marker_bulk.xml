@@ -28,6 +28,13 @@
         app:style_url="@string/style_mapbox_streets"
         app:zoom="10" />
 
+    <TextView
+        android:id="@+id/countView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:padding="16dp"
+        android:textSize="20sp"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
