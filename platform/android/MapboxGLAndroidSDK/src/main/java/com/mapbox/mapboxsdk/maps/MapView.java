@@ -113,7 +113,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  *
- * @see MapView#setAccessToken(String)
  */
 public class MapView extends FrameLayout {
 
@@ -838,6 +837,10 @@ public class MapView extends FrameLayout {
 
     /**
      * <p>
+     * DEPRECATED @see MapboxAccountManager#getInstance(String)
+     * </p>
+     *
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
      * <p>
@@ -848,6 +851,7 @@ public class MapView extends FrameLayout {
      * @param accessToken Your public Mapbox access token.
      * @see MapView#onCreate(Bundle)
      */
+    @Deprecated
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         if (mDestroyed) {
@@ -862,10 +866,15 @@ public class MapView extends FrameLayout {
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
      */
+    @Deprecated
     @UiThread
     @Nullable
     public String getAccessToken() {

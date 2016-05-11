@@ -584,22 +584,32 @@ public class MapboxMap {
 
     /**
      * <p>
+     * DEPRECATED @see MapboxAccountManager#getInstance(String)
+     * </p>
+     *
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
      *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#setAccessToken(String)
      */
+    @Deprecated
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         mMapView.setAccessToken(accessToken);
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
      */
+    @Deprecated
     @UiThread
     @Nullable
     public String getAccessToken() {

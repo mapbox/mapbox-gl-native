@@ -8,7 +8,7 @@ public class MapboxAccountManager {
 
     /**
      * MapboxAccountManager should NOT be instantiated directly.
-     * Use MapboxAccountManager.getInstance() instead.
+     * Use @see MapboxAccountManager#getInstance(String) instead.
      * @param accessToken
      */
     private MapboxAccountManager(String accessToken) {
