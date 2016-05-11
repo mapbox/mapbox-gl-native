@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -62,6 +63,7 @@ public class MyLocationView extends View {
 
     private ValueAnimator locationChangeAnimator;
     private ValueAnimator accuracyAnimator;
+    private ObjectAnimator directionAnimator;
 
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
@@ -390,7 +392,16 @@ public class MyLocationView extends View {
                 newDir -= 360.f;
             }
             compassDirection = newDir;
-            invalidate();
+
+            if (directionAnimator != null) {
+                directionAnimator.end();
+                directionAnimator = null;
+            }
+
+            directionAnimator = ObjectAnimator.ofFloat(this, View.ROTATION, oldDir, newDir);
+            directionAnimator.setDuration(1000);
+            directionAnimator.start();
+
         } else {
             compassDirection = 0;
         }
