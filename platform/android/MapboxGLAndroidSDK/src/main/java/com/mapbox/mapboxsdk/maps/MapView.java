@@ -10,9 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -60,6 +58,7 @@ import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -75,8 +74,6 @@ import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.exceptions.IconBitmapChangedException;
-import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
-import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
@@ -88,7 +85,6 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.telemetry.MapboxEvent;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
@@ -113,7 +109,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  *
- * @see MapView#setAccessToken(String)
  */
 public class MapView extends FrameLayout {
 
@@ -258,7 +253,13 @@ public class MapView extends FrameLayout {
             mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         }
 
-        String accessToken = options.getAccessToken();
+        String accessToken = null;
+        if (MapboxAccountManager.getInstance() != null) {
+            accessToken = MapboxAccountManager.getInstance().getAccessToken();
+        } else {
+            accessToken = options.getAccessToken();
+        }
+
         String style = options.getStyle();
         if (!TextUtils.isEmpty(accessToken)) {
             mMapboxMap.setAccessToken(accessToken);
@@ -355,7 +356,7 @@ public class MapView extends FrameLayout {
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
         // Force a check for an access token
-        validateAccessToken(getAccessToken());
+        MapboxAccountManager.validateAccessToken(getAccessToken());
 
         if (savedInstanceState != null && savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
 
@@ -402,7 +403,6 @@ public class MapView extends FrameLayout {
 
             mMapboxMap.setDebugActive(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
             mMapboxMap.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
-            setAccessToken(savedInstanceState.getString(MapboxConstants.STATE_ACCESS_TOKEN));
 
             // User location
             try {
@@ -418,10 +418,8 @@ public class MapView extends FrameLayout {
             //noinspection ResourceType
             trackingSettings.setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else if (savedInstanceState == null) {
-            // Force a check for Telemetry
-            validateTelemetryServiceConfigured();
-
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
+            Log.i(MapView.class.getCanonicalName(), "MapView start Telemetry...");
             MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
             eventManager.initialize(getContext(), getAccessToken());
         }
@@ -473,7 +471,6 @@ public class MapView extends FrameLayout {
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
         outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleInitializer.getStyle());
-        outState.putString(MapboxConstants.STATE_ACCESS_TOKEN, mMapboxMap.getAccessToken());
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
 
         // TrackingSettings
@@ -838,6 +835,10 @@ public class MapView extends FrameLayout {
 
     /**
      * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
+     *
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
      * <p>
@@ -848,6 +849,7 @@ public class MapView extends FrameLayout {
      * @param accessToken Your public Mapbox access token.
      * @see MapView#onCreate(Bundle)
      */
+    @Deprecated
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         if (mDestroyed) {
@@ -857,15 +859,20 @@ public class MapView extends FrameLayout {
         if (!TextUtils.isEmpty(accessToken)) {
             accessToken = accessToken.trim();
         }
-        validateAccessToken(accessToken);
+        MapboxAccountManager.validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
      */
+    @Deprecated
     @UiThread
     @Nullable
     public String getAccessToken() {
@@ -873,31 +880,6 @@ public class MapView extends FrameLayout {
             return "";
         }
         return mNativeMapView.getAccessToken();
-    }
-
-    // Checks if the given token is valid
-    private void validateAccessToken(String accessToken) {
-        if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
-            throw new InvalidAccessTokenException();
-        }
-    }
-
-    // Checks that TelemetryService has been configured by developer
-    private void validateTelemetryServiceConfigured() {
-        try {
-            // Check Implementing app's AndroidManifest.xml
-            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), PackageManager.GET_SERVICES);
-            if (packageInfo.services != null) {
-                for (ServiceInfo service : packageInfo.services) {
-                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + e);
-        }
-        throw new TelemetryServiceNotConfiguredException();
     }
 
     //

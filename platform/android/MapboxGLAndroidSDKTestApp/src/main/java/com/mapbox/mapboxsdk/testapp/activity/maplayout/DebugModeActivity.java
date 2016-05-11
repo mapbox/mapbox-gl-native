@@ -51,7 +51,6 @@ public class DebugModeActivity extends AppCompatActivity {
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.setTag(true);
-        mapView.setAccessToken(getString(R.string.mapbox_access_token));
         mapView.setStyleUrl(STYLES[currentStyleIndex]);
         mapView.onCreate(savedInstanceState);
 

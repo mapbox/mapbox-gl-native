@@ -11,7 +11,6 @@ import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -33,7 +32,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -584,22 +582,32 @@ public class MapboxMap {
 
     /**
      * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
+     *
+     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
      *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#setAccessToken(String)
      */
+    @Deprecated
     @UiThread
     public void setAccessToken(@NonNull String accessToken) {
         mMapView.setAccessToken(accessToken);
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#getAccessToken()
+     * </p>
+     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
      */
+    @Deprecated
     @UiThread
     @Nullable
     public String getAccessToken() {

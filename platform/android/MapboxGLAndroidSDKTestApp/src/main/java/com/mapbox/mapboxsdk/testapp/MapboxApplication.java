@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp;
 import android.app.Application;
 import android.os.StrictMode;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.squareup.leakcanary.LeakCanary;
 
 public class MapboxApplication extends Application {
@@ -10,6 +11,7 @@ public class MapboxApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        MapboxAccountManager.start(getApplicationContext(), getString(R.string.mapbox_access_token));
         LeakCanary.install(this);
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()

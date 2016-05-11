@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:style_url="@string/style_light"
-        app:access_token="@string/mapbox_access_token"
         android:layout_below="@id/toolbar" />
 
 </RelativeLayout>

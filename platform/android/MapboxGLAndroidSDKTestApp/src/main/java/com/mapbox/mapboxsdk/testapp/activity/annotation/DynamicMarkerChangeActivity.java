@@ -48,7 +48,6 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMapView.setTag(false);
-        mMapView.setAccessToken(getString(R.string.mapbox_access_token));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

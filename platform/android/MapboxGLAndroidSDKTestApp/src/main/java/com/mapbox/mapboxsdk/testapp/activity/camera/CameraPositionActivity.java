@@ -46,7 +46,6 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
         }
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setAccessToken(getString(R.string.mapbox_access_token));
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     }

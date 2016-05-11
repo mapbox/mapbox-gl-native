@@ -13,12 +13,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-
 import java.util.Arrays;
 
 /**
@@ -74,6 +72,7 @@ public class MapboxMapOptions implements Parcelable {
     private int myLocationAccuracyAlpha;
 
     private String style;
+    @Deprecated
     private String accessToken;
 
     /**
@@ -217,11 +216,15 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
      * Specifies the accesstoken associated with a map view.
      *
      * @param accessToken Token to be used to access the service
      * @return This
      */
+    @Deprecated
     public MapboxMapOptions accessToken(String accessToken) {
         this.accessToken = accessToken;
         return this;
@@ -595,10 +598,14 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * <p>
+     * DEPRECATED @see MapboxAccountManager#start(String)
+     * </p>
      * Get the current configured access token for a map view.
      *
      * @return Access token to be used.
      */
+    @Deprecated
     public String getAccessToken() {
         return accessToken;
     }
