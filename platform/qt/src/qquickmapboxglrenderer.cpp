@@ -16,6 +16,7 @@ QQuickMapboxGLRenderer::QQuickMapboxGLRenderer()
     settings.setAccessToken(qgetenv("MAPBOX_ACCESS_TOKEN"));
     settings.setCacheDatabasePath("/tmp/mbgl-cache.db");
     settings.setCacheDatabaseMaximumSize(20 * 1024 * 1024);
+    settings.setViewportMode(QMapboxGLSettings::FlippedYViewport);
 
     m_map.reset(new QMapboxGL(nullptr, settings));
 }

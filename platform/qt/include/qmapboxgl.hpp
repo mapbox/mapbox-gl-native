@@ -36,6 +36,11 @@ public:
         ConstrainWidthAndHeight
     };
 
+    enum ViewportMode {
+        DefaultViewport = 0,
+        FlippedYViewport
+    };
+
     MapMode mapMode() const;
     void setMapMode(MapMode);
 
@@ -44,6 +49,9 @@ public:
 
     ConstrainMode constrainMode() const;
     void setConstrainMode(ConstrainMode);
+
+    ViewportMode viewportMode() const;
+    void setViewportMode(ViewportMode);
 
     unsigned cacheDatabaseMaximumSize() const;
     void setCacheDatabaseMaximumSize(unsigned);
@@ -61,6 +69,7 @@ private:
     MapMode m_mapMode;
     GLContextMode m_contextMode;
     ConstrainMode m_constrainMode;
+    ViewportMode m_viewportMode;
 
     unsigned m_cacheMaximumSize;
     QString m_cacheDatabasePath;

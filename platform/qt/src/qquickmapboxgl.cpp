@@ -14,10 +14,6 @@
 QQuickMapboxGL::QQuickMapboxGL(QQuickItem *parent_)
     : QQuickFramebufferObject(parent_)
 {
-#if QT_VERSION >= 0x050600
-    // FIXME: https://github.com/mapbox/mapbox-gl-native/issues/4866
-    setMirrorVertically(true);
-#endif
 }
 
 QQuickMapboxGL::~QQuickMapboxGL()
@@ -166,7 +162,7 @@ QColor QQuickMapboxGL::color() const
 
 void QQuickMapboxGL::pan(int dx, int dy)
 {
-    m_pan += QPointF(dx, dy);
+    m_pan += QPointF(dx, -dy);
 
     m_syncState |= PanNeedsSync;
     update();
