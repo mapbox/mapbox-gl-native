@@ -8,12 +8,14 @@ The Mapbox OS X SDK requires the OS X 10.10.0 SDK or above.
 
 ### Building the SDK
 
+Grab a [prebuilt release](https://github.com/mapbox/mapbox-gl-native/releases/) – look for the releases that begin with “osx-” – or build the SDK from source:
+
 1. [Install core dependencies](../../INSTALL.md).
-1. Run `make xpackage`, which produces a `Mapbox.framework` in the `gyp/build/Release/` folder.
+1. Run `make xpackage`, which produces a `Mapbox.framework` in the `build/osx/pkg/` folder.
 
 ### Installation
 
-1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework from the `build/osx/Build/Products/Release/` directory into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
+1. Open the project editor, select your application target, then go to the General tab. Drag Mapbox.framework into the “Embedded Binaries” section. (Don’t drag it into the “Linked Frameworks and Libraries” section; Xcode will add it there automatically.) In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish.
 
 1. Mapbox vector tiles require a Mapbox account and API access token. In the project editor, select the application target, then go to the Info tab. Under the “Custom OS X Application Target Properties” section, set `MGLMapboxAccessToken` to your access token. You can obtain an access token from the [Mapbox account page](https://www.mapbox.com/studio/account/tokens/).
 
