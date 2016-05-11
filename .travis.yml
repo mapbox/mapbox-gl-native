@@ -7,7 +7,7 @@ addons_shortcuts:
     apt:
       sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
       packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils', 'cat' ]
+                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
   addons_gcc49: &gcc49
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
