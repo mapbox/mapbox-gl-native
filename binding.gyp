@@ -57,12 +57,17 @@
             'platform/default/jpeg_reader.cpp',
           ],
 
+          'cflags': [
+            '-fsanitize=address',
+          ],
+
           'cflags_cc': [
             '<@(boost_cflags)',
             '<@(nunicode_cflags)',
             '<@(webp_cflags)',
             '<@(libpng_cflags)',
             '<@(libjpeg-turbo_cflags)',
+            '-fsanitize=address',
           ],
 
           'link_settings': {
@@ -75,6 +80,7 @@
               '<@(libpng_static_libs)',
               '<@(libjpeg-turbo_ldflags)',
               '<@(libjpeg-turbo_static_libs)',
+              '-fsanitize=address',
             ],
           },
         }]

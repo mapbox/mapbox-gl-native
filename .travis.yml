@@ -51,11 +51,10 @@ matrix:
       sudo: false
       language: node
       compiler: ": node4-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 PATH=mason_packages/linux-x86_64/node_asan/4.4.4/bin:$PATH
       addons: *clang35
       script:
-        - nvm install 4
-        - nvm use 4
+        - nvm use system
         - make node
         - make test-node
       after_script:
