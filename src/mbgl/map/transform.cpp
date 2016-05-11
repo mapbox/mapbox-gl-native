@@ -36,9 +36,9 @@ static double _normalizeAngle(double angle, double anchorAngle)
     return angle;
 }
 
-Transform::Transform(View &view_, ConstrainMode constrainMode)
+Transform::Transform(View &view_, ConstrainMode constrainMode, ViewportMode viewportMode)
     : view(view_)
-    , state(constrainMode)
+    , state(constrainMode, viewportMode)
 {
 }
 
@@ -553,6 +553,16 @@ void Transform::setConstrainMode(mbgl::ConstrainMode mode) {
 
 ConstrainMode Transform::getConstrainMode() const {
     return state.getConstrainMode();
+}
+
+#pragma mark - Viewport mode
+
+void Transform::setViewportMode(mbgl::ViewportMode mode) {
+    state.viewportMode = mode;
+}
+
+ViewportMode Transform::getViewportMode() const {
+    return state.getViewportMode();
 }
 
 #pragma mark - Transition

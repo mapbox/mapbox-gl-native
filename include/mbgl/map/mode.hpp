@@ -29,6 +29,13 @@ enum class ConstrainMode : EnumType {
     WidthAndHeight,
 };
 
+// Satisfies embedding platforms that requires the viewport coordinate systems
+// to be set according to its standards.
+enum class ViewportMode : EnumType {
+    Default,
+    FlippedY,
+};
+
 enum class MapDebugOptions : EnumType {
     NoDebug     = 0,
     TileBorders = 1 << 1,

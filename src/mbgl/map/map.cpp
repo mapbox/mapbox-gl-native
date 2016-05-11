@@ -34,7 +34,7 @@ enum class RenderState {
 
 class Map::Impl : public Style::Observer {
 public:
-    Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode);
+    Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
     void onResourceLoaded() override;
     void onResourceError(std::exception_ptr) override;
@@ -76,16 +76,16 @@ public:
     bool loading = false;
 };
 
-Map::Map(View& view, FileSource& fileSource, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode)
-    : impl(std::make_unique<Impl>(view, fileSource, mapMode, contextMode, constrainMode)) {
+Map::Map(View& view, FileSource& fileSource, MapMode mapMode, GLContextMode contextMode, ConstrainMode constrainMode, ViewportMode viewportMode)
+    : impl(std::make_unique<Impl>(view, fileSource, mapMode, contextMode, constrainMode, viewportMode)) {
     view.initialize(this);
     update(Update::Dimensions);
 }
 
-Map::Impl::Impl(View& view_, FileSource& fileSource_, MapMode mode_, GLContextMode contextMode_, ConstrainMode constrainMode_)
+Map::Impl::Impl(View& view_, FileSource& fileSource_, MapMode mode_, GLContextMode contextMode_, ConstrainMode constrainMode_, ViewportMode viewportMode_)
     : view(view_),
       fileSource(fileSource_),
-      transform(view, constrainMode_),
+      transform(view, constrainMode_, viewportMode_),
       mode(mode_),
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
@@ -636,6 +636,17 @@ void Map::setConstrainMode(mbgl::ConstrainMode mode) {
 
 ConstrainMode Map::getConstrainMode() const {
     return impl->transform.getConstrainMode();
+}
+
+#pragma mark - Viewport mode
+
+void Map::setViewportMode(mbgl::ViewportMode mode) {
+    impl->transform.setViewportMode(mode);
+    update(Update::Repaint);
+}
+
+ViewportMode Map::getViewportMode() const {
+    return impl->transform.getViewportMode();
 }
 
 #pragma mark - Projection

@@ -34,7 +34,8 @@ public:
     explicit Map(View&, FileSource&,
                  MapMode mapMode = MapMode::Continuous,
                  GLContextMode contextMode = GLContextMode::Unique,
-                 ConstrainMode constrainMode = ConstrainMode::HeightOnly);
+                 ConstrainMode constrainMode = ConstrainMode::HeightOnly,
+                 ViewportMode viewportMode = ViewportMode::Default);
     ~Map();
 
     // Register a callback that will get called (on the render thread) when all resources have
@@ -117,10 +118,14 @@ public:
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
-    
+
     // Constrain mode
     void setConstrainMode(ConstrainMode);
     ConstrainMode getConstrainMode() const;
+
+    // Viewport mode
+    void setViewportMode(ViewportMode);
+    ViewportMode getViewportMode() const;
 
     // Size
     uint16_t getWidth() const;

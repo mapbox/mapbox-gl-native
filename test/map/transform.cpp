@@ -8,7 +8,7 @@ using namespace mbgl;
 
 TEST(Transform, InvalidScale) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
@@ -48,7 +48,7 @@ TEST(Transform, InvalidScale) {
 
 TEST(Transform, InvalidLatLng) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
@@ -84,7 +84,7 @@ TEST(Transform, InvalidLatLng) {
 
 TEST(Transform, InvalidBearing) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude);
@@ -111,7 +111,7 @@ TEST(Transform, PerspectiveProjection) {
     MockView view;
     LatLng loc;
 
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setScale(2 << 9);
     transform.setPitch(0.9);
@@ -142,7 +142,7 @@ TEST(Transform, PerspectiveProjection) {
 
 TEST(Transform, UnwrappedLatLng) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setScale(2 << 9);
     transform.setPitch(0.9);
@@ -175,7 +175,7 @@ TEST(Transform, ConstrainHeightOnly) {
     MockView view;
     LatLng loc;
 
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setScale(std::pow(2, util::MAX_ZOOM));
 
@@ -194,7 +194,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
     MockView view;
     LatLng loc;
 
-    Transform transform(view, ConstrainMode::WidthAndHeight);
+    Transform transform(view, ConstrainMode::WidthAndHeight, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setScale(std::pow(2, util::MAX_ZOOM));
 
@@ -211,7 +211,7 @@ TEST(Transform, ConstrainWidthAndHeight) {
 
 TEST(Transform, Anchor) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
 
     const LatLng latLng { 10, -100 };
@@ -312,7 +312,7 @@ TEST(Transform, Anchor) {
 
 TEST(Transform, Padding) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
 
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude);
@@ -350,7 +350,7 @@ TEST(Transform, Padding) {
 
 TEST(Transform, MoveBy) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setLatLngZoom({ 0, 0 }, 10);
 
@@ -378,7 +378,7 @@ TEST(Transform, MoveBy) {
 
 TEST(Transform, Antimeridian) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
     transform.setLatLngZoom({ 0, 0 }, 1);
 
@@ -422,7 +422,7 @@ TEST(Transform, Antimeridian) {
 
 TEST(Transform, Camera) {
     MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly);
+    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
     transform.resize({{ 1000, 1000 }});
 
     const LatLng latLng1 { 45, 135 };

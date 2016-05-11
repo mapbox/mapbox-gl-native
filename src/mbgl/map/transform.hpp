@@ -20,7 +20,7 @@ class View;
 
 class Transform : private util::noncopyable {
 public:
-    Transform(View&, ConstrainMode);
+    Transform(View&, ConstrainMode, ViewportMode);
 
     // Map view
     bool resize(std::array<uint16_t, 2> size);
@@ -132,10 +132,14 @@ public:
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
-    
+
     // Constrain mode
     void setConstrainMode(ConstrainMode);
     ConstrainMode getConstrainMode() const;
+
+    // Viewport mode
+    void setViewportMode(ViewportMode);
+    ViewportMode getViewportMode() const;
 
     // Transitions
     bool inTransition() const;

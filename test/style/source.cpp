@@ -25,7 +25,7 @@ public:
     StubFileSource fileSource;
     StubStyleObserver observer;
     MockView view;
-    Transform transform { view, ConstrainMode::HeightOnly };
+    Transform transform { view, ConstrainMode::HeightOnly, ViewportMode::Default };
     TransformState transformState;
     Worker worker { 1 };
     gl::TexturePool texturePool;

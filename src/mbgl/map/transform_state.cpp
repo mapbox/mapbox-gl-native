@@ -7,8 +7,9 @@
 
 namespace mbgl {
 
-TransformState::TransformState(ConstrainMode constrainMode_)
+TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewportMode_)
     : constrainMode(constrainMode_)
+    , viewportMode(viewportMode_)
 {
 }
 
@@ -39,7 +40,8 @@ void TransformState::getProjMatrix(mat4& projMatrix) const {
 
     // After the rotateX, z values are in pixel units. Convert them to
     // altitude unites. 1 altitude unit = the screen height.
-    matrix::scale(projMatrix, projMatrix, 1, -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
+    const bool flippedY = viewportMode == ViewportMode::FlippedY;
+    matrix::scale(projMatrix, projMatrix, 1, flippedY ? 1 : -1, 1.0f / (rotatedNorth() ? getWidth() : getHeight()));
 
     using NO = NorthOrientation;
     switch (getNorthOrientation()) {
@@ -87,6 +89,12 @@ double TransformState::getNorthOrientationAngle() const {
 
 ConstrainMode TransformState::getConstrainMode() const {
     return constrainMode;
+}
+
+#pragma mark - ViewportMode
+
+ViewportMode TransformState::getViewportMode() const {
+    return viewportMode;
 }
 
 #pragma mark - Position

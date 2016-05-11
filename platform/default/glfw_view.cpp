@@ -96,6 +96,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `N` to reset north\n");
     printf("- Press `R` to toggle any available `night` style class\n");
     printf("- Press `Z` to cycle through north orientations\n");
+    printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
     printf("\n");
     printf("- Press `1` through `6` to add increasing numbers of point annotations for testing\n");

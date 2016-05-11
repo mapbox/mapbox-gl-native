@@ -51,7 +51,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
         gammaScale = 1.0f;
         matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
     }
-    matrix::scale(exMatrix, exMatrix, s, s, 1);
+    const bool flippedY = !skewed && state.getViewportMode() == ViewportMode::FlippedY;
+    matrix::scale(exMatrix, exMatrix, s, flippedY ? -s : s, 1);
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
     float fontSize = paintSize;
@@ -217,7 +218,8 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                 matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
                 s = state.getAltitude();
             }
-            matrix::scale(exMatrix, exMatrix, s, s, 1);
+            const bool flippedY = !skewed && state.getViewportMode() == ViewportMode::FlippedY;
+            matrix::scale(exMatrix, exMatrix, s, flippedY ? -s : s, 1);
 
             matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
 
