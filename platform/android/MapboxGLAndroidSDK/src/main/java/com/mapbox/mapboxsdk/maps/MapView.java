@@ -469,7 +469,7 @@ public class MapView extends FrameLayout {
         }
     }
 
-    void invalidateViewMarkers(){
+    void invalidateViewMarkers() {
         long currentTime = SystemClock.elapsedRealtime();
 
         if (mViewMarkersUpdateRunning || currentTime < mViewMarkerBoundsUpdateTime) {
@@ -477,101 +477,84 @@ public class MapView extends FrameLayout {
         }
 
         mViewMarkerBoundsUpdateTime = currentTime + 300;
-//        new ViewMarkerInBoundsTask().execute();
-//    }
 
-//    public class ViewMarkerInBoundsTask extends AsyncTask<Void, Void, ViewMarkerInBoundsTask.Result> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-            mViewMarkersUpdateRunning = true;
-//        }
+        mViewMarkersUpdateRunning = true;
 
-//        @Override
-//        protected Result doInBackground(Void... params) {
-            List<Marker> inBounds = new ArrayList<>();
-            Map<Marker, View> outBounds = new HashMap<>();
+        List<Marker> inBounds = new ArrayList<>();
+        Map<Marker, View> outBounds = new HashMap<>();
 
-            LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
-            long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
-            LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
-            Log.v(MapboxConstants.TAG, "Annotations in bounds: " + ids.length);
+        LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
+        long[] ids = mNativeMapView.getAnnotationsInBounds(bounds);
+        LongSparseArray<View> markerViews = mMapboxMap.getMarkerViews();
+        Log.v(MapboxConstants.TAG, "Annotations in bounds: " + ids.length);
 
-            boolean found;
-            long key;
+        boolean found;
+        long key;
 
-            // introduce new markers
-            for (long id : ids) {
-                found = false;
-                for (int i = 0; i < markerViews.size(); i++) {
-                    key = markerViews.keyAt(i);
-
-                    if (id == key) {
-                        found = true;
-                    }
-                }
-
-                if (!found) {
-                    Annotation annotation = mMapboxMap.getAnnotation(id);
-                    if (annotation instanceof Marker) {
-                        inBounds.add((Marker) annotation);
-                    } else {
-                        Log.v(MapboxConstants.TAG, "Not instance of Marker" + id);
-                    }
-                } else {
-                    Log.v(MapboxConstants.TAG, "Already added " + id);
-                }
-            }
-
-            // clean up out of bound markers
+        // introduce new markers
+        for (long id : ids) {
+            found = false;
             for (int i = 0; i < markerViews.size(); i++) {
-                found = false;
                 key = markerViews.keyAt(i);
-                for (long id : ids) {
-                    if (id == key) {
-                        found = true;
-                    }
-                }
-                if (!found) {
-                    Annotation annotation = mMapboxMap.getAnnotation(key);
-                    if (annotation instanceof Marker) {
-                        outBounds.put((Marker) annotation, markerViews.get(key));
-                    } else {
-                        Log.v(MapboxConstants.TAG, "Not instance of Marker" + key);
-                    }
+
+                if (id == key) {
+                    found = true;
                 }
             }
+
+            if (!found) {
+                Annotation annotation = mMapboxMap.getAnnotation(id);
+                if (annotation instanceof Marker) {
+                    inBounds.add((Marker) annotation);
+                } else {
+                    Log.v(MapboxConstants.TAG, "Not instance of Marker" + id);
+                }
+            } else {
+                Log.v(MapboxConstants.TAG, "Already added " + id);
+            }
+        }
+
+        // clean up out of bound markers
+        for (int i = 0; i < markerViews.size(); i++) {
+            found = false;
+            key = markerViews.keyAt(i);
+            for (long id : ids) {
+                if (id == key) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                Annotation annotation = mMapboxMap.getAnnotation(key);
+                if (annotation instanceof Marker) {
+                    outBounds.put((Marker) annotation, markerViews.get(key));
+                } else {
+                    Log.v(MapboxConstants.TAG, "Not instance of Marker" + key);
+                }
+            }
+        }
         Result result = new Result(inBounds, outBounds);
+        mMapboxMap.setViewMarkersBoundsTaskResult(result);
+        mViewMarkersUpdateRunning = false;
+        Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
+    }
 
-//            return new Result(inBounds, outBounds);
-//        }
+    public class Result {
+        private List<Marker> inBounds;
+        private Map<Marker, View> outBounds;
 
-//        @Override
-//        protected void onPostExecute(Result result) {
-//            super.onPostExecute(result);
-            mMapboxMap.setViewMarkersBoundsTaskResult(result);
-            mViewMarkersUpdateRunning = false;
-            Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
+        public Result(List<Marker> inBounds, Map<Marker, View> outBounds) {
+            this.inBounds = inBounds;
+            this.outBounds = outBounds;
         }
 
-        public class Result {
-            private List<Marker> inBounds;
-            private Map<Marker, View> outBounds;
-
-            public Result(List<Marker> inBounds, Map<Marker, View> outBounds) {
-                this.inBounds = inBounds;
-                this.outBounds = outBounds;
-            }
-
-            public List<Marker> getInBounds() {
-                return inBounds;
-            }
-
-            public Map<Marker, View> getOutBounds() {
-                return outBounds;
-            }
+        public List<Marker> getInBounds() {
+            return inBounds;
         }
+
+        public Map<Marker, View> getOutBounds() {
+            return outBounds;
+        }
+    }
 //    }
 
     /**
@@ -1456,7 +1439,7 @@ public class MapView extends FrameLayout {
                 mViewHolder = viewMarkers.valueAt(i);
                 if (mViewHolder != null) {
                     Marker marker = (Marker) mMapboxMap.getAnnotation(viewMarkers.keyAt(i));
-                    if(marker!=null) {
+                    if (marker != null) {
                         PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
                         mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
                         mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));

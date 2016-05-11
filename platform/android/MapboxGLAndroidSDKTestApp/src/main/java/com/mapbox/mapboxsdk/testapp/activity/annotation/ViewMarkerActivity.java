@@ -68,8 +68,9 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
         mapboxMap.setMarkerViewAdapter(new CountryAdapter(this));
         mapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
             @Override
-            public void onMarkerClick(@NonNull Marker marker, @NonNull View view) {
+            public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view) {
                 Log.d(MapboxConstants.TAG, "Country clicked " + ((CountryMarker) marker).getAbbrevName());
+                return true;
             }
         });
 

@@ -1,9 +1,14 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.SystemClock;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +22,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
@@ -68,12 +74,15 @@ public class MapboxMap {
 
     private List<Marker> mSelectedMarkers;
     private LongSparseArray<View> mMarkerViews;
-    private List<InfoWindow> mInfoWindows;
 
+    private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
+
     private MapboxMap.MarkerViewAdapter mMarkerViewAdapter;
-    private Bitmap mViewMarkerBitmap;
     private OnMarkerViewClickListener mOnMarkerViewClickListener;
+    private int mMarkerViewItemAnimatorInRes;
+    private int mMarkerViewItemAnimatorOutRes;
+    private Bitmap mViewMarkerBitmap;
 
     private boolean mMyLocationEnabled;
     private boolean mAllowConcurrentMultipleInfoWindows;
@@ -660,7 +669,7 @@ public class MapboxMap {
             if (adaptedView != null) {
                 // hack to hide old marker, todo replace with visibility
                 Icon icon = marker.getIcon();
-                if(!icon.getBitmap().equals(mViewMarkerBitmap)) {
+                if (!icon.getBitmap().equals(mViewMarkerBitmap)) {
                     if (mViewMarkerBitmap == null) {
                         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
                         mViewMarkerBitmap = Bitmap.createBitmap(icon.getBitmap().getWidth(), icon.getBitmap().getHeight(), conf);
@@ -671,15 +680,27 @@ public class MapboxMap {
                     @Override
                     public void onClick(View v) {
 
-                        if (mSelectedMarkers.contains(marker)) {
-                            return;
-                        }
-
+                        boolean clickHandled = false;
                         if (mOnMarkerViewClickListener != null) {
-                            mOnMarkerViewClickListener.onMarkerClick(marker, v);
+                            clickHandled = mOnMarkerViewClickListener.onMarkerClick(marker, v);
                         }
 
-                        mSelectedMarkers.add(marker);
+                        if (!clickHandled) {
+                            if (mMarkerViewItemAnimatorInRes != 0) {
+                                Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(),mMarkerViewItemAnimatorInRes);
+                                animator.setTarget(v);
+                                animator.addListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        selectMarker(marker);
+                                    }
+                                });
+                                animator.start();
+                            } else {
+                                selectMarker(marker);
+                            }
+                        }
                     }
                 });
 
@@ -1184,6 +1205,13 @@ public class MapboxMap {
             if (marker.isInfoWindowShown()) {
                 marker.hideInfoWindow();
             }
+
+            View viewMarker = mMarkerViews.get(marker.getId());
+            if(viewMarker!=null){
+                Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(),mMarkerViewItemAnimatorOutRes);
+                animator.setTarget(viewMarker);
+                animator.start();
+            }
         }
 
         // Removes all selected markers from the list
@@ -1240,6 +1268,21 @@ public class MapboxMap {
 
     public OnMarkerViewClickListener getOnMarkerViewClickListener() {
         return mOnMarkerViewClickListener;
+    }
+
+    public void setMarkerViewItemAnimation(@AnimatorRes int animationInRes,@AnimatorRes int animationOutRes) {
+        mMarkerViewItemAnimatorInRes = animationInRes;
+        mMarkerViewItemAnimatorOutRes = animationOutRes;
+    }
+
+    @AnimatorRes
+    public int getMarkerViewItemAnimatorInRes() {
+        return mMarkerViewItemAnimatorInRes;
+    }
+
+    @AnimatorRes
+    public int getMarkerViewItemAnimatorOutRes() {
+        return mMarkerViewItemAnimatorOutRes;
     }
 
     //
@@ -1838,7 +1881,7 @@ public class MapboxMap {
 
     public interface OnMarkerViewClickListener {
 
-        void onMarkerClick(@NonNull Marker marker, @NonNull View view);
+        boolean onMarkerClick(@NonNull Marker marker, @NonNull View view);
     }
 
     /**
