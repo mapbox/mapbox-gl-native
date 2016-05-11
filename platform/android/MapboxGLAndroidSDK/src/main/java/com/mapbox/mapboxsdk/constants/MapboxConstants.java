@@ -33,6 +33,11 @@ public class MapboxConstants {
     public static final int ANIMATION_DURATION = 300;
 
     /**
+     * Default short animation time
+     */
+    public static final int ANIMATION_DURATION_SHORT = 150;
+
+    /**
      * The currently supported minimum zoom level.
      */
     public static final float MINIMUM_ZOOM = 0.0f;
