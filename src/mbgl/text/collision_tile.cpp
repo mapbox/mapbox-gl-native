@@ -86,8 +86,8 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, const bool al
 
         if (!allowOverlap) {
             for (auto it = tree.qbegin(bgi::intersects(getTreeBox(anchor, box))); it != tree.qend(); ++it) {
-                const auto& blocking = std::get<1>(*it);
-                auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
+                const CollisionBox& blocking = std::get<1>(*it);
+                Point<float> blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
 
                 minPlacementScale = findPlacementScale(minPlacementScale, anchor, box, blockingAnchor, blocking);
                 if (minPlacementScale >= maxScale) return minPlacementScale;
