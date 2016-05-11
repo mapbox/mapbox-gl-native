@@ -1,7 +1,6 @@
 #include <mbgl/layer/fill_layer.hpp>
 #include <mbgl/style/style_bucket_parameters.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/util/get_geometries.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
@@ -63,7 +62,7 @@ std::unique_ptr<Bucket> FillLayer::createBucket(StyleBucketParameters& parameter
 
     auto& name = bucketName();
     parameters.eachFilteredFeature(filter, [&] (const auto& feature, std::size_t index, const std::string& layerName) {
-        auto geometries = getGeometries(feature);
+        auto geometries = feature.getGeometries();
         bucket->addGeometry(geometries);
         parameters.featureIndex.insert(geometries, index, layerName, name);
     });
