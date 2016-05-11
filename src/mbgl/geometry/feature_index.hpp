@@ -17,6 +17,7 @@ enum class TranslateAnchorType : bool;
 
 class IndexedSubfeature {
     public:
+        IndexedSubfeature() = delete;
         std::size_t index;
         std::string sourceLayerName;
         std::string bucketName;

@@ -5,8 +5,9 @@ namespace mbgl {
 
 CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
         const float top, const float bottom, const float left, const float right,
-        const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature,
-        const bool straight) {
+        const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_,
+        const bool straight)
+        : indexedFeature(indexedFeature_) {
 
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
@@ -29,19 +30,18 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates &line, const Anchor
             // used for icon labels that are aligned with the line, but don't curve along it
             const GeometryCoordinate vector = convertPoint<int16_t>(util::unit(convertPoint<double>(line[anchor.segment + 1] - line[anchor.segment])) * length);
             const GeometryCoordinates newLine({ anchorPoint - vector, anchorPoint + vector });
-            bboxifyLabel(newLine, anchorPoint, 0, length, height, indexedFeature);
+            bboxifyLabel(newLine, anchorPoint, 0, length, height);
         } else {
             // used for text labels that curve along a line
-            bboxifyLabel(line, anchorPoint, anchor.segment, length, height, indexedFeature);
+            bboxifyLabel(line, anchorPoint, anchor.segment, length, height);
         }
     } else {
-        boxes.emplace_back(anchor.point, x1, y1, x2, y2, std::numeric_limits<float>::infinity(), indexedFeature);
+        boxes.emplace_back(anchor.point, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
     }
 }
 
 void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
-        GeometryCoordinate &anchorPoint, const int segment, const float labelLength, const float boxSize,
-        const IndexedSubfeature& indexedFeature) {
+        GeometryCoordinate &anchorPoint, const int segment, const float labelLength, const float boxSize) {
 
     const float step = boxSize / 2;
     const unsigned int nBoxes = std::floor(labelLength / step);
@@ -97,7 +97,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates &line,
         const float distanceToInnerEdge = std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
         const float maxScale = labelLength / 2 / distanceToInnerEdge;
 
-        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale, indexedFeature);
+        boxes.emplace_back(boxAnchor, -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
     }
 }
 

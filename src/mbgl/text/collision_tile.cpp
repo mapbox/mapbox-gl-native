@@ -129,7 +129,7 @@ void CollisionTile::insertFeature(CollisionFeature& feature, const float minPlac
     if (minPlacementScale < maxScale) {
         std::vector<CollisionTreeBox> treeBoxes;
         for (auto& box : feature.boxes) {
-            treeBoxes.emplace_back(getTreeBox(util::matrixMultiply(rotationMatrix, box.anchor), box), box);
+            treeBoxes.emplace_back(getTreeBox(util::matrixMultiply(rotationMatrix, box.anchor), box), box, feature.indexedFeature);
         }
         if (ignorePlacement) {
             ignoredTree.insert(treeBoxes.begin(), treeBoxes.end());
@@ -168,8 +168,7 @@ std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const float m
 
     for (auto& blockingTreeBox : blockingBoxes) {
         const auto& blocking = std::get<1>(blockingTreeBox);
-
-        auto& indexedFeature = blocking.indexedFeature;
+        const auto& indexedFeature = std::get<2>(blockingTreeBox);
 
         auto& seenFeatures = sourceLayerFeatures[indexedFeature.sourceLayerName];
         if (seenFeatures.find(indexedFeature.index) == seenFeatures.end()) {
