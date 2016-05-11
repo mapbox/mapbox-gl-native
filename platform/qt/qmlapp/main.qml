@@ -41,12 +41,12 @@ ApplicationWindow {
                     anchors.fill: parent
                     visible: false
 
-                    style: "mapbox://styles/mapbox/streets-v8"
+                    style: "mapbox://styles/mapbox/streets-v9"
 
                     center: QtPositioning.coordinate(60.170448, 24.942046) // Helsinki
                     zoomLevel: 14
-                    minimumZoomLevel: 4
-                    maximumZoomLevel: 16
+                    minimumZoomLevel: 0
+                    maximumZoomLevel: 20
 
                     bearing: bearingSlider.value
                     pitch: pitchSlider.value
@@ -119,7 +119,7 @@ ApplicationWindow {
                     anchors.fill: parent
                     visible: false
 
-                    style: "mapbox://styles/mapbox/satellite-hybrid-v8"
+                    style: "mapbox://styles/mapbox/satellite-streets-v9"
 
                     center: mapStreets.center
                     zoomLevel: mapStreets.zoomLevel
