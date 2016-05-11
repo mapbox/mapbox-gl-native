@@ -77,7 +77,7 @@ float CollisionTile::findPlacementScale(float minPlacementScale, const Point<flo
     return minPlacementScale;
 }
 
-float CollisionTile::placeFeature(const CollisionFeature &feature, const bool allowOverlap, const bool avoidEdges) {
+float CollisionTile::placeFeature(const CollisionFeature& feature, const bool allowOverlap, const bool avoidEdges) {
 
     float minPlacementScale = minScale;
 
@@ -124,7 +124,7 @@ float CollisionTile::placeFeature(const CollisionFeature &feature, const bool al
     return minPlacementScale;
 }
 
-void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlacementScale, const bool ignorePlacement) {
+void CollisionTile::insertFeature(CollisionFeature& feature, const float minPlacementScale, const bool ignorePlacement) {
     for (auto& box : feature.boxes) {
         box.placementScale = minPlacementScale;
     }
@@ -143,7 +143,7 @@ void CollisionTile::insertFeature(CollisionFeature &feature, const float minPlac
 
 }
 
-Box CollisionTile::getTreeBox(const Point<float> &anchor, const CollisionBox &box, const float scale) {
+Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& box, const float scale) {
     return Box{
         CollisionPoint{
             anchor.x + box.x1 / scale,
