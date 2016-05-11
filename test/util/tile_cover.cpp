@@ -1,7 +1,6 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/test/mock_view.hpp>
 
 #include <gtest/gtest.h>
 
@@ -29,8 +28,7 @@ TEST(TileCover, WorldZ0) {
 }
 
 TEST(TileCover, Pitch) {
-    MockView view;
-    Transform transform(view, ConstrainMode::HeightOnly, ViewportMode::Default);
+    Transform transform;
     transform.resize({ { 512, 512 } });
     transform.setZoom(2);
     transform.setPitch(40.0 * M_PI / 180.0);

@@ -80,7 +80,6 @@
 
         'src/mbgl/test/stub_file_source.hpp',
         'src/mbgl/test/stub_file_source.cpp',
-        'src/mbgl/test/mock_view.hpp',
         'src/mbgl/test/util.hpp',
         'src/mbgl/test/util.cpp',
         'src/mbgl/test/fixture_log_observer.hpp',

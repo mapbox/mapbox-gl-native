@@ -3,6 +3,7 @@
 
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/change.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/update.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -16,11 +17,11 @@
 
 namespace mbgl {
 
-class View;
-
 class Transform : private util::noncopyable {
 public:
-    Transform(View&, ConstrainMode, ViewportMode);
+    Transform(std::function<void(MapChange)> = nullptr,
+              ConstrainMode = ConstrainMode::HeightOnly,
+              ViewportMode = ViewportMode::Default);
 
     // Map view
     bool resize(std::array<uint16_t, 2> size);
@@ -163,7 +164,7 @@ public:
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
-    View &view;
+    std::function<void(MapChange)> callback;
 
     TransformState state;
 

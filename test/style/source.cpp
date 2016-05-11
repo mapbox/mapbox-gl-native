@@ -1,6 +1,5 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/test/mock_view.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
 #include <mbgl/source/source.hpp>
@@ -24,8 +23,7 @@ public:
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    MockView view;
-    Transform transform { view, ConstrainMode::HeightOnly, ViewportMode::Default };
+    Transform transform;
     TransformState transformState;
     Worker worker { 1 };
     gl::TexturePool texturePool;
