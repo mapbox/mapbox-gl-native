@@ -85,11 +85,8 @@ float CollisionTile::placeFeature(const CollisionFeature& feature, const bool al
         const auto anchor = util::matrixMultiply(rotationMatrix, box.anchor);
 
         if (!allowOverlap) {
-            std::vector<CollisionTreeBox> blockingBoxes;
-            tree.query(bgi::intersects(getTreeBox(anchor, box)), std::back_inserter(blockingBoxes));
-
-            for (auto& blockingTreeBox : blockingBoxes) {
-                const auto& blocking = std::get<1>(blockingTreeBox);
+            for (auto it = tree.qbegin(bgi::intersects(getTreeBox(anchor, box))); it != tree.qend(); ++it) {
+                const auto& blocking = std::get<1>(*it);
                 auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
 
                 minPlacementScale = findPlacementScale(minPlacementScale, anchor, box, blockingAnchor, blocking);
