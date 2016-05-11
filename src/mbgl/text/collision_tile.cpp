@@ -156,30 +156,31 @@ Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& bo
 std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const float minX, const float minY, const float maxX, const float maxY, const float scale) {
 
     std::vector<IndexedSubfeature> result;
+    std::unordered_map<std::string, std::set<std::size_t>> sourceLayerFeatures;
 
     auto anchor = util::matrixMultiply(rotationMatrix, Point<float>(minX, minY));
     CollisionBox queryBox(anchor, 0, 0, maxX - minX, maxY - minY, scale);
+    auto predicates = bgi::intersects(getTreeBox(anchor, queryBox));
 
-    std::vector<CollisionTreeBox> blockingBoxes;
-    tree.query(bgi::intersects(getTreeBox(anchor, queryBox)), std::back_inserter(blockingBoxes));
-    ignoredTree.query(bgi::intersects(getTreeBox(anchor, queryBox)), std::back_inserter(blockingBoxes));
+    auto fn = [&] (const Tree& tree_) {
+        for (auto it = tree_.qbegin(predicates); it != tree_.qend(); ++it) {
+            const CollisionBox& blocking = std::get<1>(*it);
+            const IndexedSubfeature& indexedFeature = std::get<2>(*it);
 
-    std::unordered_map<std::string, std::set<std::size_t>> sourceLayerFeatures;
-
-    for (auto& blockingTreeBox : blockingBoxes) {
-        const auto& blocking = std::get<1>(blockingTreeBox);
-        const auto& indexedFeature = std::get<2>(blockingTreeBox);
-
-        auto& seenFeatures = sourceLayerFeatures[indexedFeature.sourceLayerName];
-        if (seenFeatures.find(indexedFeature.index) == seenFeatures.end()) {
-            auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
-            float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
-            if (minPlacementScale >= scale) {
-                seenFeatures.insert(indexedFeature.index);
-                result.push_back(indexedFeature);
+            auto& seenFeatures = sourceLayerFeatures[indexedFeature.sourceLayerName];
+            if (seenFeatures.find(indexedFeature.index) == seenFeatures.end()) {
+                auto blockingAnchor = util::matrixMultiply(rotationMatrix, blocking.anchor);
+                float minPlacementScale = findPlacementScale(minScale, anchor, queryBox, blockingAnchor, blocking);
+                if (minPlacementScale >= scale) {
+                    seenFeatures.insert(indexedFeature.index);
+                    result.push_back(indexedFeature);
+                }
             }
         }
-    }
+    };
+
+    fn(tree);
+    fn(ignoredTree);
 
     return result;
 }
