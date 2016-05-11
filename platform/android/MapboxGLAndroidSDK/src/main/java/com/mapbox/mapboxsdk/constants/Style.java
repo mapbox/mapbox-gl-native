@@ -24,7 +24,7 @@ public class Style {
      */
     private static final String MAPBOX_STREETS_BASE = "mapbox://styles/mapbox/streets-v%d";
     /**
-     * Outdoors: A rugged style that emphasizes physical terrain and outdoor activities.
+     * Outdoors: A general-purpose style tailored to outdoor activities.
      */
     private static final String OUTDOORS_BASE = "mapbox://styles/mapbox/outdoors-v%d";
     /**
