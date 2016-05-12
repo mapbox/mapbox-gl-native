@@ -42,7 +42,7 @@ public:
     float placeFeature(const CollisionFeature&, const bool allowOverlap, const bool avoidEdges);
     void insertFeature(CollisionFeature&, const float minPlacementScale, const bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const float minX, const float minY, const float maxX, const float maxY, const float scale);
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const mapbox::geometry::box<int16_t>&, const float scale);
 
     const PlacementConfig config;
 

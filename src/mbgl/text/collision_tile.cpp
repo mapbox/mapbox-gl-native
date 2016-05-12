@@ -153,13 +153,13 @@ Box CollisionTile::getTreeBox(const Point<float>& anchor, const CollisionBox& bo
     };
 }
 
-std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const float minX, const float minY, const float maxX, const float maxY, const float scale) {
+std::vector<IndexedSubfeature> CollisionTile::queryRenderedSymbols(const mapbox::geometry::box<int16_t>& box, const float scale) {
 
     std::vector<IndexedSubfeature> result;
     std::unordered_map<std::string, std::set<std::size_t>> sourceLayerFeatures;
 
-    auto anchor = util::matrixMultiply(rotationMatrix, Point<float>(minX, minY));
-    CollisionBox queryBox(anchor, 0, 0, maxX - minX, maxY - minY, scale);
+    auto anchor = util::matrixMultiply(rotationMatrix, convertPoint<float>(box.min));
+    CollisionBox queryBox(anchor, 0, 0, box.max.x - box.min.x, box.max.y - box.min.y, scale);
     auto predicates = bgi::intersects(getTreeBox(anchor, queryBox));
 
     auto fn = [&] (const Tree& tree_) {

@@ -7,6 +7,8 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
 
+#include <mapbox/geometry/envelope.hpp>
+
 #include <cassert>
 #include <string>
 
@@ -21,23 +23,8 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
                           const std::string& sourceLayerName,
                           const std::string& bucketName) {
     for (const auto& ring : geometries) {
-        float minX = std::numeric_limits<float>::infinity();
-        float minY = std::numeric_limits<float>::infinity();
-        float maxX = -std::numeric_limits<float>::infinity();
-        float maxY = -std::numeric_limits<float>::infinity();
-
-        for (const auto& p : ring) {
-            const float x = p.x;
-            const float y = p.y;
-            minX = util::min(minX, x);
-            minY = util::min(minY, y);
-            maxX = util::max(maxX, x);
-            maxY = util::max(maxY, y);
-        }
-
-        grid.insert(
-                IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
-                { int32_t(minX), int32_t(minY), int32_t(maxX), int32_t(maxY) });
+        grid.insert(IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
+                    mapbox::geometry::envelope<GeometryCoordinates, int16_t>(ring));
     }
 }
 
@@ -72,30 +59,11 @@ void FeatureIndex::query(
         const GeometryTile& geometryTile,
         const Style& style) const {
 
+    mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope<GeometryCollection, int16_t>(queryGeometry);
+
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
-
-    float additionalRadius = style.getQueryRadius() * pixelsToTileUnits;
-
-    float minX = std::numeric_limits<float>::infinity();
-    float minY = std::numeric_limits<float>::infinity();
-    float maxX = -std::numeric_limits<float>::infinity();
-    float maxY = -std::numeric_limits<float>::infinity();
-
-    for (const auto& ring : queryGeometry) {
-        for (const auto& p : ring) {
-            minX = util::min<float>(minX, p.x);
-            minY = util::min<float>(minY, p.y);
-            maxX = util::max<float>(maxX, p.x);
-            maxY = util::max<float>(maxY, p.y);
-        }
-    }
-
-    std::vector<IndexedSubfeature> features = grid.query({
-        int(minX - additionalRadius),
-        int(minY - additionalRadius),
-        int(maxX + additionalRadius),
-        int(maxY + additionalRadius)
-    });
+    const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, std::ceil(style.getQueryRadius() * pixelsToTileUnits));
+    std::vector<IndexedSubfeature> features = grid.query({ box.min - additionalRadius, box.max + additionalRadius });
 
     std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
@@ -110,7 +78,7 @@ void FeatureIndex::query(
 
     // query symbol features
     assert(collisionTile);
-    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(minX, minY, maxX, maxY, scale);
+    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(box, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTile, style, bearing, pixelsToTileUnits);

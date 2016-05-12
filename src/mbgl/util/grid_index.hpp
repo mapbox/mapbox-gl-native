@@ -1,5 +1,8 @@
 #pragma once
 
+#include <mapbox/geometry/point.hpp>
+#include <mapbox/geometry/box.hpp>
+
 #include <cstdint>
 #include <cstddef>
 #include <vector>
@@ -8,22 +11,15 @@ namespace mbgl {
 
 template <class T>
 class GridIndex {
-    public:
-
+public:
     GridIndex(int32_t extent_, int32_t n_, int32_t padding_);
 
-    struct BBox {
-        int32_t x1;
-        int32_t y1;
-        int32_t x2;
-        int32_t y2;
-    };
+    using BBox = mapbox::geometry::box<int16_t>;
 
-    void insert(T&& t, BBox&& bbox);
-    std::vector<T> query(const BBox& bbox) const;
+    void insert(T&& t, const BBox&);
+    std::vector<T> query(const BBox&) const;
 
-    private:
-
+private:
     int32_t convertToCellCoord(int32_t x) const;
 
     const int32_t extent;

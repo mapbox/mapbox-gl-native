@@ -20,13 +20,13 @@ GridIndex<T>::GridIndex(int32_t extent_, int32_t n_, int32_t padding_) :
     };
 
 template <class T>
-void GridIndex<T>::insert(T&& t, BBox&& bbox) {
+void GridIndex<T>::insert(T&& t, const BBox& bbox) {
     size_t uid = elements.size();
 
-    auto cx1 = convertToCellCoord(bbox.x1);
-    auto cy1 = convertToCellCoord(bbox.y1);
-    auto cx2 = convertToCellCoord(bbox.x2);
-    auto cy2 = convertToCellCoord(bbox.y2);
+    auto cx1 = convertToCellCoord(bbox.min.x);
+    auto cy1 = convertToCellCoord(bbox.min.y);
+    auto cx2 = convertToCellCoord(bbox.max.x);
+    auto cy2 = convertToCellCoord(bbox.max.y);
 
     for (int32_t x = cx1; x <= cx2; x++) {
         for (int32_t y = cy1; y <= cy2; y++) {
@@ -43,10 +43,10 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
     std::vector<T> result;
     std::unordered_set<size_t> seenUids;
 
-    auto cx1 = convertToCellCoord(queryBBox.x1);
-    auto cy1 = convertToCellCoord(queryBBox.y1);
-    auto cx2 = convertToCellCoord(queryBBox.x2);
-    auto cy2 = convertToCellCoord(queryBBox.y2);
+    auto cx1 = convertToCellCoord(queryBBox.min.x);
+    auto cy1 = convertToCellCoord(queryBBox.min.y);
+    auto cx2 = convertToCellCoord(queryBBox.max.x);
+    auto cy2 = convertToCellCoord(queryBBox.max.y);
 
     for (int32_t x = cx1; x <= cx2; x++) {
         for (int32_t y = cy1; y <= cy2; y++) {
@@ -57,10 +57,10 @@ std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
 
                     auto& pair = elements.at(uid);
                     auto& bbox = pair.second;
-                    if (queryBBox.x1 <= bbox.x2 &&
-                        queryBBox.y1 <= bbox.y2 &&
-                        queryBBox.x2 >= bbox.x1 &&
-                        queryBBox.y2 >= bbox.y1) {
+                    if (queryBBox.min.x <= bbox.max.x &&
+                        queryBBox.min.y <= bbox.max.y &&
+                        queryBBox.max.x >= bbox.min.x &&
+                        queryBBox.max.y >= bbox.min.y) {
 
                         result.push_back(pair.first);
                     }
