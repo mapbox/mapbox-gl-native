@@ -28,9 +28,19 @@ enum class FeatureType : uint8_t {
 // Normalized vector tile coordinates.
 // Each geometry coordinate represents a point in a bidimensional space,
 // varying from -V...0...+V, where V is the maximum extent applicable.
-using GeometryCoordinate  = Point<int16_t>;
-using GeometryCoordinates = std::vector<GeometryCoordinate>;
-using GeometryCollection  = std::vector<GeometryCoordinates>;
+using GeometryCoordinate = Point<int16_t>;
+
+class GeometryCoordinates : public std::vector<GeometryCoordinate> {
+public:
+    using coordinate_type = int16_t;
+    using std::vector<GeometryCoordinate>::vector;
+};
+
+class GeometryCollection : public std::vector<GeometryCoordinates> {
+public:
+    using coordinate_type = int16_t;
+    using std::vector<GeometryCoordinates>::vector;
+};
 
 class GeometryTileFeature : private util::noncopyable {
 public:

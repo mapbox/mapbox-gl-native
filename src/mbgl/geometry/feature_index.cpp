@@ -24,7 +24,7 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
                           const std::string& bucketName) {
     for (const auto& ring : geometries) {
         grid.insert(IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
-                    mapbox::geometry::envelope<GeometryCoordinates, int16_t>(ring));
+                    mapbox::geometry::envelope(ring));
     }
 }
 
@@ -59,7 +59,7 @@ void FeatureIndex::query(
         const GeometryTile& geometryTile,
         const Style& style) const {
 
-    mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope<GeometryCollection, int16_t>(queryGeometry);
+    mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
 
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
     const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, std::ceil(style.getQueryRadius() * pixelsToTileUnits));
