@@ -56,7 +56,8 @@ matrix:
       script:
         - make node
         - nvm use system
-        - ASAN_OPTIONS=detect_leaks=1 make test-node
+        - ASAN_OPTIONS=detect_leaks=1 npm test
+        - ASAN_OPTIONS=detect_leaks=1 npm run test-suite
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
