@@ -473,20 +473,21 @@ NAN_METHOD(NodeMap::QueryRenderedFeatures) {
             auto pos0 = Nan::Get(posOrBox, 0).ToLocalChecked().As<v8::Array>();
             auto pos1 = Nan::Get(posOrBox, 1).ToLocalChecked().As<v8::Array>();
 
-            std::array<mbgl::ScreenCoordinate, 2> queryBox = {{{
+            result = nodeMap->map->queryRenderedFeatures(mbgl::ScreenBox {
+                {
                     Nan::Get(pos0, 0).ToLocalChecked()->NumberValue(),
                     Nan::Get(pos0, 1).ToLocalChecked()->NumberValue()
                 }, {
                     Nan::Get(pos1, 0).ToLocalChecked()->NumberValue(),
                     Nan::Get(pos1, 1).ToLocalChecked()->NumberValue()
-                }}};
-            result = nodeMap->map->queryRenderedFeatures(queryBox);
+                }
+            });
 
         } else {
-            mbgl::ScreenCoordinate queryPoint(
+            result = nodeMap->map->queryRenderedFeatures(mbgl::ScreenCoordinate {
                 Nan::Get(posOrBox, 0).ToLocalChecked()->NumberValue(),
-                Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue());
-            result = nodeMap->map->queryRenderedFeatures(queryPoint);
+                Nan::Get(posOrBox, 1).ToLocalChecked()->NumberValue()
+            });
         }
 
         auto array = Nan::New<v8::Array>();

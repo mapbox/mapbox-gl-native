@@ -6,6 +6,7 @@
 
 #include <mapbox/geometry/point.hpp>
 #include <mapbox/geometry/point_arithmetic.hpp>
+#include <mapbox/geometry/box.hpp>
 
 #include <cmath>
 
@@ -15,6 +16,7 @@ class CanonicalTileID;
 class UnwrappedTileID;
 
 using ScreenCoordinate = mapbox::geometry::point<double>;
+using ScreenBox        = mapbox::geometry::box<double>;
 
 class LatLng {
 public:
