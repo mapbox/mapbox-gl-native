@@ -97,7 +97,7 @@ public class MapboxEventManager {
 
     /**
      * Internal setup of MapboxEventsManager.  It needs to be called once before @link MapboxEventManager#getMapboxEventManager
-     * <p/>
+     *
      * This allows for a cleaner getMapboxEventManager() that doesn't require context and accessToken
      *
      * @param context     The context associated with MapView

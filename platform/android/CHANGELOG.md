@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.0.1
+
+Mapbox Android 4.0.1 is a patch release to make this bug fix available sooner.
+
+* onMapReady() not getting called when offline ([#4500](https://github.com/mapbox/mapbox-gl-native/issues/4500))
+
 ## 4.0.0
 
 Mapbox Android 4.0.0 contains the following 3 major new features.
