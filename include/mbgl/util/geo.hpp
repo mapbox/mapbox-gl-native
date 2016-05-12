@@ -169,19 +169,6 @@ inline bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
     return !(a == b);
 }
 
-class MetersBounds {
-public:
-    ProjectedMeters sw;
-    ProjectedMeters ne;
-
-    MetersBounds(const ProjectedMeters& sw_, const ProjectedMeters& ne_)
-        : sw(sw_), ne(ne_) {}
-
-    explicit operator bool() const {
-        return sw && ne;
-    }
-};
-
 // Determines the orientation of the map.
 enum class NorthOrientation : uint8_t {
     Upwards, // Default

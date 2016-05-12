@@ -32,7 +32,6 @@ class TransformState;
 class Tile;
 class TileCoordinate;
 struct ClipID;
-struct box;
 
 class Source : private util::noncopyable {
 public:

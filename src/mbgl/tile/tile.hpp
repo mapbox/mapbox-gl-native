@@ -9,7 +9,6 @@
 namespace mbgl {
 
 class TileData;
-struct box;
 
 class Tile {
 public:
