@@ -30,7 +30,8 @@
     "preinstall": "npm install node-pre-gyp",
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
     "test": "tape platform/node/test/js/**/*.test.js",
-    "test-suite": "node platform/node/test/render.test.js"
+    "test-suite": "node platform/node/test/render.test.js",
+    "leak": "node platform/node/test/js/leak.test.js"
   },
   "gypfile": true,
   "binary": {

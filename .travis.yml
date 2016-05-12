@@ -46,7 +46,7 @@ after_script:
 
 matrix:
   include:
-    # Clang 3.5 - Release - Node
+    # Clang 3.5 - Debug - Node
     - os: linux
       sudo: false
       language: node
@@ -56,8 +56,7 @@ matrix:
       script:
         - make node
         - nvm use system
-        - ASAN_OPTIONS=detect_leaks=1 npm test
-        - ASAN_OPTIONS=detect_leaks=1 npm run test-suite
+        - ASAN_OPTIONS=detect_leaks=1 npm run leak
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
