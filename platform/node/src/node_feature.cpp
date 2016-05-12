@@ -76,6 +76,11 @@ public:
 };
 
 struct ToValue {
+    v8::Local<v8::Value> operator()(std::nullptr_t) {
+        Nan::EscapableHandleScope scope;
+        return scope.Escape(Nan::Null());
+    }
+
     v8::Local<v8::Value> operator()(bool t) {
         Nan::EscapableHandleScope scope;
         return scope.Escape(Nan::New(t));
