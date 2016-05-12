@@ -6,7 +6,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
  * Abstract builder class for composing custom Marker objects.
- * <p/>
+ *
  * Extending this class requires implementing Parceable interface.
  *
  * @param <U> Type of the marker to be composed

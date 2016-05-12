@@ -309,7 +309,7 @@ public class MapboxMap {
     /**
      * Animates the movement of the camera from the current position to the position defined in the update.
      * During the animation, a call to getCameraPosition() returns an intermediate location of the camera.
-     * <p/>
+     *
      * See CameraUpdateFactory for a set of updates.
      *
      * @param update The change that should be applied to the camera.
@@ -1136,7 +1136,7 @@ public class MapboxMap {
     /**
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     * <p/>
+     *
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the

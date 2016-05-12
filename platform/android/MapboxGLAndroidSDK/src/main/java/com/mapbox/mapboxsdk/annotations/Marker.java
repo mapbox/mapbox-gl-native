@@ -11,9 +11,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 
 /**
  * Marker is an annotation that shows an icon image at a geographical location.
- * </p>
+ *
  * An {@link InfoWindow} can be shown when a Marker is pressed
- * <p/>
  */
 public class Marker extends Annotation {
 

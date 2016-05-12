@@ -25,7 +25,7 @@ public class TelemetryService extends Service {
      * {@link IBinder} is usually for a complex interface
      * that has been <a href="{@docRoot}guide/components/aidl.html">described using
      * aidl</a>.
-     * <p/>
+     *
      * <p><em>Note that unlike other application components, calls on to the
      * IBinder interface returned here may not happen on the main thread
      * of the process</em>.  More information about the main thread can be found in
@@ -93,19 +93,17 @@ public class TelemetryService extends Service {
      * Called by the system every time a client explicitly starts the service by calling
      * {@link Context#startService}, providing the arguments it supplied and a
      * unique integer token representing the start request.  Do not call this method directly.
-     * <p/>
+     *
      * <p>For backwards compatibility, the default implementation calls
      * {@link #onStart} and returns either {@link #START_STICKY}
      * or {@link #START_STICKY_COMPATIBILITY}.
-     * <p/>
+     * </p>
      * <p>If you need your application to run on platform versions prior to API
      * level 5, you can use the following model to handle the older {@link #onStart}
      * callback in that case.  The <code>handleCommand</code> method is implemented by
      * you as appropriate:
-     * <p/>
-     * {@sample development/samples/ApiDemos/src/com/example/android/apis/app/ForegroundService.java
-     * start_compatibility}
-     * <p/>
+     * </p>
+     *
      * <p class="caution">Note that the system calls this on your
      * service's main thread.  A service's main thread is the same
      * thread where UI operations take place for Activities running in the

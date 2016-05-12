@@ -12,9 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * <p>
  * Builder for composing {@link com.mapbox.mapboxsdk.annotations.Marker} objects.
  * </p>
- * <p/>
  * <h3>Example</h3>
- * <p/>
  * <pre>
  * mMapView.addMarker(new MarkerOptions()
  *   .title("Intersection")

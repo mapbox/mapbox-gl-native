@@ -23,7 +23,7 @@ import android.util.Log;
 /**
  * A utility class to help log timings splits throughout a method call.
  * Typical usage is:
- * <p/>
+ *
  * <pre>
  *     TimingLogger timings = new TimingLogger(TAG, "methodA");
  *     // ... do some work A ...
@@ -34,9 +34,9 @@ import android.util.Log;
  *     timings.addSplit("work C");
  *     timings.dumpToLog();
  * </pre>
- * <p/>
+ *
  * <p>The dumpToLog call would add the following to the log:</p>
- * <p/>
+ *
  * <pre>
  *     D/TAG     ( 3459): methodA: begin
  *     D/TAG     ( 3459): methodA:      9 ms, work A

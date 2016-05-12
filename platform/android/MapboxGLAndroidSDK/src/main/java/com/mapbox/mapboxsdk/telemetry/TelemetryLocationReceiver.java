@@ -37,7 +37,7 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
      * 10 seconds that the system allows before considering the receiver to
      * be blocked and a candidate to be killed). You cannot launch a popup dialog
      * in your implementation of onReceive().
-     * <p/>
+     *
      * <p><b>If this BroadcastReceiver was launched through a &lt;receiver&gt; tag,
      * then the object is no longer alive after returning from this
      * function.</b>  This means you should not perform any operations that
@@ -47,7 +47,7 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
      * {@link Context#bindService(Intent, ServiceConnection, int)}.  If you wish
      * to interact with a service that is already running, you can use
      * {@link #peekService}.
-     * <p/>
+     *
      * <p>The Intent filters used in {@link Context#registerReceiver}
      * and in application manifests are <em>not</em> guaranteed to be exclusive. They
      * are hints to the operating system about how to find suitable recipients. It is
