@@ -51,7 +51,7 @@ matrix:
       sudo: false
       language: node
       compiler: ": node4-clang35-release"
-      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 ASAN_OPTIONS=detect_leaks=0 PATH=./mason_packages/linux-x86_64/node_asan/4.4.4/bin:$PATH
+      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 ASAN_OPTIONS=detect_leaks=0 PATH=./mason_packages/linux-x86_64/node_asan/4.4.4/bin:$PATH CXXFLAGS="-fsanitize=address" CFLAGS="-fsanitize=address" LDFLAGS="-fsanitize=address"
       addons: *clang35
       script:
         - make node
