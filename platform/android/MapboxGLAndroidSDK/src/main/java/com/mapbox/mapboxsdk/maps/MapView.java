@@ -59,6 +59,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.ZoomButtonsController;
 
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
@@ -1754,7 +1755,10 @@ public class MapView extends FrameLayout {
                     if (annotation instanceof Marker) {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
-                                mMapboxMap.selectMarker((Marker) annotation);
+                                // only handle click if no marker view is available
+                                if(mMapboxMap.getMarkerViews().get(annotation.getId())==null) {
+                                    mMapboxMap.selectMarker((Marker) annotation);
+                                }
                             }
                             break;
                         }
