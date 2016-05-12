@@ -1,27 +1,20 @@
-#ifndef MBGL_UTIL_TILE_COORDINATE
-#define MBGL_UTIL_TILE_COORDINATE
+#pragma once
 
-#include <mbgl/style/types.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/map/transform_state.hpp>
 
-
 namespace mbgl {
-
-class TransformState;
 
 // Has floating point x/y coordinates.
 // Used for computing the tiles that need to be visible in the viewport.
 class TileCoordinate {
 public:
-    double x, y, z;
+    Point<double> p;
+    double z;
 
     static TileCoordinate fromLatLng(const TransformState& state, double zoom, const LatLng& latLng) {
         const double scale = std::pow(2, zoom - state.getZoom());
-        return {
-            state.lngX(latLng.longitude) * scale / util::tileSize,
-            state.latY(latLng.latitude) * scale / util::tileSize,
-            zoom
-        };
+        return { state.project(latLng) * scale / double(util::tileSize), zoom };
     }
 
     static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& point) {
@@ -29,11 +22,8 @@ public:
     }
 
     TileCoordinate zoomTo(double zoom) const {
-        double scale = std::pow(2, zoom - z);
-        return { x * scale, y * scale, zoom };
+        return { p * std::pow(2, zoom - z), zoom };
     }
 };
 
 } // namespace mbgl
-
-#endif

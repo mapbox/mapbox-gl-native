@@ -3,6 +3,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
 
@@ -69,10 +70,8 @@ public:
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&, LatLng::WrapMode = LatLng::Unwrapped) const;
 
-    double xLng(double x, double worldSize) const;
-    double yLat(double y, double worldSize) const;
-    double lngX(double lon) const;
-    double latY(double lat) const;
+    Point<double> project(const LatLng&) const;
+    LatLng unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
 
 private:
     bool rotatedNorth() const;

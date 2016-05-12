@@ -109,14 +109,9 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     // Find the shortest path otherwise.
     else startLatLng.unwrapForShortestPath(latLng);
 
-    const ScreenCoordinate startPoint = {
-        state.lngX(startLatLng.longitude),
-        state.latY(startLatLng.latitude),
-    };
-    const ScreenCoordinate endPoint = {
-        state.lngX(latLng.longitude),
-        state.latY(latLng.latitude),
-    };
+    const Point<double> startPoint = state.project(startLatLng);
+    const Point<double> endPoint = state.project(latLng);
+
     ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
     
@@ -145,11 +140,8 @@ void Transform::easeTo(const CameraOptions& camera, const AnimationOptions& anim
     state.rotating = angle != startAngle;
 
     startTransition(camera, animation, [=](double t) {
-        ScreenCoordinate framePoint = util::interpolate(startPoint, endPoint, t);
-        LatLng frameLatLng = {
-            state.yLat(framePoint.y, startWorldSize),
-            state.xLng(framePoint.x, startWorldSize)
-        };
+        Point<double> framePoint = util::interpolate(startPoint, endPoint, t);
+        LatLng frameLatLng = state.unproject(framePoint, startWorldSize);
         double frameScale = util::interpolate(startScale, scale, t);
         state.setLatLngZoom(frameLatLng, state.scaleZoom(frameScale));
         
@@ -191,14 +183,9 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     LatLng startLatLng = getLatLng(padding).wrapped();
     startLatLng.unwrapForShortestPath(latLng);
 
-    const ScreenCoordinate startPoint = {
-        state.lngX(startLatLng.longitude),
-        state.latY(startLatLng.latitude),
-    };
-    const ScreenCoordinate endPoint = {
-        state.lngX(latLng.longitude),
-        state.latY(latLng.latitude),
-    };
+    const Point<double> startPoint = state.project(startLatLng);
+    const Point<double> endPoint = state.project(latLng);
+
     ScreenCoordinate center = getScreenCoordinate(padding);
     center.y = state.height - center.y;
     
@@ -316,14 +303,11 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         double us = u(s);
         
         // Calculate the current point and zoom level along the flight path.
-        ScreenCoordinate framePoint = util::interpolate(startPoint, endPoint, us);
+        Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
         double frameZoom = startZoom + state.scaleZoom(1 / w(s));
         
         // Convert to geographic coordinates and set the new viewpoint.
-        LatLng frameLatLng = {
-            state.yLat(framePoint.y, startWorldSize),
-            state.xLng(framePoint.x, startWorldSize),
-        };
+        LatLng frameLatLng = state.unproject(framePoint, startWorldSize);
         state.setLatLngZoom(frameLatLng, frameZoom);
         
         if (angle != startAngle) {

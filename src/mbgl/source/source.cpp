@@ -335,10 +335,10 @@ std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordina
 static Point<int16_t> coordinateToTilePoint(const CanonicalTileID& tileID, const TileCoordinate& coord) {
     auto zoomedCoord = coord.zoomTo(tileID.z);
     return {
-        int16_t(util::clamp<int64_t>((zoomedCoord.x - tileID.x) * util::EXTENT,
+        int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.x) * util::EXTENT,
                     std::numeric_limits<int16_t>::min(),
                     std::numeric_limits<int16_t>::max())),
-        int16_t(util::clamp<int64_t>((zoomedCoord.y - tileID.y) * util::EXTENT,
+        int16_t(util::clamp<int64_t>((zoomedCoord.p.y - tileID.y) * util::EXTENT,
                     std::numeric_limits<int16_t>::min(),
                     std::numeric_limits<int16_t>::max()))
     };
@@ -364,10 +364,10 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
     double z = queryGeometry[0].z;
 
     for (const auto& c : queryGeometry) {
-        minX = util::min(minX, c.x);
-        minY = util::min(minY, c.y);
-        maxX = util::max(maxX, c.x);
-        maxY = util::max(maxY, c.y);
+        minX = util::min(minX, c.p.x);
+        minY = util::min(minY, c.p.y);
+        maxX = util::max(maxX, c.p.x);
+        maxY = util::max(maxY, c.p.y);
     }
 
     std::map<CanonicalTileID, TileQuery> tileQueries;
@@ -375,8 +375,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
     for (const auto& tilePtr : tiles) {
         const auto& tile = tilePtr.second;
 
-        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, { minX, minY, z });
-        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, { maxX, maxY, z });
+        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, { { minX, minY }, z });
+        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, { { maxX, maxY }, z });
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;

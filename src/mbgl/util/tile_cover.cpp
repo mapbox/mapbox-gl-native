@@ -16,7 +16,7 @@ struct edge {
     double x1 = 0, y1 = 0;
     double dx = 0, dy = 0;
 
-    edge(TileCoordinate a, TileCoordinate b) {
+    edge(Point<double> a, Point<double> b) {
         if (a.y > b.y) std::swap(a, b);
         x0 = a.x;
         y0 = a.y;
@@ -54,7 +54,7 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine sca
 }
 
 // scan-line conversion
-static void scanTriangle(const TileCoordinate& a, const TileCoordinate& b, const TileCoordinate& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
+static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
@@ -75,17 +75,12 @@ namespace util {
 
 namespace {
 
-std::vector<UnwrappedTileID> tileCover(const TileCoordinate& tl,
-                                       const TileCoordinate& tr,
-                                       const TileCoordinate& br,
-                                       const TileCoordinate& bl,
-                                       const TileCoordinate& c,
+std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
+                                       const Point<double>& tr,
+                                       const Point<double>& br,
+                                       const Point<double>& bl,
+                                       const Point<double>& c,
                                        int32_t z) {
-    assert(tl.z == z);
-    assert(tr.z == z);
-    assert(br.z == z);
-    assert(bl.z == z);
-    assert(c.z == z);
     const int32_t tiles = 1 << z;
 
     struct ID {
@@ -154,11 +149,11 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
 
     const TransformState state;
     return tileCover(
-        TileCoordinate::fromLatLng(state, z, bounds.northwest()),
-        TileCoordinate::fromLatLng(state, z, bounds.northeast()),
-        TileCoordinate::fromLatLng(state, z, bounds.southeast()),
-        TileCoordinate::fromLatLng(state, z, bounds.southwest()),
-        TileCoordinate::fromLatLng(state, z, bounds.center()),
+        TileCoordinate::fromLatLng(state, z, bounds.northwest()).p,
+        TileCoordinate::fromLatLng(state, z, bounds.northeast()).p,
+        TileCoordinate::fromLatLng(state, z, bounds.southeast()).p,
+        TileCoordinate::fromLatLng(state, z, bounds.southwest()).p,
+        TileCoordinate::fromLatLng(state, z, bounds.center()).p,
         z);
 }
 
@@ -166,11 +161,11 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
     const double w = state.getWidth();
     const double h = state.getHeight();
     return tileCover(
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }),
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }),
-        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }),
-        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }),
-        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }),
+        TileCoordinate::fromScreenCoordinate(state, z, { 0,   0   }).p,
+        TileCoordinate::fromScreenCoordinate(state, z, { w,   0   }).p,
+        TileCoordinate::fromScreenCoordinate(state, z, { w,   h   }).p,
+        TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
+        TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
         z);
 }
 

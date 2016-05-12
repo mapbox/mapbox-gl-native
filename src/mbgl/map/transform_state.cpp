@@ -201,22 +201,20 @@ bool TransformState::isGestureInProgress() const {
 
 #pragma mark - Projection
 
-double TransformState::lngX(double lng) const {
-    return (util::LONGITUDE_MAX + lng) * worldSize() / util::DEGREES_MAX;
+Point<double> TransformState::project(const LatLng& ll) const {
+    return Point<double>(
+        (util::LONGITUDE_MAX + ll.longitude),
+        (util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + ll.latitude * M_PI / util::DEGREES_MAX)))
+    ) * worldSize() / util::DEGREES_MAX;
 }
 
-double TransformState::latY(double lat) const {
-    double y_ = util::RAD2DEG * std::log(std::tan(M_PI / 4 + lat * M_PI / util::DEGREES_MAX));
-    return (util::LONGITUDE_MAX - y_) * worldSize() / util::DEGREES_MAX;
-}
-
-double TransformState::xLng(double x_, double worldSize_) const {
-    return x_ * util::DEGREES_MAX / worldSize_ - util::LONGITUDE_MAX;
-}
-
-double TransformState::yLat(double y_, double worldSize_) const {
-    double y2 = util::LONGITUDE_MAX - y_ * util::DEGREES_MAX / worldSize_;
-    return util::DEGREES_MAX / M_PI * std::atan(std::exp(y2 * util::DEG2RAD)) - 90.0f;
+LatLng TransformState::unproject(const Point<double>& p, double worldSize, LatLng::WrapMode wrapMode) const {
+    Point<double> p2 = p * util::DEGREES_MAX / worldSize;
+    return LatLng(
+        util::DEGREES_MAX / M_PI * std::atan(std::exp((util::LONGITUDE_MAX - p2.y) * util::DEG2RAD)) - 90.0f,
+        p2.x - util::LONGITUDE_MAX,
+        wrapMode
+    );
 }
 
 double TransformState::zoomScale(double zoom) const {
@@ -234,7 +232,8 @@ double TransformState::worldSize() const {
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
     mat4 mat = coordinatePointMatrix(getZoom());
     vec4 p;
-    vec4 c = {{ lngX(latLng.longitude) / util::tileSize, latY(latLng.latitude) / util::tileSize, 0, 1 }};
+    Point<double> pt = project(latLng) / double(util::tileSize);
+    vec4 c = {{ pt.x, pt.y, 0, 1 }};
     matrix::transformMat4(p, c, mat);
     return { p[0] / p[3], height - p[1] / p[3] };
 }
@@ -263,19 +262,15 @@ LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, L
 
     double w0 = coord0[3];
     double w1 = coord1[3];
-    double x0 = coord0[0] / w0;
-    double x1 = coord1[0] / w1;
-    double y0 = coord0[1] / w0;
-    double y1 = coord1[1] / w1;
+
+    Point<double> p0 = Point<double>(coord0[0], coord0[1]) / w0;
+    Point<double> p1 = Point<double>(coord1[0], coord1[1]) / w1;
+
     double z0 = coord0[2] / w0;
     double z1 = coord1[2] / w1;
-
     double t = z0 == z1 ? 0 : (targetZ - z0) / (z1 - z0);
-    return {
-        yLat(util::interpolate(y0, y1, t), scale),
-        xLng(util::interpolate(x0, x1, t), scale),
-        wrapMode
-    };
+
+    return unproject(util::interpolate(p0, p1, t), scale, wrapMode);
 }
 
 mat4 TransformState::coordinatePointMatrix(double z) const {
@@ -322,18 +317,10 @@ void TransformState::constrain(double& scale_, double& x_, double& y_) const {
 }
 
 void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& anchor) {
-    auto latLngToTileCoord = [&](const LatLng& ll) -> Point<double> {
-        return { lngX(ll.longitude), latY(ll.latitude) };
-    };
-
-    auto tileCoordToLatLng = [&](const Point<double> coord) -> LatLng {
-        return { yLat(coord.y, worldSize()), xLng(coord.x, worldSize()) };
-    };
-
-    auto centerCoord = latLngToTileCoord(getLatLng(LatLng::Unwrapped));
-    auto latLngCoord = latLngToTileCoord(latLng);
-    auto anchorCoord = latLngToTileCoord(screenCoordinateToLatLng(anchor));
-    setLatLngZoom(tileCoordToLatLng(centerCoord + latLngCoord - anchorCoord), getZoom());
+    auto centerCoord = project(getLatLng(LatLng::Unwrapped));
+    auto latLngCoord = project(latLng);
+    auto anchorCoord = project(screenCoordinateToLatLng(anchor));
+    setLatLngZoom(unproject(centerCoord + latLngCoord - anchorCoord, worldSize()), getZoom());
 }
 
 void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
