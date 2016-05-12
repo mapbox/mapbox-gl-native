@@ -25,29 +25,6 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    class Task {
-    public:
-        Task(Resource resource, FileSource::Callback callback, DefaultFileSource::Impl* impl) {
-            auto offlineResponse = impl->offlineDatabase.get(resource);
-
-            Resource revalidation = resource;
-
-            if (offlineResponse) {
-                revalidation.priorModified = offlineResponse->modified;
-                revalidation.priorExpires = offlineResponse->expires;
-                revalidation.priorEtag = offlineResponse->etag;
-                callback(*offlineResponse);
-            }
-
-            onlineRequest = impl->onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
-                impl->offlineDatabase.put(revalidation, onlineResponse);
-                callback(onlineResponse);
-            });
-        }
-
-        std::unique_ptr<AsyncRequest> onlineRequest;
-    };
-
     Impl(const std::string& cachePath, uint64_t maximumCacheSize)
         : offlineDatabase(cachePath, maximumCacheSize) {
     }
@@ -105,7 +82,21 @@ public:
     }
 
     void request(AsyncRequest* req, Resource resource, Callback callback) {
-        tasks[req] = std::make_unique<Task>(resource, callback, this);
+        auto offlineResponse = offlineDatabase.get(resource);
+
+        Resource revalidation = resource;
+
+        if (offlineResponse) {
+            revalidation.priorModified = offlineResponse->modified;
+            revalidation.priorExpires = offlineResponse->expires;
+            revalidation.priorEtag = offlineResponse->etag;
+            callback(*offlineResponse);
+        }
+
+        tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
+            this->offlineDatabase.put(revalidation, onlineResponse);
+            callback(onlineResponse);
+        });
     }
 
     void cancel(AsyncRequest* req) {
@@ -132,7 +123,7 @@ private:
 
     OfflineDatabase offlineDatabase;
     OnlineFileSource onlineFileSource;
-    std::unordered_map<AsyncRequest*, std::unique_ptr<Task>> tasks;
+    std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
 };
 
