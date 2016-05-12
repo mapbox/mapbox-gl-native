@@ -188,7 +188,7 @@ public class MapView extends FrameLayout {
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
-        mStyleInitializer = new StyleInitializer();
+        mStyleInitializer = new StyleInitializer(context);
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
         if (!isInEditMode()) {
@@ -2673,13 +2673,13 @@ public class MapView extends FrameLayout {
     /**
      * Class responsible for managing state of Style loading.
      */
-    private class StyleInitializer {
+    static class StyleInitializer {
 
         private String mStyle;
         private boolean mDefaultStyle;
 
-        public StyleInitializer() {
-            mStyle = Style.getMapboxStreetsUrl(getResources().getInteger(R.integer.style_version));
+        StyleInitializer(@NonNull  Context context) {
+            mStyle = Style.getMapboxStreetsUrl(context.getResources().getInteger(R.integer.style_version));
             mDefaultStyle = true;
         }
 
@@ -2688,6 +2688,10 @@ public class MapView extends FrameLayout {
         }
 
         void setStyle(@NonNull String style, boolean defaultStyle) {
+            if (style == null) {
+                // don't override default style
+                return;
+            }
             mStyle = style;
             mDefaultStyle = defaultStyle;
         }
