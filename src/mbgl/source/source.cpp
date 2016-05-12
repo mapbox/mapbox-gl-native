@@ -27,7 +27,7 @@
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
-#include <mbgl/algorithm/update_renderables_impl.hpp>
+#include <mbgl/algorithm/update_renderables.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>

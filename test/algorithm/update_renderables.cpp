@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include "mock.hpp"
 
-#include <mbgl/algorithm/update_renderables_impl.hpp>
+#include <mbgl/algorithm/update_renderables.hpp>
 
 using namespace mbgl;
 
