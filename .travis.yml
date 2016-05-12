@@ -55,12 +55,8 @@ matrix:
       addons: *clang35
       script:
         - make node
-        - export ASAN_OPTIONS=detect_leaks=1
-        - echo $PATH
         - nvm use system
-        - which node
-        - npm -v
-        - make test-node
+        - ASAN_OPTIONS=detect_leaks=1 make test-node
       after_script:
         - ccache --show-stats
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
