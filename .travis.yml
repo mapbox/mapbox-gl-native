@@ -51,18 +51,10 @@ matrix:
       sudo: false
       language: node
       compiler: ": node4-clang35-release"
-      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5 ASAN_OPTIONS=detect_leaks=0
+      env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5 ASAN_OPTIONS=detect_leaks=0 PATH=./mason_packages/linux-x86_64/node_asan/4.4.4/bin:$PATH
       addons: *clang35
       script:
         - make node
-        # Trim first line of npm shell script to remove localization
-        - tail -n +2 ./mason_packages/osx-x86_64/node_asan/4.4.4/bin/npm > /tmp/npm && \
-          mv /tmp/npm ./mason_packages/osx-x86_64/node_asan/4.4.4/bin/npm
-        # Make npm portable
-        - echo -e '#!/bin/sh\n// 2>/dev/null; exec "`dirname "$0"`/node" "$0" "$@"' | \
-          cat - ./mason_packages/osx-x86_64/node_asan/4.4.4/bin/npm > /tmp/npm && \
-          mv /tmp/npm ./mason_packages/osx-x86_64/node_asan/4.4.4/bin/npm
-        - export PATH=./mason_packages/linux-x86_64/node_asan/4.4.4/bin:$PATH 
         - export ASAN_OPTIONS=detect_leaks=1
         - echo $PATH
         - nvm use system
