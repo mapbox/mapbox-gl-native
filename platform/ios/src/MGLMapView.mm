@@ -4364,22 +4364,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return;
     }
     
-    // Update all visible annotation views
-    std::set<MGLAnnotationTag> visibleTags;
-    std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:CGRectInset(self.bounds, -_largestAnnotationViewSize.width - MGLAnnotationUpdateViewportOutset.width, -_largestAnnotationViewSize.height - MGLAnnotationUpdateViewportOutset.width)];
-    
-    for(auto const& annotationTag: annotationTags)
+    for (auto &pair : _annotationContextsByAnnotationTag)
     {
-        auto &annotationContext = _annotationContextsByAnnotationTag[annotationTag];
-        id<MGLAnnotation> annotation = annotationContext.annotation;
+        CGRect viewPort = CGRectInset(self.bounds, -_largestAnnotationViewSize.width - MGLAnnotationUpdateViewportOutset.width, -_largestAnnotationViewSize.height - MGLAnnotationUpdateViewportOutset.width);
         
+        MGLAnnotationContext &annotationContext = pair.second;
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
        
-        // If there is no annotation view at this point, it means the context's view was reused by some
-        // other context so we need to reuse or make a new view.
-        if (!annotationContext.annotationView)
+        if (!annotationView)
         {
-            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotation];
-            
+            MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
             if (annotationView)
             {
                 // If the annotation view has no superview it means it was never used before so add it
@@ -4387,32 +4381,19 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 {
                     [self.glView addSubview:annotationView];
                 }
-                
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 annotationContext.annotationView = annotationView;
             }
         }
         
-        annotationContext.annotationView.center = [self convertCoordinate:annotation.coordinate toPointToView:self];;
-        visibleTags.insert(annotationTag);
-    }
-    
-    // Hide and add offscreen annotation views to reuse queue
-    for (auto &pair : _annotationContextsByAnnotationTag)
-    {
-        MGLAnnotationTag annotationTag = pair.first;
-        MGLAnnotationContext &annotationContext = pair.second;
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
-        const bool tagIsNotVisible = visibleTags.find(annotationTag) == visibleTags.end();
-      
-        // The call to `annotationTagsInRect:` (above) does not return the correct result when the
-        // map is tilted and the user is scrolling quickly. So, some annotation views get stuck in
-        // a limbo state where they are onscreen and put on the reuse queue. Hiding the views hides
-        // the bug until we fix the result of `annotationTagsInRect:`.
-        annotationView.hidden = tagIsNotVisible;
-        
-        if (annotationView && annotationView.reuseIdentifier && tagIsNotVisible)
+        bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationView.frame);
+        if (!annotationViewIsVisible)
         {
             [self enqueueAnnotationViewForAnnotationContext:annotationContext];
+        }
+        else
+        {
+            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];;
         }
     }
 }
