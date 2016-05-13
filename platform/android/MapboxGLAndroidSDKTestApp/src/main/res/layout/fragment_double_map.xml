@@ -7,8 +7,7 @@
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        mapbox:access_token="@string/mapbox_access_token" />
+        android:layout_height="match_parent"/>
 
     <FrameLayout
         android:id="@+id/map_card"
@@ -22,6 +21,6 @@
             android:id="@+id/mini_map"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            mapbox:access_token="@string/mapbox_access_token" />
+            />
     </FrameLayout>
 </RelativeLayout>

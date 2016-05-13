@@ -44,7 +44,6 @@
         android:layout_height="match_parent"
         app:my_location_foreground_tint="@color/primary"
         app:my_location_accuracy_tint="@color/primary"
-        app:access_token="@string/mapbox_access_token"
         app:style_url="@string/style_mapbox_streets"
         app:zoom="15" />
 
