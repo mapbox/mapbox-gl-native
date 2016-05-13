@@ -318,24 +318,24 @@ RenderData Style::getRenderData() const {
 }
 
 std::vector<Feature> Style::queryRenderedFeatures(const StyleQueryParameters& parameters) const {
-    std::vector<std::unordered_map<std::string, std::vector<Feature>>> sourceResults;
+    std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
+
     for (const auto& source : sources) {
-        sourceResults.emplace_back(source->queryRenderedFeatures(parameters));
+        auto sourceResults = source->queryRenderedFeatures(parameters);
+        std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
     }
 
-    std::vector<Feature> features;
+    std::vector<Feature> result;
 
     // Combine all results based on the style layer order.
     for (const auto& layer : layers) {
-        for (const auto& sourceResult : sourceResults) {
-            auto it = sourceResult.find(layer->id);
-            if (it != sourceResult.end()) {
-                std::move(it->second.begin(), it->second.end(), std::back_inserter(features));
-            }
+        auto it = resultsByLayer.find(layer->id);
+        if (it != resultsByLayer.end()) {
+            std::move(it->second.begin(), it->second.end(), std::back_inserter(result));
         }
     }
 
-    return features;
+    return result;
 }
 
 float Style::getQueryRadius() const {
