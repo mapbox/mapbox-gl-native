@@ -932,6 +932,20 @@ IB_DESIGNABLE
  */
 - (nullable MGLAnnotationImage *)dequeueReusableAnnotationImageWithIdentifier:(NSString *)identifier;
 
+/**
+ Returns a reusable annotation view object associated with its identifier.
+ 
+ For performance reasons, you should generally reuse `MGLAnnotationView`
+ objects for identical-looking annotations in your map views. Dequeueing
+ saves time and memory during performance-critical operations such as
+ scrolling.
+ 
+ @param identifier A string identifying the annotation view to be reused.
+    This string is the same one you specify when initially returning the
+    annotation view object using the `-mapView:viewForAnnotation:` method.
+ @return An annotation view object with the given identifier, or `nil` if no
+    such object exists in the reuse queue.
+ */
 - (nullable MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier;
 
 #pragma mark Managing Annotation Selections
@@ -1154,6 +1168,13 @@ IB_DESIGNABLE
 
 #pragma mark Managing the Display of Annotations
 
+/**
+ Returns a view object to use for the marker for the specified point annotation object.
+ 
+ @param mapView The map view that requested the annotation view.
+ @param annotation The object representing the annotation that is about to be displayed.
+ @return The view object to display for the specified annotation or `nil` if you want to display the default marker image.
+ */
 - (nullable MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
