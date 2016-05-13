@@ -1,14 +1,14 @@
 #include <mbgl/test/util.hpp>
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Cancel)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(Cancel)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&](Response) {
         ADD_FAILURE() << "Callback should not be called";
@@ -17,9 +17,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Cancel)) {
     loop.runOnce();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTP200)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
@@ -34,9 +34,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTP404)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/doesnotexist" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
@@ -52,9 +52,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTPTile404)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Tile, "http://127.0.0.1:3000/doesnotexist" }, [&](Response res) {
         EXPECT_TRUE(res.noContent);
@@ -69,9 +69,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/empty-data" }, [&](Response res) {
         EXPECT_FALSE(res.noContent);
@@ -86,9 +86,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTP204)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/no-content" }, [&](Response res) {
         EXPECT_TRUE(res.noContent);
@@ -103,9 +103,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(HTTP500)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/permanent-error" }, [&](Response res) {
         ASSERT_NE(nullptr, res.error);
@@ -121,9 +121,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(ExpiresParsing)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" }, [&](Response res) {
@@ -139,9 +139,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(CacheControlParsing)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
@@ -156,9 +156,9 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
     loop.run();
 }
 
-TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) {
+TEST(HTTPRequestHandler, TEST_REQUIRES_SERVER(Load)) {
     util::RunLoop loop;
-    HTTPFileSource fs;
+    storage::HTTPRequestHandler fs;
 
     const int concurrency = 50;
     const int max = 10000;

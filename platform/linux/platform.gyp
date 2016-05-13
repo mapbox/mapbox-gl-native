@@ -57,7 +57,7 @@
         '../default/png_reader.cpp',
         '../default/jpeg_reader.cpp',
         '../default/asset_repository.cpp',
-        '../default/http_file_source.cpp',
+        '../default/http_request_handler.cpp',
         '../default/default_file_source.cpp',
         '../default/online_file_source.cpp',
         '../default/mbgl/storage/offline.hpp',

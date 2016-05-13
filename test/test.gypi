@@ -60,7 +60,7 @@
         'storage/offline_download.cpp',
         'storage/asset_repository.cpp',
         'storage/default_file_source.cpp',
-        'storage/http_file_source.cpp',
+        'storage/http_request_handler.cpp',
         'storage/online_file_source.cpp',
         'storage/headers.cpp',
         'storage/resource.cpp',

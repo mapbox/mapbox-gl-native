@@ -1,4 +1,4 @@
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
@@ -12,8 +12,9 @@
 #include "attach_env.hpp"
 
 namespace mbgl {
+namespace storage {
 
-class HTTPFileSource::Impl {
+class HTTPRequestHandler::Impl {
 public:
     android::UniqueEnv env { android::AttachEnv() };
 };
@@ -22,7 +23,7 @@ class HTTPRequest : public AsyncRequest {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/HTTPRequest"; };
 
-    HTTPRequest(jni::JNIEnv&, const Resource&, FileSource::Callback);
+    HTTPRequest(jni::JNIEnv&, const Resource&, HTTPRequestHandler::Callback);
     ~HTTPRequest();
 
     void onFailure(jni::JNIEnv&, int type, jni::String message);
@@ -36,7 +37,7 @@ public:
 
 private:
     Resource resource;
-    FileSource::Callback callback;
+    HTTPRequestHandler::Callback callback;
     Response response;
 
     util::AsyncTask async { [this] {
@@ -53,21 +54,25 @@ private:
 
 jni::Class<HTTPRequest> HTTPRequest::javaClass;
 
+} // namespace storage
+
 namespace android {
 
 void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
-    HTTPRequest::javaClass = *jni::Class<HTTPRequest>::Find(env).NewGlobalRef(env).release();
+    storage::HTTPRequest::javaClass = *jni::Class<storage::HTTPRequest>::Find(env).NewGlobalRef(env).release();
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "mNativePtr",
-        METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
-        METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
+    jni::RegisterNativePeer<storage::HTTPRequest>(env, storage::HTTPRequest::javaClass, "mNativePtr",
+        METHOD(&storage::HTTPRequest::onFailure, "nativeOnFailure"),
+        METHOD(&storage::HTTPRequest::onResponse, "nativeOnResponse"));
 }
 
 } // namespace android
 
-HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource::Callback callback_)
+namespace storage {
+
+HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, HTTPRequestHandler::Callback callback_)
     : resource(resource_),
       callback(callback_) {
     std::string etagStr;
@@ -93,7 +98,7 @@ HTTPRequest::HTTPRequest(jni::JNIEnv& env, const Resource& resource_, FileSource
 }
 
 HTTPRequest::~HTTPRequest() {
-    android::UniqueEnv env = android::AttachEnv();
+    auto env = android::AttachEnv();
 
     static auto cancel = javaClass.GetMethod<void ()>(*env, "cancel");
 
@@ -163,18 +168,19 @@ void HTTPRequest::onFailure(jni::JNIEnv& env, int type, jni::String message) {
     async.send();
 }
 
-HTTPFileSource::HTTPFileSource()
+HTTPRequestHandler::HTTPRequestHandler()
     : impl(std::make_unique<Impl>()) {
 }
 
-HTTPFileSource::~HTTPFileSource() = default;
+HTTPRequestHandler::~HTTPRequestHandler() = default;
 
-std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> HTTPRequestHandler::request(const Resource& resource, Callback callback) {
     return std::make_unique<HTTPRequest>(*impl->env, resource, callback);
 }
 
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
+uint32_t HTTPRequestHandler::maximumConcurrentRequests() {
     return 20;
 }
 
+} // namespace storage
 } // namespace mbgl

@@ -1,4 +1,4 @@
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 
@@ -18,6 +18,7 @@
 @end
 
 namespace mbgl {
+namespace storage {
 
 // Data that is shared between the requesting thread and the thread running the completion handler.
 class HTTPRequestShared {
@@ -50,7 +51,7 @@ private:
 
 class HTTPRequest : public AsyncRequest {
 public:
-    HTTPRequest(FileSource::Callback callback_)
+    HTTPRequest(HTTPRequestHandler::Callback callback_)
         : shared(std::make_shared<HTTPRequestShared>(response, async)),
           callback(callback_) {
     }
@@ -66,7 +67,7 @@ public:
     NSURLSessionDataTask* task = nil;
 
 private:
-    FileSource::Callback callback;
+    HTTPRequestHandler::Callback callback;
     Response response;
 
     util::AsyncTask async { [this] {
@@ -77,7 +78,7 @@ private:
     } };
 };
 
-class HTTPFileSource::Impl {
+class HTTPRequestHandler::Impl {
 public:
     Impl() {
         @autoreleasepool {
@@ -105,7 +106,7 @@ private:
     NSBundle* getSDKBundle() const;
 };
 
-NSString *HTTPFileSource::Impl::getUserAgent() const {
+NSString *HTTPRequestHandler::Impl::getUserAgent() const {
     NSMutableArray *userAgentComponents = [NSMutableArray array];
     
     NSBundle *appBundle = [NSBundle mainBundle];
@@ -118,7 +119,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
         [userAgentComponents addObject:[NSProcessInfo processInfo].processName];
     }
     
-    NSBundle *sdkBundle = HTTPFileSource::Impl::getSDKBundle();
+    NSBundle *sdkBundle = HTTPRequestHandler::Impl::getSDKBundle();
     if (sdkBundle) {
         NSString *versionString = sdkBundle.infoDictionary[@"MGLSemanticVersionString"];
         if (!versionString) {
@@ -175,7 +176,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
     return [userAgentComponents componentsJoinedByString:@" "];
 }
 
-NSBundle *HTTPFileSource::Impl::getSDKBundle() const {
+NSBundle *HTTPRequestHandler::Impl::getSDKBundle() const {
     NSBundle *bundle = [NSBundle bundleForClass:[MBGLBundleCanary class]];
     if (bundle && ![bundle.infoDictionary[@"CFBundlePackageType"] isEqualToString:@"FMWK"]) {
         // For static frameworks, the class is contained in the application bundle rather than the
@@ -186,17 +187,17 @@ NSBundle *HTTPFileSource::Impl::getSDKBundle() const {
     return bundle;
 }
 
-HTTPFileSource::HTTPFileSource()
+HTTPRequestHandler::HTTPRequestHandler()
     : impl(std::make_unique<Impl>()) {
 }
 
-HTTPFileSource::~HTTPFileSource() = default;
+HTTPRequestHandler::~HTTPRequestHandler() = default;
 
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
+uint32_t HTTPRequestHandler::maximumConcurrentRequests() {
     return 20;
 }
 
-std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> HTTPRequestHandler::request(const Resource& resource, Callback callback) {
     auto request = std::make_unique<HTTPRequest>(callback);
     auto shared = request->shared; // Explicit copy so that it also gets copied into the completion handler block below.
 
@@ -317,4 +318,5 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
     return std::move(request);
 }
 
-}
+} // namespace storage
+} // namespace mbgl

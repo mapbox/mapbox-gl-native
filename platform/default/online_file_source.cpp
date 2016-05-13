@@ -1,5 +1,5 @@
 #include <mbgl/storage/online_file_source.hpp>
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/storage/network_status.hpp>
 
 #include <mbgl/storage/response.hpp>
@@ -82,7 +82,7 @@ public:
         assert(activeRequests.find(request) == activeRequests.end());
         assert(!request->request);
 
-        if (activeRequests.size() >= HTTPFileSource::maximumConcurrentRequests()) {
+        if (activeRequests.size() >= storage::HTTPRequestHandler::maximumConcurrentRequests()) {
             queueRequest(request);
         } else {
             activateRequest(request);
@@ -96,7 +96,7 @@ public:
 
     void activateRequest(OnlineFileRequest* request) {
         activeRequests.insert(request);
-        request->request = httpFileSource.request(request->resource, [=] (Response response) {
+        request->request = httpRequestHandler.request(request->resource, [=] (Response response) {
             activeRequests.erase(request);
             activatePendingRequest();
             request->request.reset();
@@ -140,7 +140,7 @@ private:
     std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
-    HTTPFileSource httpFileSource;
+    storage::HTTPRequestHandler httpRequestHandler;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
 

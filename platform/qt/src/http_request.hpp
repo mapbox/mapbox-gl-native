@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/util/async_request.hpp>
 
 #include <QNetworkRequest>
@@ -12,10 +12,12 @@ namespace mbgl {
 
 class Response;
 
+namespace storage {
+
 class HTTPRequest : public AsyncRequest
 {
 public:
-    HTTPRequest(HTTPFileSource::Impl*, const Resource&, FileSource::Callback);
+    HTTPRequest(HTTPRequestHandler::Impl*, const Resource&, HTTPRequestHandler::Callback);
     virtual ~HTTPRequest();
 
     QUrl requestUrl() const;
@@ -24,11 +26,12 @@ public:
     void handleNetworkReply(QNetworkReply *reply);
 
 private:
-    HTTPFileSource::Impl* m_context;
+    HTTPRequestHandler::Impl* m_context;
     Resource m_resource;
-    FileSource::Callback m_callback;
+    HTTPRequestHandler::Callback m_callback;
 
     bool m_handled = false;
 };
 
+} // namespace storage
 } // namespace mbgl
