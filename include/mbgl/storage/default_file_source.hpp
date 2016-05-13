@@ -9,6 +9,11 @@
 
 namespace mbgl {
 
+namespace storage {
+class AssetRepository;
+} // namespace storage
+
+
 namespace util {
 template <typename T> class Thread;
 } // namespace util
@@ -107,7 +112,7 @@ public:
 
 private:
     const std::unique_ptr<util::Thread<Impl>> thread;
-    const std::unique_ptr<FileSource> assetFileSource;
+    const std::unique_ptr<storage::AssetRepository> assetRepository;
 };
 
 } // namespace mbgl

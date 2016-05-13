@@ -1,4 +1,4 @@
-#include "http_file_source.hpp"
+#include "http_request_handler.hpp"
 #include "http_request.hpp"
 
 #include <mbgl/platform/log.hpp>
@@ -16,8 +16,9 @@ void initResources() {
 }
 
 namespace mbgl {
+namespace storage {
 
-HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
+HTTPRequestHandler::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
 {
     initResources();
 
@@ -38,7 +39,7 @@ HTTPFileSource::Impl::Impl() : m_manager(new QNetworkAccessManager(this))
     connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinish(QNetworkReply*)));
 }
 
-void HTTPFileSource::Impl::request(HTTPRequest* req)
+void HTTPRequestHandler::Impl::request(HTTPRequest* req)
 {
     QUrl url = req->requestUrl();
 
@@ -56,7 +57,7 @@ void HTTPFileSource::Impl::request(HTTPRequest* req)
     data.first = m_manager->get(networkRequest);
 }
 
-void HTTPFileSource::Impl::cancel(HTTPRequest* req)
+void HTTPRequestHandler::Impl::cancel(HTTPRequest* req)
 {
     QUrl url = req->requestUrl();
 
@@ -90,7 +91,7 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req)
     }
 }
 
-void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply)
+void HTTPRequestHandler::Impl::replyFinish(QNetworkReply* reply)
 {
     const QUrl& url = reply->request().url();
 
@@ -109,18 +110,18 @@ void HTTPFileSource::Impl::replyFinish(QNetworkReply* reply)
     reply->deleteLater();
 }
 
-HTTPFileSource::HTTPFileSource()
+HTTPRequestHandler::HTTPRequestHandler()
     : impl(std::make_unique<Impl>()) {
 }
 
-HTTPFileSource::~HTTPFileSource() = default;
+HTTPRequestHandler::~HTTPRequestHandler() = default;
 
-std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback)
+std::unique_ptr<AsyncRequest> HTTPRequestHandler::request(const Resource& resource, Callback callback)
 {
     return std::make_unique<HTTPRequest>(impl.get(), resource, callback);
 }
 
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
+uint32_t HTTPRequestHandler::maximumConcurrentRequests() {
 #if QT_VERSION >= 0x050000
     return 20;
 #else
@@ -128,4 +129,5 @@ uint32_t HTTPFileSource::maximumConcurrentRequests() {
 #endif
 }
 
-} // mbgl
+} // namespace storage
+} // namespace mbgl

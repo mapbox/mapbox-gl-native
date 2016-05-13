@@ -1,5 +1,5 @@
 #include "http_request.hpp"
-#include "http_file_source.hpp"
+#include "http_request_handler.hpp"
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -11,8 +11,9 @@
 #include <QPair>
 
 namespace mbgl {
+namespace storage {
 
-HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context, const Resource& resource, FileSource::Callback callback)
+HTTPRequest::HTTPRequest(HTTPRequestHandler::Impl* context, const Resource& resource, HTTPRequestHandler::Callback callback)
     : m_context(context)
     , m_resource(resource)
     , m_callback(callback)
@@ -119,4 +120,5 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
     callback(response);
 }
 
+} // namespace storage
 } // namespace mbgl

@@ -46,7 +46,7 @@
       ],
 
       'sources': [
-        '../default/asset_file_source.cpp',
+        '../default/asset_repository.cpp',
         '../default/default_file_source.cpp',
         '../default/online_file_source.cpp',
         '../default/mbgl/storage/offline.hpp',
@@ -57,7 +57,7 @@
         '../default/mbgl/storage/offline_download.cpp',
         '../default/sqlite3.hpp',
         '../default/sqlite3.cpp',
-        '../darwin/src/http_file_source.mm',
+        '../darwin/src/http_request_handler.mm',
         '../darwin/src/log_nslog.mm',
         '../darwin/src/string_nsstring.mm',
         '../darwin/src/image.mm',

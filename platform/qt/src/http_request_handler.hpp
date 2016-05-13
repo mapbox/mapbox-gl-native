@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/storage/resource.hpp>
 
 #include <QMap>
@@ -13,10 +13,11 @@
 #include <QVector>
 
 namespace mbgl {
+namespace storage {
 
 class HTTPRequest;
 
-class HTTPFileSource::Impl : public QObject
+class HTTPRequestHandler::Impl : public QObject
 {
     Q_OBJECT
 
@@ -36,4 +37,5 @@ private:
     QSslConfiguration m_ssl;
 };
 
+} // namespace storage
 } // namespace mbgl

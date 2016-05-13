@@ -37,7 +37,7 @@
       ],
 
       'sources': [
-        '../default/asset_file_source.cpp',
+        '../default/asset_repository.cpp',
         '../default/default_file_source.cpp',
         '../default/log_stderr.cpp',
         '../default/mbgl/storage/offline.cpp',
@@ -53,8 +53,8 @@
         'qmapbox.qrc',
         'src/async_task.cpp',
         'src/async_task_impl.hpp',
-        'src/http_file_source.cpp',
-        'src/http_file_source.hpp',
+        'src/http_request_handler.cpp',
+        'src/http_request_handler.hpp',
         'src/http_request.cpp',
         'src/http_request.hpp',
         'src/image.cpp',

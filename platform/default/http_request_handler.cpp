@@ -1,4 +1,4 @@
-#include <mbgl/storage/http_file_source.hpp>
+#include <mbgl/storage/http_request_handler.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/platform/log.hpp>
@@ -31,15 +31,16 @@ static void handleError(CURLcode code) {
 }
 
 namespace mbgl {
+namespace storage {
 
-class HTTPFileSource::Impl {
+class HTTPRequestHandler::Impl {
 public:
     Impl();
     ~Impl();
 
     static int handleSocket(CURL *handle, curl_socket_t s, int action, void *userp, void *socketp);
     static int startTimeout(CURLM *multi, long timeout_ms, void *userp);
-    static void onTimeout(HTTPFileSource::Impl *context);
+    static void onTimeout(HTTPRequestHandler::Impl *context);
 
     void perform(curl_socket_t s, util::RunLoop::Event event);
     CURL *getHandle();
@@ -63,7 +64,7 @@ public:
 
 class HTTPRequest : public AsyncRequest {
 public:
-    HTTPRequest(HTTPFileSource::Impl*, const Resource&, FileSource::Callback);
+    HTTPRequest(HTTPRequestHandler::Impl*, const Resource&, HTTPRequestHandler::Callback);
     ~HTTPRequest();
 
     void handleResult(CURLcode code);
@@ -72,9 +73,9 @@ private:
     static size_t headerCallback(char *const buffer, const size_t size, const size_t nmemb, void *userp);
     static size_t writeCallback(void *const contents, const size_t size, const size_t nmemb, void *userp);
 
-    HTTPFileSource::Impl* context = nullptr;
+    HTTPRequestHandler::Impl* context = nullptr;
     Resource resource;
-    FileSource::Callback callback;
+    HTTPRequestHandler::Callback callback;
 
     // Will store the current response.
     std::shared_ptr<std::string> data;
@@ -86,7 +87,7 @@ private:
     char error[CURL_ERROR_SIZE] = { 0 };
 };
 
-HTTPFileSource::Impl::Impl() {
+HTTPRequestHandler::Impl::Impl() {
     if (curl_global_init(CURL_GLOBAL_ALL)) {
         throw std::runtime_error("Could not init cURL");
     }
@@ -100,7 +101,7 @@ HTTPFileSource::Impl::Impl() {
     handleError(curl_multi_setopt(multi, CURLMOPT_TIMERDATA, this));
 }
 
-HTTPFileSource::Impl::~Impl() {
+HTTPRequestHandler::Impl::~Impl() {
     while (!handles.empty()) {
         curl_easy_cleanup(handles.front());
         handles.pop();
@@ -115,7 +116,7 @@ HTTPFileSource::Impl::~Impl() {
     timeout.stop();
 }
 
-CURL *HTTPFileSource::Impl::getHandle() {
+CURL *HTTPRequestHandler::Impl::getHandle() {
     if (!handles.empty()) {
         auto handle = handles.front();
         handles.pop();
@@ -125,12 +126,12 @@ CURL *HTTPFileSource::Impl::getHandle() {
     }
 }
 
-void HTTPFileSource::Impl::returnHandle(CURL *handle) {
+void HTTPRequestHandler::Impl::returnHandle(CURL *handle) {
     curl_easy_reset(handle);
     handles.push(handle);
 }
 
-void HTTPFileSource::Impl::checkMultiInfo() {
+void HTTPRequestHandler::Impl::checkMultiInfo() {
     CURLMsg *message = nullptr;
     int pending = 0;
 
@@ -150,7 +151,7 @@ void HTTPFileSource::Impl::checkMultiInfo() {
     }
 }
 
-void HTTPFileSource::Impl::perform(curl_socket_t s, util::RunLoop::Event events) {
+void HTTPRequestHandler::Impl::perform(curl_socket_t s, util::RunLoop::Event events) {
     int flags = 0;
 
     if (events == util::RunLoop::Event::Read) {
@@ -166,7 +167,7 @@ void HTTPFileSource::Impl::perform(curl_socket_t s, util::RunLoop::Event events)
     checkMultiInfo();
 }
 
-int HTTPFileSource::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int action, void *userp,
+int HTTPRequestHandler::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int action, void *userp,
                               void * /* socketp */) {
     assert(userp);
     auto context = reinterpret_cast<Impl *>(userp);
@@ -194,7 +195,7 @@ int HTTPFileSource::Impl::handleSocket(CURL * /* handle */, curl_socket_t s, int
     return 0;
 }
 
-void HTTPFileSource::Impl::onTimeout(Impl *context) {
+void HTTPRequestHandler::Impl::onTimeout(Impl *context) {
     int running_handles;
     CURLMcode error = curl_multi_socket_action(context->multi, CURL_SOCKET_TIMEOUT, 0, &running_handles);
     if (error != CURLM_OK) {
@@ -203,7 +204,7 @@ void HTTPFileSource::Impl::onTimeout(Impl *context) {
     context->checkMultiInfo();
 }
 
-int HTTPFileSource::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, void *userp) {
+int HTTPRequestHandler::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, void *userp) {
     assert(userp);
     auto context = reinterpret_cast<Impl *>(userp);
 
@@ -219,7 +220,7 @@ int HTTPFileSource::Impl::startTimeout(CURLM * /* multi */, long timeout_ms, voi
     return 0;
 }
 
-HTTPRequest::HTTPRequest(HTTPFileSource::Impl* context_, const Resource& resource_, FileSource::Callback callback_)
+HTTPRequest::HTTPRequest(HTTPRequestHandler::Impl* context_, const Resource& resource_, HTTPRequestHandler::Callback callback_)
     : context(context_),
       resource(resource_),
       callback(callback_),
@@ -389,18 +390,19 @@ void HTTPRequest::handleResult(CURLcode code) {
     callback_(response_);
 }
 
-HTTPFileSource::HTTPFileSource()
+HTTPRequestHandler::HTTPRequestHandler()
     : impl(std::make_unique<Impl>()) {
 }
 
-HTTPFileSource::~HTTPFileSource() = default;
+HTTPRequestHandler::~HTTPRequestHandler() = default;
 
-std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> HTTPRequestHandler::request(const Resource& resource, Callback callback) {
     return std::make_unique<HTTPRequest>(impl.get(), resource, callback);
 }
 
-uint32_t HTTPFileSource::maximumConcurrentRequests() {
+uint32_t HTTPRequestHandler::maximumConcurrentRequests() {
     return 20;
 }
 
+} // namespace storage
 } // namespace mbgl
