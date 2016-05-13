@@ -60,9 +60,7 @@ typedef void (*CustomLayerInitializeFunction)(void* context) ;
 typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
 typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
-#if QT_VERSION >= 0x050000
 Q_DECL_EXPORT void initializeGLExtensions();
-#endif
 
 }
 

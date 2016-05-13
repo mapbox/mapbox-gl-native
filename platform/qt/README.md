@@ -30,6 +30,12 @@ to provide it by setting the environment variable `MAPBOX_ACCESS_TOKEN`:
 
     export MAPBOX_ACCESS_TOKEN=MYTOKEN
 
+#### Using QMapboxGL
+
+`QMapboxGL` is a [QObject](http://doc.qt.io/qt-5/qobject.html) - [MapWindow](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/qt/app/mapwindow.hpp) provides an example [QGLWidget](http://doc.qt.io/qt-5/qglwidget.html) that contains a `QMapboxGL` object. If you use `QMapboxGL` in non-standard Qt widgets, make sure to initialize the GL extensions required by Mapbox whenever possible:
+
+    QMapbox::initializeGLExtensions();
+
 #### Linux
 
 For Linux (Ubuntu) desktop, together with these [build

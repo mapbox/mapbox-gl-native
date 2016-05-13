@@ -30,6 +30,8 @@ private:
     void mousePressEvent(QMouseEvent *ev) final;
     void mouseMoveEvent(QMouseEvent *ev) final;
     void wheelEvent(QWheelEvent *ev) final;
+
+    void initializeGL() final;
     void resizeGL(int w, int h) final;
     void paintGL() final;
 

@@ -7,6 +7,8 @@
 
 #if QT_VERSION >= 0x050000
 #include <QOpenGLContext>
+#else
+#include <QGLContext>
 #endif
 
 // mbgl::MapMode
@@ -39,14 +41,17 @@ Q_DECL_EXPORT QList<QPair<QString, QString>>& defaultStyles()
     return styles;
 }
 
-#if QT_VERSION >= 0x050000
 Q_DECL_EXPORT void initializeGLExtensions()
 {
     mbgl::gl::InitializeExtensions([](const char* name) {
+#if QT_VERSION >= 0x050000
         QOpenGLContext* thisContext = QOpenGLContext::currentContext();
         return thisContext->getProcAddress(name);
+#else
+        const QGLContext* thisContext = QGLContext::currentContext();
+        return reinterpret_cast<mbgl::gl::glProc>(thisContext->getProcAddress(name));
+#endif
     });
 }
-#endif
 
 }

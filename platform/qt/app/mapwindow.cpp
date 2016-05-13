@@ -142,6 +142,11 @@ void MapWindow::wheelEvent(QWheelEvent *ev)
     ev->accept();
 }
 
+void MapWindow::initializeGL()
+{
+    QMapbox::initializeGLExtensions();
+}
+
 void MapWindow::resizeGL(int w, int h)
 {
     m_map.resize(QSize(w, h));

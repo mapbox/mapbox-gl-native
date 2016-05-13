@@ -129,8 +129,12 @@
         ['<(qt_version_major) == 4', {
           'variables': {
             'cflags': [
+              '<@(qt_opengl_cflags)',
               # Qt4 generates code with unused variables.
               '-Wno-unused-variable',
+            ],
+            'ldflags': [
+              '<@(qt_opengl_ldflags)',
             ],
           },
         }],
