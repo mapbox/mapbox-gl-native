@@ -31,6 +31,7 @@
 
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
+#include <mapbox/geometry/envelope.hpp>
 
 #include <rapidjson/error/en.h>
 
@@ -324,16 +325,8 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     return allTilesUpdated;
 }
 
-std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordinate>& queryPoints, const TransformState& transformState) {
-    std::vector<TileCoordinate> queryGeometry;
-    for (auto& p : queryPoints) {
-        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(transformState, 0, { p.x, transformState.getHeight() - p.y }));
-    }
-    return queryGeometry;
-}
-
-static Point<int16_t> coordinateToTilePoint(const CanonicalTileID& tileID, const TileCoordinate& coord) {
-    auto zoomedCoord = coord.zoomTo(tileID.z);
+static Point<int16_t> coordinateToTilePoint(const CanonicalTileID& tileID, const Point<double>& p) {
+    auto zoomedCoord = TileCoordinate { p, 0 }.zoomTo(tileID.z);
     return {
         int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.x) * util::EXTENT,
                     std::numeric_limits<int16_t>::min(),
@@ -352,31 +345,22 @@ struct TileQuery {
 };
 
 std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(const StyleQueryParameters& parameters) const {
+    LineString<double> queryGeometry;
 
-    std::vector<TileCoordinate> queryGeometry = pointsToCoordinates(parameters.geometry, parameters.transformState);
-
-    std::unordered_map<std::string, std::vector<Feature>> result;
-
-    double minX = std::numeric_limits<double>::infinity();
-    double minY = std::numeric_limits<double>::infinity();
-    double maxX = -std::numeric_limits<double>::infinity();
-    double maxY = -std::numeric_limits<double>::infinity();
-    double z = queryGeometry[0].z;
-
-    for (const auto& c : queryGeometry) {
-        minX = util::min(minX, c.p.x);
-        minY = util::min(minY, c.p.y);
-        maxX = util::max(maxX, c.p.x);
-        maxY = util::max(maxY, c.p.y);
+    for (const auto& p : parameters.geometry) {
+        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(
+            parameters.transformState, 0, { p.x, parameters.transformState.getHeight() - p.y }).p);
     }
+
+    mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
     std::map<CanonicalTileID, TileQuery> tileQueries;
 
     for (const auto& tilePtr : tiles) {
         const auto& tile = tilePtr.second;
 
-        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, { { minX, minY }, z });
-        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, { { maxX, maxY }, z });
+        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, box.min);
+        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, box.max);
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
@@ -399,6 +383,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
                 });
         }
     }
+
+    std::unordered_map<std::string, std::vector<Feature>> result;
 
     for (const auto& it : tileQueries) {
         auto& tileQuery = std::get<1>(it);
