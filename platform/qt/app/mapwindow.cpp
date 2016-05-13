@@ -149,13 +149,16 @@ void MapWindow::initializeGL()
 
 void MapWindow::resizeGL(int w, int h)
 {
-    m_map.resize(QSize(w, h));
+    QSize size(w, h);
+#if QT_VERSION >= 0x050000
+    size /= qApp->devicePixelRatio();
+#endif
+    m_map.resize(size);
+    glViewport(0, 0, size.width(), size.height());
 }
 
 void MapWindow::paintGL()
 {
-    glViewport(0, 0, width(), height());
-
     m_frameDraws++;
     m_map.render();
 }

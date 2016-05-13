@@ -11,7 +11,12 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/traits.hpp>
 
+#if QT_VERSION >= 0x050000
+#include <QGuiApplication>
+#else
 #include <QCoreApplication>
+#endif
+
 #include <QImage>
 #include <QMapboxGL>
 #include <QMargins>
@@ -636,8 +641,12 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 
 float QMapboxGLPrivate::getPixelRatio() const
 {
+#if QT_VERSION >= 0x050000
+    return qApp->devicePixelRatio();
+#else
     // FIXME: Should handle pixel ratio.
     return 1.0;
+#endif
 }
 
 std::array<uint16_t, 2> QMapboxGLPrivate::getSize() const
