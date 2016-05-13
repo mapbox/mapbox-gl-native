@@ -31,8 +31,8 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
     state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
                                                         std::unique_ptr<GeometryTile> tile,
-                                                        optional<SystemTimePoint> modified_,
-                                                        optional<SystemTimePoint> expires_) {
+                                                        optional<Timestamp> modified_,
+                                                        optional<Timestamp> expires_) {
         if (err) {
             callback(err);
             return;

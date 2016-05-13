@@ -30,7 +30,7 @@ public:
     ~OnlineFileRequest();
 
     void networkIsReachableAgain();
-    void schedule(optional<SystemTimePoint> expires);
+    void schedule(optional<Timestamp> expires);
     void completed(Response);
 
     OnlineFileSource::Impl& impl;
@@ -192,7 +192,7 @@ OnlineFileRequest::OnlineFileRequest(const Resource& resource_, Callback callbac
     if (resource.priorExpires) {
         schedule(resource.priorExpires);
     } else {
-        schedule(SystemClock::now());
+        schedule(util::now());
     }
 }
 
@@ -214,20 +214,20 @@ static Duration errorRetryTimeout(Response::Error::Reason failedRequestReason, u
     }
 }
 
-static Duration expirationTimeout(optional<SystemTimePoint> expires, uint32_t expiredRequests) {
+static Duration expirationTimeout(optional<Timestamp> expires, uint32_t expiredRequests) {
     if (expiredRequests) {
         return Seconds(1 << std::min(expiredRequests - 1, 31u));
     } else if (expires) {
-        return std::max(SystemDuration::zero(), *expires - SystemClock::now());
+        return std::max(Seconds::zero(), *expires - util::now());
     } else {
         return Duration::max();
     }
 }
 
-SystemTimePoint interpolateExpiration(const SystemTimePoint& current,
-                                      optional<SystemTimePoint> prior,
-                                      bool& expired) {
-    auto now = SystemClock::now();
+Timestamp interpolateExpiration(const Timestamp& current,
+                                optional<Timestamp> prior,
+                                bool& expired) {
+    auto now = util::now();
     if (current > now) {
         return current;
     }
@@ -256,10 +256,10 @@ SystemTimePoint interpolateExpiration(const SystemTimePoint& current,
     // Assume that either the client or server clock is wrong and
     // try to interpolate a valid expiration date (from the client POV)
     // observing a minimum timeout.
-    return now + std::max<SystemDuration>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
+    return now + std::max<Seconds>(delta, util::CLOCK_SKEW_RETRY_TIMEOUT);
 }
 
-void OnlineFileRequest::schedule(optional<SystemTimePoint> expires) {
+void OnlineFileRequest::schedule(optional<Timestamp> expires) {
     if (request) {
         // There's already a request in progress; don't start another one.
         return;
@@ -339,7 +339,7 @@ void OnlineFileRequest::networkIsReachableAgain() {
     // We need all requests to fail at least once before we are going to start retrying
     // them, and we only immediately restart request that failed due to connection issues.
     if (failedRequestReason == Response::Error::Reason::Connection) {
-        schedule(SystemClock::now());
+        schedule(util::now());
     }
 }
 

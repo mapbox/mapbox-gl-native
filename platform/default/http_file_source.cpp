@@ -316,7 +316,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         // Always overwrite the modification date; We might already have a value here from the
         // Date header, but this one is more accurate.
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->modified = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
+        baton->response->modified = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
     } else if ((begin = headerMatches("etag: ", buffer, length)) != std::string::npos) {
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
@@ -324,7 +324,7 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         baton->response->expires = http::CacheControl::parse(value.c_str()).toTimePoint();
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = SystemClock::from_time_t(curl_getdate(value.c_str(), nullptr));
+        baton->response->expires = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };
     }
 
     return length;

@@ -22,7 +22,7 @@ TEST(Map, Offline) {
     auto expiredItem = [] (const std::string& path) {
         Response response;
         response.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/offline/"s + path));
-        response.expires = SystemClock::from_time_t(0);
+        response.expires = Timestamp{ Seconds(0) };
         return response;
     };
 

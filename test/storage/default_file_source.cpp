@@ -104,7 +104,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Response", *res.data);
         EXPECT_FALSE(bool(res.expires));
-        EXPECT_EQ(SystemClock::from_time_t(1420070400), *res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
         EXPECT_FALSE(res.etag);
 
         // Second request returns the cached response, then immediately revalidates.
@@ -119,7 +119,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 EXPECT_TRUE(res2.notModified);
                 ASSERT_FALSE(res2.data.get());
                 EXPECT_TRUE(bool(res2.expires));
-                EXPECT_EQ(SystemClock::from_time_t(1420070400), *res2.modified);
+                EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
                 EXPECT_FALSE(res2.etag);
 
                 loop.stop();

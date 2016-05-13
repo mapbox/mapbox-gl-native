@@ -130,8 +130,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_EQ(SystemClock::from_time_t(1420797926), res.expires);
-        EXPECT_EQ(SystemClock::from_time_t(1420794326), res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1420797926) }, res.expires);
+        EXPECT_EQ(Timestamp{ Seconds(1420794326) }, res.modified);
         EXPECT_EQ("foo", *res.etag);
         loop.stop();
     });
@@ -147,7 +147,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
-        EXPECT_GT(Seconds(2), util::abs(*res.expires - SystemClock::now() - Seconds(120))) << "Expiration date isn't about 120 seconds in the future";
+        EXPECT_GT(Seconds(2), util::abs(*res.expires - util::now() - Seconds(120))) << "Expiration date isn't about 120 seconds in the future";
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();

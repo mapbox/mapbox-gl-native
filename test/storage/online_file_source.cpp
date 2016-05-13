@@ -148,7 +148,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryDelayOnExpiredTile)) {
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
-        EXPECT_GT(SystemClock::now(), res.expires);
+        EXPECT_GT(util::now(), res.expires);
     });
 
     util::Timer timer;
@@ -172,12 +172,12 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RetryOnClockSkew)) {
         switch (counter++) {
         case 0: {
             EXPECT_EQ(nullptr, res.error);
-            EXPECT_GT(SystemClock::now(), res.expires);
+            EXPECT_GT(util::now(), res.expires);
         } break;
         case 1: {
             EXPECT_EQ(nullptr, res.error);
 
-            auto now = SystemClock::now();
+            auto now = util::now();
             EXPECT_LT(now + Seconds(40), res.expires) << "Expiration not interpolated to 60s";
             EXPECT_GT(now + Seconds(80), res.expires) << "Expiration not interpolated to 60s";
 
@@ -195,7 +195,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
 
     // Very long expiration time, should never arrive.
     Resource resource1{ Resource::Unknown, "http://127.0.0.1:3000/test" };
-    resource1.priorExpires = SystemClock::now() + Seconds(100000);
+    resource1.priorExpires = util::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req1 = fs.request(resource1, [&](Response) {
         FAIL() << "Should never be called";
@@ -210,7 +210,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(RespectPriorExpires)) {
 
     // Very long expiration time, should never arrive.
     Resource resource3{ Resource::Unknown, "http://127.0.0.1:3000/test" };
-    resource3.priorExpires = SystemClock::now() + Seconds(100000);
+    resource3.priorExpires = util::now() + Seconds(100000);
 
     std::unique_ptr<AsyncRequest> req3 = fs.request(resource3, [&](Response) {
         FAIL() << "Should never be called";

@@ -110,7 +110,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
     }
 
     if (modified) {
-        response.modified = util::parseTimePoint(jni::Make<std::string>(env, modified).c_str());
+        response.modified = util::parseTimestamp(jni::Make<std::string>(env, modified).c_str());
     }
 
     if (cacheControl) {
@@ -118,7 +118,7 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
     }
 
     if (expires) {
-        response.expires = util::parseTimePoint(jni::Make<std::string>(env, expires).c_str());
+        response.expires = util::parseTimestamp(jni::Make<std::string>(env, expires).c_str());
     }
 
     if (code == 200) {

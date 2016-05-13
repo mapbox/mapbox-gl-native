@@ -181,7 +181,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     Statement accessedStmt = getStatement(
         "UPDATE resources SET accessed = ?1 WHERE url = ?2");
 
-    accessedStmt->bind(1, SystemClock::now());
+    accessedStmt->bind(1, util::now());
     accessedStmt->bind(2, resource.url);
     accessedStmt->run();
 
@@ -201,8 +201,8 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     uint64_t size = 0;
 
     response.etag     = stmt->get<optional<std::string>>(0);
-    response.expires  = stmt->get<optional<SystemTimePoint>>(1);
-    response.modified = stmt->get<optional<SystemTimePoint>>(2);
+    response.expires  = stmt->get<optional<Timestamp>>(1);
+    response.modified = stmt->get<optional<Timestamp>>(2);
 
     optional<std::string> data = stmt->get<optional<std::string>>(3);
     if (!data) {
@@ -229,7 +229,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
             "    expires  = ?2 "
             "WHERE url    = ?3 ");
 
-        update->bind(1, SystemClock::now());
+        update->bind(1, util::now());
         update->bind(2, response.expires);
         update->bind(3, resource.url);
         update->run();
@@ -257,7 +257,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     update->bind(2, response.etag);
     update->bind(3, response.expires);
     update->bind(4, response.modified);
-    update->bind(5, SystemClock::now());
+    update->bind(5, util::now());
     update->bind(8, resource.url);
 
     if (response.noContent) {
@@ -283,7 +283,7 @@ bool OfflineDatabase::putResource(const Resource& resource,
     insert->bind(3, response.etag);
     insert->bind(4, response.expires);
     insert->bind(5, response.modified);
-    insert->bind(6, SystemClock::now());
+    insert->bind(6, util::now());
 
     if (response.noContent) {
         insert->bind(7, nullptr);
@@ -309,7 +309,7 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
         "  AND y            = ?5 "
         "  AND z            = ?6 ");
 
-    accessedStmt->bind(1, SystemClock::now());
+    accessedStmt->bind(1, util::now());
     accessedStmt->bind(2, tile.urlTemplate);
     accessedStmt->bind(3, tile.pixelRatio);
     accessedStmt->bind(4, tile.x);
@@ -341,8 +341,8 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     uint64_t size = 0;
 
     response.etag     = stmt->get<optional<std::string>>(0);
-    response.expires  = stmt->get<optional<SystemTimePoint>>(1);
-    response.modified = stmt->get<optional<SystemTimePoint>>(2);
+    response.expires  = stmt->get<optional<Timestamp>>(1);
+    response.modified = stmt->get<optional<Timestamp>>(2);
 
     optional<std::string> data = stmt->get<optional<std::string>>(3);
     if (!data) {
@@ -373,7 +373,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
             "  AND y            = ?6 "
             "  AND z            = ?7 ");
 
-        update->bind(1, SystemClock::now());
+        update->bind(1, util::now());
         update->bind(2, response.expires);
         update->bind(3, tile.urlTemplate);
         update->bind(4, tile.pixelRatio);
@@ -407,7 +407,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     update->bind(1, response.modified);
     update->bind(2, response.etag);
     update->bind(3, response.expires);
-    update->bind(4, SystemClock::now());
+    update->bind(4, util::now());
     update->bind(7, tile.urlTemplate);
     update->bind(8, tile.pixelRatio);
     update->bind(9, tile.x);
@@ -440,7 +440,7 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     insert->bind(6, response.modified);
     insert->bind(7, response.etag);
     insert->bind(8, response.expires);
-    insert->bind(9, SystemClock::now());
+    insert->bind(9, util::now());
 
     if (response.noContent) {
         insert->bind(10, nullptr);

@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
             : region(region_),
               fileSource(fileSource_),
               loop(loop_),
-              start(SystemClock::now()) {
+              start(util::now()) {
         }
 
         void statusChanged(OfflineRegionStatus status) override {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
 
             std::string bytesPerSecond = "-";
 
-            auto elapsedSeconds = (SystemClock::now() - start) / 1s;
+            auto elapsedSeconds = (util::now() - start) / 1s;
             if (elapsedSeconds != 0) {
                 bytesPerSecond = util::toString(status.completedResourceSize / elapsedSeconds);
             }
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
         OfflineRegion& region;
         DefaultFileSource& fileSource;
         util::RunLoop& loop;
-        SystemTimePoint start;
+        Timestamp start;
     };
 
     static auto stop = [&] {

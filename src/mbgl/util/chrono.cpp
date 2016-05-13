@@ -11,8 +11,8 @@ static const char *week[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 static const char *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-std::string rfc1123(SystemTimePoint timePoint) {
-    std::time_t time = SystemClock::to_time_t(timePoint);
+std::string rfc1123(Timestamp timestamp) {
+    std::time_t time = std::chrono::system_clock::to_time_t(timestamp);
     std::tm info;
     gmtime_r(&time, &info);
     char buffer[30];
@@ -21,8 +21,8 @@ std::string rfc1123(SystemTimePoint timePoint) {
     return buffer;
 }
 
-std::string iso8601(SystemTimePoint timePoint) {
-    std::time_t time = SystemClock::to_time_t(timePoint);
+std::string iso8601(Timestamp timestamp) {
+    std::time_t time = std::chrono::system_clock::to_time_t(timestamp);
     std::tm info;
     gmtime_r(&time, &info);
     char buffer[30];
@@ -30,8 +30,8 @@ std::string iso8601(SystemTimePoint timePoint) {
     return buffer;
 }
 
-SystemTimePoint parseTimePoint(const char * timePoint) {
-    return SystemClock::from_time_t(parse_date(timePoint));
+Timestamp parseTimestamp(const char* timestamp) {
+    return std::chrono::time_point_cast<Seconds>(std::chrono::system_clock::from_time_t(parse_date(timestamp)));
 }
 
 } // namespace util

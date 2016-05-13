@@ -18,16 +18,16 @@ class GLObjectStore;
 class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(const OverscaledTileID& id, TileData::State,
-                optional<SystemTimePoint> modified,
-                optional<SystemTimePoint> expires,
+                optional<Timestamp> modified,
+                optional<Timestamp> expires,
                 MapDebugOptions);
 
     void drawLines(PlainShader&, gl::GLObjectStore&);
     void drawPoints(PlainShader&, gl::GLObjectStore&);
 
     const TileData::State state;
-    const optional<SystemTimePoint> modified;
-    const optional<SystemTimePoint> expires;
+    const optional<Timestamp> modified;
+    const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
 private:

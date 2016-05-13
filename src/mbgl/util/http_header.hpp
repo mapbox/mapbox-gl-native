@@ -16,7 +16,7 @@ public:
     optional<uint64_t> maxAge;
     bool mustRevalidate = false;
 
-    optional<SystemTimePoint> toTimePoint() const;
+    optional<Timestamp> toTimePoint() const;
 };
 
 } // namespace http

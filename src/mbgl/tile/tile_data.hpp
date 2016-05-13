@@ -107,8 +107,8 @@ public:
     void dumpDebugLogs() const;
 
     const OverscaledTileID id;
-    optional<SystemTimePoint> modified;
-    optional<SystemTimePoint> expires;
+    optional<Timestamp> modified;
+    optional<Timestamp> expires;
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;

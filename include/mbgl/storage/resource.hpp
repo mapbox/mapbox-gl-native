@@ -29,8 +29,14 @@ public:
         int8_t z;
     };
 
-    Resource(Kind kind_, const std::string& url_, optional<TileData> tileData_ = {})
+    enum Necessity : bool {
+        Optional = false,
+        Required = true,
+    };
+
+    Resource(Kind kind_, const std::string& url_, optional<TileData> tileData_ = {}, Necessity necessity_ = Required)
         : kind(kind_),
+          necessity(necessity_),
           url(url_),
           tileData(std::move(tileData_)) {
     }
@@ -41,7 +47,8 @@ public:
                          float pixelRatio,
                          int32_t x,
                          int32_t y,
-                         int8_t z);
+                         int8_t z,
+                         Necessity = Required);
     static Resource glyphs(const std::string& urlTemplate,
                            const FontStack& fontStack,
                            const std::pair<uint16_t, uint16_t>& glyphRange);
@@ -49,13 +56,14 @@ public:
     static Resource spriteJSON(const std::string& base, float pixelRatio);
 
     Kind kind;
+    Necessity necessity;
     std::string url;
 
     // Includes auxiliary data if this is a tile request.
     optional<TileData> tileData;
 
-    optional<SystemTimePoint> priorModified = {};
-    optional<SystemTimePoint> priorExpires = {};
+    optional<Timestamp> priorModified = {};
+    optional<Timestamp> priorExpires = {};
     optional<std::string> priorEtag = {};
 };
 

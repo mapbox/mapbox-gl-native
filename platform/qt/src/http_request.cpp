@@ -71,13 +71,13 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         QString header = QString(line.first).toLower();
 
         if (header == "last-modified") {
-            response.modified = util::parseTimePoint(line.second.constData());
+            response.modified = util::parseTimestamp(line.second.constData());
         } else if (header == "etag") {
             response.etag = std::string(line.second.constData(), line.second.size());
         } else if (header == "cache-control") {
             response.expires = http::CacheControl::parse(line.second.constData()).toTimePoint();
         } else if (header == "expires") {
-            response.expires = util::parseTimePoint(line.second.constData());
+            response.expires = util::parseTimestamp(line.second.constData());
         }
     }
 

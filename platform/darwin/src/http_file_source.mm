@@ -271,12 +271,12 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
                     NSString *expires = [headers objectForKey:@"Expires"];
                     if (expires) {
-                        response.expires = util::parseTimePoint([expires UTF8String]);
+                        response.expires = util::parseTimestamp([expires UTF8String]);
                     }
 
                     NSString *last_modified = [headers objectForKey:@"Last-Modified"];
                     if (last_modified) {
-                        response.modified = util::parseTimePoint([last_modified UTF8String]);
+                        response.modified = util::parseTimestamp([last_modified UTF8String]);
                     }
 
                     NSString *etag = [headers objectForKey:@"ETag"];

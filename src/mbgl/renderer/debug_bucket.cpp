@@ -10,7 +10,11 @@
 
 using namespace mbgl;
 
-DebugBucket::DebugBucket(const OverscaledTileID& id, const TileData::State state_, optional<SystemTimePoint> modified_, optional<SystemTimePoint> expires_, MapDebugOptions debugMode_)
+DebugBucket::DebugBucket(const OverscaledTileID& id,
+                         const TileData::State state_,
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_,
+                         MapDebugOptions debugMode_)
     : state(state_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),

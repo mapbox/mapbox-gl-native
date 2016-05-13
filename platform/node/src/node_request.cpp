@@ -79,14 +79,16 @@ NAN_METHOD(NodeRequest::Respond) {
         if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(modified)) {
-                response.modified = mbgl::SystemClock::from_time_t(modified / 1000);
+                response.modified = mbgl::Timestamp{ mbgl::Seconds(
+                    static_cast<mbgl::Seconds::rep>(modified / 1000)) };
             }
         }
 
         if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
             const double expires = Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()->ToNumber()->Value();
             if (!std::isnan(expires)) {
-                response.expires = mbgl::SystemClock::from_time_t(expires / 1000);
+                response.expires = mbgl::Timestamp{ mbgl::Seconds(
+                    static_cast<mbgl::Seconds::rep>(expires / 1000)) };
             }
         }
 
