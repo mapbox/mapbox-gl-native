@@ -138,7 +138,7 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
         Toast.makeText(this, "Cycle " + cycle + ", step " + cycleStep, Toast.LENGTH_SHORT).show();
 
         // schedule next cycle
-        cycleHandler.postDelayed(cycleRunner, 1500);
+        cycleHandler.postDelayed(cycleRunner, 2100);
     }
 
     @Override
