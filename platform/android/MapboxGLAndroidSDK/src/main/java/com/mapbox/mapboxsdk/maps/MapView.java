@@ -60,6 +60,7 @@ import android.widget.ZoomButtonsController;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -257,7 +258,13 @@ public class MapView extends FrameLayout {
             mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
         }
 
-        String accessToken = options.getAccessToken();
+        String accessToken = null;
+        if (MapboxAccountManager.getInstance() != null) {
+            accessToken = MapboxAccountManager.getInstance().getAccessToken();
+        } else {
+            accessToken = options.getAccessToken();
+        }
+
         String style = options.getStyle();
         if (!TextUtils.isEmpty(accessToken)) {
             mMapboxMap.setAccessToken(accessToken);
