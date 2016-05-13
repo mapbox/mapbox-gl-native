@@ -51,7 +51,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
 
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(getString(R.string.mapbox_access_token));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override

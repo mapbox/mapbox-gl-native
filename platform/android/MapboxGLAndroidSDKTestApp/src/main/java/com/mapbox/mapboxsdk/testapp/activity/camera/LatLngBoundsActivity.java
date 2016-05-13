@@ -43,7 +43,6 @@ public class LatLngBoundsActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(getString(R.string.mapbox_access_token));
         mMapView.setStyleUrl(Style.getDarkStyleUrl(AppConstant.STYLE_VERSION));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {

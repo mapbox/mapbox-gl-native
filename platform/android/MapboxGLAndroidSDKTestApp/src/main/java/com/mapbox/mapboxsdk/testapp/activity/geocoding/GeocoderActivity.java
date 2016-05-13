@@ -60,7 +60,6 @@ public class GeocoderActivity extends AppCompatActivity {
         setMessage(getString(R.string.geocoder_instructions));
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setAccessToken(getString(R.string.mapbox_access_token));
         mapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
         mapView.onCreate(savedInstanceState);
 

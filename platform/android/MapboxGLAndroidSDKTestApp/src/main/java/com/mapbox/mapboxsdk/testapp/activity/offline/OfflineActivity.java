@@ -77,7 +77,6 @@ public class OfflineActivity extends AppCompatActivity
 
         // Set up map
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(getString(R.string.mapbox_access_token));
         mMapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
