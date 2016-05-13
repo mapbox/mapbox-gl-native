@@ -208,3 +208,255 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
 
     loop.run();
 }
+
+TEST(DefaultFileSource, OptionalNonExpired) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+
+    using namespace std::chrono_literals;
+
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(optionalResource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(optionalResource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+TEST(DefaultFileSource, OptionalExpired) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+
+    using namespace std::chrono_literals;
+
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() - 1h;
+    fs.put(optionalResource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(optionalResource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_EQ(*response.expires, *res.expires);
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+TEST(DefaultFileSource, OptionalNotFound) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+
+    using namespace std::chrono_literals;
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(optionalResource, [&](Response res) {
+        req.reset();
+        ASSERT_TRUE(res.error.get());
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ("Not found in offline database", res.error->message);
+        EXPECT_FALSE(res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+// Test that we can make a request with etag data that doesn't first try to load
+// from cache like a regular request
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    resource.priorEtag.emplace("snowfall");
+
+    using namespace std::chrono_literals;
+
+    // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_TRUE(res.notModified);
+        EXPECT_FALSE(res.data.get());
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_LT(util::now(), *res.expires);
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+// Test that we can make a request with etag data that doesn't first try to load
+// from cache like a regular request
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    resource.priorEtag.emplace("sunshine");
+
+    using namespace std::chrono_literals;
+
+    // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+// Test that we can make a request that doesn't first try to load
+// from cache like a regular request.
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    // Setting any prior field results in skipping the cache.
+    resource.priorExpires.emplace(Seconds(0));
+
+    using namespace std::chrono_literals;
+
+    // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(bool(res.modified));
+        ASSERT_TRUE(bool(res.etag));
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+// Test that we can make a request with a Modified field that doesn't first try to load
+// from cache like a regular request
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    resource.priorModified.emplace(Seconds(1420070400)); // January 1, 2015
+
+    using namespace std::chrono_literals;
+
+    // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_TRUE(res.notModified);
+        EXPECT_FALSE(res.data.get());
+        ASSERT_TRUE(bool(res.expires));
+        EXPECT_LT(util::now(), *res.expires);
+        ASSERT_TRUE(bool(res.modified));
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_FALSE(bool(res.etag));
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+// Test that we can make a request with a Modified field that doesn't first try to load
+// from cache like a regular request
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    resource.priorModified.emplace(Seconds(1417392000)); // December 1, 2014
+
+    using namespace std::chrono_literals;
+
+    // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.expires = util::now() + 1h;
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        EXPECT_EQ(nullptr, res.error);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Response", *res.data);
+        EXPECT_FALSE(bool(res.expires));
+        EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
+        EXPECT_FALSE(res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}
