@@ -12,6 +12,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
+#include <mbgl/style/style_query_parameters.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/math/clamp.hpp>
@@ -323,6 +324,14 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     return allTilesUpdated;
 }
 
+std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordinate>& queryPoints, const TransformState& transformState) {
+    std::vector<TileCoordinate> queryGeometry;
+    for (auto& p : queryPoints) {
+        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(transformState, 0, { p.x, transformState.getHeight() - p.y }));
+    }
+    return queryGeometry;
+}
+
 static Point<int16_t> coordinateToTilePoint(const CanonicalTileID& tileID, const TileCoordinate& coord) {
     auto zoomedCoord = coord.zoomTo(tileID.z);
     return {
@@ -342,11 +351,9 @@ struct TileQuery {
     double scale;
 };
 
-std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(
-        const std::vector<TileCoordinate>& queryGeometry,
-        const double zoom,
-        const double bearing,
-        const optional<std::vector<std::string>>& layerIDs) const {
+std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(const StyleQueryParameters& parameters) const {
+
+    std::vector<TileCoordinate> queryGeometry = pointsToCoordinates(parameters.geometry, parameters.transformState);
 
     std::unordered_map<std::string, std::vector<Feature>> result;
 
@@ -384,19 +391,23 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         if (it != tileQueries.end()) {
             it->second.queryGeometry.push_back(std::move(tileSpaceQueryGeometry));
         } else {
-            (void)zoom;
             tileQueries.emplace(tile.id.canonical, TileQuery{
                     tile.data,
                     { tileSpaceQueryGeometry },
                     util::tileSize * tile.data.id.overscaleFactor(),
-                    std::pow(2, zoom - tile.data.id.overscaledZ)
+                    std::pow(2, parameters.transformState.getZoom() - tile.data.id.overscaledZ)
                 });
         }
     }
 
     for (const auto& it : tileQueries) {
         auto& tileQuery = std::get<1>(it);
-        tileQuery.tileData.queryRenderedFeatures(result, tileQuery.queryGeometry, bearing, tileQuery.tileSize, tileQuery.scale, layerIDs);
+        tileQuery.tileData.queryRenderedFeatures(result,
+                                                 tileQuery.queryGeometry,
+                                                 parameters.transformState.getAngle(),
+                                                 tileQuery.tileSize,
+                                                 tileQuery.scale,
+                                                 parameters.layerIDs);
     }
 
     return result;

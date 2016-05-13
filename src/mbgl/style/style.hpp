@@ -31,7 +31,7 @@ class StyleLayer;
 class Tile;
 class Bucket;
 class StyleUpdateParameters;
-class TileCoordinate;
+class StyleQueryParameters;
 
 struct RenderItem {
     inline RenderItem(const StyleLayer& layer_,
@@ -109,11 +109,7 @@ public:
 
     RenderData getRenderData() const;
 
-    std::vector<Feature> queryRenderedFeatures(
-            const std::vector<TileCoordinate>& queryGeometry,
-            const double zoom,
-            const double bearing,
-            const optional<std::vector<std::string>>& layerIDs) const;
+    std::vector<Feature> queryRenderedFeatures(const StyleQueryParameters&) const;
 
     float getQueryRadius() const;
 

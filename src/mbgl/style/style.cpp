@@ -317,14 +317,10 @@ RenderData Style::getRenderData() const {
     return result;
 }
 
-std::vector<Feature> Style::queryRenderedFeatures(
-        const std::vector<TileCoordinate>& queryGeometry,
-        const double zoom,
-        const double bearing,
-        const optional<std::vector<std::string>>& layerIDs) const {
+std::vector<Feature> Style::queryRenderedFeatures(const StyleQueryParameters& parameters) const {
     std::vector<std::unordered_map<std::string, std::vector<Feature>>> sourceResults;
     for (const auto& source : sources) {
-        sourceResults.emplace_back(source->queryRenderedFeatures(queryGeometry, zoom, bearing, layerIDs));
+        sourceResults.emplace_back(source->queryRenderedFeatures(parameters));
     }
 
     std::vector<Feature> features;

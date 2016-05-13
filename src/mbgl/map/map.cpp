@@ -10,6 +10,7 @@
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
+#include <mbgl/style/style_query_parameters.hpp>
 #include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -725,42 +726,31 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
 
 #pragma mark - Feature query api
 
-std::vector<TileCoordinate> pointsToCoordinates(const std::vector<ScreenCoordinate>& queryPoints, const TransformState& transformState) {
-    std::vector<TileCoordinate> queryGeometry;
-    for (auto& p : queryPoints) {
-        queryGeometry.push_back(TileCoordinate::fromScreenCoordinate(transformState, 0, { p.x, transformState.getHeight() - p.y }));
-    }
-    return queryGeometry;
-}
-
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
-    return impl->style->queryRenderedFeatures(
-        pointsToCoordinates({ point }, impl->transform.getState()),
-        impl->transform.getZoom(),
-        impl->transform.getAngle(),
-        layerIDs);
+    return impl->style->queryRenderedFeatures({
+        { point },
+        impl->transform.getState(),
+        layerIDs
+    });
 }
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const optional<std::vector<std::string>>& layerIDs) {
     if (!impl->style) return {};
 
-    std::vector<ScreenCoordinate> queryPoints {
-        box.min,
-        { box.max.x, box.min.y },
-        box.max,
-        { box.min.x, box.max.y },
-        box.min
-    };
-
-    return impl->style->queryRenderedFeatures(
-        pointsToCoordinates(queryPoints, impl->transform.getState()),
-        impl->transform.getZoom(),
-        impl->transform.getAngle(),
-        layerIDs);
+    return impl->style->queryRenderedFeatures({
+        {
+            box.min,
+            { box.max.x, box.min.y },
+            box.max,
+            { box.min.x, box.max.y },
+            box.min
+        },
+        impl->transform.getState(),
+        layerIDs
+    });
 }
-
 
 #pragma mark - Style API
 

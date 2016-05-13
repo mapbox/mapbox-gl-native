@@ -25,12 +25,12 @@ namespace mbgl {
 
 class Style;
 class StyleUpdateParameters;
+class StyleQueryParameters;
 class Painter;
 class FileSource;
 class AsyncRequest;
 class TransformState;
 class Tile;
-class TileCoordinate;
 struct ClipID;
 
 class Source : private util::noncopyable {
@@ -80,11 +80,8 @@ public:
 
     TileData* getTileData(const OverscaledTileID&) const;
 
-    std::unordered_map<std::string, std::vector<Feature>> queryRenderedFeatures(
-            const std::vector<TileCoordinate>& queryGeometry,
-            const double zoom,
-            const double bearing,
-            const optional<std::vector<std::string>>& layerIDs) const;
+    std::unordered_map<std::string, std::vector<Feature>>
+    queryRenderedFeatures(const StyleQueryParameters&) const;
 
     void setCacheSize(size_t);
     void onLowMemory();
