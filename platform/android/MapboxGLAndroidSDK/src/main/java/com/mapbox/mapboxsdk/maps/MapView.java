@@ -457,7 +457,7 @@ public class MapView extends FrameLayout {
                         }
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
-                    if (mMapboxMap.getMarkerViewAdapter() != null) {
+                    if (mMapboxMap.getMarkerViewAdapters() != null) {
                         invalidateViewMarkers();
                     }
                 }

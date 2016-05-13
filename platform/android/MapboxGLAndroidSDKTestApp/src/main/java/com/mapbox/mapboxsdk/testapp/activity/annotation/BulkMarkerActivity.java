@@ -89,12 +89,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 public void onClick(View v) {
                     if (mMapboxMap != null) {
                         fab.animate().alpha(0).start();
-                        mMapboxMap.setMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+                        mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
                         mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                             @Override
                             public void onMapChanged(@MapView.MapChange int change) {
                                 if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-                                    if (mMapboxMap.getMarkerViewAdapter() != null) {
+                                    if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
                                         viewCountView.setText("ViewCache size " + (mMapView.getChildCount()-5));
                                     }
                                 }
@@ -104,7 +104,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                         mMapboxMap.setMarkerViewItemAnimation(R.animator.scale_up, R.animator.scale_down);
                         mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                             @Override
-                            public boolean onMarkerClick(@NonNull final Marker marker, @NonNull View view) {
+                            public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
                                 Toast.makeText(BulkMarkerActivity.this, "Hello "+marker.getId(), Toast.LENGTH_SHORT).show();
                                 return false;
                             }
@@ -115,11 +115,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    public static class TextAdapter implements MapboxMap.MarkerViewAdapter<Marker> {
+    public static class TextAdapter extends MapboxMap.MarkerViewAdapter<Marker> {
 
         private LayoutInflater inflater;
 
         public TextAdapter(@NonNull Context context) {
+            super(context);
             this.inflater = LayoutInflater.from(context);
         }
 

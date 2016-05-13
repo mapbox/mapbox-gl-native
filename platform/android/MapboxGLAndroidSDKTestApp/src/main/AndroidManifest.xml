@@ -262,6 +262,14 @@
                 android:value="@string/category_annotation" />
         </activity>
 
+        <activity
+            android:name=".activity.annotation.MultipleViewMarkerAdapterActivity"
+            android:description="@string/description_view_marker2"
+            android:label="@string/activity_view_marker2">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
 
         <!-- Configuration Settings -->
         <meta-data

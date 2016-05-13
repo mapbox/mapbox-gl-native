@@ -65,29 +65,33 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
         final List<Marker> markers = mapboxMap.addMarkers(countries);
 
         // Add view marker adapter
-        mapboxMap.setMarkerViewAdapter(new CountryAdapter(this));
+        mapboxMap.addMarkerViewAdapter(new CountryAdapter(this));
         mapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
             @Override
-            public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view) {
+            public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
                 Log.d(MapboxConstants.TAG, "Country clicked " + ((CountryMarker) marker).getAbbrevName());
                 return true;
             }
         });
 
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mapboxMap.removeAnnotation(markers.get(2));
-            }
-        });
+        View view = findViewById(R.id.fab);
+        if(view!=null) {
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mapboxMap.removeAnnotation(markers.get(2));
+                }
+            });
+        }
     }
 
 
-    private static class CountryAdapter implements MapboxMap.MarkerViewAdapter<CountryMarker> {
+    private static class CountryAdapter extends MapboxMap.MarkerViewAdapter<CountryMarker> {
 
         private LayoutInflater inflater;
 
         public CountryAdapter(@NonNull Context context) {
+            super(context);
             this.inflater = LayoutInflater.from(context);
         }
 

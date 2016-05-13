@@ -18,6 +18,7 @@
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
+    <string name="activity_view_marker2">View Marker AP2</string>
 
     <!-- InfoWindow-->
     <string name="activity_info_window">Standard InfoWindow example</string>
@@ -78,6 +79,7 @@
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
+    <string name="description_view_marker2">Use an Android SDK View as marker2</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
     <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
