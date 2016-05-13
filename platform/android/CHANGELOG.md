@@ -6,7 +6,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 Mapbox Android 4.0.1 is a patch release to make this bug fix available sooner.
 
-* onMapReady() not getting called when offline ([#4500](https://github.com/mapbox/mapbox-gl-native/issues/4500))
+* MapboxMap.removeAnnotations() doesn't remove markers ([#4553](https://github.com/mapbox/mapbox-gl-native/issues/4553))
 
 ## 4.0.0
 
