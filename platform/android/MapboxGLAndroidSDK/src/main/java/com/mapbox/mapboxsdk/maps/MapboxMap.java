@@ -103,7 +103,6 @@ public class MapboxMap {
     private double mMaxZoomLevel = -1;
     private double mMinZoomLevel = -1;
 
-    private Pools.SimplePool<View> mViewReusePool = new Pools.SimplePool<>(20);
     private List<MapboxMap.MarkerViewAdapter> mMarkerViewAdapters;
 
     MapboxMap(@NonNull MapView mapView) {
@@ -658,22 +657,22 @@ public class MapboxMap {
             convertView = outBoundsEntry.getValue();
             if (convertView != null) {
                 if (mMarkerViewItemAnimatorOutRes != 0) {
-                    removeMarkerView(outBoundsEntry.getKey().getId());
                     Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), mMarkerViewItemAnimatorOutRes);
                     animator.setDuration(0);
                     animator.setTarget(convertView);
                     animator.start();
                 }
+                removeMarkerView(outBoundsEntry.getKey().getId());
             }
         }
 
         // in bounds markers
         List<Marker> inBoundsMarkers = result.getInBounds();
         for (final Marker marker : inBoundsMarkers) {
-            convertView = mViewReusePool.acquire();
             Log.v("TAG", "Calling get view for " + marker.getId());
             for (final MarkerViewAdapter adapter : mMarkerViewAdapters) {
-                if (adapter.getMarkerClass()==marker.getClass()) {
+                if (adapter.getMarkerClass() == marker.getClass()) {
+                    convertView = (View) adapter.getViewReusePool().acquire();
                     View adaptedView = adapter.getView(marker, convertView, mMapView);
                     if (adaptedView != null) {
                         // hack to hide old marker, todo replace with visibility
@@ -1020,26 +1019,35 @@ public class MapboxMap {
 
     private void removeMarkerView(long id) {
         final View viewHolder = mMarkerViews.get(id);
-        if (viewHolder != null) {
+        final Marker marker = (Marker) getAnnotation(id);
+        if (viewHolder != null && marker != null) {
+            for (final MarkerViewAdapter<?> adapter : mMarkerViewAdapters) {
+                if (adapter.getMarkerClass() == marker.getClass()) {
 
-            // cancel ongoing animations
-            viewHolder.animate().cancel();
-            viewHolder.setAlpha(1);
+                    // get pool of Views associated to an adapter
+                    final Pools.SimplePool<View> viewPool = adapter.getViewReusePool();
 
-            // animate alpha
-            viewHolder.animate()
-                    .alpha(0)
-                    .setDuration(MapboxConstants.ANIMATION_DURATION_SHORT)
-                    .setInterpolator(new FastOutSlowInInterpolator())
-                    .setListener(new AnimatorListenerAdapter() {
+                    // cancel ongoing animations
+                    viewHolder.animate().cancel();
+                    viewHolder.setAlpha(1);
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            viewHolder.setVisibility(View.GONE);
-                            mViewReusePool.release(viewHolder);
-                        }
-                    });
+                    // animate alpha
+                    viewHolder.animate()
+                            .alpha(0)
+                            .setDuration(MapboxConstants.ANIMATION_DURATION_SHORT)
+                            .setInterpolator(new FastOutSlowInInterpolator())
+                            .setListener(new AnimatorListenerAdapter() {
+
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    viewHolder.setVisibility(View.GONE);
+                                    viewPool.release(viewHolder);
+                                }
+                            });
+                }
+            }
+
         }
         mMarkerViews.remove(id);
     }
@@ -1912,46 +1920,24 @@ public class MapboxMap {
 
     public static abstract class MarkerViewAdapter<U extends Marker> {
 
-        private Class<U> persistentClass;
+        private final Class<U> persistentClass;
+        private final Pools.SimplePool<View> mViewReusePool;
 
         @SuppressWarnings("unchecked")
         public MarkerViewAdapter(Context context) {
-            this.persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+            persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+            mViewReusePool = new Pools.SimplePool<>(20);
         }
-
-        @AnimatorRes
-        private int animSelectOutRes;
-
-        @AnimatorRes
-        private int animSelectInRes;
-
-        @AnimatorRes
-        private int animEnterRes;
-
-        @AnimatorRes
-        private int animExitRes;
 
         @Nullable
         public abstract View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
 
-        public int getAnimSelectOutRes() {
-            return animSelectOutRes;
-        }
-
-        public int getAnimSelectInRes() {
-            return animSelectInRes;
-        }
-
-        public int getAnimEnterRes() {
-            return animEnterRes;
-        }
-
-        public int getAnimExitRes() {
-            return animExitRes;
-        }
-
-        public Class<U> getMarkerClass(){
+        public Class<U> getMarkerClass() {
             return persistentClass;
+        }
+
+        public Pools.SimplePool<View> getViewReusePool() {
+            return mViewReusePool;
         }
     }
 
