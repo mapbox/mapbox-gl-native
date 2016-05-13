@@ -835,7 +835,7 @@ public class MapView extends FrameLayout {
 
     /**
      * <p>
-     * DEPRECATED @see MapboxAccountManager#getInstance(String)
+     * DEPRECATED @see MapboxAccountManager#start(String)
      * </p>
      *
      * <p>
