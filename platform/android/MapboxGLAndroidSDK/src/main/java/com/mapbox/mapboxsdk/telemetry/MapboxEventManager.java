@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -26,6 +27,7 @@ import android.view.WindowManager;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.constants.GeoConstants;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.exceptions.TelemetryServiceNotConfiguredException;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 import org.json.JSONArray;
@@ -58,6 +60,7 @@ public class MapboxEventManager {
 
     private static MapboxEventManager mapboxEventManager = null;
 
+    private boolean initialized = false;
     private boolean telemetryEnabled;
 
     private final Vector<Hashtable<String, Object>> events = new Vector<>();
@@ -104,8 +107,16 @@ public class MapboxEventManager {
      * @param accessToken The accessToken to load MapView
      */
     public void initialize(@NonNull Context context, @NonNull String accessToken) {
+
+        if (initialized) {
+            Log.d(TAG, "Mapbox Telemetry has already been initialized.");
+            return;
+        }
+
         this.context = context.getApplicationContext();
         this.accessToken = accessToken;
+
+        validateTelemetryServiceConfigured();
 
         // Setup Message Digest
         try {
@@ -171,6 +182,8 @@ public class MapboxEventManager {
         // Register for battery updates
         IntentFilter iFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryStatus = context.registerReceiver(null, iFilter);
+
+        initialized = true;
     }
 
     /**
@@ -183,6 +196,24 @@ public class MapboxEventManager {
             mapboxEventManager = new MapboxEventManager();
         }
         return mapboxEventManager;
+    }
+
+    // Checks that TelemetryService has been configured by developer
+    private void validateTelemetryServiceConfigured() {
+        try {
+            // Check Implementing app's AndroidManifest.xml
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_SERVICES);
+            if (packageInfo.services != null) {
+                for (ServiceInfo service : packageInfo.services) {
+                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + e);
+        }
+        throw new TelemetryServiceNotConfiguredException();
     }
 
     public static String generateCreateDate() {

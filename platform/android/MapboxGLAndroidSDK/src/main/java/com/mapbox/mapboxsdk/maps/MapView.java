@@ -416,9 +416,6 @@ public class MapView extends FrameLayout {
             //noinspection ResourceType
             trackingSettings.setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else if (savedInstanceState == null) {
-            // Force a check for Telemetry
-            validateTelemetryServiceConfigured();
-
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
             MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
             eventManager.initialize(getContext(), getAccessToken());
@@ -887,24 +884,6 @@ public class MapView extends FrameLayout {
         if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
             throw new InvalidAccessTokenException();
         }
-    }
-
-    // Checks that TelemetryService has been configured by developer
-    private void validateTelemetryServiceConfigured() {
-        try {
-            // Check Implementing app's AndroidManifest.xml
-            PackageInfo packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), PackageManager.GET_SERVICES);
-            if (packageInfo.services != null) {
-                for (ServiceInfo service : packageInfo.services) {
-                    if (TextUtils.equals("com.mapbox.mapboxsdk.telemetry.TelemetryService", service.name)) {
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.w(MapboxConstants.TAG, "Error checking for Telemetry Service Config: " + e);
-        }
-        throw new TelemetryServiceNotConfiguredException();
     }
 
     //
