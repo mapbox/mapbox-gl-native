@@ -88,7 +88,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 
 - (void)setupBaseURL {
     NSString *testServerURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"MGLTelemetryTestServerURL"];
-    if (testServerURL) {
+    if (testServerURL && [testServerURL hasPrefix:@"https://"]) {
         _baseURL = testServerURL;
         _usesTestServer = YES;
     } else {
