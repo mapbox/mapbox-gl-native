@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/asset_repository.hpp>
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -8,7 +8,7 @@
 
 namespace {
 
-std::string getFileSourceRoot() {
+std::string getAssetRepositoryRoot() {
 #ifdef MBGL_ASSET_ZIP
     // Regenerate with `cd test/fixtures/storage/ && zip -r assets.zip assets/`
     return "test/fixtures/storage/assets.zip";
@@ -21,10 +21,10 @@ std::string getFileSourceRoot() {
 
 using namespace mbgl;
 
-TEST(AssetFileSource, Stress) {
+TEST(AssetRepository, Stress) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     // iOS seems to run out of file descriptors...
 #if TARGET_OS_IPHONE
@@ -41,7 +41,7 @@ TEST(AssetFileSource, Stress) {
 
     class TestWorker {
     public:
-        TestWorker(mbgl::AssetFileSource* fs_) : fs(fs_) {}
+        TestWorker(storage::AssetRepository* fs_) : fs(fs_) {}
 
         void run(std::function<void()> endCallback) {
             const std::string asset("asset://nonempty");
@@ -65,7 +65,7 @@ TEST(AssetFileSource, Stress) {
     private:
         unsigned numRequests = 1000;
 
-        mbgl::AssetFileSource* fs;
+        storage::AssetRepository* fs;
         std::unique_ptr<mbgl::AsyncRequest> request;
 
         std::function<void(mbgl::Response)> requestCallback;
@@ -88,10 +88,10 @@ TEST(AssetFileSource, Stress) {
     loop.run();
 }
 
-TEST(AssetFileSource, EmptyFile) {
+TEST(AssetRepository, EmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://empty" }, [&](Response res) {
         req.reset();
@@ -104,10 +104,10 @@ TEST(AssetFileSource, EmptyFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, NonEmptyFile) {
+TEST(AssetRepository, NonEmptyFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://nonempty" }, [&](Response res) {
         req.reset();
@@ -120,10 +120,10 @@ TEST(AssetFileSource, NonEmptyFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, NonExistentFile) {
+TEST(AssetRepository, NonExistentFile) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://does_not_exist" }, [&](Response res) {
         req.reset();
@@ -137,10 +137,10 @@ TEST(AssetFileSource, NonExistentFile) {
     loop.run();
 }
 
-TEST(AssetFileSource, ReadDirectory) {
+TEST(AssetRepository, ReadDirectory) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://directory" }, [&](Response res) {
         req.reset();
@@ -154,10 +154,10 @@ TEST(AssetFileSource, ReadDirectory) {
     loop.run();
 }
 
-TEST(AssetFileSource, URLEncoding) {
+TEST(AssetRepository, URLEncoding) {
     util::RunLoop loop;
 
-    AssetFileSource fs(getFileSourceRoot());
+    storage::AssetRepository fs(getAssetRepositoryRoot());
 
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "asset://%6eonempty" }, [&](Response res) {
         req.reset();

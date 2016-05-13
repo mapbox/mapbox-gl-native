@@ -46,7 +46,7 @@
       ],
 
       'sources': [
-        '../default/asset_file_source.cpp',
+        '../default/asset_repository.cpp',
         '../default/default_file_source.cpp',
         '../default/online_file_source.cpp',
         '../default/mbgl/storage/offline.hpp',

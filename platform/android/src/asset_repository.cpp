@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/asset_repository.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/thread.hpp>
@@ -34,6 +34,7 @@ struct ZipFileHolder {
 }
 
 namespace mbgl {
+namespace storage {
 
 class AssetFileRequest : public AsyncRequest {
 public:
@@ -44,13 +45,13 @@ public:
     std::unique_ptr<WorkRequest> workRequest;
 };
 
-class AssetFileSource::Impl {
+class AssetRepository::Impl {
 public:
     Impl(const std::string& root_)
         : root(root_) {
     }
 
-    void request(const std::string& url, FileSource::Callback callback) {
+    void request(const std::string& url, AssetRepository::Callback callback) {
         ZipHolder archive = ::zip_open(root.c_str(), 0, nullptr);
         if (!archive.archive) {
             reportError(Response::Error::Reason::Other, "Could not open zip archive", callback);
@@ -88,7 +89,7 @@ public:
         callback(response);
     }
 
-    void reportError(Response::Error::Reason reason, const char * message, FileSource::Callback callback) {
+    void reportError(Response::Error::Reason reason, const char * message, AssetRepository::Callback callback) {
         Response response;
         response.error = std::make_unique<Response::Error>(reason, message);
         callback(response);
@@ -98,16 +99,17 @@ private:
     std::string root;
 };
 
-AssetFileSource::AssetFileSource(const std::string& root)
+AssetRepository::AssetRepository(const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource"},
+        util::ThreadContext{"AssetRepository"},
         root)) {
 }
 
-AssetFileSource::~AssetFileSource() = default;
+AssetRepository::~AssetRepository() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> AssetRepository::request(const Resource& resource, Callback callback) {
     return thread->invokeWithCallback(&Impl::request, callback, resource.url);
 }
 
-}
+} // namespace storage
+} // namespace mbgl

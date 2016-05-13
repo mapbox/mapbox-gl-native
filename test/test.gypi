@@ -58,7 +58,7 @@
         'storage/offline.cpp',
         'storage/offline_database.cpp',
         'storage/offline_download.cpp',
-        'storage/asset_file_source.cpp',
+        'storage/asset_repository.cpp',
         'storage/default_file_source.cpp',
         'storage/http_file_source.cpp',
         'storage/online_file_source.cpp',

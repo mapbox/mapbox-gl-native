@@ -1,4 +1,4 @@
-#include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/asset_repository.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
@@ -11,14 +11,15 @@
 #include <unistd.h>
 
 namespace mbgl {
+namespace storage {
 
-class AssetFileSource::Impl {
+class AssetRepository::Impl {
 public:
     Impl(const std::string& root_)
         : root(root_) {
     }
 
-    void request(const std::string& url, FileSource::Callback callback) {
+    void request(const std::string& url, AssetRepository::Callback callback) {
         std::string path;
 
         if (url.size() <= 8 || url[8] == '/') {
@@ -55,16 +56,17 @@ private:
     std::string root;
 };
 
-AssetFileSource::AssetFileSource(const std::string& root)
+AssetRepository::AssetRepository(const std::string& root)
     : thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetFileSource"},
+        util::ThreadContext{"AssetRepository"},
         root)) {
 }
 
-AssetFileSource::~AssetFileSource() = default;
+AssetRepository::~AssetRepository() = default;
 
-std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource, Callback callback) {
+std::unique_ptr<AsyncRequest> AssetRepository::request(const Resource& resource, Callback callback) {
     return thread->invokeWithCallback(&Impl::request, callback, resource.url);
 }
 
+} // namespace storage
 } // namespace mbgl
