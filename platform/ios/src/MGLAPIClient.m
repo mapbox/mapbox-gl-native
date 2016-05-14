@@ -14,7 +14,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 @interface MGLAPIClient ()
 
 @property (nonatomic, copy) NSURLSession *session;
-@property (nonatomic, copy) NSString *baseURL;
+@property (nonatomic, copy) NSURL *baseURL;
 @property (nonatomic, copy) NSData *digicertCert;
 @property (nonatomic, copy) NSData *geoTrustCert;
 @property (nonatomic, copy) NSData *testServerCert;
@@ -76,8 +76,9 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 #pragma mark Utilities
 
 - (NSURLRequest *)requestForEvents:(NS_ARRAY_OF(MGLMapboxEventAttributes *) *)events {
-    NSString *url = [NSString stringWithFormat:@"%@/%@?access_token=%@", self.baseURL, MGLAPIClientEventsPath, [MGLAccountManager accessToken]];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    NSString *path = [NSString stringWithFormat:@"%@?access_token=%@", MGLAPIClientEventsPath, [MGLAccountManager accessToken]];
+    NSURL *url = [NSURL URLWithString:path relativeToURL:self.baseURL];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request setValue:self.userAgent forHTTPHeaderField:MGLAPIClientHeaderFieldUserAgentKey];
     [request setValue:MGLAPIClientHeaderFieldContentTypeValue forHTTPHeaderField:MGLAPIClientHeaderFieldContentTypeKey];
     [request setHTTPMethod:MGLAPIClientHTTPMethodPost];
@@ -87,12 +88,13 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 }
 
 - (void)setupBaseURL {
-    NSString *testServerURL = [[NSUserDefaults standardUserDefaults] stringForKey:@"MGLTelemetryTestServerURL"];
-    if (testServerURL) {
-        _baseURL = testServerURL;
-        _usesTestServer = YES;
+    NSString *testServerURLString = [[NSUserDefaults standardUserDefaults] stringForKey:@"MGLTelemetryTestServerURL"];
+    NSURL *testServerURL = [NSURL URLWithString:testServerURLString];
+    if (testServerURL && [testServerURL.scheme isEqualToString:@"https"]) {
+        self.baseURL = testServerURL;
+        self.usesTestServer = YES;
     } else {
-        _baseURL = MGLAPIClientBaseURL;
+        self.baseURL = [NSURL URLWithString:MGLAPIClientBaseURL];
     }
 }
 
