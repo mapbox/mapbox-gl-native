@@ -72,6 +72,7 @@ public class MapboxMapOptions implements Parcelable {
     private int myLocationAccuracyAlpha;
 
     private String style;
+    @Deprecated
     private String accessToken;
 
     /**
