@@ -361,7 +361,7 @@ public class MapView extends FrameLayout {
     @UiThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
         // Force a check for an access token
-        validateAccessToken(getAccessToken());
+        MapboxAccountManager.validateAccessToken(getAccessToken());
 
         if (savedInstanceState != null && savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
 
@@ -424,6 +424,7 @@ public class MapView extends FrameLayout {
             trackingSettings.setMyBearingTrackingMode(savedInstanceState.getInt(MapboxConstants.STATE_MY_BEARING_TRACKING_MODE, MyBearingTracking.NONE));
         } else if (savedInstanceState == null) {
             // Start Telemetry (authorization determined in initial MapboxEventManager constructor)
+            Log.i(MapView.class.getCanonicalName(), "MapView start Telemetry...");
             MapboxEventManager eventManager = MapboxEventManager.getMapboxEventManager();
             eventManager.initialize(getContext(), getAccessToken());
         }
@@ -863,7 +864,7 @@ public class MapView extends FrameLayout {
         if (!TextUtils.isEmpty(accessToken)) {
             accessToken = accessToken.trim();
         }
-        validateAccessToken(accessToken);
+        MapboxAccountManager.validateAccessToken(accessToken);
         mNativeMapView.setAccessToken(accessToken);
     }
 
@@ -884,13 +885,6 @@ public class MapView extends FrameLayout {
             return "";
         }
         return mNativeMapView.getAccessToken();
-    }
-
-    // Checks if the given token is valid
-    private void validateAccessToken(String accessToken) {
-        if (TextUtils.isEmpty(accessToken) || (!accessToken.startsWith("pk.") && !accessToken.startsWith("sk."))) {
-            throw new InvalidAccessTokenException();
-        }
     }
 
     //

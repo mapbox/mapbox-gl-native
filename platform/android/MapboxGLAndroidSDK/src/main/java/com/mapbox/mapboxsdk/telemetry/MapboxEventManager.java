@@ -108,8 +108,10 @@ public class MapboxEventManager {
      */
     public void initialize(@NonNull Context context, @NonNull String accessToken) {
 
+        Log.i(TAG, "Telemetry initialize() called...");
+
         if (initialized) {
-            Log.d(TAG, "Mapbox Telemetry has already been initialized.");
+            Log.i(TAG, "Mapbox Telemetry has already been initialized.");
             return;
         }
 
@@ -128,6 +130,7 @@ public class MapboxEventManager {
         SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
         // Determine if Telemetry Should Be Enabled
+        Log.i(TAG, "Right before Telemetry set enabled in initialized()");
         setTelemetryEnabled(prefs.getBoolean(MapboxConstants.MAPBOX_SHARED_PREFERENCE_KEY_TELEMETRY_ENABLED, true));
 
         // Load / Create Vendor Id
@@ -229,6 +232,7 @@ public class MapboxEventManager {
      * @param telemetryEnabled True to start telemetry, false to stop it
      */
     public void setTelemetryEnabled(boolean telemetryEnabled) {
+        Log.i(TAG, "setTelemetryEnabled(); this.telemetryEnabled = " + this.telemetryEnabled + "; telemetryEnabled = " + telemetryEnabled);
         if (this.telemetryEnabled == telemetryEnabled) {
             Log.d(TAG, "No need to start / stop telemetry as it's already in that state.");
             return;
