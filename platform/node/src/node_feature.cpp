@@ -159,7 +159,7 @@ v8::Local<v8::Object> toJS(const Feature& feature) {
     Nan::Set(result, Nan::New("properties").ToLocalChecked(), toJS(feature.properties));
 
     if (feature.id) {
-        Nan::Set(result, Nan::New("id").ToLocalChecked(), toJS(*feature.id));
+        Nan::Set(result, Nan::New("id").ToLocalChecked(), Nan::New(double(*feature.id)));
     }
 
     return scope.Escape(result);

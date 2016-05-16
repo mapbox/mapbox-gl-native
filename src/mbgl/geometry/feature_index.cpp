@@ -123,11 +123,7 @@ void FeatureIndex::addFeature(
 
         Feature feature { mapbox::geometry::point<double>() };
         feature.properties = geometryTileFeature->getProperties();
-
-        optional<uint64_t> id = geometryTileFeature->getID();
-        if (id) {
-            feature.id = Value(*id);
-        }
+        feature.id = geometryTileFeature->getID();
 
         result[layerID].push_back(std::move(feature));
     }

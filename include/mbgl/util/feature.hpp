@@ -13,7 +13,7 @@ public:
     Feature(geometry_type&& geometry_)
         : mapbox::geometry::feature<double> { std::move(geometry_) } {}
 
-    optional<Value> id {};
+    optional<uint64_t> id;
 };
 
 } // namespace mbgl
