@@ -19,17 +19,16 @@ namespace mbgl {
 
 class GeoJSONTileFeature : public GeometryTileFeature {
 public:
-    using Tags = std::unordered_map<std::string, std::string>;
-
-    GeoJSONTileFeature(FeatureType, GeometryCollection&&, Tags&& = Tags{});
+    GeoJSONTileFeature(FeatureType, GeometryCollection&&, Feature::property_map&&);
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
+    Feature::property_map getProperties() const override { return properties; }
     GeometryCollection getGeometries() const override;
 
 private:
     const FeatureType type;
     const GeometryCollection geometries;
-    const Tags tags;
+    const Feature::property_map properties;
 };
 
 class GeoJSONTileLayer : public GeometryTileLayer {

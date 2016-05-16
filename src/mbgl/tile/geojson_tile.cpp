@@ -6,8 +6,8 @@ namespace mbgl {
 
 GeoJSONTileFeature::GeoJSONTileFeature(FeatureType type_,
                                        GeometryCollection&& geometries_,
-                                       GeoJSONTileFeature::Tags&& tags_)
-    : type(type_), geometries(std::move(geometries_)), tags(std::move(tags_)) {
+                                       Feature::property_map&& properties_)
+    : type(type_), geometries(std::move(geometries_)), properties(std::move(properties_)) {
 }
 
 FeatureType GeoJSONTileFeature::getType() const {
@@ -15,8 +15,8 @@ FeatureType GeoJSONTileFeature::getType() const {
 }
 
 optional<Value> GeoJSONTileFeature::getValue(const std::string& key) const {
-    auto it = tags.find(key);
-    if (it != tags.end()) {
+    auto it = properties.find(key);
+    if (it != properties.end()) {
         return optional<Value>(it->second);
     }
     return optional<Value>();
@@ -89,10 +89,10 @@ std::unique_ptr<GeoJSONTile> convertTile(const mapbox::geojsonvt::Tile& tile) {
                 }
             }
 
-            GeoJSONTileFeature::Tags tags{ feature.tags.begin(), feature.tags.end() };
+            Feature::property_map properties { feature.tags.begin(), feature.tags.end() };
 
             features.emplace_back(std::make_shared<GeoJSONTileFeature>(
-                featureType, std::move(geometry), std::move(tags)));
+                featureType, std::move(geometry), std::move(properties)));
         }
 
         layer = std::make_unique<GeoJSONTileLayer>(std::move(features));
