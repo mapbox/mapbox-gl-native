@@ -325,24 +325,17 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     return allTilesUpdated;
 }
 
-static Point<int16_t> coordinateToTilePoint(const CanonicalTileID& tileID, const Point<double>& p) {
-    auto zoomedCoord = TileCoordinate { p, 0 }.zoomTo(tileID.z);
+static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const Point<double>& p) {
+    auto zoomedCoord = TileCoordinate { p, 0 }.zoomTo(tileID.canonical.z);
     return {
-        int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.x) * util::EXTENT,
+        int16_t(util::clamp<int64_t>((zoomedCoord.p.x - tileID.canonical.x - tileID.wrap * std::pow(2, tileID.canonical.z)) * util::EXTENT,
                     std::numeric_limits<int16_t>::min(),
                     std::numeric_limits<int16_t>::max())),
-        int16_t(util::clamp<int64_t>((zoomedCoord.p.y - tileID.y) * util::EXTENT,
+        int16_t(util::clamp<int64_t>((zoomedCoord.p.y - tileID.canonical.y) * util::EXTENT,
                     std::numeric_limits<int16_t>::min(),
                     std::numeric_limits<int16_t>::max()))
     };
 }
-
-struct TileQuery {
-    TileData& tileData;
-    GeometryCollection queryGeometry;
-    double tileSize;
-    double scale;
-};
 
 std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(const StyleQueryParameters& parameters) const {
     LineString<double> queryGeometry;
@@ -354,13 +347,13 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
 
     mapbox::geometry::box<double> box = mapbox::geometry::envelope(queryGeometry);
 
-    std::map<CanonicalTileID, TileQuery> tileQueries;
+    std::unordered_map<std::string, std::vector<Feature>> result;
 
     for (const auto& tilePtr : tiles) {
         const auto& tile = tilePtr.second;
 
-        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id.canonical, box.min);
-        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id.canonical, box.max);
+        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id, box.min);
+        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id, box.max);
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
@@ -368,32 +361,15 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         GeometryCoordinates tileSpaceQueryGeometry;
 
         for (const auto& c : queryGeometry) {
-            tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id.canonical, c));
+            tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id, c));
         }
 
-        auto it = tileQueries.find(tile.id.canonical);
-        if (it != tileQueries.end()) {
-            it->second.queryGeometry.push_back(std::move(tileSpaceQueryGeometry));
-        } else {
-            tileQueries.emplace(tile.id.canonical, TileQuery{
-                    tile.data,
-                    { tileSpaceQueryGeometry },
-                    util::tileSize * tile.data.id.overscaleFactor(),
-                    std::pow(2, parameters.transformState.getZoom() - tile.data.id.overscaledZ)
-                });
-        }
-    }
-
-    std::unordered_map<std::string, std::vector<Feature>> result;
-
-    for (const auto& it : tileQueries) {
-        auto& tileQuery = std::get<1>(it);
-        tileQuery.tileData.queryRenderedFeatures(result,
-                                                 tileQuery.queryGeometry,
-                                                 parameters.transformState.getAngle(),
-                                                 tileQuery.tileSize,
-                                                 tileQuery.scale,
-                                                 parameters.layerIDs);
+        tile.data.queryRenderedFeatures(result,
+                                        { tileSpaceQueryGeometry },
+                                        parameters.transformState.getAngle(),
+                                        util::tileSize * tile.data.id.overscaleFactor(),
+                                        std::pow(2, parameters.transformState.getZoom() - tile.data.id.overscaledZ),
+                                        parameters.layerIDs);
     }
 
     return result;
