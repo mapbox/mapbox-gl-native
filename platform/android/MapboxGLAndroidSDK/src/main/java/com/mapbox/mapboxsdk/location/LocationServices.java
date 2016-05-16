@@ -74,8 +74,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      * @param enableGPS true if GPS is to be enabled, false if GPS is to be disabled
      */
     public void toggleGPS(boolean enableGPS) {
-        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+        if (!areLocationPermissionsGranted()) {
             Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
             return;
         }
@@ -175,5 +174,18 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     public boolean removeLocationListener(@NonNull LocationListener locationListener) {
         return this.locationListeners.remove(locationListener);
+    }
+
+    /**
+     * Check status of Location Permissions
+     * @return True if granted to the app, False if not
+     */
+    public boolean areLocationPermissionsGranted() {
+        if ((ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            Log.w(TAG, "Location Permissions Not Granted Yet.  Try again after requesting.");
+            return false;
+        }
+        return true;
     }
 }

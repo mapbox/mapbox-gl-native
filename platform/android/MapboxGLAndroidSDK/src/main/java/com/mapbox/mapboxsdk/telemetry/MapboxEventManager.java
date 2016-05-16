@@ -18,6 +18,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -244,8 +245,33 @@ public class MapboxEventManager {
             context.startService(new Intent(context, TelemetryService.class));
 
             // Make sure Ambient Mode is started at a minimum
-            if (LocationServices.getLocationServices(context).isGPSEnabled()) {
-                LocationServices.getLocationServices(context).toggleGPS(false);
+            if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
+                Log.i(TAG, "Permissions are good, see if GPS is enabled and if not then setup Ambient.");
+                if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                    LocationServices.getLocationServices(context).toggleGPS(false);
+                }
+            } else {
+                // Start timer that checks for Permissions
+                Log.i(TAG, "Permissions are not good.  Need to do some looping to check on stuff.");
+
+                final Handler permsHandler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (LocationServices.getLocationServices(context).areLocationPermissionsGranted()) {
+                            Log.i(TAG, "Permissions finally granted, so starting Ambient if GPS isn't already enabled");
+                            // Start Ambient
+                            if (LocationServices.getLocationServices(context).isGPSEnabled()) {
+                                LocationServices.getLocationServices(context).toggleGPS(false);
+                            }
+                        } else {
+                            // Restart Handler
+                            Log.i(TAG, "Permissions not granted yet... let's try again in 30 seconds");
+                            permsHandler.postDelayed(this, 1000 * 30);
+                        }
+                    }
+                };
+                permsHandler.postDelayed(runnable, 1000 * 10);
             }
 
             // Manage Timer Flush
