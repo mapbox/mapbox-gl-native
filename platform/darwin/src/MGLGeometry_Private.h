@@ -29,11 +29,6 @@ NS_INLINE mbgl::LatLngBounds MGLLatLngBoundsFromCoordinateBounds(MGLCoordinateBo
                                     MGLLatLngFromLocationCoordinate2D(coordinateBounds.ne));
 }
 
-NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds coordinateBounds) {
-    mbgl::LatLngBounds bounds = MGLLatLngBoundsFromCoordinateBounds(coordinateBounds);
-    return bounds.contains(MGLLatLngFromLocationCoordinate2D(coordinate));
-}
-
 #if TARGET_OS_IPHONE
 NS_INLINE mbgl::EdgeInsets MGLEdgeInsetsFromNSEdgeInsets(UIEdgeInsets insets) {
     return { insets.top, insets.left, insets.bottom, insets.right };
