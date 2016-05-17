@@ -78,4 +78,25 @@
                           @"Northeast should round-trip.");
 }
 
+- (void)testCoordinateInCoordinateBounds {
+    CLLocationCoordinate2D ne = CLLocationCoordinate2DMake(41, -111);
+    CLLocationCoordinate2D sw = CLLocationCoordinate2DMake(45, -104);
+    MGLCoordinateBounds wyoming = MGLCoordinateBoundsMake(ne, sw);
+
+    CLLocationCoordinate2D centerOfWyoming = CLLocationCoordinate2DMake(43, -107.5);
+
+    XCTAssertTrue(MGLCoordinateInCoordinateBounds(ne, wyoming));
+    XCTAssertTrue(MGLCoordinateInCoordinateBounds(sw, wyoming));
+    XCTAssertTrue(MGLCoordinateInCoordinateBounds(centerOfWyoming, wyoming));
+
+    CLLocationCoordinate2D australia = CLLocationCoordinate2DMake(-25, 135);
+    CLLocationCoordinate2D brazil = CLLocationCoordinate2DMake(-12, -50);
+    CLLocationCoordinate2D china = CLLocationCoordinate2DMake(35, 100);
+
+    XCTAssertFalse(MGLCoordinateInCoordinateBounds(australia, wyoming));
+    XCTAssertFalse(MGLCoordinateInCoordinateBounds(brazil, wyoming));
+    XCTAssertFalse(MGLCoordinateInCoordinateBounds(china, wyoming));
+    XCTAssertFalse(MGLCoordinateInCoordinateBounds(kCLLocationCoordinate2DInvalid, wyoming));
+}
+
 @end
