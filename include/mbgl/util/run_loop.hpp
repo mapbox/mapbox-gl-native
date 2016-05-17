@@ -48,9 +48,9 @@ public:
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
     void invoke(Fn&& fn, Args&&... args) {
-        auto tuple = std::make_tuple(std::move(args)...);
+        auto tuple = std::make_tuple(std::forward<Args>(args)...);
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
-            std::move(fn),
+            std::forward<Fn>(fn),
             std::move(tuple));
 
         push(task);
@@ -63,9 +63,9 @@ public:
         auto flag = std::make_shared<std::atomic<bool>>();
         *flag = false;
 
-        auto tuple = std::make_tuple(std::move(args)...);
+        auto tuple = std::make_tuple(std::forward<Args>(args)...);
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
-            std::move(fn),
+            std::forward<Fn>(fn),
             std::move(tuple),
             flag);
 
@@ -86,19 +86,19 @@ public:
         // because if the request was cancelled, then R might have been destroyed. L2 needs to check
         // the flag because the request may have been cancelled after L2 was invoked but before it
         // began executing.
-        auto after = [flag, current = RunLoop::Get(), callback1 = std::move(callback)] (auto&&... results1) {
+        auto after = [flag, current = RunLoop::Get(), callback1 = std::forward<Cb>(callback)] (auto&&... results1) mutable {
             if (!*flag) {
-                current->invoke([flag, callback2 = std::move(callback1)] (auto&&... results2) {
+                current->invoke([flag, callback2 = std::forward<Cb>(callback1)] (auto&&... results2) {
                     if (!*flag) {
-                        callback2(std::move(results2)...);
+                        callback2(std::forward<decltype(results2)>(results2)...);
                     }
-                }, std::move(results1)...);
+                }, std::forward<decltype(results1)>(results1)...);
             }
         };
 
-        auto tuple = std::make_tuple(std::move(args)..., after);
+        std::tuple<Args..., decltype(after)> tuple(std::forward<Args>(args)..., std::move(after));
         auto task = std::make_shared<Invoker<Fn, decltype(tuple)>>(
-            std::move(fn),
+            std::forward<Fn>(fn),
             std::move(tuple),
             flag);
 
