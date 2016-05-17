@@ -25,6 +25,7 @@
         'util/mapbox.cpp',
         'util/merge_lines.cpp',
         'util/run_loop.cpp',
+        'util/number_conversions.cpp',
         'util/text_conversions.cpp',
         'util/thread.cpp',
         'util/thread_local.cpp',
