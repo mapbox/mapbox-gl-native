@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -27,28 +28,6 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
-
-    private int cycleStep;
-    private int cycle;
-    private Handler cycleHandler;
-    private Runnable cycleRunner = new Runnable() {
-        @Override
-        public void run() {
-            startAddRemoveCycle();
-        }
-    };
-
-    private final static LatLng[] LAT_LNGS = new LatLng[]{
-            new LatLng(38.907327, -77.041293),
-            new LatLng(38.909698, -77.029642),
-            new LatLng(38.907227, -77.036530),
-            new LatLng(38.905607, -77.031916),
-            new LatLng(38.897424, -77.036508),
-            new LatLng(38.897642, -77.041980),
-            new LatLng(38.889876, -77.008849),
-            new LatLng(38.889441, -77.050134),
-            new LatLng(38.902580, -77.050102)
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,74 +50,45 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
-                cycleHandler = new Handler();
-                startAddRemoveCycle();
+                reloadMarkers();
             }
         });
     }
 
-    public void startAddRemoveCycle() {
-        switch (cycleStep) {
-            case 0:
-                // removing old annotations
-                mMapboxMap.removeAnnotations();
-                break;
+    private void reloadMarkers() {
+        mMapboxMap.removeAnnotations();
 
-            case 1:
-                // addMarker
-                for (LatLng latLng : LAT_LNGS) {
-                    Marker marker = mMapboxMap.addMarker(new MarkerOptions().position(latLng));
-                    Log.v(MapboxConstants.TAG, "Marker added via addMarker " + marker.getId());
-                }
-                break;
+        double lat = -80; // to 80
+        double lon = -179; // to 179
 
-            case 2:
-                // removing old annotations
-                mMapboxMap.removeAnnotations(mMapboxMap.getAnnotations());
-                break;
+        LatLng latLng = new LatLng();
 
-            case 3:
-                // addMarkers
-                List<MarkerOptions> markerOptions = new ArrayList<>();
-                for (LatLng latLng : LAT_LNGS) {
-                    markerOptions.add(new MarkerOptions().position(latLng));
-                }
-                List<Marker> markers = mMapboxMap.addMarkers(markerOptions);
-                for (Marker m : markers) {
-                    Log.v(MapboxConstants.TAG, "Marker added via addMarkers " + m.getId());
-                }
-                break;
+        int verticalAmount = 12;
+        int horizontalAmount = 50;
+        double latStep = 2 * (Math.abs(lat) / verticalAmount);
+        double lonStep = 2 * (Math.abs(lon) / horizontalAmount);
+        Log.v(MapboxConstants.TAG, "LatStep " + latStep + " LonStep " + lonStep);
 
-            case 4:
-                // removing old annotations
-                List<Annotation> annotationList = mMapboxMap.getAnnotations();
-                for (Annotation annotation : annotationList) {
-                    mMapboxMap.removeAnnotation(annotation.getId());
-                }
-                break;
+        for (int j = 0; j < verticalAmount; j++) {
 
-            case 5:
-                // addMarker
-                for (LatLng latLng : LAT_LNGS) {
-                    Marker marker = mMapboxMap.addMarker(new MarkerOptions().position(latLng));
-                    Log.v(MapboxConstants.TAG, "Marker added via addMarker " + marker.getId());
-                }
-                break;
+            for (int i = 0; i < horizontalAmount; i++) {
+                lon += lonStep;
+
+                Log.v(MapboxConstants.TAG, "Lat " + lat + " Lon " + lon);
+
+                latLng.setLatitude(lat);
+                latLng.setLongitude(lon);
+
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .icon(IconFactory.getInstance(AddRemoveMarkerActivity.this).fromResource(R.drawable.ic_chelsea));
+                Marker m = mMapboxMap.addMarker(options);
+                Log.v(MapboxConstants.TAG,"Marker aded with id "+m.getId());
+            }
+
+            lat += latStep;
+            lon = -179;
         }
-
-        // update cycle
-        if (cycleStep == 5) {
-            cycle++;
-            cycleStep = 0;
-        } else {
-            cycleStep++;
-        }
-
-        // show data
-        Toast.makeText(this, "Cycle " + cycle + ", step " + cycleStep, Toast.LENGTH_SHORT).show();
-
-        // schedule next cycle
-        cycleHandler.postDelayed(cycleRunner, 2100);
     }
 
     @Override
@@ -151,7 +101,6 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-        cycleHandler.removeCallbacks(cycleRunner);
     }
 
     @Override
@@ -176,7 +125,7 @@ public class AddRemoveMarkerActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                reloadMarkers();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -16,9 +16,6 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:center_latitude="38.894364"
-        app:center_longitude="-77.036884"
-        app:style_url="@string/style_mapbox_streets"
-        app:zoom="12" />
+        app:style_url="@string/style_mapbox_streets" />
 
 </LinearLayout>
