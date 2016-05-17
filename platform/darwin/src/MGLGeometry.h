@@ -64,6 +64,14 @@ NS_INLINE BOOL MGLCoordinateBoundsEqualToCoordinateBounds(MGLCoordinateBounds bo
             bounds1.ne.longitude == bounds2.ne.longitude);
 }
 
+/** Returns `YES` if the coordinate is within the coordinate bounds. */
+NS_INLINE BOOL MGLCoordinateInCoordinateBounds(CLLocationCoordinate2D coordinate, MGLCoordinateBounds bounds) {
+    return (coordinate.latitude  >= bounds.sw.latitude  &&
+            coordinate.latitude  <= bounds.ne.latitude  &&
+            coordinate.longitude >= bounds.sw.longitude &&
+            coordinate.longitude <= bounds.ne.longitude);
+}
+
 /** Returns the area spanned by the coordinate bounds. */
 NS_INLINE MGLCoordinateSpan MGLCoordinateBoundsGetCoordinateSpan(MGLCoordinateBounds bounds) {
     return MGLCoordinateSpanMake(bounds.ne.latitude - bounds.sw.latitude,
