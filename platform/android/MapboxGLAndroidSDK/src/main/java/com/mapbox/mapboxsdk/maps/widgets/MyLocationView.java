@@ -429,17 +429,18 @@ public class MyLocationView extends View {
 
     private class CompassListener implements SensorEventListener {
 
-        private boolean paused;
         private SensorManager mSensorManager;
         private Sensor mAccelerometer;
         private Sensor mMagnetometer;
-        private float[] mLastAccelerometer = new float[3];
-        private float[] mLastMagnetometer = new float[3];
-        private boolean mLastAccelerometerSet = false;
-        private boolean mLastMagnetometerSet = false;
-        private float[] mR = new float[9];
-        private float[] mOrientation = new float[3];
+        private boolean paused;
+
         private float mCurrentDegree = 0f;
+
+        private float[] mOrientation = new float[3];
+        private float[] mGData = new float[3];
+        private float[] mMData = new float[3];
+        private float[] mR = new float[16];
+        private float[] mI = new float[16];
 
         // Controls the sensor updateLatLng rate in milliseconds
         private static final int UPDATE_RATE_MS = 500;
@@ -476,30 +477,24 @@ public class MyLocationView extends View {
                 return;
             }
 
-            if (event.sensor == mAccelerometer) {
-                System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
-                mLastAccelerometerSet = true;
-            } else if (event.sensor == mMagnetometer) {
-                System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
-                mLastMagnetometerSet = true;
+            int type = event.sensor.getType();
+            float[] data;
+            if (type == Sensor.TYPE_ACCELEROMETER) {
+                data = mGData;
+            } else if (type == Sensor.TYPE_MAGNETIC_FIELD) {
+                data = mMData;
+            } else {
+                // we should not be here.
+                return;
             }
 
-            if (mLastAccelerometerSet && mLastMagnetometerSet) {
-                SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
-                SensorManager.getOrientation(mR, mOrientation);
-                float azimuthInRadians = mOrientation[0];
-
-                float compassBearing = (float) (Math.toDegrees(azimuthInRadians) + 360) % 360;
-                if (compassBearing < 0) {
-                    // only allow positive degrees
-                    compassBearing += 360;
-                }
-
-                if (compassBearing > mCurrentDegree + 15 || compassBearing < mCurrentDegree - 15) {
-                    mCurrentDegree = compassBearing;
-                    setCompass(mCurrentDegree);
-                }
+            for (int i = 0; i < 3; i++) {
+                data[i] = event.values[i];
             }
+
+            SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
+            SensorManager.getOrientation(mR, mOrientation);
+            setCompass((int) (mOrientation[0] * 180.0f / Math.PI));
             mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
         }
 
