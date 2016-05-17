@@ -350,10 +350,10 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
     std::unordered_map<std::string, std::vector<Feature>> result;
 
     for (const auto& tilePtr : tiles) {
-        const auto& tile = tilePtr.second;
+        const Tile& tile = tilePtr.second;
 
-        auto tileSpaceBoundsMin = coordinateToTilePoint(tile.id, box.min);
-        auto tileSpaceBoundsMax = coordinateToTilePoint(tile.id, box.max);
+        Point<int16_t> tileSpaceBoundsMin = coordinateToTilePoint(tile.id, box.min);
+        Point<int16_t> tileSpaceBoundsMax = coordinateToTilePoint(tile.id, box.max);
 
         if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT ||
             tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) continue;
