@@ -53,7 +53,6 @@ module.exports = function (style, options, callback) {
 
     function prepareFeatures(r) {
         delete r.layer;
-        r.geometry = null;
         return r;
     }
 };

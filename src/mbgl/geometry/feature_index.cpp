@@ -57,6 +57,7 @@ void FeatureIndex::query(
         const double scale,
         const optional<std::vector<std::string>>& filterLayerIDs,
         const GeometryTile& geometryTile,
+        const CanonicalTileID& tileID,
         const Style& style) const {
 
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
@@ -73,7 +74,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTile, style, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTile, tileID, style, bearing, pixelsToTileUnits);
     }
 
     // query symbol features
@@ -81,7 +82,7 @@ void FeatureIndex::query(
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(box, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTile, style, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTile, tileID, style, bearing, pixelsToTileUnits);
     }
 }
 
@@ -91,6 +92,7 @@ void FeatureIndex::addFeature(
     const GeometryCollection& queryGeometry,
     const optional<std::vector<std::string>>& filterLayerIDs,
     const GeometryTile& geometryTile,
+    const CanonicalTileID& tileID,
     const Style& style,
     const float bearing,
     const float pixelsToTileUnits) const {
@@ -112,20 +114,13 @@ void FeatureIndex::addFeature(
         }
 
         auto styleLayer = style.getLayer(layerID);
-        if (!styleLayer) {
+        if (!styleLayer ||
+            (!styleLayer->is<SymbolLayer>() &&
+             !styleLayer->queryIntersectsGeometry(queryGeometry, geometryTileFeature->getGeometries(), bearing, pixelsToTileUnits))) {
             continue;
         }
 
-        if (!styleLayer->is<SymbolLayer>()) {
-            auto geometries = geometryTileFeature->getGeometries();
-            if (!styleLayer->queryIntersectsGeometry(queryGeometry, geometries, bearing, pixelsToTileUnits)) continue;
-        }
-
-        Feature feature { mapbox::geometry::point<double>() };
-        feature.properties = geometryTileFeature->getProperties();
-        feature.id = geometryTileFeature->getID();
-
-        result[layerID].push_back(std::move(feature));
+        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
     }
 }
 

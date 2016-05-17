@@ -23,6 +23,9 @@ using MultiLineString = mapbox::geometry::multi_line_string<T>;
 template <class T>
 using MultiPolygon = mapbox::geometry::multi_polygon<T>;
 
+template <class T>
+using LinearRing = mapbox::geometry::linear_ring<T>;
+
 template <class S, class T>
 Point<S> convertPoint(const Point<T>& p) {
     return Point<S>(p.x, p.y);

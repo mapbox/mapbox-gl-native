@@ -14,6 +14,7 @@ namespace mbgl {
 class Style;
 class CollisionTile;
 enum class TranslateAnchorType : bool;
+class CanonicalTileID;
 
 class IndexedSubfeature {
 public:
@@ -38,6 +39,7 @@ public:
             const double scale,
             const optional<std::vector<std::string>>& layerIDs,
             const GeometryTile&,
+            const CanonicalTileID&,
             const Style&) const;
 
     static optional<GeometryCollection> translateQueryGeometry(
@@ -58,6 +60,7 @@ private:
             const GeometryCollection& queryGeometry,
             const optional<std::vector<std::string>>& filterLayerIDs,
             const GeometryTile&,
+            const CanonicalTileID&,
             const Style&,
             const float bearing,
             const float pixelsToTileUnits) const;
