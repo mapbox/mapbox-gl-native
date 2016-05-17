@@ -57,8 +57,8 @@ public class Projection {
     public VisibleRegion getVisibleRegion() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        int viewportWidth = mMapView.getWidth();
-        int viewportHeight = mMapView.getHeight();
+        int viewportWidth = mMapView.getContentWidth();
+        int viewportHeight = mMapView.getContentHeight();
 
         LatLng topLeft = fromScreenLocation(new PointF(0, 0));
         LatLng topRight = fromScreenLocation(new PointF(viewportWidth, 0));

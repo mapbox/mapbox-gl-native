@@ -226,7 +226,14 @@ public final class CameraUpdateFactory {
             // Get required objects
             Projection projection = mapboxMap.getProjection();
             UiSettings uiSettings = mapboxMap.getUiSettings();
-            RectF padding = getPadding();
+
+            // calculate correct padding
+            int[] mapPadding = mapboxMap.getPadding();
+            RectF latLngPadding = getPadding();
+            RectF padding = new RectF(latLngPadding.left + mapPadding[0],
+                    latLngPadding.top + mapPadding[1],
+                    latLngPadding.right + mapPadding[2],
+                    latLngPadding.bottom + mapPadding[3]);
 
             // Calculate the bounds of the possibly rotated shape with respect to the viewport
             PointF nePixel = new PointF(-Float.MAX_VALUE, -Float.MAX_VALUE);
@@ -243,7 +250,6 @@ public final class CameraUpdateFactory {
             // Calculate width/height
             float width = nePixel.x - swPixel.x;
             float height = nePixel.y - swPixel.y;
-
 
             double zoom = 0;
             float minScale = 1;

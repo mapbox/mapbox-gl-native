@@ -68,10 +68,12 @@ public class LatLngBoundsActivity extends AppCompatActivity {
                         .include(LOS_ANGELES)
                         .build();
 
-                // And padding
-                int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+                // Add map padding
+                int mapPadding = (int) getResources().getDimension(R.dimen.fab_margin);
+                mapboxMap.setPadding(mapPadding, mapPadding, mapPadding, mapPadding);
 
-                // Move camera to the bounds with padding
+                // Move camera to the bounds with added padding
+                int padding = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
                 mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
 
                 // Call mapboxMap.getProjection().getVisibleRegion().latLngBounds to retrieve the bounds
