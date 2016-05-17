@@ -31,10 +31,8 @@ void TileData::dumpDebugLogs() const {
 
 void TileData::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>&,
-        const GeometryCollection&,
-        const double,
-        const double,
-        const double,
+        const GeometryCoordinates&,
+        const TransformState&,
         const optional<std::vector<std::string>>&) {}
 
 } // namespace mbgl

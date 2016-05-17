@@ -7,6 +7,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
@@ -192,15 +193,20 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
 
 void VectorTileData::queryRenderedFeatures(
         std::unordered_map<std::string, std::vector<Feature>>& result,
-        const GeometryCollection& queryGeometry,
-        const double bearing,
-        const double tileSize,
-        const double scale,
+        const GeometryCoordinates& queryGeometry,
+        const TransformState& transformState,
         const optional<std::vector<std::string>>& layerIDs) {
 
     if (!featureIndex || !geometryTile) return;
 
-    featureIndex->query(result, queryGeometry, bearing, tileSize, scale, layerIDs, *geometryTile, style);
+    featureIndex->query(result,
+                        { queryGeometry },
+                        transformState.getAngle(),
+                        util::tileSize * id.overscaleFactor(),
+                        std::pow(2, transformState.getZoom() - id.overscaledZ),
+                        layerIDs,
+                        *geometryTile,
+                        style);
 }
 
 void VectorTileData::cancel() {

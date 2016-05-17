@@ -365,10 +365,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
         }
 
         tile.data.queryRenderedFeatures(result,
-                                        { tileSpaceQueryGeometry },
-                                        parameters.transformState.getAngle(),
-                                        util::tileSize * tile.data.id.overscaleFactor(),
-                                        std::pow(2, parameters.transformState.getZoom() - tile.data.id.overscaledZ),
+                                        tileSpaceQueryGeometry,
+                                        parameters.transformState,
                                         parameters.layerIDs);
     }
 

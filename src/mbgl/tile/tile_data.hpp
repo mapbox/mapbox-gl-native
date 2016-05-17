@@ -21,6 +21,7 @@ namespace mbgl {
 class StyleLayer;
 class Worker;
 class DebugBucket;
+class TransformState;
 
 class TileData : private util::noncopyable {
 public:
@@ -87,10 +88,8 @@ public:
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
-            const GeometryCollection& queryGeometry,
-            const double bearing,
-            const double tileSize,
-            const double scale,
+            const GeometryCoordinates& queryGeometry,
+            const TransformState&,
             const optional<std::vector<std::string>>& layerIDs);
 
     bool isReady() const {
