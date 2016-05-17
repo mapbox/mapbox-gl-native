@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <exception>
+#include <sstream>
 
 namespace mbgl {
 namespace util {
@@ -11,6 +12,12 @@ namespace util {
 template <class T>
 inline std::string toString(T t) {
     return std::to_string(t);
+}
+
+inline std::string toString(double num) {
+    std::ostringstream formatted;
+    formatted << num;
+    return formatted.str();
 }
 
 inline std::string toString(int8_t num) {

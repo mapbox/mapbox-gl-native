@@ -30,6 +30,6 @@ TEST(TextConversions, to_lower) {
     EXPECT_EQ(std::string("weisskopfseeadler"), platform::lowercase("weiSSkopfseeadler")); // DE
 
     EXPECT_EQ(std::string("azərbaycan"), platform::lowercase("AZƏRBAYCAN")); // AZ
-    EXPECT_EQ(std::string("ὀδυσσεύς"), platform::lowercase("ὈΔΥΣΣΕΎΣ")); // GR
 
+    EXPECT_EQ(std::string("ὀδυσσεύς"), platform::lowercase("ὈΔΥΣΣΕΎΣ")); // GR
 }
