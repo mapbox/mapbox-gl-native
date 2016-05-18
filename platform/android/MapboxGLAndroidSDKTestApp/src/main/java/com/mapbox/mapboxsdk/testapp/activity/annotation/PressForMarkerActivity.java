@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 public class PressForMarkerActivity extends AppCompatActivity {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
     private ArrayList<MarkerOptions> mMarkerList = new ArrayList<>();
 
     private static final DecimalFormat LAT_LON_FORMATTER = new DecimalFormat("#.#####");
@@ -46,9 +48,10 @@ public class PressForMarkerActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(final MapboxMap mapboxMap) {
+            public void onMapReady(final MapboxMap map) {
+                mapboxMap = map;
                 mapboxMap.setStyleUrl(Style.getOutdoorsStyleUrl(9));
-                mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.1855569, 5.7215506), 11));
+                resetMap();
 
                 mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
                     @Override
@@ -74,6 +77,20 @@ public class PressForMarkerActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void resetMap() {
+        if (mapboxMap == null) {
+            return;
+        }
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.1855569, 5.7215506), 11));
+        mapboxMap.removeAnnotations();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_press_for_marker, menu);
+        return true;
     }
 
     @Override
@@ -113,6 +130,9 @@ public class PressForMarkerActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.menuItemReset:
+                resetMap();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

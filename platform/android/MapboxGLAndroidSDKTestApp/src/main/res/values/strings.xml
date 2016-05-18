@@ -80,6 +80,7 @@
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
     <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
     <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on gesture</string>
+    <string name="menuitem_title_reset">Reset</string>
 
     <string name="category">category</string>
     <string name="category_annotation">Annotation</string>
