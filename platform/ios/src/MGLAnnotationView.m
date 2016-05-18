@@ -27,6 +27,13 @@
     // Intentionally left blank. The default implementation of this method does nothing.
 }
 
+- (void)setCenter:(CGPoint)center
+{
+    center.x += _centerOffset.x;
+    center.y += _centerOffset.y;
+    [super setCenter:center];
+}
+
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
     // Allow mbgl to drive animation of this view’s bounds.
