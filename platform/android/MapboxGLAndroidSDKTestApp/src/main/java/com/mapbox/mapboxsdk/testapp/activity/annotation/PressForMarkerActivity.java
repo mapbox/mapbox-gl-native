@@ -77,6 +77,14 @@ public class PressForMarkerActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        mapView.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_MARKER_LIST, mMarkerList);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mapView.onResume();
