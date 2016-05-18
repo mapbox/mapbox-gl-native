@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Setting this property to YES will force the annotation view to tilt according to the associated map view.
  */
-@property (nonatomic, assign, getter=isFlattened) BOOL flatten;
+@property (nonatomic, assign, getter=isFlat) BOOL flat;
 
 
 /**

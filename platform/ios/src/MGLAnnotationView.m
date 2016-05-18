@@ -46,7 +46,7 @@
     
     [super setCenter:center];
     
-    if (_flatten) {
+    if (_flat) {
         [self updatePitch:pitch];
     }
 }
