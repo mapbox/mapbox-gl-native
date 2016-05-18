@@ -27,10 +27,16 @@
     // Intentionally left blank. The default implementation of this method does nothing.
 }
 
+- (void)setCenterOffset:(CGVector)centerOffset
+{
+    _centerOffset = centerOffset;
+    self.center = self.center;
+}
+
 - (void)setCenter:(CGPoint)center
 {
-    center.x += _centerOffset.x;
-    center.y += _centerOffset.y;
+    center.x += _centerOffset.dx;
+    center.y += _centerOffset.dy;
     [super setCenter:center];
 }
 

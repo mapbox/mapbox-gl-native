@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  By changing this property you can reposition the view as needed. The offset is measured in points.
  Positive offset moves the annotation view towards the bottom right, while negative offset moves it towards the top left.
  */
-@property (nonatomic) CGPoint centerOffset;
+@property (nonatomic) CGVector centerOffset;
 
 
 /**
