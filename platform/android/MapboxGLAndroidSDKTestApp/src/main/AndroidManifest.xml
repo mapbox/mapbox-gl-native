@@ -66,6 +66,13 @@
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
         </activity>
+        <activity android:name=".activity.annotation.PressForMarkerActivity"
+                  android:description="@string/description_press_for_marker"
+                  android:label="@string/activity_press_for_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
         <activity
             android:name=".activity.camera.CameraAnimationTypeActivity"
             android:description="@string/description_camera_animation_types"
