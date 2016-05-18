@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.SystemClock;
@@ -11,6 +12,8 @@ import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -581,16 +584,11 @@ public class MapboxMap {
     //
 
     /**
-     * <p>
-     * DEPRECATED @see MapboxAccountManager#start(String)
-     * </p>
-     *
-     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
-     * </p>
      *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#setAccessToken(String)
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
      */
     @Deprecated
     @UiThread
@@ -599,13 +597,10 @@ public class MapboxMap {
     }
 
     /**
-     * <p>
-     * DEPRECATED @see MapboxAccountManager#getAccessToken()
-     * </p>
-     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
+     * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
      */
     @Deprecated
     @UiThread

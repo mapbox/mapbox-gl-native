@@ -834,13 +834,7 @@ public class MapView extends FrameLayout {
     //
 
     /**
-     * <p>
-     * DEPRECATED @see MapboxAccountManager#start(String)
-     * </p>
-     *
-     * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
-     * </p>
      * <p>
      * You must set a valid access token before you call {@link MapView#onCreate(Bundle)}
      * or an exception will be thrown.
@@ -848,6 +842,7 @@ public class MapView extends FrameLayout {
      *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#onCreate(Bundle)
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
      */
     @Deprecated
     @UiThread
@@ -864,13 +859,10 @@ public class MapView extends FrameLayout {
     }
 
     /**
-     * <p>
-     * DEPRECATED @see MapboxAccountManager#getAccessToken()
-     * </p>
-     *
      * Returns the current Mapbox access token used to load map styles and tiles.
      *
      * @return The current Mapbox access token.
+     * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
      */
     @Deprecated
     @UiThread
