@@ -2,6 +2,8 @@
 
 #import "MGLTypes.h"
 
+@class MGLMapView;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /** The MGLAnnotationView class is responsible for representing point-based annotation markers as a view. Annotation views represent an annotation object, which is an object that corresponds to the MGLAnnotation protocol. When an annotation’s coordinate point is visible on the map view, the map view delegate is asked to provide a corresponding annotation view. If an annotation view is created with a reuse identifier, the map view may recycle the view when it goes offscreen. */
@@ -33,6 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
  Positive offset moves the annotation view towards the bottom right, while negative offset moves it towards the top left.
  */
 @property (nonatomic) CGVector centerOffset;
+
+
+/**
+ Annotation view is not flattened by default.
+ 
+ Setting this property to true will force the annotation view to tilt according to the associated map view.
+ */
+@property (nonatomic, assign) BOOL flatten;
 
 
 /**

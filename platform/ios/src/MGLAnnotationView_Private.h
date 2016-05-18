@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) id<MGLAnnotation> annotation;
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
+@property (nonatomic, weak) MGLMapView *mapView;
 
 @end
 
