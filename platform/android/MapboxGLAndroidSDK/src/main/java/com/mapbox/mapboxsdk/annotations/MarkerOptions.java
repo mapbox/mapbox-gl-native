@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.annotations;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
@@ -38,7 +37,8 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
         title(in.readString());
-        if(in.readByte()!=0){
+        markerView(in.readByte() != 0);
+        if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
             Bitmap iconBitmap = in.readParcelable(Bitmap.class.getClassLoader());
@@ -63,6 +63,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         out.writeString(getSnippet());
         out.writeString(getTitle());
         Icon icon = getIcon();
+        out.writeByte((byte) (markerView ? 1 : 0));
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
             out.writeString(getIcon().getId());
@@ -86,6 +87,7 @@ public final class MarkerOptions extends BaseMarkerOptions<Marker, MarkerOptions
         marker.setSnippet(snippet);
         marker.setTitle(title);
         marker.setIcon(icon);
+        marker.setMarkerView(markerView);
         return marker;
     }
 

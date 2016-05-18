@@ -1,9 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -12,15 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ViewPropertyAnimatorCompatSet;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -30,6 +23,7 @@ import android.widget.Toast;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -48,6 +42,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
+    private boolean mCustomMarkerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +83,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 @Override
                 public void onClick(View v) {
                     if (mMapboxMap != null) {
+                        mCustomMarkerView = true;
+
                         fab.animate().alpha(0).start();
                         mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
                         mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
@@ -95,20 +92,25 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                             public void onMapChanged(@MapView.MapChange int change) {
                                 if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
                                     if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
-                                        viewCountView.setText("ViewCache size " + (mMapView.getChildCount()-5));
+                                        viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
                                     }
                                 }
                             }
                         });
 
-                        mMapboxMap.setMarkerViewItemAnimation(R.animator.scale_up, R.animator.scale_down);
                         mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                             @Override
                             public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-                                Toast.makeText(BulkMarkerActivity.this, "Hello "+marker.getId(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BulkMarkerActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
                                 return false;
                             }
                         });
+
+                        // reload markers
+                        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+                        if (spinner != null) {
+                            loadBulkMarkers(spinner.getSelectedItemPosition());
+                        }
                     }
                 }
             });
@@ -148,8 +150,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        int markersAmount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
-        new LoadBulkMarkerTask(this, mMapboxMap, markersAmount).execute();
+        loadBulkMarkers(position);
+    }
+
+    private void loadBulkMarkers(int selectedSpinnerPosition) {
+        int markersAmount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[selectedSpinnerPosition]);
+        new LoadBulkMarkerTask(this, mMapboxMap, markersAmount, mCustomMarkerView).execute();
     }
 
     @Override
@@ -205,13 +211,15 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         private Context mAppContext;
         private ProgressDialog mProgressDialog;
         private int mAmount;
+        private boolean mMarkerView;
 
-        public LoadBulkMarkerTask(Context context, MapboxMap mapboxMap, int amount) {
+        public LoadBulkMarkerTask(Context context, MapboxMap mapboxMap, int amount, boolean markerView) {
             mMapboxMap = mapboxMap;
             mapboxMap.removeAnnotations();
             mProgressDialog = ProgressDialog.show(context, "Loading", "Fetching markers", false);
             mAppContext = context.getApplicationContext();
             mAmount = amount;
+            mMarkerView = markerView;
         }
 
         @Override
@@ -231,10 +239,10 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     location = locations.get(i);
                     markerOptions.add(new MarkerOptions()
                             .position(location)
+                            .markerView(mMarkerView)
                             .title(String.valueOf(i))
                             .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
                 }
-
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Could not add markers,", e);
             }

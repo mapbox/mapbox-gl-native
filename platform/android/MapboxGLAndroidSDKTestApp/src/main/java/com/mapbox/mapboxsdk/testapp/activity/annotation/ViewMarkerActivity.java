@@ -14,10 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -55,13 +55,11 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
 
     @Override
     public void onMapReady(final MapboxMap mapboxMap) {
-
-        // Add country markers
         final List<BaseMarkerOptions> countries = new ArrayList<>();
-        countries.add(new CountryMarkerOptions().title("China").abbrevName("ch").flagRes(R.drawable.ic_china).position(new LatLng(31.230416, 121.473701)));
-        countries.add(new CountryMarkerOptions().title("United States").abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.907192, -77.036871)));
-        countries.add(new CountryMarkerOptions().title("Brazil").abbrevName("br").flagRes(R.drawable.ic_brazil).position(new LatLng(-15.798200, -47.922363)));
-        countries.add(new CountryMarkerOptions().title("Germany").abbrevName("de").flagRes(R.drawable.ic_germany).position(new LatLng(52.520007, 13.404954)));
+        countries.add(new CountryMarkerOptions().markerView(true).title("China").abbrevName("ch").flagRes(R.drawable.ic_china).position(new LatLng(31.230416, 121.473701)));
+        countries.add(new CountryMarkerOptions().markerView(true).title("United States").abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.907192, -77.036871)));
+        countries.add(new CountryMarkerOptions().markerView(true).title("Brazil").abbrevName("br").flagRes(R.drawable.ic_brazil).position(new LatLng(-15.798200, -47.922363)));
+        countries.add(new CountryMarkerOptions().markerView(true).title("Germany").abbrevName("de").flagRes(R.drawable.ic_germany).position(new LatLng(52.520007, 13.404954)));
         final List<Marker> markers = mapboxMap.addMarkers(countries);
 
         // Add view marker adapter
@@ -75,7 +73,7 @@ public class ViewMarkerActivity extends AppCompatActivity implements OnMapReadyC
         });
 
         View view = findViewById(R.id.fab);
-        if(view!=null) {
+        if (view != null) {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

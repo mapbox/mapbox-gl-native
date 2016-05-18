@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +17,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -39,8 +39,8 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
             new LatLng(38.897424, -77.036508),
             new LatLng(38.897642, -77.041980),
             new LatLng(38.889876, -77.008849),
-            new LatLng(38.889441, -77.050134),
-            new LatLng(38.902580, -77.050102)};
+            new LatLng(38.889441, -77.050134)
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,33 +59,53 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
 
         final TextView viewCountView = (TextView) findViewById(R.id.countView);
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMapView.setAccessToken(getString(R.string.mapbox_access_token));
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                mMapboxMap.addMarker(new CountryMarkerOptions().title("United States").abbrevName("us").flagRes(R.drawable.ic_us).position(new LatLng(38.899774, -77.023237)));
+                int infoWindowOffset = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+
+                // add flag marker
+                mMapboxMap.addMarker(new CountryMarkerOptions()
+                        .markerView(true)
+                        .title("United States")
+                        .abbrevName("us")
+                        .flagRes(R.drawable.ic_us)
+                        .position(new LatLng(38.899774, -77.023237))
+                );
+
+                mMapboxMap.addMarker(new CountryMarkerOptions()
+                        .title("United States")
+                        .abbrevName("us")
+                        .flagRes(R.drawable.ic_us)
+                        .position(new LatLng(38.902580, -77.050102))
+                );
+
+                // add text markers
+                for (int i = 0; i < LAT_LNGS.length; i++) {
+                    mMapboxMap.addMarker(new MarkerOptions()
+                            .position(LAT_LNGS[i])
+                            .markerView(true)
+                            .title(String.valueOf(i)));
+                }
+
+                // set adapters
                 mMapboxMap.addMarkerViewAdapter(new TextAdapter(MultipleViewMarkerAdapterActivity.this));
                 mMapboxMap.addMarkerViewAdapter(new CountryAdapter(MultipleViewMarkerAdapterActivity.this));
-
-                for (int i = 0; i < LAT_LNGS.length; i++) {
-                    mMapboxMap.addMarker(new MarkerOptions().position(LAT_LNGS[i]).title(String.valueOf(i)));
-                }
 
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-                            if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
+                            if (!mMapboxMap.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
                                 viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
                             }
                         }
                     }
                 });
 
-                mMapboxMap.setMarkerViewItemAnimation(R.animator.scale_up, R.animator.scale_down);
                 mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
@@ -122,6 +142,21 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
             return convertView;
         }
 
+        @Override
+        public MarkerViewSettings getMarkerViewSettings(Marker marker) {
+            MarkerViewSettings.Builder builder = new MarkerViewSettings.Builder()
+                    .animSelectRes(R.animator.scale_up)
+                    .animDeselectRes(R.animator.scale_down)
+                    .infoWindowOffset(0, (int) getContext().getResources()
+                            .getDimension(R.dimen.fab_margin));
+
+            if (marker.getId() == 0) {
+                builder.flat(true);
+            }
+
+            return builder.build();
+        }
+
         private static class ViewHolder {
             TextView title;
         }
@@ -152,6 +187,17 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
             viewHolder.flag.setImageResource(marker.getFlagRes());
             viewHolder.abbrev.setText(marker.getAbbrevName());
             return convertView;
+        }
+
+        @Override
+        public MarkerViewSettings getMarkerViewSettings(Marker marker) {
+            return new MarkerViewSettings.Builder()
+                    .animSelectRes(R.animator.scale_up)
+                    .animDeselectRes(R.animator.scale_down)
+                    .infoWindowOffset(0, (int) getContext().getResources()
+                            .getDimension(R.dimen.coordinatebounds_margin))
+                    .flat(true)
+                    .build();
         }
 
         private static class ViewHolder {
