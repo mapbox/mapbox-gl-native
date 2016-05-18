@@ -52,6 +52,7 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
         if (annotationView == nil) {
             let av = PlaygroundAnnotationView(reuseIdentifier: "annotation")
             av.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+            av.centerOffset = CGVector(dx: -15, dy: -15)
             let centerView = UIView(frame: CGRectInset(av.bounds, 3, 3))
             centerView.backgroundColor = UIColor.whiteColor()
             av.addSubview(centerView)

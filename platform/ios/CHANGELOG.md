@@ -26,6 +26,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Removed unused SVG files from the SDK’s resource bundle. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
 - Deprecated `-[MGLMapView emptyMemoryCache]`. ([#4725](https://github.com/mapbox/mapbox-gl-native/pull/4725))
 - Added `MGLCoordinateInCoordinateBounds()`, a function that tests whether or not a coordinate is in a given bounds. ([#5053](https://github.com/mapbox/mapbox-gl-native/pull/5053))
+- An MGLAnnotationView can be repositioned in relation to the associated MGLAnnotation.coordinate by changing its `centerOffset` property. ([#5059](https://github.com/mapbox/mapbox-gl-native/issues/5059))
 
 ## 3.2.2
 
