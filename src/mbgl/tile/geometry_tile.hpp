@@ -94,4 +94,8 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
 // convert from GeometryTileFeature to Feature (eventually we should eliminate GeometryTileFeature)
 Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 
+// Fix up possibly-non-V2-compliant polygon geometry using angus clipper.
+// The result is guaranteed to have correctly wound, strictly simple rings.
+GeometryCollection fixupPolygons(const GeometryCollection&);
+
 } // namespace mbgl

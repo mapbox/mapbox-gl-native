@@ -1,6 +1,8 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
+#include <clipper/clipper.hpp>
+
 namespace mbgl {
 
 static double signedArea(const GeometryCoordinates& ring) {
@@ -13,6 +15,67 @@ static double signedArea(const GeometryCoordinates& ring) {
     }
 
     return sum;
+}
+
+static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
+    ClipperLib::Path result;
+    result.reserve(ring.size());
+    for (const auto& p : ring) {
+        result.emplace_back(p.x, p.y);
+    }
+    return result;
+}
+
+static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
+    GeometryCoordinates result;
+    result.reserve(path.size());
+    for (const auto& p : path) {
+        using Coordinate = GeometryCoordinates::coordinate_type;
+        assert(p.x >= std::numeric_limits<Coordinate>::min());
+        assert(p.x <= std::numeric_limits<Coordinate>::max());
+        assert(p.y >= std::numeric_limits<Coordinate>::min());
+        assert(p.y <= std::numeric_limits<Coordinate>::max());
+        result.emplace_back(Coordinate(p.x), Coordinate(p.y));
+    }
+    return result;
+}
+
+static void processPolynodeBranch(ClipperLib::PolyNode* polynode, GeometryCollection& rings) {
+    // Exterior ring.
+    rings.push_back(fromClipperPath(polynode->Contour));
+    assert(signedArea(rings.back()) > 0);
+
+    // Interior rings.
+    for (auto * ring : polynode->Childs) {
+        rings.push_back(fromClipperPath(ring->Contour));
+        assert(signedArea(rings.back()) < 0);
+    }
+
+    // PolyNodes may be nested in the case of a polygon inside a hole.
+    for (auto * ring : polynode->Childs) {
+        for (auto * subRing : ring->Childs) {
+            processPolynodeBranch(subRing, rings);
+        }
+    }
+}
+
+GeometryCollection fixupPolygons(const GeometryCollection& rings) {
+    ClipperLib::Clipper clipper;
+    clipper.StrictlySimple(true);
+
+    for (const auto& ring : rings) {
+        clipper.AddPath(toClipperPath(ring), ClipperLib::ptSubject, true);
+    }
+
+    ClipperLib::PolyTree polygons;
+    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+    clipper.Clear();
+
+    GeometryCollection result;
+    for (auto * polynode : polygons.Childs) {
+        processPolynodeBranch(polynode, result);
+    }
+    return result;
 }
 
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
