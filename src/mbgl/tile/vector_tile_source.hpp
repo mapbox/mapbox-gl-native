@@ -2,6 +2,7 @@
 
 #include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/storage/resource.hpp>
 
 namespace mbgl {
 
@@ -9,17 +10,13 @@ class FileSource;
 
 class VectorTileSource : public GeometryTileSource {
 public:
-    VectorTileSource(const OverscaledTileID&,
-                     float pixelRatio,
-                     const std::string& urlTemplate,
-                     FileSource&);
+    VectorTileSource(const Resource&, FileSource&);
+    virtual ~VectorTileSource() = default;
 
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileSource::Callback&) override;
+    std::unique_ptr<AsyncRequest> monitorTile(const Callback&) override;
 
 private:
-    OverscaledTileID tileID;
-    float pixelRatio;
-    std::string urlTemplate;
+    const Resource resource;
     FileSource& fileSource;
 };
 
