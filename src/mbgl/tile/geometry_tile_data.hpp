@@ -19,16 +19,16 @@ namespace style {
 class Style;
 }
 
-class VectorTileData : public TileData {
+class GeometryTileData : public TileData {
 public:
-    VectorTileData(const OverscaledTileID&,
+    GeometryTileData(const OverscaledTileID&,
                    std::unique_ptr<GeometryTileSource> tileSource,
                    std::string sourceID,
                    style::Style&,
                    const MapMode,
                    const std::function<void(std::exception_ptr)>& callback);
 
-    ~VectorTileData();
+    ~GeometryTileData();
 
     Bucket* getBucket(const style::Layer&) override;
 

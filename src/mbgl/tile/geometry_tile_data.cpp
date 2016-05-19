@@ -1,4 +1,4 @@
-#include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/layer_impl.hpp>
@@ -12,12 +12,12 @@
 
 namespace mbgl {
 
-VectorTileData::VectorTileData(const OverscaledTileID& id_,
-                               std::unique_ptr<GeometryTileSource> tileSource_,
-                               std::string sourceID,
-                               style::Style& style_,
-                               const MapMode mode_,
-                               const std::function<void(std::exception_ptr)>& callback)
+GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
+                                   std::unique_ptr<GeometryTileSource> tileSource_,
+                                   std::string sourceID,
+                                   style::Style& style_,
+                                   const MapMode mode_,
+                                   const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_, std::move(tileSource_)),
       style(style_),
       worker(style_.workers),
@@ -93,11 +93,11 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
     });
 }
 
-VectorTileData::~VectorTileData() {
+GeometryTileData::~GeometryTileData() {
     cancel();
 }
 
-bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
+bool GeometryTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
     if (workRequest) {
         // There's already parsing or placement going on.
         return false;
@@ -139,7 +139,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
     return true;
 }
 
-Bucket* VectorTileData::getBucket(const style::Layer& layer) {
+Bucket* GeometryTileData::getBucket(const style::Layer& layer) {
     const auto it = buckets.find(layer.baseImpl->bucketName());
     if (it == buckets.end()) {
         return nullptr;
@@ -149,7 +149,7 @@ Bucket* VectorTileData::getBucket(const style::Layer& layer) {
     return it->second.get();
 }
 
-void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& callback) {
+void GeometryTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& callback) {
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
@@ -157,7 +157,7 @@ void VectorTileData::redoPlacement(const PlacementConfig newConfig, const std::f
     }
 }
 
-void VectorTileData::redoPlacement(const std::function<void()>& callback) {
+void GeometryTileData::redoPlacement(const std::function<void()>& callback) {
     // Don't start a new placement request when the current one hasn't completed yet, or when
     // we are parsing buckets.
     if (workRequest) return;
@@ -187,11 +187,11 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
     });
 }
 
-void VectorTileData::queryRenderedFeatures(
-        std::unordered_map<std::string, std::vector<Feature>>& result,
-        const GeometryCoordinates& queryGeometry,
-        const TransformState& transformState,
-        const optional<std::vector<std::string>>& layerIDs) {
+void GeometryTileData::queryRenderedFeatures(
+    std::unordered_map<std::string, std::vector<Feature>>& result,
+    const GeometryCoordinates& queryGeometry,
+    const TransformState& transformState,
+    const optional<std::vector<std::string>>& layerIDs) {
 
     if (!featureIndex || !geometryTile) return;
 
@@ -206,7 +206,7 @@ void VectorTileData::queryRenderedFeatures(
                         style);
 }
 
-void VectorTileData::cancel() {
+void GeometryTileData::cancel() {
     obsolete = true;
     tileRequest.reset();
     workRequest.reset();
