@@ -19,6 +19,7 @@ namespace mbgl {
 class Worker;
 class DebugBucket;
 class TransformState;
+class TileSource;
 
 namespace style {
 class Layer;
@@ -26,7 +27,7 @@ class Layer;
 
 class TileData : private util::noncopyable {
 public:
-    TileData(const OverscaledTileID&);
+    TileData(const OverscaledTileID&, std::unique_ptr<TileSource>);
     virtual ~TileData();
 
     // Mark this tile as no longer needed and cancel any pending work.
@@ -63,6 +64,7 @@ public:
     const OverscaledTileID id;
     optional<Timestamp> modified;
     optional<Timestamp> expires;
+    const std::unique_ptr<TileSource> tileSource;
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;

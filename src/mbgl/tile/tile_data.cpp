@@ -1,11 +1,12 @@
 #include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
-TileData::TileData(const OverscaledTileID& id_)
-    : id(id_) {
+TileData::TileData(const OverscaledTileID& id_, std::unique_ptr<TileSource> tileSource_)
+    : id(id_), tileSource(std::move(tileSource_)) {
 }
 
 TileData::~TileData() = default;

@@ -13,12 +13,12 @@
 namespace mbgl {
 
 VectorTileData::VectorTileData(const OverscaledTileID& id_,
-                               std::unique_ptr<GeometryTileSource> monitor_,
+                               std::unique_ptr<GeometryTileSource> tileSource_,
                                std::string sourceID,
                                style::Style& style_,
                                const MapMode mode_,
                                const std::function<void(std::exception_ptr)>& callback)
-    : TileData(id_),
+    : TileData(id_, std::move(tileSource_)),
       style(style_),
       worker(style_.workers),
       tileWorker(id_,
@@ -27,10 +27,9 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
                  obsolete,
-                 mode_),
-      monitor(std::move(monitor_))
-{
-    tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
+                 mode_) {
+    auto geometryTileSource = reinterpret_cast<GeometryTileSource*>(tileSource.get());
+    tileRequest = geometryTileSource->monitorTile([callback, this](std::exception_ptr err,
                                                         std::unique_ptr<GeometryTile> tile,
                                                         optional<Timestamp> modified_,
                                                         optional<Timestamp> expires_) {

@@ -25,6 +25,7 @@
 #include <mbgl/tile/vector_tile_source.hpp>
 #include <mbgl/tile/geojson_tile_source.hpp>
 #include <mbgl/tile/annotation_tile_source.hpp>
+#include <mbgl/tile/raster_tile_source.hpp>
 
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
@@ -202,9 +203,11 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
 
     // If we don't find working tile data, we're just going to load it.
     if (type == SourceType::Raster) {
-        data = std::make_unique<RasterTileData>(overscaledTileID, parameters.pixelRatio,
-                                                tileset->tiles.at(0), parameters.texturePool,
-                                                parameters.worker, parameters.fileSource, callback);
+        std::unique_ptr<RasterTileSource> monitor;
+        monitor = std::make_unique<RasterTileSource>(overscaledTileID, parameters.pixelRatio, tileset->tiles.at(0), parameters.fileSource);
+
+        data = std::make_unique<RasterTileData>(overscaledTileID, std::move(monitor),
+                                                parameters.texturePool, parameters.worker, callback);
     } else {
         std::unique_ptr<GeometryTileSource> monitor;
 

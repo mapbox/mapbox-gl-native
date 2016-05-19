@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-class FileSource;
+class RasterTileSource;
 class AsyncRequest;
 
 namespace gl { class TexturePool; }
@@ -17,11 +17,9 @@ class Layer;
 class RasterTileData : public TileData {
 public:
     RasterTileData(const OverscaledTileID&,
-                   float pixelRatio,
-                   const std::string& urlTemplate,
+                   std::unique_ptr<RasterTileSource>,
                    gl::TexturePool&,
                    Worker&,
-                   FileSource&,
                    const std::function<void(std::exception_ptr)>& callback);
     ~RasterTileData();
 
@@ -31,9 +29,13 @@ public:
 private:
     gl::TexturePool& texturePool;
     Worker& worker;
-    std::unique_ptr<AsyncRequest> req;
-    std::unique_ptr<Bucket> bucket;
+
+    std::unique_ptr<AsyncRequest> tileRequest;
     std::unique_ptr<AsyncRequest> workRequest;
+
+    // Contains the Bucket object for the tile. Buckets are render
+    // objects and they get added by tile parsing operations.
+    std::unique_ptr<Bucket> bucket;
 };
 
 } // namespace mbgl

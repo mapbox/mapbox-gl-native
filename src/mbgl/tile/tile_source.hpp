@@ -12,7 +12,12 @@ namespace mbgl {
 class GeometryTile;
 class AsyncRequest;
 
-class GeometryTileSource : private util::noncopyable {
+class TileSource : private util::noncopyable {
+public:
+    virtual ~TileSource() = default;
+};
+
+class GeometryTileSource : public TileSource {
 public:
     virtual ~GeometryTileSource() = default;
 
