@@ -67,27 +67,6 @@ public:
     virtual util::ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
-class AsyncRequest;
-
-class GeometryTileMonitor : private util::noncopyable {
-public:
-    virtual ~GeometryTileMonitor() = default;
-
-    using Callback = std::function<void (std::exception_ptr,
-                                         std::unique_ptr<GeometryTile>,
-                                         optional<Timestamp> modified,
-                                         optional<Timestamp> expires)>;
-    /*
-     * Monitor the tile held by this object for changes. When the tile is loaded for the first time,
-     * or updates, the callback is executed. If an error occurs, the first parameter will be set.
-     * Otherwise it will be null. If there is no data for the requested tile, the second parameter
-     * will be null.
-     *
-     * To cease monitoring, release the returned Request.
-     */
-    virtual std::unique_ptr<AsyncRequest> monitorTile(const Callback&) = 0;
-};
-
 // classifies an array of rings into polygons with outer rings and holes
 std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
 

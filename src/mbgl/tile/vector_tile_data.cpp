@@ -1,4 +1,5 @@
 #include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/worker.hpp>
@@ -12,7 +13,7 @@
 namespace mbgl {
 
 VectorTileData::VectorTileData(const OverscaledTileID& id_,
-                               std::unique_ptr<GeometryTileMonitor> monitor_,
+                               std::unique_ptr<GeometryTileSource> monitor_,
                                std::string sourceID,
                                style::Style& style_,
                                const MapMode mode_,

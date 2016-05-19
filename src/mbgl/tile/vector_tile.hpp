@@ -66,20 +66,4 @@ private:
     mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
-class TileID;
-class FileSource;
-
-class VectorTileMonitor : public GeometryTileMonitor {
-public:
-    VectorTileMonitor(const OverscaledTileID&, float pixelRatio, const std::string& urlTemplate, FileSource&);
-
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
-
-private:
-    OverscaledTileID tileID;
-    float pixelRatio;
-    std::string urlTemplate;
-    FileSource& fileSource;
-};
-
 } // namespace mbgl

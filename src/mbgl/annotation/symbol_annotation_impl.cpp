@@ -1,5 +1,6 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {

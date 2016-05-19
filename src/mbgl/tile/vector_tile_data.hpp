@@ -12,7 +12,7 @@
 namespace mbgl {
 
 class AsyncRequest;
-class GeometryTileMonitor;
+class GeometryTileSource;
 class FeatureIndex;
 
 namespace style {
@@ -22,7 +22,7 @@ class Style;
 class VectorTileData : public TileData {
 public:
     VectorTileData(const OverscaledTileID&,
-                   std::unique_ptr<GeometryTileMonitor> monitor,
+                   std::unique_ptr<GeometryTileSource> monitor,
                    std::string sourceID,
                    style::Style&,
                    const MapMode,
@@ -50,7 +50,7 @@ private:
     Worker& worker;
     TileWorker tileWorker;
 
-    std::unique_ptr<GeometryTileMonitor> monitor;
+    std::unique_ptr<GeometryTileSource> monitor;
     std::unique_ptr<AsyncRequest> tileRequest;
     std::unique_ptr<AsyncRequest> workRequest;
 

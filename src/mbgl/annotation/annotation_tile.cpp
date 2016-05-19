@@ -32,23 +32,4 @@ util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) c
     return nullptr;
 }
 
-AnnotationTileMonitor::AnnotationTileMonitor(const OverscaledTileID& tileID_, AnnotationManager& annotationManager_)
-    : tileID(tileID_),
-      annotationManager(annotationManager_) {
-}
-
-AnnotationTileMonitor::~AnnotationTileMonitor() {
-    annotationManager.removeTileMonitor(*this);
-}
-
-std::unique_ptr<AsyncRequest> AnnotationTileMonitor::monitorTile(const GeometryTileMonitor::Callback& callback_) {
-    callback = callback_;
-    annotationManager.addTileMonitor(*this);
-    return nullptr;
-}
-
-void AnnotationTileMonitor::update(std::unique_ptr<GeometryTile> tile) {
-    callback(nullptr, std::move(tile), {}, {});
-}
-
 } // namespace mbgl

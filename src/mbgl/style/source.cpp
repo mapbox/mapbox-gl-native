@@ -22,6 +22,10 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
+#include <mbgl/tile/vector_tile_source.hpp>
+#include <mbgl/tile/geojson_tile_source.hpp>
+#include <mbgl/tile/annotation_tile_source.hpp>
+
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/style/parser.hpp>
@@ -202,14 +206,14 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
                                                 tileset->tiles.at(0), parameters.texturePool,
                                                 parameters.worker, parameters.fileSource, callback);
     } else {
-        std::unique_ptr<GeometryTileMonitor> monitor;
+        std::unique_ptr<GeometryTileSource> monitor;
 
         if (type == SourceType::Vector) {
-            monitor = std::make_unique<VectorTileMonitor>(overscaledTileID, parameters.pixelRatio, tileset->tiles.at(0), parameters.fileSource);
+            monitor = std::make_unique<VectorTileSource>(overscaledTileID, parameters.pixelRatio, tileset->tiles.at(0), parameters.fileSource);
         } else if (type == SourceType::Annotations) {
-            monitor = std::make_unique<AnnotationTileMonitor>(overscaledTileID, parameters.annotationManager);
+            monitor = std::make_unique<AnnotationTileSource>(overscaledTileID, parameters.annotationManager);
         } else if (type == SourceType::GeoJSON) {
-            monitor = std::make_unique<GeoJSONTileMonitor>(geojsonvt.get(), overscaledTileID);
+            monitor = std::make_unique<GeoJSONTileSource>(geojsonvt.get(), overscaledTileID);
         } else {
             Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(type).c_str());
             return nullptr;

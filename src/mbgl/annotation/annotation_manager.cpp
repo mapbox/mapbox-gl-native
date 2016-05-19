@@ -5,6 +5,7 @@
 #include <mbgl/annotation/fill_annotation_impl.hpp>
 #include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/tile/annotation_tile_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -139,12 +140,12 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 }
 
-void AnnotationManager::addTileMonitor(AnnotationTileMonitor& monitor) {
+void AnnotationManager::addTileSource(AnnotationTileSource& monitor) {
     monitors.insert(&monitor);
     monitor.update(getTile(monitor.tileID.canonical));
 }
 
-void AnnotationManager::removeTileMonitor(AnnotationTileMonitor& monitor) {
+void AnnotationManager::removeTileSource(AnnotationTileSource& monitor) {
     monitors.erase(&monitor);
 }
 
