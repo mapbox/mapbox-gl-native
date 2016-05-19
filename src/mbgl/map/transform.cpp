@@ -45,24 +45,23 @@ Transform::Transform(std::function<void(MapChange)> callback_,
 #pragma mark - Map View
 
 bool Transform::resize(const std::array<uint16_t, 2> size) {
-    if (state.width != size[0] || state.height != size[1]) {
-
-        if (callback) {
-            callback(MapChangeRegionWillChange);
-        }
-
-        state.width = size[0];
-        state.height = size[1];
-        state.constrain(state.scale, state.x, state.y);
-
-        if (callback) {
-            callback(MapChangeRegionDidChange);
-        }
-
-        return true;
-    } else {
+    if (state.width == size[0] && state.height == size[1]) {
         return false;
     }
+
+    if (callback) {
+        callback(MapChangeRegionWillChange);
+    }
+
+    state.width = size[0];
+    state.height = size[1];
+    state.constrain(state.scale, state.x, state.y);
+
+    if (callback) {
+        callback(MapChangeRegionDidChange);
+    }
+
+    return true;
 }
 
 #pragma mark - Camera

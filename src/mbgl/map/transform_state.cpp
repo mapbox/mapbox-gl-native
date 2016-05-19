@@ -230,6 +230,10 @@ double TransformState::worldSize() const {
 }
 
 ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) const {
+    if (width == 0 || height == 0) {
+        return {};
+    }
+
     mat4 mat = coordinatePointMatrix(getZoom());
     vec4 p;
     Point<double> pt = project(latLng) / double(util::tileSize);
@@ -239,6 +243,10 @@ ScreenCoordinate TransformState::latLngToScreenCoordinate(const LatLng& latLng) 
 }
 
 LatLng TransformState::screenCoordinateToLatLng(const ScreenCoordinate& point, LatLng::WrapMode wrapMode) const {
+    if (width == 0 || height == 0) {
+        return {};
+    }
+
     float targetZ = 0;
     mat4 mat = coordinatePointMatrix(getZoom());
 

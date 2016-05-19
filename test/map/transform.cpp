@@ -474,3 +474,43 @@ TEST(Transform, Camera) {
     transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
     ASSERT_FALSE(transform.inTransition());
 }
+
+TEST(Transform, DefaultTransform) {
+    Transform transform;
+    const TransformState& state = transform.getState();
+
+    LatLng nullIsland, latLng = {};
+    ScreenCoordinate center, point = {};
+    const uint16_t min = std::numeric_limits<uint16_t>::min();
+    const uint16_t max = std::numeric_limits<uint16_t>::max();
+
+    auto testConversions = [&](const LatLng& coord, const ScreenCoordinate& screenCoord) {
+        latLng = state.screenCoordinateToLatLng(center);
+        ASSERT_NEAR(latLng.latitude, coord.latitude, 0.000001);
+        ASSERT_NEAR(latLng.longitude, coord.longitude, 0.000001);
+        point = state.latLngToScreenCoordinate(nullIsland);
+        ASSERT_DOUBLE_EQ(point.x, screenCoord.x);
+        ASSERT_DOUBLE_EQ(point.y, screenCoord.y);
+    };
+
+    testConversions(nullIsland, center);
+
+    // Cannot assign the current size.
+    ASSERT_FALSE(transform.resize({{}}));
+
+    ASSERT_TRUE(transform.resize({{ min, max }}));
+    testConversions(nullIsland, center);
+
+    ASSERT_TRUE(transform.resize({{ max, min }}));
+    testConversions(nullIsland, center);
+
+    ASSERT_TRUE(transform.resize({{ min, min }}));
+    testConversions(nullIsland, center);
+
+    center = { max / 2., max / 2. };
+
+    // -1 evaluates to UINT_MAX.
+    ASSERT_TRUE(transform.resize({{ static_cast<uint16_t>(-1), static_cast<uint16_t>(-1) }}));
+    ASSERT_FALSE(transform.resize({{ max, max }}));
+    testConversions(nullIsland, center);
+}
