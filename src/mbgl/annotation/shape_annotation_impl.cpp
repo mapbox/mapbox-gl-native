@@ -144,6 +144,11 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
             renderGeometry.push_back(renderLine);
         }
 
+        // https://github.com/mapbox/geojson-vt-cpp/issues/44
+        if (featureType == FeatureType::Polygon) {
+            renderGeometry = fixupPolygons(renderGeometry);
+        }
+
         layer.features.emplace_back(
             std::make_shared<AnnotationTileFeature>(featureType, renderGeometry));
     }

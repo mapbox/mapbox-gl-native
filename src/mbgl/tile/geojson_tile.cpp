@@ -89,6 +89,11 @@ std::unique_ptr<GeoJSONTile> convertTile(const mapbox::geojsonvt::Tile& tile) {
                 }
             }
 
+            // https://github.com/mapbox/geojson-vt-cpp/issues/44
+            if (featureType == FeatureType::Polygon) {
+                geometry = fixupPolygons(geometry);
+            }
+
             Feature::property_map properties { feature.tags.begin(), feature.tags.end() };
 
             features.emplace_back(std::make_shared<GeoJSONTileFeature>(
