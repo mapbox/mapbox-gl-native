@@ -34,6 +34,14 @@
                 android:value="@string/category_infowindow" />
         </activity>
         <activity
+            android:name=".activity.annotation.AddRemoveMarkerActivity"
+            android:description="@string/description_add_remove_marker"
+            android:label="@string/activity_add_remove_markers">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
+        <activity
             android:name=".activity.infowindow.InfoWindowAdapterActivity"
             android:description="@string/description_info_window_adapter"
             android:label="@string/activity_infowindow_adapter">
