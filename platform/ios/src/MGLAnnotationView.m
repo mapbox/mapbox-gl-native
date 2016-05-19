@@ -1,11 +1,11 @@
 #import "MGLAnnotationView.h"
 #import "MGLAnnotationView_Private.h"
+#import "MGLMapView.h"
 
 @interface MGLAnnotationView ()
 
 @property (nonatomic) id<MGLAnnotation> annotation;
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
-
 @end
 
 @implementation MGLAnnotationView
@@ -35,9 +35,25 @@
 
 - (void)setCenter:(CGPoint)center
 {
+    [self setCenter:center pitch:0];
+}
+
+- (void)setCenter:(CGPoint)center pitch:(CGFloat)pitch
+{
     center.x += _centerOffset.dx;
     center.y += _centerOffset.dy;
+    
     [super setCenter:center];
+    
+    if (_flat) {
+        [self updatePitch:pitch];
+    }
+}
+
+- (void)updatePitch:(CGFloat)pitch
+{
+    CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(pitch), 1.0, 0, 0);
+    self.layer.transform = t;
 }
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event

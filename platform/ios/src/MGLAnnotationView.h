@@ -36,6 +36,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
+ Setting this property to YES will force the annotation view to tilt according to the associated map view.
+ */
+@property (nonatomic, assign, getter=isFlat) BOOL flat;
+
+
+/**
  Called when the view is removed from the reuse queue.
 
  The default implementation of this method does nothing. You can override it in your custom annotation views and use it to put the view 

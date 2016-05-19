@@ -4381,7 +4381,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 {
                     [self.glView addSubview:annotationView];
                 }
-                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                
+                CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+                [annotationView setCenter:center pitch:self.camera.pitch];
+                
                 annotationContext.annotationView = annotationView;
             }
         }
@@ -4393,7 +4396,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         else
         {
-            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];;
+            CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            [annotationView setCenter:center pitch:self.camera.pitch];
         }
     }
 }

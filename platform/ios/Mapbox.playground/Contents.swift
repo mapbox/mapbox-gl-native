@@ -5,23 +5,45 @@ import Mapbox
 let width: CGFloat = 700
 let height: CGFloat = 800
 
+class Responder: NSObject {
+    var mapView: MGLMapView?
+    func togglePitch(sender: UISwitch)  {
+        let camera = mapView!.camera
+        camera.pitch = sender.on ? 60 : 0
+        mapView!.setCamera(camera, animated: false)
+    }
+}
+
 //: A control panel
 let panelWidth: CGFloat = 200
 let panel = UIView(frame: CGRect(x: width - panelWidth, y: 0, width: 200, height: 100))
 panel.alpha = 0.8
 panel.backgroundColor = UIColor.whiteColor()
+
+// Delete markers
 let deleteSwitchLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 30))
 deleteSwitchLabel.adjustsFontSizeToFitWidth = true
 deleteSwitchLabel.text = "Delete Markers"
 let deleteMarkerSwitchView = UISwitch(frame: CGRect(x: panelWidth - panelWidth / 2.0, y:0, width: 100, height: 50))
 panel.addSubview(deleteSwitchLabel)
 panel.addSubview(deleteMarkerSwitchView)
+
+// Hide markers
 let hideSwitchLabel = UILabel(frame: CGRect(x: 0, y: 30, width: 100, height: 30))
 hideSwitchLabel.adjustsFontSizeToFitWidth = true
 hideSwitchLabel.text = "Hide Markers"
 let hideMarkerSwitchView = UISwitch(frame: CGRect(x: panelWidth - panelWidth / 2.0, y: 30, width: 100, height: 50))
 panel.addSubview(hideSwitchLabel)
 panel.addSubview(hideMarkerSwitchView)
+
+// Pitch map
+let pitchLabel = UILabel(frame: CGRect(x: 0, y: 60, width: 100, height: 30))
+pitchLabel.text = "Pitch"
+let pitchSwitch = UISwitch(frame: CGRect(x: panelWidth-panelWidth / 2.0, y: 60, width: 100, height: 50))
+let responder = Responder()
+pitchSwitch.addTarget(responder, action: #selector(responder.togglePitch(_:)), forControlEvents: .ValueChanged)
+panel.addSubview(pitchLabel)
+panel.addSubview(pitchSwitch)
 
 //: # Mapbox Maps
 
@@ -53,6 +75,7 @@ class MapDelegate: NSObject, MGLMapViewDelegate {
             let av = PlaygroundAnnotationView(reuseIdentifier: "annotation")
             av.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
             av.centerOffset = CGVector(dx: -15, dy: -15)
+            av.flat = true
             let centerView = UIView(frame: CGRectInset(av.bounds, 3, 3))
             centerView.backgroundColor = UIColor.whiteColor()
             av.addSubview(centerView)
@@ -121,6 +144,7 @@ XCPlaygroundPage.currentPage.liveView = mapView
 
 let mapDelegate = MapDelegate()
 mapView.delegate = mapDelegate
+responder.mapView = mapView
 
 let tapGesture = UILongPressGestureRecognizer(target: mapDelegate, action: #selector(mapDelegate.handleTap))
 mapView.addGestureRecognizer(tapGesture)
