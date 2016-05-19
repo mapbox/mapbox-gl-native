@@ -152,7 +152,11 @@ GeometryCollection VectorTileFeature::getGeometries() const {
         }
     }
 
-    return lines;
+    if (layer.version >= 2 || type != FeatureType::Polygon) {
+        return lines;
+    }
+
+    return fixupPolygons(lines);
 }
 
 VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
@@ -194,6 +198,9 @@ VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
             break;
         case 5: // extent
             extent = layer_pbf.get_uint32();
+            break;
+        case 15: // version
+            version = layer_pbf.get_uint32();
             break;
         default:
             layer_pbf.skip();
