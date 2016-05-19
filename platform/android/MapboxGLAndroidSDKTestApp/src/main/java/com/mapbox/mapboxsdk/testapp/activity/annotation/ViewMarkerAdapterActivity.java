@@ -26,7 +26,7 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerOptions;
 
-public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
+public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
@@ -45,14 +45,13 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_marker_bulk);
+        setContentView(R.layout.activity_marker_view);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
@@ -65,7 +64,13 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
             public void onMapReady(@NonNull MapboxMap mapboxMap) {
                 mMapboxMap = mapboxMap;
 
-                int infoWindowOffset = (int) getResources().getDimension(R.dimen.coordinatebounds_margin);
+                // add text markers
+                for (int i = 0; i < LAT_LNGS.length; i++) {
+                    mMapboxMap.addMarker(new MarkerOptions()
+                            .position(LAT_LNGS[i])
+                            .markerView(true)
+                            .title(String.valueOf(i)));
+                }
 
                 // add flag marker
                 mMapboxMap.addMarker(new CountryMarkerOptions()
@@ -76,24 +81,15 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
                         .position(new LatLng(38.899774, -77.023237))
                 );
 
+                // default GL marker
                 mMapboxMap.addMarker(new CountryMarkerOptions()
                         .title("United States")
-                        .abbrevName("us")
-                        .flagRes(R.drawable.ic_us)
                         .position(new LatLng(38.902580, -77.050102))
                 );
 
-                // add text markers
-                for (int i = 0; i < LAT_LNGS.length; i++) {
-                    mMapboxMap.addMarker(new MarkerOptions()
-                            .position(LAT_LNGS[i])
-                            .markerView(true)
-                            .title(String.valueOf(i)));
-                }
-
                 // set adapters
-                mMapboxMap.addMarkerViewAdapter(new TextAdapter(MultipleViewMarkerAdapterActivity.this));
-                mMapboxMap.addMarkerViewAdapter(new CountryAdapter(MultipleViewMarkerAdapterActivity.this));
+                mMapboxMap.addMarkerViewAdapter(new TextAdapter(ViewMarkerAdapterActivity.this));
+                mMapboxMap.addMarkerViewAdapter(new CountryAdapter(ViewMarkerAdapterActivity.this));
 
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
@@ -109,7 +105,7 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
                 mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-                        Toast.makeText(MultipleViewMarkerAdapterActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ViewMarkerAdapterActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });
@@ -148,7 +144,7 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
                     .animSelectRes(R.animator.scale_up)
                     .animDeselectRes(R.animator.scale_down)
                     .infoWindowOffset(0, (int) getContext().getResources()
-                            .getDimension(R.dimen.fab_margin));
+                            .getDimension(R.dimen.coordinatebounds_margin));
 
             if (marker.getId() == 0) {
                 builder.flat(true);
@@ -192,10 +188,10 @@ public class MultipleViewMarkerAdapterActivity extends AppCompatActivity {
         @Override
         public MarkerViewSettings getMarkerViewSettings(Marker marker) {
             return new MarkerViewSettings.Builder()
-                    .animSelectRes(R.animator.scale_up)
-                    .animDeselectRes(R.animator.scale_down)
+                    .animSelectRes(R.animator.rotate_360)
+                    .animDeselectRes(R.animator.rotate_360)
                     .infoWindowOffset(0, (int) getContext().getResources()
-                            .getDimension(R.dimen.coordinatebounds_margin))
+                            .getDimension(R.dimen.fab_margin))
                     .flat(true)
                     .build();
         }

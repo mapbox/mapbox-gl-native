@@ -45,7 +45,6 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_animate_coordinates"
-        app:backgroundTint="@android:color/white" />
+        android:src="@drawable/ic_animate_coordinates" />
 
 </RelativeLayout>

@@ -77,43 +77,8 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         });
 
         final View fab = findViewById(R.id.fab);
-        final TextView viewCountView = (TextView) findViewById(R.id.countView);
         if (fab != null) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mMapboxMap != null) {
-                        mCustomMarkerView = true;
-
-                        fab.animate().alpha(0).start();
-                        mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
-                        mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-                            @Override
-                            public void onMapChanged(@MapView.MapChange int change) {
-                                if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-                                    if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
-                                        viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
-                                    }
-                                }
-                            }
-                        });
-
-                        mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
-                            @Override
-                            public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-                                Toast.makeText(BulkMarkerActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
-                                return false;
-                            }
-                        });
-
-                        // reload markers
-                        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-                        if (spinner != null) {
-                            loadBulkMarkers(spinner.getSelectedItemPosition());
-                        }
-                    }
-                }
-            });
+            fab.setOnClickListener(new FabClickListener());
         }
     }
 
@@ -146,7 +111,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
             TextView title;
         }
     }
-
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -201,6 +165,43 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private class FabClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            if (mMapboxMap != null) {
+                mCustomMarkerView = true;
+
+                v.animate().alpha(0).start();
+                mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+                mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+                    @Override
+                    public void onMapChanged(@MapView.MapChange int change) {
+                        if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
+                            if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
+                                TextView viewCountView = (TextView) findViewById(R.id.countView);
+                                viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
+                            }
+                        }
+                    }
+                });
+
+                mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
+                        Toast.makeText(BulkMarkerActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
+
+                // reload markers
+                Spinner spinner = (Spinner) findViewById(R.id.spinner);
+                if (spinner != null) {
+                    loadBulkMarkers(spinner.getSelectedItemPosition());
+                }
+            }
         }
     }
 

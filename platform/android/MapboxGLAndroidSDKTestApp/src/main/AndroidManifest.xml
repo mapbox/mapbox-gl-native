@@ -254,18 +254,9 @@
         </activity>
 
         <activity
-            android:name=".activity.annotation.ViewMarkerActivity"
+            android:name=".activity.annotation.ViewMarkerAdapterActivity"
             android:description="@string/description_view_marker"
             android:label="@string/activity_view_marker">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_annotation" />
-        </activity>
-
-        <activity
-            android:name=".activity.annotation.MultipleViewMarkerAdapterActivity"
-            android:description="@string/description_view_marker2"
-            android:label="@string/activity_view_marker2">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_annotation" />

@@ -158,7 +158,6 @@ public class MapView extends FrameLayout {
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
     private long mViewMarkerBoundsUpdateTime;
-    private boolean mViewMarkersUpdateRunning;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -453,9 +452,11 @@ public class MapView extends FrameLayout {
                         }
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
-                    if (mMapboxMap.getMarkerViewAdapters() != null) {
+                    if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
                         invalidateViewMarkers();
                     }
+                }else if(change== DID_FINISH_LOADING_MAP){
+                    invalidateViewMarkers();
                 }
             }
         });
@@ -471,17 +472,11 @@ public class MapView extends FrameLayout {
 
     void invalidateViewMarkers() {
         long currentTime = SystemClock.elapsedRealtime();
-
-        if (mViewMarkersUpdateRunning || currentTime < mViewMarkerBoundsUpdateTime) {
+        if (currentTime < mViewMarkerBoundsUpdateTime) {
             return;
         }
-        mViewMarkerBoundsUpdateTime = currentTime + 300;
-        mViewMarkersUpdateRunning = true;
-
         mMapboxMap.invalidateViewMarkersInBounds();
-
-        mViewMarkersUpdateRunning = false;
-        Log.v(MapboxConstants.TAG, "Amount of child views " + getChildCount());
+        mViewMarkerBoundsUpdateTime = currentTime + 250;
     }
 
     /**
@@ -623,13 +618,9 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getPitch();
     }
 
-    void setTilt(Double pitch, @Nullable Long duration) {
-        long actualDuration = 0;
-        if (duration != null) {
-            actualDuration = duration;
-        }
+    void setTilt(Double pitch) {
         mMyLocationView.setTilt(pitch);
-        mNativeMapView.setPitch(pitch, actualDuration);
+        mNativeMapView.setPitch(pitch, 0);
     }
 
 
@@ -1356,8 +1347,6 @@ public class MapView extends FrameLayout {
                 return;
             }
 
-            Log.v(MapboxConstants.TAG, "SurfaceTexture has been updated");
-
             mCompassView.update(getDirection());
             mMyLocationView.update();
 
@@ -2003,7 +1992,7 @@ public class MapView extends FrameLayout {
             pitch = Math.max(MapboxConstants.MINIMUM_TILT, Math.min(MapboxConstants.MAXIMUM_TILT, pitch));
 
             // Tilt the map
-            setTilt(pitch, null);
+            mMapboxMap.setTilt(pitch);
 
             return true;
         }
