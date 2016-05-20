@@ -706,7 +706,7 @@ public class MapboxMap {
                             final int animSelectRes = marker.getSelectAnimRes();
                             adaptedView.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick(View v) {
+                                public void onClick(final View v) {
                                     boolean clickHandled = false;
                                     if (mOnMarkerViewClickListener != null) {
                                         clickHandled = mOnMarkerViewClickListener.onMarkerClick(marker, v, adapter);
@@ -714,6 +714,7 @@ public class MapboxMap {
 
                                     if (!clickHandled) {
                                         if (animSelectRes != 0) {
+                                            v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                                             Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), animSelectRes);
                                             animator.setTarget(v);
                                             animator.addListener(new AnimatorListenerAdapter() {
@@ -721,6 +722,7 @@ public class MapboxMap {
                                                 public void onAnimationEnd(Animator animation) {
                                                     super.onAnimationEnd(animation);
                                                     selectMarker(marker);
+                                                    v.setLayerType(View.LAYER_TYPE_NONE, null);
                                                 }
                                             });
                                             animator.start();
@@ -1298,11 +1300,19 @@ public class MapboxMap {
             }
 
             if (marker instanceof MarkerView) {
-                View viewMarker = mMarkerViewMap.get(marker);
+                final View viewMarker = mMarkerViewMap.get(marker);
                 if (viewMarker != null) {
                     int deselectAnimatorRes = ((MarkerView) marker).getDeselectAnimRes();
                     if (deselectAnimatorRes != 0) {
+                        viewMarker.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                         Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), deselectAnimatorRes);
+                        animator.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+                                viewMarker.setLayerType(View.LAYER_TYPE_NONE, null);
+                            }
+                        });
                         animator.setTarget(viewMarker);
                         animator.start();
                     }
