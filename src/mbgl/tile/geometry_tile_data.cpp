@@ -13,12 +13,11 @@
 namespace mbgl {
 
 GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
-                                   std::unique_ptr<GeometryTileSource> tileSource_,
                                    std::string sourceID,
                                    style::Style& style_,
                                    const MapMode mode_,
-                                   const std::function<void(std::exception_ptr)>& callback)
-    : TileData(id_, std::move(tileSource_)),
+                                   const std::function<void(std::exception_ptr)>& callback_)
+    : TileData(id_),
       style(style_),
       worker(style_.workers),
       tileWorker(id_,
@@ -27,69 +26,68 @@ GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
                  obsolete,
-                 mode_) {
-    auto geometryTileSource = reinterpret_cast<GeometryTileSource*>(tileSource.get());
-    tileRequest = geometryTileSource->monitorTile([callback, this](std::exception_ptr err,
-                                                        std::unique_ptr<GeometryTile> tile,
-                                                        optional<Timestamp> modified_,
-                                                        optional<Timestamp> expires_) {
-        if (err) {
-            callback(err);
-            return;
-        }
+                 mode_),
+      callback(callback_) {
+}
 
-        modified = modified_;
-        expires = expires_;
+void GeometryTileData::setData(std::exception_ptr err,
+                               std::unique_ptr<GeometryTile> tile,
+                               optional<Timestamp> modified_,
+                               optional<Timestamp> expires_) {
+    if (err) {
+        callback(err);
+        return;
+    }
 
-        if (!tile) {
-            // This is a 404 response. We're treating these as empty tiles.
-            workRequest.reset();
-            availableData = DataAvailability::All;
-            buckets.clear();
-            callback(err);
-            return;
-        }
+    modified = modified_;
+    expires = expires_;
 
-        // Mark the tile as pending again if it was complete before to prevent signaling a complete
-        // state despite pending parse operations.
-        if (availableData == DataAvailability::All) {
-            availableData = DataAvailability::Some;
-        }
-
-        // Kick off a fresh parse of this tile. This happens when the tile is new, or
-        // when tile data changed. Replacing the workdRequest will cancel a pending work
-        // request in case there is one.
+    if (!tile) {
+        // This is a 404 response. We're treating these as empty tiles.
         workRequest.reset();
-        workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
-            workRequest.reset();
+        availableData = DataAvailability::All;
+        buckets.clear();
+        callback(err);
+        return;
+    }
 
-            std::exception_ptr error;
-            if (result.is<TileParseResultData>()) {
-                auto& resultBuckets = result.get<TileParseResultData>();
-                availableData =
-                    resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+    // Mark the tile as pending again if it was complete before to prevent signaling a complete
+    // state despite pending parse operations.
+    if (availableData == DataAvailability::All) {
+        availableData = DataAvailability::Some;
+    }
 
-                // Persist the configuration we just placed so that we can later check whether we need to
-                // place again in case the configuration has changed.
-                placedConfig = config;
+    // Kick off a fresh parse of this tile. This happens when the tile is new, or
+    // when tile data changed. Replacing the workdRequest will cancel a pending work
+    // request in case there is one.
+    workRequest.reset();
+    workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [this, config = targetConfig] (TileParseResult result) {
+        workRequest.reset();
 
-                // Move over all buckets we received in this parse request, potentially overwriting
-                // existing buckets in case we got a refresh parse.
-                buckets = std::move(resultBuckets.buckets);
+        std::exception_ptr error;
+        if (result.is<TileParseResultData>()) {
+            auto& resultBuckets = result.get<TileParseResultData>();
+            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
-                if (isComplete()) {
-                    featureIndex = std::move(resultBuckets.featureIndex);
-                    geometryTile = std::move(resultBuckets.geometryTile);
-                }
+            // Persist the configuration we just placed so that we can later check whether we need to
+            // place again in case the configuration has changed.
+            placedConfig = config;
 
-            } else {
-                // This is triggered when parsing fails (e.g. due to an invalid vector tile)
-                error = result.get<std::exception_ptr>();
-                availableData = DataAvailability::All;
+            // Move over all buckets we received in this parse request, potentially overwriting
+            // existing buckets in case we got a refresh parse.
+            buckets = std::move(resultBuckets.buckets);
+
+            if (isComplete()) {
+                featureIndex = std::move(resultBuckets.featureIndex);
+                geometryTile = std::move(resultBuckets.geometryTile);
             }
 
-            callback(error);
-        });
+        } else {
+            error = result.get<std::exception_ptr>();
+            availableData = DataAvailability::All;
+        }
+
+        callback(error);
     });
 }
 
@@ -97,21 +95,20 @@ GeometryTileData::~GeometryTileData() {
     cancel();
 }
 
-bool GeometryTileData::parsePending(std::function<void(std::exception_ptr)> callback) {
+bool GeometryTileData::parsePending() {
     if (workRequest) {
         // There's already parsing or placement going on.
         return false;
     }
 
     workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
+    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
 
         std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
-            availableData =
-                    resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
@@ -149,20 +146,20 @@ Bucket* GeometryTileData::getBucket(const style::Layer& layer) {
     return it->second.get();
 }
 
-void GeometryTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& callback) {
+void GeometryTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& cb) {
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
-        redoPlacement(callback);
+        redoPlacement(cb);
     }
 }
 
-void GeometryTileData::redoPlacement(const std::function<void()>& callback) {
+void GeometryTileData::redoPlacement(const std::function<void()>& cb) {
     // Don't start a new placement request when the current one hasn't completed yet, or when
     // we are parsing buckets.
     if (workRequest) return;
 
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, callback, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, cb, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -180,9 +177,9 @@ void GeometryTileData::redoPlacement(const std::function<void()>& callback) {
         // The target configuration could have changed since we started placement. In this case,
         // we're starting another placement run.
         if (placedConfig != targetConfig) {
-            redoPlacement(callback);
+            redoPlacement(cb);
         } else {
-            callback();
+            cb();
         }
     });
 }
@@ -208,7 +205,6 @@ void GeometryTileData::queryRenderedFeatures(
 
 void GeometryTileData::cancel() {
     obsolete = true;
-    tileRequest.reset();
     workRequest.reset();
 }
 

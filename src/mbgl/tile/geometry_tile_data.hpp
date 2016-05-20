@@ -12,6 +12,7 @@
 namespace mbgl {
 
 class AsyncRequest;
+class GeometryTile;
 class GeometryTileSource;
 class FeatureIndex;
 
@@ -22,17 +23,21 @@ class Style;
 class GeometryTileData : public TileData {
 public:
     GeometryTileData(const OverscaledTileID&,
-                   std::unique_ptr<GeometryTileSource> tileSource,
-                   std::string sourceID,
-                   style::Style&,
-                   const MapMode,
-                   const std::function<void(std::exception_ptr)>& callback);
+                     std::string sourceID,
+                     style::Style&,
+                     const MapMode,
+                     const std::function<void(std::exception_ptr)>& callback);
 
     ~GeometryTileData();
 
+    void setData(std::exception_ptr err,
+                 std::unique_ptr<GeometryTile> tile,
+                 optional<Timestamp> modified_,
+                 optional<Timestamp> expires_);
+
     Bucket* getBucket(const style::Layer&) override;
 
-    bool parsePending(std::function<void(std::exception_ptr)> callback) override;
+    bool parsePending() override;
 
     void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
     void redoPlacement(const std::function<void()>&) override;
@@ -50,7 +55,6 @@ private:
     Worker& worker;
     TileWorker tileWorker;
 
-    std::unique_ptr<AsyncRequest> tileRequest;
     std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains all the Bucket objects for the tile. Buckets are render
@@ -69,6 +73,8 @@ private:
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     util::Atomic<bool> obsolete { false };
+
+    const std::function<void(std::exception_ptr)> callback;
 };
 
 } // namespace mbgl

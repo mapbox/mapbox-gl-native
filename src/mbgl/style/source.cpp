@@ -25,7 +25,7 @@
 #include <mbgl/tile/vector_tile_source.hpp>
 #include <mbgl/tile/geojson_tile_source.hpp>
 #include <mbgl/tile/annotation_tile_source.hpp>
-#include <mbgl/tile/raster_tile_source.hpp>
+#include <mbgl/tile/image_tile_source.hpp>
 
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
@@ -193,8 +193,7 @@ const std::map<UnwrappedTileID, Tile>& Source::getTiles() const {
 
 std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledTileID,
                                              const UpdateParameters& parameters) {
-    std::unique_ptr<TileData> data = cache.get(overscaledTileID);
-    if (data) {
+    if (auto data = cache.get(overscaledTileID)) {
         return data;
     }
 
@@ -207,33 +206,40 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
         const auto resource = Resource::tile(
             tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
             overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-        auto monitor = std::make_unique<RasterTileSource>(resource, parameters.fileSource);
-        data =
-            std::make_unique<RasterTileData>(overscaledTileID, std::move(monitor),
-                                             parameters.texturePool, parameters.worker, callback);
-    } else {
-        std::unique_ptr<GeometryTileSource> monitor;
+        auto data = std::make_unique<RasterTileData>(overscaledTileID, parameters.texturePool,
+                                                     parameters.worker, callback);
+        data->setTileSource(
+            std::make_unique<ImageTileSource>(*data, resource, parameters.fileSource));
 
+        // Need a std::move here to create a std::unique_ptr<TileData> from
+        // std::unique_ptr<GeometryTileData>.
+        return std::move(data);
+    } else {
+        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+                                                       parameters.mode, callback);
         if (type == SourceType::Vector) {
             assert(!tileset->tiles.empty());
             const auto resource = Resource::tile(
                 tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
                 overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-            monitor = std::make_unique<VectorTileSource>(resource, parameters.fileSource);
+            data->setTileSource(
+                std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
         } else if (type == SourceType::Annotations) {
-            monitor = std::make_unique<AnnotationTileSource>(overscaledTileID, parameters.annotationManager);
+            data->setTileSource(std::make_unique<AnnotationTileSource>(
+                *data, overscaledTileID, parameters.annotationManager));
         } else if (type == SourceType::GeoJSON) {
-            monitor = std::make_unique<GeoJSONTileSource>(geojsonvt.get(), overscaledTileID);
+            data->setTileSource(
+                std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
         } else {
-            Log::Warning(Event::Style, "Source type '%s' is not implemented", SourceTypeClass(type).c_str());
+            Log::Warning(Event::Style, "Source type '%s' is not implemented",
+                         SourceTypeClass(type).c_str());
             return nullptr;
         }
 
-        data = std::make_unique<GeometryTileData>(overscaledTileID, std::move(monitor), id,
-                                                  parameters.style, parameters.mode, callback);
+        // Need a std::move here to create a std::unique_ptr<TileData> from
+        // std::unique_ptr<GeometryTileData>.
+        return std::move(data);
     }
-
-    return data;
 }
 
 TileData* Source::getTileData(const OverscaledTileID& overscaledTileID) const {
@@ -322,13 +328,9 @@ bool Source::update(const UpdateParameters& parameters) {
     }
 
     for (auto& pair : tileDataMap) {
-        const auto& dataTileID = pair.first;
         auto tileData = pair.second.get();
         if (parameters.shouldReparsePartialTiles && tileData->isIncomplete()) {
-            auto callback = std::bind(&Source::tileLoadingCallback, this, dataTileID,
-                                      std::placeholders::_1, false);
-
-            if (!tileData->parsePending(callback)) {
+            if (!tileData->parsePending()) {
                 allTilesUpdated = false;
             }
         } else {

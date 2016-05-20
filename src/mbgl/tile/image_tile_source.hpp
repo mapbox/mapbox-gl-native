@@ -9,10 +9,10 @@ namespace mbgl {
 class FileSource;
 class AsyncRequest;
 
-class VectorTileSource : public GeometryTileSource {
+class ImageTileSource : public RasterTileSource {
 public:
-    VectorTileSource(GeometryTileData&, const Resource&, FileSource&);
-    virtual ~VectorTileSource() = default;
+    ImageTileSource(RasterTileData&, const Resource&, FileSource&);
+    virtual ~ImageTileSource() = default;
 
 private:
     const Resource resource;

@@ -16,10 +16,8 @@ namespace mbgl {
 
 class GeoJSONTileSource : public GeometryTileSource {
 public:
-    GeoJSONTileSource(mapbox::geojsonvt::GeoJSONVT*, const OverscaledTileID&);
+    GeoJSONTileSource(GeometryTileData&, mapbox::geojsonvt::GeoJSONVT*, const OverscaledTileID&);
     virtual ~GeoJSONTileSource();
-
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileSource::Callback&) override;
 
     void setGeoJSONVT(mapbox::geojsonvt::GeoJSONVT*);
 
@@ -31,7 +29,6 @@ public:
 
 private:
     mapbox::geojsonvt::GeoJSONVT* geojsonvt = nullptr;
-    GeometryTileSource::Callback callback;
 };
 
 } // namespace mbgl

@@ -1,5 +1,6 @@
 #include <mbgl/tile/geojson_tile_source.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <mbgl/util/async_request.hpp>
 
@@ -7,9 +8,11 @@
 
 namespace mbgl {
 
-GeoJSONTileSource::GeoJSONTileSource(mapbox::geojsonvt::GeoJSONVT* geojsonvt_,
+GeoJSONTileSource::GeoJSONTileSource(GeometryTileData& tileData_,
+                                     mapbox::geojsonvt::GeoJSONVT* geojsonvt_,
                                      const OverscaledTileID& id)
-    : tileID(id), geojsonvt(geojsonvt_) {
+    : GeometryTileSource(tileData_), tileID(id), geojsonvt(geojsonvt_) {
+    update();
 }
 
 GeoJSONTileSource::~GeoJSONTileSource() = default;
@@ -89,15 +92,8 @@ void GeoJSONTileSource::update() {
     if (geojsonvt) {
         auto tile = convertTile(
             geojsonvt->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y));
-        callback(nullptr, std::move(tile), {}, {});
+        tileData.setData(nullptr, std::move(tile), {}, {});
     }
-}
-
-std::unique_ptr<AsyncRequest>
-GeoJSONTileSource::monitorTile(const GeometryTileSource::Callback& cb) {
-    callback = cb;
-    update();
-    return nullptr;
 }
 
 } // namespace mbgl

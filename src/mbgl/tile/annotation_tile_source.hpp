@@ -8,20 +8,19 @@
 namespace mbgl {
 
 class AnnotationManager;
+class GeometryTile;
 
 class AnnotationTileSource : public GeometryTileSource {
 public:
-    AnnotationTileSource(const OverscaledTileID&, AnnotationManager&);
+    AnnotationTileSource(GeometryTileData&, const OverscaledTileID&, AnnotationManager&);
     ~AnnotationTileSource();
 
     void update(std::unique_ptr<GeometryTile>);
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileSource::Callback&) override;
 
     OverscaledTileID tileID;
 
 private:
     AnnotationManager& annotationManager;
-    GeometryTileSource::Callback callback;
 };
 
 } // namespace mbgl

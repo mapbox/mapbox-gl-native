@@ -5,11 +5,17 @@
 
 namespace mbgl {
 
-TileData::TileData(const OverscaledTileID& id_, std::unique_ptr<TileSource> tileSource_)
-    : id(id_), tileSource(std::move(tileSource_)) {
+TileData::TileData(const OverscaledTileID& id_)
+    : id(id_) {
 }
 
 TileData::~TileData() = default;
+
+void TileData::setTileSource(std::unique_ptr<TileSource> tileSource_) {
+    assert(!tileSource);
+    assert(tileSource_);
+    tileSource = std::move(tileSource_);
+}
 
 void TileData::dumpDebugLogs() const {
     Log::Info(Event::General, "TileData::id: %s", util::toString(id).c_str());

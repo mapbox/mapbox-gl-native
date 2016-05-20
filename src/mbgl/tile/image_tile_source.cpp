@@ -1,14 +1,13 @@
-#include <mbgl/tile/vector_tile_source.hpp>
-#include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/image_tile_source.hpp>
+#include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
 
-VectorTileSource::VectorTileSource(GeometryTileData& tileData_,
-                                   const Resource& resource_,
-                                   FileSource& fileSource_)
-    : GeometryTileSource(tileData_), resource(resource_), fileSource(fileSource_) {
+ImageTileSource::ImageTileSource(RasterTileData& tileData_,
+                                 const Resource& resource_,
+                                 FileSource& fileSource_)
+    : RasterTileSource(tileData_), resource(resource_), fileSource(fileSource_) {
     request = fileSource.request(resource, [this](Response res) {
         if (res.error) {
             tileData.setData(std::make_exception_ptr(std::runtime_error(res.error->message)),
@@ -18,8 +17,7 @@ VectorTileSource::VectorTileSource(GeometryTileData& tileData_,
         } else if (res.noContent) {
             tileData.setData(nullptr, nullptr, res.modified, res.expires);
         } else {
-            tileData.setData(nullptr, std::make_unique<VectorTile>(res.data), res.modified,
-                             res.expires);
+            tileData.setData(nullptr, res.data, res.modified, res.expires);
         }
     });
 }
