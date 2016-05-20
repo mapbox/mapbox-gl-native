@@ -270,8 +270,8 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs \
-	        ./platform/android/MapboxGLAndroidSDK/src/main/assets \
-	        ./node_modules
+	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
 
 distclean: clean
 	-rm -rf ./mason_packages
+	-rm -rf ./node_modules
