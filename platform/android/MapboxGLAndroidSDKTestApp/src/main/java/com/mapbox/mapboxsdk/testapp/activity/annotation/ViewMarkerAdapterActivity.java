@@ -1,12 +1,14 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +19,9 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -25,6 +29,8 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerOptions;
+import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerView;
+import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerViewOptions;
 
 public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
@@ -66,20 +72,27 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
                 // add text markers
                 for (int i = 0; i < LAT_LNGS.length; i++) {
-                    mMapboxMap.addMarker(new MarkerOptions()
+                    mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
-                            .markerView(true)
-                            .title(String.valueOf(i)));
+                            .title(String.valueOf(i))
+                            .infoWindowOffset(new Point(0,32))
+                            .selectAnimRes(R.animator.scale_up)
+                            .deselectAnimRes(R.animator.scale_down)
+                    );
                 }
 
                 // add flag marker
-                mMapboxMap.addMarker(new CountryMarkerOptions()
-                        .markerView(true)
-                        .title("United States")
-                        .abbrevName("us")
-                        .flagRes(R.drawable.ic_us)
-                        .position(new LatLng(38.899774, -77.023237))
-                );
+                CountryMarkerViewOptions options = new CountryMarkerViewOptions();
+                options.title("United States");
+                options.abbrevName("us");
+                options.flagRes(R.drawable.ic_us);
+                options.position(new LatLng(38.899774, -77.023237));
+                options.selectAnimRes(R.animator.rotate_360);
+                options.deselectAnimRes(R.animator.rotate_360);
+                options.infoWindowOffset(new Point(0, 64));
+                options.flat(true);
+
+                mapboxMap.addMarker(options);
 
                 // default GL marker
                 mMapboxMap.addMarker(new CountryMarkerOptions()
@@ -113,7 +126,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
         });
     }
 
-    private static class TextAdapter extends MapboxMap.MarkerViewAdapter<Marker> {
+    private static class TextAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
 
         private LayoutInflater inflater;
 
@@ -124,7 +137,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
         @Nullable
         @Override
-        public View getView(@NonNull Marker marker, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(@NonNull MarkerView marker, @Nullable View convertView, @NonNull ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
                 viewHolder = new ViewHolder();
@@ -134,23 +147,9 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            Log.v(MapboxConstants.TAG,"SSSSST");
             viewHolder.title.setText(marker.getTitle());
             return convertView;
-        }
-
-        @Override
-        public MarkerViewSettings getMarkerViewSettings(Marker marker) {
-            MarkerViewSettings.Builder builder = new MarkerViewSettings.Builder()
-                    .animSelectRes(R.animator.scale_up)
-                    .animDeselectRes(R.animator.scale_down)
-                    .infoWindowOffset(0, (int) getContext().getResources()
-                            .getDimension(R.dimen.coordinatebounds_margin));
-
-            if (marker.getId() == 0) {
-                builder.flat(true);
-            }
-
-            return builder.build();
         }
 
         private static class ViewHolder {
@@ -158,7 +157,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
         }
     }
 
-    private static class CountryAdapter extends MapboxMap.MarkerViewAdapter<CountryMarker> {
+    private static class CountryAdapter extends MapboxMap.MarkerViewAdapter<CountryMarkerView> {
 
         private LayoutInflater inflater;
 
@@ -169,7 +168,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
         @Nullable
         @Override
-        public View getView(@NonNull CountryMarker marker, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(@NonNull CountryMarkerView marker, @Nullable View convertView, @NonNull ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
                 viewHolder = new ViewHolder();
@@ -180,20 +179,10 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            Log.v(MapboxConstants.TAG,"TESTSSSSS");
             viewHolder.flag.setImageResource(marker.getFlagRes());
             viewHolder.abbrev.setText(marker.getAbbrevName());
             return convertView;
-        }
-
-        @Override
-        public MarkerViewSettings getMarkerViewSettings(Marker marker) {
-            return new MarkerViewSettings.Builder()
-                    .animSelectRes(R.animator.rotate_360)
-                    .animDeselectRes(R.animator.rotate_360)
-                    .infoWindowOffset(0, (int) getContext().getResources()
-                            .getDimension(R.dimen.fab_margin))
-                    .flat(true)
-                    .build();
         }
 
         private static class ViewHolder {

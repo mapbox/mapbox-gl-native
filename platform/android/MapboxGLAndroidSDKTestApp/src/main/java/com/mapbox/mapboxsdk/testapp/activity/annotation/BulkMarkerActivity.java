@@ -23,7 +23,8 @@ import android.widget.Toast;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -82,7 +83,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    public static class TextAdapter extends MapboxMap.MarkerViewAdapter<Marker> {
+    public static class TextAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
 
         private LayoutInflater inflater;
 
@@ -93,7 +94,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
         @Nullable
         @Override
-        public View getView(@NonNull Marker marker, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(@NonNull MarkerView marker, @Nullable View convertView, @NonNull ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
                 viewHolder = new ViewHolder();
@@ -168,7 +169,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         }
     }
 
-    private class FabClickListener implements View.OnClickListener{
+    private class FabClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             if (mMapboxMap != null) {
@@ -238,11 +239,18 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 LatLng location;
                 for (int i = 0; i < mAmount; i++) {
                     location = locations.get(i);
-                    markerOptions.add(new MarkerOptions()
-                            .position(location)
-                            .markerView(mMarkerView)
-                            .title(String.valueOf(i))
-                            .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
+
+                    if (mMarkerView) {
+//                        markerOptions.add(new MarkerViewOptions()
+//                                .position(location)
+//                                .title(String.valueOf(i))
+//                                .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
+                    } else {
+                        markerOptions.add(new MarkerOptions()
+                                .position(location)
+                                .title(String.valueOf(i))
+                                .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
+                    }
                 }
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Could not add markers,", e);

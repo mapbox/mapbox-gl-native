@@ -4,7 +4,6 @@ import android.content.Context;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.location.Location;
@@ -26,12 +25,13 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
+import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerViewSettings;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -77,8 +77,7 @@ public class MapboxMap {
     private LongSparseArray<Annotation> mAnnotations;
 
     private List<Marker> mSelectedMarkers;
-    private Map<Marker, View> mMarkerViewMap;
-    private LongSparseArray<MarkerViewSettings> mMarkerViewSettingsMap;
+    private Map<MarkerView, View> mMarkerViewMap;
 
     private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
@@ -118,7 +117,6 @@ public class MapboxMap {
         mSelectedMarkers = new ArrayList<>();
         mInfoWindows = new ArrayList<>();
         mMarkerViewMap = new HashMap<>();
-        mMarkerViewSettingsMap = new LongSparseArray<>();
     }
 
     //
@@ -619,6 +617,7 @@ public class MapboxMap {
      * <p>
      * Sets the current Mapbox access token used to load map styles and tiles.
      * </p>
+     *
      * @param accessToken Your public Mapbox access token.
      * @see MapView#setAccessToken(String)
      * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
@@ -652,18 +651,17 @@ public class MapboxMap {
     //
 
     void invalidateViewMarkersInBounds() {
-        List<Marker> markers = mMapView.getMarkersInBounds(mProjection.getVisibleRegion().latLngBounds);
+        List<MarkerView> markers = mMapView.getMarkerViewsInBounds(mProjection.getVisibleRegion().latLngBounds);
         View convertView;
 
         // remove old markers
-        Iterator<Marker> iterator = mMarkerViewMap.keySet().iterator();
+        Iterator<MarkerView> iterator = mMarkerViewMap.keySet().iterator();
         while (iterator.hasNext()) {
-            Marker m = iterator.next();
+            MarkerView m = iterator.next();
             if (!markers.contains(m)) {
                 // remove marker
                 convertView = mMarkerViewMap.get(m);
-                MarkerViewSettings settings = mMarkerViewSettingsMap.get(m.getId());
-                int deselectAnimRes = settings.getDeselectAnimRes();
+                int deselectAnimRes = m.getDeselectAnimRes();
                 if (deselectAnimRes != 0) {
                     Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), deselectAnimRes);
                     animator.setDuration(0);
@@ -676,34 +674,27 @@ public class MapboxMap {
         }
 
         // introduce new markers
-        for (final Marker marker : markers) {
-            if (marker.isViewMarker() && !mMarkerViewMap.containsKey(marker)) {
+        for (final MarkerView marker : markers) {
+            if (!mMarkerViewMap.containsKey(marker)) {
                 for (final MarkerViewAdapter adapter : mMarkerViewAdapters) {
                     if (adapter.getMarkerClass() == marker.getClass()) {
-
-                        MarkerViewSettings settings = mMarkerViewSettingsMap.get(marker.getId());
-                        if (settings == null) {
-                            settings = adapter.getMarkerViewSettings(marker);
-                            mMarkerViewSettingsMap.put(marker.getId(), settings);
-                        }
-
                         convertView = (View) adapter.getViewReusePool().acquire();
                         View adaptedView = adapter.getView(marker, convertView, mMapView);
 
-                        // infowindow offset
-                        Point infoWindowOffset = settings.getInfoWindowOffset();
-                        marker.setTopOffsetPixels(infoWindowOffset.y);
+                        // InfoWindow offset
+                        Point infoWindowOffset = marker.getInfoWindowOffset();
+                        marker.setTopOffsetPixels(-infoWindowOffset.y);
                         marker.setRightOffsetPixels(infoWindowOffset.x);
 
                         if (adaptedView != null) {
 
                             // tilt
-                            adaptedView.setRotationX(settings.getTiltValue());
+                            adaptedView.setRotationX(marker.getTiltValue());
 
                             if (mSelectedMarkers.contains(marker)) {
                                 // if a marker to be shown was selected
                                 // replay that animation with duration 0
-                                int selectAnimRes = settings.getSelectAnimRes();
+                                int selectAnimRes = marker.getSelectAnimRes();
                                 if (selectAnimRes != 0) {
                                     Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), selectAnimRes);
                                     animator.setDuration(0);
@@ -712,7 +703,7 @@ public class MapboxMap {
                                 }
                             }
 
-                            final int animSelectRes = settings.getSelectAnimRes();
+                            final int animSelectRes = marker.getSelectAnimRes();
                             adaptedView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -752,11 +743,10 @@ public class MapboxMap {
     }
 
     void setTilt(double tilt) {
-        for (Map.Entry<Marker, View> entry : mMarkerViewMap.entrySet()) {
-            MarkerViewSettings settings = mMarkerViewSettingsMap.get(entry.getKey().getId());
-            if (settings.isFlat()) {
-                settings.setTiltValue((float) tilt);
-                entry.getValue().setRotationX((float) tilt);
+        for (MarkerView markerView : mMarkerViewMap.keySet()) {
+            if (markerView.isFlat()) {
+                markerView.setTiltValue((float) tilt);
+                mMarkerViewMap.get(markerView).setRotationX((float) tilt);
             }
         }
         mMapView.setTilt(tilt);
@@ -793,6 +783,29 @@ public class MapboxMap {
     @NonNull
     public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
         Marker marker = prepareMarker(markerOptions);
+        long id = mMapView.addMarker(marker);
+        marker.setMapboxMap(this);
+        marker.setId(id);
+        mAnnotations.put(id, marker);
+        return marker;
+    }
+
+    /**
+     * <p>
+     * Adds a marker to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptions A marker options object that defines how to render the marker.
+     * @return The {@code Marker} that was added to the map.
+     */
+    @UiThread
+    @NonNull
+    public Marker addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
+        Marker marker = markerOptions.getMarker();
+        Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
+        marker.setIcon(icon);
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -1284,13 +1297,15 @@ public class MapboxMap {
                 marker.hideInfoWindow();
             }
 
-            View viewMarker = mMarkerViewMap.get(marker);
-            if (viewMarker != null) {
-                int deselectAnimatorRes = mMarkerViewSettingsMap.get(marker.getId()).getDeselectAnimRes();
-                if (deselectAnimatorRes != 0) {
-                    Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), deselectAnimatorRes);
-                    animator.setTarget(viewMarker);
-                    animator.start();
+            if (marker instanceof MarkerView) {
+                View viewMarker = mMarkerViewMap.get(marker);
+                if (viewMarker != null) {
+                    int deselectAnimatorRes = ((MarkerView) marker).getDeselectAnimRes();
+                    if (deselectAnimatorRes != 0) {
+                        Animator animator = AnimatorInflater.loadAnimator(mMapView.getContext(), deselectAnimatorRes);
+                        animator.setTarget(viewMarker);
+                        animator.start();
+                    }
                 }
             }
         }
@@ -1327,7 +1342,7 @@ public class MapboxMap {
 
     private Marker prepareMarker(BaseMarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        if (markerOptions.isViewMarker()) {
+        if (marker instanceof MarkerView) {
             Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
             marker.setIcon(icon);
         } else {
@@ -1407,7 +1422,7 @@ public class MapboxMap {
         return mInfoWindows;
     }
 
-    Map<Marker, View> getMarkerViewMap() {
+    Map<MarkerView, View> getMarkerViewMap() {
         return mMarkerViewMap;
     }
 
@@ -1939,7 +1954,7 @@ public class MapboxMap {
         View getInfoWindow(@NonNull Marker marker);
     }
 
-    public static abstract class MarkerViewAdapter<U extends Marker> {
+    public static abstract class MarkerViewAdapter<U extends MarkerView> {
 
         private Context context;
         private final Class<U> persistentClass;
@@ -1965,10 +1980,6 @@ public class MapboxMap {
 
         public Context getContext() {
             return context;
-        }
-
-        public MarkerViewSettings getMarkerViewSettings(Marker marker) {
-            return new MarkerViewSettings.Builder().build();
         }
     }
 

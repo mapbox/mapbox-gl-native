@@ -69,6 +69,7 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -1109,6 +1110,33 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
+    List<MarkerView> getMarkerViewsInBounds(@NonNull LatLngBounds bbox) {
+        if (mDestroyed || bbox == null) {
+            return new ArrayList<>();
+        }
+
+        // TODO: filter in JNI using C++ parameter to getAnnotationsInBounds
+        long[] ids = mNativeMapView.getAnnotationsInBounds(bbox);
+
+        List<Long> idsList = new ArrayList<>(ids.length);
+        for (int i = 0; i < ids.length; i++) {
+            idsList.add(ids[i]);
+        }
+
+        List<MarkerView> annotations = new ArrayList<>(ids.length);
+        List<Annotation> annotationList = mMapboxMap.getAnnotations();
+        int count = annotationList.size();
+        for (int i = 0; i < count; i++) {
+            Annotation annotation = annotationList.get(i);
+            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
+                annotations.add((MarkerView) annotation);
+            }
+        }
+
+        return new ArrayList<>(annotations);
+    }
+
+
     int getTopOffsetPixelsForIcon(Icon icon) {
         if (mDestroyed) {
             return 0;
@@ -1350,7 +1378,7 @@ public class MapView extends FrameLayout {
             mCompassView.update(getDirection());
             mMyLocationView.update();
 
-            Map<Marker, View> viewMarkers = mMapboxMap.getMarkerViewMap();
+            Map<MarkerView, View> viewMarkers = mMapboxMap.getMarkerViewMap();
             for (Marker marker : viewMarkers.keySet()) {
                 mViewHolder = viewMarkers.get(marker);
                 if (mViewHolder != null) {
