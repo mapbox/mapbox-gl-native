@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -27,7 +26,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerOptions;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerView;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerViewOptions;
@@ -72,12 +70,12 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
                 // add text markers
                 for (int i = 0; i < LAT_LNGS.length; i++) {
-                    mMapboxMap.addMarker(new MarkerViewOptions()
+                    mMapboxMap.addMarkerView(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
-                            .infoWindowOffset(new Point(0,32))
-                            .selectAnimRes(R.animator.scale_up)
-                            .deselectAnimRes(R.animator.scale_down)
+                            .infoWindowOffset(new Point(0, 86))
+                            .selectAnimatorResource(R.animator.scale_up)
+                            .deselectAnimatorResource(R.animator.scale_down)
                     );
                 }
 
@@ -87,12 +85,12 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
                 options.abbrevName("us");
                 options.flagRes(R.drawable.ic_us);
                 options.position(new LatLng(38.899774, -77.023237));
-                options.selectAnimRes(R.animator.rotate_360);
-                options.deselectAnimRes(R.animator.rotate_360);
+                options.selectAnimatorResource(R.animator.rotate_360);
+                options.deselectAnimatorResource(R.animator.rotate_360);
                 options.infoWindowOffset(new Point(0, 64));
                 options.flat(true);
 
-                mapboxMap.addMarker(options);
+                mapboxMap.addMarkerView(options);
 
                 // default GL marker
                 mMapboxMap.addMarker(new CountryMarkerOptions()
@@ -147,7 +145,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            Log.v(MapboxConstants.TAG,"SSSSST");
+            Log.v(MapboxConstants.TAG, "SSSSST");
             viewHolder.title.setText(marker.getTitle());
             return convertView;
         }
@@ -179,7 +177,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            Log.v(MapboxConstants.TAG,"TESTSSSSS");
+            Log.v(MapboxConstants.TAG, "TESTSSSSS");
             viewHolder.flag.setImageResource(marker.getFlagRes());
             viewHolder.abbrev.setText(marker.getAbbrevName());
             return convertView;

@@ -804,10 +804,8 @@ public class MapboxMap {
      */
     @UiThread
     @NonNull
-    public Marker addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-        Marker marker = markerOptions.getMarker();
-        Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
-        marker.setIcon(icon);
+    public Marker addMarkerView(@NonNull BaseMarkerViewOptions markerOptions) {
+        Marker marker = prepareViewMarker(markerOptions);
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -861,6 +859,58 @@ public class MapboxMap {
                 }
             }
         }
+        return markers;
+    }
+
+    /**
+     * <p>
+     * Adds multiple markers to this map.
+     * </p>
+     * The marker's icon is rendered on the map at the location {@code Marker.position}.
+     * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     *
+     * @param markerOptionsList A list of marker options objects that defines how to render the markers.
+     * @return A list of the {@code Marker}s that were added to the map.
+     */
+    @UiThread
+    @NonNull
+    public List<Marker> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerOptionsList) {
+        int count = markerOptionsList.size();
+        List<Marker> markers = new ArrayList<>(count);
+        if (count > 0) {
+            BaseMarkerViewOptions markerOptions;
+            Marker marker;
+            for (int i = 0; i < count; i++) {
+                markerOptions = markerOptionsList.get(i);
+                marker = markerOptions.getMarker();
+                Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
+                marker.setIcon(icon);
+                markers.add(marker);
+            }
+
+            if (markers.size() > 0) {
+                long[] ids = mMapView.addMarkers(markers);
+
+                // if unittests or markers are correctly added to map
+                if (ids == null || ids.length == markers.size()) {
+                    long id = 0;
+                    Marker m;
+                    for (int i = 0; i < markers.size(); i++) {
+                        m = markers.get(i);
+                        m.setMapboxMap(this);
+                        if (ids != null) {
+                            id = ids[i];
+                        } else {
+                            //unit test
+                            id++;
+                        }
+                        m.setId(id);
+                        mAnnotations.put(id, m);
+                    }
+                }
+            }
+        }
+        invalidateViewMarkersInBounds();
         return markers;
     }
 
@@ -1352,20 +1402,22 @@ public class MapboxMap {
 
     private Marker prepareMarker(BaseMarkerOptions markerOptions) {
         Marker marker = markerOptions.getMarker();
-        if (marker instanceof MarkerView) {
-            Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
-            marker.setIcon(icon);
-        } else {
-            Icon icon = mMapView.loadIconForMarker(marker);
-            marker.setTopOffsetPixels(mMapView.getTopOffsetPixelsForIcon(icon));
-        }
+        Icon icon = mMapView.loadIconForMarker(marker);
+        marker.setTopOffsetPixels(mMapView.getTopOffsetPixelsForIcon(icon));
+        return marker;
+    }
+
+    private Marker prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
+        Marker marker = markerViewOptions.getMarker();
+        Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
+        marker.setIcon(icon);
         return marker;
     }
 
     public void addMarkerViewAdapter(@Nullable MarkerViewAdapter markerViewAdapter) {
         if (!mMarkerViewAdapters.contains(markerViewAdapter)) {
             mMarkerViewAdapters.add(markerViewAdapter);
-            mMapView.invalidateViewMarkers();
+            invalidateViewMarkersInBounds();
         }
     }
 

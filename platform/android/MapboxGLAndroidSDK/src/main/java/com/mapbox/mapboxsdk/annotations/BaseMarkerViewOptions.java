@@ -3,15 +3,17 @@ package com.mapbox.mapboxsdk.annotations;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Parcelable;
+import android.support.annotation.AnimatorRes;
+import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
- * Abstract builder class for composing custom Marker objects.
- *
+ * Abstract builder class for composing custom MarkerView objects.
+ * <p>
  * Extending this class requires implementing Parceable interface.
  *
- * @param <U> Type of the marker to be composed
+ * @param <U> Type of the marker view to be composed
  * @param <T> Type of the builder to be used for composing a custom Marker
  */
 public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends BaseMarkerViewOptions<U, T>> implements Parcelable {
@@ -31,7 +33,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         infoWindowOffset = new Point();
     }
 
-    public T position(LatLng position) {
+    public T position(@NonNull LatLng position) {
         this.position = position;
         return getThis();
     }
@@ -66,12 +68,12 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return getThis();
     }
 
-    public T selectAnimRes(int selectAnimRes) {
+    public T selectAnimatorResource(@AnimatorRes int selectAnimRes) {
         this.selectAnimRes = selectAnimRes;
         return getThis();
     }
 
-    public T deselectAnimRes(int deselectAnimRes) {
+    public T deselectAnimatorResource(@AnimatorRes int deselectAnimRes) {
         this.deselectAnimRes = deselectAnimRes;
         return getThis();
     }

@@ -1,11 +1,14 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,7 +23,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
@@ -38,12 +40,14 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class BulkMarkerActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
     private boolean mCustomMarkerView;
+    private List<LatLng> mLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,12 +119,68 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        loadBulkMarkers(position);
+        int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
+        if (mLocations == null) {
+            new LoadLocationTask(this, amount).execute();
+        } else {
+            showMarkers(amount);
+        }
     }
 
-    private void loadBulkMarkers(int selectedSpinnerPosition) {
-        int markersAmount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[selectedSpinnerPosition]);
-        new LoadBulkMarkerTask(this, mMapboxMap, markersAmount, mCustomMarkerView).execute();
+
+    private void onLatLngListLoaded(List<LatLng> latLngs, int amount) {
+        mLocations = latLngs;
+        showMarkers(amount);
+    }
+
+    private void showMarkers(int amount) {
+        mMapboxMap.clear();
+
+        if (mLocations.size() < amount) {
+            amount = mLocations.size();
+        }
+
+        if (mCustomMarkerView) {
+            showNativeMarkers(amount);
+        } else {
+            showGlMarkers(amount);
+        }
+    }
+
+    private void showNativeMarkers(int amount) {
+        List<MarkerViewOptions> markerOptionsList = new ArrayList<>();
+        DecimalFormat formatter = new DecimalFormat("#.#####");
+        Random random = new Random();
+        int randomIndex;
+
+        for (int i = 0; i < amount; i++) {
+            randomIndex = random.nextInt(mLocations.size());
+            LatLng latLng = mLocations.get(randomIndex);
+            markerOptionsList.add(new MarkerViewOptions()
+                    .position(latLng)
+                    .title(String.valueOf(i))
+                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
+        }
+
+        mMapboxMap.addMarkerViews(markerOptionsList);
+    }
+
+    private void showGlMarkers(int amount) {
+        List<MarkerOptions> markerOptionsList = new ArrayList<>();
+        DecimalFormat formatter = new DecimalFormat("#.#####");
+        Random random = new Random();
+        int randomIndex;
+
+        for (int i = 0; i < amount; i++) {
+            randomIndex = random.nextInt(mLocations.size());
+            LatLng latLng = mLocations.get(randomIndex);
+            markerOptionsList.add(new MarkerOptions()
+                    .position(latLng)
+                    .title(String.valueOf(i))
+                    .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
+        }
+
+        mMapboxMap.addMarkers(markerOptionsList);
     }
 
     @Override
@@ -171,12 +231,29 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     private class FabClickListener implements View.OnClickListener {
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             if (mMapboxMap != null) {
                 mCustomMarkerView = true;
 
-                v.animate().alpha(0).start();
+                // remove fab
+                v.animate().alpha(0).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        v.setVisibility(View.GONE);
+                    }
+                }).start();
+
+                // reload markers
+                Spinner spinner = (Spinner) findViewById(R.id.spinner);
+                if (spinner != null) {
+                    int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[spinner.getSelectedItemPosition()]);
+                    showMarkers(amount);
+                }
+
+                // add adapter
                 mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
@@ -196,77 +273,38 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                         return false;
                     }
                 });
-
-                // reload markers
-                Spinner spinner = (Spinner) findViewById(R.id.spinner);
-                if (spinner != null) {
-                    loadBulkMarkers(spinner.getSelectedItemPosition());
-                }
             }
         }
     }
 
-    private static class LoadBulkMarkerTask extends AsyncTask<Void, Integer, List<BaseMarkerOptions>> {
+    private static class LoadLocationTask extends AsyncTask<Void, Integer, List<LatLng>> {
 
-        private static final String TAG = "LoadBulkMarkerTask";
-        private MapboxMap mMapboxMap;
-        private Context mAppContext;
+        private static final String TAG = "LoadLocationTask";
+        private BulkMarkerActivity mActivity;
         private ProgressDialog mProgressDialog;
         private int mAmount;
-        private boolean mMarkerView;
 
-        public LoadBulkMarkerTask(Context context, MapboxMap mapboxMap, int amount, boolean markerView) {
-            mMapboxMap = mapboxMap;
-            mapboxMap.removeAnnotations();
-            mProgressDialog = ProgressDialog.show(context, "Loading", "Fetching markers", false);
-            mAppContext = context.getApplicationContext();
+        public LoadLocationTask(BulkMarkerActivity activity, int amount) {
             mAmount = amount;
-            mMarkerView = markerView;
+            mActivity = activity;
+            mProgressDialog = ProgressDialog.show(activity, "Loading", "Fetching markers", false);
         }
 
         @Override
-        protected List<BaseMarkerOptions> doInBackground(Void... params) {
-            List<BaseMarkerOptions> markerOptions = new ArrayList<>(mAmount);
+        protected List<LatLng> doInBackground(Void... params) {
             try {
-                DecimalFormat formatter = new DecimalFormat("#.#####");
-                String json = GeoParseUtil.loadStringFromAssets(mAppContext, "points.geojson");
-                List<LatLng> locations = GeoParseUtil.parseGeoJSONCoordinates(json);
-
-                if (locations.size() < mAmount) {
-                    mAmount = locations.size();
-                }
-
-                LatLng location;
-                for (int i = 0; i < mAmount; i++) {
-                    location = locations.get(i);
-
-                    if (mMarkerView) {
-//                        markerOptions.add(new MarkerViewOptions()
-//                                .position(location)
-//                                .title(String.valueOf(i))
-//                                .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
-                    } else {
-                        markerOptions.add(new MarkerOptions()
-                                .position(location)
-                                .title(String.valueOf(i))
-                                .snippet(formatter.format(location.getLatitude()) + ", " + formatter.format(location.getLongitude())));
-                    }
-                }
+                String json = GeoParseUtil.loadStringFromAssets(mActivity.getApplicationContext(), "points.geojson");
+                return GeoParseUtil.parseGeoJSONCoordinates(json);
             } catch (IOException | JSONException e) {
                 Log.e(TAG, "Could not add markers,", e);
+                return null;
             }
-            return markerOptions;
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPostExecute(List<BaseMarkerOptions> markerOptions) {
-            super.onPostExecute(markerOptions);
-            mMapboxMap.addMarkers(markerOptions);
+        protected void onPostExecute(List<LatLng> locations) {
+            super.onPostExecute(locations);
+            mActivity.onLatLngListLoaded(locations, mAmount);
             mProgressDialog.hide();
         }
     }

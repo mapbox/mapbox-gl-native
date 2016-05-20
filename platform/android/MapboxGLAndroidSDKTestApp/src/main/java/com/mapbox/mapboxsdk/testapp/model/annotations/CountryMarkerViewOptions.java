@@ -26,8 +26,8 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         flat(in.readByte() != 0);
         centerOffset((PointF) in.readParcelable(PointF.class.getClassLoader()));
         infoWindowOffset((Point) in.readParcelable(Point.class.getClassLoader()));
-        selectAnimRes(in.readInt());
-        deselectAnimRes(in.readInt());
+        selectAnimatorResource(in.readInt());
+        deselectAnimatorResource(in.readInt());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
