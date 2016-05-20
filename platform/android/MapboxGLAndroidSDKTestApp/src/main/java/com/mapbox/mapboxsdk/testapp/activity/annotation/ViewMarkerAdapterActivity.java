@@ -145,7 +145,6 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            Log.v(MapboxConstants.TAG, "SSSSST");
             viewHolder.title.setText(marker.getTitle());
             return convertView;
         }
@@ -177,7 +176,6 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            Log.v(MapboxConstants.TAG, "TESTSSSSS");
             viewHolder.flag.setImageResource(marker.getFlagRes());
             viewHolder.abbrev.setText(marker.getAbbrevName());
             return convertView;

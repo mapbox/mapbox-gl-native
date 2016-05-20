@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -691,6 +692,9 @@ public class MapboxMap {
                             // tilt
                             adaptedView.setRotationX(marker.getTiltValue());
 
+                            // rotation
+                            adaptedView.setRotation(marker.getRotation());
+
                             if (mSelectedMarkers.contains(marker)) {
                                 // if a marker to be shown was selected
                                 // replay that animation with duration 0
@@ -804,8 +808,8 @@ public class MapboxMap {
      */
     @UiThread
     @NonNull
-    public Marker addMarkerView(@NonNull BaseMarkerViewOptions markerOptions) {
-        Marker marker = prepareViewMarker(markerOptions);
+    public MarkerView addMarkerView(@NonNull BaseMarkerViewOptions markerOptions) {
+        MarkerView marker = prepareViewMarker(markerOptions);
         long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
         marker.setId(id);
@@ -1407,8 +1411,8 @@ public class MapboxMap {
         return marker;
     }
 
-    private Marker prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
-        Marker marker = markerViewOptions.getMarker();
+    private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
+        MarkerView marker = markerViewOptions.getMarker();
         Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
         marker.setIcon(icon);
         return marker;
@@ -1423,6 +1427,22 @@ public class MapboxMap {
 
     public List<MarkerViewAdapter> getMarkerViewAdapters() {
         return mMarkerViewAdapters;
+    }
+
+    public void setMarkerViewRotation(@NonNull MarkerView markerView, float rotation) {
+        final View convertView = mMarkerViewMap.get(markerView);
+        if (convertView != null) {
+            convertView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(convertView, View.ROTATION, convertView.getRotation(), rotation);
+            rotateAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    convertView.setLayerType(View.LAYER_TYPE_NONE, null);
+                }
+            });
+            rotateAnimator.start();
+        }
     }
 
     public void setOnMarkerViewClickListener(@Nullable OnMarkerViewClickListener listener) {

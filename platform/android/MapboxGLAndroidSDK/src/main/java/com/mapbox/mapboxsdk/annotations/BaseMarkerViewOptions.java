@@ -27,6 +27,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected Point infoWindowOffset;
     protected int selectAnimRes;
     protected int deselectAnimRes;
+    protected int rotation;
 
     public BaseMarkerViewOptions() {
         centerOffset = new PointF();
@@ -78,6 +79,11 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return getThis();
     }
 
+    public T rotation(int rotation){
+        this.rotation = rotation;
+        return getThis();
+    }
+
     public LatLng getPosition() {
         return position;
     }
@@ -112,6 +118,10 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
 
     public int getDeselectAnimRes() {
         return deselectAnimRes;
+    }
+
+    public int getRotation() {
+        return rotation;
     }
 
     public abstract T getThis();

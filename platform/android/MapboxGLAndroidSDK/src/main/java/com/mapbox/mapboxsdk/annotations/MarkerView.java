@@ -3,6 +3,8 @@ package com.mapbox.mapboxsdk.annotations;
 import android.graphics.Point;
 import android.graphics.PointF;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+
 public class MarkerView extends Marker {
 
     private PointF centerOffset;
@@ -13,8 +15,9 @@ public class MarkerView extends Marker {
     private int deselectAnimRes;
 
     private float tiltValue;
+    private float rotation;
 
-    MarkerView(){
+    MarkerView() {
         centerOffset = new PointF();
         infoWindowOffset = new Point();
     }
@@ -74,5 +77,18 @@ public class MarkerView extends Marker {
 
     public void setTiltValue(float tiltValue) {
         this.tiltValue = tiltValue;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+
+        MapboxMap mapboxMap = getMapboxMap();
+        if (mapboxMap != null) {
+            mapboxMap.setMarkerViewRotation(this, rotation);
+        }
+    }
+
+    public float getRotation() {
+        return rotation;
     }
 }

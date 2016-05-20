@@ -26,6 +26,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         infoWindowOffset((Point) in.readParcelable(Point.class.getClassLoader()));
         selectAnimatorResource(in.readInt());
         deselectAnimatorResource(in.readInt());
+        rotation(in.readInt());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -55,6 +56,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeParcelable(getInfoWindowOffset(),flags);
         out.writeInt(getSelectAnimRes());
         out.writeInt(getDeselectAnimRes());
+        out.writeInt(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
@@ -74,43 +76,8 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setInfoWindowOffset(infoWindowOffset);
         marker.setSelectAnimRes(selectAnimRes);
         marker.setDeselectAnimRes(deselectAnimRes);
+        marker.setRotation(rotation);
         return marker;
-    }
-
-    public LatLng getPosition() {
-        return position;
-    }
-
-    public String getSnippet() {
-        return snippet;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Icon getIcon() {
-        return icon;
-    }
-
-    public boolean isFlat() {
-        return flat;
-    }
-
-    public PointF getCenterOffset() {
-        return centerOffset;
-    }
-
-    public Point getInfoWindowOffset() {
-        return infoWindowOffset;
-    }
-
-    public int getSelectAnimRes() {
-        return selectAnimRes;
-    }
-
-    public int getDeselectAnimRes() {
-        return deselectAnimRes;
     }
 
     public static final Parcelable.Creator<MarkerViewOptions> CREATOR
