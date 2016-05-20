@@ -27,6 +27,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Deprecated `-[MGLMapView emptyMemoryCache]`. ([#4725](https://github.com/mapbox/mapbox-gl-native/pull/4725))
 - Added `MGLCoordinateInCoordinateBounds()`, a function that tests whether or not a coordinate is in a given bounds. ([#5053](https://github.com/mapbox/mapbox-gl-native/pull/5053))
 - An MGLAnnotationView can be repositioned in relation to the associated MGLAnnotation.coordinate by changing its `centerOffset` property. ([#5059](https://github.com/mapbox/mapbox-gl-native/issues/5059))
+- An MGLAnnotationView can be rotated to match the rotation pitch of the associated map view.
 
 ## 3.2.2
 
