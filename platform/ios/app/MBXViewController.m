@@ -34,6 +34,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 @property (nonatomic) IBOutlet MGLMapView *mapView;
 @property (nonatomic) NSInteger styleIndex;
+@property (nonatomic) BOOL debugLoggingEnabled;
 
 @end
 
@@ -65,6 +66,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveState:) name:UIApplicationWillTerminateNotification object:nil];
 
     [self restoreState:nil];
+
+    self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -188,9 +191,13 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         @"Start World Tour",
         @"Add Custom Callout Point",
         @"Remove Annotations",
-        @"Print Telemetry Logfile",
-        @"Delete Telemetry Logfile",
         nil];
+
+    if (self.debugLoggingEnabled)
+    {
+        [sheet addButtonWithTitle:@"Print Telemetry Logfile"];
+        [sheet addButtonWithTitle:@"Delete Telemetry Logfile"];
+    }
 
     [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
 }
@@ -312,12 +319,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     {
         [self.mapView removeAnnotations:self.mapView.annotations];
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 13)
+    else if (buttonIndex == actionSheet.numberOfButtons - 2 && self.debugLoggingEnabled)
     {
         NSString *fileContents = [NSString stringWithContentsOfFile:[self telemetryDebugLogfilePath] encoding:NSUTF8StringEncoding error:nil];
         NSLog(@"%@", fileContents);
     }
-    else if (buttonIndex == actionSheet.firstOtherButtonIndex + 14)
+    else if (buttonIndex == actionSheet.numberOfButtons - 1 && self.debugLoggingEnabled)
     {
         NSString *filePath = [self telemetryDebugLogfilePath];
         if ([[NSFileManager defaultManager] isDeletableFileAtPath:filePath]) {
