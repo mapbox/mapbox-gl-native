@@ -14,9 +14,12 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     // glClear rather than this method.
     const BackgroundPaintProperties& properties = layer.paint;
 
-    const bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
+    bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
+
+    bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
+    isPatterned &= !wireframe;
 
     if (isPatterned) {
         imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from, true);
@@ -38,14 +41,18 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
 
     } else {
-        Color color = properties.backgroundColor;
-        color[0] *= properties.backgroundOpacity;
-        color[1] *= properties.backgroundOpacity;
-        color[2] *= properties.backgroundOpacity;
-        color[3] *= properties.backgroundOpacity;
+        if (wireframe) {
+            plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
+        } else {
+            Color color = properties.backgroundColor;
+            color[0] *= properties.backgroundOpacity;
+            color[1] *= properties.backgroundOpacity;
+            color[2] *= properties.backgroundOpacity;
+            color[3] *= properties.backgroundOpacity;
+            plainShader->u_color = color;
+        }
 
         config.program = plainShader->getID();
-        plainShader->u_color = color;
         backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
     }
 
@@ -99,8 +106,11 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         } else {
             plainShader->u_matrix = vtxMatrix;
-            Color color = properties.backgroundColor;
-            plainShader->u_color = color;
+            if (wireframe) {
+                plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
+            } else {
+                plainShader->u_color = properties.backgroundColor;
+            }
         }
 
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));

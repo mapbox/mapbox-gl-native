@@ -30,13 +30,15 @@ void Painter::renderLine(LineBucket& bucket,
     // Retina devices need a smaller distance to avoid aliasing.
     float antialiasing = 1.0 / frame.pixelRatio;
 
+    bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
+
     float blur = properties.lineBlur + antialiasing;
-    float edgeWidth = properties.lineWidth / 2.0;
+    float edgeWidth = wireframe ? 1 : properties.lineWidth / 2.0;
     float inset = -1;
     float offset = 0;
     float shift = 0;
 
-    if (properties.lineGapWidth != 0) {
+    if (properties.lineGapWidth != 0 && !wireframe) {
         inset = properties.lineGapWidth / 2.0 + antialiasing * 0.5;
         edgeWidth = properties.lineWidth;
 
@@ -46,11 +48,14 @@ void Painter::renderLine(LineBucket& bucket,
 
     float outset = offset + edgeWidth + antialiasing / 2.0 + shift;
 
-    Color color = properties.lineColor;
-    color[0] *= properties.lineOpacity;
-    color[1] *= properties.lineOpacity;
-    color[2] *= properties.lineOpacity;
-    color[3] *= properties.lineOpacity;
+    Color color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+    if (!wireframe) {
+        color = properties.lineColor;
+        color[0] *= properties.lineOpacity;
+        color[1] *= properties.lineOpacity;
+        color[2] *= properties.lineOpacity;
+        color[3] *= properties.lineOpacity;
+    }
 
     const float ratio = 1.0 / tileID.pixelsToTileUnits(1.0, state.getZoom());
 

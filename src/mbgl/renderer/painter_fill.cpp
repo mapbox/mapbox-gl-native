@@ -33,10 +33,18 @@ void Painter::renderFill(FillBucket& bucket,
         stroke_color[3] *= properties.fillOpacity;
     }
 
-    const bool pattern = !properties.fillPattern.value.from.empty();
-
+    bool pattern = !properties.fillPattern.value.from.empty();
     bool outline = properties.fillAntialias && !pattern && stroke_color != fill_color;
     bool fringeline = properties.fillAntialias && !pattern && stroke_color == fill_color;
+
+    bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
+    if (wireframe) {
+        fill_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+        stroke_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+        pattern = false;
+        outline = true;
+        fringeline = true;
+    }
 
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
@@ -154,8 +162,7 @@ void Painter::renderFill(FillBucket& bucket,
                 bucket.drawVertices(*outlinePatternShader, glObjectStore);
             }
         }
-    }
-    else {
+    } else if (!wireframe) {
         // No image fill.
         if ((fill_color[3] >= 1.0f) == (pass == RenderPass::Opaque)) {
             // Only draw the fill when it's either opaque and we're drawing opaque

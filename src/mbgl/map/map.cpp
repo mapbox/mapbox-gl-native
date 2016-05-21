@@ -796,8 +796,10 @@ void Map::setDebug(MapDebugOptions debugOptions) {
 }
 
 void Map::cycleDebugOptions() {
-    if (impl->debugOptions & MapDebugOptions::Collision)
+    if (impl->debugOptions & MapDebugOptions::Wireframe)
         impl->debugOptions = MapDebugOptions::NoDebug;
+    else if (impl->debugOptions & MapDebugOptions::Collision)
+        impl->debugOptions = MapDebugOptions::Collision | MapDebugOptions::Wireframe;
     else if (impl->debugOptions & MapDebugOptions::Timestamps)
         impl->debugOptions = impl->debugOptions | MapDebugOptions::Collision;
     else if (impl->debugOptions & MapDebugOptions::ParseStatus)

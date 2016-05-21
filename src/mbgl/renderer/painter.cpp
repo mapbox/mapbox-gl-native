@@ -141,7 +141,11 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.depthTest = GL_FALSE;
         config.depthMask = GL_TRUE;
         config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
-        config.clearColor = { background[0], background[1], background[2], background[3] };
+        if (frame.debugOptions & MapDebugOptions::Wireframe) {
+            config.clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        } else {
+            config.clearColor = { background[0], background[1], background[2], background[3] };
+        }
         config.clearStencil = 0;
         config.clearDepth = 1;
         MBGL_CHECK_ERROR(glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));

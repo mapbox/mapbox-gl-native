@@ -42,6 +42,7 @@ enum class MapDebugOptions : EnumType {
     ParseStatus = 1 << 2,
     Timestamps  = 1 << 3,
     Collision   = 1 << 4,
+    Wireframe   = 1 << 5,
 };
 
 inline MapDebugOptions operator| (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
