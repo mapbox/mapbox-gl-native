@@ -244,6 +244,10 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
 }
 
+- (IBAction)toggleWireframes:(id)sender {
+    self.mapView.debugMask ^= MGLMapDebugWireframesMask;
+}
+
 - (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
     _showsToolTipsOnDroppedPins = !_showsToolTipsOnDroppedPins;
 }
@@ -518,6 +522,11 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (menuItem.action == @selector(toggleCollisionBoxes:)) {
         BOOL isShown = self.mapView.debugMask & MGLMapDebugCollisionBoxesMask;
         menuItem.title = isShown ? @"Hide Collision Boxes" : @"Show Collision Boxes";
+        return YES;
+    }
+    if (menuItem.action == @selector(toggleWireframes:)) {
+        BOOL isShown = self.mapView.debugMask & MGLMapDebugWireframesMask;
+        menuItem.title = isShown ? @"Hide Wireframes" : @"Show Wireframes";
         return YES;
     }
     if (menuItem.action == @selector(toggleShowsToolTipsOnDroppedPins:)) {

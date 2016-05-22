@@ -2366,6 +2366,9 @@ public:
     if (options & mbgl::MapDebugOptions::Collision) {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
+    if (options & mbgl::MapDebugOptions::Wireframe) {
+        mask |= MGLMapDebugWireframesMask;
+    }
     return mask;
 }
 
@@ -2382,6 +2385,9 @@ public:
     }
     if (debugMask & MGLMapDebugCollisionBoxesMask) {
         options |= mbgl::MapDebugOptions::Collision;
+    }
+    if (debugMask & MGLMapDebugWireframesMask) {
+        options |= mbgl::MapDebugOptions::Wireframe;
     }
     _mbglMap->setDebug(options);
 }

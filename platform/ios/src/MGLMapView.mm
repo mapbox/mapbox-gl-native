@@ -1820,6 +1820,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
+    if (options & mbgl::MapDebugOptions::Wireframe)
+    {
+        mask |= MGLMapDebugWireframesMask;
+    }
     return mask;
 }
 
@@ -1841,6 +1845,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (debugMask & MGLMapDebugCollisionBoxesMask)
     {
         options |= mbgl::MapDebugOptions::Collision;
+    }
+    if (debugMask & MGLMapDebugWireframesMask)
+    {
+        options |= mbgl::MapDebugOptions::Wireframe;
     }
     _mbglMap->setDebug(options);
 }
