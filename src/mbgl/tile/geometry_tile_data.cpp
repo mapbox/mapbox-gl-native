@@ -46,6 +46,7 @@ void GeometryTileData::setData(std::exception_ptr err,
         workRequest.reset();
         availableData = DataAvailability::All;
         buckets.clear();
+        redoPlacement();
         observer->onTileLoaded(*this, true);
         return;
     }
@@ -80,6 +81,7 @@ void GeometryTileData::setData(std::exception_ptr err,
                 geometryTile = std::move(resultBuckets.geometryTile);
             }
 
+            redoPlacement();
             observer->onTileLoaded(*this, true);
         } else {
             availableData = DataAvailability::All;
@@ -121,6 +123,7 @@ bool GeometryTileData::parsePending() {
                 geometryTile = std::move(resultBuckets.geometryTile);
             }
 
+            redoPlacement();
             observer->onTileLoaded(*this, false);
         } else {
             availableData = DataAvailability::All;
@@ -142,17 +145,16 @@ Bucket* GeometryTileData::getBucket(const style::Layer& layer) {
 }
 
 void GeometryTileData::redoPlacement(const PlacementConfig newConfig) {
-    if (newConfig != placedConfig) {
-        targetConfig = newConfig;
-
-        redoPlacement();
-    }
+    targetConfig = newConfig;
+    redoPlacement();
 }
 
 void GeometryTileData::redoPlacement() {
     // Don't start a new placement request when the current one hasn't completed yet, or when
     // we are parsing buckets.
-    if (workRequest) return;
+    if (workRequest || targetConfig == placedConfig) {
+        return;
+    }
 
     workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
         workRequest.reset();

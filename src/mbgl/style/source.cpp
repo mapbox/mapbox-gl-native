@@ -406,7 +406,6 @@ void Source::setObserver(SourceObserver* observer_) {
 }
 
 void Source::onTileLoaded(TileData& tileData, bool isNewTile) {
-    tileData.redoPlacement();
     observer->onTileLoaded(*this, tileData.id, isNewTile);
 }
 
