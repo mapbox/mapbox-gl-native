@@ -27,7 +27,6 @@
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/dot_shader.hpp>
 #include <mbgl/shader/box_shader.hpp>
 #include <mbgl/shader/circle_shader.hpp>
 
@@ -64,7 +63,6 @@ Painter::Painter(const TransformState& state_, gl::GLObjectStore& glObjectStore_
     rasterShader = std::make_unique<RasterShader>(glObjectStore);
     sdfGlyphShader = std::make_unique<SDFGlyphShader>(glObjectStore);
     sdfIconShader = std::make_unique<SDFIconShader>(glObjectStore);
-    dotShader = std::make_unique<DotShader>(glObjectStore);
     collisionBoxShader = std::make_unique<CollisionBoxShader>(glObjectStore);
     circleShader = std::make_unique<CircleShader>(glObjectStore);
 
