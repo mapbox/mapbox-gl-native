@@ -25,8 +25,7 @@ public:
     GeometryTileData(const OverscaledTileID&,
                      std::string sourceID,
                      style::Style&,
-                     const MapMode,
-                     const std::function<void(std::exception_ptr)>& callback);
+                     const MapMode);
 
     ~GeometryTileData();
 
@@ -39,8 +38,8 @@ public:
 
     bool parsePending() override;
 
-    void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
-    void redoPlacement(const std::function<void()>&) override;
+    void redoPlacement(PlacementConfig config) override;
+    void redoPlacement() override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -73,8 +72,6 @@ private:
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
     util::Atomic<bool> obsolete { false };
-
-    const std::function<void(std::exception_ptr)> callback;
 };
 
 } // namespace mbgl

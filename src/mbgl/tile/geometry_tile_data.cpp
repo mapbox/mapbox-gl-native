@@ -1,4 +1,5 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_data_observer.hpp>
 #include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/layer_impl.hpp>
@@ -15,8 +16,7 @@ namespace mbgl {
 GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
                                    std::string sourceID,
                                    style::Style& style_,
-                                   const MapMode mode_,
-                                   const std::function<void(std::exception_ptr)>& callback_)
+                                   const MapMode mode_)
     : TileData(id_),
       style(style_),
       worker(style_.workers),
@@ -26,8 +26,7 @@ GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
                  obsolete,
-                 mode_),
-      callback(callback_) {
+                 mode_) {
 }
 
 void GeometryTileData::setData(std::exception_ptr err,
@@ -35,7 +34,7 @@ void GeometryTileData::setData(std::exception_ptr err,
                                optional<Timestamp> modified_,
                                optional<Timestamp> expires_) {
     if (err) {
-        callback(err);
+        observer->onTileError(*this, err);
         return;
     }
 
@@ -47,7 +46,7 @@ void GeometryTileData::setData(std::exception_ptr err,
         workRequest.reset();
         availableData = DataAvailability::All;
         buckets.clear();
-        callback(err);
+        observer->onTileLoaded(*this, true);
         return;
     }
 
@@ -64,7 +63,6 @@ void GeometryTileData::setData(std::exception_ptr err,
     workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [this, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
 
-        std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
             availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
@@ -82,12 +80,11 @@ void GeometryTileData::setData(std::exception_ptr err,
                 geometryTile = std::move(resultBuckets.geometryTile);
             }
 
+            observer->onTileLoaded(*this, true);
         } else {
-            error = result.get<std::exception_ptr>();
             availableData = DataAvailability::All;
+            observer->onTileError(*this, result.get<std::exception_ptr>());
         }
-
-        callback(error);
     });
 }
 
@@ -105,7 +102,6 @@ bool GeometryTileData::parsePending() {
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
 
-        std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
             availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
@@ -125,12 +121,11 @@ bool GeometryTileData::parsePending() {
                 geometryTile = std::move(resultBuckets.geometryTile);
             }
 
+            observer->onTileLoaded(*this, false);
         } else {
-            error = result.get<std::exception_ptr>();
             availableData = DataAvailability::All;
+            observer->onTileError(*this, result.get<std::exception_ptr>());
         }
-
-        callback(error);
     });
 
     return true;
@@ -146,20 +141,20 @@ Bucket* GeometryTileData::getBucket(const style::Layer& layer) {
     return it->second.get();
 }
 
-void GeometryTileData::redoPlacement(const PlacementConfig newConfig, const std::function<void()>& cb) {
+void GeometryTileData::redoPlacement(const PlacementConfig newConfig) {
     if (newConfig != placedConfig) {
         targetConfig = newConfig;
 
-        redoPlacement(cb);
+        redoPlacement();
     }
 }
 
-void GeometryTileData::redoPlacement(const std::function<void()>& cb) {
+void GeometryTileData::redoPlacement() {
     // Don't start a new placement request when the current one hasn't completed yet, or when
     // we are parsing buckets.
     if (workRequest) return;
 
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, cb, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
+    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
         workRequest.reset();
 
         // Persist the configuration we just placed so that we can later check whether we need to
@@ -177,9 +172,9 @@ void GeometryTileData::redoPlacement(const std::function<void()>& cb) {
         // The target configuration could have changed since we started placement. In this case,
         // we're starting another placement run.
         if (placedConfig != targetConfig) {
-            redoPlacement(cb);
+            redoPlacement();
         } else {
-            cb();
+            observer->onPlacementRedone(*this);
         }
     });
 }

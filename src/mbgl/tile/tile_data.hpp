@@ -20,6 +20,7 @@ class Worker;
 class DebugBucket;
 class TransformState;
 class TileSource;
+class TileDataObserver;
 
 namespace style {
 class Layer;
@@ -30,6 +31,7 @@ public:
     TileData(const OverscaledTileID&);
     virtual ~TileData();
 
+    void setObserver(TileDataObserver* observer);
     void setTileSource(std::unique_ptr<TileSource>);
 
     // Mark this tile as no longer needed and cancel any pending work.
@@ -38,8 +40,8 @@ public:
     virtual Bucket* getBucket(const style::Layer&) = 0;
 
     virtual bool parsePending() { return true; }
-    virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}
-    virtual void redoPlacement(const std::function<void()>&) {}
+    virtual void redoPlacement(PlacementConfig) {}
+    virtual void redoPlacement() {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -88,6 +90,8 @@ protected:
     DataAvailability availableData = DataAvailability::None;
 
     std::unique_ptr<TileSource> tileSource;
+
+    TileDataObserver* observer = nullptr;
 };
 
 } // namespace mbgl

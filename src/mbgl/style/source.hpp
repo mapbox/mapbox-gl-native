@@ -1,10 +1,12 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_data_observer.hpp>
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/feature.hpp>
@@ -36,7 +38,7 @@ class UpdateParameters;
 class QueryParameters;
 class SourceObserver;
 
-class Source : private util::noncopyable {
+class Source : public TileDataObserver, private util::noncopyable {
 public:
     Source(SourceType,
            const std::string& id,
@@ -87,7 +89,10 @@ public:
     bool enabled = false;
 
 private:
-    void tileLoadingCallback(const OverscaledTileID&, std::exception_ptr, bool isNewTile);
+    // TileDataObserver implementation.
+    void onTileLoaded(TileData&, bool isNewTile) override;
+    void onTileError(TileData&, std::exception_ptr) override;
+    void onPlacementRedone(TileData&) override;
 
     std::unique_ptr<TileData> createTile(const OverscaledTileID&, const UpdateParameters&);
 
