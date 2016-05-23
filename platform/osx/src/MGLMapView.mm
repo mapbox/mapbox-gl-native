@@ -2369,6 +2369,9 @@ public:
     if (options & mbgl::MapDebugOptions::Wireframe) {
         mask |= MGLMapDebugWireframesMask;
     }
+    if (options & mbgl::MapDebugOptions::StencilClip) {
+        mask |= MGLMapDebugStencilBufferMask;
+    }
     return mask;
 }
 
@@ -2388,6 +2391,9 @@ public:
     }
     if (debugMask & MGLMapDebugWireframesMask) {
         options |= mbgl::MapDebugOptions::Wireframe;
+    }
+    if (debugMask & MGLMapDebugStencilBufferMask) {
+        options |= mbgl::MapDebugOptions::StencilClip;
     }
     _mbglMap->setDebug(options);
 }

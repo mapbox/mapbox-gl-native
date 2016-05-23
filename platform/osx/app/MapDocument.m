@@ -248,6 +248,14 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     self.mapView.debugMask ^= MGLMapDebugWireframesMask;
 }
 
+- (IBAction)showColorBuffer:(id)sender {
+    self.mapView.debugMask &= ~MGLMapDebugStencilBufferMask;
+}
+
+- (IBAction)showStencilBuffer:(id)sender {
+    self.mapView.debugMask |= MGLMapDebugStencilBufferMask;
+}
+
 - (IBAction)toggleShowsToolTipsOnDroppedPins:(id)sender {
     _showsToolTipsOnDroppedPins = !_showsToolTipsOnDroppedPins;
 }
@@ -527,6 +535,16 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (menuItem.action == @selector(toggleWireframes:)) {
         BOOL isShown = self.mapView.debugMask & MGLMapDebugWireframesMask;
         menuItem.title = isShown ? @"Hide Wireframes" : @"Show Wireframes";
+        return YES;
+    }
+    if (menuItem.action == @selector(showColorBuffer:)) {
+        BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        menuItem.state = enabled ? NSOffState : NSOnState;
+        return YES;
+    }
+    if (menuItem.action == @selector(showStencilBuffer:)) {
+        BOOL enabled = self.mapView.debugMask & MGLMapDebugStencilBufferMask;
+        menuItem.state = enabled ? NSOnState : NSOffState;
         return YES;
     }
     if (menuItem.action == @selector(toggleShowsToolTipsOnDroppedPins:)) {

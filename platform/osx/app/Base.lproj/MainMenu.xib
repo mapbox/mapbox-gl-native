@@ -467,6 +467,19 @@
                                     <action selector="toggleWireframes:" target="-1" id="usj-ug-upt"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="2EG-Hp-4FA"/>
+                            <menuItem title="Show Color Buffer" id="Eao-WE-BWz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showColorBuffer:" target="-1" id="Nuq-Qs-98g"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Stencil Buffer" id="LlS-Yh-RkN">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showStencilBuffer:" target="-1" id="WkN-t9-Mpv"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="dYw-bb-tr1"/>
                             <menuItem title="Show Tooltips on Dropped Pins" id="uir-Rx-zmw">
                                 <modifierMask key="keyEquivalentModifierMask"/>

@@ -24,6 +24,9 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Line widths, backgrounds, and fill colors are ignored to create a
         wireframe effect. */
     MGLMapDebugWireframesMask = 1 << 5,
+    
+    /** The stencil buffer is shown instead of the color buffer. */
+    MGLMapDebugStencilBufferMask = 1 << 6,
 };
 
 @class MGLAnnotationImage;
