@@ -8,6 +8,8 @@ if [ -z ${ENABLE_COVERAGE} ] ; then
     exit 1
 fi
 
+directory=$1
+
 function usage() {
     echo "Error: LCOV and genhtml are required for generating coverage reports."
     if [ `uname -s` = 'Linux' ]; then
@@ -25,8 +27,8 @@ command -v genhtml >/dev/null 2>&1 || usage
 lcov \
     --quiet \
     --zerocounters \
-    --directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
-    --output-file "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
+    --directory "${directory}" \
+    --output-file "${directory}/coverage.info" \
     >/dev/null 2>&1
 
 # Run all unit tests
@@ -41,9 +43,9 @@ lcov \
     --directory "src/mbgl" \
     --directory "platform" \
     --directory "include/mbgl" \
-    --directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
-    --base-directory "build/${PLATFORM_SLUG}/${BUILDTYPE}" \
-    --output-file "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
+    --directory "${directory}" \
+    --base-directory "${directory}" \
+    --output-file "${directory}/coverage.info" \
     >/dev/null 2>&1
 
 # Generate HTML report based on coverage.info
@@ -59,8 +61,8 @@ genhtml \
     --sort \
     --demangle-cpp \
     --prefix $(pwd -P) \
-    --output-directory "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage" \
-    "build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage.info" \
+    --output-directory "${directory}/coverage" \
+    "${directory}/coverage.info" \
     >/dev/null 2>&1
 
-echo "Coverage report is now available in build/${PLATFORM_SLUG}/${BUILDTYPE}/coverage/index.html"
+echo "Coverage report is now available in ${directory}/coverage/index.html"
