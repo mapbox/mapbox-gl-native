@@ -1,4 +1,5 @@
 #include <mbgl/source/source.hpp>
+#include <mbgl/source/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/vector_tile.hpp>
@@ -39,6 +40,8 @@
 
 namespace mbgl {
 
+static SourceObserver nullObserver;
+
 Source::Source(SourceType type_,
                const std::string& id_,
                const std::string& url_,
@@ -50,7 +53,8 @@ Source::Source(SourceType type_,
       url(url_),
       tileSize(tileSize_),
       info(std::move(info_)),
-      geojsonvt(std::move(geojsonvt_)) {
+      geojsonvt(std::move(geojsonvt_)),
+      observer(&nullObserver) {
 }
 
 Source::~Source() = default;
@@ -380,7 +384,7 @@ void Source::onLowMemory() {
     cache.clear();
 }
 
-void Source::setObserver(Observer* observer_) {
+void Source::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 

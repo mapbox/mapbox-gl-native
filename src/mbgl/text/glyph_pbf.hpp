@@ -21,7 +21,7 @@ public:
     GlyphPBF(GlyphStore*,
              const FontStack&,
              const GlyphRange&,
-             GlyphStore::Observer*,
+             GlyphStoreObserver*,
              FileSource&);
     ~GlyphPBF();
 
@@ -32,7 +32,7 @@ public:
 private:
     std::atomic<bool> parsed;
     std::unique_ptr<AsyncRequest> req;
-    GlyphStore::Observer* observer = nullptr;
+    GlyphStoreObserver* observer = nullptr;
 };
 
 } // namespace mbgl

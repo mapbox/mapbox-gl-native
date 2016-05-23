@@ -7,6 +7,7 @@
 #include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_observer.hpp>
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/property_transition.hpp>
 #include <mbgl/style/style_update_parameters.hpp>
@@ -33,7 +34,7 @@ enum class RenderState {
     fully
 };
 
-class Map::Impl : public Style::Observer {
+class Map::Impl : public StyleObserver {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 

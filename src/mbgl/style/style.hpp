@@ -6,9 +6,9 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_transition.hpp>
 
-#include <mbgl/source/source.hpp>
-#include <mbgl/text/glyph_store.hpp>
-#include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/source/source_observer.hpp>
+#include <mbgl/text/glyph_store_observer.hpp>
+#include <mbgl/sprite/sprite_store_observer.hpp>
 #include <mbgl/map/mode.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace mbgl {
 
@@ -31,6 +32,7 @@ class SpriteAtlas;
 class LineAtlas;
 class StyleUpdateParameters;
 class StyleQueryParameters;
+class StyleObserver;
 
 struct RenderData {
     Color backgroundColor = {{ 0, 0, 0, 0 }};
@@ -38,31 +40,17 @@ struct RenderData {
     std::vector<RenderItem> order;
 };
 
-class Style : public GlyphStore::Observer,
-              public SpriteStore::Observer,
-              public Source::Observer,
+class Style : public GlyphStoreObserver,
+              public SpriteStoreObserver,
+              public SourceObserver,
               public util::noncopyable {
 public:
     Style(FileSource&, float pixelRatio);
     ~Style();
 
-    class Observer : public GlyphStore::Observer,
-                     public SpriteStore::Observer,
-                     public Source::Observer {
-    public:
-        /**
-         * In addition to the individual glyph, sprite, and source events, the
-         * following "rollup" events are provided for convenience. They are
-         * strictly additive; e.g. when a source is loaded, both `onSourceLoaded`
-         * and `onResourceLoaded` will be called.
-         */
-         virtual void onResourceLoaded() {};
-         virtual void onResourceError(std::exception_ptr) {};
-    };
-
     void setJSON(const std::string& data, const std::string& base);
 
-    void setObserver(Observer*);
+    void setObserver(StyleObserver*);
 
     bool isLoaded() const;
 
@@ -120,23 +108,22 @@ private:
 
     std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
 
-    // GlyphStore::Observer implementation.
+    // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
 
-    // SpriteStore::Observer implementation.
+    // SpriteStoreObserver implementation.
     void onSpriteLoaded() override;
     void onSpriteError(std::exception_ptr) override;
 
-    // Source::Observer implementation.
+    // SourceObserver implementation.
     void onSourceLoaded(Source&) override;
     void onSourceError(Source&, std::exception_ptr) override;
     void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
     void onPlacementRedone() override;
 
-    Observer nullObserver;
-    Observer* observer = &nullObserver;
+    StyleObserver* observer = nullptr;
 
     std::exception_ptr lastError;
 

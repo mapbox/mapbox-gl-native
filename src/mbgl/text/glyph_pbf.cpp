@@ -3,7 +3,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/text/glyph_set.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/string.hpp>
@@ -65,7 +65,7 @@ namespace mbgl {
 GlyphPBF::GlyphPBF(GlyphStore* store,
                    const FontStack& fontStack,
                    const GlyphRange& glyphRange,
-                   GlyphStore::Observer* observer_,
+                   GlyphStoreObserver* observer_,
                    FileSource& fileSource)
     : parsed(false),
       observer(observer_) {

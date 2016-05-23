@@ -1,4 +1,5 @@
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/style_observer.hpp>
 #include <mbgl/source/source.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -26,6 +27,8 @@
 #include <algorithm>
 
 namespace mbgl {
+
+static StyleObserver nullObserver;
 
 bool Style::addClass(const std::string& className, const PropertyTransition& properties) {
     if (std::find(classes.begin(), classes.end(), className) != classes.end()) return false;
@@ -64,6 +67,7 @@ Style::Style(FileSource& fileSource_, float pixelRatio)
       spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
       spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
       lineAtlas(std::make_unique<LineAtlas>(256, 512)),
+      observer(&nullObserver),
       workers(4) {
     glyphStore->setObserver(this);
     spriteStore->setObserver(this);
@@ -359,7 +363,7 @@ void Style::onLowMemory() {
     }
 }
 
-void Style::setObserver(Observer* observer_) {
+void Style::setObserver(StyleObserver* observer_) {
     observer = observer_;
 }
 

@@ -1,12 +1,15 @@
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/text/glyph_pbf.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 
+static GlyphStoreObserver nullObserver;
+
 GlyphStore::GlyphStore(FileSource& fileSource_)
-    : fileSource(fileSource_) {
+    : fileSource(fileSource_), observer(&nullObserver) {
 }
 
 GlyphStore::~GlyphStore() = default;
@@ -66,7 +69,7 @@ util::exclusive<GlyphSet> GlyphStore::getGlyphSet(const FontStack& fontStack) {
     return { it->second.get(), std::move(lock) };
 }
 
-void GlyphStore::setObserver(Observer* observer_) {
+void GlyphStore::setObserver(GlyphStoreObserver* observer_) {
     observer = observer_;
 }
 

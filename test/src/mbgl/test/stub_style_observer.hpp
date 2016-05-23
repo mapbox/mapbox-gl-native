@@ -1,14 +1,14 @@
 #ifndef MBGL_TEST_STUB_STYLE_OBSERVER
 #define MBGL_TEST_STUB_STYLE_OBSERVER
 
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_observer.hpp>
 
 namespace mbgl {
 
 /**
- * An implementation of Style::Observer that forwards all methods to dynamically-settable lambas.
+ * An implementation of StyleObserver that forwards all methods to dynamically-settable lambas.
  */
-class StubStyleObserver : public Style::Observer {
+class StubStyleObserver : public StyleObserver {
 public:
     void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);

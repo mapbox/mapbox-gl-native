@@ -18,20 +18,13 @@ namespace mbgl {
 
 class FileSource;
 class GlyphPBF;
+class GlyphStoreObserver;
 
 // The GlyphStore manages the loading and storage of Glyphs
 // and creation of GlyphSet objects. The GlyphStore lives
 // on the MapThread but can be queried from any thread.
 class GlyphStore : private util::noncopyable {
 public:
-    class Observer {
-    public:
-        virtual ~Observer() = default;
-
-        virtual void onGlyphsLoaded(const FontStack&, const GlyphRange&) {};
-        virtual void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) {};
-    };
-
     GlyphStore(FileSource&);
     ~GlyphStore();
 
@@ -52,7 +45,7 @@ public:
         return glyphURL;
     }
 
-    void setObserver(Observer* observer);
+    void setObserver(GlyphStoreObserver* observer);
 
 private:
     void requestGlyphRange(const FontStack&, const GlyphRange&);
@@ -68,8 +61,7 @@ private:
 
     util::WorkQueue workQueue;
 
-    Observer nullObserver;
-    Observer* observer = &nullObserver;
+    GlyphStoreObserver* observer = nullptr;
 };
 
 } // namespace mbgl

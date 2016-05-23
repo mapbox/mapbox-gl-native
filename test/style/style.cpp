@@ -2,6 +2,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 
 #include <mbgl/style/style.hpp>
+#include <mbgl/source/source.hpp>
 #include <mbgl/util/io.hpp>
 
 using namespace mbgl;
