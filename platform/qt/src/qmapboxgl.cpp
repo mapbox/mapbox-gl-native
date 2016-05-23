@@ -656,7 +656,12 @@ std::array<uint16_t, 2> QMapboxGLPrivate::getSize() const
 
 std::array<uint16_t, 2> QMapboxGLPrivate::getFramebufferSize() const
 {
+#if QT_VERSION >= 0x050000
+    return {{ static_cast<uint16_t>(size.width() * qApp->devicePixelRatio()),
+              static_cast<uint16_t>(size.height() * qApp->devicePixelRatio()) }};
+#else
     return getSize();
+#endif
 }
 
 void QMapboxGLPrivate::invalidate()
