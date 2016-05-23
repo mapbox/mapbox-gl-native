@@ -1,4 +1,4 @@
-#include <mbgl/shader/box_shader.hpp>
+#include <mbgl/shader/collision_box_shader.hpp>
 #include <mbgl/shader/box.vertex.hpp>
 #include <mbgl/shader/box.fragment.hpp>
 #include <mbgl/gl/gl.hpp>

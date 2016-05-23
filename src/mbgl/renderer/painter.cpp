@@ -27,7 +27,7 @@
 #include <mbgl/shader/icon_shader.hpp>
 #include <mbgl/shader/raster_shader.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/box_shader.hpp>
+#include <mbgl/shader/collision_box_shader.hpp>
 #include <mbgl/shader/circle_shader.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>

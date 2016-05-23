@@ -17,7 +17,7 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/shader/sdf_shader.hpp>
 #include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/box_shader.hpp>
+#include <mbgl/shader/collision_box_shader.hpp>
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
