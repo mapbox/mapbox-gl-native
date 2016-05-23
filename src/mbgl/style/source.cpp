@@ -287,6 +287,7 @@ bool Source::update(const UpdateParameters& parameters) {
     };
     auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
         if (auto data = createTile(dataTileID, parameters)) {
+            data->getTileSource()->setNecessity(TileSource::Necessity::Required);
             return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
         } else {
             return nullptr;
@@ -316,6 +317,7 @@ bool Source::update(const UpdateParameters& parameters) {
     auto retainIt = retain.begin();
     while (dataIt != tileDataMap.end()) {
         if (retainIt == retain.end() || dataIt->first < *retainIt) {
+            dataIt->second->getTileSource()->setNecessity(TileSource::Necessity::Optional);
             cache.add(dataIt->first, std::move(dataIt->second));
             tileDataMap.erase(dataIt++);
         } else {

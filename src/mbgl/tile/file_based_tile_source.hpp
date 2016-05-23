@@ -6,6 +6,7 @@ namespace mbgl {
 
 class FileSource;
 class AsyncRequest;
+class Response;
 
 template <typename T, typename I>
 class FileBasedTileSource : public T {
@@ -14,7 +15,15 @@ protected:
     virtual ~FileBasedTileSource() = default;
 
 protected:
-    const Resource resource;
+    void makeRequired() override;
+    void makeOptional() override;
+
+private:
+    void loadedData(const Response&);
+    void loadRequired();
+
+private:
+    Resource resource;
     FileSource& fileSource;
     std::unique_ptr<AsyncRequest> request;
 };
