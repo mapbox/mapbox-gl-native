@@ -395,13 +395,22 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        MBXDroppedPinAnnotation *point = [[MBXDroppedPinAnnotation alloc] init];
-        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
+        CGPoint point = [longPress locationInView:longPress.view];
+        NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
+        NSString *title;
+        for (id <MGLFeature> feature in features) {
+            if (!title) {
+                title = [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            }
+        }
+        
+        MBXDroppedPinAnnotation *pin = [[MBXDroppedPinAnnotation alloc] init];
+        pin.coordinate = [self.mapView convertPoint:point
                                  toCoordinateFromView:self.mapView];
-        point.title = @"Dropped Pin";
-        point.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:point.coordinate];
+        pin.title = title ?: @"Dropped Pin";
+        pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
         // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
-        [self.mapView selectAnnotation:point animated:YES];
+        [self.mapView selectAnnotation:pin animated:YES];
     }
 }
 

@@ -26,6 +26,7 @@
 #include <mbgl/util/chrono.hpp>
 
 #import "Mapbox.h"
+#import "MGLFeature_Private.h"
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
@@ -2814,6 +2815,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             [(MGLMultiPoint *)annotation addShapeAnnotationObjectToCollection:shapes withDelegate:self];
             [userShapes addObject:annotation];
         }
+        else if ([annotation isKindOfClass:[MGLMultiPolyline class]])
+        {
+            // TODO: Add real support for these types down in mbgl instead of breaking the annotation apart.
+            NS_ARRAY_OF(MGLPolyline *) *polylines = [(MGLMultiPolyline *)annotation polylines];
+            [self addAnnotations:polylines];
+        }
+        else if ([annotation isKindOfClass:[MGLMultiPolygon class]])
+        {
+            NS_ARRAY_OF(MGLPolygon *) *polygons = [(MGLMultiPolygon *)annotation polygons];
+            [self addAnnotations:polygons];
+        }
+        else if ([annotation isKindOfClass:[MGLShapeCollection class]])
+        {
+            NS_ARRAY_OF(MGLShape <MGLAnnotation> *) *shapes = [(MGLShapeCollection *)annotation shapes];
+            [self addAnnotations:shapes];
+        }
         else
         {
             MGLAnnotationView *annotationView;
@@ -4182,6 +4199,57 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             }
         }
     }
+}
+
+#pragma mark Data
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point
+{
+    return [self visibleFeaturesAtPoint:point inStyleLayersWithIdentifiers:nil];
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers
+{
+    mbgl::ScreenCoordinate screenCoordinate = { point.x, point.y };
+    
+    mbgl::optional<std::vector<std::string>> optionalLayerIDs;
+    if (styleLayerIdentifiers)
+    {
+        __block std::vector<std::string> layerIDs;
+        layerIDs.reserve(styleLayerIdentifiers.count);
+        [styleLayerIdentifiers enumerateObjectsUsingBlock:^(NSString * _Nonnull identifier, BOOL * _Nonnull stop)
+        {
+            layerIDs.push_back(identifier.UTF8String);
+        }];
+        optionalLayerIDs = layerIDs;
+    }
+    
+    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, optionalLayerIDs);
+    return MGLFeaturesFromMBGLFeatures(features);
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect {
+    return [self visibleFeaturesInRect:rect inStyleLayersWithIdentifiers:nil];
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers {
+    mbgl::ScreenBox screenBox = {
+        { CGRectGetMinX(rect), CGRectGetMinY(rect) },
+        { CGRectGetMaxX(rect), CGRectGetMaxY(rect) },
+    };
+    
+    mbgl::optional<std::vector<std::string>> optionalLayerIDs;
+    if (styleLayerIdentifiers) {
+        __block std::vector<std::string> layerIDs;
+        layerIDs.reserve(styleLayerIdentifiers.count);
+        [styleLayerIdentifiers enumerateObjectsUsingBlock:^(NSString * _Nonnull identifier, BOOL * _Nonnull stop) {
+            layerIDs.push_back(identifier.UTF8String);
+        }];
+        optionalLayerIDs = layerIDs;
+    }
+    
+    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, optionalLayerIDs);
+    return MGLFeaturesFromMBGLFeatures(features);
 }
 
 #pragma mark - Utility -

@@ -30,4 +30,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ The `MGLMultiPolyline` class represents a shape consisting of one or more
+ polylines. For example, you could use an `MGLMultiPolyline` object to represent
+ both sides of a divided highway (dual carriageway), excluding the median
+ (central reservation): each carriageway would be a distinct `MGLPolyline`
+ object.
+ */
+@interface MGLMultiPolyline : MGLShape <MGLOverlay>
+
+/**
+ An array of polygons forming the multipolyline.
+ */
+@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLPolyline *) *polylines;
+
+/**
+ Creates and returns a multipolyline object consisting of the given polylines.
+ 
+ @param polylines The array of polylines defining the shape.
+ @return A new multipolyline object.
+ */
++ (instancetype)multiPolylineWithPolylines:(NS_ARRAY_OF(MGLPolyline *) *)polylines;
+
+@end
+
 NS_ASSUME_NONNULL_END

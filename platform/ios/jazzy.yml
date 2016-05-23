@@ -33,12 +33,25 @@ custom_categories:
       - MGLCalloutView
       - MGLCalloutViewDelegate
       - MGLMultiPoint
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPolygon
       - MGLPolyline
       - MGLOverlay
       - MGLShape
+      - MGLShapeCollection
       - MGLUserLocation
+  - name: Map Data
+    children:
+      - MGLFeature
+      - MGLMultiPointFeature
+      - MGLMultiPolygonFeature
+      - MGLMultiPolylineFeature
+      - MGLPointFeature
+      - MGLPolygonFeature
+      - MGLPolylineFeature
+      - MGLShapeCollectionFeature
   - name: Offline Maps
     children:
       - MGLOfflineRegion
