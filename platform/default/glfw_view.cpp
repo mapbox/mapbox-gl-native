@@ -141,9 +141,6 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             if (!mods)
                 view->map->resetPosition();
             break;
-        case GLFW_KEY_C:
-            view->toggleClipMasks();
-            break;
         case GLFW_KEY_S:
             if (view->changeStyleCallback)
                 view->changeStyleCallback();
@@ -254,11 +251,6 @@ void GLFWView::nextOrientation() {
         case NO::Downwards: map->setNorthOrientation(NO::Leftwards); break;
         default: map->setNorthOrientation(NO::Upwards); break;
     }
-}
-
-void GLFWView::toggleClipMasks() {
-    showClipMasks = !showClipMasks;
-    map->update(mbgl::Update::Repaint);
 }
 
 void GLFWView::addRandomCustomPointAnnotations(int count) {
@@ -432,10 +424,6 @@ void GLFWView::run() {
 
             map->render();
 
-            if (showClipMasks) {
-                renderClipMasks();
-            }
-
             glfwSwapBuffers(window);
 
             report(1000 * (glfwGetTime() - started));
@@ -478,45 +466,6 @@ void GLFWView::deactivate() {
 void GLFWView::invalidate() {
     dirty = true;
     glfwPostEmptyEvent();
-}
-
-void GLFWView::renderClipMasks() {
-    // Read the stencil buffer
-    auto pixels = std::make_unique<uint8_t[]>(fbWidth * fbHeight);
-    glReadPixels(0,                // GLint x
-                 0,                // GLint y
-                 fbWidth,          // GLsizei width
-                 fbHeight,         // GLsizei height
-                 GL_STENCIL_INDEX, // GLenum format
-                 GL_UNSIGNED_BYTE, // GLenum type
-                 pixels.get()      // GLvoid * data
-                 );
-
-    // Scale the Stencil buffer to cover the entire color space.
-    auto it = pixels.get();
-    auto end = it + fbWidth * fbHeight;
-    const auto factor = 255.0f / *std::max_element(it, end);
-    for (; it != end; ++it) {
-        *it *= factor;
-    }
-
-    using namespace mbgl::gl;
-    Preserve<PixelZoom> pixelZoom;
-    Preserve<RasterPos> rasterPos;
-    Preserve<StencilTest> stencilTest;
-    Preserve<DepthTest> depthTest;
-    Preserve<Program> program;
-    Preserve<ColorMask> colorMask;
-
-    MBGL_CHECK_ERROR(glPixelZoom(1.0f, 1.0f));
-    MBGL_CHECK_ERROR(glRasterPos2f(-1.0f, -1.0f));
-    MBGL_CHECK_ERROR(glDisable(GL_STENCIL_TEST));
-    MBGL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
-    MBGL_CHECK_ERROR(glUseProgram(0));
-    MBGL_CHECK_ERROR(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
-    MBGL_CHECK_ERROR(glWindowPos2i(0, 0));
-
-    MBGL_CHECK_ERROR(glDrawPixels(fbWidth, fbHeight, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.get()));
 }
 
 void GLFWView::report(float duration) {

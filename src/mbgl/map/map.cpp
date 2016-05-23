@@ -797,8 +797,15 @@ void Map::setDebug(MapDebugOptions debugOptions) {
 }
 
 void Map::cycleDebugOptions() {
+#ifndef GL_ES_VERSION_2_0
+    if (impl->debugOptions & MapDebugOptions::StencilClip)
+        impl->debugOptions = MapDebugOptions::NoDebug;
+    else if (impl->debugOptions & MapDebugOptions::Wireframe)
+        impl->debugOptions = MapDebugOptions::StencilClip;
+#else
     if (impl->debugOptions & MapDebugOptions::Wireframe)
         impl->debugOptions = MapDebugOptions::NoDebug;
+#endif // GL_ES_VERSION_2_0
     else if (impl->debugOptions & MapDebugOptions::Collision)
         impl->debugOptions = MapDebugOptions::Collision | MapDebugOptions::Wireframe;
     else if (impl->debugOptions & MapDebugOptions::Timestamps)

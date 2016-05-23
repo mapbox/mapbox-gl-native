@@ -43,6 +43,10 @@ enum class MapDebugOptions : EnumType {
     Timestamps  = 1 << 3,
     Collision   = 1 << 4,
     Wireframe   = 1 << 5,
+// FIXME: https://github.com/mapbox/mapbox-gl-native/issues/5117
+#ifndef GL_ES_VERSION_2_0
+    StencilClip = 1 << 6,
+#endif // GL_ES_VERSION_2_0
 };
 
 inline MapDebugOptions operator| (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {

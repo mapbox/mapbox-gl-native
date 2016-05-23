@@ -99,6 +99,8 @@ public:
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);
 
+    void renderClipMasks();
+
     void renderDebugText(TileData&, const mat4&);
     void renderFill(FillBucket&, const FillLayer&, const UnwrappedTileID&, const mat4&);
     void renderLine(LineBucket&, const LineLayer&, const UnwrappedTileID&, const mat4&);

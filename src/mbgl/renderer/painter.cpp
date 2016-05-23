@@ -169,6 +169,11 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         drawClippingMasks(generator.getStencils());
     }
 
+    if (frame.debugOptions & MapDebugOptions::StencilClip) {
+        renderClipMasks();
+        return;
+    }
+
     // Actually render the layers
     if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
