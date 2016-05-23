@@ -7,6 +7,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 public class MarkerView extends Marker {
 
+    private MarkerViewManager markerViewManager;
+
     private PointF centerOffset;
     private Point infoWindowOffset;
     private boolean flat;
@@ -16,9 +18,7 @@ public class MarkerView extends Marker {
 
     private float tiltValue;
     private float rotation;
-    private float alpha;
-
-    private MarkerViewTransformer markerViewTransformer;
+    private float alpha = 1;
 
     MarkerView() {
         centerOffset = new PointF();
@@ -74,18 +74,18 @@ public class MarkerView extends Marker {
         this.deselectAnimRes = deselectAnimRes;
     }
 
-    public float getTiltValue() {
+    float getTilt() {
         return tiltValue;
     }
 
-    public void setTiltValue(float tiltValue) {
+    void setTilt(float tiltValue) {
         this.tiltValue = tiltValue;
     }
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
-        if (markerViewTransformer != null) {
-            markerViewTransformer.animateRotation(this, rotation);
+        if (markerViewManager != null) {
+            markerViewManager.animateRotation(this, rotation);
         }
     }
 
@@ -99,15 +99,14 @@ public class MarkerView extends Marker {
 
     public void setAlpha(float alpha) {
         this.alpha = alpha;
-        if (markerViewTransformer != null) {
-            markerViewTransformer.animateAlpha(this, rotation);
+        if (markerViewManager != null) {
+            markerViewManager.animateAlpha(this, alpha);
         }
     }
 
     @Override
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
-        MarkerViewManager manager = mapboxMap.getMarkerViewManager();
-        markerViewTransformer = manager.getMarkerViewTransformer();
+        markerViewManager = mapboxMap.getMarkerViewManager();
     }
 }

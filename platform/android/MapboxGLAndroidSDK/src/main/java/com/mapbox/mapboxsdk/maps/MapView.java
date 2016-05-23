@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -35,7 +33,6 @@ import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ScaleGestureDetectorCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -98,7 +95,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -1362,33 +1358,7 @@ public class MapView extends FrameLayout {
 
             mCompassView.update(getDirection());
             mMyLocationView.update();
-
-            Map<MarkerView, View> viewMarkers = mMapboxMap.getMarkerViewManager().getMarkerViewTransformer().getMarkerViewMap();
-            for (Marker marker : viewMarkers.keySet()) {
-                mViewHolder = viewMarkers.get(marker);
-                if (mViewHolder != null) {
-                    PointF point = mMapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                    mViewHolder.setX(point.x - (mViewHolder.getMeasuredWidth() / 2));
-                    mViewHolder.setY(point.y - (mViewHolder.getMeasuredHeight() / 2));
-
-                    if (mViewHolder.getVisibility() == GONE) {
-                        mViewHolder.animate().cancel();
-                        mViewHolder.setAlpha(0);
-                        mViewHolder.animate()
-                                .alpha(1)
-                                .setDuration(MapboxConstants.ANIMATION_DURATION_SHORT)
-                                .setInterpolator(new FastOutSlowInInterpolator())
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationStart(Animator animation) {
-                                        super.onAnimationStart(animation);
-                                        mViewHolder.setVisibility(VISIBLE);
-                                    }
-                                })
-                                .start();
-                    }
-                }
-            }
+            mMapboxMap.getMarkerViewManager().update();
 
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();

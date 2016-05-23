@@ -22,7 +22,7 @@ public abstract class Annotation implements Comparable<Annotation> {
      * Internal C++ id is stored as unsigned int.
      */
     private long id = -1; // -1 unless added to a MapView
-    private MapboxMap mapboxMap;
+    protected MapboxMap mapboxMap;
 
     protected Annotation() {
     }
