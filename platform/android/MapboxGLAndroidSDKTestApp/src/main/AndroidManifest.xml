@@ -254,7 +254,7 @@
         </activity>
 
         <activity
-            android:name=".activity.annotation.ViewMarkerAdapterActivity"
+            android:name=".activity.annotation.MarkerViewActivity"
             android:description="@string/description_view_marker"
             android:label="@string/activity_view_marker">
             <meta-data

@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -29,7 +30,7 @@ import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerOptions;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerView;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerViewOptions;
 
-public class ViewMarkerAdapterActivity extends AppCompatActivity {
+public class MarkerViewActivity extends AppCompatActivity {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
@@ -72,7 +73,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
                     mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
-                            .infoWindowOffset(new Point(0, 86))
+                            .infoWindowOffset(new Point(0, (int) getResources().getDimension(R.dimen.fab_margin)))
                             .selectAnimatorResource(R.animator.scale_up)
                             .deselectAnimatorResource(R.animator.scale_down)
                     );
@@ -86,9 +87,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
                 options.position(new LatLng(38.899774, -77.023237));
                 options.selectAnimatorResource(R.animator.rotate_360);
                 options.deselectAnimatorResource(R.animator.rotate_360);
-                options.infoWindowOffset(new Point(0, 64));
                 options.flat(true);
-
                 mapboxMap.addMarker(options);
 
                 // default GL marker
@@ -99,8 +98,8 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
                 // set adapters
                 final MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
-                markerViewManager.addMarkerViewAdapter(new TextAdapter(ViewMarkerAdapterActivity.this));
-                markerViewManager.addMarkerViewAdapter(new CountryAdapter(ViewMarkerAdapterActivity.this));
+                markerViewManager.addMarkerViewAdapter(new TextAdapter(MarkerViewActivity.this));
+                markerViewManager.addMarkerViewAdapter(new CountryAdapter(MarkerViewActivity.this));
 
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
@@ -116,7 +115,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
                 mMapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-                        Toast.makeText(ViewMarkerAdapterActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MarkerViewActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });

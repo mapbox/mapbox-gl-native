@@ -170,12 +170,6 @@ public class MarkerViewManager {
                     if (adapter.getMarkerClass() == marker.getClass()) {
                         convertView = (View) adapter.getViewReusePool().acquire();
                         View adaptedView = adapter.getView(marker, convertView, mapView);
-
-                        // InfoWindow offset
-                        Point infoWindowOffset = marker.getInfoWindowOffset();
-                        marker.setTopOffsetPixels(-infoWindowOffset.y);
-                        marker.setRightOffsetPixels(infoWindowOffset.x);
-
                         if (adaptedView != null) {
 
                             // tilt
@@ -206,6 +200,12 @@ public class MarkerViewManager {
                                     }
 
                                     if (!clickHandled) {
+
+                                        // InfoWindow offset
+                                        Point infoWindowOffset = marker.getInfoWindowOffset();
+                                        marker.setTopOffsetPixels(-(v.getHeight() / 2) - infoWindowOffset.y);
+                                        marker.setRightOffsetPixels(infoWindowOffset.x);
+
                                         if (animSelectRes != 0) {
                                             AnimatorUtils.animate(v, animSelectRes, new AnimatorUtils.OnAnimationEndListener() {
                                                 @Override
