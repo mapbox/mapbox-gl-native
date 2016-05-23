@@ -1603,7 +1603,9 @@ public:
     
     BOOL delegateHasImagesForAnnotations = [self.delegate respondsToSelector:@selector(mapView:imageForAnnotation:)];
     
+    NSMutableArray *userPoints = [NSMutableArray array];
     std::vector<mbgl::PointAnnotation> points;
+    NSMutableArray *userShapes = [NSMutableArray array];
     std::vector<mbgl::ShapeAnnotation> shapes;
     NSMutableArray *annotationImages = [NSMutableArray arrayWithCapacity:annotations.count];
     
@@ -1613,6 +1615,7 @@ public:
         if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
             // The multipoint knows how to style itself (with the map view’s help).
             [(MGLMultiPoint *)annotation addShapeAnnotationObjectToCollection:shapes withDelegate:self];
+            [userShapes addObject:annotation];
         } else {
             MGLAnnotationImage *annotationImage = nil;
             if (delegateHasImagesForAnnotations) {
@@ -1637,6 +1640,7 @@ public:
             }
             [annotationImages addObject:annotationImage];
             
+            [userPoints addObject:annotation];
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
             
             // Opt into potentially expensive tooltip tracking areas.
@@ -1654,7 +1658,7 @@ public:
             MGLAnnotationTag annotationTag = annotationTags[i];
             MGLAnnotationImage *annotationImage = annotationImages[i];
             annotationImage.styleIconIdentifier = @(points[i].icon.c_str());
-            id <MGLAnnotation> annotation = annotations[i];
+            id <MGLAnnotation> annotation = userPoints[i];
             
             MGLAnnotationContext context;
             context.annotation = annotation;
@@ -1674,7 +1678,7 @@ public:
         
         for (size_t i = 0; i < annotationTags.size(); ++i) {
             MGLAnnotationTag annotationTag = annotationTags[i];
-            id <MGLAnnotation> annotation = annotations[i];
+            id <MGLAnnotation> annotation = userShapes[i];
             
             MGLAnnotationContext context;
             context.annotation = annotation;

@@ -2781,7 +2781,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ( ! annotations) return;
     [self willChangeValueForKey:@"annotations"];
 
+    NSMutableArray *userPoints = [NSMutableArray array];
     std::vector<mbgl::PointAnnotation> points;
+    NSMutableArray *userShapes = [NSMutableArray array];
     std::vector<mbgl::ShapeAnnotation> shapes;
     
     NSMutableDictionary *annotationImagesForAnnotation = [NSMutableDictionary dictionary];
@@ -2797,6 +2799,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
             [(MGLMultiPoint *)annotation addShapeAnnotationObjectToCollection:shapes withDelegate:self];
+            [userShapes addObject:annotation];
         }
         else
         {
@@ -2846,6 +2849,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 annotationImagesForAnnotation[annotationValue] = annotationImage;
             }
 
+            [userPoints addObject:annotation];
             points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
         }
     }
@@ -2858,7 +2862,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         
         for (size_t i = 0; i < annotationTags.size(); ++i)
         {
-            id<MGLAnnotation> annotation = annotations[i];
+            id<MGLAnnotation> annotation = userPoints[i];
             NSValue *annotationValue = [NSValue valueWithNonretainedObject:annotation];
             
             MGLAnnotationContext context;
@@ -2890,7 +2894,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         for (size_t i = 0; i < annotationTags.size(); ++i)
         {
             MGLAnnotationTag annotationTag = annotationTags[i];
-            id <MGLAnnotation> annotation = annotations[i];
+            id <MGLAnnotation> annotation = userPoints[i];
             
             MGLAnnotationContext context;
             context.annotation = annotation;
