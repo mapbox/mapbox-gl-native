@@ -2,7 +2,6 @@ ifeq ($(shell uname -s), Darwin)
   export PLATFORM ?= osx
 else ifeq ($(shell uname -s), Linux)
   export PLATFORM ?= linux
-  export CXX11ABI = $(shell scripts/check-cxx11abi.sh)
 endif
 
 ifeq ($(PLATFORM),android)

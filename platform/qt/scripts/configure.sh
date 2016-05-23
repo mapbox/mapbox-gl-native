@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CXX11ABI=$(scripts/check-cxx11abi.sh)
+
 PROTOZERO_VERSION=1.3.0
 BOOST_VERSION=1.60.0
 GEOMETRY_VERSION=0.5.0
