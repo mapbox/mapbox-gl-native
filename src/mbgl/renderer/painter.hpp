@@ -13,8 +13,8 @@
 
 #include <mbgl/gl/gl_config.hpp>
 
+#include <mbgl/style/render_item.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/style/style.hpp>
 
 #include <mbgl/gl/gl.hpp>
 

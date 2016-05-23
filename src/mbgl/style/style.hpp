@@ -1,7 +1,9 @@
 #ifndef MBGL_STYLE_STYLE
 #define MBGL_STYLE_STYLE
 
+#include <mbgl/style/render_item.hpp>
 #include <mbgl/style/zoom_history.hpp>
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/property_transition.hpp>
 
 #include <mbgl/source/source.hpp>
@@ -27,23 +29,8 @@ class GlyphStore;
 class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
-class StyleLayer;
-class Tile;
-class Bucket;
 class StyleUpdateParameters;
 class StyleQueryParameters;
-
-struct RenderItem {
-    inline RenderItem(const StyleLayer& layer_,
-                      const Tile* tile_ = nullptr,
-                      Bucket* bucket_ = nullptr)
-        : tile(tile_), bucket(bucket_), layer(layer_) {
-    }
-
-    const Tile* const tile;
-    Bucket* const bucket;
-    const StyleLayer& layer;
-};
 
 struct RenderData {
     Color backgroundColor = {{ 0, 0, 0, 0 }};

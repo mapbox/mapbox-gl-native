@@ -1,17 +1,15 @@
 #ifndef MBGL_TEXT_GLYPH
 #define MBGL_TEXT_GLYPH
 
+#include <mbgl/text/glyph_range.hpp>
 #include <mbgl/util/rect.hpp>
 
 #include <cstdint>
-#include <utility>
 #include <vector>
 #include <string>
 #include <map>
 
 namespace mbgl {
-
-typedef std::pair<uint16_t, uint16_t> GlyphRange;
 
 // Note: this only works for the BMP
 GlyphRange getGlyphRange(char32_t glyph);

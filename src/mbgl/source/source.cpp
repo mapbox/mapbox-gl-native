@@ -23,7 +23,6 @@
 
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/style/style_parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
