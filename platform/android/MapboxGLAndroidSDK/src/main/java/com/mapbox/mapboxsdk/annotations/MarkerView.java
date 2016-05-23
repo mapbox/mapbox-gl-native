@@ -16,6 +16,9 @@ public class MarkerView extends Marker {
 
     private float tiltValue;
     private float rotation;
+    private float alpha;
+
+    private MarkerViewTransformer markerViewTransformer;
 
     MarkerView() {
         centerOffset = new PointF();
@@ -81,14 +84,30 @@ public class MarkerView extends Marker {
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
-
-        MapboxMap mapboxMap = getMapboxMap();
-        if (mapboxMap != null) {
-            mapboxMap.setMarkerViewRotation(this, rotation);
+        if (markerViewTransformer != null) {
+            markerViewTransformer.animateRotation(this, rotation);
         }
     }
 
     public float getRotation() {
         return rotation;
+    }
+
+    public float getAlpha() {
+        return alpha;
+    }
+
+    public void setAlpha(float alpha) {
+        this.alpha = alpha;
+        if (markerViewTransformer != null) {
+            markerViewTransformer.animateAlpha(this, rotation);
+        }
+    }
+
+    @Override
+    public void setMapboxMap(MapboxMap mapboxMap) {
+        super.setMapboxMap(mapboxMap);
+        MarkerViewManager manager = mapboxMap.getMarkerViewManager();
+        markerViewTransformer = manager.getMarkerViewTransformer();
     }
 }

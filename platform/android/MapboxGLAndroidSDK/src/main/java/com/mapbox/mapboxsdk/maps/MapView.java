@@ -26,7 +26,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.CallSuper;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntDef;
@@ -158,7 +157,6 @@ public class MapView extends FrameLayout {
     private StyleInitializer mStyleInitializer;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
-    private long mViewMarkerBoundsUpdateTime;
 
     @UiThread
     public MapView(@NonNull Context context) {
@@ -452,12 +450,8 @@ public class MapView extends FrameLayout {
                             iterator.remove();
                         }
                     }
-                } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE) {
-                    if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
-                        invalidateViewMarkers();
-                    }
-                }else if(change== DID_FINISH_LOADING_MAP){
-                    invalidateViewMarkers();
+                } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
+                    mMapboxMap.getMarkerViewManager().invalidateViewMarkers();
                 }
             }
         });
@@ -469,15 +463,6 @@ public class MapView extends FrameLayout {
             evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
             MapboxEventManager.getMapboxEventManager().pushEvent(evt);
         }
-    }
-
-    void invalidateViewMarkers() {
-        long currentTime = SystemClock.elapsedRealtime();
-        if (currentTime < mViewMarkerBoundsUpdateTime) {
-            return;
-        }
-        mMapboxMap.invalidateViewMarkersInBounds();
-        mViewMarkerBoundsUpdateTime = currentTime + 250;
     }
 
     /**
@@ -888,7 +873,7 @@ public class MapView extends FrameLayout {
      * <p/>
      * Returns the current Mapbox access token used to load map styles and tiles.
      * </p>
-     * 
+     *
      * @return The current Mapbox access token.
      * @deprecated As of release 4.1.0, replaced by {@link MapboxAccountManager#getAccessToken()}
      */
@@ -1110,7 +1095,7 @@ public class MapView extends FrameLayout {
         return new ArrayList<>(annotations);
     }
 
-    List<MarkerView> getMarkerViewsInBounds(@NonNull LatLngBounds bbox) {
+    public List<MarkerView> getMarkerViewsInBounds(@NonNull LatLngBounds bbox) {
         if (mDestroyed || bbox == null) {
             return new ArrayList<>();
         }
@@ -1378,7 +1363,7 @@ public class MapView extends FrameLayout {
             mCompassView.update(getDirection());
             mMyLocationView.update();
 
-            Map<MarkerView, View> viewMarkers = mMapboxMap.getMarkerViewMap();
+            Map<MarkerView, View> viewMarkers = mMapboxMap.getMarkerViewManager().getMarkerViewTransformer().getMarkerViewMap();
             for (Marker marker : viewMarkers.keySet()) {
                 mViewHolder = viewMarkers.get(marker);
                 if (mViewHolder != null) {
@@ -1698,7 +1683,7 @@ public class MapView extends FrameLayout {
                         if (annotation.getId() == newSelectedMarkerId) {
                             if (selectedMarkers.isEmpty() || !selectedMarkers.contains(annotation)) {
                                 // only handle click if no marker view is available
-                                if (mMapboxMap.getMarkerViewMap().get(annotation) == null) {
+                                if (!(annotation instanceof MarkerView)) {
                                     mMapboxMap.selectMarker((Marker) annotation);
                                 }
                             }

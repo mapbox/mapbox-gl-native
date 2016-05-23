@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,11 +27,11 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
-import com.mapbox.mapboxsdk.maps.MapView;
 
 import org.json.JSONException;
 
@@ -252,13 +251,13 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                 }
 
                 // add adapter
-                mMapboxMap.addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
+                mMapboxMap.getMarkerViewManager().addMarkerViewAdapter(new TextAdapter(BulkMarkerActivity.this));
 
                 mMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
                     @Override
                     public void onMapChanged(@MapView.MapChange int change) {
                         if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-                            if (!mMapboxMap.getMarkerViewAdapters().isEmpty()) {
+                            if (!mMapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
                                 TextView viewCountView = (TextView) findViewById(R.id.countView);
                                 viewCountView.setText("ViewCache size " + (mMapView.getChildCount() - 5));
                             }
@@ -266,7 +265,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
                     }
                 });
 
-                mMapboxMap.setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
+                mMapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(new MapboxMap.OnMarkerViewClickListener() {
                     @Override
                     public boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
                         Toast.makeText(BulkMarkerActivity.this, "Hello " + marker.getId(), Toast.LENGTH_SHORT).show();
