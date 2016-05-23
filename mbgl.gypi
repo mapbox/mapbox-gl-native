@@ -138,7 +138,7 @@
         '<!@(find <(DEPTH)/src -name "*.h")',
         '<!@(find <(DEPTH)/include -name "*.hpp")',
         '<!@(find <(DEPTH)/include -name "*.h")',
-        '<!@(find <(DEPTH)/src -name "*.glsl")',
+        '<!@(find -H <(DEPTH)/node_modules/mapbox-gl-shaders -name "*.glsl")',
         '<(SHARED_INTERMEDIATE_DIR)/include/mbgl/util/version.hpp',
       ],
 

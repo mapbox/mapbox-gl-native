@@ -16,6 +16,8 @@ else
   export XCPRETTY ?= | xcpretty
 endif
 
+default: test-$(HOST_PLATFORM)
+
 ifneq (,$(wildcard .git/.))
 .mason:
 	git submodule update --init
@@ -23,7 +25,8 @@ else
 .mason: ;
 endif
 
-default: test-$(HOST_PLATFORM)
+node_modules: package.json
+	npm update # Install dependencies but don't run our own install script.
 
 GYP = deps/run_gyp --depth=. -Goutput_dir=.
 
@@ -31,7 +34,7 @@ CONFIG_DEPENDENCIES = .mason configure
 
 # Depend on gyp includes plus directories, so that projects are regenerated when
 # files are added or removed.
-GYP_DEPENDENCIES = mbgl.gypi test/test.gypi bin/*.gypi $(shell find src include -type d)
+GYP_DEPENDENCIES = mbgl.gypi test/test.gypi bin/*.gypi $(shell find src include -type d) node_modules
 
 #### OS X targets ##############################################################
 
@@ -178,9 +181,6 @@ apackage:
 
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
 NODE_OUTPUT_PATH = build/node-$(HOST_PLATFORM)-$(shell uname -m)
-
-node_modules: package.json
-	npm update # Install dependencies but don't run our own install script.
 
 $(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)

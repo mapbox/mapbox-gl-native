@@ -1,6 +1,6 @@
 #include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linesdf.vertex.hpp>
-#include <mbgl/shader/linesdf.fragment.hpp>
+#include <mbgl/shader/linesdfpattern.vertex.hpp>
+#include <mbgl/shader/linesdfpattern.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
 #include <cstdio>
@@ -8,7 +8,7 @@
 using namespace mbgl;
 
 LineSDFShader::LineSDFShader(gl::GLObjectStore& glObjectStore)
-    : Shader("line", shaders::linesdf::vertex, shaders::linesdf::fragment, glObjectStore) {
+    : Shader("linesdfpattern", shaders::linesdfpattern::vertex, shaders::linesdfpattern::fragment, glObjectStore) {
     a_data = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"));
 }
 
