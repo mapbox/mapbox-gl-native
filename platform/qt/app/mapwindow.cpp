@@ -67,8 +67,15 @@ void MapWindow::changeStyle()
 
 void MapWindow::keyPressEvent(QKeyEvent *ev)
 {
-    if (ev->key() == Qt::Key_S) {
+    switch (ev->key()) {
+    case Qt::Key_S:
         changeStyle();
+        break;
+    case Qt::Key_Tab:
+        m_map.cycleDebugOptions();
+        break;
+    default:
+        break;
     }
 
     ev->accept();
