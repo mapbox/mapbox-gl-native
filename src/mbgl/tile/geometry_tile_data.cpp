@@ -29,15 +29,13 @@ GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
                  mode_) {
 }
 
-void GeometryTileData::setData(std::exception_ptr err,
-                               std::unique_ptr<GeometryTile> tile,
+void GeometryTileData::setError(std::exception_ptr err) {
+    observer->onTileError(*this, err);
+}
+
+void GeometryTileData::setData(std::unique_ptr<GeometryTile> tile,
                                optional<Timestamp> modified_,
                                optional<Timestamp> expires_) {
-    if (err) {
-        observer->onTileError(*this, err);
-        return;
-    }
-
     modified = modified_;
     expires = expires_;
 

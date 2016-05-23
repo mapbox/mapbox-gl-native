@@ -92,7 +92,7 @@ void GeoJSONTileSource::update() {
     if (geojsonvt) {
         auto tile = convertTile(
             geojsonvt->getTile(tileID.canonical.z, tileID.canonical.x, tileID.canonical.y));
-        tileData.setData(nullptr, std::move(tile), {}, {});
+        tileData.setData(std::move(tile), {}, {});
     }
 }
 

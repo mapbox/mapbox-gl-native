@@ -1,23 +1,22 @@
 #pragma once
 
 #include <mbgl/tile/tile_source.hpp>
-#include <mbgl/tile/tile_id.hpp>
-#include <mbgl/storage/resource.hpp>
+#include <mbgl/tile/file_based_tile_source.hpp>
 
 namespace mbgl {
 
 class FileSource;
 class AsyncRequest;
 
-class ImageTileSource : public RasterTileSource {
+class ImageTileSource final : public FileBasedTileSource<RasterTileSource, ImageTileSource> {
 public:
     ImageTileSource(RasterTileData&, const Resource&, FileSource&);
     virtual ~ImageTileSource() = default;
 
-private:
-    const Resource resource;
-    FileSource& fileSource;
-    std::unique_ptr<AsyncRequest> request;
+    static std::shared_ptr<const std::string> parseData(std::shared_ptr<const std::string> data) {
+        return data;
+    }
+
 };
 
 } // namespace mbgl

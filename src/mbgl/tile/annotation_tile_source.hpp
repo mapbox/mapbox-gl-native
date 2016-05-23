@@ -10,7 +10,7 @@ namespace mbgl {
 class AnnotationManager;
 class GeometryTile;
 
-class AnnotationTileSource : public GeometryTileSource {
+class AnnotationTileSource final : public GeometryTileSource {
 public:
     AnnotationTileSource(GeometryTileData&, const OverscaledTileID&, AnnotationManager&);
     ~AnnotationTileSource();

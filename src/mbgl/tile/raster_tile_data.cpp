@@ -17,15 +17,13 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
       worker(worker_) {
 }
 
-void RasterTileData::setData(std::exception_ptr err,
-                               std::shared_ptr<const std::string> data,
-                               optional<Timestamp> modified_,
-                               optional<Timestamp> expires_) {
-    if (err) {
-        observer->onTileError(*this, err);
-        return;
-    }
+void RasterTileData::setError(std::exception_ptr err) {
+    observer->onTileError(*this, err);
+}
 
+void RasterTileData::setData(std::shared_ptr<const std::string> data,
+                             optional<Timestamp> modified_,
+                             optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
 

@@ -13,25 +13,31 @@ class GeometryTileData;
 class RasterTileData;
 
 class GeometryTileSource : public TileSource {
+public:
+    using data_type = GeometryTileData;
+
 protected:
-    GeometryTileSource(GeometryTileData& tileData_) : tileData(tileData_) {}
+    GeometryTileSource(data_type& tileData_) : tileData(tileData_) {}
 
 public:
     virtual ~GeometryTileSource() = default;
 
 protected:
-    GeometryTileData& tileData;
+    data_type& tileData;
 };
 
 class RasterTileSource : public TileSource {
+public:
+    using data_type = RasterTileData;
+
 protected:
-    RasterTileSource(RasterTileData& tileData_) : tileData(tileData_) {};
+    RasterTileSource(data_type& tileData_) : tileData(tileData_) {};
 
 public:
     virtual ~RasterTileSource() = default;
 
 protected:
-    RasterTileData& tileData;
+    data_type& tileData;
 };
 
 } // namespace mbgl

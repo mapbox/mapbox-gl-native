@@ -29,8 +29,9 @@ public:
 
     ~GeometryTileData();
 
-    void setData(std::exception_ptr err,
-                 std::unique_ptr<GeometryTile> tile,
+    void setError(std::exception_ptr err);
+
+    void setData(std::unique_ptr<GeometryTile> tile,
                  optional<Timestamp> modified_,
                  optional<Timestamp> expires_);
 

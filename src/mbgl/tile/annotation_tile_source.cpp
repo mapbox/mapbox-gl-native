@@ -18,7 +18,7 @@ AnnotationTileSource::~AnnotationTileSource() {
 }
 
 void AnnotationTileSource::update(std::unique_ptr<GeometryTile> tile) {
-    tileData.setData(nullptr, std::move(tile), {}, {});
+    tileData.setData(std::move(tile), {}, {});
 }
 
 } // namespace mbgl

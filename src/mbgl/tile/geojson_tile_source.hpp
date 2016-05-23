@@ -14,7 +14,7 @@ class GeoJSONVT;
 
 namespace mbgl {
 
-class GeoJSONTileSource : public GeometryTileSource {
+class GeoJSONTileSource final : public GeometryTileSource {
 public:
     GeoJSONTileSource(GeometryTileData&, mapbox::geojsonvt::GeoJSONVT*, const OverscaledTileID&);
     virtual ~GeoJSONTileSource();
