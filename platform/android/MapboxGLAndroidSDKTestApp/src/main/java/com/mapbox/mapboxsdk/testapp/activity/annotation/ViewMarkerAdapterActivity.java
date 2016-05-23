@@ -69,7 +69,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
 
                 // add text markers
                 for (int i = 0; i < LAT_LNGS.length; i++) {
-                    mMapboxMap.addMarkerView(new MarkerViewOptions()
+                    mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
                             .infoWindowOffset(new Point(0, 86))
@@ -89,7 +89,7 @@ public class ViewMarkerAdapterActivity extends AppCompatActivity {
                 options.infoWindowOffset(new Point(0, 64));
                 options.flat(true);
 
-                mapboxMap.addMarkerView(options);
+                mapboxMap.addMarker(options);
 
                 // default GL marker
                 mMapboxMap.addMarker(new CountryMarkerOptions()

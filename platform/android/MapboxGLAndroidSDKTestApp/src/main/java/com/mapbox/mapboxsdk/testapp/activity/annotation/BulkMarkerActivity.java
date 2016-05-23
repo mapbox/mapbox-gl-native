@@ -147,7 +147,6 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
     }
 
     private void showNativeMarkers(int amount) {
-        List<MarkerViewOptions> markerOptionsList = new ArrayList<>();
         DecimalFormat formatter = new DecimalFormat("#.#####");
         Random random = new Random();
         int randomIndex;
@@ -155,14 +154,12 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
         for (int i = 0; i < amount; i++) {
             randomIndex = random.nextInt(mLocations.size());
             LatLng latLng = mLocations.get(randomIndex);
-            markerOptionsList.add(new MarkerViewOptions()
+            mMapboxMap.addMarker(new MarkerViewOptions()
                     .position(latLng)
                     .title(String.valueOf(i))
                     .snippet(formatter.format(latLng.getLatitude()) + ", " + formatter.format(latLng.getLongitude())));
         }
-
-        mMapboxMap.addMarkerViews(markerOptionsList);
-    }
+     }
 
     private void showGlMarkers(int amount) {
         List<MarkerOptions> markerOptionsList = new ArrayList<>();
