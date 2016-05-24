@@ -151,7 +151,7 @@ define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh .mason configure
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
 
-build/android-$1/Makefile: build/android-$1/config.gypi
+build/android-$1/Makefile: build/android-$1/config.gypi $(GYP_DEPENDENCIES)
 	$$(shell $(ANDROID_ENV) $1) deps/run_gyp platform/android/platform.gyp -I$$< \
 	  -Dcoverage= -Goutput_dir=. --depth=. --generator-output=build/android-$1 -f make-android
 
@@ -183,12 +183,12 @@ node_modules: package.json
 $(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh .mason configure
 	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
-node: $(NODE_OUTPUT_PATH)/config.gypi node_modules
+node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
 	$(NODE_PRE_GYP) configure --clang -- -I$< \
 	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 	$(NODE_PRE_GYP) build --clang
 
-xnode: $(NODE_OUTPUT_PATH)/config.gypi
+xnode: $(NODE_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	$(NODE_PRE_GYP) configure --clang -- -I$< \
 	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs= \
 	  -f xcode
@@ -212,7 +212,7 @@ QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh .mason configure
 	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
-$(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi
+$(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	$(QT_ENV) deps/run_gyp platform/qt/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
 	  -Goutput_dir=. --depth=. --generator-output=$(QT_OUTPUT_PATH) -f make
 
@@ -243,7 +243,7 @@ LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 $(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh .mason configure
 	./configure $< $@ linux $(shell uname -m)
 
-$(LINUX_MAKEFILE): $(LINUX_OUTPUT_PATH)/config.gypi
+$(LINUX_MAKEFILE): $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	deps/run_gyp platform/linux/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
 	  -Goutput_dir=. --depth=. --generator-output=$(LINUX_OUTPUT_PATH) -f make
 
