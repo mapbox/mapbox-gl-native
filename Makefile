@@ -39,7 +39,7 @@ OSX_WORK_PATH = platform/osx/osx.xcworkspace
 OSX_USER_DATA_PATH = $(OSX_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 $(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configure
-	MASON_PLATFORM=osx ./configure $< $@
+	./configure $< $@ osx
 
 $(OSX_OUTPUT_PATH)/mbgl.xcconfig: $(OSX_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@
@@ -88,7 +88,7 @@ IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 $(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configure
-	MASON_PLATFORM=ios ./configure $< $@
+	./configure $< $@ ios
 
 $(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@

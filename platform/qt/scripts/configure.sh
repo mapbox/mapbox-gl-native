@@ -73,7 +73,7 @@ function print_qt_flags {
     fi
 }
 
-CONFIGURE_SUPLATFORM=platform/qt/scripts/configure-${SUBPLATFORM}.sh
+CONFIGURE_SUPLATFORM=platform/qt/scripts/configure-${MASON_PLATFORM_VERSION}.sh
 
 if [ -f $CONFIGURE_SUPLATFORM ]; then
    source $CONFIGURE_SUPLATFORM

@@ -4,6 +4,8 @@ set -euo pipefail
 
 INPUT_FILE=$1
 OUTPUT_FILE=$2
+export MASON_PLATFORM=$3
+export MASON_PLATFORM_VERSION=${4:-}
 
 if [ -z ${INPUT_FILE} ]; then
     abort 'You need to specify an input path for the configure.sh file'
