@@ -23,8 +23,7 @@ else
 .mason: ;
 endif
 
-default:
-	@printf "You must specify a valid target\n"
+default: test-$(HOST_PLATFORM)
 
 GYP = deps/run_gyp --depth=. -Goutput_dir=.
 
