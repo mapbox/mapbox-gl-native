@@ -27,6 +27,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         selectAnimatorResource(in.readInt());
         deselectAnimatorResource(in.readInt());
         rotation(in.readInt());
+        visible(in.readByte() != 0);
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -52,11 +53,12 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeString(getSnippet());
         out.writeString(getTitle());
         out.writeByte((byte) (isFlat() ? 1 : 0));
-        out.writeParcelable(getCenterOffset(),flags);
-        out.writeParcelable(getInfoWindowOffset(),flags);
+        out.writeParcelable(getCenterOffset(), flags);
+        out.writeParcelable(getInfoWindowOffset(), flags);
         out.writeInt(getSelectAnimRes());
         out.writeInt(getDeselectAnimRes());
         out.writeInt(getRotation());
+        out.writeByte((byte) (isVisible() ? 1 : 0));
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
@@ -77,6 +79,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setSelectAnimRes(selectAnimRes);
         marker.setDeselectAnimRes(deselectAnimRes);
         marker.setRotation(rotation);
+        marker.setVisible(visible);
         return marker;
     }
 
@@ -95,11 +98,8 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         MarkerViewOptions that = (MarkerViewOptions) o;
-
         return marker != null ? marker.equals(that.marker) : that.marker == null;
-
     }
 
     @Override

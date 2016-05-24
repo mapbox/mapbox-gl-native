@@ -28,6 +28,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected int selectAnimRes;
     protected int deselectAnimRes;
     protected int rotation;
+    protected boolean visible = true;
 
     public BaseMarkerViewOptions() {
         centerOffset = new PointF();
@@ -84,6 +85,11 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return getThis();
     }
 
+    public T visible(boolean visible){
+        this.visible = visible;
+        return getThis();
+    }
+
     public LatLng getPosition() {
         return position;
     }
@@ -122,6 +128,10 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
 
     public int getRotation() {
         return rotation;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     public abstract T getThis();

@@ -49,6 +49,13 @@ public class MarkerViewManager {
         }
     }
 
+    public void animateVisible(@NonNull MarkerView marker, boolean visible) {
+        View convertView = mMarkerViewMap.get(marker);
+        if (convertView != null) {
+            convertView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
     public void update() {
         View convertView;
         for (MarkerView marker : mMarkerViewMap.keySet()) {
@@ -57,7 +64,7 @@ public class MarkerViewManager {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 convertView.setX(point.x - (convertView.getMeasuredWidth() / 2));
                 convertView.setY(point.y - (convertView.getMeasuredHeight() / 2));
-                if (convertView.getVisibility() == View.GONE) {
+                if (marker.isVisible() && convertView.getVisibility() == View.GONE) {
                     convertView.animate().cancel();
                     convertView.setAlpha(0);
                     AnimatorUtils.alpha(convertView, 1);
@@ -180,6 +187,9 @@ public class MarkerViewManager {
 
                             // alpha
                             adaptedView.setAlpha(marker.getAlpha());
+
+                            // visible
+                            adaptedView.setVisibility(marker.isVisible() ? View.VISIBLE : View.GONE);
 
                             if (mapboxMap.getSelectedMarkers().contains(marker)) {
                                 // if a marker to be shown was selected

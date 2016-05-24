@@ -12,6 +12,7 @@ public class MarkerView extends Marker {
     private PointF centerOffset;
     private Point infoWindowOffset;
     private boolean flat;
+    private boolean visible;
 
     private int selectAnimRes;
     private int deselectAnimRes;
@@ -80,6 +81,17 @@ public class MarkerView extends Marker {
 
     void setTilt(float tiltValue) {
         this.tiltValue = tiltValue;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        if (markerViewManager != null) {
+            markerViewManager.animateVisible(this, visible);
+        }
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     public void setRotation(float rotation) {
