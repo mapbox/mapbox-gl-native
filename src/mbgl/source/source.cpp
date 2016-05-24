@@ -251,7 +251,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
         }
 
         idealTiles = util::tileCover(parameters.transformState, idealZoom);
-   }
+    }
 
     // Stores a list of all the data tiles that we're definitely going to retain. There are two
     // kinds of tiles we need: the ideal tiles determined by the tile cover. They may not yet be in
@@ -259,24 +259,26 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
 
-    // Create all tiles that we definitely want to load
-    for (const auto& unwrappedTileID : idealTiles) {
-        const OverscaledTileID dataTileID(dataTileZoom, unwrappedTileID.canonical);
-        retain.emplace(dataTileID);
-
-        auto it = tileDataMap.find(dataTileID);
-        if (it == tileDataMap.end()) {
-            if (auto data = createTile(dataTileID, parameters)) {
-                it = tileDataMap.emplace(dataTileID, std::move(data)).first;
-            }
+    auto retainTileDataFn = [&retain](const TileData& tileData) -> void {
+        retain.emplace(tileData.id);
+    };
+    auto getTileDataFn = [this](const OverscaledTileID& dataTileID) -> TileData* {
+        return getTileData(dataTileID);
+    };
+    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
+        if (auto data = createTile(dataTileID, parameters)) {
+            return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
+        } else {
+            return nullptr;
         }
-    }
+    };
+    auto renderTileFn = [this](const UnwrappedTileID& renderTileID, TileData& tileData) {
+        tiles.emplace(renderTileID, Tile{ renderTileID, tileData });
+    };
 
-    tiles = algorithm::updateRenderables<Tile>(tileDataMap, idealTiles, *info, overscaledZoom);
-
-    for (auto& pair : tiles) {
-        retain.emplace(pair.second.data.id);
-    }
+    tiles.clear();
+    algorithm::updateRenderables(getTileDataFn, createTileDataFn, retainTileDataFn, renderTileFn,
+                                 idealTiles, *info, dataTileZoom);
 
     if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =
