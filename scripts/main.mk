@@ -139,7 +139,7 @@ tidy: Ninja/compdb
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Generating header files...$(FORMAT_END)\n"
 	$(ENV) deps/ninja/ninja-$(PLATFORM) -C $(PLATFORM_OUTPUT)/$(BUILDTYPE) version shaders
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Running tidy...$(FORMAT_END)\n"
-	@./scripts/clang-tidy.sh
+	@./scripts/clang-tidy.sh $(PLATFORM_OUTPUT)/$(BUILDTYPE)
 
 #### Run tests #################################################################
 
