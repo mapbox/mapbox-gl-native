@@ -1,57 +1,41 @@
 ifeq ($(shell uname -s), Darwin)
-  PLATFORM ?= osx
-else ifeq ($(shell uname -s), Linux)
-  PLATFORM ?= linux
+  HOST_PLATFORM = osx
+else
+  HOST_PLATFORM = linux
 endif
+
+PLATFORM ?= $(HOST_PLATFORM)
 
 ifeq ($(PLATFORM),android)
-  SUBPLATFORM ?= arm-v7
+  CONFIGURE_PLATFORM = android
+  CONFIGURE_SUBPLATFORM = $(firstword $(SUBPLATFORM) arm-v7)
+  CONFIGURE_INPUT = platform/android/scripts/configure.sh
+  PLATFORM_OUTPUT = ./build/android-$(CONFIGURE_SUBPLATFORM)
+
   GYP_FLAVOR_SUFFIX = -android
-  ENV = $(shell MASON_ANDROID_ABI=$(SUBPLATFORM) ./platform/android/scripts/toolchain.sh)
-else ifeq ($(PLATFORM),ios)
-  SUBPLATFORM = all
-else ifeq ($(PLATFORM),osx)
-  SUBPLATFORM = x86_64
-else
-  SUBPLATFORM ?= $(shell uname -m)
-endif
+  ENV = $(shell MASON_ANDROID_ABI=$(CONFIGURE_SUBPLATFORM) ./platform/android/scripts/toolchain.sh)
 
-ifeq ($(PLATFORM),node)
-  ifeq ($(shell uname -s), Darwin)
-    CONFIGURE_PLATFORM ?= osx
-    CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    PLATFORM_SLUG = node-osx-$(SUBPLATFORM)
-  else ifeq ($(shell uname -s), Linux)
-    CONFIGURE_PLATFORM ?= linux
-    CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    PLATFORM_SLUG = node-linux-$(SUBPLATFORM)
-  endif
-endif
-
-ifeq ($(PLATFORM),qt)
-  ifeq ($(shell uname -s), Darwin)
-    CONFIGURE_PLATFORM ?= osx
-    CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    PLATFORM_SLUG = qt-osx-$(SUBPLATFORM)
-  else ifeq ($(shell uname -s), Linux)
-    CONFIGURE_PLATFORM ?= linux
-    CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    PLATFORM_SLUG = qt-linux-$(SUBPLATFORM)
-  endif
-
+else ifeq ($(PLATFORM),qt)
+  CONFIGURE_PLATFORM = $(HOST_PLATFORM)
+  CONFIGURE_SUBPLATFORM = $(shell uname -m)
   CONFIGURE_INPUT = platform/qt/scripts/configure.sh
+  PLATFORM_OUTPUT = ./build/qt-$(HOST_PLATFORM)-$(CONFIGURE_SUBPLATFORM)
 
   # Cross compilation support
-  ENV = $(shell MASON_PLATFORM_VERSION=$(SUBPLATFORM) ./platform/qt/scripts/toolchain.sh)
-endif
+  ENV = $(shell MASON_PLATFORM_VERSION=$(CONFIGURE_SUBPLATFORM) ./platform/qt/scripts/toolchain.sh)
 
-# Defaults if not set
-PLATFORM_SLUG ?= $(PLATFORM)-$(SUBPLATFORM)
-PLATFORM_OUTPUT ?= ./build/$(PLATFORM_SLUG)
-CONFIGURE_PLATFORM ?= $(PLATFORM)
-CONFIGURE_SUBPLATFORM ?= $(SUBPLATFORM)
-CONFIGURE_INPUT ?= platform/$(CONFIGURE_PLATFORM)/scripts/configure.sh
-CONFIGURE_OUTPUT ?= $(PLATFORM_OUTPUT)/config.gypi
+else ifeq ($(PLATFORM),node)
+  CONFIGURE_PLATFORM = $(HOST_PLATFORM)
+  CONFIGURE_SUBPLATFORM = $(shell uname -m)
+  CONFIGURE_INPUT = platform/$(HOST_PLATFORM)/scripts/configure.sh
+  PLATFORM_OUTPUT = ./build/node-$(HOST_PLATFORM)-$(CONFIGURE_SUBPLATFORM)
+
+else
+  CONFIGURE_PLATFORM = $(PLATFORM)
+  CONFIGURE_SUBPLATFORM = $(shell uname -m)
+  CONFIGURE_INPUT = platform/$(CONFIGURE_PLATFORM)/scripts/configure.sh
+  PLATFORM_OUTPUT = ./build/$(PLATFORM)-$(CONFIGURE_SUBPLATFORM)
+endif
 
 ifneq (,$(findstring clang,$(CXX)))
 	CXX_HOST = "clang"
@@ -78,6 +62,7 @@ else
 .mason: ;
 endif
 
+CONFIGURE_OUTPUT = $(PLATFORM_OUTPUT)/config.gypi
 .NOTPARALLEL: $(CONFIGURE_OUTPUT)
 $(CONFIGURE_OUTPUT): $(CONFIGURE_INPUT) .mason configure
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Running configure...$(FORMAT_END)\n"
