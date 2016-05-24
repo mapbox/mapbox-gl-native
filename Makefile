@@ -27,6 +27,8 @@ endif
 default:
 	@printf "You must specify a valid target\n"
 
+CONFIG_DEPENDENCIES = .mason configure
+
 # Depend on gyp includes plus directories, so that projects are regenerated when
 # files are added or removed.
 GYP_DEPENDENCIES = mbgl.gypi test/test.gypi bin/*.gypi $(shell find src include -type d)
@@ -38,7 +40,7 @@ OSX_PROJ_PATH = $(OSX_OUTPUT_PATH)/platform/osx/platform.xcodeproj
 OSX_WORK_PATH = platform/osx/osx.xcworkspace
 OSX_USER_DATA_PATH = $(OSX_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
-$(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh .mason configure
+$(OSX_OUTPUT_PATH)/config.gypi: platform/osx/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ osx
 
 $(OSX_OUTPUT_PATH)/mbgl.xcconfig: $(OSX_OUTPUT_PATH)/config.gypi
@@ -87,7 +89,7 @@ IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/platform/ios/platform.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
-$(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh .mason configure
+$(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ ios
 
 $(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
@@ -148,7 +150,7 @@ ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
 define ANDROID_RULES
-build/android-$1/config.gypi: platform/android/scripts/configure.sh .mason configure
+build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
 
 build/android-$1/Makefile: build/android-$1/config.gypi $(GYP_DEPENDENCIES)
@@ -180,7 +182,7 @@ NODE_OUTPUT_PATH = build/node-$(HOST_PLATFORM)-$(shell uname -m)
 node_modules: package.json
 	npm update # Install dependencies but don't run our own install script.
 
-$(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh .mason configure
+$(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
 node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
@@ -209,7 +211,7 @@ QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
 # Cross compilation support
 QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/toolchain.sh)
 
-$(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh .mason configure
+$(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
 $(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
@@ -240,7 +242,7 @@ run-qt-qml-app: qt-qml-app
 LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)
 LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 
-$(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh .mason configure
+$(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ linux $(shell uname -m)
 
 $(LINUX_MAKEFILE): $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
