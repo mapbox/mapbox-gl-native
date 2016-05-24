@@ -32,6 +32,7 @@ targets.
    - clang++ 3.5 or later _or_
    - g++-5 or later
  - Python 2.x (for build only)
+ - [Node.js](https://nodejs.org/) (for build only)
  - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
  - [`libtool`](https://www.gnu.org/software/libtool/) (for build only)
  - [`automake`](https://www.gnu.org/software/automake/) (for build only)
