@@ -13,15 +13,10 @@ depending on your operating system and what platform you want to develop for.
 
 ## 1: Getting the Source
 
-Mapbox GL Native uses git submodules, so you'll need to initialize and update
-them after cloning the source from Git.
+Clone the git repository:
 
     git clone https://github.com/mapbox/mapbox-gl-native.git
     cd mapbox-gl-native
-    git submodule init
-    git submodule update
-
-Default styles in the [Mapbox GL Style Spec format](https://github.com/mapbox/mapbox-gl-style-spec) are included at `./styles` as a submodule. See the [styles project](https://github.com/mapbox/mapbox-gl-styles) to report problems or to contribute to these styles.
 
 ## 2: Installing Dependencies
 
@@ -34,8 +29,6 @@ targets.
  - Python 2.x (for build only)
  - [Node.js](https://nodejs.org/) (for build only)
  - [`pkg-config`](https://wiki.freedesktop.org/www/Software/pkg-config/) (for build only)
- - [`libtool`](https://www.gnu.org/software/libtool/) (for build only)
- - [`automake`](https://www.gnu.org/software/automake/) (for build only)
 
 Depending on your operating system and target, you'll need additional
 dependencies:
