@@ -2,6 +2,7 @@
   'variables': {
     'loop_lib': 'uv',
     'headless_lib': 'glx',
+    'coverage': '<!(echo $ENABLE_COVERAGE)>',
   },
   'conditions': [
     ['OS == "mac"', {

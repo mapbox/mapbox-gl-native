@@ -2,6 +2,7 @@
   'variables': {
     'loop_lib': 'android',
     'headless_lib': 'none',
+    'coverage': 0,
   },
   'includes': [
     '../../mbgl.gypi',

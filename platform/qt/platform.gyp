@@ -9,6 +9,7 @@
       }]
     ],
     'qtlibversion': '1.0.0',
+    'coverage': 0,
   },
   'conditions': [
     ['<(qt_version_major) == 5', {

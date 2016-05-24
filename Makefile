@@ -1,5 +1,4 @@
 export BUILDTYPE ?= Release
-export ENABLE_COVERAGE ?= 0
 
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = osx
@@ -27,6 +26,8 @@ endif
 default:
 	@printf "You must specify a valid target\n"
 
+GYP = deps/run_gyp --depth=. -Goutput_dir=.
+
 CONFIG_DEPENDENCIES = .mason configure
 
 # Depend on gyp includes plus directories, so that projects are regenerated when
@@ -47,7 +48,7 @@ $(OSX_OUTPUT_PATH)/mbgl.xcconfig: $(OSX_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@
 
 $(OSX_PROJ_PATH): platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi $(OSX_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
-	./deps/run_gyp -f xcode --depth=. --generator-output=$(OSX_OUTPUT_PATH) $<
+	$(GYP) -f xcode --generator-output=$(OSX_OUTPUT_PATH) $<
 
 osx: $(OSX_PROJ_PATH)
 	set -o pipefail && xcodebuild \
@@ -96,7 +97,7 @@ $(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
 	./scripts/export-xcconfig.py $< $@
 
 $(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
-	./deps/run_gyp -f xcode --depth=. --generator-output=$(IOS_OUTPUT_PATH) $<
+	$(GYP) -f xcode --generator-output=$(IOS_OUTPUT_PATH) $<
 
 ios: $(IOS_PROJ_PATH)
 	set -o pipefail && xcodebuild \
@@ -154,8 +155,8 @@ build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEP
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
 
 build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config.gypi $(GYP_DEPENDENCIES)
-	$$(shell $(ANDROID_ENV) $1) deps/run_gyp $$< -I build/android-$1/config.gypi \
-	  -Dcoverage= -Goutput_dir=. --depth=. --generator-output=build/android-$1 -f make-android
+	$$(shell $(ANDROID_ENV) $1) $(GYP) -f make-android -I build/android-$1/config.gypi \
+	  --generator-output=build/android-$1 $$<
 
 android-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
@@ -215,8 +216,8 @@ $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDE
 	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
 $(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(QT_ENV) deps/run_gyp $< -I $(QT_OUTPUT_PATH)/config.gypi -Dcoverage=$(ENABLE_COVERAGE) \
-	  -Goutput_dir=. --depth=. --generator-output=$(QT_OUTPUT_PATH) -f make
+	$(QT_ENV) $(GYP) -f make -I $(QT_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(QT_OUTPUT_PATH) $<
 
 qt-lib: $(QT_MAKEFILE)
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-lib
@@ -246,8 +247,8 @@ $(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_D
 	./configure $< $@ linux $(shell uname -m)
 
 $(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	deps/run_gyp $< -I $(LINUX_OUTPUT_PATH)/config.gypi -Dcoverage=$(ENABLE_COVERAGE) \
-	  -Goutput_dir=. --depth=. --generator-output=$(LINUX_OUTPUT_PATH) -f make
+	$(GYP) -f make -I $(LINUX_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(LINUX_OUTPUT_PATH) $<
 
 linux: glfw-app render offline
 
@@ -285,8 +286,9 @@ check: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
-compdb: $(LINUX_OUTPUT_PATH)/config.gypi
-	deps/run_gyp platform/linux/platform.gyp $(GYP_FLAGS) -f ninja
+compdb: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
+	$(GYP) -f ninja -I $(LINUX_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(LINUX_OUTPUT_PATH) $<
 	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) \
 		-t compdb cc cc_s cxx objc objcxx > $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
 
