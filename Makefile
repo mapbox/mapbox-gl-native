@@ -60,7 +60,7 @@ xproj: $(OSX_PROJ_PATH) $(OSX_WORK_PATH)
 	cp platform/osx/WorkspaceSettings.xcsettings "$(OSX_USER_DATA_PATH)/WorkspaceSettings.xcsettings"
 	open $(OSX_WORK_PATH)
 
-test-osx: osx node_modules/express
+test-osx: osx node_modules
 	ulimit -c unlimited && ($(OSX_OUTPUT_PATH)/Build/Products/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
 	set -o pipefail && xcodebuild \
@@ -227,7 +227,7 @@ qt-app: $(QT_MAKEFILE)
 qt-qml-app: $(QT_MAKEFILE)
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-qml-app
 
-test-qt: $(QT_MAKEFILE) node_modules/express
+test-qt: $(QT_MAKEFILE) node_modules
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
 	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=*
 
@@ -251,7 +251,7 @@ $(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi 
 
 linux: glfw-app render offline
 
-test-linux: test-*
+test-linux: node_modules test-*
 
 render: $(LINUX_MAKEFILE)
 	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
@@ -275,11 +275,8 @@ ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
 
-test-%: node_modules/express test
+test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
-
-node_modules/express:
-	npm install express@4.11.1
 
 check: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
