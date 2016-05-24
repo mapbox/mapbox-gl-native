@@ -116,7 +116,7 @@
     [cacheURL getResourceValue:&exclusionFlag
                         forKey:NSURLIsExcludedFromBackupKey
                          error:&error];
-    XCTAssertTrue([exclusionFlag boolValue], @"Backup exclusion flag should be set for cache database.");
+    XCTAssertTrue(exclusionFlag && [exclusionFlag boolValue], @"Backup exclusion flag should be set for cache database.");
     XCTAssertNil(error, @"No errors should be returned when checking backup exclusion flag.");
 }
 
