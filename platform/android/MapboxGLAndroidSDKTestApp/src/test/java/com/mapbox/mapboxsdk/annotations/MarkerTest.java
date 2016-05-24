@@ -70,8 +70,8 @@ public class MarkerTest {
 
     @Test
     public void testHashCode() {
-        Marker marker = new MarkerOptions().position(new LatLng(10, 12)).getMarker();
-        assertEquals("hash code should match", marker.hashCode(), -1946419200);
+        Marker marker = new MarkerOptions().getMarker();
+        assertEquals("hash code should match", marker.hashCode(), 0);
     }
 
     @Test
