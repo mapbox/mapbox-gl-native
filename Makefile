@@ -153,8 +153,8 @@ define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
 
-build/android-$1/Makefile: build/android-$1/config.gypi $(GYP_DEPENDENCIES)
-	$$(shell $(ANDROID_ENV) $1) deps/run_gyp platform/android/platform.gyp -I$$< \
+build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config.gypi $(GYP_DEPENDENCIES)
+	$$(shell $(ANDROID_ENV) $1) deps/run_gyp $$< -I build/android-$1/config.gypi \
 	  -Dcoverage= -Goutput_dir=. --depth=. --generator-output=build/android-$1 -f make-android
 
 android-lib-$1: build/android-$1/Makefile
@@ -214,8 +214,8 @@ QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
-$(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(QT_ENV) deps/run_gyp platform/qt/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
+$(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
+	$(QT_ENV) deps/run_gyp $< -I $(QT_OUTPUT_PATH)/config.gypi -Dcoverage=$(ENABLE_COVERAGE) \
 	  -Goutput_dir=. --depth=. --generator-output=$(QT_OUTPUT_PATH) -f make
 
 qt-lib: $(QT_MAKEFILE)
@@ -245,8 +245,8 @@ LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 $(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ linux $(shell uname -m)
 
-$(LINUX_MAKEFILE): $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	deps/run_gyp platform/linux/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
+$(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
+	deps/run_gyp $< -I $(LINUX_OUTPUT_PATH)/config.gypi -Dcoverage=$(ENABLE_COVERAGE) \
 	  -Goutput_dir=. --depth=. --generator-output=$(LINUX_OUTPUT_PATH) -f make
 
 linux: glfw-app render offline
