@@ -56,6 +56,10 @@ public:
         program.reset();
         lineWidth.reset();
         activeTexture.reset();
+#ifndef GL_ES_VERSION_2_0
+        pixelZoom.reset();
+        rasterPos.reset();
+#endif // GL_ES_VERSION_2_0
     }
 
     void setDirty() {
@@ -76,6 +80,10 @@ public:
         program.setDirty();
         lineWidth.setDirty();
         activeTexture.setDirty();
+#ifndef GL_ES_VERSION_2_0
+        pixelZoom.setDirty();
+        rasterPos.setDirty();
+#endif // GL_ES_VERSION_2_0
     }
 
     Value<StencilFunc> stencilFunc;
@@ -95,6 +103,10 @@ public:
     Value<Program> program;
     Value<LineWidth> lineWidth;
     Value<ActiveTexture> activeTexture;
+#ifndef GL_ES_VERSION_2_0
+    Value<PixelZoom> pixelZoom;
+    Value<RasterPos> rasterPos;
+#endif // GL_ES_VERSION_2_0
 };
 
 } // namespace gl

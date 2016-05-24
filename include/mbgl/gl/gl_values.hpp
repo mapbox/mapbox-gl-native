@@ -269,6 +269,10 @@ struct PixelZoom {
     }
 };
 
+inline bool operator!=(const PixelZoom::Type& a, const PixelZoom::Type& b) {
+    return a.xfactor != b.xfactor || a.yfactor != b.yfactor;
+}
+
 struct RasterPos {
     using Type = std::array<GLdouble, 4>;
     static const Type Default;
