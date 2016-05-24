@@ -24,8 +24,6 @@ else
 .mason: ;
 endif
 
-RUN = +$(MAKE) -f scripts/main.mk
-
 default:
 	@printf "You must specify a valid target\n"
 
@@ -146,26 +144,33 @@ idocument:
 
 #### Android targets #####################################################
 
-# Builds a particular android architecture.
-android-lib-%:
-	$(RUN) PLATFORM=android SUBPLATFORM=$* Makefile/all
+ANDROID_ENV = platform/android/scripts/toolchain.sh
+ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
-# Builds the default Android library
-.PHONY: android-lib
-android-lib: android-lib-arm-v7
+define ANDROID_RULES
+build/android-$1/config.gypi: platform/android/scripts/configure.sh .mason configure
+	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
 
-# Builds the selected/default Android library
-.PHONY: android
-android: android-lib
+build/android-$1/Makefile: build/android-$1/config.gypi
+	$$(shell $(ANDROID_ENV) $1) deps/run_gyp platform/android/platform.gyp -I$$< \
+	  -Dcoverage= -Goutput_dir=. --depth=. --generator-output=build/android-$1 -f make-android
+
+android-lib-$1: build/android-$1/Makefile
+	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
+
+apackage: android-lib-$1
+endef
+
+$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
+
+android: android-lib-arm-v7
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
-
-# Builds all android architectures for distribution.
-.PHONY: apackage
-apackage: android-lib-arm-v5 android-lib-arm-v7 android-lib-arm-v8 android-lib-x86 android-lib-x86-64 android-lib-mips
-	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 test-android:
 	cd platform/android && ./gradlew testReleaseUnitTest --continue
+
+apackage:
+	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
 #### Node targets #####################################################
 

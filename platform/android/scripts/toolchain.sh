@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 export MASON_PLATFORM=android
-export MASON_ANDROID_ABI=${MASON_ANDROID_ABI:-arm-v7}
+export MASON_ANDROID_ABI=${1:-arm-v7}
 export PATH="`pwd`/.mason:${PATH}"
 export MASON_DIR="`pwd`/.mason"
 
