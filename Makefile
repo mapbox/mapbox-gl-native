@@ -198,80 +198,96 @@ test-node: node
 
 #### Qt targets #####################################################
 
-.PHONY: qt-lib
-qt-lib:
-	$(RUN) PLATFORM=qt Makefile/qt-lib
+QT_OUTPUT_PATH = build/qt-$(HOST_PLATFORM)-$(shell uname -m)
+QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
 
-.PHONY: qt-app
-qt-app:
-	$(RUN) PLATFORM=qt Makefile/qt-app
+# Cross compilation support
+QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/toolchain.sh)
 
-.PHONY: run-qt-app
+$(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh .mason configure
+	$(QT_ENV) ./configure $< $@ linux $(shell uname -m)
+
+$(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi
+	$(QT_ENV) deps/run_gyp platform/qt/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
+	  -Goutput_dir=. --depth=. --generator-output=$(QT_OUTPUT_PATH) -f make
+
+qt-lib: $(QT_MAKEFILE)
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-lib
+
+qt-app: $(QT_MAKEFILE)
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-app
+
+qt-qml-app: $(QT_MAKEFILE)
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-qml-app
+
+test-qt: $(QT_MAKEFILE) node_modules/express
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
+	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=*
+
 run-qt-app: qt-app
-	$(RUN) PLATFORM=qt run-qt-app
+	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qmapboxgl
 
-.PHONY: qt-qml-app
-qt-qml-app:
-	$(RUN) PLATFORM=qt Makefile/qt-qml-app
-
-.PHONY: run-qt-qml-app
 run-qt-qml-app: qt-qml-app
-	$(RUN) PLATFORM=qt run-qt-qml-app
+	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qquickmapboxgl
 
-.PHONY: test-qt
-test-qt: node_modules/express
-	$(RUN) PLATFORM=qt test-*
+#### Linux targets #####################################################
 
-#### Miscellaneous targets #####################################################
+LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)
+LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 
-.PHONY: linux
+$(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh .mason configure
+	./configure $< $@ linux $(shell uname -m)
+
+$(LINUX_MAKEFILE): $(LINUX_OUTPUT_PATH)/config.gypi
+	deps/run_gyp platform/linux/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
+	  -Goutput_dir=. --depth=. --generator-output=$(LINUX_OUTPUT_PATH) -f make
+
 linux: glfw-app render offline
 
-.PHONY: test-linux
 test-linux: test-*
 
-.PHONY: glfw-app
-glfw-app:
-	$(RUN) Makefile/glfw-app
+render: $(LINUX_MAKEFILE)
+	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
 
-.PHONY: run-glfw-app
+offline: $(LINUX_MAKEFILE)
+	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
+
+glfw-app: $(LINUX_MAKEFILE)
+	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) glfw-app
+
+test: $(LINUX_MAKEFILE)
+	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) test
+
 run-glfw-app: glfw-app
-	$(RUN) run-glfw-app
+	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && ./mapbox-glfw
 
-.PHONY: run-valgrind-glfw-app
 run-valgrind-glfw-app: glfw-app
-	$(RUN) run-valgrind-glfw-app
+	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
 
-.PHONY: test
-test:
-	$(RUN) Makefile/test
+ifneq (,$(shell which gdb))
+  GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
+endif
 
-test-%: node_modules/express
-	$(RUN) test-$*
+test-%: node_modules/express test
+	$(GDB) $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
 
 node_modules/express:
 	npm install express@4.11.1
 
-.PHONY: check
-check:
-	$(RUN) BUILDTYPE=Debug ENABLE_COVERAGE=1 check
-
-.PHONY: render
-render:
-	$(RUN) Makefile/mbgl-render
-
-.PHONY: offline
-offline:
-	$(RUN) Makefile/mbgl-offline
+check: test
+	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
-.PHONY: compdb
-compdb:
-	$(RUN) Ninja/compdb
+compdb: $(LINUX_OUTPUT_PATH)/config.gypi
+	deps/run_gyp platform/linux/platform.gyp $(GYP_FLAGS) -f ninja
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) \
+		-t compdb cc cc_s cxx objc objcxx > $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
 
-.PHONY: tidy
-tidy:
-	$(RUN) tidy
+tidy: compdb
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) version shaders
+	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+
+#### Miscellaneous targets #####################################################
 
 clean:
 	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
