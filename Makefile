@@ -210,7 +210,7 @@ QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
 QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/toolchain.sh)
 
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh .mason configure
-	$(QT_ENV) ./configure $< $@ linux $(shell uname -m)
+	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
 $(QT_MAKEFILE): $(QT_OUTPUT_PATH)/config.gypi
 	$(QT_ENV) deps/run_gyp platform/qt/platform.gyp -I$< -Dcoverage=$(ENABLE_COVERAGE) \
