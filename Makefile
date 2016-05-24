@@ -1,4 +1,4 @@
-export BUILDTYPE ?= Release
+export BUILDTYPE ?= Debug
 
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = osx
