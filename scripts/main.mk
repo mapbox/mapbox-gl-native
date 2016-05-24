@@ -24,23 +24,11 @@ else ifeq ($(PLATFORM),qt)
   # Cross compilation support
   ENV = $(shell MASON_PLATFORM_VERSION=$(CONFIGURE_SUBPLATFORM) ./platform/qt/scripts/toolchain.sh)
 
-else ifeq ($(PLATFORM),node)
-  CONFIGURE_PLATFORM = $(HOST_PLATFORM)
-  CONFIGURE_SUBPLATFORM = $(shell uname -m)
-  CONFIGURE_INPUT = platform/$(HOST_PLATFORM)/scripts/configure.sh
-  PLATFORM_OUTPUT = ./build/node-$(HOST_PLATFORM)-$(CONFIGURE_SUBPLATFORM)
-
 else
   CONFIGURE_PLATFORM = $(PLATFORM)
   CONFIGURE_SUBPLATFORM = $(shell uname -m)
   CONFIGURE_INPUT = platform/$(CONFIGURE_PLATFORM)/scripts/configure.sh
   PLATFORM_OUTPUT = ./build/$(PLATFORM)-$(CONFIGURE_SUBPLATFORM)
-endif
-
-ifneq (,$(findstring clang,$(CXX)))
-	CXX_HOST = "clang"
-else ifneq (,$(findstring g++,$(CXX)))
-	CXX_HOST = "g++"
 endif
 
 # Text formatting
@@ -86,19 +74,6 @@ Makefile/__project__: $(CONFIGURE_OUTPUT)
 Ninja/__project__: $(CONFIGURE_OUTPUT)
 	@printf "$(TEXT_BOLD)$(COLOR_GREEN)* Recreating project...$(FORMAT_END)\n"
 	$(ENV) deps/run_gyp platform/$(PLATFORM)/platform.gyp $(GYP_FLAGS) -f ninja
-
-#### Node targets ##############################################################
-
-NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
-
-Makefile/node: $(CONFIGURE_OUTPUT)
-	$(NODE_PRE_GYP) configure --clang -- $(GYP_FLAGS) \
-	  -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
-	$(NODE_PRE_GYP) build --clang
-
-Xcode/node: $(CONFIGURE_OUTPUT)
-	$(NODE_PRE_GYP) configure --clang -- $(GYP_FLAGS) -f xcode \
-	  -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 
 #### Build individual targets ##################################################
 

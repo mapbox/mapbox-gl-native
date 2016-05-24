@@ -2,8 +2,10 @@ export BUILDTYPE ?= Release
 export ENABLE_COVERAGE ?= 0
 
 ifeq ($(shell uname -s), Darwin)
+  HOST_PLATFORM = osx
   export JOBS ?= $(shell sysctl -n hw.ncpu)
 else ifeq ($(shell uname -s), Linux)
+  HOST_PLATFORM = linux
   export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 else
   $(error Cannot determine host platform)
@@ -167,16 +169,24 @@ test-android:
 
 #### Node targets #####################################################
 
+NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
+NODE_OUTPUT_PATH = build/node-$(HOST_PLATFORM)-$(shell uname -m)
+
 node_modules: package.json
 	npm update # Install dependencies but don't run our own install script.
 
-.PHONY: node
-node: node_modules
-	$(RUN) PLATFORM=node Makefile/node
+$(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh .mason configure
+	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
 
-.PHONY: xnode
-xnode:
-	$(RUN) Xcode/node
+node: $(NODE_OUTPUT_PATH)/config.gypi node_modules
+	$(NODE_PRE_GYP) configure --clang -- -I$< \
+	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
+	$(NODE_PRE_GYP) build --clang
+
+xnode: $(NODE_OUTPUT_PATH)/config.gypi
+	$(NODE_PRE_GYP) configure --clang -- -I$< \
+	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs= \
+	  -f xcode
 	./platform/node/scripts/create_node_scheme.sh "node test" "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
 	./platform/node/scripts/create_node_scheme.sh "npm run test-suite" "platform/node/test/render.test.js"
 	open ./build/binding.xcodeproj
