@@ -1,30 +1,30 @@
 ifeq ($(shell uname -s), Darwin)
-  export PLATFORM ?= osx
+  PLATFORM ?= osx
 else ifeq ($(shell uname -s), Linux)
-  export PLATFORM ?= linux
+  PLATFORM ?= linux
 endif
 
 ifeq ($(PLATFORM),android)
-  export SUBPLATFORM ?= arm-v7
+  SUBPLATFORM ?= arm-v7
   GYP_FLAVOR_SUFFIX = -android
   ENV = $(shell MASON_ANDROID_ABI=$(SUBPLATFORM) ./platform/android/scripts/toolchain.sh)
 else ifeq ($(PLATFORM),ios)
-  export SUBPLATFORM = all
+  SUBPLATFORM = all
 else ifeq ($(PLATFORM),osx)
-  export SUBPLATFORM = x86_64
+  SUBPLATFORM = x86_64
 else
-  export SUBPLATFORM ?= $(shell uname -m)
+  SUBPLATFORM ?= $(shell uname -m)
 endif
 
 ifeq ($(PLATFORM),node)
   ifeq ($(shell uname -s), Darwin)
     CONFIGURE_PLATFORM ?= osx
     CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    export PLATFORM_SLUG = node-osx-$(SUBPLATFORM)
+    PLATFORM_SLUG = node-osx-$(SUBPLATFORM)
   else ifeq ($(shell uname -s), Linux)
     CONFIGURE_PLATFORM ?= linux
     CONFIGURE_SUBPLATFORM = $(SUBPLATFORM)
-    export PLATFORM_SLUG = node-linux-$(SUBPLATFORM)
+    PLATFORM_SLUG = node-linux-$(SUBPLATFORM)
   endif
 endif
 
