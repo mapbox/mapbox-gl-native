@@ -89,10 +89,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLPointFeature : MGLPointAnnotation <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -100,10 +96,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLPolylineFeature : MGLPolyline <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -111,10 +103,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLPolygonFeature : MGLPolygon <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -122,10 +110,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLMultiPointFeature : MGLMultiPoint <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -133,10 +117,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLMultiPolylineFeature : MGLMultiPolyline <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -144,10 +124,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLMultiPolygonFeature : MGLMultiPolygon <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 /**
@@ -155,10 +131,6 @@ NS_ASSUME_NONNULL_BEGIN
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources">tile source</a>.
  */
 @interface MGLShapeCollectionFeature : MGLShapeCollection <MGLFeature>
-
-@property (nonatomic, copy, nullable, readwrite) id identifier;
-@property (nonatomic, copy, readwrite) NS_DICTIONARY_OF(NSString *, id) *attributes;
-
 @end
 
 NS_ASSUME_NONNULL_END
