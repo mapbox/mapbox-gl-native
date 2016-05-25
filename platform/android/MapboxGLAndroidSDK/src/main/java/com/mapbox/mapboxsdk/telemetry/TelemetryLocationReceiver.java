@@ -63,7 +63,7 @@ public class TelemetryLocationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Location location = (Location)intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         if (location != null) {
-            Log.d(TAG, "location received = " + location);
+//            Log.d(TAG, "location received = " + location);
             MapboxEventManager.getMapboxEventManager().addLocationEvent(location);
         } else {
             Log.d(TAG, "location NOT received");

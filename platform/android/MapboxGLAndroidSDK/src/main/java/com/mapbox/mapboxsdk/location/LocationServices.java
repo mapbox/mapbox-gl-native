@@ -123,7 +123,7 @@ public class LocationServices implements com.mapzen.android.lost.api.LocationLis
      */
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged()..." + location);
+//        Log.d(TAG, "onLocationChanged()..." + location);
         this.lastLocation = location;
 
         // Update Listeners
