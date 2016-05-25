@@ -38,8 +38,8 @@ class GLHolder : private util::noncopyable {
 public:
     GLHolder() {}
 
-    GLHolder(GLHolder&& o) noexcept : id(o.id) { o.id = 0; }
-    GLHolder& operator=(GLHolder&& o) noexcept { id = o.id; o.id = 0; return *this; }
+    GLHolder(GLHolder&& o) noexcept : id(o.id), objectStore(o.objectStore) { o.id = 0; }
+    GLHolder& operator=(GLHolder&& o) noexcept { id = o.id; objectStore = o.objectStore; o.id = 0; return *this; }
 
     explicit operator bool() const { return id; }
     GLuint getID() const { return id; }
@@ -107,10 +107,10 @@ public:
     TexturePoolHolder() { ids.fill(0); }
     ~TexturePoolHolder() { reset(); }
 
-    TexturePoolHolder(TexturePoolHolder&& o) noexcept : ids(std::move(o.ids)) {}
-    TexturePoolHolder& operator=(TexturePoolHolder&& o) noexcept { ids = std::move(o.ids); return *this; }
+    TexturePoolHolder(TexturePoolHolder&& o) noexcept : ids(std::move(o.ids)), objectStore(o.objectStore) { o.ids.fill(0); }
+    TexturePoolHolder& operator=(TexturePoolHolder&& o) noexcept { ids = std::move(o.ids); objectStore = o.objectStore; o.ids.fill(0); return *this; }
 
-    explicit operator bool() { return std::none_of(ids.begin(), ids.end(), [](int id) { return id == 0; }); }
+    explicit operator bool() const { return std::any_of(ids.begin(), ids.end(), [](int id) { return id; }); }
     const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
     const GLuint& operator[](size_t pos) { return ids[pos]; }
 
