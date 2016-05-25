@@ -29,11 +29,14 @@ void Painter::renderDebugText(TileData& tileData, const mat4 &matrix) {
 
     config.depthTest = GL_FALSE;
 
-    if (!tileData.debugBucket || tileData.debugBucket->state != tileData.getState()
-                              || !(tileData.debugBucket->modified == tileData.modified)
-                              || !(tileData.debugBucket->expires == tileData.expires)
-                              || tileData.debugBucket->debugMode != frame.debugOptions) {
-        tileData.debugBucket = std::make_unique<DebugBucket>(tileData.id, tileData.getState(), tileData.modified, tileData.expires, frame.debugOptions);
+    if (!tileData.debugBucket || tileData.debugBucket->renderable != tileData.isRenderable() ||
+        tileData.debugBucket->complete != tileData.isComplete() ||
+        !(tileData.debugBucket->modified == tileData.modified) ||
+        !(tileData.debugBucket->expires == tileData.expires) ||
+        tileData.debugBucket->debugMode != frame.debugOptions) {
+        tileData.debugBucket = std::make_unique<DebugBucket>(
+            tileData.id, tileData.isRenderable(), tileData.isComplete(), tileData.modified,
+            tileData.expires, frame.debugOptions);
     }
 
     config.program = plainShader->getID();

@@ -11,17 +11,20 @@
 using namespace mbgl;
 
 DebugBucket::DebugBucket(const OverscaledTileID& id,
-                         const TileData::State state_,
+                         const bool renderable_,
+                         const bool complete_,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_,
                          MapDebugOptions debugMode_)
-    : state(state_),
+    : renderable(renderable_),
+      complete(complete_),
       modified(std::move(modified_)),
       expires(std::move(expires_)),
       debugMode(debugMode_) {
     double baseline = 200;
     if (debugMode & MapDebugOptions::ParseStatus) {
-        const std::string text = util::toString(id) + " - " + TileData::StateToString(state);
+        const std::string text = util::toString(id) + " - " +
+                                 (complete ? "complete" : renderable ? "renderable" : "pending");
         fontBuffer.addText(text.c_str(), 50, baseline, 5);
         baseline += 200;
     }

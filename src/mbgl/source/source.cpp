@@ -307,8 +307,7 @@ bool Source::update(const StyleUpdateParameters& parameters) {
     for (auto& pair : tileDataMap) {
         const auto& dataTileID = pair.first;
         auto tileData = pair.second.get();
-        if (parameters.shouldReparsePartialTiles &&
-            tileData->getState() == TileData::State::partial) {
+        if (parameters.shouldReparsePartialTiles && tileData->isIncomplete()) {
             auto callback = std::bind(&Source::tileLoadingCallback, this, dataTileID,
                                       std::placeholders::_1, false);
 

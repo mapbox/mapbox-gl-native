@@ -27,7 +27,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
             modified = res.modified;
             expires = res.expires;
         } else if (res.noContent) {
-            state = State::parsed;
+            availableData = DataAvailability::All;
             modified = res.modified;
             expires = res.expires;
             workRequest.reset();
@@ -43,13 +43,13 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
 
                 std::exception_ptr error;
                 if (result.is<std::unique_ptr<Bucket>>()) {
-                    state = State::parsed;
                     bucket = std::move(result.get<std::unique_ptr<Bucket>>());
                 } else {
                     error = result.get<std::exception_ptr>();
-                    state = State::parsed;
                     bucket.reset();
                 }
+
+                availableData = DataAvailability::All;
 
                 callback(error);
             });

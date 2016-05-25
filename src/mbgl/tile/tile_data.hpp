@@ -23,26 +23,6 @@ class TransformState;
 
 class TileData : private util::noncopyable {
 public:
-    // loading:
-    //   A request to the FileSource was made for the actual tile data and TileData
-    //   is waiting for it to arrive.
-    //
-    // partial:
-    //   TileData is partially parsed, some buckets are still waiting for dependencies
-    //   to arrive, but it is good for rendering. Partial tiles can also be re-parsed,
-    //   but might remain in the same state if dependencies are still missing.
-    //
-    // parsed:
-    //   TileData is fully parsed and its contents won't change from this point. This
-    //   is the only state which is safe to cache this object.
-    enum class State {
-        loading,
-        partial,
-        parsed,
-    };
-
-    static const char* StateToString(State);
-
     TileData(const OverscaledTileID&);
     virtual ~TileData();
 
@@ -65,15 +45,14 @@ public:
     // partial state is still waiting for network resources but can also
     // be rendered, although layers will be missing.
     bool isRenderable() const {
-        return state == State::partial || state == State::parsed;
+        return availableData != DataAvailability::None;
     }
 
     bool isComplete() const {
-        return state == State::parsed;
+        return availableData == DataAvailability::All;
     }
-
-    State getState() const {
-        return state;
+    bool isIncomplete() const {
+        return availableData == DataAvailability::Some;
     }
 
     void dumpDebugLogs() const;
@@ -86,7 +65,20 @@ public:
     std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
-    State state;
+    enum class DataAvailability : uint8_t {
+        // Still waiting for data to load or parse.
+        None,
+
+        // TileData is partially parsed, some buckets are still waiting for dependencies
+        // to arrive, but it is good for rendering. Partial tiles can also be re-parsed,
+        // but might remain in the same state if dependencies are still missing.
+        Some,
+
+        // TileData is fully parsed, and all buckets are available if they exist.
+        All,
+    };
+
+    DataAvailability availableData = DataAvailability::None;
 };
 
 } // namespace mbgl

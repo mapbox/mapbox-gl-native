@@ -44,7 +44,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
         if (!tile) {
             // This is a 404 response. We're treating these as empty tiles.
             workRequest.reset();
-            state = State::parsed;
+            availableData = DataAvailability::All;
             buckets.clear();
             callback(err);
             return;
@@ -52,8 +52,8 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
 
         // Mark the tile as pending again if it was complete before to prevent signaling a complete
         // state despite pending parse operations.
-        if (isComplete()) {
-            state = State::partial;
+        if (availableData == DataAvailability::All) {
+            availableData = DataAvailability::Some;
         }
 
         // Kick off a fresh parse of this tile. This happens when the tile is new, or
@@ -66,7 +66,8 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
             std::exception_ptr error;
             if (result.is<TileParseResultData>()) {
                 auto& resultBuckets = result.get<TileParseResultData>();
-                state = resultBuckets.complete ? State::parsed : State::partial;
+                availableData =
+                    resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
                 // Persist the configuration we just placed so that we can later check whether we need to
                 // place again in case the configuration has changed.
@@ -84,7 +85,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
             } else {
                 // This is triggered when parsing fails (e.g. due to an invalid vector tile)
                 error = result.get<std::exception_ptr>();
-                state = State::parsed;
+                availableData = DataAvailability::All;
             }
 
             callback(error);
@@ -109,7 +110,8 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
         std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
-            state = resultBuckets.complete ? State::parsed : State::partial;
+            availableData =
+                    resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
 
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
@@ -128,7 +130,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 
         } else {
             error = result.get<std::exception_ptr>();
-            state = State::parsed;
+            availableData = DataAvailability::All;
         }
 
         callback(error);

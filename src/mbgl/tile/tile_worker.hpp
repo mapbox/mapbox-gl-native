@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <list>
+#include <atomic>
 #include <unordered_map>
 
 namespace mbgl {

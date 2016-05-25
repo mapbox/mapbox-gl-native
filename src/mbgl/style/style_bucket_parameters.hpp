@@ -5,6 +5,7 @@
 #include <mbgl/style/filter.hpp>
 
 #include <functional>
+#include <atomic>
 
 namespace mbgl {
 
