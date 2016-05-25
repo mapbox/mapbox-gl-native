@@ -78,16 +78,24 @@ GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     return result;
 }
 
+bool sortByArea(std::pair<double,GeometryCoordinates> const& a, std::pair<double,GeometryCoordinates> const& b) {
+    return a.first > b.first;
+}
+
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
     std::vector<GeometryCollection> polygons;
 
     std::size_t len = rings.size();
+
+    // @TODO make this an argument
+    unsigned EARCUT_MAX_RINGS = 2;
 
     if (len <= 1) {
         polygons.push_back(rings);
         return polygons;
     }
 
+    std::vector<std::pair<double, GeometryCoordinates>> innerRings;
     GeometryCollection polygon;
     int8_t ccw = 0;
 
@@ -100,16 +108,39 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
         if (ccw == 0)
             ccw = (area < 0 ? -1 : 1);
 
+        // Store built up polygon and start new one
         if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
+            std::sort(innerRings.begin(), innerRings.end(), sortByArea);
+            unsigned ringCount = 0;
+            for (const auto& pair : innerRings) {
+                if (ringCount > EARCUT_MAX_RINGS - 1) break;
+                polygon.push_back(pair.second);
+                ringCount++;
+            }
             polygons.push_back(polygon);
-            polygon.clear();
-        }
 
-        polygon.push_back(rings[i]);
+            innerRings.clear();
+            polygon.clear();
+            polygon.push_back(rings[i]);
+        // Start new polygon
+        } else if (polygon.empty()) {
+            polygon.push_back(rings[i]);
+        // Continue current polygon
+        } else {
+            innerRings.push_back(make_pair(area, rings[i]));
+        }
     }
 
-    if (!polygon.empty())
+    if (!polygon.empty()) {
+        std::sort(innerRings.begin(), innerRings.end(), sortByArea);
+        unsigned ringCount = 0;
+        for (const auto& pair : innerRings) {
+            if (ringCount > EARCUT_MAX_RINGS - 1) break;
+            polygon.push_back(pair.second);
+            ringCount++;
+        }
         polygons.push_back(polygon);
+    }
 
     return polygons;
 }
