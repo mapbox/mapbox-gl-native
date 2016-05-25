@@ -1,5 +1,4 @@
-#ifndef MBGL_COMMON_HEADLESS_VIEW
-#define MBGL_COMMON_HEADLESS_VIEW
+#pragma once
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
@@ -85,5 +84,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_RASTERBUCKET
-#define MBGL_RENDERER_RASTERBUCKET
+#pragma once
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/raster.hpp>
@@ -27,5 +26,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

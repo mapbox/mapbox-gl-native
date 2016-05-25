@@ -1,5 +1,4 @@
-#ifndef MBGL_GL_GL_CONFIG
-#define MBGL_GL_GL_CONFIG
+#pragma once
 
 #include <cstdint>
 #include <tuple>
@@ -111,5 +110,3 @@ public:
 
 } // namespace gl
 } // namespace mbgl
-
-#endif // MBGL_RENDERER_GL_CONFIG

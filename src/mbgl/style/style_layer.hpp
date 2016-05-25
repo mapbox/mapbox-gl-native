@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_STYLE_LAYER
-#define MBGL_STYLE_STYLE_LAYER
+#pragma once
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter.hpp>
@@ -101,5 +100,3 @@ protected:
 };
 
 } // namespace mbgl
-
-#endif

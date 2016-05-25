@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_GLYPH_STORE_OBSERVER
-#define MBGL_TEXT_GLYPH_STORE_OBSERVER
+#pragma once
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/text/glyph_range.hpp>
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

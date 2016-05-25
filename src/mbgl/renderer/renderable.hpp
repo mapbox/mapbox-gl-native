@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_RENDERABLE
-#define MBGL_RENDERER_RENDERABLE
+#pragma once
 
 #include <mbgl/util/clip_id.hpp>
 
@@ -10,5 +9,3 @@ struct Renderable {
 };
 
 } // namespace mbgl
-
-#endif

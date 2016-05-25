@@ -1,5 +1,4 @@
-#ifndef MBGL_PLATFORM_EVENT
-#define MBGL_PLATFORM_EVENT
+#pragma once
 
 #include <mbgl/util/enum.hpp>
 
@@ -88,5 +87,3 @@ constexpr EventPermutation disabledEventPermutations[] = {
 };
 
 } // namespace mbgl
-
-#endif

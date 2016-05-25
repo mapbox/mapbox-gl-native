@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_TYPES
-#define MBGL_STYLE_TYPES
+#pragma once
 
 #include <mbgl/util/enum.hpp>
 
@@ -145,6 +144,4 @@ using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRende
 using CustomLayerDeinitializeFunction = void (*)(void* context);
 
 } // namespace mbgl
-
-#endif
 

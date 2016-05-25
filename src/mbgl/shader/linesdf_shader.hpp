@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_LINESDF
-#define MBGL_SHADER_SHADER_LINESDF
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -35,5 +34,3 @@ private:
 
 
 } // namespace mbgl
-
-#endif

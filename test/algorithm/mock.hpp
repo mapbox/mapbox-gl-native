@@ -1,5 +1,4 @@
-#ifndef MBGL_TEST_MOCK
-#define MBGL_TEST_MOCK
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -56,5 +55,3 @@ MockTileData* MockSource::createTileData(const mbgl::OverscaledTileID& tileID) {
     // Replace the existing MockTileData object, if any.
     return (dataTiles[tileID] = std::make_unique<MockTileData>()).get();
 }
-
-#endif

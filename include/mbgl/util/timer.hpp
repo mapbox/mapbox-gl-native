@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TIMER
-#define MBGL_UTIL_TIMER
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -25,5 +24,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

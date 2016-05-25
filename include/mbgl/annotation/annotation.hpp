@@ -1,5 +1,4 @@
-#ifndef MBGL_ANNOTATION
-#define MBGL_ANNOTATION
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -10,5 +9,3 @@ using AnnotationID = uint32_t;
 using AnnotationIDs = std::vector<AnnotationID>;
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_BINPACK
-#define MBGL_GEOMETRY_BINPACK
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/rect.hpp>
@@ -100,5 +99,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

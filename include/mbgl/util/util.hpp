@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_UTIL
-#define MBGL_UTIL_UTIL
+#pragma once
 
 #ifdef DEBUG
 
@@ -11,7 +10,5 @@
 
 #define MBGL_STORE_THREAD(tid)
 #define MBGL_VERIFY_THREAD(tid)
-
-#endif
 
 #endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_CAMERA
-#define MBGL_MAP_CAMERA
+#pragma once
 
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -76,5 +75,3 @@ struct AnimationOptions {
 };
 
 } // namespace mbgl
-
-#endif /* MBGL_MAP_CAMERA */

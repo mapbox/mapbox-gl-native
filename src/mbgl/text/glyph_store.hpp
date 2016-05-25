@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_GLYPH_STORE
-#define MBGL_TEXT_GLYPH_STORE
+#pragma once
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_set.hpp>
@@ -65,5 +64,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

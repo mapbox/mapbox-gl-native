@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_BOX
-#define MBGL_SHADER_SHADER_BOX
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -24,5 +23,3 @@ protected:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_SHADER_BOX_SHADER

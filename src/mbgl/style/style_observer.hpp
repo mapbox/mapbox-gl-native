@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_STYLE_OBSERVER
-#define MBGL_STYLE_STYLE_OBSERVER
+#pragma once
 
 #include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/sprite/sprite_store_observer.hpp>
@@ -22,5 +21,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

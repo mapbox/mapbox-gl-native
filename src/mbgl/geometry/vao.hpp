@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_VAO
-#define MBGL_GEOMETRY_VAO
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -69,5 +68,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

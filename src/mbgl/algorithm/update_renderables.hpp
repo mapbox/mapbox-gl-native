@@ -1,5 +1,4 @@
-#ifndef MBGL_ALGORITHM_UPDATE_RENDERABLES
-#define MBGL_ALGORITHM_UPDATE_RENDERABLES
+#pragma once
 
 #include <cstdint>
 
@@ -11,5 +10,3 @@ void updateRenderables(Layer& layer, const uint8_t z);
 
 } // namespace algorithm
 } // namespace mbgl
-
-#endif

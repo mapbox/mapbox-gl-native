@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_TRIANGLE_ELEMENTS_BUFFER
-#define MBGL_GEOMETRY_TRIANGLE_ELEMENTS_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 #include <mbgl/geometry/vao.hpp>
@@ -45,5 +44,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

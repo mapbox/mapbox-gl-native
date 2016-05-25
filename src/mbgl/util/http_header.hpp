@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_HTTP_HEADER
-#define MBGL_UTIL_HTTP_HEADER
+#pragma once
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -21,5 +20,3 @@ public:
 
 } // namespace http
 } // namespace mbgl
-
-#endif

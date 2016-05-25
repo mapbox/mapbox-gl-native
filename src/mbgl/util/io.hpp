@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_IO
-#define MBGL_UTIL_IO
+#pragma once
 
 #include <string>
 #include <stdexcept>
@@ -20,5 +19,3 @@ void deleteFile(const std::string& filename);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

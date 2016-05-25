@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_UTIL_GL_OBJECT_STORE
-#define MBGL_MAP_UTIL_GL_OBJECT_STORE
+#pragma once
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -137,5 +136,3 @@ public:
 
 } // namespace gl
 } // namespace mbgl
-
-#endif

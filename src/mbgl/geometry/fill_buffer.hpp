@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_FILL_BUFFER
-#define MBGL_GEOMETRY_FILL_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 #include <vector>
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

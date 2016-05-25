@@ -18,10 +18,9 @@ shader_name, shader_type, extension = os.path.basename(input_file).split('.')
 with open(input_file, "r") as f:
     data = f.read()
 
-content = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
+content = """#pragma once
 
-#ifndef MBGL_SHADER_{NAME}_{TYPE}
-#define MBGL_SHADER_{NAME}_{TYPE}
+// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
 #include <mbgl/gl/gl.hpp>
 
@@ -38,8 +37,6 @@ constexpr const char* {type} = R"MBGL_SHADER(#version 120\n{data})MBGL_SHADER";
 }} // namespace {name}
 }} // namespace shaders
 }} // namespace mbgl
-
-#endif
 """.format(
      name = shader_name,
      NAME = shader_name.upper(),

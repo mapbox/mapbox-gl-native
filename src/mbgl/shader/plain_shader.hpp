@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_PLAIN
-#define MBGL_SHADER_SHADER_PLAIN
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

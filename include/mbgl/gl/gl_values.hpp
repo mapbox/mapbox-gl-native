@@ -1,5 +1,4 @@
-#ifndef MBGL_GL_GL_VALUES
-#define MBGL_GL_GL_VALUES
+#pragma once
 
 #include <cstdint>
 #include <tuple>
@@ -286,9 +285,7 @@ struct RasterPos {
     }
 };
 
-#endif
+#endif // GL_ES_VERSION_2_0
 
 } // namespace gl
 } // namespace mbgl
-
-#endif // MBGL_RENDERER_GL_CONFIG

@@ -1,5 +1,4 @@
-#ifndef MBGL_LAYOUT_PROPERTY
-#define MBGL_LAYOUT_PROPERTY
+#pragma once
 
 #include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/function.hpp>
@@ -36,5 +35,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_ENUM
-#define MBGL_UTIL_ENUM
+#pragma once
 
 #include <iosfwd>
 #include <string>
@@ -50,6 +49,4 @@ public:
     inline std::ostream& operator<<(std::ostream& os, type t) { return os << name(t).str(); }
 
 } // namespace mbgl
-
-#endif
 

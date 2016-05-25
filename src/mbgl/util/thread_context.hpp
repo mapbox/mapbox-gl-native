@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_THREAD_CONTEXT
-#define MBGL_UTIL_THREAD_CONTEXT
+#pragma once
 
 #include <string>
 
@@ -21,5 +20,3 @@ public:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

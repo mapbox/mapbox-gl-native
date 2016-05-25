@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_PROJECTION
-#define MBGL_UTIL_PROJECTION
+#pragma once
 
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
@@ -42,5 +41,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

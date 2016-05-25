@@ -1,5 +1,4 @@
-#ifndef MBGL_COMMON_SETTINGS_NSUSERDEFAULTS
-#define MBGL_COMMON_SETTINGS_NSUSERDEFAULTS
+#pragma once
 
 #import <mbgl/ios/MGLTypes.h>
 
@@ -26,5 +25,3 @@ public:
 };
 
 }
-
-#endif

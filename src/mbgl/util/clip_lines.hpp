@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_CLIP_LINES
-#define MBGL_UTIL_CLIP_LINES
+#pragma once
 
 #include <map>
 #include <string>
@@ -15,5 +14,3 @@ GeometryCollection clipLines(const GeometryCollection &lines,
 
 } // end namespace util
 } // end namespace mbgl
-
-#endif

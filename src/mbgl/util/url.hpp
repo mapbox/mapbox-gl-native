@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_URL
-#define MBGL_UTIL_URL
+#pragma once
 
 #include <string>
 
@@ -12,5 +11,3 @@ std::string percentDecode(const std::string&);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

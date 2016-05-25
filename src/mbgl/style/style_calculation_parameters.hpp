@@ -1,5 +1,4 @@
-#ifndef STYLE_CALCULATION_PARAMETERS
-#define STYLE_CALCULATION_PARAMETERS
+#pragma once
 
 #include <mbgl/style/zoom_history.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -27,5 +26,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

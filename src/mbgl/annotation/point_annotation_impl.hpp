@@ -1,5 +1,4 @@
-#ifndef MBGL_POINT_ANNOTATION_IMPL
-#define MBGL_POINT_ANNOTATION_IMPL
+#pragma once
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/point_annotation.hpp>
@@ -68,5 +67,3 @@ struct indexable<std::shared_ptr<const mbgl::PointAnnotationImpl>> {
 } // end namespace index
 } // end namespace geometry
 } // end namespace boost
-
-#endif

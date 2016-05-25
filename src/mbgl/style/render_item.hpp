@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_RENDER_ITEM
-#define MBGL_STYLE_RENDER_ITEM
+#pragma once
 
 namespace mbgl {
 
@@ -20,5 +19,3 @@ struct RenderItem {
 };
 
 } // namespace mbgl
-
-#endif

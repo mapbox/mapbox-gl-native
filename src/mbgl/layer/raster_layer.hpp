@@ -1,5 +1,4 @@
-#ifndef MBGL_RASTER_LAYER
-#define MBGL_RASTER_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/paint_property.hpp>
@@ -39,5 +38,3 @@ inline bool StyleLayer::is<RasterLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

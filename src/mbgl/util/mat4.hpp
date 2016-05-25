@@ -20,8 +20,7 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef MBGL_UTIL_MAT4
-#define MBGL_UTIL_MAT4
+#pragma once
 
 #include <array>
 
@@ -48,5 +47,3 @@ void transformMat4(vec4& out, const vec4& a, const mat4& m);
 
 } // namespace matrix
 } // namespace mbgl
-
-#endif // MBGL_UTIL_MAT4

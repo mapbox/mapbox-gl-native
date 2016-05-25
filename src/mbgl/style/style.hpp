@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_STYLE
-#define MBGL_STYLE_STYLE
+#pragma once
 
 #include <mbgl/style/render_item.hpp>
 #include <mbgl/style/zoom_history.hpp>
@@ -137,5 +136,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

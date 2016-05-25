@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TRANSITION
-#define MBGL_UTIL_TRANSITION
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -74,5 +73,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

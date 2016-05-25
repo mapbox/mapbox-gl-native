@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_WORK_TASK
-#define MBGL_UTIL_WORK_TASK
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

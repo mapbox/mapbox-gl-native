@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_GEO
-#define MBGL_UTIL_GEO
+#pragma once
 
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/constants.hpp>
@@ -216,5 +215,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_WORKER
-#define MBGL_UTIL_WORKER
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/thread.hpp>
@@ -61,5 +60,3 @@ private:
     std::size_t current = 0;
 };
 } // namespace mbgl
-
-#endif

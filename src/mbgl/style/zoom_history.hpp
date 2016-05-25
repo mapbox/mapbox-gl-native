@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_ZOOM_HISTORY
-#define MBGL_STYLE_ZOOM_HISTORY
+#pragma once
 
 #include <mbgl/util/chrono.hpp>
 
@@ -35,5 +34,3 @@ struct ZoomHistory {
     }
 };
 } // namespace mbgl
-
-#endif

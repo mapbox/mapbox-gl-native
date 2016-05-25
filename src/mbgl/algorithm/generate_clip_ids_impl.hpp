@@ -1,5 +1,4 @@
-#ifndef MBGL_ALGORITHM_GENERATE_CLIP_IDS_IMPL
-#define MBGL_ALGORITHM_GENERATE_CLIP_IDS_IMPL
+#pragma once
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/util/math.hpp>
@@ -77,5 +76,3 @@ void ClipIDGenerator::update(Renderables& renderables) {
 
 } // namespace algorithm
 } // namespace mbgl
-
-#endif

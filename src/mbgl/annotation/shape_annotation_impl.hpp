@@ -1,5 +1,4 @@
-#ifndef MBGL_SHAPE_ANNOTATION_IMPL
-#define MBGL_SHAPE_ANNOTATION_IMPL
+#pragma once
 
 #include <mapbox/geojsonvt.hpp>
 
@@ -37,5 +36,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

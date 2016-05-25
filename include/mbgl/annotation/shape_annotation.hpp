@@ -1,5 +1,4 @@
-#ifndef MBGL_ANNOTATION_SHAPE_ANNOTATION
-#define MBGL_ANNOTATION_SHAPE_ANNOTATION
+#pragma once
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/types.hpp>
@@ -53,5 +52,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

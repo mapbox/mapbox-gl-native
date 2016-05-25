@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TEXTUREPOOL
-#define MBGL_UTIL_TEXTUREPOOL
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -37,5 +36,3 @@ private:
 
 } // namespace gl
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TRANSFORM
-#define MBGL_MAP_TRANSFORM
+#pragma once
 
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/mode.hpp>
@@ -180,5 +179,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

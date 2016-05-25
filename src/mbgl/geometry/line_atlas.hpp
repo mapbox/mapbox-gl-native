@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_LINE_ATLAS
-#define MBGL_GEOMETRY_LINE_ATLAS
+#pragma once
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_object_store.hpp>
@@ -42,5 +41,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

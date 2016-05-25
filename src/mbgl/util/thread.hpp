@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_THREAD
-#define MBGL_UTIL_THREAD
+#pragma once
 
 #include <future>
 #include <thread>
@@ -140,5 +139,3 @@ Thread<Object>::~Thread() {
 
 } // namespace util
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_WORK_REQUEST
-#define MBGL_UTIL_WORK_REQUEST
+#pragma once
 
 #include <mbgl/util/async_request.hpp>
 
@@ -20,5 +19,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

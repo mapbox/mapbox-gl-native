@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_TEXT_BUFFER
-#define MBGL_GEOMETRY_TEXT_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 #include <array>
@@ -19,5 +18,3 @@ public:
 
 
 } // namespace mbgl
-
-#endif

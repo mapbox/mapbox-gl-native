@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_VIEW
-#define MBGL_MAP_VIEW
+#pragma once
 
 #include <mbgl/map/change.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -61,5 +60,3 @@ protected:
     mbgl::Map *map = nullptr;
 };
 } // namespace mbgl
-
-#endif

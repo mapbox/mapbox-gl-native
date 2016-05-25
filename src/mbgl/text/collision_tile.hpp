@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_COLLISION_TILE
-#define MBGL_TEXT_COLLISION_TILE
+#pragma once
 
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/text/placement_config.hpp>
@@ -64,5 +63,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

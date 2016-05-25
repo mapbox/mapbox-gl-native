@@ -1,5 +1,4 @@
-#ifndef MBGL_ANDROID_NATIVE_MAP_VIEW
-#define MBGL_ANDROID_NATIVE_MAP_VIEW
+#pragma once
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/view.hpp>
@@ -98,5 +97,3 @@ private:
 };
 }
 }
-
-#endif

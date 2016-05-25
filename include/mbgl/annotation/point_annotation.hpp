@@ -1,5 +1,4 @@
-#ifndef MBGL_ANNOTATION_POINT_ANNOTATION
-#define MBGL_ANNOTATION_POINT_ANNOTATION
+#pragma once
 
 #include <mbgl/util/geo.hpp>
 
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

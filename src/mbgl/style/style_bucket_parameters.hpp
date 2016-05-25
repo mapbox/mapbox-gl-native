@@ -1,5 +1,4 @@
-#ifndef STYLE_BUCKET_PARAMETERS
-#define STYLE_BUCKET_PARAMETERS
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/style/filter.hpp>
@@ -60,5 +59,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

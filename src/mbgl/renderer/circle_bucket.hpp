@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_CIRCLE_BUCKET
-#define MBGL_RENDERER_CIRCLE_BUCKET
+#pragma once
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
@@ -38,5 +37,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_RENDERER_CIRCLE_BUCKET

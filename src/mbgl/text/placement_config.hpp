@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_PLACEMENT_CONFIG
-#define MBGL_TEXT_PLACEMENT_CONFIG
+#pragma once
 
 namespace mbgl {
 
@@ -24,5 +23,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

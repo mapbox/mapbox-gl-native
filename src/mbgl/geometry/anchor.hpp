@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_ANCHOR
-#define MBGL_GEOMETRY_ANCHOR
+#pragma once
 
 #include <mbgl/util/geometry.hpp>
 
@@ -23,5 +22,3 @@ struct Anchor {
 typedef std::vector<Anchor> Anchors;
 
 } // namespace mbgl
-
-#endif

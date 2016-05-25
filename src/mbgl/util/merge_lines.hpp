@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_MERGELINES
-#define MBGL_UTIL_MERGELINES
+#pragma once
 
 #include <map>
 #include <string>
@@ -25,5 +24,3 @@ void mergeLines(std::vector<SymbolFeature> &features);
 
 } // end namespace util
 } // end namespace mbgl
-
-#endif

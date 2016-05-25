@@ -44,8 +44,7 @@ else:
     rev = DEFAULT_REV
 
 header = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
-#ifndef MBGL_UTIL_VERSION
-#define MBGL_UTIL_VERSION
+#pragma once
 
 #define MBGL_VERSION 0x{major:02x}{minor:02x}{patch:02x}
 #define MBGL_VERSION_STRING "{major}.{minor}.{patch}"
@@ -62,10 +61,8 @@ extern const char *revision;
 extern const char *string;
 extern const unsigned int number;
 
-}}
-}}
-
-#endif
+}} // namespace mbgl
+}} // namespace version
 """.format(
     major = tag[0],
     minor = tag[1],

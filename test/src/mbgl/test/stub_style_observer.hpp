@@ -1,5 +1,4 @@
-#ifndef MBGL_TEST_STUB_STYLE_OBSERVER
-#define MBGL_TEST_STUB_STYLE_OBSERVER
+#pragma once
 
 #include <mbgl/style/style_observer.hpp>
 
@@ -64,5 +63,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_CLASS_DICTIONARY
-#define MBGL_STYLE_CLASS_DICTIONARY
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -33,5 +32,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

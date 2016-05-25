@@ -1,5 +1,4 @@
-#ifndef MBGL_ANDROID_JNI
-#define MBGL_ANDROID_JNI
+#pragma once
 
 #include <string>
 
@@ -26,5 +25,3 @@ extern void detach_jni_thread(JavaVM* vm, JNIEnv** env, bool detach);
 
 }
 }
-
-#endif

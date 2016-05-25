@@ -1,5 +1,4 @@
-#ifndef MBGL_SPRITE_STORE
-#define MBGL_SPRITE_STORE
+#pragma once
 
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -69,5 +68,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

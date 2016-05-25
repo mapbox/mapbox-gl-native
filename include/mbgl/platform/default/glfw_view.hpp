@@ -1,5 +1,4 @@
-#ifndef MBGL_COMMON_GLFW_VIEW
-#define MBGL_COMMON_GLFW_VIEW
+#pragma once
 
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -90,5 +89,3 @@ private:
     GLFWwindow *window = nullptr;
     bool dirty = false;
 };
-
-#endif

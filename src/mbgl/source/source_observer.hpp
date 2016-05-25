@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_SOURCE_OBSERVER
-#define MBGL_MAP_SOURCE_OBSERVER
+#pragma once
 
 #include <exception>
 
@@ -20,5 +19,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

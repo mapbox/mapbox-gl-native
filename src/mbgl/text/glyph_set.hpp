@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_GLYPH_SET
-#define MBGL_TEXT_GLYPH_SET
+#pragma once
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -21,5 +20,3 @@ private:
 };
 
 } // end namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_STRING
-#define MBGL_UTIL_STRING
+#pragma once
 
 #include <string>
 #include <cassert>
@@ -53,5 +52,3 @@ inline std::string toString(std::exception_ptr error) {
 
 } // namespace util
 } // namespace mbgl
-
-#endif

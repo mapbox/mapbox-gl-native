@@ -1,5 +1,4 @@
-#ifndef MBGL_TILE_TILE_ID
-#define MBGL_TILE_TILE_ID
+#pragma once
 
 #include <mbgl/util/constants.hpp>
 
@@ -266,5 +265,3 @@ inline float UnwrappedTileID::pixelsToTileUnits(const float pixelValue, const fl
 }
 
 } // namespace mbgl
-
-#endif

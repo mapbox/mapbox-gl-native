@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_PROPERTY_TRANSITION
-#define MBGL_STYLE_PROPERTY_TRANSITION
+#pragma once
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
@@ -16,5 +15,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_STYLE_PROPERTY_TRANSITION

@@ -1,5 +1,4 @@
-#ifndef MBGL_GL_GL
-#define MBGL_GL_GL
+#pragma once
 
 //#define GL_TRACK
 
@@ -163,6 +162,4 @@ void mbx_glTexImage2D(GLenum target,
                       GLenum format,
                       GLenum type,
                       const GLvoid * data);
-#endif
-
 #endif

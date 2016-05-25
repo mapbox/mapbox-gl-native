@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_VARIANT
-#define MBGL_UTIL_VARIANT
+#pragma once
 
 #include <mapbox/variant.hpp>
 
@@ -9,5 +8,3 @@ template <typename... T>
 using variant = mapbox::util::variant<T...>;
 
 } // namespace mbgl
-
-#endif

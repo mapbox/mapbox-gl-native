@@ -1,5 +1,4 @@
-#ifndef MBGL_JSON_SETTINGS
-#define MBGL_JSON_SETTINGS
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 
@@ -23,5 +22,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

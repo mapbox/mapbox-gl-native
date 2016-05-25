@@ -1,5 +1,4 @@
-#ifndef MBGL_BENCH_LOCATIONS
-#define MBGL_BENCH_LOCATIONS
+#pragma once
 
 #include <vector>
 #include <string>
@@ -19,5 +18,3 @@ extern const std::vector<Location> locations;
 
 }
 }
-
-#endif

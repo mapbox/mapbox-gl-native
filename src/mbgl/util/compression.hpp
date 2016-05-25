@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_COMPRESSION
-#define MBGL_UTIL_COMPRESSION
+#pragma once
 
 #include <string>
 
@@ -11,5 +10,3 @@ std::string decompress(const std::string &raw);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

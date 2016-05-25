@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_ASSERT
-#define MBGL_UTIL_ASSERT
+#pragma once
 
 #include <cassert>
 
@@ -9,5 +8,3 @@
     ((void)((expr) ? ((void)0) : ((void)fprintf(stderr, "%s:%u: failed assertion `%s'\n",          \
                                                 __FILE__, __LINE__, #expr),                        \
                                   abort())))
-
-#endif

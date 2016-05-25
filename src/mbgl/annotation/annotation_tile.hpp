@@ -1,5 +1,4 @@
-#ifndef MBGL_ANNOTATION_TILE
-#define MBGL_ANNOTATION_TILE
+#pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -57,5 +56,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

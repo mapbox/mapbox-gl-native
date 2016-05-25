@@ -1,5 +1,4 @@
-#ifndef MBGL_STORAGE_ONLINE_FILE_SOURCE
-#define MBGL_STORAGE_ONLINE_FILE_SOURCE
+#pragma once
 
 #include <mbgl/storage/file_source.hpp>
 
@@ -24,5 +23,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

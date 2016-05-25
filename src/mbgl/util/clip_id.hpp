@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_CLIP_IDS
-#define MBGL_UTIL_CLIP_IDS
+#pragma once
 
 #include <bitset>
 #include <string>
@@ -35,5 +34,3 @@ struct ClipID {
 ::std::ostream& operator<<(::std::ostream& os, const ClipID& rhs);
 
 } // namespace mbgl
-
-#endif

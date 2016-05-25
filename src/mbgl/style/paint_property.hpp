@@ -1,5 +1,4 @@
-#ifndef MBGL_PAINT_PROPERTY
-#define MBGL_PAINT_PROPERTY
+#pragma once
 
 #include <mbgl/style/class_dictionary.hpp>
 #include <mbgl/style/property_parsing.hpp>
@@ -144,5 +143,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_RUN_LOOP
-#define MBGL_UTIL_RUN_LOOP
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/util.hpp>
@@ -182,5 +181,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

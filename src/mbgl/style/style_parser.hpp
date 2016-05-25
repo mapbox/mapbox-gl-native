@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_STYLE_PARSER
-#define MBGL_STYLE_STYLE_PARSER
+#pragma once
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/style_layer.hpp>
@@ -54,5 +53,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef STYLE_UPDATE_PARAMETERS
-#define STYLE_UPDATE_PARAMETERS
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 
@@ -53,5 +52,3 @@ public:
 };
 
 }
-
-#endif

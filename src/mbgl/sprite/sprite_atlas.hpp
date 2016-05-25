@@ -1,5 +1,4 @@
-#ifndef MBGL_SPRITE_ATLAS
-#define MBGL_SPRITE_ATLAS
+#pragma once
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -101,5 +100,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

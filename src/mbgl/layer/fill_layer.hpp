@@ -1,5 +1,4 @@
-#ifndef MBGL_FILL_LAYER
-#define MBGL_FILL_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/paint_property.hpp>
@@ -46,5 +45,3 @@ inline bool StyleLayer::is<FillLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

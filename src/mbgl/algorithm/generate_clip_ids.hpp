@@ -1,5 +1,4 @@
-#ifndef MBGL_ALGORITHM_GENERATE_CLIP_IDS
-#define MBGL_ALGORITHM_GENERATE_CLIP_IDS
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/clip_id.hpp>
@@ -34,5 +33,3 @@ public:
 
 } // namespace algorithm
 } // namespace mbgl
-
-#endif

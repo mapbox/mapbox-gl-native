@@ -1,5 +1,4 @@
-#ifndef MBGL_SPRITE_IMAGE
-#define MBGL_SPRITE_IMAGE
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geo.hpp>
@@ -28,5 +27,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

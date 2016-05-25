@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_RASTER
-#define MBGL_UTIL_RASTER
+#pragma once
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/texture_pool.hpp>
@@ -60,5 +59,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

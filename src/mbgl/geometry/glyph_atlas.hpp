@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_GLYPH_ATLAS
-#define MBGL_GEOMETRY_GLYPH_ATLAS
+#pragma once
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
@@ -58,5 +57,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

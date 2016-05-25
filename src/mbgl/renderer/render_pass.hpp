@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_RENDER_PASS
-#define MBGL_RENDERER_RENDER_PASS
+#pragma once
 
 #include <mbgl/util/traits.hpp>
 
@@ -26,5 +25,3 @@ constexpr inline RenderPass operator&(RenderPass a, RenderPass b) {
 }
 
 } // namespace mbgl
-
-#endif

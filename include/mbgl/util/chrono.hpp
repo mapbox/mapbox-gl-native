@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_CHRONO
-#define MBGL_UTIL_CHRONO
+#pragma once
 
 #include <chrono>
 #include <string>
@@ -42,5 +41,3 @@ constexpr std::chrono::duration<Rep, Period> abs(std::chrono::duration<Rep, Peri
 } // namespace util
 
 } // namespace mbgl
-
-#endif

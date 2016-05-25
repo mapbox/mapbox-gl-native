@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_QUADS
-#define MBGL_TEXT_QUADS
+#pragma once
 
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -44,5 +43,3 @@ namespace mbgl {
             const float boxScale, const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
             const bool alongLine, const GlyphPositions& face);
 } // namespace mbgl
-
-#endif

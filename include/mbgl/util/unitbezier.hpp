@@ -23,8 +23,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MBGL_UTIL_UNITBEZIER
-#define MBGL_UTIL_UNITBEZIER
+#pragma once
 
 #include <cmath>
 
@@ -117,5 +116,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

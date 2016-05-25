@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_SHADER
-#define MBGL_RENDERER_SHADER
+#pragma once
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_object_store.hpp>
@@ -32,5 +31,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

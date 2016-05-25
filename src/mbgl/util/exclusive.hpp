@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_EXCLUSIVE
-#define MBGL_UTIL_EXCLUSIVE
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -26,5 +25,3 @@ private:
 
 } // end namespace util
 } // end namespace mbgl
-
-#endif

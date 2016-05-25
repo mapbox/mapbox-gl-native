@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_CONSTANTS
-#define MBGL_UTIL_CONSTANTS
+#pragma once
 
 #include <mbgl/util/chrono.hpp>
 
@@ -59,5 +58,3 @@ extern const bool shapingWarning;
 } // namespace debug
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_DTOA
-#define MBGL_UTIL_DTOA
+#pragma once
 
 #include <string>
 
@@ -18,5 +17,3 @@ inline std::string dtoa(double value) {
 
 } // end namespace util
 } // end namespace mbgl
-
-#endif

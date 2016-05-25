@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_CIRCLE_BUFFER
-#define MBGL_GEOMETRY_CIRCLE_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 
@@ -23,5 +22,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_GEOMETRY_CIRCLE_BUFFER

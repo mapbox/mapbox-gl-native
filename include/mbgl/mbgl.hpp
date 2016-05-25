@@ -1,7 +1,4 @@
-#ifndef MBGL_MAIN
-#define MBGL_MAIN
+#pragma once
 
 #include "map/map.hpp"
 #include "map/view.hpp"
-
-#endif

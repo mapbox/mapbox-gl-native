@@ -1,5 +1,4 @@
-#ifndef MBGL_ANNOTATION_MANAGER
-#define MBGL_ANNOTATION_MANAGER
+#pragma once
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/point_annotation_impl.hpp>
@@ -61,5 +60,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

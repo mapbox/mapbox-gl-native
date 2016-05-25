@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_CIRCLE_SHADER
-#define MBGL_SHADER_CIRCLE_SHADER
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -20,5 +19,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_SHADER_CIRCLE_SHADER

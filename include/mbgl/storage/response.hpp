@@ -1,5 +1,4 @@
-#ifndef MBGL_STORAGE_RESPONSE
-#define MBGL_STORAGE_RESPONSE
+#pragma once
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
@@ -56,5 +55,3 @@ public:
 std::ostream& operator<<(std::ostream&, Response::Error::Reason);
 
 } // namespace mbgl
-
-#endif

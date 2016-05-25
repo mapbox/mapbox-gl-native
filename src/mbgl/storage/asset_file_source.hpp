@@ -1,5 +1,4 @@
-#ifndef MBGL_STORAGE_ASSET_FILE_SOURCE
-#define MBGL_STORAGE_ASSET_FILE_SOURCE
+#pragma once
 
 #include <mbgl/storage/file_source.hpp>
 
@@ -22,5 +21,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_STORAGE_ASSET_FILE_SOURCE

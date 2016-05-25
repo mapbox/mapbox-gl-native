@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_FUNCTION_EVALUATOR
-#define MBGL_STYLE_FUNCTION_EVALUATOR
+#pragma once
 
 #include <mbgl/style/function.hpp>
 #include <mbgl/util/interpolate.hpp>
@@ -41,5 +40,3 @@ struct Interpolator<Faded<T>>
 }
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_OFFLINE_DATABASE
-#define MBGL_OFFLINE_DATABASE
+#pragma once
 
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/offline.hpp>
@@ -111,5 +110,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_TEST_UTIL
-#define MBGL_TEST_UTIL
+#pragma once
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
@@ -76,5 +75,3 @@ void checkImage(const std::string& base,
 
 }
 }
-
-#endif

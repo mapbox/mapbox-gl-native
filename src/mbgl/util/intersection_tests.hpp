@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_INTERSECTION_TESTS
-#define MBGL_UTIL_INTERSECTION_TESTS
+#pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
 
@@ -12,5 +11,3 @@ bool multiPolygonIntersectsMultiPolygon(const GeometryCollection&, const Geometr
 
 }
 } // namespace mbgl
-
-#endif

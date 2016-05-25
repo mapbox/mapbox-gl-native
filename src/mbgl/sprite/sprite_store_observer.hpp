@@ -1,5 +1,4 @@
-#ifndef MBGL_SPRITE_STORE_OBSERVER
-#define MBGL_SPRITE_STORE_OBSERVER
+#pragma once
 
 #include <exception>
 
@@ -14,5 +13,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

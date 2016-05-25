@@ -1,5 +1,4 @@
-#ifndef MBGL_STORAGE_RESOURCE
-#define MBGL_STORAGE_RESOURCE
+#pragma once
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/optional.hpp>
@@ -68,5 +67,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

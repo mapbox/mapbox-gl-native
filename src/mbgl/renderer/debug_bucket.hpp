@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_DEBUGBUCKET
-#define MBGL_RENDERER_DEBUGBUCKET
+#pragma once
 
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/map/mode.hpp>
@@ -36,5 +35,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

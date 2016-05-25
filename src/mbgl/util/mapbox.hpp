@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_MAPBOX
-#define MBGL_UTIL_MAPBOX
+#pragma once
 
 #include <string>
 #include <mbgl/style/types.hpp>
@@ -24,5 +23,3 @@ extern const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT;
 } // namespace mapbox
 } // namespace util
 } // namespace mbgl
-
-#endif

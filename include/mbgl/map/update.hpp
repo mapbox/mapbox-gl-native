@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_UPDATE
-#define MBGL_MAP_UPDATE
+#pragma once
 
 #include <mbgl/util/traits.hpp>
 
@@ -31,5 +30,3 @@ inline bool operator& (const Update& lhs, const Update& rhs) {
 }
 
 } // namespace mbgl
-
-#endif // MBGL_MAP_UPDATE

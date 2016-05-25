@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_OPTIONAL
-#define MBGL_UTIL_OPTIONAL
+#pragma once
 
 #include <experimental/optional>
 
@@ -9,5 +8,3 @@ template <typename T>
 using optional = std::experimental::optional<T>;
 
 } // namespace mbgl
-
-#endif

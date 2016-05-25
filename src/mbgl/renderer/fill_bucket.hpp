@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_FILLBUCKET
-#define MBGL_RENDERER_FILLBUCKET
+#pragma once
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -67,5 +66,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

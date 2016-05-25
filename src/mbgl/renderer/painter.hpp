@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_PAINTER
-#define MBGL_RENDERER_PAINTER
+#pragma once
 
 #include <mbgl/map/transform_state.hpp>
 
@@ -242,5 +241,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

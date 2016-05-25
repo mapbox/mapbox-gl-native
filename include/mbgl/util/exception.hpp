@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_EXCEPTION
-#define MBGL_UTIL_EXCEPTION
+#pragma once
 
 #include <stdexcept>
 
@@ -28,5 +27,3 @@ struct ShaderException : Exception {
 
 } // namespace util
 } // namespace mbgl
-
-#endif

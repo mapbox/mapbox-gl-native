@@ -1,5 +1,4 @@
-#ifndef MBGL_GL_DEBUG_MESSAGES
-#define MBGL_GL_DEBUG_MESSAGES
+#pragma once
 
 #include <string>
 
@@ -25,5 +24,3 @@ struct group {
 } // namespace debugging
 } // namespace gl
 } // namespace mbgl
-
-#endif

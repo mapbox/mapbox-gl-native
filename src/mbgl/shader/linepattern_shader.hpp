@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_LINEPATTERN
-#define MBGL_SHADER_SHADER_LINEPATTERN
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -35,5 +34,3 @@ private:
     GLint a_data = -1;
 };
 } // namespace mbgl
-
-#endif

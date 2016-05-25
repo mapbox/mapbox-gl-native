@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TILE_DATA
-#define MBGL_MAP_TILE_DATA
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -117,5 +116,3 @@ protected:
 };
 
 } // namespace mbgl
-
-#endif

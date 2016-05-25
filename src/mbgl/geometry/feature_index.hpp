@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_FEATURE_INDEX
-#define MBGL_GEOMETRY_FEATURE_INDEX
+#pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/grid_index.hpp>
@@ -72,5 +71,3 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> bucketLayerIDs;
 };
 }
-
-#endif

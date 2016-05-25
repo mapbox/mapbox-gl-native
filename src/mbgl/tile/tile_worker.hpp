@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TILE_WORKER
-#define MBGL_MAP_TILE_WORKER
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_data.hpp>
@@ -95,5 +94,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

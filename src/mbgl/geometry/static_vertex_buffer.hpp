@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_STATIC_VERTEX_BUFFER
-#define MBGL_GEOMETRY_STATIC_VERTEX_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 
@@ -22,5 +21,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

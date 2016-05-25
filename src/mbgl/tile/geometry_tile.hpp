@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_GEOMETRY_TILE
-#define MBGL_MAP_GEOMETRY_TILE
+#pragma once
 
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/feature.hpp>
@@ -96,5 +95,3 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
 Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 
 } // namespace mbgl
-
-#endif

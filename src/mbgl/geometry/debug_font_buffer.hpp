@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_DEBUG_FONT_BUFFER
-#define MBGL_GEOMETRY_DEBUG_FONT_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 
@@ -13,5 +12,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

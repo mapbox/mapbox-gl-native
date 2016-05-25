@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_PATTERN
-#define MBGL_SHADER_SHADER_PATTERN
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -27,5 +26,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

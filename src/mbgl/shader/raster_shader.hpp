@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_SHADER_RASTER
-#define MBGL_RENDERER_SHADER_RASTER
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -24,5 +23,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

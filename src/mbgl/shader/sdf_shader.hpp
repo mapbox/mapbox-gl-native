@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SDF_SHADER
-#define MBGL_SHADER_SDF_SHADER
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -40,5 +39,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

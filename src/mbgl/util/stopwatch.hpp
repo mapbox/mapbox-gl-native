@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_STOPWATCH
-#define MBGL_UTIL_STOPWATCH
+#pragma once
 
 #include <mbgl/platform/event.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -37,5 +36,3 @@ class stopwatch {
 #endif
 } // namespace util
 } // namespace mbgl
-
-#endif

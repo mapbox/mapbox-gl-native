@@ -1,5 +1,4 @@
-#ifndef MBGL_ALGORITHM_COVERED_BY_CHILDREN
-#define MBGL_ALGORITHM_COVERED_BY_CHILDREN
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 
@@ -30,5 +29,3 @@ bool coveredByChildren(const UnwrappedTileID& id, const Container& container) {
 
 } // namespace algorithm
 } // namespace mbgl
-
-#endif

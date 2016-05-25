@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_COLLISION_FEATURE
-#define MBGL_TEXT_COLLISION_FEATURE
+#pragma once
 
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/text/shaping.hpp>
@@ -63,5 +62,3 @@ namespace mbgl {
                     const int segment, const float length, const float height);
     };
 } // namespace mbgl
-
-#endif

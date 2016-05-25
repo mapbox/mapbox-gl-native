@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_CHECK_MAX_ANGLE
-#define MBGL_TEXT_CHECK_MAX_ANGLE
+#pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
 
@@ -11,5 +10,3 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
         const float windowSize, const float maxAngle);
 
 } // namespace mbgl
-
-#endif

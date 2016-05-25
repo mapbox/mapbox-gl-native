@@ -1,5 +1,4 @@
-#ifndef STYLE_RENDER_PARAMETERS
-#define STYLE_RENDER_PARAMETERS
+#pragma once
 
 namespace mbgl {
 
@@ -14,5 +13,3 @@ public:
 };
 
 }
-
-#endif

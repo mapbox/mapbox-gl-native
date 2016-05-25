@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_ASYNC_TASK
-#define MBGL_UTIL_ASYNC_TASK
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 
@@ -23,5 +22,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

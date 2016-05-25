@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_IMAGE
-#define MBGL_UTIL_IMAGE
+#pragma once
 
 #include <string>
 #include <memory>
@@ -49,5 +48,3 @@ PremultipliedImage decodeImage(const std::string&);
 std::string encodePNG(const PremultipliedImage&);
 
 } // namespace mbgl
-
-#endif

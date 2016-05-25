@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_GETANCHORS
-#define MBGL_TEXT_GETANCHORS
+#pragma once
 
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -12,5 +11,3 @@ Anchors getAnchors(const GeometryCoordinates &line, float spacing,
         const float iconLeft, const float iconRight,
         const float glyphSize, const float boxScale, const float overscaling);
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_TEXT_GLYPH
-#define MBGL_TEXT_GLYPH
+#pragma once
 
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/util/rect.hpp>
@@ -81,5 +80,3 @@ public:
 };
 
 } // end namespace mbgl
-
-#endif

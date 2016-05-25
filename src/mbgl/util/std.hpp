@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_STD
-#define MBGL_UTIL_STD
+#pragma once
 
 #include <memory>
 #include <type_traits>
@@ -26,5 +25,3 @@ void erase_if(Container &container, Predicate pred) {
 
 } // namespace util
 } // namespace mbgl
-
-#endif

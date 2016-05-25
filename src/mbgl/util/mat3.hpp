@@ -20,8 +20,7 @@
 //
 // 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef MBGL_UTIL_MAT3
-#define MBGL_UTIL_MAT3
+#pragma once
 
 #include <array>
 
@@ -38,5 +37,3 @@ void scale(mat3& out, const mat3& a, double x, double y);
 
 } // namespace matrix
 } // namespace mbgl
-
-#endif

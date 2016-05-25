@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_NONCOPYABLE
-#define MBGL_UTIL_NONCOPYABLE
+#pragma once
 
 namespace mbgl { namespace util {
 
@@ -20,5 +19,3 @@ typedef non_copyable_::noncopyable noncopyable;
 
 } // namespace util
 } // namespace mbgl
-
-#endif

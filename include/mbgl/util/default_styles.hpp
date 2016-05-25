@@ -1,5 +1,4 @@
-#ifndef MBGL_PLATFORM_DEFAULT_STYLES
-#define MBGL_PLATFORM_DEFAULT_STYLES
+#pragma once
 
 #include <vector>
 #include <string>
@@ -30,5 +29,3 @@ static const unsigned currentVersion = 9;
 } // end namespace default_styles
 } // end namespace util
 } // end namespace mbgl
-
-#endif

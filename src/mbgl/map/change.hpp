@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_CHANGE
-#define MBGL_MAP_CHANGE
+#pragma once
 
 #include <cstdint>
 
@@ -23,5 +22,3 @@ enum MapChange : uint8_t {
 };
 
 } // namespace mbgl
-
-#endif

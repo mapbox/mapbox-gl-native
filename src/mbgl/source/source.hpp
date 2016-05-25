@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_SOURCE
-#define MBGL_MAP_SOURCE
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_data.hpp>
@@ -108,5 +107,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

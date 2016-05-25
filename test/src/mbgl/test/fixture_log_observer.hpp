@@ -1,5 +1,4 @@
-#ifndef MBGL_TEST_FIXTURE_LOG_OBSERVER
-#define MBGL_TEST_FIXTURE_LOG_OBSERVER
+#pragma once
 
 #include <mbgl/platform/log.hpp>
 
@@ -67,5 +66,3 @@ private:
 using FixtureLogObserver = FixtureLog::Observer;
 
 } // namespace mbgl
-
-#endif

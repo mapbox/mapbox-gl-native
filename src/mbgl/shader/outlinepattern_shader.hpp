@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_OUTLINEPATTERN
-#define MBGL_SHADER_SHADER_OUTLINEPATTERN
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -28,5 +27,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

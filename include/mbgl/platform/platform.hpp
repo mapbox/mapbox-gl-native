@@ -1,5 +1,4 @@
-#ifndef MBGL_PLATFORM_PLATFORM
-#define MBGL_PLATFORM_PLATFORM
+#pragma once
 
 #include <memory>
 #include <string>
@@ -25,5 +24,3 @@ void showDebugImage(std::string name, const char *data, size_t width, size_t hei
 void showColorDebugImage(std::string name, const char *data, size_t logical_width, size_t logical_height, size_t width, size_t height);
 } // namespace platform
 } // namespace mbgl
-
-#endif

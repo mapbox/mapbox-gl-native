@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_UTF
-#define MBGL_UTIL_UTF
+#pragma once
 
 #include <memory>
 
@@ -20,5 +19,3 @@ class utf8_to_utf32 {
 
 } // namespace mbgl
 } // namespace util
-
-#endif

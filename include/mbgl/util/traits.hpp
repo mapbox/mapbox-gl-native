@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TRAITS
-#define MBGL_UTIL_TRAITS
+#pragma once
 
 #include <type_traits>
 
@@ -11,5 +10,3 @@ constexpr auto underlying_type(T t) -> typename std::underlying_type<T>::type {
 }
 
 } // namespace mbgl
-
-#endif // MBGL_UTIL_TRAITS

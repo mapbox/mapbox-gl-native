@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_SOURCE_INFO
-#define MBGL_MAP_SOURCE_INFO
+#pragma once
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/constants.hpp>
@@ -26,5 +25,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_MAP_SOURCE_INFO

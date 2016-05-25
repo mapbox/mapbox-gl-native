@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_VECTOR_TILE
-#define MBGL_MAP_VECTOR_TILE
+#pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -83,5 +82,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

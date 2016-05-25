@@ -1,5 +1,4 @@
-#ifndef STYLE_CASCADE_PARAMETERS
-#define STYLE_CASCADE_PARAMETERS
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -19,5 +18,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

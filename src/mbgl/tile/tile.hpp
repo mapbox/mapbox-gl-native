@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TILE
-#define MBGL_MAP_TILE
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/mat4.hpp>
@@ -27,5 +26,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif

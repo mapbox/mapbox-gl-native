@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_PTR
-#define MBGL_UTIL_PTR
+#pragma once
 
 #include <memory>
 #include <cassert>
@@ -25,5 +24,3 @@ public:
 };
 } // namespace util
 } // namespace mbgl
-
-#endif

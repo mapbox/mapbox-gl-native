@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_LINE_BUFFER
-#define MBGL_GEOMETRY_LINE_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 
@@ -36,5 +35,3 @@ public:
 
 
 } // namespace mbgl
-
-#endif

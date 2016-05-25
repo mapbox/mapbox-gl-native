@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TOKEN
-#define MBGL_UTIL_TOKEN
+#pragma once
 
 #include <map>
 #include <string>
@@ -40,5 +39,3 @@ std::string replaceTokens(const std::string &source, const Lookup &lookup) {
 
 } // end namespace util
 } // end namespace mbgl
-
-#endif

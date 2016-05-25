@@ -1,5 +1,4 @@
-#ifndef MBGL_PLATFORM_LOG
-#define MBGL_PLATFORM_LOG
+#pragma once
 
 #include <mbgl/platform/event.hpp>
 
@@ -79,5 +78,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

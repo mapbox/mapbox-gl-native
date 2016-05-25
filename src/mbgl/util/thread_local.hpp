@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_THREAD_LOCAL
-#define MBGL_UTIL_THREAD_LOCAL
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 
@@ -55,5 +54,3 @@ private:
 
 } // namespace util
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_SYMBOL_LAYER
-#define MBGL_SYMBOL_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
@@ -93,5 +92,3 @@ inline bool StyleLayer::is<SymbolLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

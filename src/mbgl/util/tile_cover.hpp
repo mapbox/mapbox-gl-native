@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_TILE_COVER
-#define MBGL_UTIL_TILE_COVER
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/types.hpp>
@@ -21,5 +20,3 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, int32_t z);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

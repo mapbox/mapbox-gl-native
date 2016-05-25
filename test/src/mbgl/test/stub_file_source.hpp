@@ -1,5 +1,4 @@
-#ifndef TEST_RESOURCES_STUB_FILE_SOURCE
-#define TEST_RESOURCES_STUB_FILE_SOURCE
+#pragma once
 
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/timer.hpp>
@@ -40,6 +39,4 @@ private:
     util::Timer timer;
 };
 
-}
-
-#endif
+} // namespace mbgl

@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TRANSFORM_STATE
-#define MBGL_MAP_TRANSFORM_STATE
+#pragma once
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/util/geo.hpp>
@@ -122,5 +121,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif // MBGL_MAP_TRANSFORM_STATE

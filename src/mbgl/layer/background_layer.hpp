@@ -1,5 +1,4 @@
-#ifndef MBGL_BACKGROUND_LAYER
-#define MBGL_BACKGROUND_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/paint_property.hpp>
@@ -35,5 +34,3 @@ inline bool StyleLayer::is<BackgroundLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

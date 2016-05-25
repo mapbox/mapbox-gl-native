@@ -1,5 +1,4 @@
-#ifndef MBGL_ALGORITHM_UPDATE_RENDERABLES_IMPL
-#define MBGL_ALGORITHM_UPDATE_RENDERABLES_IMPL
+#pragma once
 
 #include <mbgl/algorithm/update_renderables.hpp>
 #include <mbgl/tile/tile_id.hpp>
@@ -89,5 +88,3 @@ std::map<UnwrappedTileID, Renderable> updateRenderables(const DataTiles& dataTil
 
 } // namespace algorithm
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_PREMULTIPLY
-#define MBGL_UTIL_PREMULTIPLY
+#pragma once
 
 #include <mbgl/util/image.hpp>
 
@@ -11,5 +10,3 @@ UnassociatedImage unpremultiply(PremultipliedImage&&);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

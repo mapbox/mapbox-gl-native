@@ -1,5 +1,4 @@
-#ifndef MBGL_LINE_LAYER
-#define MBGL_LINE_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/layout_property.hpp>
@@ -63,5 +62,3 @@ inline bool StyleLayer::is<LineLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

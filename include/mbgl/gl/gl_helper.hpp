@@ -1,5 +1,4 @@
-#ifndef MBGL_GL_GL_HELPER
-#define MBGL_GL_GL_HELPER
+#pragma once
 
 namespace mbgl {
 namespace gl {
@@ -19,5 +18,3 @@ private:
 
 } // namespace gl
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_MAP
-#define MBGL_MAP_MAP
+#pragma once
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -186,5 +185,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

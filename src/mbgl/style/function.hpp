@@ -1,5 +1,4 @@
-#ifndef MBGL_STYLE_FUNCTION
-#define MBGL_STYLE_FUNCTION
+#pragma once
 
 #include <vector>
 #include <utility>
@@ -27,5 +26,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_SHADER_SHADER_ICON
-#define MBGL_SHADER_SHADER_ICON
+#pragma once
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
@@ -29,5 +28,3 @@ protected:
 };
 
 } // namespace mbgl
-
-#endif

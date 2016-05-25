@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_MODE
-#define MBGL_MAP_MODE
+#pragma once
 
 #include <cstdint>
 
@@ -63,5 +62,3 @@ inline bool operator& (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
 }
 
 } // namespace mbgl
-
-#endif // MBGL_MAP_MODE

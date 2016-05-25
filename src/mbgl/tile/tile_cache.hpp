@@ -1,5 +1,4 @@
-#ifndef MBGL_MAP_TILE_CACHE
-#define MBGL_MAP_TILE_CACHE
+#pragma once
 
 #include <mbgl/tile/tile_id.hpp>
 
@@ -30,5 +29,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_RENDERER_FRAME_HISTORY
-#define MBGL_RENDERER_FRAME_HISTORY
+#pragma once
 
 #include <array>
 
@@ -36,5 +35,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

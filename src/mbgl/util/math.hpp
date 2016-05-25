@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_MATH
-#define MBGL_UTIL_MATH
+#pragma once
 
 #include <cmath>
 #include <array>
@@ -113,5 +112,3 @@ uint32_t ceil_log2(uint64_t x);
 
 } // namespace util
 } // namespace mbgl
-
-#endif

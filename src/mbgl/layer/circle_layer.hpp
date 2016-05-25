@@ -1,5 +1,4 @@
-#ifndef MBGL_CIRCLE_LAYER
-#define MBGL_CIRCLE_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 #include <mbgl/style/paint_property.hpp>
@@ -45,5 +44,3 @@ inline bool StyleLayer::is<CircleLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

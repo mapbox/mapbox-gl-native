@@ -1,5 +1,4 @@
-#ifndef MBGL_GEOMETRY_ICON_BUFFER
-#define MBGL_GEOMETRY_ICON_BUFFER
+#pragma once
 
 #include <mbgl/geometry/buffer.hpp>
 
@@ -16,5 +15,3 @@ namespace mbgl {
     };
 
 } // namespace mbgl
-
-#endif

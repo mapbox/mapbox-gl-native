@@ -1,5 +1,4 @@
-#ifndef MBGL_UTIL_CHANNEL
-#define MBGL_UTIL_CHANNEL
+#pragma once
 
 #include <mbgl/util/noncopyable.hpp>
 
@@ -35,5 +34,3 @@ private:
 };
 
 }
-
-#endif

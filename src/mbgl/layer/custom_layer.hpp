@@ -1,5 +1,4 @@
-#ifndef MBGL_CUSTOM_LAYER
-#define MBGL_CUSTOM_LAYER
+#pragma once
 
 #include <mbgl/style/style_layer.hpp>
 
@@ -44,5 +43,3 @@ inline bool StyleLayer::is<CustomLayer>() const {
 }
 
 } // namespace mbgl
-
-#endif

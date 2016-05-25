@@ -1,5 +1,4 @@
-#ifndef MBGL_SPRITE_PARSER
-#define MBGL_SPRITE_PARSER
+#pragma once
 
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -36,5 +35,3 @@ using SpriteParseResult = variant<
 SpriteParseResult parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MBGL_STORAGE_NETWORK_STATUS
-#define MBGL_STORAGE_NETWORK_STATUS
+#pragma once
 
 #include <atomic>
 #include <mutex>
@@ -33,5 +32,3 @@ private:
 };
 
 } // namespace mbgl
-
-#endif

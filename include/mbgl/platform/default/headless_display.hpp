@@ -1,5 +1,4 @@
-#ifndef MBGL_COMMON_HEADLESS_DISPLAY
-#define MBGL_COMMON_HEADLESS_DISPLAY
+#pragma once
 
 #include <mbgl/platform/default/headless_view.hpp>
 
@@ -21,5 +20,3 @@ public:
 };
 
 } // namespace mbgl
-
-#endif
