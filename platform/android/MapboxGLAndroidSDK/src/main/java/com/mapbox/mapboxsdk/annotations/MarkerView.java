@@ -155,4 +155,9 @@ public class MarkerView extends Marker {
         super.setMapboxMap(mapboxMap);
         markerViewManager = mapboxMap.getMarkerViewManager();
     }
+
+    @Override
+    public String toString() {
+        return "MarkerView [position[" + getPosition() + "]]";
+    }
 }
