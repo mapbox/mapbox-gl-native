@@ -63,7 +63,7 @@ bool Source::isLoaded() const {
     if (!loaded) return false;
 
     for (const auto& pair : tileDataMap) {
-        if (pair.second->getState() != TileData::State::parsed) {
+        if (!pair.second->isComplete()) {
             return false;
         }
     }

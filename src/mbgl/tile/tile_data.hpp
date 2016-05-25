@@ -24,15 +24,9 @@ class TransformState;
 
 class TileData : private util::noncopyable {
 public:
-    // initial:
-    //   Initial state, only used when the TileData object is created.
-    //
     // loading:
     //   A request to the FileSource was made for the actual tile data and TileData
     //   is waiting for it to arrive.
-    //
-    // loaded:
-    //   The actual tile data has arrived and the tile can be parsed.
     //
     // partial:
     //   TileData is partially parsed, some buckets are still waiting for dependencies
@@ -47,9 +41,7 @@ public:
     //   The TileData can go to obsolete from any state, due to parsing or loading error,
     //   request cancellation or because the tile is no longer in use.
     enum class State {
-        initial,
         loading,
-        loaded,
         partial,
         parsed,
         obsolete
@@ -80,6 +72,10 @@ public:
     // be rendered, although layers will be missing.
     bool isRenderable() const {
         return state == State::partial || state == State::parsed;
+    }
+
+    bool isComplete() const {
+        return state == State::parsed;
     }
 
     State getState() const {

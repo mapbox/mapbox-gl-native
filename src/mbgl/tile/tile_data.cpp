@@ -6,16 +6,14 @@ namespace mbgl {
 
 TileData::TileData(const OverscaledTileID& id_)
     : id(id_),
-      state(State::initial) {
+      state(State::loading) {
 }
 
 TileData::~TileData() = default;
 
 const char* TileData::StateToString(const State state) {
     switch (state) {
-        case TileData::State::initial: return "initial";
         case TileData::State::loading : return "loading";
-        case TileData::State::loaded : return "loaded";
         case TileData::State::obsolete : return "obsolete";
         case TileData::State::parsed : return "parsed";
         case TileData::State::partial : return "partial";

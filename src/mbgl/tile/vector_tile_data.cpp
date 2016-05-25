@@ -29,7 +29,6 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
                  mode_),
       monitor(std::move(monitor_))
 {
-    state = State::loading;
     tileRequest = monitor->monitorTile([callback, this](std::exception_ptr err,
                                                         std::unique_ptr<GeometryTile> tile,
                                                         optional<Timestamp> modified_,
@@ -51,9 +50,9 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
             return;
         }
 
-        if (state == State::loading) {
-            state = State::loaded;
-        } else if (isRenderable()) {
+        // Mark the tile as pending again if it was complete before to prevent signaling a complete
+        // state despite pending parse operations.
+        if (isComplete()) {
             state = State::partial;
         }
 
@@ -80,7 +79,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
                 // existing buckets in case we got a refresh parse.
                 buckets = std::move(resultBuckets.buckets);
 
-                if (state == State::parsed) {
+                if (isComplete()) {
                     featureIndex = std::move(resultBuckets.featureIndex);
                     geometryTile = std::move(resultBuckets.geometryTile);
                 }
@@ -127,7 +126,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
             // place again in case the configuration has changed.
             placedConfig = config;
 
-            if (state == State::parsed) {
+            if (isComplete()) {
                 featureIndex = std::move(resultBuckets.featureIndex);
                 geometryTile = std::move(resultBuckets.geometryTile);
             }
