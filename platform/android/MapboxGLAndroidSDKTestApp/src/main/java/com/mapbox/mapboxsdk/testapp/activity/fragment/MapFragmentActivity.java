@@ -40,7 +40,6 @@ public class MapFragmentActivity extends AppCompatActivity {
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             MapboxMapOptions options = new MapboxMapOptions();
-            options.accessToken(getString(R.string.mapbox_access_token));
             options.styleUrl(Style.getOutdoorsStyleUrl(AppConstant.STYLE_VERSION));
 
             options.scrollGesturesEnabled(false);

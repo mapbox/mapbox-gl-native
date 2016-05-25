@@ -40,7 +40,6 @@ public class SupportMapFragmentActivity extends AppCompatActivity {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             MapboxMapOptions options = new MapboxMapOptions();
-            options.accessToken(getString(R.string.mapbox_access_token));
             options.styleUrl(Style.getSatelliteStreetsStyleUrl(AppConstant.STYLE_VERSION));
 
             options.scrollGesturesEnabled(false);
