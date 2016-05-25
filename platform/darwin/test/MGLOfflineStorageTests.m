@@ -97,6 +97,29 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
+- (void)testBackupExclusion {
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory
+                                                                      inDomain:NSUserDomainMask
+                                                             appropriateForURL:nil
+                                                                        create:NO
+                                                                         error:nil];
+    // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
+    NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache directory should exist.");
+
+    NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheURL.path], @"Cache database should exist.");
+
+    NSError *error = nil;
+    NSNumber *exclusionFlag = nil;
+    [cacheURL getResourceValue:&exclusionFlag
+                        forKey:NSURLIsExcludedFromBackupKey
+                         error:&error];
+    XCTAssertTrue(exclusionFlag && [exclusionFlag boolValue], @"Backup exclusion flag should be set for cache database.");
+    XCTAssertNil(error, @"No errors should be returned when checking backup exclusion flag.");
+}
+
 - (void)testRemovePack {
     NSUInteger countOfPacks = [MGLOfflineStorage sharedOfflineStorage].packs.count;
     

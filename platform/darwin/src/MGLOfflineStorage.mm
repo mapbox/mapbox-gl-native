@@ -64,12 +64,6 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:MGLOfflineStorageFileName];
         NSString *cachePath = cacheURL ? cacheURL.path : @"";
         
-        // Avoid backing up the offline cache onto iCloud, because it can be
-        // redownloaded. Ideally, we’d even put the ambient cache in Caches, so
-        // it can be reclaimed by the system when disk space runs low. But
-        // unfortunately it has to live in the same file as offline resources.
-        [cacheURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
-        
         // Move the offline cache from v3.2.0-beta.1 to a location that can also
         // be used for ambient caching.
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
@@ -92,7 +86,13 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         }
         
         _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
-        
+
+        // Avoid backing up the offline cache onto iCloud, because it can be
+        // redownloaded. Ideally, we’d even put the ambient cache in Caches, so
+        // it can be reclaimed by the system when disk space runs low. But
+        // unfortunately it has to live in the same file as offline resources.
+        [cacheURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
+
         // Observe for changes to the global access token (and find out the current one).
         [[MGLAccountManager sharedManager] addObserver:self
                                             forKeyPath:@"accessToken"
