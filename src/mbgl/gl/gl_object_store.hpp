@@ -41,7 +41,7 @@ public:
     GLHolder(GLHolder&& o) noexcept : id(o.id) { o.id = 0; }
     GLHolder& operator=(GLHolder&& o) noexcept { id = o.id; o.id = 0; return *this; }
 
-    explicit operator bool() const { return id; }
+    explicit operator bool() const { return id && objectStore; }
     GLuint getID() const { return id; }
 
 protected:
@@ -110,7 +110,7 @@ public:
     TexturePoolHolder(TexturePoolHolder&& o) noexcept : ids(std::move(o.ids)) {}
     TexturePoolHolder& operator=(TexturePoolHolder&& o) noexcept { ids = std::move(o.ids); return *this; }
 
-    explicit operator bool() { return std::none_of(ids.begin(), ids.end(), [](int id) { return id == 0; }); }
+    explicit operator bool() const { return std::any_of(ids.begin(), ids.end(), [](int id) { return id; }) && objectStore; }
     const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
     const GLuint& operator[](size_t pos) { return ids[pos]; }
 

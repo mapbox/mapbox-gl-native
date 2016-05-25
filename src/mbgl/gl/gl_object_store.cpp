@@ -61,12 +61,11 @@ void TexturePoolHolder::create(GLObjectStore& objectStore_) {
 
 void TexturePoolHolder::reset() {
     if (!bool()) return;
-    for (GLuint id : ids) {
-        if (id) {
-            objectStore->abandonedTextures.push_back(id);
-        }
-    }
-    ids.fill(0);
+    std::for_each(ids.begin(), ids.end(), [&](GLuint& id) {
+        if (id == 0) return;
+        objectStore->abandonedTextures.push_back(id);
+        id = 0;
+    });
 }
 
 void VAOHolder::create(GLObjectStore& objectStore_) {
