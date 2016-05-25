@@ -31,6 +31,7 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             apt-get install -y pkg-config
+            export BUILDTYPE=Release
             make android
             make test-android
     - slack:
@@ -71,6 +72,7 @@ workflows:
             signing.password=$SIGNING_PASSWORD
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
 
+            export BUILDTYPE=Release
             make apackage -j4
 
             cd platform/android
