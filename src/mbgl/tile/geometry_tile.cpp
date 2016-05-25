@@ -114,6 +114,18 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
     return polygons;
 }
 
+void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
+    if (polygon.size() > 1 + maxHoles) {
+        std::nth_element(polygon.begin() + 1,
+                         polygon.begin() + 1 + maxHoles,
+                         polygon.end(),
+                         [] (const auto& a, const auto& b) {
+                             return signedArea(a) > signedArea(b);
+                         });
+        polygon.resize(1 + maxHoles);
+    }
+}
+
 static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
     const double size = util::EXTENT * std::pow(2, tileID.z);
     const double x0 = util::EXTENT * tileID.x;
