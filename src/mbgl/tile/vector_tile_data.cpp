@@ -62,9 +62,6 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
         workRequest.reset();
         workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
             workRequest.reset();
-            if (state == State::obsolete) {
-                return;
-            }
 
             std::exception_ptr error;
             if (result.is<TileParseResultData>()) {
@@ -85,8 +82,9 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
                 }
 
             } else {
+                // This is triggered when parsing fails (e.g. due to an invalid vector tile)
                 error = result.get<std::exception_ptr>();
-                state = State::obsolete;
+                state = State::parsed;
             }
 
             callback(error);
@@ -107,9 +105,6 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
     workRequest.reset();
     workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, callback, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
-        if (state == State::obsolete) {
-            return;
-        }
 
         std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
@@ -133,7 +128,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
 
         } else {
             error = result.get<std::exception_ptr>();
-            state = State::obsolete;
+            state = State::parsed;
         }
 
         callback(error);

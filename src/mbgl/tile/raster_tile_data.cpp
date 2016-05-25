@@ -47,7 +47,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
                     bucket = std::move(result.get<std::unique_ptr<Bucket>>());
                 } else {
                     error = result.get<std::exception_ptr>();
-                    state = State::obsolete;
+                    state = State::parsed;
                     bucket.reset();
                 }
 
@@ -66,9 +66,7 @@ Bucket* RasterTileData::getBucket(StyleLayer const&) {
 }
 
 void RasterTileData::cancel() {
-    if (state != State::obsolete) {
-        state = State::obsolete;
-    }
+    state = State::obsolete;
     req = nullptr;
     workRequest.reset();
 }
