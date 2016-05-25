@@ -2812,7 +2812,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
-            [(MGLMultiPoint *)annotation addShapeAnnotationObjectToCollection:shapes withDelegate:self];
+            // The multipoint knows how to style itself (with the map view’s help).
+            MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
+            if (!multiPoint.pointCount) {
+                continue;
+            }
+            shapes.emplace_back(multiPoint.annotationSegments, [multiPoint shapeAnnotationPropertiesObjectWithDelegate:self]);
             [userShapes addObject:annotation];
         }
         else if ([annotation isKindOfClass:[MGLMultiPolyline class]])

@@ -14,7 +14,6 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
 @implementation MGLMultiPoint
 {
-    CLLocationCoordinate2D *_coords;
     size_t _count;
     MGLCoordinateBounds _bounds;
 }
@@ -27,13 +26,13 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     if (self)
     {
         _count = count;
-        _coords = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
+        _coordinates = (CLLocationCoordinate2D *)malloc(_count * sizeof(CLLocationCoordinate2D));
 
         mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
 
         for (NSUInteger i = 0; i < _count; i++)
         {
-            _coords[i] = coords[i];
+            _coordinates[i] = coords[i];
             bounds.extend(mbgl::LatLng(coords[i].latitude, coords[i].longitude));
         }
 
@@ -45,7 +44,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
 - (void)dealloc
 {
-    free(_coords);
+    free(_coordinates);
 }
 
 - (CLLocationCoordinate2D)coordinate
@@ -59,7 +58,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
     assert(_count > 0);
 
-    return CLLocationCoordinate2DMake(_coords[0].latitude, _coords[0].longitude);
+    return CLLocationCoordinate2DMake(_coordinates[0].latitude, _coordinates[0].longitude);
 }
 
 - (NSUInteger)pointCount
@@ -89,7 +88,7 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
 
     for (NSUInteger i = range.location; i < range.location + range.length; i++)
     {
-        coords[index] = _coords[i];
+        coords[index] = _coordinates[i];
         index++;
     }
 }
@@ -104,24 +103,16 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
-- (void)addShapeAnnotationObjectToCollection:(std::vector<mbgl::ShapeAnnotation> &)shapes withDelegate:(id <MGLMultiPointDelegate>)delegate {
+- (mbgl::AnnotationSegments)annotationSegments {
     NSUInteger count = self.pointCount;
-    if (count == 0) {
-        return;
-    }
-    
-    CLLocationCoordinate2D *coordinates = (CLLocationCoordinate2D *)malloc(count * sizeof(CLLocationCoordinate2D));
-    NSAssert(coordinates, @"Unable to allocate annotation with %lu points", (unsigned long)count);
-    [self getCoordinates:coordinates range:NSMakeRange(0, count)];
+    CLLocationCoordinate2D *coordinates = self.coordinates;
     
     mbgl::AnnotationSegment segment;
     segment.reserve(count);
     for (NSUInteger i = 0; i < count; i++) {
         segment.push_back(MGLLatLngFromLocationCoordinate2D(coordinates[i]));
     }
-    free(coordinates);
-    shapes.emplace_back(mbgl::AnnotationSegments {{ segment }},
-                        [self shapeAnnotationPropertiesObjectWithDelegate:delegate]);
+    return { segment };
 }
 
 - (mbgl::ShapeAnnotation::Properties)shapeAnnotationPropertiesObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate {

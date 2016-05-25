@@ -88,20 +88,21 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
         const double tolerance = baseTolerance / (maxAmountOfTiles * util::EXTENT);
 
         geojsonvt::ProjectedRings rings;
-        std::vector<geojsonvt::LonLat> points;
+        for (auto& segment : shape.segments) {
+            std::vector<geojsonvt::LonLat> points;
+            for (auto& latLng : segment) {
+                const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
+                points.push_back(geojsonvt::LonLat(latLng.longitude, constrainedLatitude));
+            }
 
-        for (size_t i = 0; i < shape.segments[0].size(); ++i) { // first segment for now (no holes)
-            const double constrainedLatitude = util::clamp(shape.segments[0][i].latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-            points.push_back(geojsonvt::LonLat(shape.segments[0][i].longitude, constrainedLatitude));
+            if (type == geojsonvt::ProjectedFeatureType::Polygon &&
+                    (points.front().lon != points.back().lon || points.front().lat != points.back().lat)) {
+                points.push_back(geojsonvt::LonLat(points.front().lon, points.front().lat));
+            }
+
+            auto ring = geojsonvt::Convert::projectRing(points, tolerance);
+            rings.push_back(ring);
         }
-
-        if (type == geojsonvt::ProjectedFeatureType::Polygon &&
-                (points.front().lon != points.back().lon || points.front().lat != points.back().lat)) {
-            points.push_back(geojsonvt::LonLat(points.front().lon, points.front().lat));
-        }
-
-        auto ring = geojsonvt::Convert::projectRing(points, tolerance);
-        rings.push_back(ring);
 
         std::vector<geojsonvt::ProjectedFeature> features;
         features.push_back(geojsonvt::Convert::create(geojsonvt::Tags(), type, rings));

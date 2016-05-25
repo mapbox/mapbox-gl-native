@@ -23,10 +23,16 @@
     
     mapbox::geometry::polygon<double> polygon = {
         {
-            { -77.0325453144239, 38.9131982 },
-            { -122.4135302, 37.7757368 },
-            { 77.6368034, 12.9810816 },
-            { -74.2178961777998, -13.15589555 },
+            { 1, 1 },
+            { 4, 1 },
+            { 4, 4 },
+            { 1, 4 },
+        },
+        {
+            { 2, 2 },
+            { 3, 2 },
+            { 3, 3 },
+            { 2, 3 },
         },
     };
     features.emplace_back(polygon);
@@ -52,6 +58,30 @@
     MGLPolygonFeature *polygonShape = (MGLPolygonFeature *)shapes[2];
     XCTAssertTrue([polygonShape isKindOfClass:[MGLPolygonFeature class]]);
     XCTAssertEqual(polygonShape.pointCount, 4);
+    CLLocationCoordinate2D *polygonCoordinates = polygonShape.coordinates;
+    XCTAssertNotEqual(polygonCoordinates, nil);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[0]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(1, 1)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[1]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(1, 4)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[2]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(4, 4)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[3]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(4, 1)]);
+    NS_ARRAY_OF(MGLPolygon *) *interiorPolygons = polygonShape.interiorPolygons;
+    XCTAssertEqual(interiorPolygons.count, 1);
+    MGLPolygon *interiorPolygon = interiorPolygons.firstObject;
+    XCTAssertEqual(interiorPolygon.pointCount, 4);
+    CLLocationCoordinate2D interiorPolygonCoordinates[4];
+    [interiorPolygon getCoordinates:interiorPolygonCoordinates range:NSMakeRange(0, interiorPolygon.pointCount)];
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[0]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(2, 2)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[1]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(2, 3)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[2]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 3)]);
+    XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:interiorPolygonCoordinates[3]],
+                          [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(3, 2)]);
 }
 
 - (void)testPropertyConversion {

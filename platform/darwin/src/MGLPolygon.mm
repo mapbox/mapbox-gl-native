@@ -7,10 +7,30 @@
 
 @dynamic overlayBounds;
 
-+ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords
-                                 count:(NSUInteger)count
-{
-    return [[self alloc] initWithCoordinates:coords count:count];
++ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count {
+    return [self polygonWithCoordinates:coords count:count interiorPolygons:nil];
+}
+
++ (instancetype)polygonWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count interiorPolygons:(NSArray<MGLPolygon *> *)interiorPolygons {
+    return [[self alloc] initWithCoordinates:coords count:count interiorPolygons:interiorPolygons];
+}
+
+- (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count interiorPolygons:(NSArray<MGLPolygon *> *)interiorPolygons {
+    if (self = [super initWithCoordinates:coords count:count]) {
+        if (interiorPolygons.count) {
+            _interiorPolygons = interiorPolygons;
+        }
+    }
+    return self;
+}
+
+- (mbgl::AnnotationSegments)annotationSegments {
+    auto segments = super.annotationSegments;
+    for (MGLPolygon *polygon in self.interiorPolygons) {
+        auto interiorSegments = polygon.annotationSegments;
+        segments.push_back(interiorSegments.front());
+    }
+    return segments;
 }
 
 - (mbgl::ShapeAnnotation::Properties)shapeAnnotationPropertiesObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {

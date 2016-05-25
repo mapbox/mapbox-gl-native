@@ -306,6 +306,22 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
             free(polygonCoordinates);
         }
+        
+        CLLocationCoordinate2D innerCoordinates[] = {
+            CLLocationCoordinate2DMake(-5, -5),
+            CLLocationCoordinate2DMake(-5, 5),
+            CLLocationCoordinate2DMake(5, 5),
+            CLLocationCoordinate2DMake(5, -5),
+        };
+        MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:innerCoordinates count:sizeof(innerCoordinates) / sizeof(innerCoordinates[0])];
+        CLLocationCoordinate2D outerCoordinates[] = {
+            CLLocationCoordinate2DMake(-10, -20),
+            CLLocationCoordinate2DMake(-10, 10),
+            CLLocationCoordinate2DMake(10, 10),
+            CLLocationCoordinate2DMake(10, -10),
+        };
+        MGLPolygon *outerPolygon = [MGLPolygon polygonWithCoordinates:outerCoordinates count:sizeof(outerCoordinates) / sizeof(outerCoordinates[0]) interiorPolygons:@[innerPolygon]];
+        [self.mapView addAnnotation:outerPolygon];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {

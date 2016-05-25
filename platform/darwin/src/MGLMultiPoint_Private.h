@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
-/** Adds a shape annotation to the given vector by asking the delegate for style values. */
-- (void)addShapeAnnotationObjectToCollection:(std::vector<mbgl::ShapeAnnotation> &)shapes withDelegate:(id <MGLMultiPointDelegate>)delegate;
+/** Returns the shape’s annotation segments. */
+- (mbgl::AnnotationSegments)annotationSegments;
 
 /** Constructs a shape annotation properties object by asking the delegate for style values. */
 - (mbgl::ShapeAnnotation::Properties)shapeAnnotationPropertiesObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate;

@@ -171,33 +171,44 @@ class GeometryEvaluator {
 public:
     MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::point<T> &geometry) const {
         MGLPointFeature *feature = [[MGLPointFeature alloc] init];
-        feature.coordinate = coordinateFromPoint(geometry);
+        feature.coordinate = coordinateFromPointGeometry(geometry);
         return feature;
     }
     
     MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::line_string<T> &geometry) const {
         std::vector<CLLocationCoordinate2D> coordinates;
         coordinates.reserve(geometry.size());
-        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPoint);
+        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
         
-        return [[MGLPolylineFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
+        return [MGLPolylineFeature polylineWithCoordinates:&coordinates[0] count:coordinates.size()];
     }
     
     MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::polygon<T> &geometry) const {
-        // TODO: MGLPolygon doesn’t support holes, so what to do?
-        auto &linearRing = geometry.front();
-        
+        auto &outerRing = geometry.front();
         std::vector<CLLocationCoordinate2D> coordinates;
-        coordinates.reserve(linearRing.size());
-        std::transform(linearRing.begin(), linearRing.end(), std::back_inserter(coordinates), coordinateFromPoint);
+        coordinates.reserve(outerRing.size());
+        std::transform(outerRing.begin(), outerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
         
-        return [[MGLPolygonFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
+        NSMutableArray *innerPolygons;
+        if (geometry.size() > 1) {
+            innerPolygons = [NSMutableArray arrayWithCapacity:geometry.size() - 1];
+            for (auto iter = geometry.begin() + 1; iter != geometry.end(); iter++) {
+                auto &innerRing = *iter;
+                std::vector<CLLocationCoordinate2D> coordinates;
+                coordinates.reserve(innerRing.size());
+                std::transform(innerRing.begin(), innerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
+                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+                [innerPolygons addObject:innerPolygon];
+            }
+        }
+        
+        return [MGLPolygonFeature polygonWithCoordinates:&coordinates[0] count:coordinates.size() interiorPolygons:innerPolygons];
     }
     
     MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::multi_point<T> &geometry) const {
         std::vector<CLLocationCoordinate2D> coordinates;
         coordinates.reserve(geometry.size());
-        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPoint);
+        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
         
         return [[MGLMultiPointFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
     }
@@ -207,7 +218,7 @@ public:
         for (auto &lineString : geometry) {
             std::vector<CLLocationCoordinate2D> coordinates;
             coordinates.reserve(lineString.size());
-            std::transform(lineString.begin(), lineString.end(), std::back_inserter(coordinates), coordinateFromPoint);
+            std::transform(lineString.begin(), lineString.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
             
             MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:&coordinates[0] count:coordinates.size()];
             [polylines addObject:polyline];
@@ -219,14 +230,25 @@ public:
     MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::multi_polygon<T> &geometry) const {
         NSMutableArray *polygons = [NSMutableArray arrayWithCapacity:geometry.size()];
         for (auto &polygon : geometry) {
-            // TODO: MGLPolygon doesn’t support holes, so what to do?
             auto &linearRing = polygon.front();
-            
             std::vector<CLLocationCoordinate2D> coordinates;
             coordinates.reserve(linearRing.size());
-            std::transform(linearRing.begin(), linearRing.end(), std::back_inserter(coordinates), coordinateFromPoint);
+            std::transform(linearRing.begin(), linearRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
             
-            MGLPolygon *polygonObject = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+            NSMutableArray *innerPolygons;
+            if (polygon.size() > 1) {
+                innerPolygons = [NSMutableArray arrayWithCapacity:polygon.size() - 1];
+                for (auto iter = polygon.begin() + 1; iter != polygon.end(); iter++) {
+                    auto &innerRing = *iter;
+                    std::vector<CLLocationCoordinate2D> coordinates;
+                    coordinates.reserve(innerRing.size());
+                    std::transform(innerRing.begin(), innerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
+                    MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+                    [innerPolygons addObject:innerPolygon];
+                }
+            }
+            
+            MGLPolygon *polygonObject = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size() interiorPolygons:innerPolygons];
             [polygons addObject:polygonObject];
         }
         
@@ -245,7 +267,7 @@ public:
     }
     
 private:
-    static CLLocationCoordinate2D coordinateFromPoint(const mapbox::geometry::point<T> &point) {
+    static CLLocationCoordinate2D coordinateFromPointGeometry(const mapbox::geometry::point<T> &point) {
         return CLLocationCoordinate2DMake(point.y, point.x);
     }
 };

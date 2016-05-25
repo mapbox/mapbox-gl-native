@@ -1615,7 +1615,11 @@ public:
         
         if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
             // The multipoint knows how to style itself (with the map view’s help).
-            [(MGLMultiPoint *)annotation addShapeAnnotationObjectToCollection:shapes withDelegate:self];
+            MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
+            if (!multiPoint.pointCount) {
+                continue;
+            }
+            shapes.emplace_back(multiPoint.annotationSegments, [multiPoint shapeAnnotationPropertiesObjectWithDelegate:self]);
             [userShapes addObject:annotation];
         } else if ([annotation isKindOfClass:[MGLMultiPolyline class]]) {
             // TODO: Add real support for these types down in mbgl instead of breaking the annotation apart.
