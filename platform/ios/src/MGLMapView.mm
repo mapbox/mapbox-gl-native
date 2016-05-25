@@ -2902,7 +2902,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         for (size_t i = 0; i < annotationTags.size(); ++i)
         {
             MGLAnnotationTag annotationTag = annotationTags[i];
-            id <MGLAnnotation> annotation = userPoints[i];
+            id <MGLAnnotation> annotation = userShapes[i];
             
             MGLAnnotationContext context;
             context.annotation = annotation;
