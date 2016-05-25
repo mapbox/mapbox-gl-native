@@ -29,7 +29,7 @@ class SymbolLayer;
 // thread. This class is movable-only because the vector contains movable-only value elements.
 class TileParseResultData {
 public:
-    TileData::State state = TileData::State::invalid;
+    TileData::State state;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTile> geometryTile;

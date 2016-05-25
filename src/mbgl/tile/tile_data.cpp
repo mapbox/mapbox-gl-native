@@ -14,7 +14,6 @@ TileData::~TileData() = default;
 const char* TileData::StateToString(const State state) {
     switch (state) {
         case TileData::State::initial: return "initial";
-        case TileData::State::invalid : return "invalid";
         case TileData::State::loading : return "loading";
         case TileData::State::loaded : return "loaded";
         case TileData::State::obsolete : return "obsolete";
