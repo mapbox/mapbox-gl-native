@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 
@@ -77,7 +78,12 @@ public class SupportMapFragment extends Fragment {
 
         // Assign an AccessToken if needed
         if (options == null || options.getAccessToken() == null) {
-            String token = getToken(inflater.getContext());
+            String token = null;
+            if (MapboxAccountManager.getInstance() != null) {
+                token = MapboxAccountManager.getInstance().getAccessToken();
+            } else {
+                token = getToken(inflater.getContext());
+            }
             if (TextUtils.isEmpty(token)) {
                 throw new InvalidAccessTokenException();
             }
