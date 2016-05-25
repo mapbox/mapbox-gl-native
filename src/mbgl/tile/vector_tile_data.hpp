@@ -34,8 +34,6 @@ public:
     void redoPlacement(PlacementConfig config, const std::function<void()>&) override;
     void redoPlacement(const std::function<void()>&) override;
 
-    bool hasData() const override;
-
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,

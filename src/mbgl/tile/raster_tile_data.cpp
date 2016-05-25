@@ -82,7 +82,3 @@ void RasterTileData::cancel() {
     req = nullptr;
     workRequest.reset();
 }
-
-bool RasterTileData::hasData() const {
-    return bucket.get() != nullptr;
-}

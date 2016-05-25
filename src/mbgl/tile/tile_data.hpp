@@ -82,9 +82,6 @@ public:
         return state == State::partial || state == State::parsed;
     }
 
-    // Returns true when there's at least some data that we can render.
-    virtual bool hasData() const = 0;
-
     State getState() const {
         return state;
     }
