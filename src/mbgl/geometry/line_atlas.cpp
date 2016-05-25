@@ -129,7 +129,7 @@ void LineAtlas::upload(gl::GLObjectStore& glObjectStore) {
 
 void LineAtlas::bind(gl::GLObjectStore& glObjectStore) {
     bool first = false;
-    if (!texture) {
+    if (!texture.created()) {
         texture.create(glObjectStore);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));

@@ -60,7 +60,7 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
 void FrameHistory::upload(gl::GLObjectStore& glObjectStore) {
 
     if (changed) {
-        const bool first = !texture;
+        const bool first = !texture.created();
         bind(glObjectStore);
 
         if (first) {
@@ -95,7 +95,7 @@ void FrameHistory::upload(gl::GLObjectStore& glObjectStore) {
 }
 
 void FrameHistory::bind(gl::GLObjectStore& glObjectStore) {
-    if (!texture) {
+    if (!texture.created()) {
         texture.create(glObjectStore);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
