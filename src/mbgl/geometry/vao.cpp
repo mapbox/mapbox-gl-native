@@ -26,7 +26,9 @@ void VertexArrayObject::bindVertexArrayObject(gl::GLObjectStore& glObjectStore) 
         return;
     }
 
-    if (!vao) vao.create(glObjectStore);
+    if (!vao.created()) {
+        vao.create(glObjectStore);
+    }
     MBGL_CHECK_ERROR(gl::BindVertexArray(vao.getID()));
 }
 

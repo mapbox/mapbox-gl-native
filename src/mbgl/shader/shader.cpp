@@ -86,7 +86,7 @@ bool Shader::compileShader(gl::ShaderHolder& shader, const GLchar *source[]) {
 }
 
 Shader::~Shader() {
-    if (program) {
+    if (program.created()) {
         MBGL_CHECK_ERROR(glDetachShader(program.getID(), vertexShader.getID()));
         MBGL_CHECK_ERROR(glDetachShader(program.getID(), fragmentShader.getID()));
     }

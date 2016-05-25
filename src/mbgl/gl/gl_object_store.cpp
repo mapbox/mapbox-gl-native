@@ -6,61 +6,61 @@ namespace mbgl {
 namespace gl {
 
 void ProgramHolder::create(GLObjectStore& objectStore_) {
-    if (id) return;
+    if (created()) return;
     objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateProgram());
 }
 
 void ProgramHolder::reset() {
-    if (!id) return;
+    if (!created()) return;
     objectStore->abandonedPrograms.push_back(id);
     id = 0;
 }
 
 void ShaderHolder::create(GLObjectStore& objectStore_) {
-    if (id) return;
+    if (created()) return;
     objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateShader(type));
 }
 
 void ShaderHolder::reset() {
-    if (!id) return;
+    if (!created()) return;
     objectStore->abandonedShaders.push_back(id);
     id = 0;
 }
 
 void BufferHolder::create(GLObjectStore& objectStore_) {
-    if (id) return;
+    if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
 }
 
 void BufferHolder::reset() {
-    if (!id) return;
+    if (!created()) return;
     objectStore->abandonedBuffers.push_back(id);
     id = 0;
 }
 
 void TextureHolder::create(GLObjectStore& objectStore_) {
-    if (id) return;
+    if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(1, &id));
 }
 
 void TextureHolder::reset() {
-    if (!id) return;
+    if (!created()) return;
     objectStore->abandonedTextures.push_back(id);
     id = 0;
 }
 
 void TexturePoolHolder::create(GLObjectStore& objectStore_) {
-    if (bool()) return;
+    if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
 }
 
 void TexturePoolHolder::reset() {
-    if (!bool()) return;
+    if (!created()) return;
     for (GLuint& id : ids) {
         if (id == 0) continue;
         objectStore->abandonedTextures.push_back(id);
@@ -69,13 +69,13 @@ void TexturePoolHolder::reset() {
 }
 
 void VAOHolder::create(GLObjectStore& objectStore_) {
-    if (id) return;
+    if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
 }
 
 void VAOHolder::reset() {
-    if (!id) return;
+    if (!created()) return;
     objectStore->abandonedVAOs.push_back(id);
     id = 0;
 }
