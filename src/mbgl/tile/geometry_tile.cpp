@@ -78,7 +78,11 @@ GeometryCollection fixupPolygons(const GeometryCollection& rings) {
     return result;
 }
 
-std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
+bool sortByArea(std::pair<double,GeometryCoordinates> const& a, std::pair<double,GeometryCoordinates> const& b) {
+    return a.first > b.first;
+}
+
+std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings, unsigned maxRings) {
     std::vector<GeometryCollection> polygons;
 
     std::size_t len = rings.size();
@@ -88,6 +92,7 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
         return polygons;
     }
 
+    std::vector<std::pair<double, GeometryCoordinates>> innerRings;
     GeometryCollection polygon;
     int8_t ccw = 0;
 
@@ -100,16 +105,39 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
         if (ccw == 0)
             ccw = (area < 0 ? -1 : 1);
 
+        // Store built up polygon and start new one
         if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
+            std::sort(innerRings.begin(), innerRings.end(), sortByArea);
+            unsigned ringCount = 1;
+            for (const auto& pair : innerRings) {
+                if (maxRings > 0 && ringCount > maxRings - 1) break;
+                polygon.push_back(pair.second);
+                ringCount++;
+            }
             polygons.push_back(polygon);
-            polygon.clear();
-        }
 
-        polygon.push_back(rings[i]);
+            innerRings.clear();
+            polygon.clear();
+            polygon.push_back(rings[i]);
+        // Start new polygon
+        } else if (polygon.empty()) {
+            polygon.push_back(rings[i]);
+        // Continue current polygon
+        } else {
+            innerRings.push_back(make_pair(std::abs(area), rings[i]));
+        }
     }
 
-    if (!polygon.empty())
+    if (!polygon.empty()) {
+        std::sort(innerRings.begin(), innerRings.end(), sortByArea);
+        unsigned ringCount = 1;
+        for (const auto& pair : innerRings) {
+            if (maxRings > 0 && ringCount > maxRings - 1) break;
+            polygon.push_back(pair.second);
+            ringCount++;
+        }
         polygons.push_back(polygon);
+    }
 
     return polygons;
 }
@@ -165,7 +193,7 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
 
         case FeatureType::Polygon: {
             MultiPolygon<double> multiPolygon;
-            for (const auto& pg : classifyRings(geometries)) {
+            for (const auto& pg : classifyRings(geometries, 0)) {
                 Polygon<double> polygon;
                 for (const auto& r : pg) {
                     LinearRing<double> linearRing;

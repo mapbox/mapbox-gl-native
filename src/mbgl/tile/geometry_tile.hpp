@@ -90,7 +90,7 @@ public:
 };
 
 // classifies an array of rings into polygons with outer rings and holes
-std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
+std::vector<GeometryCollection> classifyRings(const GeometryCollection&, unsigned maxRings);
 
 // convert from GeometryTileFeature to Feature (eventually we should eliminate GeometryTileFeature)
 Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);

@@ -54,6 +54,7 @@
         'math/minmax.cpp',
         'math/clamp.cpp',
 
+        'tile/geometry_tile.cpp',
         'tile/tile_id.cpp',
 
         'storage/offline.cpp',
