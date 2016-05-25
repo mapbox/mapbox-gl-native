@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.constants;
 
+import android.content.Context;
 import java.util.Locale;
 
 /**
@@ -14,7 +15,9 @@ public class MapboxConstants {
 
     /**
      * Key used to store access token in AndroidManifest.xml
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
      */
+    @Deprecated
     public static final String KEY_META_DATA_MANIFEST = "com.mapbox.AccessToken";
 
     /**

@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
 
@@ -93,7 +92,10 @@ public final class MapFragment extends Fragment {
      * @param context The {@link Context} of the {@link android.app.Activity} or {@link android.app.Fragment}.
      * @return The Mapbox access token or null if not found.
      * @see MapboxConstants#KEY_META_DATA_MANIFEST
+     *
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
      */
+    @Deprecated
     private String getToken(@NonNull Context context) {
         try {
             // read out AndroidManifest
