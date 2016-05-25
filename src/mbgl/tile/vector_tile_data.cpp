@@ -25,7 +25,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
                  *style_.spriteStore,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
-                 state,
+                 obsolete,
                  mode_),
       monitor(std::move(monitor_))
 {
@@ -66,7 +66,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
             std::exception_ptr error;
             if (result.is<TileParseResultData>()) {
                 auto& resultBuckets = result.get<TileParseResultData>();
-                state = resultBuckets.state;
+                state = resultBuckets.complete ? State::parsed : State::partial;
 
                 // Persist the configuration we just placed so that we can later check whether we need to
                 // place again in case the configuration has changed.
@@ -109,7 +109,7 @@ bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callba
         std::exception_ptr error;
         if (result.is<TileParseResultData>()) {
             auto& resultBuckets = result.get<TileParseResultData>();
-            state = resultBuckets.state;
+            state = resultBuckets.complete ? State::parsed : State::partial;
 
             // Move over all buckets we received in this parse request, potentially overwriting
             // existing buckets in case we got a refresh parse.
@@ -205,7 +205,7 @@ void VectorTileData::queryRenderedFeatures(
 }
 
 void VectorTileData::cancel() {
-    state = State::obsolete;
+    obsolete = true;
     tileRequest.reset();
     workRequest.reset();
 }

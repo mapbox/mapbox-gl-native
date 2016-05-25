@@ -9,7 +9,6 @@
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 
-#include <atomic>
 #include <string>
 #include <memory>
 #include <functional>
@@ -36,15 +35,10 @@ public:
     // parsed:
     //   TileData is fully parsed and its contents won't change from this point. This
     //   is the only state which is safe to cache this object.
-    //
-    // obsolete:
-    //   The TileData can go to obsolete from any state, due to parsing or loading error,
-    //   request cancellation or because the tile is no longer in use.
     enum class State {
         loading,
         partial,
         parsed,
-        obsolete
     };
 
     static const char* StateToString(State);
@@ -92,7 +86,7 @@ public:
     std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
-    std::atomic<State> state;
+    State state;
 };
 
 } // namespace mbgl

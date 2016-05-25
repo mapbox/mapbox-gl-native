@@ -64,6 +64,9 @@ private:
     // Stores the placement configuration of how the text should be placed. This isn't necessarily
     // the one that is being displayed.
     PlacementConfig targetConfig;
+
+    // Used to signal the worker that it should abandon parsing this tile as soon as possible.
+    std::atomic<bool> obsolete { false };
 };
 
 } // namespace mbgl

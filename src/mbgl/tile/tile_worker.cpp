@@ -22,14 +22,14 @@ TileWorker::TileWorker(const OverscaledTileID& id_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
-                       const std::atomic<TileData::State>& state_,
+                       const std::atomic<bool>& obsolete_,
                        const MapMode mode_)
     : id(id_),
       sourceID(std::move(sourceID_)),
       spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
-      state(state_),
+      obsolete(obsolete_),
       mode(mode_) {
 }
 
@@ -92,9 +92,9 @@ TileParseResult TileWorker::parsePendingLayers(const PlacementConfig config) {
 }
 
 TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
-    result.state = pending.empty() ? TileData::State::parsed : TileData::State::partial;
+    result.complete = pending.empty();
 
-    if (result.state == TileData::State::parsed) {
+    if (result.complete) {
         featureIndex->setCollisionTile(placeLayers(config));
         result.featureIndex = std::move(featureIndex);
         result.geometryTile = std::move(geometryTile);
@@ -131,7 +131,7 @@ std::unique_ptr<CollisionTile> TileWorker::redoPlacement(
 
 void TileWorker::parseLayer(const StyleLayer* layer) {
     // Cancel early when parsing.
-    if (state == TileData::State::obsolete)
+    if (obsolete)
         return;
 
     // Background and custom layers are special cases.
@@ -158,7 +158,7 @@ void TileWorker::parseLayer(const StyleLayer* layer) {
 
     StyleBucketParameters parameters(id,
                                      *geometryLayer,
-                                     state,
+                                     obsolete,
                                      reinterpret_cast<uintptr_t>(this),
                                      partialParse,
                                      spriteStore,

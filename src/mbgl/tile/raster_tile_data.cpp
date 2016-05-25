@@ -66,7 +66,6 @@ Bucket* RasterTileData::getBucket(StyleLayer const&) {
 }
 
 void RasterTileData::cancel() {
-    state = State::obsolete;
     req = nullptr;
     workRequest.reset();
 }

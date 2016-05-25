@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/tile/tile_data.hpp>
 
 #include <functional>
 
@@ -21,7 +21,7 @@ class StyleBucketParameters {
 public:
     StyleBucketParameters(const OverscaledTileID& tileID_,
                           const GeometryTileLayer& layer_,
-                          const std::atomic<TileData::State>& state_,
+                          const std::atomic<bool>& obsolete_,
                           uintptr_t tileUID_,
                           bool& partialParse_,
                           SpriteStore& spriteStore_,
@@ -31,7 +31,7 @@ public:
                           const MapMode mode_)
         : tileID(tileID_),
           layer(layer_),
-          state(state_),
+          obsolete(obsolete_),
           tileUID(tileUID_),
           partialParse(partialParse_),
           spriteStore(spriteStore_),
@@ -41,14 +41,14 @@ public:
           mode(mode_) {}
 
     bool cancelled() const {
-        return state == TileData::State::obsolete;
+        return obsolete;
     }
 
     void eachFilteredFeature(const Filter&, std::function<void (const GeometryTileFeature&, std::size_t index, const std::string& layerName)>);
 
     const OverscaledTileID& tileID;
     const GeometryTileLayer& layer;
-    const std::atomic<TileData::State>& state;
+    const std::atomic<bool>& obsolete;
     uintptr_t tileUID;
     bool& partialParse;
     SpriteStore& spriteStore;

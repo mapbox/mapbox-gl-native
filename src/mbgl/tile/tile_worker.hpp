@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/map/mode.hpp>
-#include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -29,7 +29,7 @@ class SymbolLayer;
 // thread. This class is movable-only because the vector contains movable-only value elements.
 class TileParseResultData {
 public:
-    TileData::State state;
+    bool complete = false;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<const GeometryTile> geometryTile;
@@ -46,7 +46,7 @@ public:
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const std::atomic<TileData::State>&,
+               const std::atomic<bool>&,
                const MapMode);
     ~TileWorker();
 
@@ -71,7 +71,7 @@ private:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    const std::atomic<TileData::State>& state;
+    const std::atomic<bool>& obsolete;
     const MapMode mode;
 
     bool partialParse = false;
