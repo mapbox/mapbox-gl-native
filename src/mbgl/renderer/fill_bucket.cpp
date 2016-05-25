@@ -35,7 +35,11 @@ FillBucket::~FillBucket() {
 }
 
 void FillBucket::addGeometry(const GeometryCollection& geometry) {
-    for (const auto& polygon : classifyRings(geometry)) {
+    // Max number of rings to allow per polygon.
+    // Optimizes polygons with many interior rings for earcut tesselation.
+    unsigned maxRings = 500;
+
+    for (const auto& polygon : classifyRings(geometry, maxRings)) {
         std::size_t totalVertices = 0;
 
         for (const auto& ring : polygon) {

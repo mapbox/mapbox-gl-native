@@ -82,13 +82,10 @@ bool sortByArea(std::pair<double,GeometryCoordinates> const& a, std::pair<double
     return a.first > b.first;
 }
 
-std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
+std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings, unsigned maxRings) {
     std::vector<GeometryCollection> polygons;
 
     std::size_t len = rings.size();
-
-    // @TODO make this an argument
-    unsigned EARCUT_MAX_RINGS = 2;
 
     if (len <= 1) {
         polygons.push_back(rings);
@@ -111,9 +108,9 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
         // Store built up polygon and start new one
         if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
             std::sort(innerRings.begin(), innerRings.end(), sortByArea);
-            unsigned ringCount = 0;
+            unsigned ringCount = 1;
             for (const auto& pair : innerRings) {
-                if (ringCount > EARCUT_MAX_RINGS - 1) break;
+                if (maxRings > 0 && ringCount > maxRings - 1) break;
                 polygon.push_back(pair.second);
                 ringCount++;
             }
@@ -127,15 +124,15 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
             polygon.push_back(rings[i]);
         // Continue current polygon
         } else {
-            innerRings.push_back(make_pair(area, rings[i]));
+            innerRings.push_back(make_pair(std::abs(area), rings[i]));
         }
     }
 
     if (!polygon.empty()) {
         std::sort(innerRings.begin(), innerRings.end(), sortByArea);
-        unsigned ringCount = 0;
+        unsigned ringCount = 1;
         for (const auto& pair : innerRings) {
-            if (ringCount > EARCUT_MAX_RINGS - 1) break;
+            if (maxRings > 0 && ringCount > maxRings - 1) break;
             polygon.push_back(pair.second);
             ringCount++;
         }
@@ -196,7 +193,7 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
 
         case FeatureType::Polygon: {
             MultiPolygon<double> multiPolygon;
-            for (const auto& pg : classifyRings(geometries)) {
+            for (const auto& pg : classifyRings(geometries, 0)) {
                 Polygon<double> polygon;
                 for (const auto& r : pg) {
                     LinearRing<double> linearRing;
