@@ -43,13 +43,10 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     } else {
         if (wireframe) {
             plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
+            plainShader->u_opacity = 1.0f;
         } else {
-            Color color = properties.backgroundColor;
-            color[0] *= properties.backgroundOpacity;
-            color[1] *= properties.backgroundOpacity;
-            color[2] *= properties.backgroundOpacity;
-            color[3] *= properties.backgroundOpacity;
-            plainShader->u_color = color;
+            plainShader->u_color = properties.backgroundColor;
+            plainShader->u_opacity = properties.backgroundOpacity;
         }
 
         config.program = plainShader->getID();
@@ -102,18 +99,10 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
             patternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
-
-
         } else {
             plainShader->u_matrix = vtxMatrix;
-            if (wireframe) {
-                plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
-            } else {
-                plainShader->u_color = properties.backgroundColor;
-            }
         }
 
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
     }
-
 }

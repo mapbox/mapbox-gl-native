@@ -24,12 +24,6 @@ void Painter::renderCircle(CircleBucket& bucket,
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 
-    Color color = properties.circleColor;
-    color[0] *= properties.circleOpacity;
-    color[1] *= properties.circleOpacity;
-    color[2] *= properties.circleOpacity;
-    color[3] *= properties.circleOpacity;
-
     // Antialiasing factor: this is a minimum blur distance that serves as
     // a faux-antialiasing for the circle. since blur is a ratio of the circle's
     // size and the intent is to keep the blur at roughly 1px, the two
@@ -40,7 +34,8 @@ void Painter::renderCircle(CircleBucket& bucket,
 
     circleShader->u_matrix = vtxMatrix;
     circleShader->u_exmatrix = extrudeMatrix;
-    circleShader->u_color = color;
+    circleShader->u_color = properties.circleColor;
+    circleShader->u_opacity = properties.circleOpacity;
     circleShader->u_blur = std::max<float>(properties.circleBlur, antialiasing);
     circleShader->u_size = properties.circleRadius;
 

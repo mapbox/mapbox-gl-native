@@ -49,12 +49,10 @@ void Painter::renderLine(LineBucket& bucket,
     float outset = offset + edgeWidth + antialiasing / 2.0 + shift;
 
     Color color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+    float opacity = 1.0f;
     if (!wireframe) {
         color = properties.lineColor;
-        color[0] *= properties.lineOpacity;
-        color[1] *= properties.lineOpacity;
-        color[2] *= properties.lineOpacity;
-        color[3] *= properties.lineOpacity;
+        opacity = properties.lineOpacity;
     }
 
     const float ratio = 1.0 / tileID.pixelsToTileUnits(1.0, state.getZoom());
@@ -85,6 +83,7 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader->u_ratio = ratio;
         linesdfShader->u_blur = blur;
         linesdfShader->u_color = color;
+        linesdfShader->u_opacity = opacity;
 
         LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, glObjectStore);
         LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, glObjectStore);
@@ -167,6 +166,7 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader->u_antialiasingmatrix = antialiasingMatrix;
 
         lineShader->u_color = color;
+        lineShader->u_opacity = opacity;
 
         bucket.drawLines(*lineShader, glObjectStore);
     }
