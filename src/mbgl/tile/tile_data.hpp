@@ -66,13 +66,6 @@ public:
 
     static const char* StateToString(State);
 
-    // Tile data considered "Ready" can be used for rendering. Data in
-    // partial state is still waiting for network resources but can also
-    // be rendered, although layers will be missing.
-    inline static bool isReadyState(const State& state) {
-        return state == State::partial || state == State::parsed;
-    }
-
     TileData(const OverscaledTileID&);
     virtual ~TileData();
 
@@ -91,8 +84,11 @@ public:
             const TransformState&,
             const optional<std::vector<std::string>>& layerIDs);
 
-    bool isReady() const {
-        return isReadyState(state);
+    // Tile data considered "Renderable" can be used for rendering. Data in
+    // partial state is still waiting for network resources but can also
+    // be rendered, although layers will be missing.
+    bool isRenderable() const {
+        return state == State::partial || state == State::parsed;
     }
 
     // Returns true when there's at least some data that we can render.

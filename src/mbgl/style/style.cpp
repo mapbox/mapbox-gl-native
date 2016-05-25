@@ -288,7 +288,7 @@ RenderData Style::getRenderData() const {
 
         for (auto& pair : source->getTiles()) {
             auto& tile = pair.second;
-            if (!tile.data.isReady()) {
+            if (!tile.data.isRenderable()) {
                 continue;
             }
 

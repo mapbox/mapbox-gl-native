@@ -17,7 +17,7 @@ bool tryTile(const UnwrappedTileID& renderTileID,
              Renderables& renderables) {
     if (renderables.find(renderTileID) == renderables.end()) {
         const auto it = dataTiles.find(dataTileID);
-        if (it == dataTiles.end() || !it->second->isReady()) {
+        if (it == dataTiles.end() || !it->second->isRenderable()) {
             return false;
         }
 

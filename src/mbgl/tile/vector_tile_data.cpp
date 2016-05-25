@@ -53,7 +53,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
 
         if (state == State::loading) {
             state = State::loaded;
-        } else if (isReady()) {
+        } else if (isRenderable()) {
             state = State::partial;
         }
 

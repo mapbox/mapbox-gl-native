@@ -44,7 +44,7 @@ struct MockBucket {};
 
 
 struct MockTileData {
-    bool isReady() {
+    bool isRenderable() {
         return ready;
     }
 

@@ -18,7 +18,7 @@ void TileCache::setSize(size_t size_) {
 }
 
 void TileCache::add(const OverscaledTileID& key, std::unique_ptr<TileData> data) {
-    if (!data->isReady() || !size) {
+    if (!data->isRenderable() || !size) {
         return;
     }
 
@@ -48,7 +48,7 @@ std::unique_ptr<TileData> TileCache::get(const OverscaledTileID& key) {
         data = std::move(it->second);
         tiles.erase(it);
         orderedKeys.remove(key);
-        assert(data->isReady());
+        assert(data->isRenderable());
     }
 
     return data;
