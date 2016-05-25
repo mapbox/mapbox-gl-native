@@ -36,7 +36,7 @@ public:
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
     void bind(gl::GLObjectStore& glObjectStore) {
-        if (buffer) {
+        if (buffer.created()) {
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
         } else {
             buffer.create(glObjectStore);
@@ -65,7 +65,7 @@ public:
 
     // Uploads the buffer to the GPU to be available when we need it.
     inline void upload(gl::GLObjectStore& glObjectStore) {
-        if (!buffer) {
+        if (!buffer.created()) {
             bind(glObjectStore);
         }
     }
@@ -73,7 +73,7 @@ public:
 protected:
     // increase the buffer size by at least /required/ bytes.
     inline void *addElement() {
-        if (buffer) {
+        if (buffer.created()) {
             throw std::runtime_error("Can't add elements after buffer was bound to GPU");
         }
         if (length < pos + itemSize) {
