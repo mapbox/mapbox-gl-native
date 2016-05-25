@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -62,8 +61,13 @@ public class MarkerViewManager {
             convertView = mMarkerViewMap.get(marker);
             if (convertView != null) {
                 PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                convertView.setX(point.x - (convertView.getMeasuredWidth() / 2));
-                convertView.setY(point.y - (convertView.getMeasuredHeight() / 2));
+                int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
+                int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
+                marker.setOffsetX(x);
+                marker.setOffsetY(y);
+                convertView.setX(point.x - x);
+                convertView.setY(point.y - y);
+
                 if (marker.isVisible() && convertView.getVisibility() == View.GONE) {
                     convertView.animate().cancel();
                     convertView.setAlpha(0);
@@ -176,7 +180,7 @@ public class MarkerViewManager {
                 for (final MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
                     if (adapter.getMarkerClass() == marker.getClass()) {
                         convertView = (View) adapter.getViewReusePool().acquire();
-                        View adaptedView = adapter.getView(marker, convertView, mapView);
+                        final View adaptedView = adapter.getView(marker, convertView, mapView);
                         if (adaptedView != null) {
 
                             // tilt
@@ -210,11 +214,11 @@ public class MarkerViewManager {
                                     }
 
                                     if (!clickHandled) {
-
                                         // InfoWindow offset
-                                        Point infoWindowOffset = marker.getInfoWindowOffset();
-                                        marker.setTopOffsetPixels(-(v.getHeight() / 2) - infoWindowOffset.y);
-                                        marker.setRightOffsetPixels(infoWindowOffset.x);
+                                        int infoWindowOffsetX = (int) ((adaptedView.getWidth() * marker.getInfoWindowAnchorU()) - marker.getOffsetX());
+                                        int infoWindowOffsetY = (int) ((adaptedView.getHeight() * marker.getInfoWindowAnchorV()) -marker.getOffsetY());
+                                        marker.setTopOffsetPixels(infoWindowOffsetY);
+                                        marker.setRightOffsetPixels(infoWindowOffsetX);
 
                                         if (animSelectRes != 0) {
                                             AnimatorUtils.animate(v, animSelectRes, new AnimatorUtils.OnAnimationEndListener() {

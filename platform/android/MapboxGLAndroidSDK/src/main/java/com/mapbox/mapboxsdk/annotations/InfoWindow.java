@@ -30,6 +30,7 @@ public class InfoWindow {
     protected WeakReference<View> mView;
 
     private float mMarkerHeightOffset;
+    private float mMarkerWidthOffset;
     private float mViewWidthOffset;
     private PointF mCoordinates;
     private boolean mIsVisible;
@@ -108,9 +109,9 @@ public class InfoWindow {
 
             // Calculate y-offset for update method
             mMarkerHeightOffset = -view.getMeasuredHeight() + offsetY;
+            mMarkerWidthOffset = -offsetX;
 
             // Calculate default Android x,y coordinate
-
             mCoordinates = mapboxMap.getProjection().toScreenLocation(position);
             float x = mCoordinates.x - (view.getMeasuredWidth() / 2) + offsetX;
             float y = mCoordinates.y - view.getMeasuredHeight() + offsetY;
@@ -244,7 +245,7 @@ public class InfoWindow {
         View view = mView.get();
         if (mapboxMap != null && marker != null && view != null) {
             mCoordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-            view.setX(mCoordinates.x + mViewWidthOffset);
+            view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
             view.setY(mCoordinates.y + mMarkerHeightOffset);
         }
     }

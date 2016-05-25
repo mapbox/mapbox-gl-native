@@ -1,8 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -22,8 +20,8 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         snippet(in.readString());
         title(in.readString());
         flat(in.readByte() != 0);
-        centerOffset((PointF) in.readParcelable(PointF.class.getClassLoader()));
-        infoWindowOffset((Point) in.readParcelable(Point.class.getClassLoader()));
+        anchor(in.readFloat(), in.readFloat());
+        infoWindowAnchor(in.readFloat(), in.readFloat());
         selectAnimatorResource(in.readInt());
         deselectAnimatorResource(in.readInt());
         rotation(in.readInt());
@@ -53,8 +51,10 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeString(getSnippet());
         out.writeString(getTitle());
         out.writeByte((byte) (isFlat() ? 1 : 0));
-        out.writeParcelable(getCenterOffset(), flags);
-        out.writeParcelable(getInfoWindowOffset(), flags);
+        out.writeFloat(getAnchorU());
+        out.writeFloat(getAnchorV());
+        out.writeFloat(getInfoWindowAnchorU());
+        out.writeFloat(getInfoWindowAnchorV());
         out.writeInt(getSelectAnimRes());
         out.writeInt(getDeselectAnimRes());
         out.writeInt(getRotation());
@@ -74,8 +74,8 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setTitle(title);
         marker.setIcon(icon);
         marker.setFlat(flat);
-        marker.setCenterOffset(centerOffset);
-        marker.setInfoWindowOffset(infoWindowOffset);
+        marker.setAnchor(anchorU, anchorV);
+        marker.setInfoWindowAnchor(infoWindowAnchorU, infoWindowAnchorV);
         marker.setSelectAnimRes(selectAnimRes);
         marker.setDeselectAnimRes(deselectAnimRes);
         marker.setRotation(rotation);

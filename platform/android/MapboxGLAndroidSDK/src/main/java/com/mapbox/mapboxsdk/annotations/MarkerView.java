@@ -1,18 +1,22 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Point;
-import android.graphics.PointF;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 public class MarkerView extends Marker {
 
     private MarkerViewManager markerViewManager;
 
-    private PointF centerOffset;
-    private Point infoWindowOffset;
+    private float anchorU;
+    private float anchorV;
+
+    private float offsetX;
+    private float offsetY;
+
+    private float infoWindowAnchorU;
+    private float infoWindowAnchorV;
+
     private boolean flat;
-    private boolean visible;
+    private boolean visible = true;
 
     private int selectAnimRes;
     private int deselectAnimRes;
@@ -22,33 +26,63 @@ public class MarkerView extends Marker {
     private float alpha = 1;
 
     MarkerView() {
-        centerOffset = new PointF();
-        infoWindowOffset = new Point();
     }
 
     public MarkerView(BaseMarkerViewOptions baseMarkerViewOptions) {
         super(baseMarkerViewOptions);
-        this.centerOffset = baseMarkerViewOptions.getCenterOffset();
-        this.infoWindowOffset = baseMarkerViewOptions.getInfoWindowOffset();
+        this.anchorU = baseMarkerViewOptions.getAnchorU();
+        this.anchorV = baseMarkerViewOptions.getAnchorV();
+        this.infoWindowAnchorU = baseMarkerViewOptions.getInfoWindowAnchorU();
+        this.infoWindowAnchorV = baseMarkerViewOptions.getInfoWindowAnchorV();
         this.flat = baseMarkerViewOptions.isFlat();
         this.selectAnimRes = baseMarkerViewOptions.getSelectAnimRes();
         this.deselectAnimRes = baseMarkerViewOptions.getDeselectAnimRes();
+        this.infoWindowAnchorU = baseMarkerViewOptions.infoWindowAnchorU;
+        this.infoWindowAnchorV = baseMarkerViewOptions.infoWindowAnchorV;
+        this.anchorU = baseMarkerViewOptions.anchorU;
+        this.anchorV = baseMarkerViewOptions.anchorV;
     }
 
-    public PointF getCenterOffset() {
-        return centerOffset;
+    public void setAnchor(float u, float v) {
+        this.anchorU = u;
+        this.anchorV = v;
     }
 
-    public void setCenterOffset(PointF centerOffset) {
-        this.centerOffset = centerOffset;
+    public float getAnchorU() {
+        return anchorU;
     }
 
-    public Point getInfoWindowOffset() {
-        return infoWindowOffset;
+    public float getAnchorV() {
+        return anchorV;
     }
 
-    public void setInfoWindowOffset(Point infoWindowOffset) {
-        this.infoWindowOffset = infoWindowOffset;
+    void setOffsetX(float x){
+        offsetX = x;
+    }
+
+    void setOffsetY(float y){
+        offsetY = y;
+    }
+
+    float getOffsetX() {
+        return offsetX;
+    }
+
+    float getOffsetY() {
+        return offsetY;
+    }
+
+    public void setInfoWindowAnchor(float u, float v) {
+        this.infoWindowAnchorU = u;
+        this.infoWindowAnchorV = v;
+    }
+
+    public float getInfoWindowAnchorU() {
+        return infoWindowAnchorU;
+    }
+
+    public float getInfoWindowAnchorV() {
+        return infoWindowAnchorV;
     }
 
     public boolean isFlat() {

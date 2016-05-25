@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarkerView, CountryMarkerViewOptions> {
@@ -24,10 +25,11 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         snippet(in.readString());
         title(in.readString());
         flat(in.readByte() != 0);
-        centerOffset((PointF) in.readParcelable(PointF.class.getClassLoader()));
-        infoWindowOffset((Point) in.readParcelable(Point.class.getClassLoader()));
+        anchor(in.readFloat(), in.readFloat());
+        infoWindowAnchor(in.readFloat(), in.readFloat());
         selectAnimatorResource(in.readInt());
         deselectAnimatorResource(in.readInt());
+        rotation(in.readInt());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -35,6 +37,8 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
             Icon icon = IconFactory.recreate(iconId, iconBitmap);
             icon(icon);
         }
+        abbrevName(in.readString());
+        flagRes(in.readInt());
     }
 
     @Override
@@ -53,16 +57,21 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         out.writeString(getSnippet());
         out.writeString(getTitle());
         out.writeByte((byte) (isFlat() ? 1 : 0));
-        out.writeParcelable(getCenterOffset(), flags);
-        out.writeParcelable(getInfoWindowOffset(), flags);
+        out.writeFloat(getAnchorU());
+        out.writeFloat(getAnchorV());
+        out.writeFloat(getInfoWindowAnchorU());
+        out.writeFloat(getInfoWindowAnchorV());
         out.writeInt(getSelectAnimRes());
         out.writeInt(getDeselectAnimRes());
+        out.writeInt(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
             out.writeString(getIcon().getId());
             out.writeParcelable(getIcon().getBitmap(), flags);
         }
+        out.writeString(abbrevName);
+        out.writeInt(flagRes);
     }
 
     @Override
@@ -78,38 +87,6 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
     public CountryMarkerViewOptions flagRes(int flagRes) {
         this.flagRes = flagRes;
         return getThis();
-    }
-
-    public LatLng getPosition() {
-        return position;
-    }
-
-    public String getSnippet() {
-        return snippet;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public boolean isFlat() {
-        return flat;
-    }
-
-    public PointF getCenterOffset() {
-        return centerOffset;
-    }
-
-    public Point getInfoWindowOffset() {
-        return infoWindowOffset;
-    }
-
-    public int getSelectAnimRes() {
-        return selectAnimRes;
-    }
-
-    public int getDeselectAnimRes() {
-        return deselectAnimRes;
     }
 
     public static final Parcelable.Creator<CountryMarkerViewOptions> CREATOR

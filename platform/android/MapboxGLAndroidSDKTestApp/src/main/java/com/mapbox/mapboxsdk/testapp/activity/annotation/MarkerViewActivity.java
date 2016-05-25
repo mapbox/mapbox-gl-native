@@ -73,7 +73,6 @@ public class MarkerViewActivity extends AppCompatActivity {
                     mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
-                            .infoWindowOffset(new Point(0, (int) getResources().getDimension(R.dimen.fab_margin)))
                             .selectAnimatorResource(R.animator.scale_up)
                             .deselectAnimatorResource(R.animator.scale_down)
                     );

@@ -1,7 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.os.Parcelable;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
@@ -23,16 +21,16 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected String title;
     protected Icon icon;
     protected boolean flat;
-    protected PointF centerOffset;
-    protected Point infoWindowOffset;
+    protected float anchorU = 0.5f;
+    protected float anchorV = 1f;
+    protected float infoWindowAnchorU = 0.5f;
+    protected float infoWindowAnchorV = 0.0f;
     protected int selectAnimRes;
     protected int deselectAnimRes;
     protected int rotation;
     protected boolean visible = true;
 
     public BaseMarkerViewOptions() {
-        centerOffset = new PointF();
-        infoWindowOffset = new Point();
     }
 
     public T position(@NonNull LatLng position) {
@@ -60,13 +58,15 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return getThis();
     }
 
-    public T centerOffset(PointF centerOffset) {
-        this.centerOffset = centerOffset;
+    public T anchor(float u, float v) {
+        this.anchorU = u;
+        this.anchorV = v;
         return getThis();
     }
 
-    public T infoWindowOffset(Point infoWindowOffset) {
-        this.infoWindowOffset = infoWindowOffset;
+    public T infoWindowAnchor(float u, float v) {
+        this.infoWindowAnchorU = u;
+        this.infoWindowAnchorV = v;
         return getThis();
     }
 
@@ -80,7 +80,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return getThis();
     }
 
-    public T rotation(int rotation){
+    public T rotation(int rotation) {
         this.rotation = rotation;
         return getThis();
     }
@@ -110,12 +110,20 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
         return flat;
     }
 
-    public PointF getCenterOffset() {
-        return centerOffset;
+    public float getAnchorU() {
+        return anchorU;
     }
 
-    public Point getInfoWindowOffset() {
-        return infoWindowOffset;
+    public float getAnchorV() {
+        return anchorV;
+    }
+
+    public float getInfoWindowAnchorU() {
+        return infoWindowAnchorU;
+    }
+
+    public float getInfoWindowAnchorV() {
+        return infoWindowAnchorV;
     }
 
     public int getSelectAnimRes() {
