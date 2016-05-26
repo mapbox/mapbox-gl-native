@@ -12,8 +12,9 @@ public:
     void bind(GLbyte *offset) final;
 
     UniformMatrix<4>                u_matrix         = {"u_matrix",         *this};
-    UniformMatrix<4>                u_exmatrix       = {"u_exmatrix",       *this};
-    Uniform<std::array<GLfloat, 2>> u_linewidth      = {"u_linewidth",      *this};
+    Uniform<GLfloat>                u_linewidth      = {"u_linewidth",      *this};
+    Uniform<GLfloat>                u_gapwidth       = {"u_gapwidth",       *this};
+    Uniform<GLfloat>                u_antialiasing   = {"u_antialiasing",   *this};
     Uniform<std::array<GLfloat, 2>> u_pattern_size_a = {"u_pattern_size_a", *this};
     Uniform<std::array<GLfloat, 2>> u_pattern_tl_a   = {"u_pattern_tl_a",   *this};
     Uniform<std::array<GLfloat, 2>> u_pattern_br_a   = {"u_pattern_br_a",   *this};
