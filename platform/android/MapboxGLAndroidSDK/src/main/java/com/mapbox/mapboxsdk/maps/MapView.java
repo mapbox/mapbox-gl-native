@@ -1013,6 +1013,9 @@ public class MapView extends FrameLayout {
     }
 
     long addMarker(@NonNull Marker marker) {
+        if(mDestroyed){
+            return 0l;
+        }
         return mNativeMapView.addMarker(marker);
     }
 
