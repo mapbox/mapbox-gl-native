@@ -3,7 +3,6 @@
 #include <QMapboxGL>
 #include <QQuickMapboxGL>
 
-#include <QGuiApplication>
 #include <QSize>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFramebufferObjectFormat>
@@ -28,7 +27,7 @@ QQuickMapboxGLRenderer::~QQuickMapboxGLRenderer()
 
 QOpenGLFramebufferObject* QQuickMapboxGLRenderer::createFramebufferObject(const QSize &size)
 {
-    m_map->resize(size / qApp->devicePixelRatio());
+    m_map->resize(size);
 
     QOpenGLFramebufferObjectFormat format;
     format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);

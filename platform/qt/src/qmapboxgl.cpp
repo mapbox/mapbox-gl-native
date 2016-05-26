@@ -13,6 +13,7 @@
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
+#include <QWindow>
 #else
 #include <QCoreApplication>
 #endif
@@ -493,9 +494,12 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
 
 void QMapboxGL::resize(const QSize& size)
 {
-    if (d_ptr->size == size) return;
+    QSize converted = size / d_ptr->getPixelRatio();
+    if (d_ptr->size == converted) return;
 
-    d_ptr->size = size;
+    glViewport(0, 0, size.width(), size.height());
+
+    d_ptr->size = converted;
     d_ptr->mapObj->update(mbgl::Update::Dimensions);
 }
 
@@ -642,11 +646,16 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 float QMapboxGLPrivate::getPixelRatio() const
 {
 #if QT_VERSION >= 0x050000
-    return qApp->devicePixelRatio();
+    // QWindow is the most reliable pixel ratio because QGuiApplication returns
+    // the maximum pixel ratio of all available QScreen objects - this is not
+    // valid for cases e.g. where two or more QScreen objects with different
+    // pixel ratios are present and the window shows on the screen with lower
+    // pixel ratio.
+    static const float pixelRatio = QGuiApplication::allWindows().first()->devicePixelRatio();
 #else
-    // FIXME: Should handle pixel ratio.
-    return 1.0;
+    static const float pixelRatio = 1.0;
 #endif
+    return pixelRatio;
 }
 
 std::array<uint16_t, 2> QMapboxGLPrivate::getSize() const
@@ -656,12 +665,8 @@ std::array<uint16_t, 2> QMapboxGLPrivate::getSize() const
 
 std::array<uint16_t, 2> QMapboxGLPrivate::getFramebufferSize() const
 {
-#if QT_VERSION >= 0x050000
-    return {{ static_cast<uint16_t>(size.width() * qApp->devicePixelRatio()),
-              static_cast<uint16_t>(size.height() * qApp->devicePixelRatio()) }};
-#else
-    return getSize();
-#endif
+    return {{ static_cast<uint16_t>(size.width() * getPixelRatio()),
+              static_cast<uint16_t>(size.height() * getPixelRatio()) }};
 }
 
 void QMapboxGLPrivate::invalidate()
