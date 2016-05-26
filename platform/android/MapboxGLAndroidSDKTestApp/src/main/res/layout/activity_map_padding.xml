@@ -40,8 +40,6 @@
         android:layout_width="@dimen/map_padding_right"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:layout_marginLeft="@dimen/map_padding_left"
-        android:layout_marginStart="@dimen/map_padding_left"
         android:alpha="0.5"
         android:layout_marginTop="?attr/actionBarSize"
         android:background="@color/mapbox_blue" />
