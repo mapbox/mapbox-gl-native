@@ -447,7 +447,7 @@ public class MapView extends FrameLayout {
                         }
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
-                    mMapboxMap.getMarkerViewManager().invalidateViewMarkers();
+                    mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
                 }
             }
         });
