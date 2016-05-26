@@ -1121,6 +1121,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     for (UIView *subview in view.subviews) [self updateTintColorForView:subview];
 }
 
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
 #pragma mark - Gestures -
 
 - (void)handleCompassTapGesture:(__unused id)sender
