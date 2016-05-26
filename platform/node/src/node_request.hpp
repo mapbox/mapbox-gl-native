@@ -12,6 +12,7 @@
 namespace node_mbgl {
 
 class NodeFileSource;
+class NodeRequest;
 
 class NodeRequest : public Nan::ObjectWrap {
 public:
@@ -24,9 +25,17 @@ public:
     static Nan::Persistent<v8::Function> constructor;
 
     NodeRequest(mbgl::FileSource::Callback);
+    ~NodeRequest();
+
+    struct NodeAsyncRequest : public mbgl::AsyncRequest {
+        NodeAsyncRequest(NodeRequest*);
+        ~NodeAsyncRequest() override;
+        NodeRequest* request;
+    };
 
 private:
     mbgl::FileSource::Callback callback;
+    NodeAsyncRequest* asyncRequest = nullptr;
 };
 
 }

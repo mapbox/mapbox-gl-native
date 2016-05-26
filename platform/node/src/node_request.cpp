@@ -45,6 +45,14 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
 
+    // Move out of the object so callback() can only be fired once.
+    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
+    auto callback = std::move(request->callback);
+    if (!callback) {
+        info.GetReturnValue().SetUndefined();
+        return;
+    }
+
     mbgl::Response response;
 
     if (info.Length() < 1) {
@@ -114,14 +122,39 @@ NAN_METHOD(NodeRequest::Respond) {
     }
 
     // Send the response object to the NodeFileSource object
-    Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>())->callback(response);
+    callback(response);
     info.GetReturnValue().SetUndefined();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Instance
 
-NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
-    : callback(callback_) {}
-
+NodeRequest::NodeAsyncRequest::NodeAsyncRequest(NodeRequest* request_) : request(request_) {
+    assert(request);
+    // Make sure the JS object has a pointer to this so that it can remove its pointer in the
+    // destructor
+    request->asyncRequest = this;
 }
+
+NodeRequest::NodeAsyncRequest::~NodeAsyncRequest() {
+    if (request) {
+        // Remove the callback function because the AsyncRequest was canceled and we are no longer
+        // interested in the result.
+        request->callback = {};
+        request->asyncRequest = nullptr;
+    }
+}
+
+NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
+    : callback(callback_) {
+}
+
+NodeRequest::~NodeRequest() {
+    // When this object gets garbage collected, make sure that the AsyncRequest can no longer
+    // attempt to remove the callback function this object was holding (it can't be fired anymore).
+    if (asyncRequest) {
+        asyncRequest->request = nullptr;
+    }
+}
+
+} // namespace node_mbgl

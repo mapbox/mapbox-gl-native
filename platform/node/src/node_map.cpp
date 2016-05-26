@@ -528,12 +528,13 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
     Nan::HandleScope scope;
 
     auto requestHandle = NodeRequest::Create(resource, callback_)->ToObject();
+    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(requestHandle);
     auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
 
     v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
     Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
 
-    return std::make_unique<mbgl::AsyncRequest>();
+    return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
 }
 
-}
+} // namespace node_mbgl
