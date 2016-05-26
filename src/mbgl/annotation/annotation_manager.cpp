@@ -90,7 +90,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID
 
     AnnotationTileLayer& pointLayer = *tile->layers.emplace(
         PointLayerID,
-        std::make_unique<AnnotationTileLayer>()).first->second;
+        std::make_unique<AnnotationTileLayer>(PointLayerID)).first->second;
 
     LatLngBounds tileBounds(tileID);
 

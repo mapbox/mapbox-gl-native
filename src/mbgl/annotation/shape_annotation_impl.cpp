@@ -119,7 +119,7 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
         return;
 
     AnnotationTileLayer& layer = *tile.layers.emplace(layerID,
-        std::make_unique<AnnotationTileLayer>()).first->second;
+        std::make_unique<AnnotationTileLayer>(layerID)).first->second;
 
     for (auto& shapeFeature : shapeTile.features) {
         FeatureType featureType = FeatureType::Unknown;
