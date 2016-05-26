@@ -331,8 +331,18 @@ public class MapboxMap {
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
+        easeCamera(update, durationMs, true, callback);
+    }
+
+    @UiThread
+    public final void easeCamera(CameraUpdate update, int durationMs, boolean easingInterpolator) {
+        easeCamera(update, durationMs, easingInterpolator, null);
+    }
+
+    @UiThread
+    public final void easeCamera(CameraUpdate update, int durationMs, boolean easingInterpolator, final MapboxMap.CancelableCallback callback) {
         mCameraPosition = update.getCameraPosition(this);
-        mMapView.easeTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, new CancelableCallback() {
+        mMapView.easeTo(mCameraPosition.bearing, mCameraPosition.target, getDurationNano(durationMs), mCameraPosition.tilt, mCameraPosition.zoom, easingInterpolator, new CancelableCallback() {
             @Override
             public void onCancel() {
                 if (callback != null) {

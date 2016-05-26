@@ -446,8 +446,8 @@ final class NativeMapView {
         nativeJumpTo(mNativeMapViewPtr, angle, center, pitch, zoom);
     }
 
-    public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom) {
-        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+    public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator) {
+        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom, easingInterpolator);
     }
 
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
@@ -641,7 +641,7 @@ final class NativeMapView {
 
     private native void nativeJumpTo(long nativeMapViewPtr, double angle, LatLng center, double pitch, double zoom);
 
-    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
+    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator);
 
     private native void nativeFlyTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
 

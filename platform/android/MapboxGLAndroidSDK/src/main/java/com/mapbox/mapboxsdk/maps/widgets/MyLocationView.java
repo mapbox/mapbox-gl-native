@@ -120,7 +120,6 @@ public class MyLocationView extends View {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
 
-
         foregroundDrawable = defaultDrawable;
         foregroundBearingDrawable = bearingDrawable;
         setForegroundDrawableTint(foregroundTintColor);
@@ -594,8 +593,7 @@ public class MyLocationView extends View {
             if (previousUpdateTimeStamp == 0) {
                 locationUpdateDuration = 0;
             } else {
-                // TODO remove 10 * hack to multiply duration to workaround easing interpolation (easeCamera)
-                locationUpdateDuration = 10 * (locationUpdateTimestamp - previousUpdateTimeStamp);
+                locationUpdateDuration = locationUpdateTimestamp - previousUpdateTimeStamp;
             }
 
             // calculate interpolated location
@@ -613,7 +611,6 @@ public class MyLocationView extends View {
                 }
                 gpsDirection = 0;
                 setCompass(gpsDirection);
-//                }
             } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
                 if (!compassListener.isPaused()) {
                     builder.bearing(compassListener.getCurrentDegree());
@@ -622,10 +619,11 @@ public class MyLocationView extends View {
                 }
             }
 
+            // accuracy
             updateAccuracy(location);
 
-            // animate to new camera
-            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) locationUpdateDuration, null);
+            // ease to new camera position with a linear interpolator
+            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), (int) locationUpdateDuration, false /*linear interpolator*/);
         }
 
         @Override

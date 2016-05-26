@@ -1182,7 +1182,7 @@ public class MapView extends FrameLayout {
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
     }
 
-    void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
+    void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mDestroyed) {
             return;
         }
@@ -1203,7 +1203,7 @@ public class MapView extends FrameLayout {
             });
         }
 
-        mNativeMapView.easeTo(bearing, center, duration, pitch, zoom);
+        mNativeMapView.easeTo(bearing, center, duration, pitch, zoom, easingInterpolator);
     }
 
     void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
