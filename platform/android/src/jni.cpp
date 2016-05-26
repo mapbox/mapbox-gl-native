@@ -74,6 +74,7 @@ jni::jfieldID* polygonAlphaId = nullptr;
 jni::jfieldID* polygonFillColorId = nullptr;
 jni::jfieldID* polygonStrokeColorId = nullptr;
 jni::jfieldID* polygonPointsId = nullptr;
+jni::jfieldID* polygonHolesId = nullptr;
 
 jni::jmethodID* listToArrayId = nullptr;
 
@@ -248,6 +249,52 @@ jni::jarray<jlong>* std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t
     return &jarray;
 }
 
+mbgl::AnnotationSegments annotation_segments_from_jlist_of_latlng_jlist(JNIEnv *env, jni::jobject* jlist) {
+
+    mbgl::AnnotationSegments segments;
+
+    NullCheck(*env, jlist);
+
+    jni::jarray<jni::jobject>* jarray =
+        reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, jlist, *listToArrayId));
+
+    NullCheck(*env, jarray);
+    std::size_t len = jni::GetArrayLength(*env, *jarray);
+
+    for (std::size_t i = 0; i < len; i++) {
+        mbgl::AnnotationSegment segment;
+    
+        jni::jobject* latLngList = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *jarray, i));
+        NullCheck(*env, latLngList);
+
+        jni::jarray<jni::jobject>* holePoints =
+            reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, latLngList, *listToArrayId));
+            NullCheck(*env, holePoints);
+
+        std::size_t holePointsLen = jni::GetArrayLength(*env, *holePoints);
+
+        for (std::size_t j = 0; j < holePointsLen; j++) {
+            jni::jobject* latLng = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *holePoints, j));
+            NullCheck(*env, latLng);
+
+            jdouble latitude = jni::GetField<jdouble>(*env, latLng, *latLngLatitudeId);
+            jdouble longitude = jni::GetField<jdouble>(*env, latLng, *latLngLongitudeId);
+
+            segment.push_back(mbgl::LatLng(latitude, longitude));
+            jni::DeleteLocalRef(*env, latLng);            
+        }
+
+        jni::DeleteLocalRef(*env, holePoints);
+
+        segments.push_back(segment);
+    }
+
+    jni::DeleteLocalRef(*env, jarray);
+    jarray = nullptr;
+
+    return segments;
+}
+
 mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jni::jobject* jlist) {
     mbgl::AnnotationSegment segment;
 
@@ -277,7 +324,7 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jni::j
     return segment;
 }
 
-std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jni::jobject* polygon) {
+std::pair<mbgl::AnnotationSegments, mbgl::ShapeAnnotation::Properties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jni::jobject* polygon) {
     jfloat alpha = jni::GetField<jfloat>(*env, polygon, *polygonAlphaId);
     jint fillColor = jni::GetField<jint>(*env, polygon, *polygonFillColorId);
     jint strokeColor = jni::GetField<jint>(*env, polygon, *polygonStrokeColorId);
@@ -303,7 +350,14 @@ std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation
     mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
     jni::DeleteLocalRef(*env, points);
 
-    return std::make_pair(segment, shapeProperties);
+    jni::jobject* holes = jni::GetField<jni::jobject*>(*env, polygon, *polygonHolesId);
+    mbgl::AnnotationSegments segments = annotation_segments_from_jlist_of_latlng_jlist(env, holes);    
+    jni::DeleteLocalRef(*env, holes);
+
+    // Insert the shell segment at the beginning of the list
+    segments.insert(segments.begin(), segment);
+
+    return std::make_pair(segments, shapeProperties);
 }
 
 static std::vector<uint8_t> metadata_from_java(JNIEnv* env, jni::jarray<jbyte>& j) {
@@ -892,11 +946,12 @@ jlong nativeAddPolygon(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, j
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
     std::vector<mbgl::ShapeAnnotation> shapes;
-    std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
+    std::pair<mbgl::AnnotationSegments, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
 
-    shapes.emplace_back(mbgl::AnnotationSegments { segment.first }, segment.second);
+    shapes.emplace_back(segment.first, segment.second);
 
     std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
+
     uint32_t id = shapeAnnotationIDs.at(0);
     return id;
 }
@@ -918,8 +973,8 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
     for (std::size_t i = 0; i < len; i++) {
         jni::jobject* polygon = jni::GetObjectArrayElement(*env, *jarray, i);
 
-        std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
-        shapes.emplace_back(mbgl::AnnotationSegments { segment.first }, segment.second);
+        std::pair<mbgl::AnnotationSegments, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
+        shapes.emplace_back(segment.first, segment.second);
 
         jni::DeleteLocalRef(*env, polygon);
     }
@@ -1755,6 +1810,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     polygonFillColorId = &jni::GetFieldID(env, *polygonClass, "fillColor", "I");
     polygonStrokeColorId = &jni::GetFieldID(env, *polygonClass, "strokeColor", "I");
     polygonPointsId = &jni::GetFieldID(env, *polygonClass, "points", "Ljava/util/List;");
+    polygonHolesId = &jni::GetFieldID(env, *polygonClass, "holes", "Ljava/util.List;");
 
     jni::jclass* listClass = &jni::FindClass(env, "java/util/List");
     listToArrayId = &jni::GetMethodID(env, *listClass, "toArray", "()[Ljava/lang/Object;");

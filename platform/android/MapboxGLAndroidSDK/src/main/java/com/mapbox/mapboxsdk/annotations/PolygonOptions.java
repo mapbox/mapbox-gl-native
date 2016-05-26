@@ -73,6 +73,17 @@ public final class PolygonOptions implements Parcelable {
         return this;
     }
 
+    public PolygonOptions addHole(Iterable<LatLng> points) {
+        List<LatLng> hole = new ArrayList<LatLng>();
+        for (LatLng point : points) {
+            hole.add(point);
+        }
+
+        polygon.addHole(hole);
+        
+        return this;
+    }
+
     public PolygonOptions alpha(float alpha) {
         polygon.setAlpha(alpha);
         return this;
@@ -126,6 +137,10 @@ public final class PolygonOptions implements Parcelable {
         return polygon.getPoints();
     }
 
+    public List<List<LatLng>> getHoles() {
+        return polygon.getHoles();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -136,6 +151,7 @@ public final class PolygonOptions implements Parcelable {
         if (Float.compare(polygon.getAlpha(), getAlpha()) != 0) return false;
         if (getFillColor() != polygon.getFillColor()) return false;
         if (getStrokeColor() != polygon.getStrokeColor()) return false;
+        if (getHoles() != null ? !getHoles().equals(polygon.getHoles()) : polygon.getHoles() != null) return false;
         return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
     }
 
@@ -146,6 +162,7 @@ public final class PolygonOptions implements Parcelable {
         result = 31 * result + getFillColor();
         result = 31 * result + getStrokeColor();
         result = 31 * result + (getPoints() != null ? getPoints().hashCode() : 0);
+        result = 31 * result + (getHoles() != null ? getHoles().hashCode() : 0);
         return result;
     }
 }
