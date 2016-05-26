@@ -3,6 +3,7 @@
 #include <mbgl/mbgl.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/util/geometry.hpp>
 
 #ifdef MBGL_USE_GLES2
 #define GLFW_INCLUDE_ES2
@@ -43,7 +44,8 @@ public:
     void report(float duration);
 
 private:
-    mbgl::LatLng makeRandomPoint() const;
+    mbgl::LatLng makeRandomLatLng() const;
+    mbgl::Point<double> makeRandomPoint() const;
     static std::shared_ptr<const mbgl::SpriteImage>
     makeSpriteImage(int width, int height, float pixelRatio);
 

@@ -248,35 +248,6 @@ jni::jarray<jlong>* std_vector_uint_to_jobject(JNIEnv *env, std::vector<uint32_t
     return &jarray;
 }
 
-mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jni::jobject* jlist) {
-    mbgl::AnnotationSegment segment;
-
-    NullCheck(*env, jlist);
-    jni::jarray<jni::jobject>* jarray =
-        reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, jlist, *listToArrayId));
-
-    NullCheck(*env, jarray);
-    std::size_t len = jni::GetArrayLength(*env, *jarray);
-
-    segment.reserve(len);
-
-    for (std::size_t i = 0; i < len; i++) {
-        jni::jobject* latLng = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *jarray, i));
-        NullCheck(*env, latLng);
-
-        jdouble latitude = jni::GetField<jdouble>(*env, latLng, *latLngLatitudeId);
-        jdouble longitude = jni::GetField<jdouble>(*env, latLng, *latLngLongitudeId);
-
-        segment.push_back(mbgl::LatLng(latitude, longitude));
-        jni::DeleteLocalRef(*env, latLng);
-    }
-
-    jni::DeleteLocalRef(*env, jarray);
-    jarray = nullptr;
-
-    return segment;
-}
-
 static std::vector<uint8_t> metadata_from_java(JNIEnv* env, jni::jarray<jbyte>& j) {
     mbgl::Log::Debug(mbgl::Event::JNI, "metadata_from_java");
     std::size_t length = jni::GetArrayLength(*env, j);
@@ -756,6 +727,33 @@ static mbgl::Color toColor(jint color) {
     return {{ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }};
 }
 
+template <class Geometry>
+Geometry toGeometry(JNIEnv *env, jni::jobject* jlist) {
+    NullCheck(*env, jlist);
+    jni::jarray<jni::jobject>* jarray =
+        reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, jlist, *listToArrayId));
+    NullCheck(*env, jarray);
+
+    Geometry geometry;
+    geometry.reserve(jni::GetArrayLength(*env, *jarray));
+
+    for (std::size_t i = 0; i < geometry.size(); i++) {
+        jni::jobject* latLng = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *jarray, i));
+        NullCheck(*env, latLng);
+
+        geometry.push_back(mbgl::Point<double>(
+            jni::GetField<jdouble>(*env, latLng, *latLngLongitudeId),
+            jni::GetField<jdouble>(*env, latLng, *latLngLatitudeId)));
+
+        jni::DeleteLocalRef(*env, latLng);
+    }
+
+    jni::DeleteLocalRef(*env, jarray);
+    jni::DeleteLocalRef(*env, jlist);
+
+    return geometry;
+}
+
 jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jarray<jni::jobject>* jarray) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolylines");
     assert(nativeMapViewPtr != 0);
@@ -776,10 +774,7 @@ jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nat
         lineProperties.width = jni::GetField<jfloat>(*env, polyline, *polylineWidthId);
 
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polyline, *polylinePointsId);
-        mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
-        jni::DeleteLocalRef(*env, points);
-
-        shapes.emplace_back(mbgl::AnnotationSegments { segment }, lineProperties);
+        shapes.emplace_back(toGeometry<mbgl::LineString<double>>(env, points), lineProperties);
 
         jni::DeleteLocalRef(*env, polyline);
     }
@@ -807,10 +802,7 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
         fillProperties.color = toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId));
 
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
-        mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
-        jni::DeleteLocalRef(*env, points);
-
-        shapes.emplace_back(mbgl::AnnotationSegments { segment }, fillProperties);
+        shapes.emplace_back(mbgl::Polygon<double> { toGeometry<mbgl::LinearRing<double>>(env, points) }, fillProperties);
 
         jni::DeleteLocalRef(*env, polygon);
     }
@@ -899,17 +891,17 @@ void nativeSetVisibleCoordinateBounds(JNIEnv *env, jni::jobject* obj, jlong nati
     std::size_t count = jni::GetArrayLength(*env, *coordinates);
 
     mbgl::EdgeInsets mbglInsets = {top, left, bottom, right};
-    mbgl::AnnotationSegment segment;
-    segment.reserve(count);
+    std::vector<mbgl::LatLng> latLngs;
+    latLngs.reserve(count);
 
     for (std::size_t i = 0; i < count; i++) {
         jni::jobject* latLng = jni::GetObjectArrayElement(*env, *coordinates, i);
         jdouble latitude = jni::GetField<jdouble>(*env, latLng, *latLngLatitudeId);
         jdouble longitude = jni::GetField<jdouble>(*env, latLng, *latLngLongitudeId);
-        segment.push_back(mbgl::LatLng(latitude, longitude));
+        latLngs.push_back(mbgl::LatLng(latitude, longitude));
     }
 
-    mbgl::CameraOptions cameraOptions = nativeMapView->getMap().cameraForLatLngs(segment, mbglInsets);
+    mbgl::CameraOptions cameraOptions = nativeMapView->getMap().cameraForLatLngs(latLngs, mbglInsets);
     if (direction >= 0) {
         // convert from degrees to radians
         cameraOptions.angle = (-direction * M_PI) / 180;

@@ -2309,14 +2309,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    mbgl::AnnotationSegment segment;
-    segment.reserve(count);
+    std::vector<mbgl::LatLng> latLngs;
+    latLngs.reserve(count);
     for (NSUInteger i = 0; i < count; i++)
     {
-        segment.push_back({coordinates[i].latitude, coordinates[i].longitude});
+        latLngs.push_back({coordinates[i].latitude, coordinates[i].longitude});
     }
     
-    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(segment, padding);
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngs(latLngs, padding);
     if (direction >= 0)
     {
         cameraOptions.angle = MGLRadiansFromDegrees(-direction);
@@ -2820,7 +2820,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             if (!multiPoint.pointCount) {
                 continue;
             }
-            shapes.emplace_back(multiPoint.annotationSegments, [multiPoint shapeAnnotationPropertiesObjectWithDelegate:self]);
+            shapes.emplace_back([multiPoint shapeAnnotationObjectWithDelegate:self]);
             [userShapes addObject:annotation];
         }
         else if ([annotation isKindOfClass:[MGLMultiPolyline class]]

@@ -481,13 +481,12 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> 
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) const {
-    AnnotationSegment segment = {
+    return cameraForLatLngs({
         bounds.northwest(),
         bounds.southwest(),
         bounds.southeast(),
         bounds.northeast(),
-    };
-    return cameraForLatLngs(segment, padding);
+    }, padding);
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) const {

@@ -3,13 +3,10 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/style/types.hpp>
 
-#include <mbgl/util/geo.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/util/variant.hpp>
 
 namespace mbgl {
-
-using AnnotationSegment = std::vector<LatLng>;
-using AnnotationSegments = std::vector<AnnotationSegment>;
 
 struct FillAnnotationProperties {
     float opacity = 1;
@@ -30,10 +27,10 @@ public:
         LineAnnotationProperties, // creates a line annotation
         std::string>; // creates an annotation whose type and properties are sourced from a style layer
 
-    ShapeAnnotation(const AnnotationSegments& segments_, const Properties& properties_)
-        : segments(segments_), properties(properties_) {}
+    ShapeAnnotation(const Geometry<double>& geometry_, const Properties& properties_)
+        : geometry(geometry_), properties(properties_) {}
 
-    const AnnotationSegments segments;
+    const Geometry<double> geometry;
     const Properties properties;
 };
 

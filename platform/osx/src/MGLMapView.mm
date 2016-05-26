@@ -1619,7 +1619,7 @@ public:
             if (!multiPoint.pointCount) {
                 continue;
             }
-            shapes.emplace_back(multiPoint.annotationSegments, [multiPoint shapeAnnotationPropertiesObjectWithDelegate:self]);
+            shapes.emplace_back([multiPoint shapeAnnotationObjectWithDelegate:self]);
             [userShapes addObject:annotation];
         } else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
                    || [annotation isKindOfClass:[MGLMultiPolygon class]]

@@ -13,17 +13,22 @@
     return [[self alloc] initWithCoordinates:coords count:count];
 }
 
-- (mbgl::ShapeAnnotation::Properties)shapeAnnotationPropertiesObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
-    mbgl::ShapeAnnotation::Properties shapeProperties = [super shapeAnnotationPropertiesObjectWithDelegate:delegate];
-    
+- (mbgl::ShapeAnnotation)shapeAnnotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate {
     mbgl::LineAnnotationProperties lineProperties;
     lineProperties.opacity = [delegate alphaForShapeAnnotation:self];
     lineProperties.color = [delegate strokeColorForShapeAnnotation:self];
     lineProperties.width = [delegate lineWidthForPolylineAnnotation:self];
-    
-    shapeProperties.set<mbgl::LineAnnotationProperties>(lineProperties);
-    
-    return shapeProperties;
+
+    NSUInteger count = self.pointCount;
+    CLLocationCoordinate2D *coordinates = self.coordinates;
+
+    mbgl::LineString<double> geometry;
+    geometry.reserve(self.pointCount);
+    for (NSUInteger i = 0; i < count; i++) {
+        geometry.push_back(mbgl::Point<double>(coordinates[i].longitude, coordinates[i].latitude));
+    }
+
+    return mbgl::ShapeAnnotation(geometry, lineProperties);
 }
 
 @end

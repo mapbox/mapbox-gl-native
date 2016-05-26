@@ -208,10 +208,15 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
     }
 }
 
-mbgl::LatLng GLFWView::makeRandomPoint() const {
+mbgl::LatLng GLFWView::makeRandomLatLng() const {
     const double x = width * double(std::rand()) / RAND_MAX;
     const double y = height * double(std::rand()) / RAND_MAX;
     return map->latLngForPixel({ x, y });
+}
+
+mbgl::Point<double> GLFWView::makeRandomPoint() const {
+    mbgl::LatLng latLng = makeRandomLatLng();
+    return { latLng.longitude, latLng.latitude };
 }
 
 std::shared_ptr<const mbgl::SpriteImage>
@@ -261,7 +266,7 @@ void GLFWView::addRandomCustomPointAnnotations(int count) {
         const auto name = std::string{ "marker-" } + mbgl::util::toString(spriteID++);
         map->addAnnotationIcon(name, makeSpriteImage(22, 22, 1));
         spriteIDs.push_back(name);
-        points.emplace_back(makeRandomPoint(), name);
+        points.emplace_back(makeRandomLatLng(), name);
     }
 
     auto newIDs = map->addPointAnnotations(points);
@@ -272,7 +277,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
     std::vector<mbgl::PointAnnotation> points;
 
     for (int i = 0; i < count; i++) {
-        points.emplace_back(makeRandomPoint(), "default_marker");
+        points.emplace_back(makeRandomLatLng(), "default_marker");
     }
 
     auto newIDs = map->addPointAnnotations(points);
@@ -286,15 +291,9 @@ void GLFWView::addRandomShapeAnnotations(int count) {
     properties.opacity = .1;
 
     for (int i = 0; i < count; i++) {
-        mbgl::AnnotationSegment triangle;
-        triangle.push_back(makeRandomPoint());
-        triangle.push_back(makeRandomPoint());
-        triangle.push_back(makeRandomPoint());
-
-        mbgl::AnnotationSegments segments;
-        segments.push_back(triangle);
-
-        shapes.emplace_back(segments, properties);
+        mbgl::Polygon<double> triangle;
+        triangle.push_back({ makeRandomPoint(), makeRandomPoint(), makeRandomPoint() });
+        shapes.emplace_back(triangle, properties);
     }
 
     auto newIDs = map->addShapeAnnotations(shapes);

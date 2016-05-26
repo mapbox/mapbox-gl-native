@@ -54,13 +54,13 @@ TEST(Annotations, LineAnnotation) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
-    AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
+    LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
 
     LineAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
     properties.width = 5;
 
-    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
+    map.addShapeAnnotation(ShapeAnnotation(line, properties));
 
     checkRendering(map, "line_annotation");
 }
@@ -75,12 +75,12 @@ TEST(Annotations, FillAnnotation) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
-    AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
     FillAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
 
-    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
+    map.addShapeAnnotation(ShapeAnnotation(polygon, properties));
 
     checkRendering(map, "fill_annotation");
 }
@@ -95,9 +95,9 @@ TEST(Annotations, StyleSourcedShapeAnnotation) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
 
-    AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    map.addShapeAnnotation(ShapeAnnotation(segments, "annotation"));
+    map.addShapeAnnotation(ShapeAnnotation(polygon, "annotation"));
 
     checkRendering(map, "style_sourced_shape_annotation");
 }
@@ -133,12 +133,12 @@ TEST(Annotations, NonImmediateAdd) {
 
     test::render(map);
 
-    AnnotationSegments segments = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
     FillAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
 
-    map.addShapeAnnotation(ShapeAnnotation(segments, properties));
+    map.addShapeAnnotation(ShapeAnnotation(polygon, properties));
 
     checkRendering(map, "non_immediate_add");
 }
@@ -210,7 +210,7 @@ TEST(Annotations, RemoveShape) {
     HeadlessView view(display, 1);
     StubFileSource fileSource;
 
-    AnnotationSegments segments = {{ {{ { 0, 0 }, { 45, 45 } }} }};
+    LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
 
     LineAnnotationProperties properties;
     properties.color = {{ 255, 0, 0, 1 }};
@@ -218,7 +218,7 @@ TEST(Annotations, RemoveShape) {
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    AnnotationID shape = map.addShapeAnnotation(ShapeAnnotation(segments, properties));
+    AnnotationID shape = map.addShapeAnnotation(ShapeAnnotation(line, properties));
 
     test::render(map);
 
@@ -235,7 +235,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     StubFileSource fileSource;
     Map map(view, fileSource, MapMode::Still);
 
-    map.removeAnnotation(map.addShapeAnnotation(ShapeAnnotation({}, {})));
+    map.removeAnnotation(map.addShapeAnnotation(ShapeAnnotation(LineString<double>(), {})));
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
     test::render(map);
