@@ -913,6 +913,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         _displayLink.frameInterval = MGLTargetFrameInterval;
         [_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         _needsDisplayRefresh = YES;
+        [self updateFromDisplayLink];
     }
     else if ( ! isVisible && _displayLink)
     {
