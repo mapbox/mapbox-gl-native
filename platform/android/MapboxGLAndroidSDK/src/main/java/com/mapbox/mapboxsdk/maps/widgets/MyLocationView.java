@@ -20,7 +20,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -56,7 +55,6 @@ public class MyLocationView extends View {
     private long locationUpdateTimestamp;
 
     private float gpsDirection;
-    private float compassDirection;
     private float previousDirection;
 
     private float accuracy = 0;
@@ -614,8 +612,7 @@ public class MyLocationView extends View {
             } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
                 if (!compassListener.isPaused()) {
                     builder.bearing(compassListener.getCurrentDegree());
-                    compassDirection = 0;
-                    setCompass(compassDirection);
+                    setCompass(0);
                 }
             }
 
@@ -662,7 +659,7 @@ public class MyLocationView extends View {
             // calculate updateLatLng time + add some extra offset to improve animation
             long previousUpdateTimeStamp = locationUpdateTimestamp;
             locationUpdateTimestamp = SystemClock.elapsedRealtime();
-            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.2);
+            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1);
 
             // calculate interpolated entity
             interpolatedLocation = new LatLng((latLng.getLatitude() + previousLocation.getLatitude()) / 2, (latLng.getLongitude() + previousLocation.getLongitude()) / 2);
@@ -678,7 +675,6 @@ public class MyLocationView extends View {
             locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
                     previousLocation, interpolatedLocation
             ));
-            locationChangeAnimator.setInterpolator(new FastOutLinearInInterpolator());
             locationChangeAnimator.start();
 
             // use interpolated location as current location
