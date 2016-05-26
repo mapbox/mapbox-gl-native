@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.1.0-beta.1
+
+Mapbox Android 4.1.0 builds off our ambitious 4.0.0 version with 3 major new features being released.  To help us produce the highest quality SDK possible we're releasing an official Beta release first so that everyone has time to explore it and help hardened it before the official 4.1.0 Final Release.
+
+* View Based Annotations ([#3276](https://github.com/mapbox/mapbox-gl-native/issues/3276))
+* UserLocationView Refactor ([#4396](https://github.com/mapbox/mapbox-gl-native/issues/4396))
+* MapboxAccountManager ([#5004](https://github.com/mapbox/mapbox-gl-native/issues/5004))
+
 ## 4.0.1
 
 Mapbox Android 4.0.1 is a patch release to make this bug fix available sooner.
