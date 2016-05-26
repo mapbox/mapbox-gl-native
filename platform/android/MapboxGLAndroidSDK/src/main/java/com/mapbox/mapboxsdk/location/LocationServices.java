@@ -18,12 +18,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Manages locational updates. Contains methods to register and unregister location listeners.
- * <p>
  * <ul>
  * <li>You can register a {@link LocationListener} with {@link #addLocationListener(LocationListener)} to receive location updates.</li>
  * <li> You can unregister a {@link LocationListener} with {@link #removeLocationListener(LocationListener)}.</li>
  * </ul>
- * <p/>
  * <p>
  * Note: If registering a listener in your Activity.onResume() implementation, you should unregister it in Activity.onPause().
  * (You won't receive location updates when paused, and this will cut down on unnecessary system overhead).

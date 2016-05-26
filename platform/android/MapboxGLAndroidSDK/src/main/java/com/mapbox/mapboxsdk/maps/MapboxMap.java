@@ -291,7 +291,7 @@ public class MapboxMap {
      * it will return the current location of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update) {
@@ -306,7 +306,7 @@ public class MapboxMap {
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
      *                   positive, otherwise an IllegalArgumentException will be thrown.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs) {
@@ -327,7 +327,7 @@ public class MapboxMap {
      *                   will be notified with onFinish(). If the animation stops due to interruption
      *                   by a later camera movement or a user gesture, onCancel() will be called.
      *                   Do not update or ease the camera from within onCancel().
-     * @see {@link CameraUpdateFactory} for a set of camera updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
@@ -368,7 +368,7 @@ public class MapboxMap {
      * of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update) {
@@ -385,7 +385,7 @@ public class MapboxMap {
      * @param callback The callback to invoke from the main thread when the animation stops. If the
      *                 animation completes normally, onFinish() is called; otherwise, onCancel() is
      *                 called. Do not update or animate the camera from within onCancel().
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
@@ -401,7 +401,7 @@ public class MapboxMap {
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
      *                   positive, otherwise an IllegalArgumentException will be thrown.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs) {
@@ -424,7 +424,7 @@ public class MapboxMap {
      *                   by a later camera movement or a user gesture, onCancel() will be called.
      *                   Do not update or animate the camera from within onCancel(). If a callback
      *                   isn't required, leave it as null.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
@@ -1282,9 +1282,11 @@ public class MapboxMap {
     //
 
     /**
+     * <p>
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     * <p/>
+     * </p>
+     * <p>
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
