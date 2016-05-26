@@ -31,24 +31,10 @@ public:
         std::string>; // creates an annotation whose type and properties are sourced from a style layer
 
     ShapeAnnotation(const AnnotationSegments& segments_, const Properties& properties_)
-        : segments(wrapCoordinates(segments_)), properties(properties_) {}
+        : segments(segments_), properties(properties_) {}
 
     const AnnotationSegments segments;
     const Properties properties;
-
-private:
-    AnnotationSegments wrapCoordinates(const AnnotationSegments& segments_) {
-        AnnotationSegments wrappedSegments;
-        // Wrap all segments coordinates.
-        for (const auto& segment_ : segments_) {
-            AnnotationSegment wrappedSegment;
-            for (const auto& latLng_ : segment_) {
-                wrappedSegment.push_back(latLng_.wrapped());
-            }
-            wrappedSegments.push_back(wrappedSegment);
-        }
-        return wrappedSegments;
-    }
 };
 
 } // namespace mbgl

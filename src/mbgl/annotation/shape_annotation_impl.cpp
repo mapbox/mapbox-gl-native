@@ -91,8 +91,9 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
         for (auto& segment : shape.segments) {
             std::vector<geojsonvt::LonLat> points;
             for (auto& latLng : segment) {
-                const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-                points.push_back(geojsonvt::LonLat(latLng.longitude, constrainedLatitude));
+                const double wrappedLongitude = util::wrap(latLng.longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
+                const double clampedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
+                points.push_back(geojsonvt::LonLat(wrappedLongitude, clampedLatitude));
             }
 
             if (type == geojsonvt::ProjectedFeatureType::Polygon &&
