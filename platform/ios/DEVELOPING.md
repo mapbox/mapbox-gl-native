@@ -80,14 +80,21 @@ To add or update text that the user may see in the iOS SDK:
 
 `make test-ios` builds and runs unit tests of cross-platform code as well as the SDK.
 
-To run these unit tests on the command line, install ios-sim version 3.2.0 (not any other version):
+Before you can run UI tests of the SDK, check out KIF and OHHTTPStubs via Git submodules:
+
+```bash
+git submodule init
+git submodule update
+```
+
+Before you can run unit tests of the cross-platform code on the command line, install ios-sim version 3.2.0 (not any other version):
 
 ```bash
 brew tap mapbox/homebrew-ios-sim-3
 brew install mapbox/homebrew-ios-sim-3/ios-sim
 ```
 
-To instead run the tests in Xcode:
+To instead run the cross-platform tests in Xcode instead of on the command line:
 
 1. Run `make iproj` to set up the workspace.
 1. Change the scheme to “test (platform project)” and press Command-R to run core unit tests.
