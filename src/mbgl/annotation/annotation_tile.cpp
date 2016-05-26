@@ -21,6 +21,9 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
     return optional<Value>();
 }
 
+AnnotationTileLayer::AnnotationTileLayer(const std::string &name_)
+    : name(name_) {}
+
 util::ptr<GeometryTileLayer> AnnotationTile::getLayer(const std::string& name) const {
     auto it = layers.find(name);
     if (it != layers.end()) {

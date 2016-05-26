@@ -259,3 +259,23 @@ TEST(Annotations, SwitchStyle) {
 
     checkRendering(map, "switch_style");
 }
+
+TEST(Annotations, QueryRenderedFeatures) {
+    util::RunLoop loop;
+
+    auto display = std::make_shared<mbgl::HeadlessDisplay>();
+    HeadlessView view(display, 1);
+    StubFileSource fileSource;
+
+    Map map(view, fileSource, MapMode::Still);
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    const LatLng latLng(0, 0);
+    map.addPointAnnotation(PointAnnotation(latLng, "default_marker"));
+
+    test::render(map);
+    
+    auto point = map.pixelForLatLng(latLng);
+    auto features = map.queryRenderedFeatures(point);
+    EXPECT_EQ(features.size(), 1);
+}
