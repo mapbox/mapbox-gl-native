@@ -108,6 +108,17 @@ public final class PolygonOptions implements Parcelable {
     return this;
   }
 
+  public PolygonOptions addHole(Iterable<LatLng> points) {
+    List<LatLng> hole = new ArrayList<LatLng>();
+    for (LatLng point : points) {
+      hole.add(point);
+    }
+
+    polygon.addHole(hole);
+
+    return this;
+  }
+
   /**
    * Set the alpha value of the polyline.
    *
@@ -182,6 +193,10 @@ public final class PolygonOptions implements Parcelable {
     return polygon.getPoints();
   }
 
+  public List<List<LatLng>> getHoles() {
+    return polygon.getHoles();
+  }
+
   /**
    * Compares this {@link PolygonOptions} object with another {@link PolygonOptions} and
    * determines if their color, alpha, stroke color, and vertices match.
@@ -210,6 +225,9 @@ public final class PolygonOptions implements Parcelable {
     if (getStrokeColor() != polygon.getStrokeColor()) {
       return false;
     }
+    if (getHoles() != null ? !getHoles().equals(polygon.getHoles()) : polygon.getHoles() != null) {
+      return false;
+    }
     return !(getPoints() != null ? !getPoints().equals(polygon.getPoints()) : polygon.getPoints() != null);
   }
 
@@ -228,6 +246,7 @@ public final class PolygonOptions implements Parcelable {
     result = 31 * result + getFillColor();
     result = 31 * result + getStrokeColor();
     result = 31 * result + (getPoints() != null ? getPoints().hashCode() : 0);
+    result = 31 * result + (getHoles() != null ? getHoles().hashCode() : 0);
     return result;
   }
 }

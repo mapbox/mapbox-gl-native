@@ -27,6 +27,7 @@ import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.C
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.PARTIAL_ALPHA;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.RED_COLOR;
 import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.STAR_SHAPE_POINTS;
+import static com.mapbox.mapboxsdk.testapp.activity.annotation.PolygonActivity.Config.STAR_SHAPE_HOLES;
 
 /**
  * Activity to test the Polygon annotation API & programmatically creating a MapView.
@@ -135,6 +136,7 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
       case R.id.action_id_points:
         allPoints = !allPoints;
         polygon.setPoints(allPoints ? STAR_SHAPE_POINTS : BROKEN_SHAPE_POINTS);
+        polygon.setHoles(STAR_SHAPE_HOLES);
         return true;
       case R.id.action_id_color:
         color = !color;
@@ -174,6 +176,38 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
         add(new LatLng(45.515369, -122.678489));
         add(new LatLng(45.506346, -122.702007));
         add(new LatLng(45.522585, -122.685699));
+      }
+    };
+
+    static final List<List<LatLng>> STAR_SHAPE_HOLES = new ArrayList<ArrayList<LatLng>>() {
+      {
+        add(new ArrayList<LatLng>() {
+          {
+            add(new LatLng(45.522584, -122.672653));
+            add(new LatLng(45.532584, -122.672653));
+            add(new LatLng(45.532584, -122.682653));
+            add(new LatLng(45.522584, -122.682653));
+            add(new LatLng(45.522584, -122.672653));
+          }
+        });
+        add(new ArrayList<LatLng>() {
+          {
+            add(new LatLng(45.521584, -122.671653));
+            add(new LatLng(45.516584, -122.671653));
+            add(new LatLng(45.516584, -122.676653));
+            add(new LatLng(45.521584, -122.676653));
+            add(new LatLng(45.521584, -122.671653));
+          }
+        });
+        add(new ArrayList<LatLng>() {
+          {
+            add(new LatLng(45.529584, -122.661653));
+            add(new LatLng(45.524584, -122.661653));
+            add(new LatLng(45.524584, -122.656653));
+            add(new LatLng(45.529584, -122.656653));
+            add(new LatLng(45.529584, -122.661653));
+          }
+        });
       }
     };
 
