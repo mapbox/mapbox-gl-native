@@ -26,7 +26,7 @@ else
 endif
 
 node_modules: package.json
-	npm update --dev # Install dependencies but don't run our own install script.
+	npm update # Install dependencies but don't run our own install script.
 
 GYP = deps/run_gyp --depth=. -Goutput_dir=.
 
