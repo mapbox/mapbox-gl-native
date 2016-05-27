@@ -99,6 +99,7 @@ CONFIG+="  'variables': {"$LN
 print_opengl_flags
 print_qt_flags
 
+print_flags unique_resource cflags
 print_flags protozero cflags
 print_flags boost cflags
 print_flags boost_libprogram_options static_libs
