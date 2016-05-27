@@ -33,7 +33,7 @@ void updateRenderables(GetTileDataFn getTileData,
         const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
         auto data = getTileData(idealDataTileID);
         if (!data) {
-            data = createTileData(idealDataTileID);
+            data = createTileData(idealDataTileID, true);
             assert(data);
         }
 

@@ -25,16 +25,18 @@ std::ostream& operator<<(std::ostream& os, const GetTileDataAction& action) {
 
 struct CreateTileDataAction {
     const OverscaledTileID tileID;
+    bool required;
 
     bool operator==(const CreateTileDataAction& rhs) const {
-        return tileID == rhs.tileID;
+        return tileID == rhs.tileID && required == rhs.required;
     }
 };
 
 std::ostream& operator<<(std::ostream& os, const CreateTileDataAction& action) {
     return os << "CreateTileDataAction{ { " << int(action.tileID.overscaledZ) << ", { "
               << int(action.tileID.canonical.z) << ", " << action.tileID.canonical.x << ", "
-              << action.tileID.canonical.y << " } } }";
+              << action.tileID.canonical.y << " } }, " << (action.required ? "true" : "false")
+              << " }";
 }
 
 struct RetainTileDataAction {
@@ -86,8 +88,8 @@ auto getTileDataFn(ActionLog& log, const T& dataTiles) {
 
 template <typename T>
 auto createTileDataFn(ActionLog& log, T& dataTiles) {
-    return [&](const auto& id) {
-        log.emplace_back(CreateTileDataAction{ id });
+    return [&](const auto& id, bool required) {
+        log.emplace_back(CreateTileDataAction{ id, required });
         return (dataTiles[id] = std::make_unique<MockTileData>(id)).get();
     };
 }
@@ -142,14 +144,14 @@ TEST(UpdateRenderables, SingleTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false }, // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 0, 1 } } },     // create ideal tile
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, false }, // four child tiles
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, false }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, // parent tile
+                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false },   // missing ideal tile
+                  CreateTileDataAction{ { 1, { 1, 0, 1 } }, true }, // create ideal tile
+                  RetainTileDataAction{ { 1, { 1, 0, 1 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 2 } }, false },   // four child tiles
+                  GetTileDataAction{ { 2, { 2, 0, 3 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 2 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 3 } }, false },   // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false },   // parent tile
 
                   GetTileDataAction{ { 1, { 1, 1, 1 } }, true },  // found ideal tile
                   RetainTileDataAction{ { 1, { 1, 1, 1 } } },     //
@@ -240,30 +242,30 @@ TEST(UpdateRenderables, UseParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false }, // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 0, 1 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 0, 1 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 2 } }, false }, // child tile
-                  GetTileDataAction{ { 2, { 2, 0, 3 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 2 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 3 } }, false }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },  // parent found!
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 }, // render parent
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, false }, // missing ideal tile
-                  CreateTileDataAction{ { 1, { 1, 1, 0 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },     //
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 2, { 2, 2, 1 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 3, 0 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 3, 1 } }, false }, // ...
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, false }, // missing tile
-                  CreateTileDataAction{ { 1, { 1, 1, 1 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 1, 1 } } },     //
-                  GetTileDataAction{ { 2, { 2, 2, 2 } }, false }, // child tile
-                  GetTileDataAction{ { 2, { 2, 2, 3 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 3, 2 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 3, 3 } }, false }, // ...
+                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false },   // missing ideal tile
+                  CreateTileDataAction{ { 1, { 1, 0, 1 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 0, 1 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 2 } }, false },   // child tile
+                  GetTileDataAction{ { 2, { 2, 0, 3 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 2 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 3 } }, false },   // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    // parent found!
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },   // render parent
+                  GetTileDataAction{ { 1, { 1, 1, 0 } }, false },   // missing ideal tile
+                  CreateTileDataAction{ { 1, { 1, 1, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 2, { 2, 2, 1 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 3, 0 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 3, 1 } }, false },   // ...
+                  GetTileDataAction{ { 1, { 1, 1, 1 } }, false },   // missing tile
+                  CreateTileDataAction{ { 1, { 1, 1, 1 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 1, 1 } } },       //
+                  GetTileDataAction{ { 2, { 2, 2, 2 } }, false },   // child tile
+                  GetTileDataAction{ { 2, { 2, 2, 3 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 3, 2 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 3, 3 } }, false },   // ...
               }),
               log);
 }
@@ -283,15 +285,15 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, // missing ideal tile
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, false }, // ...
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, false }, // ...
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, false }, // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // parent tile, missing
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, // parent tile, missing
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   // missing ideal tile
+                  CreateTileDataAction{ { 2, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 3, { 3, 0, 1 } }, false },   // ...
+                  GetTileDataAction{ { 3, { 3, 1, 0 } }, false },   // ...
+                  GetTileDataAction{ { 3, { 3, 1, 1 } }, false },   // ...
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // parent tile, missing
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false },   // parent tile, missing
               }),
               log);
 
@@ -311,16 +313,16 @@ TEST(UpdateRenderables, DontUseWrongParentTile) {
                   GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // missing parent tile
                   GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, // missing parent tile
 
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false }, // missing ideal tile
-                  CreateTileDataAction{ { 2, { 2, 2, 0 } } },     //
-                  RetainTileDataAction{ { 2, { 2, 2, 0 } } },     //
-                  GetTileDataAction{ { 3, { 3, 4, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 3, { 3, 4, 1 } }, false }, // ...
-                  GetTileDataAction{ { 3, { 3, 5, 0 } }, false }, // ...
-                  GetTileDataAction{ { 3, { 3, 5, 1 } }, false }, // ...
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, true },  // found parent tile
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },     //
-                  RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 }, // render parent tile
+                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false },   // missing ideal tile
+                  CreateTileDataAction{ { 2, { 2, 2, 0 } }, true }, //
+                  RetainTileDataAction{ { 2, { 2, 2, 0 } } },       //
+                  GetTileDataAction{ { 3, { 3, 4, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 3, { 3, 4, 1 } }, false },   // ...
+                  GetTileDataAction{ { 3, { 3, 5, 0 } }, false },   // ...
+                  GetTileDataAction{ { 3, { 3, 5, 1 } }, false },   // ...
+                  GetTileDataAction{ { 1, { 1, 1, 0 } }, true },    // found parent tile
+                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },       //
+                  RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 },   // render parent tile
               }),
               log);
 }
@@ -390,16 +392,16 @@ TEST(UpdateRenderables, UseOverlappingParentTile) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // ideal tile not found
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },  // parent tile found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 }, //
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // ideal tile not found
+                  CreateTileDataAction{ { 1, { 1, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false },   // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    // parent tile found
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },   //
 
                   GetTileDataAction{ { 1, { 1, 0, 1 } }, true },  // ideal tile found
                   RetainTileDataAction{ { 1, { 1, 0, 1 } } },     //
@@ -426,17 +428,17 @@ TEST(UpdateRenderables, UseChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 0);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, // ideal tile, missing
-                  CreateTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, true },  // child tile found
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 }, // render child tile
-                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false }, // child tile not found
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, true },  // child tile found
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },     //
-                  RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 }, // render child tile
-                  GetTileDataAction{ { 1, { 1, 1, 1 } }, false }, // child tile not found
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false },   // ideal tile, missing
+                  CreateTileDataAction{ { 0, { 0, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, true },    // child tile found
+                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },       //
+                  RenderTileAction{ { 1, 0, 0 }, *tile_1_1_0_0 },   // render child tile
+                  GetTileDataAction{ { 1, { 1, 0, 1 } }, false },   // child tile not found
+                  GetTileDataAction{ { 1, { 1, 1, 0 } }, true },    // child tile found
+                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },       //
+                  RenderTileAction{ { 1, 1, 0 }, *tile_1_1_1_0 },   // render child tile
+                  GetTileDataAction{ { 1, { 1, 1, 1 } }, false },   // child tile not found
                   // no parent tile of 0 to consider
               }),
               log);
@@ -460,18 +462,18 @@ TEST(UpdateRenderables, PreferChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // ideal tile, not found
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },  // child tile, found
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 }, //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false }, // child tile, not found
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },  // parent tile, found
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 }, //
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // ideal tile, not found
+                  CreateTileDataAction{ { 1, { 1, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },    // child tile, found
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },   //
+                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false },   // child tile, not found
+                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false },   // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    // parent tile, found
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },   //
               }),
               log);
 
@@ -570,18 +572,18 @@ TEST(UpdateRenderables, UseParentAndChildTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // ideal tile, missing
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },  //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 }, //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false }, //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },  //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 }, //
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // ideal tile, missing
+                  CreateTileDataAction{ { 1, { 1, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },   //
+                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false },   //
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },   //
               }),
               log);
 
@@ -621,13 +623,13 @@ TEST(UpdateRenderables, DontUseTilesLowerThanMinzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, // ideal tile, missing
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false }, //
-                  GetTileDataAction{ { 3, { 3, 0, 1 } }, false }, //
-                  GetTileDataAction{ { 3, { 3, 1, 0 } }, false }, //
-                  GetTileDataAction{ { 3, { 3, 1, 1 } }, false }, //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   // ideal tile, missing
+                  CreateTileDataAction{ { 2, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false },   //
+                  GetTileDataAction{ { 3, { 3, 0, 1 } }, false },   //
+                  GetTileDataAction{ { 3, { 3, 1, 0 } }, false },   //
+                  GetTileDataAction{ { 3, { 3, 1, 1 } }, false },   //
                   // no requests for zoom 1 tiles
               }),
               log);
@@ -650,9 +652,9 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, // ideal tile, missing
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   // ideal tile, missing
+                  CreateTileDataAction{ { 2, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
                   GetTileDataAction{ { 3, { 2, 0, 0 } }, false }, // overzoomed tile, not children!
                   GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, //
                   GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, //
@@ -666,13 +668,13 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, false }, // ideal tile, missing
-                  CreateTileDataAction{ { 3, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },     //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },  //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 }, //
+                  GetTileDataAction{ { 3, { 2, 0, 0 } }, false },   // ideal tile, missing
+                  CreateTileDataAction{ { 3, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },       //
+                  GetTileDataAction{ { 4, { 2, 0, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },   //
               }),
               log);
 
@@ -709,12 +711,12 @@ TEST(UpdateRenderables, UseOverzoomedTileAfterMaxzoom) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 2);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, //
-                  CreateTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, true },  // use overzoomed tile!
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },     //
-                  RenderTileAction{ { 2, 0, 0 }, *tile_3_2_0_0 }, //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   //
+                  CreateTileDataAction{ { 2, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  GetTileDataAction{ { 3, { 2, 0, 0 } }, true },    // use overzoomed tile!
+                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },       //
+                  RenderTileAction{ { 2, 0, 0 }, *tile_3_2_0_0 },   //
               }),
               log);
 }
@@ -751,13 +753,13 @@ TEST(UpdateRenderables, AscendToNonOverzoomedTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 3);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 3, { 2, 0, 0 } }, false }, //
-                  CreateTileDataAction{ { 3, { 2, 0, 0 } } },     //
-                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },     //
-                  GetTileDataAction{ { 4, { 2, 0, 0 } }, false }, // prefer using a child first
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },  //
-                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },     //
-                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 }, //
+                  GetTileDataAction{ { 3, { 2, 0, 0 } }, false },   //
+                  CreateTileDataAction{ { 3, { 2, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 3, { 2, 0, 0 } } },       //
+                  GetTileDataAction{ { 4, { 2, 0, 0 } }, false },   // prefer using a child first
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 2, { 2, 0, 0 } } },       //
+                  RenderTileAction{ { 2, 0, 0 }, *tile_2_2_0_0 },   //
               }),
               log);
 
@@ -795,29 +797,29 @@ TEST(UpdateRenderables, DoNotAscendMultipleTimesIfNotFound) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 8);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 8, { 8, 0, 0 } }, false }, // ideal tile
-                  CreateTileDataAction{ { 8, { 8, 0, 0 } } },     //
-                  RetainTileDataAction{ { 8, { 8, 0, 0 } } },     //
-                  GetTileDataAction{ { 9, { 9, 0, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 9, { 9, 0, 1 } }, false }, // ...
-                  GetTileDataAction{ { 9, { 9, 1, 0 } }, false }, // ...
-                  GetTileDataAction{ { 9, { 9, 1, 1 } }, false }, // ...
-                  GetTileDataAction{ { 7, { 7, 0, 0 } }, false }, // ascent
-                  GetTileDataAction{ { 6, { 6, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 5, { 5, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 4, { 4, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // ...
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false }, // ...
+                  GetTileDataAction{ { 8, { 8, 0, 0 } }, false },   // ideal tile
+                  CreateTileDataAction{ { 8, { 8, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 8, { 8, 0, 0 } } },       //
+                  GetTileDataAction{ { 9, { 9, 0, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 9, { 9, 0, 1 } }, false },   // ...
+                  GetTileDataAction{ { 9, { 9, 1, 0 } }, false },   // ...
+                  GetTileDataAction{ { 9, { 9, 1, 1 } }, false },   // ...
+                  GetTileDataAction{ { 7, { 7, 0, 0 } }, false },   // ascent
+                  GetTileDataAction{ { 6, { 6, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 5, { 5, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 4, { 4, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 3, { 3, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // ...
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, false },   // ...
 
-                  GetTileDataAction{ { 8, { 8, 1, 0 } }, false }, // ideal tile
-                  CreateTileDataAction{ { 8, { 8, 1, 0 } } },     //
-                  RetainTileDataAction{ { 8, { 8, 1, 0 } } },     //
-                  GetTileDataAction{ { 9, { 9, 2, 0 } }, false }, // child tile
-                  GetTileDataAction{ { 9, { 9, 2, 1 } }, false }, // ...
-                  GetTileDataAction{ { 9, { 9, 3, 0 } }, false }, // ...
-                  GetTileDataAction{ { 9, { 9, 3, 1 } }, false }, // ...
+                  GetTileDataAction{ { 8, { 8, 1, 0 } }, false },   // ideal tile
+                  CreateTileDataAction{ { 8, { 8, 1, 0 } }, true }, //
+                  RetainTileDataAction{ { 8, { 8, 1, 0 } } },       //
+                  GetTileDataAction{ { 9, { 9, 2, 0 } }, false },   // child tile
+                  GetTileDataAction{ { 9, { 9, 2, 1 } }, false },   // ...
+                  GetTileDataAction{ { 9, { 9, 3, 0 } }, false },   // ...
+                  GetTileDataAction{ { 9, { 9, 3, 1 } }, false },   // ...
                   // no second ascent to 0
               }),
               log);
@@ -902,27 +904,27 @@ TEST(UpdateRenderables, WrappedTiles) {
     algorithm::updateRenderables(getTileData, createTileData, retainTileData, renderTile,
                                  source.idealTiles, source.info, 1);
     EXPECT_EQ(ActionLog({
-                  GetTileDataAction{ { 1, { 1, 1, 0 } }, false },  // ideal tile 1/-1/0
-                  CreateTileDataAction{ { 1, { 1, 1, 0 } } },      //
-                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },      //
-                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false },  //
-                  GetTileDataAction{ { 2, { 2, 2, 1 } }, false },  //
-                  GetTileDataAction{ { 2, { 2, 3, 0 } }, false },  //
-                  GetTileDataAction{ { 2, { 2, 3, 1 } }, false },  //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },   //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },      //
-                  RenderTileAction{ { 0, -1, 0 }, *tile_0_0_0_0 }, //
+                  GetTileDataAction{ { 1, { 1, 1, 0 } }, false },   // ideal tile 1/-1/0
+                  CreateTileDataAction{ { 1, { 1, 1, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 1, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 2, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 2, 1 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 3, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 3, 1 } }, false },   //
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, -1, 0 }, *tile_0_0_0_0 },  //
 
-                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false }, // ideal tile 1/0/0
-                  CreateTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },     //
-                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false }, //
-                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false }, //
-                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },  //
-                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },     //
-                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 }, //
+                  GetTileDataAction{ { 1, { 1, 0, 0 } }, false },   // ideal tile 1/0/0
+                  CreateTileDataAction{ { 1, { 1, 0, 0 } }, true }, //
+                  RetainTileDataAction{ { 1, { 1, 0, 0 } } },       //
+                  GetTileDataAction{ { 2, { 2, 0, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 0, 1 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 1, 0 } }, false },   //
+                  GetTileDataAction{ { 2, { 2, 1, 1 } }, false },   //
+                  GetTileDataAction{ { 0, { 0, 0, 0 } }, true },    //
+                  RetainTileDataAction{ { 0, { 0, 0, 0 } } },       //
+                  RenderTileAction{ { 0, 0, 0 }, *tile_0_0_0_0 },   //
 
                   GetTileDataAction{ { 1, { 1, 1, 0 } }, true },  // ideal tile 1/1/0
                   RetainTileDataAction{ { 1, { 1, 1, 0 } } },     //

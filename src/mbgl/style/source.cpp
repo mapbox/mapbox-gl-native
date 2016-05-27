@@ -285,9 +285,12 @@ bool Source::update(const UpdateParameters& parameters) {
     auto getTileDataFn = [this](const OverscaledTileID& dataTileID) -> TileData* {
         return getTileData(dataTileID);
     };
-    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
+    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID,
+                                                bool required) -> TileData* {
         if (auto data = createTile(dataTileID, parameters)) {
-            data->getTileSource()->setNecessity(TileSource::Necessity::Required);
+            if (required) {
+                data->getTileSource()->setNecessity(TileSource::Necessity::Required);
+            }
             return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
         } else {
             return nullptr;
