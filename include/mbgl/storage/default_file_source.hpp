@@ -26,6 +26,10 @@ public:
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
+    bool supportsOptionalRequests() const override {
+        return true;
+    }
+
     void setAccessToken(const std::string&);
     std::string getAccessToken() const;
 

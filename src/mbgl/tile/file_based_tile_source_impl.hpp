@@ -13,12 +13,42 @@ FileBasedTileSource<T, I>::FileBasedTileSource(typename T::data_type& tileData_,
                                                FileSource& fileSource_)
     : T(tileData_), resource(resource_), fileSource(fileSource_) {
     assert(!request);
-    // The first request is always optional.
+    if (fileSource.supportsOptionalRequests()) {
+        // When supported, the first request is always optional, even if the TileSource
+        // is marked as required. That way, we can let the first optional request continue
+        // to load when the TileSource is later changed from required to optional. If we
+        // started out with a required request, we'd have to cancel everything, including the
+        // initial optional part of the request.
+        loadOptional();
+    } else {
+        // When the FileSource doesn't support optional requests, we do nothing until the
+        // data is definitely required.
+        if (T::isRequired()) {
+            loadRequired();
+        } else {
+            // We're using this field to check whether the pending request is optional or required.
+            resource.necessity = Resource::Optional;
+        }
+    }
+}
+
+template <typename T, typename I>
+void FileBasedTileSource<T, I>::loadOptional() {
+    assert(!request);
+
     resource.necessity = Resource::Optional;
     request = fileSource.request(resource, [this](Response res) {
         request.reset();
-        loadedData(res);
-        T::loaded = true;
+
+        if (res.error && res.error->reason == Response::Error::Reason::NotFound) {
+            // When the optional request could not be satisfied, don't treat it as an error.
+            // Instead, we make sure that the next request knows that there has been an optional
+            // request before by setting one of the prior* fields.
+            resource.priorExpires = Timestamp{ Seconds::zero() };
+        } else {
+            loadedData(res);
+        }
+
         if (T::isRequired()) {
             loadRequired();
         }
@@ -27,14 +57,14 @@ FileBasedTileSource<T, I>::FileBasedTileSource(typename T::data_type& tileData_,
 
 template <typename T, typename I>
 void FileBasedTileSource<T, I>::makeRequired() {
-    if (T::loaded && !request) {
+    if (!request) {
         loadRequired();
     }
 }
 
 template <typename T, typename I>
 void FileBasedTileSource<T, I>::makeOptional() {
-    if (T::loaded && request) {
+    if (resource.necessity == Resource::Required && request) {
         // Abort a potential HTTP request.
         request.reset();
     }
@@ -42,12 +72,7 @@ void FileBasedTileSource<T, I>::makeOptional() {
 
 template <typename T, typename I>
 void FileBasedTileSource<T, I>::loadedData(const Response& res) {
-    if (res.error && !T::loaded && res.error->reason == Response::Error::Reason::NotFound) {
-        // When the optional request could not be satisfied, don't treat it as an error. Instead,
-        // we make sure that the next request knows that there has been an optional request before
-        // by setting one of the prior* fields.
-        resource.priorExpires = Timestamp{ Seconds::zero() };
-    } else if (res.error) {
+    if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
         T::tileData.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
         resource.priorExpires = res.expires;
@@ -67,9 +92,7 @@ void FileBasedTileSource<T, I>::loadRequired() {
     assert(!request);
 
     resource.necessity = Resource::Required;
-    request = fileSource.request(resource, [this](Response res) {
-        loadedData(res);
-    });
+    request = fileSource.request(resource, [this](Response res) { loadedData(res); });
 }
 
 } // namespace mbgl

@@ -19,6 +19,7 @@ protected:
     void makeOptional() override;
 
 private:
+    void loadOptional();
     void loadedData(const Response&);
     void loadRequired();
 
