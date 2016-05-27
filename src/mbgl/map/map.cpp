@@ -37,7 +37,7 @@ class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
-    void onResourceLoaded() override;
+    void onNeedsRepaint() override;
     void onResourceError(std::exception_ptr) override;
 
     void update();
@@ -836,7 +836,7 @@ void Map::onLowMemory() {
     impl->view.invalidate();
 }
 
-void Map::Impl::onResourceLoaded() {
+void Map::Impl::onNeedsRepaint() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }

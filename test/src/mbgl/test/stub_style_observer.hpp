@@ -43,8 +43,8 @@ public:
         if (tileError) tileError(source, tileID, error);
     }
 
-    void onResourceLoaded() override {
-        if (resourceLoaded) resourceLoaded();
+    void onNeedsRepaint() override {
+        if (needsRepaint) needsRepaint();
     };
 
     void onResourceError(std::exception_ptr error) override {
@@ -59,6 +59,6 @@ public:
     std::function<void (Source&, std::exception_ptr)> sourceError;
     std::function<void (Source&, const OverscaledTileID&, bool isNewTile)> tileLoaded;
     std::function<void (Source&, const OverscaledTileID&, std::exception_ptr)> tileError;
-    std::function<void ()> resourceLoaded;
+    std::function<void ()> needsRepaint;
     std::function<void (std::exception_ptr)> resourceError;
 };

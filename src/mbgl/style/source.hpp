@@ -92,7 +92,7 @@ private:
     // TileDataObserver implementation.
     void onTileLoaded(TileData&, bool isNewTile) override;
     void onTileError(TileData&, std::exception_ptr) override;
-    void onPlacementRedone(TileData&) override;
+    void onNeedsRepaint() override;
 
     std::unique_ptr<TileData> createTile(const OverscaledTileID&, const UpdateParameters&);
 

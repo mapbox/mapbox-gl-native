@@ -174,7 +174,7 @@ void GeometryTileData::redoPlacement() {
         if (placedConfig != targetConfig) {
             redoPlacement();
         } else {
-            observer->onPlacementRedone(*this);
+            observer->onNeedsRepaint();
         }
     });
 }

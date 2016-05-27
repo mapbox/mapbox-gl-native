@@ -12,7 +12,7 @@ public:
 
     virtual void onTileLoaded(TileData&, bool /*isNewTile*/) {}
     virtual void onTileError(TileData&, std::exception_ptr) {}
-    virtual void onPlacementRedone(TileData&) {}
+    virtual void onNeedsRepaint() {}
 };
 
 } // namespace mbgl

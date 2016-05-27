@@ -418,8 +418,8 @@ void Source::onTileError(TileData& tileData, std::exception_ptr error) {
     observer->onTileError(*this, tileData.id, error);
 }
 
-void Source::onPlacementRedone(TileData&) {
-    observer->onPlacementRedone();
+void Source::onNeedsRepaint() {
+    observer->onNeedsRepaint();
 }
 
 void Source::dumpDebugLogs() const {
