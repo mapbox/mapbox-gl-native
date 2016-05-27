@@ -3,7 +3,7 @@
 #import "MGLAccountManager.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
-static NSString * const MGLAPIClientBaseURL = @"https://api.mapbox.com";
+static NSString * const MGLAPIClientBaseURL = @"https://events.mapbox.com";
 static NSString * const MGLAPIClientEventsPath = @"events/v2";
 
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
