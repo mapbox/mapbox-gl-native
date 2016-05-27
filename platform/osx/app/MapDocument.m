@@ -14,6 +14,27 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     { .latitude = -13.15589555, .longitude = -74.2178961777998 },
 };
 
+NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotation>) *shapes) {
+    NSMutableArray *flattenedShapes = [NSMutableArray arrayWithCapacity:shapes.count];
+    for (id <MGLAnnotation> shape in shapes) {
+        NSArray *subshapes;
+        if ([shape isKindOfClass:[MGLMultiPolyline class]]) {
+            subshapes = [(MGLMultiPolyline *)shape polylines];
+        } else if ([shape isKindOfClass:[MGLMultiPolygon class]]) {
+            subshapes = [(MGLMultiPolygon *)shape polygons];
+        } else if ([shape isKindOfClass:[MGLShapeCollection class]]) {
+            subshapes = MBXFlattenedShapes([(MGLShapeCollection *)shape shapes]);
+        }
+        
+        if (subshapes) {
+            [flattenedShapes addObjectsFromArray:subshapes];
+        } else {
+            [flattenedShapes addObject:shape];
+        }
+    }
+    return flattenedShapes;
+}
+
 @interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, MGLMapViewDelegate>
 
 @property (weak) IBOutlet NSMenu *mapViewContextMenu;
@@ -420,8 +441,7 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
         if (!NSPointInRect([gestureRecognizer locationInView:self.mapView.compass], self.mapView.compass.bounds)
             && !NSPointInRect([gestureRecognizer locationInView:self.mapView.zoomControls], self.mapView.zoomControls.bounds)
             && !NSPointInRect([gestureRecognizer locationInView:self.mapView.attributionView], self.mapView.attributionView.bounds)) {
-            NSArray *features = [self.mapView visibleFeaturesAtPoint:location];
-            [self.mapView addAnnotations:features];
+            [self dropPinAtPoint:location];
         }
     }
 }
@@ -462,6 +482,16 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
 
 - (void)removePinAtPoint:(NSPoint)point {
     [self.mapView removeAnnotation:[self.mapView annotationAtPoint:point]];
+}
+
+- (IBAction)selectFeatures:(id)sender {
+    [self selectFeaturesAtPoint:_mouseLocationForMapViewContextMenu];
+}
+
+- (void)selectFeaturesAtPoint:(NSPoint)point {
+    NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
+    NSArray *flattenedFeatures = MBXFlattenedShapes(features);
+    [self.mapView addAnnotations:flattenedFeatures];
 }
 
 #pragma mark User interface validation
@@ -519,6 +549,9 @@ static const CLLocationCoordinate2D WorldTourDestinations[] = {
     if (menuItem.action == @selector(removePin:)) {
         id <MGLAnnotation> annotationUnderCursor = [self.mapView annotationAtPoint:_mouseLocationForMapViewContextMenu];
         menuItem.hidden = annotationUnderCursor == nil;
+        return YES;
+    }
+    if (menuItem.action == @selector(selectFeatures:)) {
         return YES;
     }
     if (menuItem.action == @selector(toggleTileBoundaries:)) {

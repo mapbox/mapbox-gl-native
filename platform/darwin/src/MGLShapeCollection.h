@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  An array of shapes forming the shape collection.
  */
-@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape <MGLAnnotation> *) *shapes;
+@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLShape *) *shapes;
 
 /**
  Creates and returns a shape collection consisting of the given shapes.
@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
     this array is copied to the new object.
  @return A new shape collection object.
  */
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape <MGLAnnotation> *) *)shapes;
++ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape *) *)shapes;
 
 @end
 
