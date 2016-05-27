@@ -37,7 +37,7 @@ public class MarkerViewManager {
      * Creates an instance of MarkerViewManager.
      *
      * @param mapboxMap the MapboxMap associated with the MarkerViewManager
-     * @param mapView   the MapView associarted with the MarkerViewManager
+     * @param mapView   the MapView associated with the MarkerViewManager
      */
     public MarkerViewManager(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
         this.mapboxMap = mapboxMap;

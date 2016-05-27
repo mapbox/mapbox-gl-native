@@ -6,6 +6,12 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
+/**
+ * builder class for composing MarkerView objects.
+ * <p>
+ * Do not extend this class directly but extend BaseMarkerViewOptions instead.
+ * </p>
+ */
 public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerViewOptions> {
 
     private MarkerView marker;

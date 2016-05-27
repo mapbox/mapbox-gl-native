@@ -1214,6 +1214,11 @@ public class MapboxMap {
         return marker;
     }
 
+    /**
+     * Get the MarkerViewManager associated to the MapView.
+     *
+     * @return the associated MarkerViewManager
+     */
     public MarkerViewManager getMarkerViewManager() {
         return mMarkerViewManager;
     }
@@ -1801,12 +1806,22 @@ public class MapboxMap {
         View getInfoWindow(@NonNull Marker marker);
     }
 
+    /**
+     * Interface definition for a callback to be invoked when an MarkerView will be shown.
+     *
+     * @param <U> the instance type of MarkerView
+     */
     public static abstract class MarkerViewAdapter<U extends MarkerView> {
 
         private Context context;
         private final Class<U> persistentClass;
         private final Pools.SimplePool<View> mViewReusePool;
 
+        /**
+         * Create an instance of MarkerViewAdapter.
+         *
+         * @param context the context associated to a MapView
+         */
         @SuppressWarnings("unchecked")
         public MarkerViewAdapter(Context context) {
             this.context = context;
@@ -1814,24 +1829,60 @@ public class MapboxMap {
             mViewReusePool = new Pools.SimplePool<>(20);
         }
 
+        /**
+         * Called when an MarkerView will be added to the MapView.
+         *
+         * @param marker      the model representing the MarkerView
+         * @param convertView the reusable view
+         * @param parent      the parent ViewGroup of the convertview
+         * @return the View that is adapted to the contents of MarkerView
+         */
         @Nullable
         public abstract View getView(@NonNull U marker, @NonNull View convertView, @NonNull ViewGroup parent);
 
+        /**
+         * Returns the generic type of the used MarkerView.
+         *
+         * @return the generic type
+         */
         public Class<U> getMarkerClass() {
             return persistentClass;
         }
 
+        /**
+         * Returns the pool used to store reusable Views.
+         *
+         * @return the pool associated to this adapter
+         */
         public Pools.SimplePool<View> getViewReusePool() {
             return mViewReusePool;
         }
 
+        /**
+         * Returns the context associated to the hosting MapView.
+         *
+         * @return the context used
+         */
         public Context getContext() {
             return context;
         }
     }
 
+    /**
+     * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
+     *
+     * @see MarkerViewManager#setOnMarkerViewClickListener(OnMarkerViewClickListener)
+     */
     public interface OnMarkerViewClickListener {
 
+        /**
+         * Called when the user clicks on a MarkerView.
+         *
+         * @param marker  the MarkerView associated to the clicked View
+         * @param view    the clicked View
+         * @param adapter the adapter used to adapt the MarkerView to the View
+         * @return If true the listener has consumed the event and the info window will not be shown
+         */
         boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MarkerViewAdapter adapter);
     }
 
@@ -1903,7 +1954,7 @@ public class MapboxMap {
     public interface SnapshotReadyCallback {
         /**
          * Invoked when the snapshot has been taken.
-         **/
+         */
         void onSnapshotReady(Bitmap snapshot);
     }
 
