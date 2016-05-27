@@ -4,7 +4,6 @@
 using namespace mbgl;
 
 FrameHistory::FrameHistory() {
-    changeTimes.fill(TimePoint::min());
     changeOpacities.fill(0);
     opacities.fill(0);
 };
@@ -14,6 +13,7 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
     int16_t zoomIndex = std::floor(zoom * 10.0);
 
     if (firstFrame) {
+        changeTimes.fill(now);
 
         for (int16_t z = 0; z <= zoomIndex; z++) {
             opacities[z] = 255u;
