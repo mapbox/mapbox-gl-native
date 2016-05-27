@@ -33,17 +33,19 @@ void updateRenderables(GetTileDataFn getTileData,
         const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
         auto data = getTileData(idealDataTileID);
         if (!data) {
-            data = createTileData(idealDataTileID, true);
+            data = createTileData(idealDataTileID);
             assert(data);
         }
 
         // if (source has the tile and bucket is loaded) {
         if (data->isRenderable()) {
-            retainTileData(*data);
+            retainTileData(*data, true);
             renderTile(idealRenderTileID, *data);
         } else {
+            bool triedPrevious = data->hasTriedOptional();
+
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
-            retainTileData(*data);
+            retainTileData(*data, true);
             covered = true;
             overscaledZ = dataTileZoom + 1;
             if (overscaledZ > info.maxZoom) {
@@ -51,7 +53,7 @@ void updateRenderables(GetTileDataFn getTileData,
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
                 data = getTileData(childDataTileID);
                 if (data && data->isRenderable()) {
-                    retainTileData(*data);
+                    retainTileData(*data, false);
                     renderTile(idealRenderTileID, *data);
                 } else {
                     covered = false;
@@ -62,7 +64,7 @@ void updateRenderables(GetTileDataFn getTileData,
                     const OverscaledTileID childDataTileID(overscaledZ, childTileID);
                     data = getTileData(childDataTileID);
                     if (data && data->isRenderable()) {
-                        retainTileData(*data);
+                        retainTileData(*data, false);
                         renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *data);
                     } else {
                         // At least one child tile doesn't exist, so we are going to look for
@@ -88,11 +90,19 @@ void updateRenderables(GetTileDataFn getTileData,
                     }
 
                     data = getTileData(parentDataTileID);
-                    if (data && data->isRenderable()) {
-                        retainTileData(*data);
-                        renderTile(parentRenderTileID, *data);
-                        // Break parent tile ascent, since we found one.
-                        break;
+                    if (!data && triedPrevious) {
+                        data = createTileData(parentDataTileID);
+                    }
+
+                    if (data) {
+                        triedPrevious = data->hasTriedOptional();
+                        retainTileData(*data, false);
+
+                        if (data->isRenderable()) {
+                            renderTile(parentRenderTileID, *data);
+                            // Break parent tile ascent, since we found one.
+                            break;
+                        }
                     }
                 }
             }

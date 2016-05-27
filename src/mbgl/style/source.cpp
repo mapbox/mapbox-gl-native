@@ -279,18 +279,16 @@ bool Source::update(const UpdateParameters& parameters) {
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
 
-    auto retainTileDataFn = [&retain](const TileData& tileData) -> void {
+    auto retainTileDataFn = [&retain](TileData& tileData, bool required) -> void {
         retain.emplace(tileData.id);
+        tileData.getTileSource()->setNecessity(required ? TileSource::Necessity::Required
+                                                        : TileSource::Necessity::Optional);
     };
     auto getTileDataFn = [this](const OverscaledTileID& dataTileID) -> TileData* {
         return getTileData(dataTileID);
     };
-    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID,
-                                                bool required) -> TileData* {
+    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
         if (auto data = createTile(dataTileID, parameters)) {
-            if (required) {
-                data->getTileSource()->setNecessity(TileSource::Necessity::Required);
-            }
             return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
         } else {
             return nullptr;
