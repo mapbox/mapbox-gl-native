@@ -9,6 +9,7 @@
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
@@ -23,6 +24,7 @@
 #include <QMargins>
 #include <QString>
 #include <QStringList>
+#include <QThreadStorage>
 
 #include <memory>
 
@@ -66,6 +68,12 @@ static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrameF
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingMap), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMap), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMapFullyRendered), "error");
+
+namespace {
+
+QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
+
+}
 
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
@@ -159,8 +167,14 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
 
 QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
     : QObject(parent_)
-    , d_ptr(new QMapboxGLPrivate(this, settings))
 {
+    // Multiple QMapboxGL running on the same thread
+    // will share the same mbgl::util::RunLoop
+    if (!loop.hasLocalData()) {
+        loop.setLocalData(std::make_shared<mbgl::util::RunLoop>());
+    }
+
+    d_ptr = new QMapboxGLPrivate(this, settings);
 }
 
 QMapboxGL::~QMapboxGL()
