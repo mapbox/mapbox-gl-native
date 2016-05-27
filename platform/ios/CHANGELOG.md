@@ -30,6 +30,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - An MGLAnnotationView can be rotated to match the rotation pitch of the associated map view.
 - Added a new option to `MGLMapDebugMaskOptions`, `MGLMapDebugWireframesMask`, that shows wireframes instead of the usual rendered output. ([#4359](https://github.com/mapbox/mapbox-gl-native/pull/4359))
 - Fixed an issue (speculatively) where the tile cache could be included in iCloud backups. ([#5124](https://github.com/mapbox/mapbox-gl-native/pull/5124))
+- Fixed a memory leak when using raster resources. ([#5141](https://github.com/mapbox/mapbox-gl-native/pull/5141))
 
 ## 3.2.2
 
