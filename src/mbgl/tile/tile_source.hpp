@@ -42,13 +42,6 @@ public:
         }
     }
 
-    bool isLoaded() const {
-        // "loaded" is considered true once the initial load action completed, regardless of whether
-        // the TileData is required or optional, and whether any actual TileData was loaded in the
-        // case of optional TileData
-        return loaded;
-    }
-
 protected:
     // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
     // should try to make every effort (e.g. fetch from internet, or revalidate existing resources).
@@ -62,7 +55,6 @@ protected:
 
 protected:
     Necessity necessity;
-    bool loaded = false;
 };
 
 class GeometryTileData;
