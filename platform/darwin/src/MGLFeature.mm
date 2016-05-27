@@ -6,6 +6,8 @@
 
 #import "MGLMultiPoint_Private.h"
 
+#import <mbgl/util/geometry.hpp>
+
 @protocol MGLFeaturePrivate <MGLFeature>
 
 @property (nonatomic, copy, nullable, readwrite) id identifier;
@@ -141,24 +143,19 @@ public:
     }
     
     id operator()(const std::vector<mbgl::Value> &values) const {
-        std::vector<id> objects;
-        objects.reserve(values.size());
+        NSMutableArray *objects = [NSMutableArray arrayWithCapacity:values.size()];
         for (const auto &v : values) {
-            objects.push_back(mbgl::Value::visit(v, *this));
+            [objects addObject:mbgl::Value::visit(v, *this)];
         }
-        return [NSArray arrayWithObjects:&objects[0] count:objects.size()];
+        return objects;
     }
     
     id operator()(const std::unordered_map<std::string, mbgl::Value> &items) const {
-        std::vector<NSString *> keys;
-        keys.reserve(items.size());
-        std::vector<id> objects;
-        objects.reserve(items.size());
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:items.size()];
         for (auto &item : items) {
-            keys.push_back(@(item.first.c_str()));
-            objects.push_back(mbgl::Value::visit(item.second, *this));
+            attributes[@(item.first.c_str())] = mbgl::Value::visit(item.second, *this);
         }
-        return [NSDictionary dictionaryWithObjects:&objects[0] forKeys:&keys[0] count:keys.size()];
+        return attributes;
     }
 };
 
@@ -169,57 +166,30 @@ public:
 template <typename T>
 class GeometryEvaluator {
 public:
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::point<T> &geometry) const {
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::Point<T> &geometry) const {
         MGLPointFeature *feature = [[MGLPointFeature alloc] init];
-        feature.coordinate = coordinateFromPointGeometry(geometry);
+        feature.coordinate = toLocationCoordinate2D(geometry);
         return feature;
     }
     
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::line_string<T> &geometry) const {
-        std::vector<CLLocationCoordinate2D> coordinates;
-        coordinates.reserve(geometry.size());
-        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-        
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::LineString<T> &geometry) const {
+        std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(geometry);
         return [MGLPolylineFeature polylineWithCoordinates:&coordinates[0] count:coordinates.size()];
     }
     
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::polygon<T> &geometry) const {
-        auto &outerRing = geometry.front();
-        std::vector<CLLocationCoordinate2D> coordinates;
-        coordinates.reserve(outerRing.size());
-        std::transform(outerRing.begin(), outerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-        
-        NSMutableArray *innerPolygons;
-        if (geometry.size() > 1) {
-            innerPolygons = [NSMutableArray arrayWithCapacity:geometry.size() - 1];
-            for (auto iter = geometry.begin() + 1; iter != geometry.end(); iter++) {
-                auto &innerRing = *iter;
-                std::vector<CLLocationCoordinate2D> coordinates;
-                coordinates.reserve(innerRing.size());
-                std::transform(innerRing.begin(), innerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
-                [innerPolygons addObject:innerPolygon];
-            }
-        }
-        
-        return [MGLPolygonFeature polygonWithCoordinates:&coordinates[0] count:coordinates.size() interiorPolygons:innerPolygons];
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::Polygon<T> &geometry) const {
+        return toShape<MGLPolygonFeature>(geometry);
     }
     
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::multi_point<T> &geometry) const {
-        std::vector<CLLocationCoordinate2D> coordinates;
-        coordinates.reserve(geometry.size());
-        std::transform(geometry.begin(), geometry.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-        
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::MultiPoint<T> &geometry) const {
+        std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(geometry);
         return [[MGLMultiPointFeature alloc] initWithCoordinates:&coordinates[0] count:coordinates.size()];
     }
     
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::multi_line_string<T> &geometry) const {
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::MultiLineString<T> &geometry) const {
         NSMutableArray *polylines = [NSMutableArray arrayWithCapacity:geometry.size()];
         for (auto &lineString : geometry) {
-            std::vector<CLLocationCoordinate2D> coordinates;
-            coordinates.reserve(lineString.size());
-            std::transform(lineString.begin(), lineString.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-            
+            std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(lineString);
             MGLPolyline *polyline = [MGLPolyline polylineWithCoordinates:&coordinates[0] count:coordinates.size()];
             [polylines addObject:polyline];
         }
@@ -227,29 +197,10 @@ public:
         return [MGLMultiPolylineFeature multiPolylineWithPolylines:polylines];
     }
     
-    MGLShape <MGLFeaturePrivate> * operator()(const mapbox::geometry::multi_polygon<T> &geometry) const {
+    MGLShape <MGLFeaturePrivate> * operator()(const mbgl::MultiPolygon<T> &geometry) const {
         NSMutableArray *polygons = [NSMutableArray arrayWithCapacity:geometry.size()];
         for (auto &polygon : geometry) {
-            auto &linearRing = polygon.front();
-            std::vector<CLLocationCoordinate2D> coordinates;
-            coordinates.reserve(linearRing.size());
-            std::transform(linearRing.begin(), linearRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-            
-            NSMutableArray *innerPolygons;
-            if (polygon.size() > 1) {
-                innerPolygons = [NSMutableArray arrayWithCapacity:polygon.size() - 1];
-                for (auto iter = polygon.begin() + 1; iter != polygon.end(); iter++) {
-                    auto &innerRing = *iter;
-                    std::vector<CLLocationCoordinate2D> coordinates;
-                    coordinates.reserve(innerRing.size());
-                    std::transform(innerRing.begin(), innerRing.end(), std::back_inserter(coordinates), coordinateFromPointGeometry);
-                    MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
-                    [innerPolygons addObject:innerPolygon];
-                }
-            }
-            
-            MGLPolygon *polygonObject = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size() interiorPolygons:innerPolygons];
-            [polygons addObject:polygonObject];
+            [polygons addObject:toShape(polygon)];
         }
         
         return [MGLMultiPolygonFeature multiPolygonWithPolygons:polygons];
@@ -259,23 +210,46 @@ public:
         NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:collection.size()];
         for (auto &geometry : collection) {
             // This is very much like the transformation that happens in MGLFeaturesFromMBGLFeatures(), but these are raw geometries with no associated feature IDs or attributes.
-            GeometryEvaluator<T> evaluator;
-            MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<T>::visit(geometry, evaluator);
+            MGLShape <MGLFeaturePrivate> *shape = mapbox::geometry::geometry<T>::visit(geometry, *this);
             [shapes addObject:shape];
         }
         return [MGLShapeCollectionFeature shapeCollectionWithShapes:shapes];
     }
     
 private:
-    static CLLocationCoordinate2D coordinateFromPointGeometry(const mapbox::geometry::point<T> &point) {
+    static CLLocationCoordinate2D toLocationCoordinate2D(const mbgl::Point<T> &point) {
         return CLLocationCoordinate2DMake(point.y, point.x);
+    }
+    
+    static std::vector<CLLocationCoordinate2D> toLocationCoordinates2D(const std::vector<mbgl::Point<T>> &points) {
+        std::vector<CLLocationCoordinate2D> coordinates;
+        coordinates.reserve(points.size());
+        std::transform(points.begin(), points.end(), std::back_inserter(coordinates), toLocationCoordinate2D);
+        return coordinates;
+    }
+    
+    template<typename U = MGLPolygon>
+    static U *toShape(const mbgl::Polygon<T> &geometry) {
+        auto &linearRing = geometry.front();
+        std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(linearRing);
+        NSMutableArray *innerPolygons;
+        if (geometry.size() > 1) {
+            innerPolygons = [NSMutableArray arrayWithCapacity:geometry.size() - 1];
+            for (auto iter = geometry.begin() + 1; iter != geometry.end(); iter++) {
+                auto &innerRing = *iter;
+                std::vector<CLLocationCoordinate2D> coordinates = toLocationCoordinates2D(innerRing);
+                MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:&coordinates[0] count:coordinates.size()];
+                [innerPolygons addObject:innerPolygon];
+            }
+        }
+        
+        return [U polygonWithCoordinates:&coordinates[0] count:coordinates.size() interiorPolygons:innerPolygons];
     }
 };
 
 NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
-    std::vector<MGLShape <MGLFeature> *> shapes;
-    shapes.reserve(features.size());
-    std::transform(features.begin(), features.end(), std::back_inserter(shapes), ^MGLShape <MGLFeature> * (const mbgl::Feature &feature) {
+    NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
+    for (const auto &feature : features) {
         NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:feature.properties.size()];
         for (auto &pair : feature.properties) {
             auto &value = pair.second;
@@ -289,7 +263,7 @@ NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vec
             shape.identifier = @(*feature.id);
         }
         shape.attributes = attributes;
-        return shape;
-    });
-    return [NSArray arrayWithObjects:&shapes[0] count:shapes.size()];
+        [shapes addObject:shape];
+    }
+    return shapes;
 }
