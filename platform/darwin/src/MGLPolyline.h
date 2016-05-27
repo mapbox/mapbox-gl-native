@@ -36,6 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
  both sides of a divided highway (dual carriageway), excluding the median
  (central reservation): each carriageway would be a distinct `MGLPolyline`
  object.
+ 
+ @note `MGLMultiPolyline` objects cannot be added to a map view using
+    `-[MGLMapView addAnnotations:]` and related methods.
  */
 @interface MGLMultiPolyline : MGLShape <MGLOverlay>
 

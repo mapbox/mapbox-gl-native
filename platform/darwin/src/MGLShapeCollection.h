@@ -10,6 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLShapeCollection` class represents a shape consisting of one or more
  distinct but related shapes that are instances of `MGLShape`. The constituent
  shapes can be a mixture of different kinds of shapes.
+ 
+ @note `MGLShapeCollection` objects cannot be added to a map view using
+    `-[MGLMapView addAnnotations:]` and related methods.
  */
 @interface MGLShapeCollection : MGLShape
 

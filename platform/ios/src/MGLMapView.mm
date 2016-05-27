@@ -2820,21 +2820,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             shapes.emplace_back(multiPoint.annotationSegments, [multiPoint shapeAnnotationPropertiesObjectWithDelegate:self]);
             [userShapes addObject:annotation];
         }
-        else if ([annotation isKindOfClass:[MGLMultiPolyline class]])
+        else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
+                 || [annotation isKindOfClass:[MGLMultiPolygon class]]
+                 || [annotation isKindOfClass:[MGLShapeCollection class]])
         {
-            // TODO: Add real support for these types down in mbgl instead of breaking the annotation apart.
-            NS_ARRAY_OF(MGLPolyline *) *polylines = [(MGLMultiPolyline *)annotation polylines];
-            [self addAnnotations:polylines];
-        }
-        else if ([annotation isKindOfClass:[MGLMultiPolygon class]])
-        {
-            NS_ARRAY_OF(MGLPolygon *) *polygons = [(MGLMultiPolygon *)annotation polygons];
-            [self addAnnotations:polygons];
-        }
-        else if ([annotation isKindOfClass:[MGLShapeCollection class]])
-        {
-            NS_ARRAY_OF(MGLShape <MGLAnnotation> *) *shapes = [(MGLShapeCollection *)annotation shapes];
-            [self addAnnotations:shapes];
+            continue;
         }
         else
         {

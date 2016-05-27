@@ -19,8 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
  Typically, you do not create feature objects yourself but rather obtain them
  using `-[MGLMapView visibleFeaturesAtPoint:]` and related methods. Each feature
  object associates a shape with an identifier and attributes as specified by the
- source. Like any `MGLAnnotation` object, an `MGLFeature` object can be added to
- a map view using `-[MGLMapView addAnnotations:]` and related methods.
+ source. Like ordinary `MGLAnnotation` objects, some kinds of `MGLFeature`
+ objects can also be added to a map view using `-[MGLMapView addAnnotations:]`
+ and related methods.
  */
 @protocol MGLFeature <MGLAnnotation>
 

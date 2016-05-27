@@ -60,6 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
  object to represent an atoll together with an island in the atoll’s lagoon:
  the atoll itself would be one `MGLPolygon` object, while the inner island would
  be another.
+ 
+ @note `MGLMultiPolygon` objects cannot be added to a map view using
+    `-[MGLMapView addAnnotations:]` and related methods.
  */
 @interface MGLMultiPolygon : MGLShape <MGLOverlay>
 
