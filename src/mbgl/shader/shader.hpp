@@ -14,7 +14,7 @@ public:
     const GLchar *name;
 
     GLuint getID() const {
-        return program.getID();
+        return program.get();
     }
 
     virtual void bind(GLbyte *offset) = 0;
@@ -23,11 +23,11 @@ protected:
     GLint a_pos = -1;
 
 private:
-    bool compileShader(gl::ShaderHolder&, const GLchar *source[]);
+    bool compileShader(gl::UniqueShader&, const GLchar *source[]);
 
-    gl::ProgramHolder program;
-    gl::ShaderHolder vertexShader = { GL_VERTEX_SHADER };
-    gl::ShaderHolder fragmentShader = { GL_FRAGMENT_SHADER };
+    gl::UniqueProgram program;
+    gl::UniqueShader vertexShader;
+    gl::UniqueShader fragmentShader;
 };
 
 } // namespace mbgl

@@ -94,7 +94,7 @@ private:
     std::unique_ptr<uint32_t[]> data;
     std::atomic<bool> dirty;
     bool fullUploadRequired = true;
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
     uint32_t filter = 0;
     static const int buffer = 1;
 };

@@ -5,6 +5,7 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
@@ -31,7 +32,7 @@ private:
     bool firstFrame = true;
     bool changed = true;
 
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
 };
 
 } // namespace mbgl

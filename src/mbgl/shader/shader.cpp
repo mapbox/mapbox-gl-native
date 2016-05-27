@@ -15,68 +15,68 @@ namespace mbgl {
 
 Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource, gl::ObjectStore& store)
     : name(name_)
+    , program(store.createProgram())
+    , vertexShader(store.createShader(GL_VERTEX_SHADER))
+    , fragmentShader(store.createShader(GL_FRAGMENT_SHADER))
 {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 
-    program.create(store);
-    vertexShader.create(store);
     if (!compileShader(vertexShader, &vertSource)) {
         Log::Error(Event::Shader, "Vertex shader %s failed to compile: %s", name, vertSource);
         throw util::ShaderException(std::string { "Vertex shader " } + name + " failed to compile");
     }
 
-    fragmentShader.create(store);
     if (!compileShader(fragmentShader, &fragSource)) {
         Log::Error(Event::Shader, "Fragment shader %s failed to compile: %s", name, fragSource);
         throw util::ShaderException(std::string { "Fragment shader " } + name + " failed to compile");
     }
 
     // Attach shaders
-    MBGL_CHECK_ERROR(glAttachShader(program.getID(), vertexShader.getID()));
-    MBGL_CHECK_ERROR(glAttachShader(program.getID(), fragmentShader.getID()));
+    MBGL_CHECK_ERROR(glAttachShader(program.get(), vertexShader.get()));
+    MBGL_CHECK_ERROR(glAttachShader(program.get(), fragmentShader.get()));
 
     {
         // Link program
         GLint status;
-        MBGL_CHECK_ERROR(glLinkProgram(program.getID()));
+        MBGL_CHECK_ERROR(glLinkProgram(program.get()));
 
-        MBGL_CHECK_ERROR(glGetProgramiv(program.getID(), GL_LINK_STATUS, &status));
+        MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_LINK_STATUS, &status));
         if (status == 0) {
             GLint logLength;
-            MBGL_CHECK_ERROR(glGetProgramiv(program.getID(), GL_INFO_LOG_LENGTH, &logLength));
+            MBGL_CHECK_ERROR(glGetProgramiv(program.get(), GL_INFO_LOG_LENGTH, &logLength));
             const auto log = std::make_unique<GLchar[]>(logLength);
             if (logLength > 0) {
-                MBGL_CHECK_ERROR(glGetProgramInfoLog(program.getID(), logLength, &logLength, log.get()));
+                MBGL_CHECK_ERROR(glGetProgramInfoLog(program.get(), logLength, &logLength, log.get()));
                 Log::Error(Event::Shader, "Program failed to link: %s", log.get());
             }
             throw util::ShaderException(std::string { "Program " } + name + " failed to link: " + log.get());
         }
     }
 
-    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program.getID(), "a_pos"));
+    a_pos = MBGL_CHECK_ERROR(glGetAttribLocation(program.get(), "a_pos"));
 }
 
-bool Shader::compileShader(gl::ShaderHolder& shader, const GLchar *source[]) {
+bool Shader::compileShader(gl::UniqueShader& shader, const GLchar *source[]) {
     GLint status = 0;
 
     const GLsizei lengths = static_cast<GLsizei>(std::strlen(*source));
-    MBGL_CHECK_ERROR(glShaderSource(shader.getID(), 1, source, &lengths));
+    MBGL_CHECK_ERROR(glShaderSource(shader.get(), 1, source, &lengths));
 
-    MBGL_CHECK_ERROR(glCompileShader(shader.getID()));
+    MBGL_CHECK_ERROR(glCompileShader(shader.get()));
 
-    MBGL_CHECK_ERROR(glGetShaderiv(shader.getID(), GL_COMPILE_STATUS, &status));
+    MBGL_CHECK_ERROR(glGetShaderiv(shader.get(), GL_COMPILE_STATUS, &status));
     if (status == 0) {
         GLint logLength;
-        MBGL_CHECK_ERROR(glGetShaderiv(shader.getID(), GL_INFO_LOG_LENGTH, &logLength));
+        MBGL_CHECK_ERROR(glGetShaderiv(shader.get(), GL_INFO_LOG_LENGTH, &logLength));
         if (logLength > 0) {
             const auto log = std::make_unique<GLchar[]>(logLength);
-            MBGL_CHECK_ERROR(glGetShaderInfoLog(shader.getID(), logLength, &logLength, log.get()));
+            MBGL_CHECK_ERROR(glGetShaderInfoLog(shader.get(), logLength, &logLength, log.get()));
             Log::Error(Event::Shader, "Shader failed to compile: %s", log.get());
         }
         return false;
     }
 
-    MBGL_CHECK_ERROR(glGetShaderiv(shader.getID(), GL_COMPILE_STATUS, &status));
+    MBGL_CHECK_ERROR(glGetShaderiv(shader.get(), GL_COMPILE_STATUS, &status));
     if (status == GL_FALSE) {
         Log::Error(Event::Shader, "Shader %s failed to compile.", name);
         return false;
@@ -86,9 +86,9 @@ bool Shader::compileShader(gl::ShaderHolder& shader, const GLchar *source[]) {
 }
 
 Shader::~Shader() {
-    if (program.created()) {
-        MBGL_CHECK_ERROR(glDetachShader(program.getID(), vertexShader.getID()));
-        MBGL_CHECK_ERROR(glDetachShader(program.getID(), fragmentShader.getID()));
+    if (program.get()) {
+        MBGL_CHECK_ERROR(glDetachShader(program.get(), vertexShader.get()));
+        MBGL_CHECK_ERROR(glDetachShader(program.get(), fragmentShader.get()));
     }
 }
 

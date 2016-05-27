@@ -3,6 +3,8 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <unique_resource.hpp>
+
 #include <array>
 #include <algorithm>
 #include <memory>
@@ -11,127 +13,102 @@
 namespace mbgl {
 namespace gl {
 
+constexpr GLsizei TextureMax = 64;
+
+class ObjectStore;
+
+struct ProgramDeleter {
+    ObjectStore* store;
+    void operator()(GLuint id) const;
+};
+
+struct ShaderDeleter {
+    ObjectStore* store;
+    void operator()(GLuint id) const;
+};
+
+struct BufferDeleter {
+    ObjectStore* store;
+    void operator()(GLuint id) const;
+};
+
+struct TextureDeleter {
+    ObjectStore* store;
+    void operator()(GLuint id) const;
+};
+
+struct VAODeleter {
+    ObjectStore* store;
+    void operator()(GLuint id) const;
+};
+
+using ObjectPool = std::array<GLuint, TextureMax>;
+
+struct TexturePoolDeleter {
+    ObjectStore* store;
+    void operator()(ObjectPool ids) const;
+};
+
+using UniqueProgram = std_experimental::unique_resource<GLuint, ProgramDeleter>;
+using UniqueShader = std_experimental::unique_resource<GLuint, ShaderDeleter>;
+using UniqueBuffer = std_experimental::unique_resource<GLuint, BufferDeleter>;
+using UniqueTexture = std_experimental::unique_resource<GLuint, TextureDeleter>;
+using UniqueVAO = std_experimental::unique_resource<GLuint, VAODeleter>;
+using UniqueTexturePool = std_experimental::unique_resource<ObjectPool, TexturePoolDeleter>;
+
 class ObjectStore : private util::noncopyable {
 public:
     ~ObjectStore();
+
+    UniqueProgram createProgram() {
+        return UniqueProgram(MBGL_CHECK_ERROR(glCreateProgram()), { this });
+    }
+
+    UniqueShader createShader(GLenum type) {
+        return UniqueShader(MBGL_CHECK_ERROR(glCreateShader(type)), { this });
+    }
+
+    UniqueBuffer createBuffer() {
+        GLuint id = 0;
+        MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+        return UniqueBuffer(std::move(id), { this });
+    }
+
+    UniqueTexture createTexture() {
+        GLuint id = 0;
+        MBGL_CHECK_ERROR(glGenTextures(1, &id));
+        return UniqueTexture(std::move(id), { this });
+    }
+
+    UniqueVAO createVAO() {
+        GLuint id = 0;
+        MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
+        return UniqueVAO(std::move(id), { this });
+    }
+
+    UniqueTexturePool createTexturePool() {
+        ObjectPool ids;
+        MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
+        return UniqueTexturePool(std::move(ids), { this });
+    }
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
 private:
-    friend class ProgramHolder;
-    friend class ShaderHolder;
-    friend class BufferHolder;
-    friend class TextureHolder;
-    friend class TexturePoolHolder;
-    friend class VAOHolder;
+    friend ProgramDeleter;
+    friend ShaderDeleter;
+    friend BufferDeleter;
+    friend TextureDeleter;
+    friend VAODeleter;
+    friend TexturePoolDeleter;
 
     std::vector<GLuint> abandonedPrograms;
     std::vector<GLuint> abandonedShaders;
     std::vector<GLuint> abandonedBuffers;
     std::vector<GLuint> abandonedTextures;
     std::vector<GLuint> abandonedVAOs;
-};
-
-class GLHolder : private util::noncopyable {
-public:
-    GLHolder() {}
-
-    GLHolder(GLHolder&& o) noexcept : id(o.id), objectStore(o.objectStore) { o.id = 0; }
-    GLHolder& operator=(GLHolder&& o) noexcept { id = o.id; objectStore = o.objectStore; o.id = 0; return *this; }
-
-    bool created() const { return id; }
-    GLuint getID() const { return id; }
-
-protected:
-    GLuint id = 0;
-    ObjectStore* objectStore = nullptr;
-};
-
-class ProgramHolder : public GLHolder {
-public:
-    ProgramHolder() = default;
-    ~ProgramHolder() { reset(); }
-
-    ProgramHolder(ProgramHolder&& o) noexcept : GLHolder(std::move(o)) {}
-    ProgramHolder& operator=(ProgramHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
-
-    void create(ObjectStore&);
-    void reset();
-};
-
-class ShaderHolder : public GLHolder {
-public:
-    ShaderHolder(GLenum type_) : type(type_) {}
-    ~ShaderHolder() { reset(); }
-
-    ShaderHolder(ShaderHolder&& o) noexcept : GLHolder(std::move(o)), type(o.type) {}
-    ShaderHolder& operator=(ShaderHolder&& o) noexcept { GLHolder::operator=(std::move(o)); type = o.type; return *this; }
-
-    void create(ObjectStore&);
-    void reset();
-
-private:
-    GLenum type = 0;
-};
-
-class BufferHolder : public GLHolder {
-public:
-    BufferHolder() = default;
-    ~BufferHolder() { reset(); }
-
-    BufferHolder(BufferHolder&& o) noexcept : GLHolder(std::move(o)) {}
-    BufferHolder& operator=(BufferHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
-
-    void create(ObjectStore&);
-    void reset();
-};
-
-class TextureHolder : public GLHolder {
-public:
-    TextureHolder() = default;
-    ~TextureHolder() { reset(); }
-
-    TextureHolder(TextureHolder&& o) noexcept : GLHolder(std::move(o)) {}
-    TextureHolder& operator=(TextureHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
-
-    void create(ObjectStore&);
-    void reset();
-};
-
-class TexturePoolHolder : private util::noncopyable {
-public:
-    static const GLsizei TextureMax = 64;
-
-    TexturePoolHolder() { ids.fill(0); }
-    ~TexturePoolHolder() { reset(); }
-
-    TexturePoolHolder(TexturePoolHolder&& o) noexcept : ids(std::move(o.ids)), objectStore(o.objectStore) { o.ids.fill(0); }
-    TexturePoolHolder& operator=(TexturePoolHolder&& o) noexcept { ids = std::move(o.ids); objectStore = o.objectStore; o.ids.fill(0); return *this; }
-
-    bool created() const { return std::any_of(ids.begin(), ids.end(), [](int id) { return id; }); }
-    const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
-    const GLuint& operator[](size_t pos) { return ids[pos]; }
-
-    void create(ObjectStore&);
-    void reset();
-
-private:
-    std::array<GLuint, TextureMax> ids;
-    ObjectStore* objectStore = nullptr;
-};
-
-class VAOHolder : public GLHolder {
-public:
-    VAOHolder() = default;
-    ~VAOHolder() { reset(); }
-
-    VAOHolder(VAOHolder&& o) noexcept : GLHolder(std::move(o)) {}
-    VAOHolder& operator=(VAOHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
-
-    void create(ObjectStore&);
-    void reset();
 };
 
 } // namespace gl

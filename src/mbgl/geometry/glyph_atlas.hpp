@@ -3,6 +3,7 @@
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 
@@ -53,7 +54,7 @@ private:
     std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
     const std::unique_ptr<uint8_t[]> data;
     std::atomic<bool> dirty;
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
 };
 
 } // namespace mbgl

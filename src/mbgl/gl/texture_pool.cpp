@@ -25,10 +25,10 @@ GLuint TexturePool::getTextureID(gl::ObjectStore& store) {
 
 void TexturePool::releaseTextureID(GLuint id) {
     for (auto it = pools.begin(); it != pools.end(); ++it) {
-        for (GLsizei i = 0; i < gl::TexturePoolHolder::TextureMax; ++i) {
-            if (it->pool[i] == id) {
+        for (GLsizei i = 0; i < gl::TextureMax; ++i) {
+            if (it->pool.get()[i] == id) {
                 it->ids.push_back(id);
-                if (GLsizei(it->ids.size()) == gl::TexturePoolHolder::TextureMax) {
+                if (GLsizei(it->ids.size()) == gl::TextureMax) {
                     pools.erase(it);
                 }
                 return;

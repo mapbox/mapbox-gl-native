@@ -5,79 +5,39 @@
 namespace mbgl {
 namespace gl {
 
-void ProgramHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    id = MBGL_CHECK_ERROR(glCreateProgram());
+void ProgramDeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedPrograms.push_back(id);
 }
 
-void ProgramHolder::reset() {
-    if (!created()) return;
-    objectStore->abandonedPrograms.push_back(id);
-    id = 0;
+void ShaderDeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedShaders.push_back(id);
 }
 
-void ShaderHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    id = MBGL_CHECK_ERROR(glCreateShader(type));
+void BufferDeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedBuffers.push_back(id);
 }
 
-void ShaderHolder::reset() {
-    if (!created()) return;
-    objectStore->abandonedShaders.push_back(id);
-    id = 0;
+void TextureDeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedTextures.push_back(id);
 }
 
-void BufferHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    MBGL_CHECK_ERROR(glGenBuffers(1, &id));
+void VAODeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedVAOs.push_back(id);
 }
 
-void BufferHolder::reset() {
-    if (!created()) return;
-    objectStore->abandonedBuffers.push_back(id);
-    id = 0;
-}
-
-void TextureHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    MBGL_CHECK_ERROR(glGenTextures(1, &id));
-}
-
-void TextureHolder::reset() {
-    if (!created()) return;
-    objectStore->abandonedTextures.push_back(id);
-    id = 0;
-}
-
-void TexturePoolHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
-}
-
-void TexturePoolHolder::reset() {
-    if (!created()) return;
+void TexturePoolDeleter::operator()(ObjectPool ids) const {
+    assert(store);
     for (GLuint& id : ids) {
-        if (id == 0) continue;
-        objectStore->abandonedTextures.push_back(id);
-        id = 0;
-    };
-}
-
-void VAOHolder::create(ObjectStore& objectStore_) {
-    if (created()) return;
-    objectStore = &objectStore_;
-    MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-}
-
-void VAOHolder::reset() {
-    if (!created()) return;
-    objectStore->abandonedVAOs.push_back(id);
-    id = 0;
+        if (id) {
+            store->abandonedTextures.push_back(id);
+            id = 0;
+        };
+    }
 }
 
 ObjectStore::~ObjectStore() {

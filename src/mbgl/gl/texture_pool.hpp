@@ -19,15 +19,14 @@ public:
 private:
     class Impl : private util::noncopyable {
     public:
-        Impl(gl::ObjectStore& store) : ids(gl::TexturePoolHolder::TextureMax) {
-            pool.create(store);
-            std::copy(pool.getIDs().begin(), pool.getIDs().end(), ids.begin());
+        Impl(gl::ObjectStore& store) : pool(store.createTexturePool()), ids(gl::TextureMax) {
+            std::copy(pool.get().begin(), pool.get().end(), ids.begin());
         }
 
         Impl(Impl&& o) : pool(std::move(o.pool)), ids(std::move(o.ids)) {}
         Impl& operator=(Impl&& o) { pool = std::move(o.pool); ids = std::move(o.ids); return *this; }
 
-        gl::TexturePoolHolder pool;
+        gl::UniqueTexturePool pool;
         std::vector<GLuint> ids;
     };
 

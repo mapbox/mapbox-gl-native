@@ -4,6 +4,7 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <stdexcept>
 
@@ -24,7 +25,7 @@ public:
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
             shader.bind(offset);
-            if (vao.created()) {
+            if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
             }
         } else {
@@ -39,7 +40,7 @@ public:
             vertexBuffer.bind(store);
             elementsBuffer.bind(store);
             shader.bind(offset);
-            if (vao.created()) {
+            if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
             }
         } else {
@@ -48,7 +49,7 @@ public:
     }
 
     GLuint getID() const {
-        return vao.getID();
+        return *vao;
     }
 
 private:
@@ -56,7 +57,7 @@ private:
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 
-    gl::VAOHolder vao;
+    mbgl::optional<gl::UniqueVAO> vao;
 
     // For debug reasons, we're storing the bind information so that we can
     // detect errors and report

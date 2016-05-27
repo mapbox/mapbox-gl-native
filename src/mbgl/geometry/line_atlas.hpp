@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <map>
@@ -35,7 +36,7 @@ public:
 private:
     const std::unique_ptr<GLbyte[]> data;
     bool dirty;
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
     int nextRow = 0;
     std::map<size_t, LinePatternPos> positions;
 };

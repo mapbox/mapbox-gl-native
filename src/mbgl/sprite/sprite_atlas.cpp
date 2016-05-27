@@ -142,9 +142,9 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     dirty = true;
 }
 
-void SpriteAtlas::upload(gl::ObjectStore& store) {
+void SpriteAtlas::upload(gl::ObjectStore& objectStore) {
     if (dirty) {
-        bind(false, store);
+        bind(false, objectStore);
     }
 }
 
@@ -179,14 +179,14 @@ void SpriteAtlas::updateDirty() {
     }
 }
 
-void SpriteAtlas::bind(bool linear, gl::ObjectStore& store) {
+void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore) {
     if (!data) {
         return; // Empty atlas
     }
 
-    if (!texture.created()) {
-        texture.create(store);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+    if (!texture) {
+        texture = objectStore.createTexture();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -196,7 +196,7 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& store) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         fullUploadRequired = true;
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 
     GLuint filter_val = linear ? GL_LINEAR : GL_NEAREST;

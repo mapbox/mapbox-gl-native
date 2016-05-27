@@ -26,10 +26,10 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
         return;
     }
 
-    if (!vao.created()) {
-        vao.create(store);
+    if (!vao) {
+        vao = store.createVAO();
     }
-    MBGL_CHECK_ERROR(gl::BindVertexArray(vao.getID()));
+    MBGL_CHECK_ERROR(gl::BindVertexArray(*vao));
 }
 
 void VertexArrayObject::verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer,

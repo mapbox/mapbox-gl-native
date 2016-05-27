@@ -129,16 +129,16 @@ void LineAtlas::upload(gl::ObjectStore& store) {
 
 void LineAtlas::bind(gl::ObjectStore& store) {
     bool first = false;
-    if (!texture.created()) {
-        texture.create(store);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+    if (!texture) {
+        texture = store.createTexture();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 
     if (dirty) {

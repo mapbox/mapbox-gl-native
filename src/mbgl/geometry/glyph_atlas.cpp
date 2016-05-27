@@ -144,7 +144,7 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
 
 void GlyphAtlas::upload(gl::ObjectStore& store) {
     if (dirty) {
-        const bool first = !texture.created();
+        const bool first = !texture;
         bind(store);
 
         std::lock_guard<std::mutex> lock(mtx);
@@ -184,9 +184,9 @@ void GlyphAtlas::upload(gl::ObjectStore& store) {
 }
 
 void GlyphAtlas::bind(gl::ObjectStore& store) {
-    if (!texture.created()) {
-        texture.create(store);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+    if (!texture) {
+        texture = store.createTexture();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -195,6 +195,6 @@ void GlyphAtlas::bind(gl::ObjectStore& store) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 };
