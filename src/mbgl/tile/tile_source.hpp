@@ -17,7 +17,7 @@ public:
     };
 
 protected:
-    TileSource(Necessity necessity_ = Necessity::Optional) : necessity(necessity_) {
+    TileSource() : necessity(Necessity::Optional) {
     }
 
 public:
@@ -73,8 +73,8 @@ public:
     using data_type = GeometryTileData;
 
 protected:
-    GeometryTileSource(data_type& tileData_, Necessity necessity_ = Necessity::Optional)
-        : TileSource(necessity_), tileData(tileData_) {
+    GeometryTileSource(data_type& tileData_)
+        : tileData(tileData_) {
     }
 
 public:
@@ -89,8 +89,8 @@ public:
     using data_type = RasterTileData;
 
 protected:
-    RasterTileSource(data_type& tileData_, Necessity necessity_ = Necessity::Optional)
-        : TileSource(necessity_), tileData(tileData_){};
+    RasterTileSource(data_type& tileData_)
+        : tileData(tileData_){};
 
 public:
     virtual ~RasterTileSource() = default;
