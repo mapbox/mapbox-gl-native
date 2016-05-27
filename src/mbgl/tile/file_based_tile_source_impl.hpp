@@ -40,6 +40,8 @@ void FileBasedTileSource<T, I>::loadOptional() {
     request = fileSource.request(resource, [this](Response res) {
         request.reset();
 
+        T::tileData.setTriedOptional();
+
         if (res.error && res.error->reason == Response::Error::Reason::NotFound) {
             // When the optional request could not be satisfied, don't treat it as an error.
             // Instead, we make sure that the next request knows that there has been an optional

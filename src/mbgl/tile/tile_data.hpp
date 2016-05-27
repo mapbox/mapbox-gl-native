@@ -50,6 +50,14 @@ public:
             const TransformState&,
             const optional<std::vector<std::string>>& layerIDs);
 
+    void setTriedOptional();
+
+    // Returns true when the tile source has received a first response, regardless of whether a load
+    // error occurred or actual data was loaded.
+    bool hasTriedOptional() const {
+        return triedOptional;
+    }
+
     // Tile data considered "Renderable" can be used for rendering. Data in
     // partial state is still waiting for network resources but can also
     // be rendered, although layers will be missing.
@@ -74,6 +82,8 @@ public:
     std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
+    bool triedOptional = false;
+
     enum class DataAvailability : uint8_t {
         // Still waiting for data to load or parse.
         None,

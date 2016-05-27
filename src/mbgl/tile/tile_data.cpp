@@ -24,6 +24,11 @@ void TileData::setTileSource(std::unique_ptr<TileSource> tileSource_) {
     tileSource = std::move(tileSource_);
 }
 
+void TileData::setTriedOptional() {
+    triedOptional = true;
+    observer->onNeedsRepaint();
+}
+
 void TileData::dumpDebugLogs() const {
     Log::Info(Event::General, "TileData::id: %s", util::toString(id).c_str());
     Log::Info(Event::General, "TileData::renderable: %s", isRenderable() ? "yes" : "no");
