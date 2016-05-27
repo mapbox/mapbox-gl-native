@@ -112,15 +112,15 @@ print_flags libuv static_libs cflags ldflags
 print_flags zlib static_libs cflags ldflags
 print_flags nunicode static_libs cflags ldflags
 print_flags libzip static_libs cflags ldflags
-print_flags geometry static_libs cflags ldflags
+print_flags geometry cflags
 print_flags geojsonvt static_libs cflags ldflags
-print_flags variant static_libs cflags ldflags
+print_flags variant cflags
 print_flags rapidjson static_libs cflags ldflags
 print_flags gtest static_libs cflags ldflags
 print_flags pixelmatch static_libs cflags ldflags
 print_flags webp static_libs cflags ldflags
-print_flags jni.hpp static_libs cflags ldflags
-print_flags earcut static_libs cflags ldflags
+print_flags jni.hpp cflags
+print_flags earcut cflags
 
 CONFIG+="  }
 }
