@@ -9,11 +9,26 @@
 
 #import <objc/runtime.h>
 
-static const CLLocationCoordinate2D WorldTourDestinations[] = {
-    { .latitude = 38.9131982, .longitude = -77.0325453144239 },
-    { .latitude = 37.7757368, .longitude = -122.4135302 },
-    { .latitude = 12.9810816, .longitude = 77.6368034 },
-    { .latitude = -13.15589555, .longitude = -74.2178961777998 },
+static const struct {
+    const char *name;
+    CLLocationCoordinate2D coordinate;
+} WorldTourDestinations[] = {
+    {
+        .name = "Washington, D.C.",
+        .coordinate = { .latitude = 38.9131982, .longitude = -77.0325453144239 },
+    },
+    {
+        .name = "San Francisco",
+        .coordinate = { .latitude = 37.7757368, .longitude = -122.4135302 },
+    },
+    {
+        .name = "Bangalore",
+        .coordinate = { .latitude = 12.9810816, .longitude = 77.6368034 },
+    },
+    {
+        .name = "Ayacucho",
+        .coordinate = { .latitude = -13.15589555, .longitude = -74.2178961777998 },
+    },
 };
 
 static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXViewControllerAnnotationViewReuseIdentifer";
@@ -124,6 +139,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (void)restoreState:(__unused NSNotification *)notification
 {
+    if ([[[NSProcessInfo processInfo] environment][@"MAPBOX_CLEAN_START"] boolValue]) {
+        return;
+    }
+    
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *archivedCamera = [defaults objectForKey:@"MBXCamera"];
     MGLMapCamera *camera = archivedCamera ? [NSKeyedUnarchiver unarchiveObjectWithData:archivedCamera] : nil;
@@ -493,7 +512,8 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     for (NSUInteger i = 0; i < numberOfAnnotations; i++)
     {
         MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
-        annotation.coordinate = WorldTourDestinations[i];
+        annotation.title = @(WorldTourDestinations[i].name);
+        annotation.coordinate = WorldTourDestinations[i].coordinate;
         [annotations addObject:annotation];
     }
     [self.mapView addAnnotations:annotations];

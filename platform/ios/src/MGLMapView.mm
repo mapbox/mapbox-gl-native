@@ -149,6 +149,11 @@ mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
     return self;
 }
 
+- (NSString *)accessibilityIdentifier
+{
+    return [NSString stringWithFormat:@"MGLMapViewAnnotation %d", self.tag];
+}
+
 - (void)accessibilityIncrement
 {
     [self.accessibilityContainer accessibilityIncrement];
@@ -184,6 +189,7 @@ public:
     if (self = [super initWithAccessibilityContainer:container])
     {
         self.accessibilityTraits = UIAccessibilityTraitButton;
+        self.accessibilityIdentifier = NSStringFromClass([self class]);
         self.accessibilityLabel = [self.accessibilityContainer accessibilityLabel];
         self.accessibilityHint = @"Returns to the map";
     }
@@ -368,6 +374,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup accessibility
     //
 //    self.isAccessibilityElement = YES;
+    self.accessibilityIdentifier = NSStringFromClass([self class]);
     self.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_LABEL", nil, nil, @"Map", @"Accessibility label");
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
     _accessibilityCompassFormatter = [[MGLCompassDirectionFormatter alloc] init];
@@ -419,6 +426,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     //
     UIImage *logo = [[MGLMapView resourceImageNamed:@"mapbox.png"] imageWithAlignmentRectInsets:UIEdgeInsetsMake(1.5, 4, 3.5, 2)];
     _logoView = [[UIImageView alloc] initWithImage:logo];
+    _logoView.accessibilityIdentifier = @"MGLMapViewLogo";
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -428,6 +436,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup attribution
     //
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    _attributionButton.accessibilityIdentifier = @"MGLMapViewInfo";
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
     _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
@@ -444,6 +453,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
+    _compassView.accessibilityIdentifier = @"MGLMapViewCompass";
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
     UIView *container = [[UIView alloc] initWithFrame:CGRectZero];

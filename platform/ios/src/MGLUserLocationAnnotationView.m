@@ -76,6 +76,11 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     return !self.hidden;
 }
 
+- (NSString *)accessibilityIdentifier
+{
+    return NSStringFromClass([self class]);
+}
+
 - (NSString *)accessibilityLabel
 {
     return self.annotation.title;

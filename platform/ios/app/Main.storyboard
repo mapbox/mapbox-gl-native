@@ -41,6 +41,7 @@
                         <barButtonItem key="leftBarButtonItem" image="settings.png" id="Jw8-JP-CaZ" userLabel="Map Settings">
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Map settings"/>
+                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXSettingsButton"/>
                             </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="showSettings:" destination="WaX-pd-UZQ" id="X2C-Ee-Qvt"/>
@@ -59,6 +60,8 @@
                             <barButtonItem image="TrackingLocationOffMask.png" id="CQ1-GP-M6x" userLabel="User Tracking Mode">
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="User tracking mode"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXUserTrackingModeButton"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityValue" value="Off"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="locateUser:" destination="WaX-pd-UZQ" id="XgF-DB-z3f"/>
@@ -67,6 +70,7 @@
                             <barButtonItem systemItem="organize" id="5IK-vz-jKQ" userLabel="Offline Packs">
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Offline packs"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXOfflinePacksButton"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <segue destination="7q0-lI-zqb" kind="show" identifier="ShowOfflinePacks" id="xjx-0t-0LD"/>
@@ -174,6 +178,9 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ONr-CS-J5X">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="string" keyPath="accessibilityIdentifier" value="MBXNavigationBar"/>
+                        </userDefinedRuntimeAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
