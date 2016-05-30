@@ -7,8 +7,8 @@
 
 using namespace mbgl;
 
-LineSDFShader::LineSDFShader(gl::GLObjectStore& glObjectStore)
-    : Shader("linesdfpattern", shaders::linesdfpattern::vertex, shaders::linesdfpattern::fragment, glObjectStore)
+LineSDFShader::LineSDFShader(gl::ObjectStore& store)
+    : Shader("linesdfpattern", shaders::linesdfpattern::vertex, shaders::linesdfpattern::fragment, store)
     , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 

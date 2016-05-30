@@ -1,14 +1,14 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 namespace mbgl {
 
 class Shader : private util::noncopyable {
 public:
-    Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment, gl::GLObjectStore&);
+    Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment, gl::ObjectStore&);
 
     ~Shader();
     const GLchar *name;

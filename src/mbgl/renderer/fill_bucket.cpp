@@ -94,10 +94,10 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
     }
 }
 
-void FillBucket::upload(gl::GLObjectStore& glObjectStore) {
-    vertexBuffer.upload(glObjectStore);
-    triangleElementsBuffer.upload(glObjectStore);
-    lineElementsBuffer.upload(glObjectStore);
+void FillBucket::upload(gl::ObjectStore& store) {
+    vertexBuffer.upload(store);
+    triangleElementsBuffer.upload(store);
+    lineElementsBuffer.upload(store);
 
     // From now on, we're going to render during the opaque and translucent pass.
     uploaded = true;
@@ -118,48 +118,48 @@ bool FillBucket::needsClipping() const {
     return true;
 }
 
-void FillBucket::drawElements(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
+void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, glObjectStore);
+        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawElements(PatternShader& shader, gl::GLObjectStore& glObjectStore) {
+void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
         assert(group);
-        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, glObjectStore);
+        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * triangleElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlineShader& shader, gl::GLObjectStore& glObjectStore) {
+void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, glObjectStore);
+        group->array[0].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader, gl::GLObjectStore& glObjectStore) {
+void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store) {
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : lineGroups) {
         assert(group);
-        group->array[1].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, glObjectStore);
+        group->array[1].bind(shader, vertexBuffer, lineElementsBuffer, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * vertexBuffer.itemSize;
         elements_index += group->elements_length * lineElementsBuffer.itemSize;

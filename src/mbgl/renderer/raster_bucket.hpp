@@ -13,14 +13,14 @@ class RasterBucket : public Bucket {
 public:
     RasterBucket(gl::TexturePool&);
 
-    void upload(gl::GLObjectStore&) override;
+    void upload(gl::ObjectStore&) override;
     void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 
     void setImage(PremultipliedImage);
 
-    void drawRaster(RasterShader&, StaticVertexBuffer&, VertexArrayObject&, gl::GLObjectStore&);
+    void drawRaster(RasterShader&, StaticVertexBuffer&, VertexArrayObject&, gl::ObjectStore&);
 
     Raster raster;
 };

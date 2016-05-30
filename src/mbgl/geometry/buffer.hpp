@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
@@ -35,11 +35,11 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::GLObjectStore& glObjectStore) {
+    void bind(gl::ObjectStore& store) {
         if (buffer.created()) {
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
         } else {
-            buffer.create(glObjectStore);
+            buffer.create(store);
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
@@ -64,9 +64,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    inline void upload(gl::GLObjectStore& glObjectStore) {
+    inline void upload(gl::ObjectStore& store) {
         if (!buffer.created()) {
-            bind(glObjectStore);
+            bind(store);
         }
     }
 

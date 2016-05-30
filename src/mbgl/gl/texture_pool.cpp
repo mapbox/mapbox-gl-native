@@ -1,12 +1,12 @@
 #include <mbgl/gl/texture_pool.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 
 #include <vector>
 
 namespace mbgl {
 namespace gl {
 
-GLuint TexturePool::getTextureID(gl::GLObjectStore& glObjectStore) {
+GLuint TexturePool::getTextureID(gl::ObjectStore& store) {
     for (auto& impl : pools) {
         if (impl.ids.empty()) continue;
         auto it = impl.ids.begin();
@@ -16,7 +16,7 @@ GLuint TexturePool::getTextureID(gl::GLObjectStore& glObjectStore) {
     }
 
     // All texture IDs are in use.
-    pools.emplace_back(Impl(glObjectStore));
+    pools.emplace_back(Impl(store));
     auto it = pools.back().ids.begin();
     GLuint id = *it;
     pools.back().ids.erase(it);

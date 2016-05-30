@@ -11,7 +11,7 @@ namespace mbgl {
 class PlainShader;
 
 namespace gl {
-class GLObjectStore;
+class ObjectStore;
 }
 
 class DebugBucket : private util::noncopyable {
@@ -23,8 +23,8 @@ public:
                 optional<Timestamp> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader&, gl::GLObjectStore&);
-    void drawPoints(PlainShader&, gl::GLObjectStore&);
+    void drawLines(PlainShader&, gl::ObjectStore&);
+    void drawPoints(PlainShader&, gl::ObjectStore&);
 
     const bool renderable;
     const bool complete;

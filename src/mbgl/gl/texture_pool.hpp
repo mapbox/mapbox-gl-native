@@ -2,7 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 
 #include <algorithm>
 #include <memory>
@@ -13,14 +13,14 @@ namespace gl {
 
 class TexturePool : private util::noncopyable {
 public:
-    GLuint getTextureID(gl::GLObjectStore&);
+    GLuint getTextureID(gl::ObjectStore&);
     void releaseTextureID(GLuint);
 
 private:
     class Impl : private util::noncopyable {
     public:
-        Impl(gl::GLObjectStore& glObjectStore) : ids(gl::TexturePoolHolder::TextureMax) {
-            pool.create(glObjectStore);
+        Impl(gl::ObjectStore& store) : ids(gl::TexturePoolHolder::TextureMax) {
+            pool.create(store);
             std::copy(pool.getIDs().begin(), pool.getIDs().end(), ids.begin());
         }
 

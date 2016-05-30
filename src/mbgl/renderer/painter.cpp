@@ -47,24 +47,24 @@
 
 using namespace mbgl;
 
-Painter::Painter(const TransformState& state_, gl::GLObjectStore& glObjectStore_)
+Painter::Painter(const TransformState& state_, gl::ObjectStore& store_)
     : state(state_),
-      glObjectStore(glObjectStore_) {
+      store(store_) {
     gl::debugging::enable();
 
-    plainShader = std::make_unique<PlainShader>(glObjectStore);
-    outlineShader = std::make_unique<OutlineShader>(glObjectStore);
-    outlinePatternShader = std::make_unique<OutlinePatternShader>(glObjectStore);
-    lineShader = std::make_unique<LineShader>(glObjectStore);
-    linesdfShader = std::make_unique<LineSDFShader>(glObjectStore);
-    linepatternShader = std::make_unique<LinepatternShader>(glObjectStore);
-    patternShader = std::make_unique<PatternShader>(glObjectStore);
-    iconShader = std::make_unique<IconShader>(glObjectStore);
-    rasterShader = std::make_unique<RasterShader>(glObjectStore);
-    sdfGlyphShader = std::make_unique<SDFGlyphShader>(glObjectStore);
-    sdfIconShader = std::make_unique<SDFIconShader>(glObjectStore);
-    collisionBoxShader = std::make_unique<CollisionBoxShader>(glObjectStore);
-    circleShader = std::make_unique<CircleShader>(glObjectStore);
+    plainShader = std::make_unique<PlainShader>(store);
+    outlineShader = std::make_unique<OutlineShader>(store);
+    outlinePatternShader = std::make_unique<OutlinePatternShader>(store);
+    lineShader = std::make_unique<LineShader>(store);
+    linesdfShader = std::make_unique<LineSDFShader>(store);
+    linepatternShader = std::make_unique<LinepatternShader>(store);
+    patternShader = std::make_unique<PatternShader>(store);
+    iconShader = std::make_unique<IconShader>(store);
+    rasterShader = std::make_unique<RasterShader>(store);
+    sdfGlyphShader = std::make_unique<SDFGlyphShader>(store);
+    sdfIconShader = std::make_unique<SDFIconShader>(store);
+    collisionBoxShader = std::make_unique<CollisionBoxShader>(store);
+    circleShader = std::make_unique<CircleShader>(store);
 
     // Reset GL values
     config.reset();
@@ -115,17 +115,17 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(glObjectStore);
-        tileBorderBuffer.upload(glObjectStore);
-        spriteAtlas->upload(glObjectStore);
-        lineAtlas->upload(glObjectStore);
-        glyphAtlas->upload(glObjectStore);
-        frameHistory.upload(glObjectStore);
-        annotationSpriteAtlas.upload(glObjectStore);
+        tileStencilBuffer.upload(store);
+        tileBorderBuffer.upload(store);
+        spriteAtlas->upload(store);
+        lineAtlas->upload(store);
+        glyphAtlas->upload(store);
+        frameHistory.upload(store);
+        annotationSpriteAtlas.upload(store);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(glObjectStore);
+                item.bucket->upload(store);
             }
         }
     }

@@ -1,7 +1,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -142,10 +142,10 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::GLObjectStore& glObjectStore) {
+void GlyphAtlas::upload(gl::ObjectStore& store) {
     if (dirty) {
         const bool first = !texture.created();
-        bind(glObjectStore);
+        bind(store);
 
         std::lock_guard<std::mutex> lock(mtx);
 
@@ -183,9 +183,9 @@ void GlyphAtlas::upload(gl::GLObjectStore& glObjectStore) {
     }
 }
 
-void GlyphAtlas::bind(gl::GLObjectStore& glObjectStore) {
+void GlyphAtlas::bind(gl::ObjectStore& store) {
     if (!texture.created()) {
-        texture.create(glObjectStore);
+        texture.create(store);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));

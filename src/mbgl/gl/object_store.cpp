@@ -1,11 +1,11 @@
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 
 #include <cassert>
 
 namespace mbgl {
 namespace gl {
 
-void ProgramHolder::create(GLObjectStore& objectStore_) {
+void ProgramHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateProgram());
@@ -17,7 +17,7 @@ void ProgramHolder::reset() {
     id = 0;
 }
 
-void ShaderHolder::create(GLObjectStore& objectStore_) {
+void ShaderHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     id = MBGL_CHECK_ERROR(glCreateShader(type));
@@ -29,7 +29,7 @@ void ShaderHolder::reset() {
     id = 0;
 }
 
-void BufferHolder::create(GLObjectStore& objectStore_) {
+void BufferHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
@@ -41,7 +41,7 @@ void BufferHolder::reset() {
     id = 0;
 }
 
-void TextureHolder::create(GLObjectStore& objectStore_) {
+void TextureHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(1, &id));
@@ -53,7 +53,7 @@ void TextureHolder::reset() {
     id = 0;
 }
 
-void TexturePoolHolder::create(GLObjectStore& objectStore_) {
+void TexturePoolHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
@@ -68,7 +68,7 @@ void TexturePoolHolder::reset() {
     };
 }
 
-void VAOHolder::create(GLObjectStore& objectStore_) {
+void VAOHolder::create(ObjectStore& objectStore_) {
     if (created()) return;
     objectStore = &objectStore_;
     MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
@@ -80,7 +80,7 @@ void VAOHolder::reset() {
     id = 0;
 }
 
-GLObjectStore::~GLObjectStore() {
+ObjectStore::~ObjectStore() {
     assert(abandonedPrograms.empty());
     assert(abandonedShaders.empty());
     assert(abandonedBuffers.empty());
@@ -88,7 +88,7 @@ GLObjectStore::~GLObjectStore() {
     assert(abandonedVAOs.empty());
 }
 
-void GLObjectStore::performCleanup() {
+void ObjectStore::performCleanup() {
     for (GLuint id : abandonedPrograms) {
         MBGL_CHECK_ERROR(glDeleteProgram(id));
     }

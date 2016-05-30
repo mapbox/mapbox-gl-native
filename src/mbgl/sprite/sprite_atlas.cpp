@@ -142,9 +142,9 @@ void SpriteAtlas::copy(const Holder& holder, const bool wrap) {
     dirty = true;
 }
 
-void SpriteAtlas::upload(gl::GLObjectStore& glObjectStore) {
+void SpriteAtlas::upload(gl::ObjectStore& store) {
     if (dirty) {
-        bind(false, glObjectStore);
+        bind(false, store);
     }
 }
 
@@ -179,13 +179,13 @@ void SpriteAtlas::updateDirty() {
     }
 }
 
-void SpriteAtlas::bind(bool linear, gl::GLObjectStore& glObjectStore) {
+void SpriteAtlas::bind(bool linear, gl::ObjectStore& store) {
     if (!data) {
         return; // Empty atlas
     }
 
     if (!texture.created()) {
-        texture.create(glObjectStore);
+        texture.create(store);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));

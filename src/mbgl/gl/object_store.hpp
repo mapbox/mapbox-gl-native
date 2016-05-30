@@ -11,9 +11,9 @@
 namespace mbgl {
 namespace gl {
 
-class GLObjectStore : private util::noncopyable {
+class ObjectStore : private util::noncopyable {
 public:
-    ~GLObjectStore();
+    ~ObjectStore();
 
     // Actually remove the objects we marked as abandoned with the above methods.
     // Only call this while the OpenGL context is exclusive to this thread.
@@ -46,7 +46,7 @@ public:
 
 protected:
     GLuint id = 0;
-    GLObjectStore* objectStore = nullptr;
+    ObjectStore* objectStore = nullptr;
 };
 
 class ProgramHolder : public GLHolder {
@@ -57,7 +57,7 @@ public:
     ProgramHolder(ProgramHolder&& o) noexcept : GLHolder(std::move(o)) {}
     ProgramHolder& operator=(ProgramHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 };
 
@@ -69,7 +69,7 @@ public:
     ShaderHolder(ShaderHolder&& o) noexcept : GLHolder(std::move(o)), type(o.type) {}
     ShaderHolder& operator=(ShaderHolder&& o) noexcept { GLHolder::operator=(std::move(o)); type = o.type; return *this; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 
 private:
@@ -84,7 +84,7 @@ public:
     BufferHolder(BufferHolder&& o) noexcept : GLHolder(std::move(o)) {}
     BufferHolder& operator=(BufferHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 };
 
@@ -96,7 +96,7 @@ public:
     TextureHolder(TextureHolder&& o) noexcept : GLHolder(std::move(o)) {}
     TextureHolder& operator=(TextureHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 };
 
@@ -114,12 +114,12 @@ public:
     const std::array<GLuint, TextureMax>& getIDs() const { return ids; }
     const GLuint& operator[](size_t pos) { return ids[pos]; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 
 private:
     std::array<GLuint, TextureMax> ids;
-    GLObjectStore* objectStore = nullptr;
+    ObjectStore* objectStore = nullptr;
 };
 
 class VAOHolder : public GLHolder {
@@ -130,7 +130,7 @@ public:
     VAOHolder(VAOHolder&& o) noexcept : GLHolder(std::move(o)) {}
     VAOHolder& operator=(VAOHolder&& o) noexcept { GLHolder::operator=(std::move(o)); return *this; }
 
-    void create(GLObjectStore&);
+    void create(ObjectStore&);
     void reset();
 };
 

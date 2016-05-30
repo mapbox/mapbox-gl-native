@@ -69,7 +69,7 @@ public:
     SymbolBucket(uint32_t overscaling, float zoom, const MapMode, const std::string& bucketName_, const std::string& sourceLayerName_);
     ~SymbolBucket() override;
 
-    void upload(gl::GLObjectStore&) override;
+    void upload(gl::ObjectStore&) override;
     void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool hasTextData() const;
@@ -82,10 +82,10 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void drawGlyphs(SDFShader&, gl::GLObjectStore&);
-    void drawIcons(SDFShader&, gl::GLObjectStore&);
-    void drawIcons(IconShader&, gl::GLObjectStore&);
-    void drawCollisionBoxes(CollisionBoxShader&, gl::GLObjectStore&);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&);
+    void drawIcons(SDFShader&, gl::ObjectStore&);
+    void drawIcons(IconShader&, gl::ObjectStore&);
+    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
     void parseFeatures(const GeometryTileLayer&, const Filter&);
     bool needsDependencies(GlyphStore&, SpriteStore&);

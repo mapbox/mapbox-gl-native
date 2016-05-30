@@ -37,14 +37,14 @@ void Raster::load(PremultipliedImage image) {
 }
 
 
-void Raster::bind(bool linear, gl::GLObjectStore& glObjectStore) {
+void Raster::bind(bool linear, gl::ObjectStore& store) {
     if (!width || !height) {
         Log::Error(Event::OpenGL, "trying to bind texture without dimension");
         return;
     }
 
     if (img.data && !textured) {
-        upload(glObjectStore);
+        upload(store);
     } else if (textured) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
     }
@@ -57,9 +57,9 @@ void Raster::bind(bool linear, gl::GLObjectStore& glObjectStore) {
     }
 }
 
-void Raster::upload(gl::GLObjectStore& glObjectStore) {
+void Raster::upload(gl::ObjectStore& store) {
     if (img.data && !textured) {
-        textureID = texturePool.getTextureID(glObjectStore);
+        textureID = texturePool.getTextureID(store);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));

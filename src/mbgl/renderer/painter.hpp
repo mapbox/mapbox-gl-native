@@ -70,7 +70,7 @@ class CollisionBoxShader;
 struct ClipID;
 
 namespace util {
-class GLObjectStore;
+class ObjectStore;
 }
 
 struct FrameData {
@@ -84,7 +84,7 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(const TransformState&, gl::GLObjectStore&);
+    Painter(const TransformState&, gl::ObjectStore&);
     ~Painter();
 
     void render(const Style& style,
@@ -136,7 +136,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::GLObjectStore&),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
 
                    // Layout
                    RotationAlignmentType rotationAlignment,
@@ -174,7 +174,7 @@ private:
     }();
 
     const TransformState& state;
-    gl::GLObjectStore& glObjectStore;
+    gl::ObjectStore& store;
 
     FrameData frame;
 

@@ -37,8 +37,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_mix = properties.backgroundPattern.value.t;
         patternShader->u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, glObjectStore);
-        backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
+        spriteAtlas->bind(true, store);
+        backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
 
     } else {
         if (wireframe) {
@@ -50,7 +50,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         }
 
         config.program = plainShader->getID();
-        backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
+        backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
     }
 
     config.stencilTest = GL_FALSE;

@@ -17,7 +17,7 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
@@ -58,7 +58,7 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    gl::GLObjectStore glObjectStore;
+    gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
 
@@ -109,13 +109,13 @@ Map::~Map() {
     impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by glObjectStore.performCleanup();
+    // cleaned up by store.performCleanup();
     impl->style.reset();
     impl->painter.reset();
     impl->texturePool.reset();
     impl->annotationManager.reset();
 
-    impl->glObjectStore.performCleanup();
+    impl->store.performCleanup();
 
     impl->view.deactivate();
 }
@@ -251,7 +251,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), glObjectStore);
+        painter = std::make_unique<Painter>(transform.getState(), store);
     }
 
     FrameData frameData { view.getFramebufferSize(),
@@ -270,7 +270,7 @@ void Map::Impl::render() {
         callback = nullptr;
     }
 
-    glObjectStore.performCleanup();
+    store.performCleanup();
 
     if (style->hasTransitions()) {
         updateFlags |= Update::RecalculateStyle;

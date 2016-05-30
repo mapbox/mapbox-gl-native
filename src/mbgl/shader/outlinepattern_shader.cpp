@@ -7,11 +7,11 @@
 
 using namespace mbgl;
 
-OutlinePatternShader::OutlinePatternShader(gl::GLObjectStore& glObjectStore)
+OutlinePatternShader::OutlinePatternShader(gl::ObjectStore& store)
     : Shader(
         "outlinepattern",
         shaders::outlinepattern::vertex, shaders::outlinepattern::fragment,
-        glObjectStore
+        store
     ) {
 }
 

@@ -61,7 +61,7 @@ void Painter::renderFill(FillBucket& bucket,
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader, glObjectStore);
+        bucket.drawVertices(*outlineShader, store);
     }
 
     if (pattern) {
@@ -112,11 +112,11 @@ void Painter::renderFill(FillBucket& bucket,
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
             config.activeTexture = GL_TEXTURE0;
-            spriteAtlas->bind(true, glObjectStore);
+            spriteAtlas->bind(true, store);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, glObjectStore);
+            bucket.drawElements(*patternShader, store);
 
             if (properties.fillAntialias && stroke_color == fill_color) {
                 config.program = outlinePatternShader->getID();
@@ -150,10 +150,10 @@ void Painter::renderFill(FillBucket& bucket,
                 outlinePatternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
                 config.activeTexture = GL_TEXTURE0;
-                spriteAtlas->bind(true, glObjectStore);
+                spriteAtlas->bind(true, store);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, glObjectStore);
+                bucket.drawVertices(*outlinePatternShader, store);
             }
         }
     } else if (!wireframe) {
@@ -170,7 +170,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, glObjectStore);
+            bucket.drawElements(*plainShader, store);
         }
     }
 
@@ -191,6 +191,6 @@ void Painter::renderFill(FillBucket& bucket,
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, glObjectStore);
+        bucket.drawVertices(*outlineShader, store);
     }
 }

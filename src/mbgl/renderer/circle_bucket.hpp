@@ -18,14 +18,14 @@ public:
     CircleBucket(const MapMode);
     ~CircleBucket() override;
 
-    void upload(gl::GLObjectStore&) override;
+    void upload(gl::ObjectStore&) override;
     void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
 
     bool hasData() const override;
     bool needsClipping() const override;
     void addGeometry(const GeometryCollection&);
 
-    void drawCircles(CircleShader&, gl::GLObjectStore&);
+    void drawCircles(CircleShader&, gl::ObjectStore&);
 
 private:
     CircleVertexBuffer vertexBuffer_;

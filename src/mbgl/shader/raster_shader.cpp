@@ -7,8 +7,8 @@
 
 using namespace mbgl;
 
-RasterShader::RasterShader(gl::GLObjectStore& glObjectStore)
-    : Shader("raster", shaders::raster::vertex, shaders::raster::fragment, glObjectStore) {
+RasterShader::RasterShader(gl::ObjectStore& store)
+    : Shader("raster", shaders::raster::vertex, shaders::raster::fragment, store) {
 }
 
 void RasterShader::bind(GLbyte* offset) {

@@ -14,9 +14,9 @@ CircleBucket::~CircleBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void CircleBucket::upload(gl::GLObjectStore& glObjectStore) {
-    vertexBuffer_.upload(glObjectStore);
-    elementsBuffer_.upload(glObjectStore);
+void CircleBucket::upload(gl::ObjectStore& store) {
+    vertexBuffer_.upload(store);
+    elementsBuffer_.upload(store);
     uploaded = true;
 }
 
@@ -80,7 +80,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
     }
 }
 
-void CircleBucket::drawCircles(CircleShader& shader, gl::GLObjectStore& glObjectStore) {
+void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
     GLbyte* vertexIndex = BUFFER_OFFSET(0);
     GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
@@ -89,7 +89,7 @@ void CircleBucket::drawCircles(CircleShader& shader, gl::GLObjectStore& glObject
 
         if (!group->elements_length) continue;
 
-        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, glObjectStore);
+        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, store);
 
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
 

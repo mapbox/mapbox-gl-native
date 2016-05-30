@@ -72,8 +72,8 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader->u_color = color;
         linesdfShader->u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, glObjectStore);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, glObjectStore);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, store);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, store);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.dashLineWidth;
@@ -95,9 +95,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linesdfShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        lineAtlas->bind(glObjectStore);
+        lineAtlas->bind(store);
 
-        bucket.drawLineSDF(*linesdfShader, glObjectStore);
+        bucket.drawLineSDF(*linesdfShader, store);
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -137,9 +137,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linepatternShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        spriteAtlas->bind(true, glObjectStore);
+        spriteAtlas->bind(true, store);
 
-        bucket.drawLinePatterns(*linepatternShader, glObjectStore);
+        bucket.drawLinePatterns(*linepatternShader, store);
 
     } else {
         config.program = lineShader->getID();
@@ -157,6 +157,6 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader->u_color = color;
         lineShader->u_opacity = opacity;
 
-        bucket.drawLines(*lineShader, glObjectStore);
+        bucket.drawLines(*lineShader, store);
     }
 }
