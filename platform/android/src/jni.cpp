@@ -277,35 +277,6 @@ mbgl::AnnotationSegment annotation_segment_from_latlng_jlist(JNIEnv *env, jni::j
     return segment;
 }
 
-std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> annotation_std_pair_from_polygon_jobject(JNIEnv *env, jni::jobject* polygon) {
-    jfloat alpha = jni::GetField<jfloat>(*env, polygon, *polygonAlphaId);
-    jint fillColor = jni::GetField<jint>(*env, polygon, *polygonFillColorId);
-    jint strokeColor = jni::GetField<jint>(*env, polygon, *polygonStrokeColorId);
-
-    int rF = (fillColor >> 16) & 0xFF;
-    int gF = (fillColor >> 8) & 0xFF;
-    int bF = (fillColor) & 0xFF;
-    int aF = (fillColor >> 24) & 0xFF;
-
-    int rS = (strokeColor >> 16) & 0xFF;
-    int gS = (strokeColor >> 8) & 0xFF;
-    int bS = (strokeColor) & 0xFF;
-    int aS = (strokeColor >> 24) & 0xFF;
-
-    mbgl::ShapeAnnotation::Properties shapeProperties;
-    mbgl::FillAnnotationProperties fillProperties;
-    fillProperties.opacity = alpha;
-    fillProperties.outlineColor = {{ static_cast<float>(rS) / 255.0f, static_cast<float>(gS) / 255.0f, static_cast<float>(bS) / 255.0f, static_cast<float>(aS) / 255.0f }};
-    fillProperties.color = {{ static_cast<float>(rF) / 255.0f, static_cast<float>(gF) / 255.0f, static_cast<float>(bF) / 255.0f, static_cast<float>(aF) / 255.0f }};
-    shapeProperties.set<mbgl::FillAnnotationProperties>(fillProperties);
-
-    jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
-    mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
-    jni::DeleteLocalRef(*env, points);
-
-    return std::make_pair(segment, shapeProperties);
-}
-
 static std::vector<uint8_t> metadata_from_java(JNIEnv* env, jni::jarray<jbyte>& j) {
     mbgl::Log::Debug(mbgl::Event::JNI, "metadata_from_java");
     std::size_t length = jni::GetArrayLength(*env, j);
@@ -777,6 +748,14 @@ jni::jarray<jlong>* nativeAddMarkers(JNIEnv *env, jni::jobject* obj, jlong nativ
     return std_vector_uint_to_jobject(env, pointAnnotationIDs);
 }
 
+static mbgl::Color toColor(jint color) {
+    float r = (color >> 16) & 0xFF;
+    float g = (color >> 8) & 0xFF;
+    float b = (color) & 0xFF;
+    float a = (color >> 24) & 0xFF;
+    return {{ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }};
+}
+
 jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jarray<jni::jobject>* jarray) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddPolylines");
     assert(nativeMapViewPtr != 0);
@@ -791,33 +770,21 @@ jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nat
     for (std::size_t i = 0; i < len; i++) {
         jni::jobject* polyline = jni::GetObjectArrayElement(*env, *jarray, i);
 
-        jfloat alpha = jni::GetField<jfloat>(*env, polyline, *polylineAlphaId);
-        jint color = jni::GetField<jint>(*env, polyline, *polylineColorId);
-
-        int r = (color >> 16) & 0xFF;
-        int g = (color >> 8) & 0xFF;
-        int b = (color) & 0xFF;
-        int a = (color >> 24) & 0xFF;
-
-        jfloat width = jni::GetField<jfloat>(*env, polyline, *polylineWidthId);
-
-        mbgl::ShapeAnnotation::Properties shapeProperties;
         mbgl::LineAnnotationProperties lineProperties;
-        lineProperties.opacity = alpha;
-        lineProperties.color = {{ static_cast<float>(r) / 255.0f, static_cast<float>(g) / 255.0f, static_cast<float>(b) / 255.0f, static_cast<float>(a) / 255.0f }};
-        lineProperties.width = width;
-        shapeProperties.set<mbgl::LineAnnotationProperties>(lineProperties);
+        lineProperties.opacity = jni::GetField<jfloat>(*env, polyline, *polylineAlphaId);
+        lineProperties.color = toColor(jni::GetField<jint>(*env, polyline, *polylineColorId));
+        lineProperties.width = jni::GetField<jfloat>(*env, polyline, *polylineWidthId);
 
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polyline, *polylinePointsId);
         mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+        jni::DeleteLocalRef(*env, points);
 
-        shapes.emplace_back(mbgl::AnnotationSegments { segment }, shapeProperties);
+        shapes.emplace_back(mbgl::AnnotationSegments { segment }, lineProperties);
 
         jni::DeleteLocalRef(*env, polyline);
     }
 
-    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
-    return std_vector_uint_to_jobject(env, shapeAnnotationIDs);
+    return std_vector_uint_to_jobject(env, nativeMapView->getMap().addShapeAnnotations(shapes));
 }
 
 jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jarray<jni::jobject>* jarray) {
@@ -834,14 +801,21 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
     for (std::size_t i = 0; i < len; i++) {
         jni::jobject* polygon = jni::GetObjectArrayElement(*env, *jarray, i);
 
-        std::pair<mbgl::AnnotationSegment, mbgl::ShapeAnnotation::Properties> segment = annotation_std_pair_from_polygon_jobject(env, polygon);
-        shapes.emplace_back(mbgl::AnnotationSegments { segment.first }, segment.second);
+        mbgl::FillAnnotationProperties fillProperties;
+        fillProperties.opacity = jni::GetField<jfloat>(*env, polygon, *polygonAlphaId);
+        fillProperties.outlineColor = toColor(jni::GetField<jint>(*env, polygon, *polygonStrokeColorId));
+        fillProperties.color = toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId));
+
+        jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
+        mbgl::AnnotationSegment segment = annotation_segment_from_latlng_jlist(env, points);
+        jni::DeleteLocalRef(*env, points);
+
+        shapes.emplace_back(mbgl::AnnotationSegments { segment }, fillProperties);
 
         jni::DeleteLocalRef(*env, polygon);
     }
 
-    std::vector<uint32_t> shapeAnnotationIDs = nativeMapView->getMap().addShapeAnnotations(shapes);
-    return std_vector_uint_to_jobject(env, shapeAnnotationIDs);
+    return std_vector_uint_to_jobject(env, nativeMapView->getMap().addShapeAnnotations(shapes));
 }
 
 void nativeRemoveAnnotations(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jarray<jlong>* jarray) {
