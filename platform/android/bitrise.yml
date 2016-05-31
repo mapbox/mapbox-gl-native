@@ -75,7 +75,7 @@ workflows:
             signing.secretKeyRingFile=secring.gpg" >> platform/android/MapboxGLAndroidSDK/gradle.properties
 
             export BUILDTYPE=Release
-            make apackage -j4
+            make apackage
 
             cd platform/android
             ./gradlew uploadArchives
