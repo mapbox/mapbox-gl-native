@@ -123,7 +123,7 @@ const NSTimeInterval MGLFlushInterval = 180;
 @property (nonatomic) MGLLocationManager *locationManager;
 @property (nonatomic) NSTimer *timer;
 @property (nonatomic) NSDate *instanceIDRotationDate;
-@property (nonatomic) NSDate *turnstileSendDate;
+@property (nonatomic) NSDate *nextTurnstileSendDate;
 
 @end
 
@@ -315,7 +315,7 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (void)pushTurnstileEvent {
-    if (self.turnstileSendDate && [[NSDate date] timeIntervalSinceDate:self.turnstileSendDate] < 0) {
+    if (self.nextTurnstileSendDate && [[NSDate date] timeIntervalSinceDate:self.nextTurnstileSendDate] < 0) {
         return;
     }
     
@@ -342,9 +342,23 @@ const NSTimeInterval MGLFlushInterval = 180;
             return;
         }
         [strongSelf writeEventToLocalDebugLog:turnstileEventAttributes];
-        NSTimeInterval twentyFourHourTimeInterval = 24 * 3600;
-        strongSelf.turnstileSendDate = [[NSDate date] dateByAddingTimeInterval:twentyFourHourTimeInterval];
+        [strongSelf updateNextTurnstileSendDate];
     }];
+}
+
+- (void)updateNextTurnstileSendDate {
+    // Find the time a day from now (sometime tomorrow)
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *dayComponent = [[NSDateComponents alloc] init];
+    dayComponent.day = 1;
+    NSDate *sometimeTomorrow = [calendar dateByAddingComponents:dayComponent toDate:[NSDate date] options:0];
+   
+    // Find the start of tomorrow and use that as the next turnstile send date. The effect of this is that
+    // turnstile events can be sent as much as once per calendar day and always at the start of a session
+    // when a map load happens.
+    NSDate *startOfTomorrow = nil;
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&startOfTomorrow interval:nil forDate:sometimeTomorrow];
+    self.nextTurnstileSendDate = startOfTomorrow;
 }
 
 + (void)pushEvent:(NSString *)event withAttributes:(MGLMapboxEventAttributes *)attributeDictionary {
