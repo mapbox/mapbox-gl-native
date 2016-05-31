@@ -4,3 +4,5 @@
 -dontwarn com.retrofit.**
 -dontwarn java.lang.**
 -dontwarn org.codehaus.**
+-keep class com.google.**
+-dontwarn com.google.**
