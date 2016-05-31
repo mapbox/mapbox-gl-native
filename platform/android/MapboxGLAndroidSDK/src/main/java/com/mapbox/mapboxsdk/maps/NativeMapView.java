@@ -347,27 +347,30 @@ final class NativeMapView {
     }
 
     public long addMarker(Marker marker) {
-        return nativeAddMarker(mNativeMapViewPtr, marker);
+        Marker[] markers = { marker };
+        return nativeAddMarkers(mNativeMapViewPtr, markers)[0];
     }
 
     public long[] addMarkers(List<Marker> markers) {
-        return nativeAddMarkers(mNativeMapViewPtr, markers);
+        return nativeAddMarkers(mNativeMapViewPtr, markers.toArray(new Marker[markers.size()]));
     }
 
     public long addPolyline(Polyline polyline) {
-        return nativeAddPolyline(mNativeMapViewPtr, polyline);
+        Polyline[] polylines = { polyline };
+        return nativeAddPolylines(mNativeMapViewPtr, polylines)[0];
     }
 
     public long[] addPolylines(List<Polyline> polylines) {
-        return nativeAddPolylines(mNativeMapViewPtr, polylines);
+        return nativeAddPolylines(mNativeMapViewPtr, polylines.toArray(new Polyline[polylines.size()]));
     }
 
     public long addPolygon(Polygon polygon) {
-        return nativeAddPolygon(mNativeMapViewPtr, polygon);
+        Polygon[] polygons = { polygon };
+        return nativeAddPolygons(mNativeMapViewPtr, polygons)[0];
     }
 
-    public long[] addPolygons(List<Polygon> polygon) {
-        return nativeAddPolygons(mNativeMapViewPtr, polygon);
+    public long[] addPolygons(List<Polygon> polygons) {
+        return nativeAddPolygons(mNativeMapViewPtr, polygons.toArray(new Polygon[polygons.size()]));
     }
 
     public void updateMarker(Marker marker) {
@@ -375,7 +378,8 @@ final class NativeMapView {
     }
 
     public void removeAnnotation(long id) {
-        nativeRemoveAnnotation(mNativeMapViewPtr, id);
+        long[] ids = { id };
+        removeAnnotations(ids);
     }
 
     public void removeAnnotations(long[] ids) {
@@ -589,21 +593,13 @@ final class NativeMapView {
 
     private native void nativeResetNorth(long nativeMapViewPtr);
 
-    private native long nativeAddMarker(long nativeMapViewPtr, Marker marker);
-
     private native void nativeUpdateMarker(long nativeMapViewPtr, Marker marker);
 
-    private native long[] nativeAddMarkers(long nativeMapViewPtr, List<Marker> markers);
+    private native long[] nativeAddMarkers(long nativeMapViewPtr, Marker[] markers);
 
-    private native long nativeAddPolyline(long nativeMapViewPtr, Polyline polyline);
+    private native long[] nativeAddPolylines(long mNativeMapViewPtr, Polyline[] polylines);
 
-    private native long[] nativeAddPolylines(long mNativeMapViewPtr, List<Polyline> polygon);
-
-    private native long nativeAddPolygon(long mNativeMapViewPtr, Polygon polygon);
-
-    private native long[] nativeAddPolygons(long mNativeMapViewPtr, List<Polygon> polygon);
-
-    private native void nativeRemoveAnnotation(long nativeMapViewPtr, long id);
+    private native long[] nativeAddPolygons(long mNativeMapViewPtr, Polygon[] polygons);
 
     private native void nativeRemoveAnnotations(long nativeMapViewPtr, long[] id);
 
