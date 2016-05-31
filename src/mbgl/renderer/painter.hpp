@@ -158,6 +158,8 @@ private:
     mat4 nativeMatrix;
     mat4 extrudeMatrix;
 
+    std::array<float, 2> extrudeScale;
+
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
         mat4 flip;

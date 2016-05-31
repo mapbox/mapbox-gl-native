@@ -100,6 +100,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // The extrusion matrix.
     matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
 
+    extrudeScale = {{ (2.0f / state.getWidth()) * state.getAltitude(), -2.0f / state.getHeight() * state.getAltitude() }};
+
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
     matrix::identity(nativeMatrix);

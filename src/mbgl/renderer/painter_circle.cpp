@@ -33,11 +33,12 @@ void Painter::renderCircle(CircleBucket& bucket,
     config.program = circleShader->getID();
 
     circleShader->u_matrix = vtxMatrix;
-    circleShader->u_exmatrix = extrudeMatrix;
+    circleShader->u_extrude_scale = extrudeScale;
+    circleShader->u_devicepixelratio = frame.pixelRatio;
     circleShader->u_color = properties.circleColor;
-    circleShader->u_opacity = properties.circleOpacity;
+    circleShader->u_radius = properties.circleRadius;
     circleShader->u_blur = std::max<float>(properties.circleBlur, antialiasing);
-    circleShader->u_size = properties.circleRadius;
+    circleShader->u_opacity = properties.circleOpacity;
 
     bucket.drawCircles(*circleShader, glObjectStore);
 }
