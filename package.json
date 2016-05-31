@@ -19,7 +19,7 @@
   "devDependencies": {
     "aws-sdk": "^2.3.5",
     "express": "^4.11.1",
-    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#13aad76282c1b6c4d38fd46f373325dfec69ab01",
+    "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#49022d5b92c067b8659f5700a04f376d75f2950e",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#b3441d9a285ffbe9b876677acb13d7df07e5b975",
     "node-gyp": "^3.3.1",
     "request": "^2.72.0",

@@ -183,35 +183,21 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             mat4 vtxMatrix =
                 translatedMatrix(matrix, paint.iconTranslate, tileID, paint.iconTranslateAnchor);
 
-            bool skewed = layout.iconRotationAlignment == RotationAlignmentType::Map;
-            mat4 exMatrix;
-            float s;
-
-            if (skewed) {
-                matrix::identity(exMatrix);
-                s = tileID.pixelsToTileUnits(1, state.getZoom());
+            float scale = fontScale;
+            std::array<float, 2> exScale = extrudeScale;
+            const bool alignedWithMap = layout.iconRotationAlignment == RotationAlignmentType::Map;
+            if (alignedWithMap) {
+                scale *= tileID.pixelsToTileUnits(1, state.getZoom());
+                exScale.fill(scale);
             } else {
-                exMatrix = extrudeMatrix;
-                matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
-                s = state.getAltitude();
+                exScale = {{ exScale[0] * scale, exScale[1] * scale }};
             }
-            const bool flippedY = !skewed && state.getViewportMode() == ViewportMode::FlippedY;
-            matrix::scale(exMatrix, exMatrix, s, flippedY ? -s : s, 1);
-
-            matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
-
-            // calculate how much longer the real world distance is at the top of the screen
-            // than at the middle of the screen.
-            float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4.0f * (1.0f + std::pow(state.getAltitude(), 2)));
-            float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
-            float extra = (topedgelength + x) / topedgelength - 1;
 
             config.program = iconShader->getID();
             iconShader->u_matrix = vtxMatrix;
-            iconShader->u_exmatrix = exMatrix;
+            iconShader->u_extrude_scale = exScale;
             iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
-            iconShader->u_skewed = skewed;
-            iconShader->u_extra = extra;
+            iconShader->u_skewed = alignedWithMap;
             iconShader->u_texture = 0;
 
             // adjust min/max zooms for variable font sies
