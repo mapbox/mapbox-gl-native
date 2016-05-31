@@ -191,7 +191,10 @@ VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
             features.push_back(layer_pbf.get_message());
             break;
         case 3: // keys
-            keysMap.emplace(layer_pbf.get_string(), keysMap.size());
+            {
+                auto iter = keysMap.emplace(layer_pbf.get_string(), keysMap.size());
+                keys.emplace_back(std::reference_wrapper<const std::string>(iter.first->first));
+            }
             break;
         case 4: // values
             values.emplace_back(parseValue(layer_pbf.get_message()));
@@ -206,10 +209,6 @@ VectorTileLayer::VectorTileLayer(protozero::pbf_reader layer_pbf) {
             layer_pbf.skip();
             break;
         }
-    }
-
-    for (auto &pair : keysMap) {
-        keys.emplace_back(std::reference_wrapper<const std::string>(pair.first));
     }
 }
 
