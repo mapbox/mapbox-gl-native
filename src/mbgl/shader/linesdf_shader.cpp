@@ -8,8 +8,8 @@
 using namespace mbgl;
 
 LineSDFShader::LineSDFShader(gl::GLObjectStore& glObjectStore)
-    : Shader("linesdfpattern", shaders::linesdfpattern::vertex, shaders::linesdfpattern::fragment, glObjectStore) {
-    a_data = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"));
+    : Shader("linesdfpattern", shaders::linesdfpattern::vertex, shaders::linesdfpattern::fragment, glObjectStore)
+    , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 
 void LineSDFShader::bind(GLbyte* offset) {
