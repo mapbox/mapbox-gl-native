@@ -47,11 +47,9 @@ public class Style {
 
     /**
      * Get versioned url of Mapbox streets style.
-     * <p>
      * <ul>
      * <li>Current default version is 9.</li>
-     * </ul
-     * </p>
+     * </ul>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>
@@ -65,11 +63,9 @@ public class Style {
 
     /**
      * Get versioned url of Outdoors streets style.
-     * <p>
      * <ul>
      * <li>Current version is 9.</li>
      * </ul>
-     * </p>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>
@@ -83,11 +79,9 @@ public class Style {
 
     /**
      * Get versioned url of Light style.
-     * <p>
      * <ul>
      * <li>Current default version is 9.</li>
      * </ul>
-     * </p>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>
@@ -101,11 +95,9 @@ public class Style {
 
     /**
      * Get versioned url of Dark style.
-     * <p>
      * <ul>
      * <li>Current default version is 9.</li>
      * </ul>
-     * </p>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>
@@ -119,11 +111,9 @@ public class Style {
 
     /**
      * Get versioned url of Satellite style.
-     * <p>
      * <ul>
      * <li>Current version is 9.</li>
      * </ul>
-     * </p>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>
@@ -137,11 +127,9 @@ public class Style {
 
     /**
      * Get versioned url of Satellite streets style.
-     * <p>
      * <ul>
      * <li>Current version is 9.</li>
      * </ul>
-     * </p>
      * <p>
      * More information on the Mapbox styles API can be found on https://www.mapbox.com/api-documentation/#styles
      * </p>

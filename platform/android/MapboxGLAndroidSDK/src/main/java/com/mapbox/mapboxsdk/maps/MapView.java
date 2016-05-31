@@ -874,7 +874,7 @@ public class MapView extends FrameLayout {
      * <p>
      * DEPRECATED @see MapboxAccountManager#getAccessToken()
      * </p>
-     * <p/>
+     * <p>
      * Returns the current Mapbox access token used to load map styles and tiles.
      * </p>
      *
