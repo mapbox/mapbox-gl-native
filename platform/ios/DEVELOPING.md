@@ -36,6 +36,7 @@ If you don’t have an Apple Developer account, change the destination to a simu
 
 You can customize the build output by passing the following arguments into the `make` invocation:
 
+* `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
 * `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for compatibility with iOS 7.x.
 * `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries.

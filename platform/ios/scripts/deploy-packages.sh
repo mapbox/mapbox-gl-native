@@ -56,6 +56,7 @@ export TRAVIS_REPO_SLUG=mapbox-gl-native
 export PUBLISH_VERSION=$1
 export GITHUB_USER=mapbox
 export GITHUB_REPO=mapbox-gl-native
+export BUILDTYPE=Release
 
 BINARY_DIRECTORY=$2
 PUBLISH_PRE_FLAG=''
