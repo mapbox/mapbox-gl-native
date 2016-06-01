@@ -22,6 +22,7 @@ GTEST_VERSION=1.7.0${CXX11ABI:-}
 PIXELMATCH_VERSION=0.9.0
 WEBP_VERSION=0.5.0
 EARCUT_VERSION=0.11
+BENCHMARK_VERSION=1.0.0
 
 function print_opengl_flags {
     CONFIG+="    'opengl_cflags%': $(quote_flags $(pkg-config gl x11 --cflags)),"$LN

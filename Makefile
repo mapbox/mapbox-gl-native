@@ -34,7 +34,7 @@ CONFIG_DEPENDENCIES = .mason/mason configure
 
 # Depend on gyp includes plus directories, so that projects are regenerated when
 # files are added or removed.
-GYP_DEPENDENCIES = mbgl.gypi test/test.gypi bin/*.gypi $(shell find src include -type d) node_modules
+GYP_DEPENDENCIES = mbgl.gypi test/test.gypi benchmark/benchmark.gypi bin/*.gypi $(shell find src include -type d) node_modules
 
 #### OS X targets ##############################################################
 
