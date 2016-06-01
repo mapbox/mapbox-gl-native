@@ -116,7 +116,7 @@ matrix:
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       script:
-        - make qt-app qt-qml-app
+        - make qt-app qt-qml-app test-qt
 
 cache:
   directories:
