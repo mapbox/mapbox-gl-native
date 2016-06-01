@@ -63,6 +63,9 @@ matrix:
         - nvm use 4
         - make node
         - make test-node
+      after_script:
+        - ccache --show-stats
+        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
     # GCC 5 - Debug - Coverage
     - os: linux
