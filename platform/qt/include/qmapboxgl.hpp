@@ -165,15 +165,11 @@ public:
     QStringList getClasses() const;
 
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
-    QMapbox::AnnotationIDs addPointAnnotations(const QMapbox::PointAnnotations &);
-
     QMapbox::AnnotationID addShapeAnnotation(const QMapbox::ShapeAnnotation &);
-    QMapbox::AnnotationIDs addShapeAnnotations(const QMapbox::ShapeAnnotations &);
 
     void updatePointAnnotation(QMapbox::AnnotationID, const QMapbox::PointAnnotation &);
 
     void removeAnnotation(QMapbox::AnnotationID);
-    void removeAnnotations(const QMapbox::AnnotationIDs &);
 
     bool isRotating() const;
     bool isScaling() const;

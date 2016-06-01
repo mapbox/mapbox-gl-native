@@ -7,8 +7,7 @@
 #import <OpenGLES/EAGL.h>
 
 #include <mbgl/mbgl.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/mode.hpp>
@@ -1776,9 +1775,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         // but safely updated.
         if (annotation == [self annotationWithTag:annotationTag])
         {
-            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+            const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, annotationImage.styleIconIdentifier.UTF8String ?: "" });
             if (annotationTag == _selectedAnnotationTag)
             {
                 [self deselectAnnotation:annotation animated:YES];
@@ -2796,11 +2795,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if ( ! annotations) return;
     [self willChangeValueForKey:@"annotations"];
 
-    NSMutableArray *userPoints = [NSMutableArray array];
-    std::vector<mbgl::PointAnnotation> points;
-    NSMutableArray *userShapes = [NSMutableArray array];
-    std::vector<mbgl::ShapeAnnotation> shapes;
-    
     NSMutableDictionary *annotationImagesForAnnotation = [NSMutableDictionary dictionary];
     NSMutableDictionary *annotationViewsForAnnotation = [NSMutableDictionary dictionary];
 
@@ -2820,8 +2814,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             if (!multiPoint.pointCount) {
                 continue;
             }
-            shapes.emplace_back([multiPoint shapeAnnotationObjectWithDelegate:self]);
-            [userShapes addObject:annotation];
+
+            MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
+            MGLAnnotationContext context;
+            context.annotation = annotation;
+            _annotationContextsByAnnotationTag[annotationTag] = context;
         }
         else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
                  || [annotation isKindOfClass:[MGLMultiPolygon class]]
@@ -2877,22 +2874,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 annotationImagesForAnnotation[annotationValue] = annotationImage;
             }
 
-            [userPoints addObject:annotation];
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
-        }
-    }
+            MGLAnnotationTag annotationTag = _mbglMap->addAnnotation(mbgl::SymbolAnnotation {
+                MGLPointFromLocationCoordinate2D(annotation.coordinate),
+                symbolName.UTF8String ?: ""
+            });
 
-    if (points.size())
-    {
-        // refactor this to build contexts above and just associate with tags here
-        
-        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addPointAnnotations(points);
-        
-        for (size_t i = 0; i < annotationTags.size(); ++i)
-        {
-            id<MGLAnnotation> annotation = userPoints[i];
-            NSValue *annotationValue = [NSValue valueWithNonretainedObject:annotation];
-            
             MGLAnnotationContext context;
             context.annotation = annotation;
             MGLAnnotationImage *annotationImage = annotationImagesForAnnotation[annotationValue];
@@ -2900,13 +2886,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             if (annotationImage) {
                 context.imageReuseIdentifier = annotationImage.reuseIdentifier;
             }
-            MGLAnnotationView *annotationView = annotationViewsForAnnotation[annotationValue];
             if (annotationView) {
                 context.annotationView = annotationView;
                 context.viewReuseIdentifier = annotationView.reuseIdentifier;
             }
             
-            MGLAnnotationTag annotationTag = annotationTags[i];
             _annotationContextsByAnnotationTag[annotationTag] = context;
             if ([annotation isKindOfClass:[NSObject class]]) {
                 NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
@@ -2915,21 +2899,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
     }
 
-    if (shapes.size())
-    {
-        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addShapeAnnotations(shapes);
-        
-        for (size_t i = 0; i < annotationTags.size(); ++i)
-        {
-            MGLAnnotationTag annotationTag = annotationTags[i];
-            id <MGLAnnotation> annotation = userShapes[i];
-            
-            MGLAnnotationContext context;
-            context.annotation = annotation;
-            _annotationContextsByAnnotationTag[annotationTag] = context;
-        }
-    }
-    
     [self updateAnnotationContainerViewWithAnnotationViews:newAnnotationViews];
     
     [self didChangeValueForKey:@"annotations"];
@@ -3072,8 +3041,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 {
     if ( ! annotations) return;
 
-    std::vector<MGLAnnotationTag> annotationTagsToRemove;
-    annotationTagsToRemove.reserve(annotations.count);
+    [self willChangeValueForKey:@"annotations"];
 
     for (id <MGLAnnotation> annotation in annotations)
     {
@@ -3088,8 +3056,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         MGLAnnotationView *annotationView = annotationContext.annotationView;
         [annotationView removeFromSuperview];
-        
-        annotationTagsToRemove.push_back(annotationTag);
 
         if (annotationTag == _selectedAnnotationTag)
         {
@@ -3102,15 +3068,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
         }
+
+        _mbglMap->removeAnnotation(annotationTag);
     }
 
-    if ( ! annotationTagsToRemove.empty())
-    {
-        [self willChangeValueForKey:@"annotations"];
-        _mbglMap->removeAnnotations(annotationTagsToRemove);
-        [self didChangeValueForKey:@"annotations"];
-        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
-    }
+    [self didChangeValueForKey:@"annotations"];
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)addOverlay:(id <MGLOverlay>)overlay
@@ -3675,8 +3638,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         if ([pair.second.imageReuseIdentifier isEqualToString:reuseIdentifier])
         {
-            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(pair.second.annotation.coordinate);
-            _mbglMap->updatePointAnnotation(pair.first, { latLng, iconIdentifier.UTF8String ?: "" });
+            const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(pair.second.annotation.coordinate);
+            _mbglMap->updateAnnotation(pair.first, mbgl::SymbolAnnotation { point, iconIdentifier.UTF8String ?: "" });
         }
     }
 }

@@ -1,8 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
 
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
@@ -29,7 +28,7 @@ void checkRendering(Map& map, const char * name) {
 
 } // end namespace
 
-TEST(Annotations, PointAnnotation) {
+TEST(Annotations, SymbolAnnotation) {
     util::RunLoop loop;
 
     auto display = std::make_shared<mbgl::HeadlessDisplay>();
@@ -39,7 +38,7 @@ TEST(Annotations, PointAnnotation) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
 
     checkRendering(map, "point_annotation");
 }
@@ -56,11 +55,11 @@ TEST(Annotations, LineAnnotation) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
 
-    LineAnnotationProperties properties;
-    properties.color = {{ 255, 0, 0, 1 }};
-    properties.width = 5;
+    LineAnnotation annotation { line };
+    annotation.color = {{ 255, 0, 0, 1 }};
+    annotation.width = 5;
 
-    map.addShapeAnnotation(ShapeAnnotation(line, properties));
+    map.addAnnotation(annotation);
 
     checkRendering(map, "line_annotation");
 }
@@ -77,10 +76,10 @@ TEST(Annotations, FillAnnotation) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillAnnotationProperties properties;
-    properties.color = {{ 255, 0, 0, 1 }};
+    FillAnnotation annotation { polygon };
+    annotation.color = {{ 255, 0, 0, 1 }};
 
-    map.addShapeAnnotation(ShapeAnnotation(polygon, properties));
+    map.addAnnotation(annotation);
 
     checkRendering(map, "fill_annotation");
 }
@@ -97,7 +96,7 @@ TEST(Annotations, StyleSourcedShapeAnnotation) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    map.addShapeAnnotation(ShapeAnnotation(polygon, "annotation"));
+    map.addAnnotation(StyleSourcedAnnotation { polygon, "annotation" });
 
     checkRendering(map, "style_sourced_shape_annotation");
 }
@@ -112,11 +111,11 @@ TEST(Annotations, AddMultiple) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addPointAnnotation(PointAnnotation({ 0, -10 }, "default_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
 
     test::render(map);
 
-    map.addPointAnnotation(PointAnnotation({ 0, 10 }, "default_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double> { 10, 0 }, "default_marker" });
 
     checkRendering(map, "add_multiple");
 }
@@ -135,10 +134,10 @@ TEST(Annotations, NonImmediateAdd) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    FillAnnotationProperties properties;
-    properties.color = {{ 255, 0, 0, 1 }};
+    FillAnnotation annotation { polygon };
+    annotation.color = {{ 255, 0, 0, 1 }};
 
-    map.addShapeAnnotation(ShapeAnnotation(polygon, properties));
+    map.addAnnotation(annotation);
 
     checkRendering(map, "non_immediate_add");
 }
@@ -153,7 +152,7 @@ TEST(Annotations, UpdateIcon) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("flipped_marker", namedMarker("default_marker.png"));
-    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "flipped_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
 
     test::render(map);
 
@@ -175,11 +174,11 @@ TEST(Annotations, UpdatePoint) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
-    AnnotationID point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+    AnnotationID point = map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(map);
 
-    map.updatePointAnnotation(point, PointAnnotation({ 0, -10 }, "flipped_marker"));
+    map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "flipped_marker" });
 
     checkRendering(map, "update_point");
 }
@@ -194,7 +193,7 @@ TEST(Annotations, RemovePoint) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    AnnotationID point = map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+    AnnotationID point = map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(map);
 
@@ -212,13 +211,13 @@ TEST(Annotations, RemoveShape) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
 
-    LineAnnotationProperties properties;
-    properties.color = {{ 255, 0, 0, 1 }};
-    properties.width = 5;
+    LineAnnotation annotation { line };
+    annotation.color = {{ 255, 0, 0, 1 }};
+    annotation.width = 5;
 
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    AnnotationID shape = map.addShapeAnnotation(ShapeAnnotation(line, properties));
+    AnnotationID shape = map.addAnnotation(annotation);
 
     test::render(map);
 
@@ -235,7 +234,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     StubFileSource fileSource;
     Map map(view, fileSource, MapMode::Still);
 
-    map.removeAnnotation(map.addShapeAnnotation(ShapeAnnotation(LineString<double>(), {})));
+    map.removeAnnotation(map.addAnnotation(LineAnnotation { LineString<double>() }));
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
     test::render(map);
@@ -251,7 +250,7 @@ TEST(Annotations, SwitchStyle) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addPointAnnotation(PointAnnotation({ 0, 0 }, "default_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(map);
 
@@ -270,12 +269,11 @@ TEST(Annotations, QueryRenderedFeatures) {
     Map map(view, fileSource, MapMode::Still);
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
     map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    const LatLng latLng(0, 0);
-    map.addPointAnnotation(PointAnnotation(latLng, "default_marker"));
+    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(map);
     
-    auto point = map.pixelForLatLng(latLng);
+    auto point = map.pixelForLatLng({ 0, 0 });
     auto features = map.queryRenderedFeatures(point);
     EXPECT_EQ(features.size(), 1);
 }

@@ -23,8 +23,6 @@ namespace mbgl {
 class FileSource;
 class View;
 class SpriteImage;
-class PointAnnotation;
-class ShapeAnnotation;
 struct CameraOptions;
 struct AnimationOptions;
 
@@ -142,16 +140,9 @@ public:
     void removeAnnotationIcon(const std::string&);
     double getTopOffsetPixelsForAnnotationIcon(const std::string&);
 
-    AnnotationID addPointAnnotation(const PointAnnotation&);
-    AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
-
-    AnnotationID addShapeAnnotation(const ShapeAnnotation&);
-    AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
-
-    void updatePointAnnotation(AnnotationID, const PointAnnotation&);
-
+    AnnotationID addAnnotation(const Annotation&);
+    void updateAnnotation(AnnotationID, const Annotation&);
     void removeAnnotation(AnnotationID);
-    void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 

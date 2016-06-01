@@ -1,24 +1,29 @@
-#include <mbgl/annotation/point_annotation_impl.hpp>
+#include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 
-PointAnnotationImpl::PointAnnotationImpl(const AnnotationID id_, const PointAnnotation& point_)
+SymbolAnnotationImpl::SymbolAnnotationImpl(const AnnotationID id_, const SymbolAnnotation& annotation_)
 : id(id_),
-  point(point_) {
+  annotation(annotation_) {
+    if (!annotation.geometry.is<Point<double>>()) {
+        throw std::runtime_error("unsupported symbol annotation geometry type");
+    }
 }
 
-void PointAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
+void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
-    featureProperties.emplace("sprite", point.icon.empty() ? std::string("default_marker") : point.icon);
+    featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker") : annotation.icon);
+
+    const Point<double>& p = annotation.geometry.get<Point<double>>();
 
     // Clamp to the latitude limits of Web Mercator.
-    const double constrainedLatitude = util::clamp(point.position.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
+    const double constrainedLatitude = util::clamp(p.y, -util::LATITUDE_MAX, util::LATITUDE_MAX);
 
     // Project a coordinate into unit space in a square map.
     const double sine = std::sin(constrainedLatitude * util::DEG2RAD);
-    const double x = point.position.longitude / util::DEGREES_MAX + 0.5;
+    const double x = p.x / util::DEGREES_MAX + 0.5;
     const double y = 0.5 - 0.25 * std::log((1.0 + sine) / (1.0 - sine)) / M_PI;
 
     Point<double> projected(x, y);

@@ -44,7 +44,6 @@ public:
     void report(float duration);
 
 private:
-    mbgl::LatLng makeRandomLatLng() const;
     mbgl::Point<double> makeRandomPoint() const;
     static std::shared_ptr<const mbgl::SpriteImage>
     makeSpriteImage(int width, int height, float pixelRatio);

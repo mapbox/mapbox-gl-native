@@ -1,8 +1,7 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/annotation/point_annotation_impl.hpp>
-#include <mbgl/annotation/shape_annotation_impl.hpp>
+#include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/geo.hpp>
@@ -11,13 +10,14 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 namespace mbgl {
 
-class PointAnnotation;
-class ShapeAnnotation;
 class AnnotationTile;
 class AnnotationTileMonitor;
+class SymbolAnnotationImpl;
+class ShapeAnnotationImpl;
 class Style;
 
 class AnnotationManager : private util::noncopyable {
@@ -25,10 +25,9 @@ public:
     AnnotationManager(float pixelRatio);
     ~AnnotationManager();
 
-    AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
-    AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
-    void updatePointAnnotation(const AnnotationID&, const PointAnnotation&, const uint8_t maxZoom);
-    void removeAnnotations(const AnnotationIDs&);
+    AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);
+    void updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
+    void removeAnnotation(const AnnotationID&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
 
@@ -46,12 +45,22 @@ public:
     static const std::string PointLayerID;
 
 private:
+    void add(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
+    void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
+    void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    void add(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
+
     std::unique_ptr<AnnotationTile> getTile(const CanonicalTileID&);
 
     AnnotationID nextID = 0;
-    PointAnnotationImpl::Tree pointTree;
-    PointAnnotationImpl::Map pointAnnotations;
-    ShapeAnnotationImpl::Map shapeAnnotations;
+
+    using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
+    using SymbolAnnotationMap = std::unordered_map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
+    using ShapeAnnotationMap = std::unordered_map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
+
+    SymbolAnnotationTree symbolTree;
+    SymbolAnnotationMap symbolAnnotations;
+    ShapeAnnotationMap shapeAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;
     std::set<AnnotationTileMonitor*> monitors;
 

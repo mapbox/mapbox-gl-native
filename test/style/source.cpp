@@ -16,6 +16,8 @@
 #include <mbgl/layer/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
+#include <mapbox/geojsonvt.hpp>
+
 using namespace mbgl;
 
 class SourceTest {

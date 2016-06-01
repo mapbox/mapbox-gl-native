@@ -18,7 +18,7 @@
 #import "MGLMapViewDelegate.h"
 
 #import <mbgl/mbgl.hpp>
-#import <mbgl/annotation/point_annotation.hpp>
+#import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/platform/darwin/reachability.h>
 #import <mbgl/gl/gl.hpp>
@@ -481,9 +481,9 @@ public:
         // match a valid annotation tag, the annotation will be unnecessarily
         // but safely updated.
         if (annotation == [self annotationWithTag:annotationTag]) {
-            const mbgl::LatLng latLng = MGLLatLngFromLocationCoordinate2D(annotation.coordinate);
+            const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            _mbglMap->updatePointAnnotation(annotationTag, { latLng, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, annotationImage.styleIconIdentifier.UTF8String ?: "" });
             if (annotationTag == _selectedAnnotationTag) {
                 [self deselectAnnotation:annotation];
             }
@@ -1604,12 +1604,6 @@ public:
     
     BOOL delegateHasImagesForAnnotations = [self.delegate respondsToSelector:@selector(mapView:imageForAnnotation:)];
     
-    NSMutableArray *userPoints = [NSMutableArray array];
-    std::vector<mbgl::PointAnnotation> points;
-    NSMutableArray *userShapes = [NSMutableArray array];
-    std::vector<mbgl::ShapeAnnotation> shapes;
-    NSMutableArray *annotationImages = [NSMutableArray arrayWithCapacity:annotations.count];
-    
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
         
@@ -1619,8 +1613,11 @@ public:
             if (!multiPoint.pointCount) {
                 continue;
             }
-            shapes.emplace_back([multiPoint shapeAnnotationObjectWithDelegate:self]);
-            [userShapes addObject:annotation];
+
+            MGLAnnotationTag annotationTag = _mbglMap->addAnnotation([multiPoint annotationObjectWithDelegate:self]);
+            MGLAnnotationContext context;
+            context.annotation = annotation;
+            _annotationContextsByAnnotationTag[annotationTag] = context;
         } else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
                    || [annotation isKindOfClass:[MGLMultiPolygon class]]
                    || [annotation isKindOfClass:[MGLShapeCollection class]]) {
@@ -1647,28 +1644,12 @@ public:
                 self.annotationImagesByIdentifier[annotationImage.reuseIdentifier] = annotationImage;
                 [self installAnnotationImage:annotationImage];
             }
-            [annotationImages addObject:annotationImage];
-            
-            [userPoints addObject:annotation];
-            points.emplace_back(MGLLatLngFromLocationCoordinate2D(annotation.coordinate), symbolName.UTF8String ?: "");
-            
-            // Opt into potentially expensive tooltip tracking areas.
-            if (annotation.toolTip.length) {
-                _wantsToolTipRects = YES;
-            }
-        }
-    }
-    
-    // Add any point annotations to mbgl and our own index.
-    if (points.size()) {
-        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addPointAnnotations(points);
-        
-        for (size_t i = 0; i < annotationTags.size(); ++i) {
-            MGLAnnotationTag annotationTag = annotationTags[i];
-            MGLAnnotationImage *annotationImage = annotationImages[i];
-            annotationImage.styleIconIdentifier = @(points[i].icon.c_str());
-            id <MGLAnnotation> annotation = userPoints[i];
-            
+
+            MGLAnnotationTag annotationTag = _mbglMap->addAnnotation(mbgl::SymbolAnnotation {
+                MGLPointFromLocationCoordinate2D(annotation.coordinate),
+                symbolName.UTF8String ?: ""
+            });
+
             MGLAnnotationContext context;
             context.annotation = annotation;
             context.imageReuseIdentifier = annotationImage.reuseIdentifier;
@@ -1678,23 +1659,14 @@ public:
                 NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
                 [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
             }
+
+            // Opt into potentially expensive tooltip tracking areas.
+            if (annotation.toolTip.length) {
+                _wantsToolTipRects = YES;
+            }
         }
     }
-    
-    // Add any shape annotations to mbgl and our own index.
-    if (shapes.size()) {
-        std::vector<MGLAnnotationTag> annotationTags = _mbglMap->addShapeAnnotations(shapes);
-        
-        for (size_t i = 0; i < annotationTags.size(); ++i) {
-            MGLAnnotationTag annotationTag = annotationTags[i];
-            id <MGLAnnotation> annotation = userShapes[i];
-            
-            MGLAnnotationContext context;
-            context.annotation = annotation;
-            _annotationContextsByAnnotationTag[annotationTag] = context;
-        }
-    }
-    
+
     [self didChangeValueForKey:@"annotations"];
     
     [self updateAnnotationTrackingAreas];
@@ -1765,16 +1737,14 @@ public:
         return;
     }
     
-    std::vector<MGLAnnotationTag> annotationTagsToRemove;
-    annotationTagsToRemove.reserve(annotations.count);
-    
+    [self willChangeValueForKey:@"annotations"];
+
     for (id <MGLAnnotation> annotation in annotations) {
         NSAssert([annotation conformsToProtocol:@protocol(MGLAnnotation)], @"Annotation does not conform to MGLAnnotation");
         
         MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
         NSAssert(annotationTag != MGLAnnotationTagNotFound, @"No ID for annotation %@", annotation);
-        annotationTagsToRemove.push_back(annotationTag);
-        
+
         if (annotationTag == _selectedAnnotationTag) {
             [self deselectAnnotation:annotation];
         }
@@ -1788,10 +1758,10 @@ public:
             ![annotation isKindOfClass:[MGLMultiPoint class]]) {
             [(NSObject *)annotation removeObserver:self forKeyPath:@"coordinate" context:(void *)(NSUInteger)annotationTag];
         }
+
+        _mbglMap->removeAnnotation(annotationTag);
     }
     
-    [self willChangeValueForKey:@"annotations"];
-    _mbglMap->removeAnnotations(annotationTagsToRemove);
     [self didChangeValueForKey:@"annotations"];
     
     [self updateAnnotationTrackingAreas];

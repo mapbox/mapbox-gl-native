@@ -1,7 +1,6 @@
 #include "qmapboxgl_p.hpp"
 
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
@@ -376,40 +375,23 @@ QStringList QMapboxGL::getClasses() const
     return classNames;
 }
 
-mbgl::PointAnnotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
+mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
     const Coordinate &coordinate = pointAnnotation.first;
     const QString &icon = pointAnnotation.second;
-    return { { coordinate.first, coordinate.second }, icon.toStdString() };
+    return mbgl::SymbolAnnotation { mbgl::Point<double> { coordinate.second, coordinate.first }, icon.toStdString() };
 }
 
 AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
 {
-    return d_ptr->mapObj->addPointAnnotation(fromPointAnnotation(pointAnnotation));
-}
-
-AnnotationIDs QMapboxGL::addPointAnnotations(const PointAnnotations &pointAnnotations)
-{
-    std::vector<mbgl::PointAnnotation> mbglPointAnnotations;
-    mbglPointAnnotations.reserve(pointAnnotations.size());
-
-    for (const PointAnnotation &pointAnnotation : pointAnnotations) {
-        mbglPointAnnotations.emplace_back(fromPointAnnotation(pointAnnotation));
-    }
-
-    AnnotationIDs ids;
-    for (const mbgl::AnnotationID &id : d_ptr->mapObj->addPointAnnotations(mbglPointAnnotations)) {
-        ids << id;
-    }
-
-    return ids;
+    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(pointAnnotation));
 }
 
 void QMapboxGL::updatePointAnnotation(AnnotationID id, const PointAnnotation &pointAnnotation)
 {
-    d_ptr->mapObj->updatePointAnnotation(id, fromPointAnnotation(pointAnnotation));
+    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(pointAnnotation));
 }
 
-mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
+mbgl::Annotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     const CoordinateSegments &segments = shapeAnnotation.first;
     const QString &styleLayer = shapeAnnotation.second;
 
@@ -427,46 +409,17 @@ mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeA
         polygon.emplace_back(linearRing);
     }
 
-    return { polygon, styleLayer.toStdString() };
+    return mbgl::StyleSourcedAnnotation { polygon, styleLayer.toStdString() };
 }
 
 AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
 {
-    return d_ptr->mapObj->addShapeAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
-}
-
-AnnotationIDs QMapboxGL::addShapeAnnotations(const ShapeAnnotations &shapeAnnotations)
-{
-    std::vector<mbgl::ShapeAnnotation> mbglShapeAnnotations;
-    mbglShapeAnnotations.reserve(shapeAnnotations.size());
-
-    for (const ShapeAnnotation &shapeAnnotation : shapeAnnotations) {
-        mbglShapeAnnotations.emplace_back(fromQMapboxGLShapeAnnotation(shapeAnnotation));
-    }
-
-    AnnotationIDs ids;
-    for (const mbgl::AnnotationID &id : d_ptr->mapObj->addShapeAnnotations(mbglShapeAnnotations)) {
-        ids << id;
-    }
-
-    return ids;
+    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
 }
 
 void QMapboxGL::removeAnnotation(AnnotationID annotationID)
 {
     d_ptr->mapObj->removeAnnotation(annotationID);
-}
-
-void QMapboxGL::removeAnnotations(const AnnotationIDs &annotationIDs)
-{
-    std::vector<mbgl::AnnotationID> mbglAnnotationIds;
-    mbglAnnotationIds.reserve(annotationIDs.size());
-
-    for (const AnnotationID annotationID : annotationIDs) {
-        mbglAnnotationIds.emplace_back(annotationID);
-    }
-
-    d_ptr->mapObj->removeAnnotations(mbglAnnotationIds);
 }
 
 bool QMapboxGL::isRotating() const

@@ -3,8 +3,6 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/style_observer.hpp>
@@ -693,37 +691,19 @@ double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
     return impl->annotationManager->getTopOffsetPixelsForIcon(name);
 }
 
-AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
-    return addPointAnnotations({ annotation }).front();
-}
-
-AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
-    auto result = impl->annotationManager->addPointAnnotations(annotations, getMaxZoom());
+AnnotationID Map::addAnnotation(const Annotation& annotation) {
+    auto result = impl->annotationManager->addAnnotation(annotation, getMaxZoom());
     update(Update::Annotations);
     return result;
 }
 
-AnnotationID Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
-    return addShapeAnnotations({ annotation }).front();
-}
-
-AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
-    auto result = impl->annotationManager->addShapeAnnotations(annotations, getMaxZoom());
-    update(Update::Annotations);
-    return result;
-}
-
-void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
-    impl->annotationManager->updatePointAnnotation(annotationId, annotation, getMaxZoom());
+void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
+    impl->annotationManager->updateAnnotation(id, annotation, getMaxZoom());
     update(Update::Annotations);
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
-    removeAnnotations({ annotation });
-}
-
-void Map::removeAnnotations(const AnnotationIDs& annotations) {
-    impl->annotationManager->removeAnnotations(annotations);
+    impl->annotationManager->removeAnnotation(annotation);
     update(Update::Annotations);
 }
 

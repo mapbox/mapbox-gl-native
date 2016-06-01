@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <string>
@@ -36,31 +35,29 @@ namespace mbgl {
 class AnnotationTileLayer;
 class CanonicalTileID;
 
-class PointAnnotationImpl {
+class SymbolAnnotationImpl {
 public:
-    using Map = std::map<AnnotationID, std::shared_ptr<PointAnnotationImpl>>;
-    using Tree = boost::geometry::index::rtree<std::shared_ptr<const PointAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
-
-    PointAnnotationImpl(const AnnotationID, const PointAnnotation&);
+    SymbolAnnotationImpl(const AnnotationID, const SymbolAnnotation&);
 
     void updateLayer(const CanonicalTileID&, AnnotationTileLayer&) const;
 
     const AnnotationID id;
-    const PointAnnotation point;
+    const SymbolAnnotation annotation;
 };
 
 } // namespace mbgl
 
-// Tell Boost Geometry how to access a std::shared_ptr<mbgl::PointAnnotation> object.
+// Tell Boost Geometry how to access a std::shared_ptr<mbgl::SymbolAnnotation> object.
 namespace boost {
 namespace geometry {
 namespace index {
 
 template <>
-struct indexable<std::shared_ptr<const mbgl::PointAnnotationImpl>> {
-    using result_type = const mbgl::LatLng&;
-    inline const mbgl::LatLng& operator()(const std::shared_ptr<const mbgl::PointAnnotationImpl>& v) const {
-        return v->point.position;
+struct indexable<std::shared_ptr<const mbgl::SymbolAnnotationImpl>> {
+    using result_type = mbgl::LatLng;
+    inline mbgl::LatLng operator()(const std::shared_ptr<const mbgl::SymbolAnnotationImpl>& v) const {
+        const mbgl::Point<double>& p = v->annotation.geometry.get<mbgl::Point<double>>();
+        return mbgl::LatLng(p.y, p.x);
     }
 };
 

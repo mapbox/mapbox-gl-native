@@ -1,5 +1,9 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/annotation/symbol_annotation_impl.hpp>
+#include <mbgl/annotation/line_annotation_impl.hpp>
+#include <mbgl/annotation/fill_annotation_impl.hpp>
+#include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/source/source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/layer/symbol_layer.hpp>
@@ -18,63 +22,54 @@ AnnotationManager::AnnotationManager(float pixelRatio)
 
 AnnotationManager::~AnnotationManager() = default;
 
-AnnotationIDs
-AnnotationManager::addPointAnnotations(const std::vector<PointAnnotation>& points, const uint8_t) {
-    AnnotationIDs annotationIDs;
-    annotationIDs.reserve(points.size());
-
-    for (const auto& point : points) {
-        const uint32_t annotationID = nextID++;
-        auto annotation = std::make_shared<PointAnnotationImpl>(annotationID, point);
-        pointTree.insert(annotation);
-        pointAnnotations.emplace(annotationID, annotation);
-        annotationIDs.push_back(annotationID);
-    }
-
-    return annotationIDs;
+AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, const uint8_t maxZoom) {
+    AnnotationID id = nextID++;
+    updateAnnotation(id, annotation, maxZoom);
+    return id;
 }
 
-AnnotationIDs
-AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shapes, const uint8_t maxZoom) {
-    AnnotationIDs annotationIDs;
-    annotationIDs.reserve(shapes.size());
-
-    for (const auto& shape : shapes) {
-        const uint32_t annotationID = nextID++;
-        shapeAnnotations.emplace(annotationID,
-            std::make_unique<ShapeAnnotationImpl>(annotationID, shape, maxZoom));
-        annotationIDs.push_back(annotationID);
-    }
-
-    return annotationIDs;
+void AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    removeAnnotation(id);
+    Annotation::visit(annotation, [&] (const auto& annotation_) {
+        this->add(id, annotation_, maxZoom);
+    });
 }
 
-void AnnotationManager::updatePointAnnotation(const AnnotationID& id, const PointAnnotation& point, const uint8_t) {
-    auto foundAnnotation = pointAnnotations.find(id);
-    if (foundAnnotation != pointAnnotations.end()) {
-        auto updatedAnnotation = std::make_shared<PointAnnotationImpl>(id, point);
-        pointTree.remove(foundAnnotation->second);
-        pointTree.insert(updatedAnnotation);
-        foundAnnotation->second = updatedAnnotation;
+void AnnotationManager::removeAnnotation(const AnnotationID& id) {
+    if (symbolAnnotations.find(id) != symbolAnnotations.end()) {
+        symbolTree.remove(symbolAnnotations.at(id));
+        symbolAnnotations.erase(id);
+    } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
+        obsoleteShapeAnnotationLayers.push_back(shapeAnnotations.at(id)->layerID);
+        shapeAnnotations.erase(id);
     }
 }
 
-void AnnotationManager::removeAnnotations(const AnnotationIDs& ids) {
-    for (const auto& id : ids) {
-        if (pointAnnotations.find(id) != pointAnnotations.end()) {
-            pointTree.remove(pointAnnotations.at(id));
-            pointAnnotations.erase(id);
-        } else if (shapeAnnotations.find(id) != shapeAnnotations.end()) {
-            obsoleteShapeAnnotationLayers.push_back(shapeAnnotations.at(id)->layerID);
-            shapeAnnotations.erase(id);
-        }
-    }
+void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t) {
+    auto impl = std::make_shared<SymbolAnnotationImpl>(id, annotation);
+    symbolTree.insert(impl);
+    symbolAnnotations.emplace(id, impl);
+}
+
+void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+    shapeAnnotations.emplace(id,
+        std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom));
+}
+
+void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+    shapeAnnotations.emplace(id,
+        std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom));
+}
+
+void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
+    shapeAnnotations.emplace(id,
+        std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom));
 }
 
 AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds& bounds) const {
     AnnotationIDs result;
 
-    pointTree.query(boost::geometry::index::intersects(bounds),
+    symbolTree.query(boost::geometry::index::intersects(bounds),
         boost::make_function_output_iterator([&](const auto& val){
             result.push_back(val->id);
         }));
@@ -83,7 +78,7 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
 }
 
 std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID& tileID) {
-    if (pointAnnotations.empty() && shapeAnnotations.empty())
+    if (symbolAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
 
     auto tile = std::make_unique<AnnotationTile>();
@@ -94,7 +89,7 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID
 
     LatLngBounds tileBounds(tileID);
 
-    pointTree.query(boost::geometry::index::intersects(tileBounds),
+    symbolTree.query(boost::geometry::index::intersects(tileBounds),
         boost::make_function_output_iterator([&](const auto& val){
             val->updateLayer(tileID, pointLayer);
         }));

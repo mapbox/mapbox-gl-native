@@ -3,7 +3,7 @@
 #import "MGLGeometry.h"
 #import "MGLTypes.h"
 
-#import <mbgl/annotation/shape_annotation.hpp>
+#import <mbgl/annotation/annotation.hpp>
 #import <vector>
 
 #import <CoreGraphics/CoreGraphics.h>
@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
 
 /** Constructs a shape annotation object, asking the delegate for style values. */
-- (mbgl::ShapeAnnotation)shapeAnnotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate;
+- (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate;
 
 @end
 
