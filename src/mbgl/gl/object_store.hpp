@@ -96,6 +96,14 @@ public:
     // Only call this while the OpenGL context is exclusive to this thread.
     void performCleanup();
 
+    bool empty() const {
+        return abandonedPrograms.empty()
+            && abandonedShaders.empty()
+            && abandonedBuffers.empty()
+            && abandonedTextures.empty()
+            && abandonedVAOs.empty();
+    }
+
 private:
     friend ProgramDeleter;
     friend ShaderDeleter;

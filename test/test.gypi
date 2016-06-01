@@ -48,6 +48,8 @@
 
         'geometry/binpack.cpp',
 
+        'gl/object.cpp',
+
         'map/map.cpp',
         'map/transform.cpp',
 
