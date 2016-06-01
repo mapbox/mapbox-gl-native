@@ -140,6 +140,8 @@ void Style::addLayer(std::unique_ptr<StyleLayer> layer, optional<std::string> be
         customLayer->initialize();
     }
 
+    layer->source = getSource(layer->sourceID);
+
     layers.emplace(before ? findLayer(*before) : layers.end(), std::move(layer));
 }
 
@@ -209,8 +211,8 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
     for (const auto& layer : layers) {
         hasPendingTransitions |= layer->recalculate(parameters);
 
-        Source* source = getSource(layer->source);
-        if (source && layer->needsRendering()) {
+        Source* source = layer->source;
+        if (layer->source && layer->needsRendering()) {
             source->enabled = true;
             if (!source->loaded && !source->isLoading()) {
                 source->load(fileSource);
@@ -280,7 +282,7 @@ RenderData Style::getRenderData() const {
             continue;
         }
 
-        Source* source = getSource(layer->source);
+        Source* source = layer->source;
         if (!source) {
             Log::Warning(Event::Render, "can't find source for layer '%s'", layer->id.c_str());
             continue;

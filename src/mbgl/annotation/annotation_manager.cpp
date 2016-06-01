@@ -115,7 +115,7 @@ void AnnotationManager::updateStyle(Style& style) {
 
         std::unique_ptr<SymbolLayer> layer = std::make_unique<SymbolLayer>();
         layer->id = PointLayerID;
-        layer->source = SourceID;
+        layer->sourceID = SourceID;
         layer->sourceLayer = PointLayerID;
         layer->layout.iconImage = std::string("{sprite}");
         layer->layout.iconAllowOverlap = true;

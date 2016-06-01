@@ -39,7 +39,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         layer->paint.lineColor = properties.color;
 
         layer->id = layerID;
-        layer->source = AnnotationManager::SourceID;
+        layer->sourceID = AnnotationManager::SourceID;
         layer->sourceLayer = layer->id;
 
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
@@ -55,7 +55,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
         layer->paint.fillOutlineColor = properties.outlineColor;
 
         layer->id = layerID;
-        layer->source = AnnotationManager::SourceID;
+        layer->sourceID = AnnotationManager::SourceID;
         layer->sourceLayer = layer->id;
 
         style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
@@ -72,7 +72,7 @@ void ShapeAnnotationImpl::updateStyle(Style& style) {
 
         layer->id = layerID;
         layer->ref = "";
-        layer->source = AnnotationManager::SourceID;
+        layer->sourceID = AnnotationManager::SourceID;
         layer->sourceLayer = layer->id;
         layer->visibility = VisibilityType::Visible;
 

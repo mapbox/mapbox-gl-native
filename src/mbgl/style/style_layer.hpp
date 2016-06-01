@@ -17,6 +17,7 @@ class StyleCascadeParameters;
 class StyleCalculationParameters;
 class StyleBucketParameters;
 class Bucket;
+class Source;
 
 class StyleLayer {
 public:
@@ -70,12 +71,14 @@ public:
 public:
     std::string id;
     std::string ref;
-    std::string source;
+    std::string sourceID;
     std::string sourceLayer;
     Filter filter;
     float minZoom = -std::numeric_limits<float>::infinity();
     float maxZoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
+
+    Source* source = nullptr;
 
 protected:
     enum class Type {

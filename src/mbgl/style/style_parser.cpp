@@ -432,10 +432,10 @@ void StyleParser::parseLayer(const std::string& id, const JSValue& value, std::u
         if (value.HasMember("source")) {
             const JSValue& value_source = value["source"];
             if (value_source.IsString()) {
-                layer->source = { value_source.GetString(), value_source.GetStringLength() };
-                auto source_it = sourcesMap.find(layer->source);
+                layer->sourceID = { value_source.GetString(), value_source.GetStringLength() };
+                auto source_it = sourcesMap.find(layer->sourceID);
                 if (source_it == sourcesMap.end()) {
-                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", layer->source.c_str(), layer->id.c_str());
+                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", layer->sourceID.c_str(), layer->id.c_str());
                 }
             } else {
                 Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", layer->id.c_str());
