@@ -71,8 +71,52 @@ public class PolygonActivity extends AppCompatActivity {
                 polygon.add(new LatLng(45.515369, -122.678489));
                 polygon.add(new LatLng(45.506346, -122.702007));
                 polygon.add(new LatLng(45.522585, -122.685699));
+
+                double lat = 0;
+                double lon = 0;
+                int points = 0;
+                for (LatLng latLng : polygon) {
+                    points++;
+                    lat += latLng.getLatitude();
+                    lon += latLng.getLongitude();
+                }
+
+                lat = lat / points;
+                lon = lon / points;
+
+                List<LatLng> hole1 = new ArrayList<>();
+                hole1.add(new LatLng(lat, lon));
+                hole1.add(new LatLng(lat + 0.01, lon));
+                hole1.add(new LatLng(lat + 0.01, lon + 0.01));
+                hole1.add(new LatLng(lat, lon + 0.01));
+                hole1.add(new LatLng(lat, lon));
+
+                lat = lat - 0.001;
+                lon = lon - 0.001;
+
+                List<LatLng> hole2 = new ArrayList<>();
+                hole2.add(new LatLng(lat, lon));
+                hole2.add(new LatLng(lat - 0.005, lon));
+                hole2.add(new LatLng(lat - 0.005, lon - 0.005));
+                hole2.add(new LatLng(lat, lon - 0.005));
+                hole2.add(new LatLng(lat, lon));
+
+                lat = lat + 0.008;
+                lon = lon - 0.01;
+
+                List<LatLng> hole3 = new ArrayList<>();
+                hole3.add(new LatLng(lat, lon));
+                hole3.add(new LatLng(lat - 0.005, lon));
+                hole3.add(new LatLng(lat - 0.005, lon - 0.005));
+                hole3.add(new LatLng(lat, lon - 0.005));
+                hole3.add(new LatLng(lat, lon));
+
                 mapboxMap.addPolygon(new PolygonOptions()
                         .addAll(polygon)
+                        .addHole(hole1)
+                        .addHole(hole2)
+                        .addHole(hole3)
+                        .alpha(0.5f)
                         .fillColor(Color.parseColor("#3bb2d0")));
             }
         });
