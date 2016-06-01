@@ -89,19 +89,17 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
 
         geojsonvt::ProjectedRings rings;
         for (auto& segment : shape.segments) {
-            std::vector<geojsonvt::LonLat> points;
+            LinearRing<double> ring;
             for (auto& latLng : segment) {
                 const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-                points.push_back(geojsonvt::LonLat(latLng.longitude, constrainedLatitude));
+                ring.push_back({latLng.longitude, constrainedLatitude});
             }
 
-            if (type == geojsonvt::ProjectedFeatureType::Polygon &&
-                    (points.front().lon != points.back().lon || points.front().lat != points.back().lat)) {
-                points.push_back(geojsonvt::LonLat(points.front().lon, points.front().lat));
+            if (type == geojsonvt::ProjectedFeatureType::Polygon && ring.front() != ring.back()) {
+                ring.push_back(ring.front());
             }
 
-            auto ring = geojsonvt::Convert::projectRing(points, tolerance);
-            rings.push_back(ring);
+            rings.push_back(geojsonvt::Convert::projectRing(ring, tolerance));
         }
 
         std::vector<geojsonvt::ProjectedFeature> features;
