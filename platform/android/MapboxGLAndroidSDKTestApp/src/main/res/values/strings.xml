@@ -38,7 +38,7 @@
     <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
-    <string name="activity_user_tracking_customization">User location customization</string>
+    <string name="activity_user_tracking_customization">User location drawable</string>
     <string name="activity_user_dot_color">User location tint color</string>
     <string name="activity_user_location_toggle">User location toggle</string>
     <string name="activity_custom_layer">Custom Layer</string>

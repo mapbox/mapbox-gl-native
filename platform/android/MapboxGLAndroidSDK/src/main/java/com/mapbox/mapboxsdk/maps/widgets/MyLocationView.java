@@ -129,9 +129,22 @@ public class MyLocationView extends View {
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
-        if (defaultDrawable == null || bearingDrawable == null) {
+        if (defaultDrawable == null) {
             return;
         }
+
+        if (bearingDrawable == null) {
+            // if user only provided one resource
+            // use same for bearing mode
+            bearingDrawable = defaultDrawable;
+        }
+
+        if (backgroundDrawable == null) {
+            // if the user didn't provide a background resource we will use the foreground resource instead,
+            // we need to create a new drawable to handle tinting correctly
+            backgroundDrawable = defaultDrawable.getConstantState().newDrawable();
+        }
+
         if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
