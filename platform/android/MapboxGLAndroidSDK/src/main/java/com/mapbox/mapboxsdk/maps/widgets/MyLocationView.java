@@ -656,9 +656,8 @@ public class MyLocationView extends View {
         @Override
         void invalidate() {
             int[] mapPadding = mapboxMap.getPadding();
-            UiSettings uiSettings = mapboxMap.getUiSettings();
-            float x = (uiSettings.getWidth() - getWidth() + mapPadding[0] - mapPadding[2]) / 2 + (contentPadding[0] - contentPadding[2]) / 2;
-            float y = (uiSettings.getHeight() - getHeight() - mapPadding[3] + mapPadding[1]) / 2 + (contentPadding[1] - contentPadding[3]) / 2;
+            float x = (getWidth() + mapPadding[0] - mapPadding[2]) / 2 + (contentPadding[0] - contentPadding[2]) / 2;
+            float y = (getHeight() - mapPadding[3] + mapPadding[1]) / 2 + (contentPadding[1] - contentPadding[3]) / 2;
             screenLocation = new PointF(x, y);
             MyLocationView.this.invalidate();
         }
