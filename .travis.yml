@@ -5,22 +5,26 @@ git:
 addons_shortcuts:
   addons_clang35: &clang35
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-      packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      sources:  [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4',
+                  'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
+                  'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_gcc5: &gcc5
     apt:
-      sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'libllvm3.4', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      sources:  [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5',
+                  'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
+                  'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_qt4: &qt4
     apt:
-      sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt4-default' ]
+      sources:  [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5',
+                  'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
-      sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
+      sources:  [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5',
+                  'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:
   global:
@@ -48,7 +52,8 @@ matrix:
   include:
     # Clang 3.5 - Release - Node
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: node
       compiler: ": node4-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
@@ -58,9 +63,6 @@ matrix:
         - nvm use 4
         - make node
         - make test-node
-      after_script:
-        - ccache --show-stats
-        - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
     # GCC 5 - Debug - Coverage
     - os: linux
@@ -83,7 +85,8 @@ matrix:
 
     # Clang 3.5 - Debug
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: ": linux-clang35-debug"
       env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
@@ -91,7 +94,8 @@ matrix:
 
     # Clang 3.5 - Release
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: ": linux-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
