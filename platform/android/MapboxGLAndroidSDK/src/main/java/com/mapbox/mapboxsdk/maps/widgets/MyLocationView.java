@@ -17,6 +17,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -36,7 +38,6 @@ import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
-import com.mapbox.mapboxsdk.maps.UiSettings;
 
 import java.lang.ref.WeakReference;
 
@@ -64,7 +65,7 @@ public class MyLocationView extends View {
 
     private ValueAnimator locationChangeAnimator;
     private ValueAnimator accuracyAnimator;
-    private ObjectAnimator directionAnimator;
+    private ValueAnimator directionAnimator;
 
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
@@ -136,7 +137,7 @@ public class MyLocationView extends View {
         if (bearingDrawable == null) {
             // if user only provided one resource
             // use same for bearing mode
-            bearingDrawable = defaultDrawable;
+            bearingDrawable = defaultDrawable.getConstantState().newDrawable();
         }
 
         if (backgroundDrawable == null) {
@@ -226,6 +227,7 @@ public class MyLocationView extends View {
         int foregroundHeight = foregroundDrawable.getIntrinsicHeight();
         foregroundBounds = new Rect(-foregroundWidth / 2, -foregroundHeight / 2, foregroundWidth / 2, foregroundHeight / 2);
         foregroundDrawable.setBounds(foregroundBounds);
+        foregroundBearingDrawable.setBounds(foregroundBounds);
 
         // invoke a new draw
         invalidate();
@@ -239,6 +241,8 @@ public class MyLocationView extends View {
             // Not ready yet
             return;
         }
+
+        final PointF pointF = screenLocation;
 
         float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
         float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel / 2;
@@ -255,8 +259,13 @@ public class MyLocationView extends View {
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
+        //
+        if (myBearingTrackingMode != MyBearingTracking.NONE) {
+            matrix.postRotate((Float) directionAnimator.getAnimatedValue());
+        }
+
         // put matrix at location of MyLocationView
-        matrix.postTranslate(screenLocation.x, screenLocation.y);
+        matrix.postTranslate(pointF.x, pointF.y);
 
         // concat our matrix on canvas
         canvas.concat(matrix);
@@ -322,6 +331,24 @@ public class MyLocationView extends View {
         super.setEnabled(enabled);
         setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
         toggleGps(enabled);
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putFloat("tilt", tilt);
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state){
+        if (state instanceof Bundle){
+            Bundle bundle = (Bundle) state;
+            tilt = bundle.getFloat("tilt");
+            state = bundle.getParcelable("superState");
+        }
+        super.onRestoreInstanceState(state);
     }
 
     /**
@@ -415,8 +442,8 @@ public class MyLocationView extends View {
         }
         previousDirection = newDir;
 
-        directionAnimator = ObjectAnimator.ofFloat(this, View.ROTATION, oldDir, newDir);
-        directionAnimator.setDuration(1000);
+        directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
+        directionAnimator.setDuration(375);
         directionAnimator.start();
     }
 
@@ -689,7 +716,7 @@ public class MyLocationView extends View {
             // calculate updateLatLng time + add some extra offset to improve animation
             long previousUpdateTimeStamp = locationUpdateTimestamp;
             locationUpdateTimestamp = SystemClock.elapsedRealtime();
-            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1);
+            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.3);
 
             // calculate interpolated entity
             interpolatedLocation = new LatLng((latLng.getLatitude() + previousLocation.getLatitude()) / 2, (latLng.getLongitude() + previousLocation.getLongitude()) / 2);

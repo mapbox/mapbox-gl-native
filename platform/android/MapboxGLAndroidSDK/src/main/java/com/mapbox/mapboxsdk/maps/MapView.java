@@ -252,6 +252,7 @@ public class MapView extends FrameLayout {
         CameraPosition position = options.getCamera();
         if (position != null) {
             mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+            mMyLocationView.setTilt(position.tilt);
         }
 
         String accessToken = null;
@@ -407,7 +408,6 @@ public class MapView extends FrameLayout {
 
             // User location
             try {
-                //noinspection ResourceType
                 mMapboxMap.setMyLocationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED));
             } catch (SecurityException ignore) {
                 // User did not accept location permissions
