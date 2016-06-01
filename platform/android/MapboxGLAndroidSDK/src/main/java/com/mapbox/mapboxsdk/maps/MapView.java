@@ -142,6 +142,7 @@ public class MapView extends FrameLayout {
     private ShoveGestureDetector mShoveGestureDetector;
     private boolean mTwoTap = false;
     private boolean mZoomStarted = false;
+    private boolean mDragStarted = false;
     private boolean mQuickZoom = false;
     private boolean mScrollInProgress = false;
 
@@ -1746,6 +1747,10 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            if (mDragStarted) {
+                return false;
+            }
+
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
 
@@ -1820,6 +1825,10 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            if (mDragStarted) {
+                return false;
+            }
+
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -1885,10 +1894,14 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            if (mDragStarted) {
+                return false;
+            }
+
             // If rotate is large enough ignore a tap
             // Also is zoom already started, don't rotate
             mTotalAngle += detector.getRotationDegreesDelta();
-            if (!mZoomStarted && ((mTotalAngle > 10.0f) || (mTotalAngle < -10.0f))) {
+            if (!mZoomStarted && ((mTotalAngle > 20.0f) || (mTotalAngle < -20.0f))) {
                 mStarted = true;
             }
 
@@ -1954,6 +1967,7 @@ public class MapView extends FrameLayout {
             mBeginTime = 0;
             mTotalDelta = 0.0f;
             mStarted = false;
+            mDragStarted = false;
         }
 
         @Override
@@ -1991,6 +2005,8 @@ public class MapView extends FrameLayout {
 
             // Tilt the map
             mMapboxMap.setTilt(pitch);
+
+            mDragStarted = true;
 
             return true;
         }
