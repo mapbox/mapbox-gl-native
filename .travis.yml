@@ -1,3 +1,7 @@
+os: linux
+sudo: required
+dist: trusty
+
 git:
   submodules: false
 
@@ -5,14 +9,16 @@ git:
 addons_shortcuts:
   addons_clang35: &clang35
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5' ]
-      packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'gdb', 'clang-3.5', 'libstdc++-4.9-dev', 'mesa-utils',
+                  'xutils-dev', 'libxrandr-dev', 'libxinerama-dev', 'libxi-dev',
+                  'libxcursor-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev' ]
   addons_gcc5: &gcc5
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5', 'libllvm3.4', 'xutils-dev',
-                  'libxxf86vm-dev', 'x11proto-xf86vidmode-dev', 'mesa-utils' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'mesa-utils',
+                  'xutils-dev', 'libxrandr-dev', 'libxinerama-dev', 'libxi-dev',
+                  'libxcursor-dev', 'libxxf86vm-dev', 'x11proto-xf86vidmode-dev' ]
   addons_qt4: &qt4
     apt:
       sources: [ 'ubuntu-toolchain-r-test' ]
@@ -45,11 +51,11 @@ after_script:
   - ./platform/linux/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
 matrix:
+  exclude:
+    - os: linux
   include:
     # Clang 3.5 - Release - Node
-    - os: linux
-      sudo: false
-      language: node
+    - language: node
       compiler: ": node4-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
@@ -63,9 +69,7 @@ matrix:
         - ./platform/node/scripts/after_script.sh ${TRAVIS_JOB_NUMBER} ${TRAVIS_TAG:-}
 
     # GCC 5 - Debug - Coverage
-    - os: linux
-      sudo: false
-      language: cpp
+    - language: cpp
       compiler: ": linux-gcc5-debug"
       env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 ENABLE_COVERAGE=1
       addons: *gcc5
@@ -74,33 +78,25 @@ matrix:
         - ./platform/linux/scripts/coveralls.sh
 
     # GCC 5 - Release
-    - os: linux
-      sudo: false
-      language: cpp
+    - language: cpp
       compiler: ": linux-gcc5-release"
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *gcc5
 
     # Clang 3.5 - Debug
-    - os: linux
-      sudo: false
-      language: cpp
+    - language: cpp
       compiler: ": linux-clang35-debug"
       env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
     # Clang 3.5 - Release
-    - os: linux
-      sudo: false
-      language: cpp
+    - language: cpp
       compiler: ": linux-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
     # Qt 4 - Release
-    - os: linux
-      sudo: false
-      language: cpp
+    - language: cpp
       compiler: ": linux-gcc5-release"
       env: FLAVOR=qt4 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
@@ -108,10 +104,7 @@ matrix:
         - make qt-app test-qt
 
     # Qt 5 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
+    - language: cpp
       compiler: ": linux-gcc5-release"
       env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
