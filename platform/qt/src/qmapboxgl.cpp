@@ -413,22 +413,21 @@ mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeA
     const CoordinateSegments &segments = shapeAnnotation.first;
     const QString &styleLayer = shapeAnnotation.second;
 
-    mbgl::AnnotationSegments mbglAnnotationSegments;
-    mbglAnnotationSegments.reserve(segments.size());
+    mbgl::Polygon<double> polygon;
+    polygon.reserve(segments.size());
 
     for (const Coordinates &coordinates : segments) {
-        mbgl::AnnotationSegment mbglAnnotationSegment;
-        mbglAnnotationSegment.reserve(coordinates.size());
+        mbgl::LinearRing<double> linearRing;
+        linearRing.reserve(coordinates.size());
 
         for (const Coordinate &coordinate : coordinates) {
-            mbgl::LatLng mbglCoordinate(coordinate.first, coordinate.second);
-            mbglAnnotationSegment.emplace_back(mbglCoordinate);
+            linearRing.emplace_back(mbgl::Point<double>(coordinate.first, coordinate.second));
         }
 
-        mbglAnnotationSegments.emplace_back(mbglAnnotationSegment);
+        polygon.emplace_back(linearRing);
     }
 
-    return { mbglAnnotationSegments, styleLayer.toStdString() };
+    return { polygon, styleLayer.toStdString() };
 }
 
 AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
