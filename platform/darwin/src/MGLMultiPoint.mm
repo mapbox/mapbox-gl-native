@@ -103,6 +103,11 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
+- (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate {
+    NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
+    return mbgl::SymbolAnnotation({mbgl::Point<double>()});
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p; count = %lu; bounds = %@>",
