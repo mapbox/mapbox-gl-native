@@ -511,7 +511,7 @@ void QMapboxGL::resize(const QSize& size)
     QSize converted = size / d_ptr->getPixelRatio();
     if (d_ptr->size == converted) return;
 
-    glViewport(0, 0, size.width(), size.height());
+    glViewport(0, 0, converted.width(), converted.height());
 
     d_ptr->size = converted;
     d_ptr->mapObj->update(mbgl::Update::Dimensions);
