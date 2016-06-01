@@ -55,7 +55,7 @@ matrix:
       sudo: required
       dist: trusty
       language: node
-      compiler: ": node4-clang35-release"
+      compiler: "node4-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
       script:
@@ -68,7 +68,7 @@ matrix:
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc5-debug"
+      compiler: "glfw-gcc5-debug"
       env: BUILDTYPE=Debug _CXX=g++-5 _CC=gcc-5 ENABLE_COVERAGE=1
       addons: *gcc5
       after_script:
@@ -79,7 +79,7 @@ matrix:
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc5-release"
+      compiler: "glfw-gcc5-release"
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *gcc5
 
@@ -88,7 +88,7 @@ matrix:
       sudo: required
       dist: trusty
       language: cpp
-      compiler: ": linux-clang35-debug"
+      compiler: "glfw-clang35-debug"
       env: BUILDTYPE=Debug _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
@@ -97,7 +97,7 @@ matrix:
       sudo: required
       dist: trusty
       language: cpp
-      compiler: ": linux-clang35-release"
+      compiler: "glfw-clang35-release"
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
@@ -105,8 +105,8 @@ matrix:
     - os: linux
       sudo: false
       language: cpp
-      compiler: ": linux-gcc5-release"
-      env: FLAVOR=qt4 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      compiler: "qt4-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
       script:
         - make qt-app test-qt
@@ -116,8 +116,8 @@ matrix:
       sudo: required
       dist: trusty
       language: cpp
-      compiler: ": linux-gcc5-release"
-      env: FLAVOR=qt5 BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+      compiler: "qt5-gcc5-release"
+      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       script:
         - make qt-app qt-qml-app test-qt
