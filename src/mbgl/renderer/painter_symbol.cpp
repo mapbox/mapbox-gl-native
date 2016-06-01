@@ -36,34 +36,28 @@ void Painter::renderSDF(SymbolBucket &bucket,
 {
     mat4 vtxMatrix = translatedMatrix(matrix, translate, tileID, translateAnchor);
 
-    bool skewed = rotationAlignment == RotationAlignmentType::Map;
-    mat4 exMatrix;
-    float s;
-    float gammaScale;
-
-    if (skewed) {
-        matrix::identity(exMatrix);
-        s = tileID.pixelsToTileUnits(1, state.getZoom());
-        gammaScale = 1.0f / std::cos(state.getPitch());
-    } else {
-        exMatrix = extrudeMatrix;
-        s = state.getAltitude();
-        gammaScale = 1.0f;
-        matrix::rotate_z(exMatrix, exMatrix, state.getNorthOrientationAngle());
-    }
-    const bool flippedY = !skewed && state.getViewportMode() == ViewportMode::FlippedY;
-    matrix::scale(exMatrix, exMatrix, s, flippedY ? -s : s, 1);
-
     // If layerStyle.size > bucket.info.fontSize then labels may collide
     float fontSize = paintSize;
     float fontScale = fontSize / sdfFontSize;
-    matrix::scale(exMatrix, exMatrix, fontScale, fontScale, 1.0f);
+
+    float scale = fontScale;
+    std::array<float, 2> exScale = extrudeScale;
+    bool alignedWithMap = rotationAlignment == RotationAlignmentType::Map;
+    float gammaScale = 1.0f;
+
+    if (alignedWithMap) {
+        scale *= tileID.pixelsToTileUnits(1, state.getZoom());
+        exScale.fill(scale);
+        gammaScale /= std::cos(state.getPitch());
+    } else {
+        exScale = {{ exScale[0] * scale, exScale[1] * scale }};
+    }
 
     config.program = sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
-    sdfShader.u_exmatrix = exMatrix;
+    sdfShader.u_extrude_scale = exScale;
     sdfShader.u_texsize = texsize;
-    sdfShader.u_skewed = skewed;
+    sdfShader.u_skewed = alignedWithMap;
     sdfShader.u_texture = 0;
 
     // adjust min/max zooms for variable font sies

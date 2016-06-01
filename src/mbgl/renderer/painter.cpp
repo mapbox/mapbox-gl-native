@@ -97,9 +97,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
-    // The extrusion matrix.
-    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
-
+    // The extrusion scale.
     const float flippedY = state.getViewportMode() == ViewportMode::FlippedY;
     extrudeScale = {{ 2.0f / state.getWidth() * state.getAltitude(),
                       (flippedY ? 2.0f : -2.0f) / state.getHeight() * state.getAltitude() }};

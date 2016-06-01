@@ -156,7 +156,6 @@ private:
 
     mat4 projMatrix;
     mat4 nativeMatrix;
-    mat4 extrudeMatrix;
 
     std::array<float, 2> extrudeScale;
 
