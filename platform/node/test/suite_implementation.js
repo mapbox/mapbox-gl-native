@@ -45,6 +45,7 @@ module.exports = function (style, options, callback) {
         var results = options.queryGeometry ?
             map.queryRenderedFeatures(options.queryGeometry) :
             [];
+        map.onLowMemory();
         map.release();
         if (timedOut) return;
         clearTimeout(watchdog);

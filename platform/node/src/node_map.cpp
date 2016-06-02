@@ -52,6 +52,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "release", Release);
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
     Nan::SetPrototypeMethod(tpl, "queryRenderedFeatures", QueryRenderedFeatures);
+    Nan::SetPrototypeMethod(tpl, "onLowMemory", OnLowMemory);
 
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Map").ToLocalChecked(), tpl->GetFunction());
@@ -498,6 +499,15 @@ NAN_METHOD(NodeMap::QueryRenderedFeatures) {
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }
+}
+
+NAN_METHOD(NodeMap::OnLowMemory) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+
+    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+
+    nodeMap->map->onLowMemory();
+    info.GetReturnValue().SetUndefined();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
