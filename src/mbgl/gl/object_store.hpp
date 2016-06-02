@@ -7,6 +7,7 @@
 
 #include <array>
 #include <algorithm>
+#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -89,6 +90,7 @@ public:
     UniqueTexturePool createTexturePool() {
         ObjectPool ids;
         MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
+        assert(ids.size() == size_t(TextureMax));
         return UniqueTexturePool(std::move(ids), { this });
     }
 

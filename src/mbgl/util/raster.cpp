@@ -16,7 +16,6 @@ Raster::Raster(gl::TexturePool& texturePool_)
 Raster::~Raster() {
     if (textured) {
         texturePool.releaseTextureID(textureID);
-        textureID = 0;
     }
 }
 
