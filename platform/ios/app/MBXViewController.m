@@ -574,14 +574,28 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
+    // Use GL backed pins for dropped pin annotations
+    if ([annotation isMemberOfClass:[MBXDroppedPinAnnotation class]])
+    {
+        return nil;
+    }
+    
     MBXAnnotationView *annotationView = (MBXAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
     if (!annotationView)
     {
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
-        annotationView.frame = CGRectMake(0, 0, 40, 40);
+        annotationView.frame = CGRectMake(0, 0, 10, 10);
         annotationView.centerColor = [UIColor whiteColor];
-        annotationView.flat = YES;
-        annotationView.scalesWithViewingDistance = YES;
+       
+        // uncomment to flatten the annotation view against the map when the map is tilted
+        // this currently causes severe performance issues when more than 2k annotations are visible
+        // annotationView.flat = YES;
+       
+        // uncomment to force annotation view to maintain a constant size when the map is tilted
+        // by default, annotation views will shrink and grow as the move towards and away from the
+        // horizon. Relatedly, annotations backed by GL sprites ONLY scale with viewing distance currently.
+        // annotationView.scalesWithViewingDistance = NO;
+        
     } else {
         // orange indicates that the annotation view was reused
         annotationView.centerColor = [UIColor orangeColor];
