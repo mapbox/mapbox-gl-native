@@ -52,6 +52,21 @@ See the relevant platform-specific `README.md` / `INSTALL.md` for details.
 
 ## Map
 ## Style
+
+The "Style" component of mapbox-gl-native contains an implementation of the [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/), defining what data to draw, the order to draw it in, and how to style the data when drawing it.
+
+In addition to supporting styles loaded from a URL, mapbox-gl-native includes a runtime styling API, which allows users to dynamically modify the current style: add and remove layers, modify layer properties, and so on. As appropriate for a C++ API, the runtime styling API API is _strongly typed_: there are subclasses for each layer type, with correctly-typed accessors for each style property. This results in a large API surface area. Fortunately, this is automated, by generating the API – and the regular portion of the implementation – from the style specification.
+
+The layers API makes a distinction between public API and internal implementation using [the `Impl` idiom](https://github.com/mapbox/mapbox-gl-native/issues/3254) seen elsewhere in the codebase. Here, it takes the form of two parallel class hierarchies:
+
+* `Layer` and its subclasses form the public API.
+* `Layer::Impl` and its subclasses form the internal API.
+
+As well as forming the boundary between public and internal, these two class hierarchies form the boundary between generated code and handwritten code. Except for `CustomLayer` and `CustomLayer::Impl`:
+
+* `Layer` subclasses are entirely generated. (`Layer` itself is handwritten.)
+* `Layer::Impl` and its subclasses are entirely handwritten.
+
 ## FileSource
 ## Layout
 ## Rendering
