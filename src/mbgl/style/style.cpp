@@ -1,16 +1,12 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/tile/tile.hpp>
-#include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/sprite/sprite_store.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -18,15 +14,16 @@
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/calculation_parameters.hpp>
-#include <mbgl/renderer/render_item.hpp>
+#include <mbgl/sprite/sprite_store.hpp>
+#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/renderer/render_item.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/math/minmax.hpp>
-
-#include <csscolorparser/csscolorparser.hpp>
 
 #include <algorithm>
 
@@ -35,8 +32,30 @@ namespace style {
 
 static Observer nullObserver;
 
+Style::Style(FileSource& fileSource_, float pixelRatio)
+    : fileSource(fileSource_),
+      glyphStore(std::make_unique<GlyphStore>(fileSource)),
+      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
+      spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
+      spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
+      lineAtlas(std::make_unique<LineAtlas>(256, 512)),
+      observer(&nullObserver),
+      workers(4) {
+    glyphStore->setObserver(this);
+    spriteStore->setObserver(this);
+}
+
+Style::~Style() {
+    for (const auto& source : sources) {
+        source->setObserver(nullptr);
+    }
+
+    glyphStore->setObserver(nullptr);
+    spriteStore->setObserver(nullptr);
+}
+
 bool Style::addClass(const std::string& className, const TransitionOptions& properties) {
-    if (std::find(classes.begin(), classes.end(), className) != classes.end()) return false;
+    if (hasClass(className)) return false;
     classes.push_back(className);
     transitionProperties = properties;
     return true;
@@ -65,19 +84,6 @@ std::vector<std::string> Style::getClasses() const {
     return classes;
 }
 
-Style::Style(FileSource& fileSource_, float pixelRatio)
-    : fileSource(fileSource_),
-      glyphStore(std::make_unique<GlyphStore>(fileSource)),
-      glyphAtlas(std::make_unique<GlyphAtlas>(1024, 1024)),
-      spriteStore(std::make_unique<SpriteStore>(pixelRatio)),
-      spriteAtlas(std::make_unique<SpriteAtlas>(1024, 1024, pixelRatio, *spriteStore)),
-      lineAtlas(std::make_unique<LineAtlas>(256, 512)),
-      observer(&nullObserver),
-      workers(4) {
-    glyphStore->setObserver(this);
-    spriteStore->setObserver(this);
-}
-
 void Style::setJSON(const std::string& json) {
     sources.clear();
     layers.clear();
@@ -98,15 +104,6 @@ void Style::setJSON(const std::string& json) {
     spriteStore->load(parser.spriteURL, fileSource);
 
     loaded = true;
-}
-
-Style::~Style() {
-    for (const auto& source : sources) {
-        source->setObserver(nullptr);
-    }
-
-    glyphStore->setObserver(nullptr);
-    spriteStore->setObserver(nullptr);
 }
 
 void Style::addSource(std::unique_ptr<Source> source) {
