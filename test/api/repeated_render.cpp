@@ -32,7 +32,7 @@ TEST(API, RepeatedRender) {
     Map map(view, fileSource, MapMode::Still);
 
     {
-        map.setStyleJSON(style, "");
+        map.setStyleJSON(style);
         PremultipliedImage result;
         map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
             result = std::move(image);
@@ -50,7 +50,7 @@ TEST(API, RepeatedRender) {
     }
 
     {
-        map.setStyleJSON(style, "");
+        map.setStyleJSON(style);
         PremultipliedImage result;
         map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
             result = std::move(image);

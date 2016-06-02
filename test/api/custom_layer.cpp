@@ -77,7 +77,7 @@ TEST(CustomLayer, Basic) {
     StubFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     map.addLayer(std::make_unique<CustomLayer>(
         "custom",
         [] (void* context) {

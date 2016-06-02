@@ -37,7 +37,7 @@ public:
 TEST(Annotations, SymbolAnnotation) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
     test.checkRendering("point_annotation");
@@ -51,7 +51,7 @@ TEST(Annotations, LineAnnotation) {
     annotation.color = {{ 255, 0, 0, 1 }};
     annotation.width = 5;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.checkRendering("line_annotation");
 }
@@ -63,7 +63,7 @@ TEST(Annotations, FillAnnotation) {
     FillAnnotation annotation { polygon };
     annotation.color = {{ 255, 0, 0, 1 }};
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
     test.checkRendering("fill_annotation");
 }
@@ -73,7 +73,7 @@ TEST(Annotations, StyleSourcedShapeAnnotation) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"));
     test.map.addAnnotation(StyleSourcedAnnotation { polygon, "annotation" });
     test.checkRendering("style_sourced_shape_annotation");
 }
@@ -81,7 +81,7 @@ TEST(Annotations, StyleSourcedShapeAnnotation) {
 TEST(Annotations, AddMultiple) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
 
@@ -94,7 +94,7 @@ TEST(Annotations, AddMultiple) {
 TEST(Annotations, NonImmediateAdd) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test::render(test.map);
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
@@ -108,7 +108,7 @@ TEST(Annotations, NonImmediateAdd) {
 TEST(Annotations, UpdateIcon) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("flipped_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
 
@@ -124,7 +124,7 @@ TEST(Annotations, UpdateIcon) {
 TEST(Annotations, UpdatePoint) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
@@ -138,7 +138,7 @@ TEST(Annotations, UpdatePoint) {
 TEST(Annotations, RemovePoint) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
@@ -156,7 +156,7 @@ TEST(Annotations, RemoveShape) {
     annotation.color = {{ 255, 0, 0, 1 }};
     annotation.width = 5;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     AnnotationID shape = test.map.addAnnotation(annotation);
 
     test::render(test.map);
@@ -169,7 +169,7 @@ TEST(Annotations, ImmediateRemoveShape) {
     AnnotationTest test;
 
     test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     test::render(test.map);
 }
@@ -177,20 +177,20 @@ TEST(Annotations, ImmediateRemoveShape) {
 TEST(Annotations, SwitchStyle) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(test.map);
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.checkRendering("switch_style");
 }
 
 TEST(Annotations, QueryRenderedFeatures) {
     AnnotationTest test;
 
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 

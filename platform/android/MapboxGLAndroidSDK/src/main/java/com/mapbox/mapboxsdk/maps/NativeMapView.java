@@ -194,11 +194,7 @@ final class NativeMapView {
     }
 
     public void setStyleJson(String newStyleJson) {
-        setStyleJson(newStyleJson, "");
-    }
-
-    public void setStyleJson(String newStyleJson, String base) {
-        nativeSetStyleJson(mNativeMapViewPtr, newStyleJson, base);
+        nativeSetStyleJson(mNativeMapViewPtr, newStyleJson);
     }
 
     public String getStyleJson() {
@@ -528,8 +524,7 @@ final class NativeMapView {
 
     private native void nativeSetStyleUrl(long nativeMapViewPtr, String url);
 
-    private native void nativeSetStyleJson(long nativeMapViewPtr,
-                                           String newStyleJson, String base);
+    private native void nativeSetStyleJson(long nativeMapViewPtr, String newStyleJson);
 
     private native String nativeGetStyleJson(long nativeMapViewPtr);
 

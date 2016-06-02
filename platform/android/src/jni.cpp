@@ -427,13 +427,11 @@ void nativeSetStyleUrl(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, j
     nativeMapView->getMap().setStyleURL(std_string_from_jstring(env, url));
 }
 
-void nativeSetStyleJson(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr,
-                                jni::jstring* newStyleJson, jni::jstring* base) {
+void nativeSetStyleJson(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* newStyleJson) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeSetStyleJSON");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
-    nativeMapView->getMap().setStyleJSON(std_string_from_jstring(env, newStyleJson),
-                                         std_string_from_jstring(env, base));
+    nativeMapView->getMap().setStyleJSON(std_string_from_jstring(env, newStyleJson));
 }
 
 jni::jstring* nativeGetStyleJson(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr) {
@@ -1686,7 +1684,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeSetClasses, "(JLjava/util/List;)V"),
         MAKE_NATIVE_METHOD(nativeGetClasses, "(J)Ljava/util/List;"),
         MAKE_NATIVE_METHOD(nativeSetStyleUrl, "(JLjava/lang/String;)V"),
-        MAKE_NATIVE_METHOD(nativeSetStyleJson, "(JLjava/lang/String;Ljava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeSetStyleJson, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeGetStyleJson, "(J)Ljava/lang/String;"),
         MAKE_NATIVE_METHOD(nativeSetAccessToken, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeGetAccessToken, "(J)Ljava/lang/String;"),

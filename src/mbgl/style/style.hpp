@@ -39,7 +39,7 @@ public:
     Style(FileSource&, float pixelRatio);
     ~Style();
 
-    void setJSON(const std::string& data, const std::string& base);
+    void setJSON(const std::string&);
 
     void setObserver(Observer*);
 

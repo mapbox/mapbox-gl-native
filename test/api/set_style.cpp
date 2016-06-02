@@ -21,7 +21,7 @@ TEST(API, SetStyle) {
 
     {
         Map map(view, fileSource, MapMode::Still);
-        map.setStyleJSON("invalid", "");
+        map.setStyleJSON("invalid");
     }
 
     auto observer = Log::removeObserver();

@@ -78,7 +78,7 @@ Style::Style(FileSource& fileSource_, float pixelRatio)
     spriteStore->setObserver(this);
 }
 
-void Style::setJSON(const std::string& json, const std::string&) {
+void Style::setJSON(const std::string& json) {
     sources.clear();
     layers.clear();
     classes.clear();

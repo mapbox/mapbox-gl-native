@@ -188,7 +188,7 @@ NAN_METHOD(NodeMap::Load) {
     }
 
     try {
-        nodeMap->map->setStyleJSON(style, ".");
+        nodeMap->map->setStyleJSON(style);
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
     }

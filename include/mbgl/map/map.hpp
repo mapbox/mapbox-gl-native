@@ -57,8 +57,8 @@ public:
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
-    void setStyleURL(const std::string& url);
-    void setStyleJSON(const std::string& json, const std::string& base = "");
+    void setStyleURL(const std::string&);
+    void setStyleJSON(const std::string&);
     std::string getStyleURL() const;
     std::string getStyleJSON() const;
 

@@ -43,7 +43,7 @@ public:
     void update();
     void render();
 
-    void loadStyleJSON(const std::string& json, const std::string& base);
+    void loadStyleJSON(const std::string&);
 
     View& view;
     FileSource& fileSource;
@@ -297,13 +297,7 @@ void Map::setStyleURL(const std::string& url) {
 
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
-    const size_t pos = impl->styleURL.rfind('/');
-    std::string base = "";
-    if (pos != std::string::npos) {
-        base = impl->styleURL.substr(0, pos + 1);
-    }
-
-    impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this, base](Response res) {
+    impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(impl->styleURL)) {
@@ -314,12 +308,12 @@ void Map::setStyleURL(const std::string& url) {
         } else if (res.notModified || res.noContent) {
             return;
         } else {
-            impl->loadStyleJSON(*res.data, base);
+            impl->loadStyleJSON(*res.data);
         }
     });
 }
 
-void Map::setStyleJSON(const std::string& json, const std::string& base) {
+void Map::setStyleJSON(const std::string& json) {
     if (impl->styleJSON == json) {
         return;
     }
@@ -332,11 +326,11 @@ void Map::setStyleJSON(const std::string& json, const std::string& base) {
     impl->styleJSON.clear();
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
-    impl->loadStyleJSON(json, base);
+    impl->loadStyleJSON(json);
 }
 
-void Map::Impl::loadStyleJSON(const std::string& json, const std::string& base) {
-    style->setJSON(json, base);
+void Map::Impl::loadStyleJSON(const std::string& json) {
+    style->setJSON(json);
     style->setObserver(this);
     styleJSON = json;
 

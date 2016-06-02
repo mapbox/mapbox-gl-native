@@ -56,15 +56,15 @@ TEST(Map, DoubleStyleLoad) {
     MapTest test;
 
     Map map(test.view, test.fileSource, MapMode::Still);
-    map.setStyleJSON("", "");
-    map.setStyleJSON("", "");
+    map.setStyleJSON("");
+    map.setStyleJSON("");
 }
 
 TEST(Map, AddLayer) {
     MapTest test;
 
     Map map(test.view, test.fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
@@ -77,7 +77,7 @@ TEST(Map, RemoveLayer) {
     MapTest test;
 
     Map map(test.view, test.fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
