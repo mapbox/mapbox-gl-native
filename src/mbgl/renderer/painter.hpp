@@ -5,17 +5,16 @@
 #include <mbgl/tile/tile_id.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
 
 #include <mbgl/gl/gl_config.hpp>
-
-#include <mbgl/style/render_item.hpp>
-#include <mbgl/style/style.hpp>
-
 #include <mbgl/gl/gl.hpp>
+
+#include <mbgl/style/style.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>

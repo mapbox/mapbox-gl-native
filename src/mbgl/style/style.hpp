@@ -1,8 +1,6 @@
 #pragma once
 
-#include <mbgl/style/render_item.hpp>
 #include <mbgl/style/transition_options.hpp>
-
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/text/glyph_store_observer.hpp>
@@ -15,12 +13,10 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/color.hpp>
 
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <set>
 
 namespace mbgl {
 
@@ -28,12 +24,7 @@ class FileSource;
 class GlyphAtlas;
 class SpriteAtlas;
 class LineAtlas;
-
-struct RenderData {
-    Color backgroundColor = {{ 0, 0, 0, 0 }};
-    std::set<style::Source*> sources;
-    std::vector<RenderItem> order;
-};
+class RenderData;
 
 namespace style {
 
