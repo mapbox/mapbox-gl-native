@@ -7,16 +7,13 @@ namespace mbgl {
 SymbolAnnotationImpl::SymbolAnnotationImpl(const AnnotationID id_, const SymbolAnnotation& annotation_)
 : id(id_),
   annotation(annotation_) {
-    if (!annotation.geometry.is<Point<double>>()) {
-        throw std::runtime_error("unsupported symbol annotation geometry type");
-    }
 }
 
 void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {
     std::unordered_map<std::string, std::string> featureProperties;
     featureProperties.emplace("sprite", annotation.icon.empty() ? std::string("default_marker") : annotation.icon);
 
-    const Point<double>& p = annotation.geometry.get<Point<double>>();
+    const Point<double>& p = annotation.geometry;
 
     // Clamp to the latitude limits of Web Mercator.
     const double constrainedLatitude = util::clamp(p.y, -util::LATITUDE_MAX, util::LATITUDE_MAX);

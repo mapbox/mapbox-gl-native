@@ -30,7 +30,7 @@ void LineAnnotationImpl::updateStyle(Style& style) const {
     style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 }
 
-const Geometry<double>& LineAnnotationImpl::geometry() const {
+const ShapeAnnotationGeometry& LineAnnotationImpl::geometry() const {
     return annotation.geometry;
 }
 

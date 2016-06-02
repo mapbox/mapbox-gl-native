@@ -57,18 +57,6 @@ struct ToGeoJSONVT {
         return convertFeature(geojsonvt::ProjectedFeatureType::Polygon, converted);
     }
 
-    geojsonvt::ProjectedFeature operator()(const Point<double>&) {
-        throw std::runtime_error("unsupported shape annotation geometry type");
-    }
-
-    geojsonvt::ProjectedFeature operator()(const MultiPoint<double>&) {
-        throw std::runtime_error("unsupported shape annotation geometry type");
-    }
-
-    geojsonvt::ProjectedFeature operator()(const mapbox::geometry::geometry_collection<double>&) {
-        throw std::runtime_error("unsupported shape annotation geometry type");
-    }
-
 private:
     geojsonvt::LonLat convertPoint(const Point<double>& p) const {
         return {
@@ -104,7 +92,7 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
         const double tolerance = baseTolerance / (maxAmountOfTiles * util::EXTENT);
 
         std::vector<geojsonvt::ProjectedFeature> features = {
-            Geometry<double>::visit(geometry(), ToGeoJSONVT(tolerance))
+            ShapeAnnotationGeometry::visit(geometry(), ToGeoJSONVT(tolerance))
         };
 
         mapbox::geojsonvt::Options options;

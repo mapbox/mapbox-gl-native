@@ -16,13 +16,19 @@ using AnnotationIDs = std::vector<AnnotationID>;
 
 class SymbolAnnotation {
 public:
-    Geometry<double> geometry;
+    Point<double> geometry;
     std::string icon;
 };
 
+using ShapeAnnotationGeometry = variant<
+    LineString<double>,
+    Polygon<double>,
+    MultiLineString<double>,
+    MultiPolygon<double>>;
+
 class LineAnnotation {
 public:
-    Geometry<double> geometry;
+    ShapeAnnotationGeometry geometry;
     float opacity = 1;
     float width = 1;
     Color color = {{ 0, 0, 0, 1 }};
@@ -30,7 +36,7 @@ public:
 
 class FillAnnotation {
 public:
-    Geometry<double> geometry;
+    ShapeAnnotationGeometry geometry;
     float opacity = 1;
     Color color = {{ 0, 0, 0, 1 }};
     Color outlineColor = {{ 0, 0, 0, -1 }};
@@ -39,7 +45,7 @@ public:
 // An annotation whose type and properties are sourced from a style layer.
 class StyleSourcedAnnotation {
 public:
-    Geometry<double> geometry;
+    ShapeAnnotationGeometry geometry;
     std::string layerID;
 };
 

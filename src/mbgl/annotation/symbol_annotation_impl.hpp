@@ -56,7 +56,7 @@ template <>
 struct indexable<std::shared_ptr<const mbgl::SymbolAnnotationImpl>> {
     using result_type = mbgl::LatLng;
     inline mbgl::LatLng operator()(const std::shared_ptr<const mbgl::SymbolAnnotationImpl>& v) const {
-        const mbgl::Point<double>& p = v->annotation.geometry.get<mbgl::Point<double>>();
+        const mbgl::Point<double>& p = v->annotation.geometry;
         return mbgl::LatLng(p.y, p.x);
     }
 };

@@ -31,7 +31,7 @@ void StyleSourcedAnnotationImpl::updateStyle(Style& style) const {
     style.addLayer(std::move(layer), sourceLayer->id);
 }
 
-const Geometry<double>& StyleSourcedAnnotationImpl::geometry() const {
+const ShapeAnnotationGeometry& StyleSourcedAnnotationImpl::geometry() const {
     return annotation.geometry;
 }
 

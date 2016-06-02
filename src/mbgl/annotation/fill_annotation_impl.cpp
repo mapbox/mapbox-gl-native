@@ -29,7 +29,7 @@ void FillAnnotationImpl::updateStyle(Style& style) const {
     style.addLayer(std::move(layer), AnnotationManager::PointLayerID);
 }
 
-const Geometry<double>& FillAnnotationImpl::geometry() const {
+const ShapeAnnotationGeometry& FillAnnotationImpl::geometry() const {
     return annotation.geometry;
 }
 

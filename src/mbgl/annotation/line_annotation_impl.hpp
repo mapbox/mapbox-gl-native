@@ -10,7 +10,7 @@ public:
     LineAnnotationImpl(const AnnotationID, const LineAnnotation&, const uint8_t maxZoom);
 
     void updateStyle(Style&) const final;
-    const Geometry<double>& geometry() const final;
+    const ShapeAnnotationGeometry& geometry() const final;
 
 private:
     const LineAnnotation annotation;
