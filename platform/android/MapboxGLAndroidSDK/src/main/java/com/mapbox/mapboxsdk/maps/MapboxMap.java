@@ -72,7 +72,6 @@ public class MapboxMap {
 
     private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
-    private Bitmap mViewMarkerBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
 
     private boolean mMyLocationEnabled;
     private boolean mAllowConcurrentMultipleInfoWindows;
@@ -703,8 +702,8 @@ public class MapboxMap {
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
         MarkerView marker = prepareViewMarker(markerOptions);
-        long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
+        long id = mMapView.addMarker(marker);
         marker.setId(id);
         mAnnotations.put(id, marker);
         return marker;
@@ -1209,8 +1208,7 @@ public class MapboxMap {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-        Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
-        marker.setIcon(icon);
+        marker.setIcon(markerViewOptions.getIcon());
         return marker;
     }
 

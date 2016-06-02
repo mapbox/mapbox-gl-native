@@ -1,5 +1,8 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
+
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
@@ -34,6 +37,8 @@ public class MarkerView extends Marker {
     private float tiltValue;
     private float rotation;
     private float alpha = 1;
+
+    private Icon markerViewIcon;
 
     /**
      * Publicly hidden default constructor
@@ -313,6 +318,34 @@ public class MarkerView extends Marker {
         if (markerViewManager != null) {
             markerViewManager.animateAlpha(this, alpha);
         }
+    }
+
+    /**
+     * Set the icon of the MarkerView.
+     *
+     * @param icon the icon to be used as Marker image
+     */
+    @Override
+    public void setIcon(@Nullable Icon icon) {
+        if (icon != null) {
+            markerViewIcon = IconFactory.recreate("icon", icon.getBitmap());
+        }
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        Icon transparentIcon = IconFactory.recreate("markerViewSettings", bitmap);
+        if (markerViewManager != null) {
+            markerViewManager.updateIcon(this);
+        }
+        super.setIcon(transparentIcon);
+    }
+
+    /**
+     * Get the icon of the MarkerView.
+     *
+     * @return the icon use as Marker image
+     */
+    @Override
+    public Icon getIcon() {
+        return markerViewIcon;
     }
 
     /**
