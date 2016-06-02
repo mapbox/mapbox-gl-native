@@ -27,7 +27,7 @@ struct ToGeoJSONVT {
 
     geojsonvt::ProjectedFeature operator()(const LineString<double>& line) const {
         geojsonvt::ProjectedRings converted;
-        converted.push_back(convertPoints(geojsonvt::ProjectedFeatureType::Polygon, line));
+        converted.push_back(convertPoints(geojsonvt::ProjectedFeatureType::LineString, line));
         return convertFeature(geojsonvt::ProjectedFeatureType::LineString, converted);
     }
 

@@ -46,7 +46,7 @@ TEST(Annotations, SymbolAnnotation) {
 TEST(Annotations, LineAnnotation) {
     AnnotationTest test;
 
-    LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
+    LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
     LineAnnotation annotation { line };
     annotation.color = {{ 255, 0, 0, 1 }};
     annotation.width = 5;
