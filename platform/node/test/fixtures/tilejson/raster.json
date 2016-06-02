@@ -1,0 +1,20 @@
+{
+  "version": 8,
+  "sources": {
+    "mapbox": {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles": [
+        "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png"
+      ]
+    }
+  },
+  "layers": [
+    {
+      "id": "satellite",
+      "type": "raster",
+      "source": "mapbox",
+      "source-layer": "mapbox_satellite_full"
+    }
+  ]
+}

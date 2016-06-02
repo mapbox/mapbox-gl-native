@@ -4,7 +4,7 @@ var test = require('tape');
 var mbgl = require('../../../../lib/mapbox-gl-native');
 var fs = require('fs');
 var path = require('path');
-var style = require('../fixtures/style.json');
+var style = require('../fixtures/tilejson/local.json');
 
 test('Map', function(t) {
     t.test('must be constructed with new', function(t) {

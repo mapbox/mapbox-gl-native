@@ -1,12 +1,11 @@
 {
   "version": 8,
-  "name": "Empty",
   "sources": {
     "mapbox": {
       "type": "vector",
       "maxzoom": 15,
       "tiles": [
-        "./fixtures/tiles/{z}-{x}-{y}.vector.pbf"
+        "https://api.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf"
       ]
     }
   },

@@ -18,10 +18,13 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.3.5",
+    "d3-queue": "^2.0.3",
     "express": "^4.11.1",
+    "generate-geo-testing-data": "^0.2.1",
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#4a567b438be303fbbf13e5ddf49d72d8debd811d",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#b3441d9a285ffbe9b876677acb13d7df07e5b975",
     "node-gyp": "^3.3.1",
+    "pretty-bytes": "^3.0.1",
     "request": "^2.72.0",
     "tape": "^4.5.1"
   },

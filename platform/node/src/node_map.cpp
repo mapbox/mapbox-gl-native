@@ -93,7 +93,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
  * @param {number} options.ratio pixel ratio
  * @example
  * var map = new mbgl.Map({ request: function() {} });
- * map.load(require('./test/fixtures/style.json'));
+ * map.load(require('./test/fixtures/tilejson/local.json'));
  * map.render({}, function(err, image) {
  *     if (err) throw err;
  *     fs.writeFileSync('image.png', image);
@@ -159,10 +159,10 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  * @throws {Error} if stylesheet is missing or invalid
  * @example
  * // providing an object
- * map.load(require('./test/fixtures/style.json'));
+ * map.load(require('./test/fixtures/tilejson/local.json'));
  *
  * // providing a string
- * map.load(fs.readFileSync('./test/fixtures/style.json', 'utf8'));
+ * map.load(fs.readFileSync('./test/fixtures/tilejson/local.json', 'utf8'));
  */
 NAN_METHOD(NodeMap::Load) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());

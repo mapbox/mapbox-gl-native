@@ -33,7 +33,7 @@ var mbgl = require('mapbox-gl-native');
 var sharp = require('sharp');
 var map = new mbgl.Map({ request: function() {} });
 
-map.load(require('./test/fixtures/style.json'));
+map.load(require('./test/fixtures/tilejson/local.json'));
 
 map.render({}, function(err, buffer) {
     if (err) throw err;
