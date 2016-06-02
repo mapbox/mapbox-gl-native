@@ -6,6 +6,7 @@
 #include <mbgl/gl/gl_helper.hpp>
 #include <mbgl/gl/gl_config.hpp>
 #include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/texture_pool.hpp>
 
 #include <memory>
 
@@ -73,35 +74,35 @@ TEST(GLObject, Store) {
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueProgram program = store.createProgram();
-    EXPECT_TRUE(program.get() != 0);
+    EXPECT_NE(program.get(), 0);
     program.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueShader shader = store.createShader(GL_VERTEX_SHADER);
-    EXPECT_TRUE(shader.get() != 0);
+    EXPECT_NE(shader.get(), 0);
     shader.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueBuffer buffer = store.createBuffer();
-    EXPECT_TRUE(buffer.get() != 0);
+    EXPECT_NE(buffer.get(), 0);
     buffer.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueTexture texture = store.createTexture();
-    EXPECT_TRUE(texture.get() != 0);
+    EXPECT_NE(texture.get(), 0);
     texture.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueVAO vao = store.createVAO();
-    EXPECT_TRUE(vao.get() != 0);
+    EXPECT_NE(vao.get(), 0);
     vao.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
@@ -109,10 +110,88 @@ TEST(GLObject, Store) {
 
     mbgl::gl::UniqueTexturePool texturePool = store.createTexturePool();
     for (auto& id : texturePool.get()) {
-        EXPECT_TRUE(id != 0);
+        EXPECT_NE(id, 0);
     }
+    EXPECT_TRUE(texturePool.get().size() == size_t(mbgl::gl::TextureMax));
     texturePool.reset();
     EXPECT_FALSE(store.empty());
+    store.performCleanup();
+    EXPECT_TRUE(store.empty());
+
+    view.deactivate();
+}
+
+TEST(GLObject, TexturePool) {
+    mbgl::HeadlessView view(std::make_shared<mbgl::HeadlessDisplay>(), 1);
+    view.activate();
+
+    mbgl::gl::ObjectStore store;
+    EXPECT_TRUE(store.empty());
+
+    mbgl::gl::TexturePool pool;
+
+    // Fill an entire texture pool.
+    for (auto i = 0; i != mbgl::gl::TextureMax; ++i) {
+        EXPECT_EQ(pool.getTextureID(store), GLuint(i + 1));
+        EXPECT_TRUE(store.empty());
+    }
+
+    // Reuse texture ids from the same pool.
+    for (auto i = 0; i != mbgl::gl::TextureMax; ++i) {
+        GLuint id = i + 1;
+        pool.releaseTextureID(id);
+        EXPECT_EQ(id, 0);
+        EXPECT_EQ(pool.getTextureID(store), GLuint(i + 1));
+        EXPECT_TRUE(store.empty());
+    }
+
+    // Trigger a new texture pool creation.
+    {
+        GLuint id = pool.getTextureID(store);
+        EXPECT_EQ(id, mbgl::gl::TextureMax + 1);
+        EXPECT_TRUE(store.empty());
+
+        pool.releaseTextureID(id);
+        EXPECT_EQ(id, 0);
+        // Last used texture from pool triggers pool recycling.
+        EXPECT_FALSE(store.empty());
+
+        store.performCleanup();
+        EXPECT_TRUE(store.empty());
+    }
+
+    // First pool is still full, thus creating a new pool.
+    GLuint id1 = pool.getTextureID(store);
+    EXPECT_GT(id1, mbgl::gl::TextureMax);
+    EXPECT_TRUE(store.empty());
+
+    // Release all textures from the first pool.
+    for (auto i = 0; i != mbgl::gl::TextureMax; ++i) {
+        GLuint id = i + 1;
+        pool.releaseTextureID(id);
+        if (i == mbgl::gl::TextureMax - 1) {
+            // Last texture from pool triggers pool recycling.
+            EXPECT_FALSE(store.empty());
+        } else {
+            EXPECT_TRUE(store.empty());
+        }
+    }
+
+    store.performCleanup();
+    EXPECT_TRUE(store.empty());
+
+    // The first pool is now gone, the next pool is now in use.
+    GLuint id2 = pool.getTextureID(store);
+    EXPECT_GT(id2, id1);
+    pool.releaseTextureID(id2);
+    EXPECT_EQ(id2, 0);
+    EXPECT_TRUE(store.empty());
+
+    // Last used texture from the pool triggers pool recycling.
+    pool.releaseTextureID(id1);
+    EXPECT_EQ(id1, 0);
+    EXPECT_FALSE(store.empty());
+
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
