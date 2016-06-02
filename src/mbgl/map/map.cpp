@@ -830,6 +830,7 @@ void Map::setSourceTileCacheSize(size_t size) {
 }
 
 void Map::onLowMemory() {
+    impl->store.performCleanup();
     if (!impl->style) return;
     impl->style->onLowMemory();
     impl->view.invalidate();
