@@ -9,271 +9,193 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <future>
-#include <vector>
-
 using namespace mbgl;
+
+namespace {
 
 std::shared_ptr<SpriteImage> namedMarker(const std::string &name) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/sprites/" + name));
     return std::make_shared<SpriteImage>(std::move(image), 1.0);
 }
 
-namespace {
+class AnnotationTest {
+public:
+    util::RunLoop loop;
+    std::shared_ptr<HeadlessDisplay> display { std::make_shared<HeadlessDisplay>() };
+    HeadlessView view { display, 1 };
+    StubFileSource fileSource;
+    Map map { view, fileSource, MapMode::Still };
 
-void checkRendering(Map& map, const char * name) {
-    test::checkImage(std::string("test/fixtures/annotations/") + name,
-                     test::render(map), 0.0002, 0.1);
-}
+    void checkRendering(const char * name) {
+        test::checkImage(std::string("test/fixtures/annotations/") + name,
+                         test::render(map), 0.0002, 0.1);
+    }
+};
 
 } // end namespace
 
 TEST(Annotations, SymbolAnnotation) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
-
-    checkRendering(map, "point_annotation");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double>(0, 0), "default_marker" });
+    test.checkRendering("point_annotation");
 }
 
 TEST(Annotations, LineAnnotation) {
-    util::RunLoop loop;
-
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
-
     LineAnnotation annotation { line };
     annotation.color = {{ 255, 0, 0, 1 }};
     annotation.width = 5;
 
-    map.addAnnotation(annotation);
-
-    checkRendering(map, "line_annotation");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotation(annotation);
+    test.checkRendering("line_annotation");
 }
 
 TEST(Annotations, FillAnnotation) {
-    util::RunLoop loop;
-
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    AnnotationTest test;
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-
     FillAnnotation annotation { polygon };
     annotation.color = {{ 255, 0, 0, 1 }};
 
-    map.addAnnotation(annotation);
-
-    checkRendering(map, "fill_annotation");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotation(annotation);
+    test.checkRendering("fill_annotation");
 }
 
 TEST(Annotations, StyleSourcedShapeAnnotation) {
-    util::RunLoop loop;
-
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
+    AnnotationTest test;
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
 
-    map.addAnnotation(StyleSourcedAnnotation { polygon, "annotation" });
-
-    checkRendering(map, "style_sourced_shape_annotation");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/annotation.json"), "");
+    test.map.addAnnotation(StyleSourcedAnnotation { polygon, "annotation" });
+    test.checkRendering("style_sourced_shape_annotation");
 }
 
 TEST(Annotations, AddMultiple) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addAnnotation(SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
+    test::render(test.map);
 
-    test::render(map);
-
-    map.addAnnotation(SymbolAnnotation { Point<double> { 10, 0 }, "default_marker" });
-
-    checkRendering(map, "add_multiple");
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 10, 0 }, "default_marker" });
+    test.checkRendering("add_multiple");
 }
 
 TEST(Annotations, NonImmediateAdd) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-
-    test::render(map);
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test::render(test.map);
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
-
     FillAnnotation annotation { polygon };
     annotation.color = {{ 255, 0, 0, 1 }};
 
-    map.addAnnotation(annotation);
-
-    checkRendering(map, "non_immediate_add");
+    test.map.addAnnotation(annotation);
+    test.checkRendering("non_immediate_add");
 }
 
 TEST(Annotations, UpdateIcon) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("flipped_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("flipped_marker", namedMarker("default_marker.png"));
-    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
+    test::render(test.map);
 
-    test::render(map);
+    test.map.removeAnnotationIcon("flipped_marker");
+    test.map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
+    test.map.update(Update::Annotations);
 
-    map.removeAnnotationIcon("flipped_marker");
-    map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
-    map.update(Update::Annotations);
-
-    checkRendering(map, "update_icon");
+    test.checkRendering("update_icon");
 }
 
 TEST(Annotations, UpdatePoint) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
+    AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
-    AnnotationID point = map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+    test::render(test.map);
 
-    test::render(map);
-
-    map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "flipped_marker" });
-
-    checkRendering(map, "update_point");
+    test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "flipped_marker" });
+    test.checkRendering("update_point");
 }
 
 TEST(Annotations, RemovePoint) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    AnnotationID point = map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+    test::render(test.map);
 
-    test::render(map);
-
-    map.removeAnnotation(point);
-
-    checkRendering(map, "remove_point");
+    test.map.removeAnnotation(point);
+    test.checkRendering("remove_point");
 }
 
 TEST(Annotations, RemoveShape) {
-    util::RunLoop loop;
-
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    AnnotationTest test;
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
-
     LineAnnotation annotation { line };
     annotation.color = {{ 255, 0, 0, 1 }};
     annotation.width = 5;
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    AnnotationID shape = map.addAnnotation(annotation);
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    AnnotationID shape = test.map.addAnnotation(annotation);
 
-    test::render(map);
+    test::render(test.map);
 
-    map.removeAnnotation(shape);
-
-    checkRendering(map, "remove_shape");
+    test.map.removeAnnotation(shape);
+    test.checkRendering("remove_shape");
 }
 
 TEST(Annotations, ImmediateRemoveShape) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
-    Map map(view, fileSource, MapMode::Still);
+    test.map.removeAnnotation(test.map.addAnnotation(LineAnnotation { LineString<double>() }));
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
 
-    map.removeAnnotation(map.addAnnotation(LineAnnotation { LineString<double>() }));
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-
-    test::render(map);
+    test::render(test.map);
 }
 
 TEST(Annotations, SwitchStyle) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+    test::render(test.map);
 
-    test::render(map);
-
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-
-    checkRendering(map, "switch_style");
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.checkRendering("switch_style");
 }
 
 TEST(Annotations, QueryRenderedFeatures) {
-    util::RunLoop loop;
+    AnnotationTest test;
 
-    auto display = std::make_shared<mbgl::HeadlessDisplay>();
-    HeadlessView view(display, 1);
-    StubFileSource fileSource;
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
-    Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
-    map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
-
-    test::render(map);
+    test::render(test.map);
     
-    auto point = map.pixelForLatLng({ 0, 0 });
-    auto features = map.queryRenderedFeatures(point);
+    auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
     EXPECT_EQ(features.size(), 1);
 }
