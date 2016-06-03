@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -22,7 +23,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class MyLocationDrawableActivity extends AppCompatActivity implements LocationListener {
 
@@ -49,7 +49,7 @@ public class MyLocationDrawableActivity extends AppCompatActivity implements Loc
 
         MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
         mapboxMapOptions.accessToken(getString(R.string.mapbox_access_token));
-        mapboxMapOptions.styleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
+        mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
         mapboxMapOptions.locationEnabled(true);
         mapboxMapOptions.camera(new CameraPosition.Builder()
                 .target(location != null ? new LatLng(location) : new LatLng(0, 0))

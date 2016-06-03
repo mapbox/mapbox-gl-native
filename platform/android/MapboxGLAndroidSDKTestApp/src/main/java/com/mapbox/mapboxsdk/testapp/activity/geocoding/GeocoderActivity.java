@@ -19,15 +19,14 @@ import com.mapbox.geocoder.GeocoderCriteria;
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class GeocoderActivity extends AppCompatActivity {
         setMessage(getString(R.string.geocoder_instructions));
 
         mapView = (MapView) findViewById(R.id.mapView);
-        mapView.setStyleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION));
+        mapView.setStyleUrl(Style.MAPBOX_STREETS);
         mapView.onCreate(savedInstanceState);
 
         final ImageView dropPinView = new ImageView(this);

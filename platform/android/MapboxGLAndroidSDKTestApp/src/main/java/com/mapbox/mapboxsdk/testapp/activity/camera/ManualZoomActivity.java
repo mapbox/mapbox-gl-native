@@ -12,12 +12,11 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class ManualZoomActivity extends AppCompatActivity {
 
@@ -39,7 +38,7 @@ public class ManualZoomActivity extends AppCompatActivity {
         }
 
         mMapView = (MapView) findViewById(R.id.manualZoomMapView);
-        mMapView.setStyleUrl(Style.getSatelliteStyleUrl(AppConstant.STYLE_VERSION));
+        mMapView.setStyleUrl(Style.SATELLITE);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
