@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.annotations;
 import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
 import org.junit.Test;
@@ -95,22 +94,6 @@ public class MarkerViewTest {
         MarkerView marker = new MarkerViewOptions().getMarker();
         assertEquals("anchorU should match ", 0.5, marker.getInfoWindowAnchorU(), 0);
         assertEquals("anchorU should match ", 0, marker.getInfoWindowAnchorV(), 0);
-    }
-
-    @Test
-    public void testSelectAnimRes() {
-        int animatorRes = R.animator.rotate_360;
-        MarkerViewOptions markerOptions = new MarkerViewOptions().selectAnimatorResource(animatorRes);
-        MarkerView marker = markerOptions.getMarker();
-        assertEquals("select animator resource should match ", animatorRes, marker.getSelectAnimRes(), 0);
-    }
-
-    @Test
-    public void testDeselectAnimRes() {
-        int animatorRes = R.animator.rotate_360;
-        MarkerViewOptions markerOptions = new MarkerViewOptions().deselectAnimatorResource(animatorRes);
-        MarkerView marker = markerOptions.getMarker();
-        assertEquals("deselect animator resource should match ", animatorRes, marker.getDeselectAnimRes(), 0);
     }
 
     @Test

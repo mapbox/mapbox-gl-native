@@ -82,8 +82,6 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setFlat(flat);
         marker.setAnchor(anchorU, anchorV);
         marker.setInfoWindowAnchor(infoWindowAnchorU, infoWindowAnchorV);
-        marker.setSelectAnimRes(selectAnimRes);
-        marker.setDeselectAnimRes(deselectAnimRes);
         marker.setRotation(rotation);
         marker.setVisible(visible);
         return marker;

@@ -51,7 +51,6 @@ public class MarkerViewManager {
         this.mapView = mapView;
         this.markerViewMap = new HashMap<>();
         this.defaultMarkerViewAdapter = new ImageMarkerViewAdapter(mapView.getContext());
-        // FIXME only add this if a MarkerView instance is added to MapboxMap
         this.markerViewAdapters.add(defaultMarkerViewAdapter);
     }
 
@@ -166,8 +165,7 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link MarkerView#getDeselectAnimRes()} will be called to get the related animation.
-     * If non are provided, no animation will be started.
+     * The {@link ImageMarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
      * </p>
      *
      * @param marker the MarkerView to deselect
@@ -175,10 +173,29 @@ public class MarkerViewManager {
     public void deselect(@NonNull MarkerView marker) {
         final View convertView = markerViewMap.get(marker);
         if (convertView != null) {
-            int deselectAnimatorRes = marker.getDeselectAnimRes();
-            if (deselectAnimatorRes != 0) {
-                AnimatorUtils.animate(convertView, deselectAnimatorRes);
+            for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
+                if (adapter.getMarkerClass().equals(marker.getClass())) {
+                    adapter.onDeselect(marker, convertView);
+                }
             }
+        }
+    }
+
+    public void select(@NonNull MarkerView marker) {
+        final View convertView = markerViewMap.get(marker);
+        for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
+            if (adapter.getMarkerClass().equals(marker.getClass())) {
+                select(marker, convertView, adapter);
+            }
+        }
+    }
+
+    public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter) {
+        if (convertView != null) {
+            if (adapter.onSelect(marker, convertView, false)) {
+                mapboxMap.selectMarker(marker);
+            }
+            marker.setSelected(true);
         }
     }
 
@@ -191,42 +208,35 @@ public class MarkerViewManager {
      * the {@link MarkerView} from the underlying collection if needed.
      * </p>
      *
-     * @param marker        the MarkerView to remove
-     * @param removeFromMap flag indicating if a MarkerView will be removed from the collection.
+     * @param marker the MarkerView to remove
      */
-    public void removeMarkerView(MarkerView marker, boolean removeFromMap) {
+    public void removeMarkerView(MarkerView marker) {
         final View viewHolder = markerViewMap.get(marker);
         if (viewHolder != null && marker != null) {
             for (final MapboxMap.MarkerViewAdapter<?> adapter : markerViewAdapters) {
-                if (adapter.getMarkerClass() == marker.getClass()) {
-
-                    // get pool of Views associated to an adapter
-                    final Pools.SimplePool<View> viewPool = adapter.getViewReusePool();
-
-                    // cancel ongoing animations
-                    viewHolder.animate().cancel();
-                    viewHolder.setAlpha(1);
-                    AnimatorUtils.alpha(viewHolder, 0, new AnimatorUtils.OnAnimationEndListener() {
-                        @Override
-                        public void onAnimationEnd() {
-                            viewHolder.setVisibility(View.GONE);
-                            viewPool.release(viewHolder);
-                        }
-                    });
+                if (adapter.getMarkerClass().equals(marker.getClass())) {
+                    if (adapter.prepareViewForReuse(marker, viewHolder)) {
+                        adapter.releaseView(viewHolder);
+                    }
                 }
             }
         }
-        if (removeFromMap) {
-            markerViewMap.remove(marker);
-        }
+        markerViewMap.remove(marker);
     }
 
     /**
-     * Add a MarkerViewAdapter.
+     * Add a MarkerViewAdapter to the MarkerViewManager.
+     * <p>
+     * The provided MarkerViewAdapter must use supply a generic subclass of MarkerView.
+     * </p>
      *
      * @param markerViewAdapter the MarkerViewAdapter to add
      */
-    public void addMarkerViewAdapter(@Nullable MapboxMap.MarkerViewAdapter markerViewAdapter) {
+    public void addMarkerViewAdapter(MapboxMap.MarkerViewAdapter markerViewAdapter) {
+        if (markerViewAdapter.getMarkerClass().equals(MarkerView.class)) {
+            throw new RuntimeException("Providing a custom MarkerViewAdapter requires subclassing MarkerView");
+        }
+
         if (!markerViewAdapters.contains(markerViewAdapter)) {
             markerViewAdapters.add(markerViewAdapter);
             invalidateViewMarkersInBounds();
@@ -288,12 +298,13 @@ public class MarkerViewManager {
             if (!markers.contains(m)) {
                 // remove marker
                 convertView = markerViewMap.get(m);
-                int deselectAnimRes = m.getDeselectAnimRes();
-                if (deselectAnimRes != 0) {
-                    AnimatorUtils.animate(convertView, deselectAnimRes, 0);
+                for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
+                    if (adapter.getMarkerClass().equals(m.getClass())) {
+                        adapter.prepareViewForReuse(m, convertView);
+                        adapter.releaseView(convertView);
+                        iterator.remove();
+                    }
                 }
-                removeMarkerView(m, false);
-                iterator.remove();
             }
         }
 
@@ -301,7 +312,7 @@ public class MarkerViewManager {
         for (final MarkerView marker : markers) {
             if (!markerViewMap.containsKey(marker)) {
                 for (final MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
-                    if (adapter.getMarkerClass() == marker.getClass()) {
+                    if (adapter.getMarkerClass().equals(marker.getClass())) {
                         convertView = (View) adapter.getViewReusePool().acquire();
                         final View adaptedView = adapter.getView(marker, convertView, mapView);
                         if (adaptedView != null) {
@@ -321,13 +332,11 @@ public class MarkerViewManager {
                             if (mapboxMap.getSelectedMarkers().contains(marker)) {
                                 // if a marker to be shown was selected
                                 // replay that animation with duration 0
-                                int selectAnimRes = marker.getSelectAnimRes();
-                                if (selectAnimRes != 0) {
-                                    AnimatorUtils.animate(convertView, selectAnimRes, 0);
+                                if (adapter.onSelect(marker, adaptedView, true)) {
+                                    mapboxMap.selectMarker(marker);
                                 }
                             }
 
-                            final int animSelectRes = marker.getSelectAnimRes();
                             adaptedView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(final View v) {
@@ -342,17 +351,7 @@ public class MarkerViewManager {
                                         int infoWindowOffsetY = (int) ((adaptedView.getHeight() * marker.getInfoWindowAnchorV()) - marker.getOffsetY());
                                         marker.setTopOffsetPixels(infoWindowOffsetY);
                                         marker.setRightOffsetPixels(infoWindowOffsetX);
-
-                                        if (animSelectRes != 0) {
-                                            AnimatorUtils.animate(v, animSelectRes, new AnimatorUtils.OnAnimationEndListener() {
-                                                @Override
-                                                public void onAnimationEnd() {
-                                                    mapboxMap.selectMarker(marker);
-                                                }
-                                            });
-                                        } else {
-                                            mapboxMap.selectMarker(marker);
-                                        }
+                                        select(marker, v, adapter);
                                     }
                                 }
                             });

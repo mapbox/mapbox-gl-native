@@ -30,6 +30,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected int deselectAnimRes;
     protected int rotation;
     protected boolean visible = true;
+    protected boolean selected;
 
     /**
      * Default constructor
