@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.constants.AppConstant;
 
 public class DebugModeActivity extends AppCompatActivity {
 
@@ -27,12 +26,12 @@ public class DebugModeActivity extends AppCompatActivity {
     private int currentStyleIndex = 0;
 
     private static final String[] STYLES = new String[]{
-            Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION),
-            Style.getOutdoorsStyleUrl(AppConstant.STYLE_VERSION),
-            Style.getLightStyleUrl(AppConstant.STYLE_VERSION),
-            Style.getDarkStyleUrl(AppConstant.STYLE_VERSION),
-            Style.getSatelliteStyleUrl(AppConstant.STYLE_VERSION),
-            Style.getSatelliteStreetsStyleUrl(AppConstant.STYLE_VERSION)
+            Style.MAPBOX_STREETS,
+            Style.OUTDOORS,
+            Style.LIGHT,
+            Style.DARK,
+            Style.SATELLITE,
+            Style.SATELLITE_STREETS
     };
 
     @Override

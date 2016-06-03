@@ -11,8 +11,11 @@
     <string name="infoWindowAddress">Address</string>
 
     <!-- these are public -->
-    <!-- {@deprecated Use Style.getXStyleUrl(int version) instead.} -->
+    <!-- Using one of these constants means your map style will always use the latest version and
+     may change as we improve the style. -->
     <string name="style_mapbox_streets">mapbox://styles/mapbox/streets-v9</string>
+    <string name="style_outdoors">mapbox://styles/mapbox/outdoors-v9</string>
+    <!-- Note: Emerald style has been deprecated and will be removed in a future release-->
     <string name="style_emerald">mapbox://styles/mapbox/emerald-v8</string>
     <string name="style_light">mapbox://styles/mapbox/light-v9</string>
     <string name="style_dark">mapbox://styles/mapbox/dark-v9</string>
