@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.graphics.Bitmap;
 import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -50,16 +49,6 @@ public class MarkerViewTest {
         MarkerView marker = markerOptions.getMarker();
         assertEquals(marker.getTitle(), "Mapbox");
         assertEquals(markerOptions.getTitle(), "Mapbox");
-    }
-
-    @Test
-    public void testIcon() {
-        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_4444);
-        Icon icon = IconFactory.recreate("test", bitmap);
-        MarkerViewOptions markerOptions = new MarkerViewOptions().icon(icon);
-        MarkerView marker = markerOptions.getMarker();
-        assertEquals("Icon should match", icon, marker.getIcon());
-        assertEquals("Icon should match", icon, markerOptions.getIcon());
     }
 
     @Test
