@@ -11,13 +11,13 @@ By default, installs binaries. On these platforms no additional dependencies are
 - 64 bit OS X or 64 bit Linux
 - Node.js v4.x _(note: v5+ is known to have issue)_
 
-Just run:
+Run:
 
 ```
 npm install mapbox-gl-native
 ```
 
-Other platforms will fall back to a source compile with `make node`. To compile this module, make sure all submodules are initialized with `git submodule update --init` and install the [external dependencies required to build from source](https://github.com/mapbox/mapbox-gl-native/blob/node-v2.1.0/INSTALL.md#2-installing-dependencies).
+Other platforms will fall back to a source compile with `make node`; see INSTALL.md in the repository root directory for prequisites.
 
 ## Testing
 

@@ -81,13 +81,6 @@ To add or update text that the user may see in the iOS SDK:
 
 `make test-ios` builds and runs unit tests of cross-platform code as well as the SDK.
 
-Before you can run UI tests of the SDK, check out KIF and OHHTTPStubs via Git submodules:
-
-```bash
-git submodule init
-git submodule update
-```
-
 Before you can run unit tests of the cross-platform code on the command line, install ios-sim version 3.2.0 (not any other version):
 
 ```bash

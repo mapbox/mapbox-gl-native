@@ -32,13 +32,11 @@ gradle will take the value of the `MAPBOX_ACCESS_TOKEN` environ variable and sav
 
 ## Building
 
-Checking out the code and initializing the git submodules:
+Checking out the code:
 
 ```
 $ git clone https://github.com/mapbox/mapbox-gl-native.git
 $ cd mapbox-gl-native
-$ git submodule init
-$ git submodule update
 ```
 
 Building a debug version will generated a self-signed test application that can be installed on the phone or emulator:
