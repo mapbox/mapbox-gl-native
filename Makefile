@@ -1,5 +1,11 @@
 export BUILDTYPE ?= Debug
 
+ifeq ($(BUILDTYPE), Release)
+else ifeq ($(BUILDTYPE), Debug)
+else
+  $(error BUILDTYPE must be Debug or Release)
+endif
+
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = macos
   HOST_PLATFORM_VERSION = $(shell uname -m)
@@ -30,6 +36,7 @@ else
   export XCPRETTY ?= | xcpretty
 endif
 
+.PHONY: default
 default: test-$(BUILD_PLATFORM)
 
 ifneq (,$(wildcard .git/.))
@@ -43,55 +50,96 @@ endif
 node_modules: package.json
 	npm update # Install dependencies but don't run our own install script.
 
-GYP = deps/run_gyp --depth=. -Goutput_dir=.
-
-CONFIG_DEPENDENCIES = .mason/mason configure
-
-# Depend on gyp includes plus directories, so that projects are regenerated when
-# files are added or removed.
-GYP_DEPENDENCIES = mbgl.gypi test/test.gypi benchmark/benchmark.gypi bin/*.gypi $(shell find src include -type d) node_modules
+BUILD_DEPS += .mason/mason
+BUILD_DEPS += Makefile
+BUILD_DEPS += node_modules
 
 #### macOS targets ##############################################################
 
+ifeq ($(HOST_PLATFORM), macos)
+
+export PATH := $(shell pwd)/platform/macos:$(PATH)
+
 MACOS_OUTPUT_PATH = build/macos
-MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/platform/macos/platform.xcodeproj
+MACOS_PROJ_PATH = $(MACOS_OUTPUT_PATH)/mbgl.xcodeproj
 MACOS_WORK_PATH = platform/macos/macos.xcworkspace
 MACOS_USER_DATA_PATH = $(MACOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
+MACOS_COMPDB_PATH = $(MACOS_OUTPUT_PATH)/compdb/$(BUILDTYPE)
 
-$(MACOS_OUTPUT_PATH)/config.gypi: platform/macos/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ macos
-
-$(MACOS_OUTPUT_PATH)/mbgl.xcconfig: $(MACOS_OUTPUT_PATH)/config.gypi
-	./scripts/export-xcconfig.py $< $@
-
-$(MACOS_PROJ_PATH): platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi $(MACOS_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
-	$(GYP) -f xcode --generator-output=$(MACOS_OUTPUT_PATH) $<
-
-macos: $(MACOS_PROJ_PATH)
-	set -o pipefail && xcodebuild \
+MACOS_XCODEBUILD = xcodebuild \
 	  -derivedDataPath $(MACOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) \
-	  -workspace $(MACOS_WORK_PATH) -scheme CI build $(XCPRETTY)
+	  -workspace $(MACOS_WORK_PATH)
 
-xproj: $(MACOS_PROJ_PATH) $(MACOS_WORK_PATH)
+
+MACOS_XCSCHEMES += platform/macos/scripts/executable.xcscheme
+MACOS_XCSCHEMES += platform/macos/scripts/library.xcscheme
+MACOS_XCSCHEMES += platform/macos/scripts/node.xcscheme
+
+$(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
+	mkdir -p $(MACOS_OUTPUT_PATH)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+
+	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
+	@# create these automatically.
+	SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-render SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-offline SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-glfw SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME=mbgl-node SCHEME_TYPE=library BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node platform/macos/scripts/create_scheme.sh
+
+	@# Create schemes for running node tests. These have all of the environment variables set to
+	@# launch in the correct location.
+	SCHEME_NAME="node tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="`npm bin tape`/tape platform/node/test/js/**/*.test.js" platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME="node render tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/render.test.js" platform/macos/scripts/create_scheme.sh
+	SCHEME_NAME="node query tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/query.test.js" platform/macos/scripts/create_scheme.sh
+
+$(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
-	cp platform/macos/WorkspaceSettings.xcsettings "$(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings"
+	cp platform/macos/WorkspaceSettings.xcsettings "$@"
+
+.PHONY: macos
+macos: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' build $(XCPRETTY)
+
+.PHONY: xproj
+xproj: $(MACOS_PROJ_PATH)
 	open $(MACOS_WORK_PATH)
 
-test-macos: macos node_modules
-	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/Build/Products/$(BUILDTYPE)/test & pid=$$! && wait $$pid \
+.PHONY: test-macos
+test-macos: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-test' build $(XCPRETTY)
+	ulimit -c unlimited && ($(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-test & pid=$$! && wait $$pid \
 	  || (lldb -c /cores/core.$$pid --batch --one-line 'thread backtrace all' --one-line 'quit' && exit 1))
-	set -o pipefail && xcodebuild \
-	  -derivedDataPath $(MACOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) \
-	  -workspace $(MACOS_WORK_PATH) -scheme CI test $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: glfw-app
+glfw-app: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-glfw' build $(XCPRETTY)
+	"$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-glfw"
+
+.PHONY: render
+render: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-render' build $(XCPRETTY)
+
+.PHONY: offline
+offline: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-offline' build $(XCPRETTY)
+
+.PHONY: node
+node: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+
+.PHONY: xpackage
 xpackage: $(MACOS_PROJ_PATH)
 	SYMBOLS=$(SYMBOLS) ./platform/macos/scripts/package.sh
 
+.PHONY: xdocument
 xdocument:
 	OUTPUT=$(OUTPUT) ./platform/macos/scripts/document.sh
 
+.PHONY: genstrings
 genstrings:
 	genstrings -u -o platform/macos/sdk/Base.lproj platform/darwin/src/*.{m,mm}
 	genstrings -u -o platform/macos/sdk/Base.lproj platform/macos/src/*.{m,mm}
@@ -100,279 +148,195 @@ genstrings:
 		textutil -convert txt -extension strings -inputencoding UTF-16 -encoding UTF-8 {} \;
 	mv platform/macos/sdk/Base.lproj/Foundation.strings platform/darwin/resources/Base.lproj/
 
+$(MACOS_COMPDB_PATH)/Makefile:
+	mkdir -p $(MACOS_COMPDB_PATH)
+	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+
+.PHONY:
+compdb: $(BUILD_DEPS) $(TEST_DEPS) $(MACOS_COMPDB_PATH)/Makefile
+	@$(MAKE) -C $(MACOS_COMPDB_PATH) cmake_check_build_system
+
+.PHONY: clang-tools
+clang-tools: compdb
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
+	$(MAKE) -C $(MACOS_COMPDB_PATH) mbgl-headers
+
+.PHONY: tidy
+tidy: clang-tools
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+
+.PHONY: check
+check: clang-tools
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
+
+endif
+
 #### iOS targets ##############################################################
 
+ifeq ($(HOST_PLATFORM), macos)
+
 IOS_OUTPUT_PATH = build/ios
-IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/platform/ios/platform.xcodeproj
+IOS_PROJ_PATH = $(IOS_OUTPUT_PATH)/mbgl.xcodeproj
 IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
-$(IOS_OUTPUT_PATH)/config.gypi: platform/ios/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ ios
-
-$(IOS_OUTPUT_PATH)/mbgl.xcconfig: $(IOS_OUTPUT_PATH)/config.gypi
-	./scripts/export-xcconfig.py $< $@
-
-$(IOS_PROJ_PATH): platform/ios/platform.gyp $(IOS_OUTPUT_PATH)/config.gypi $(IOS_OUTPUT_PATH)/mbgl.xcconfig $(GYP_DEPENDENCIES)
-	$(GYP) -f xcode --generator-output=$(IOS_OUTPUT_PATH) $<
-
-ios: $(IOS_PROJ_PATH)
-	set -o pipefail && xcodebuild \
+IOS_XCODEBUILD_SIM = xcodebuild \
 	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
 	  -derivedDataPath $(IOS_OUTPUT_PATH) \
 	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
 	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH) -scheme CI build $(XCPRETTY)
+	  -workspace $(IOS_WORK_PATH)
 
-iproj: $(IOS_PROJ_PATH)
+$(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
+	mkdir -p $(IOS_OUTPUT_PATH)
+	(cd $(IOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+		-DCMAKE_TOOLCHAIN_FILE=../../platform/ios/toolchain.cmake \
+		-DMBGL_PLATFORM=ios)
+
+$(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/ios/WorkspaceSettings.xcsettings
 	mkdir -p "$(IOS_USER_DATA_PATH)"
-	cp platform/ios/WorkspaceSettings.xcsettings "$(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings"
+	cp platform/ios/WorkspaceSettings.xcsettings "$@"
+
+.PHONY: ios
+ios: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' build $(XCPRETTY)
+
+.PHONY: iproj
+iproj: $(IOS_PROJ_PATH)
 	open $(IOS_WORK_PATH)
 
-test-ios: ios
-	ios-sim start --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
-	ios-sim launch $(IOS_OUTPUT_PATH)/Build/Products/$(BUILDTYPE)-iphonesimulator/ios-test.app --verbose --devicetypeid 'com.apple.CoreSimulator.SimDeviceType.iPhone-6,9.3'
-	set -o pipefail && xcodebuild \
-	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
-	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' \
-	  -workspace $(IOS_WORK_PATH) -scheme CI test $(XCPRETTY)
+.PHONY: test-ios
+test-ios: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
+.PHONY: ipackage-strip
 ipackage-strip: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO \
 	./platform/ios/scripts/package.sh
 
+.PHONY: ipackage-sim
 ipackage-sim: $(IOS_PROJ_PATH)
 	BUILDTYPE=Debug FORMAT=dynamic BUILD_DEVICE=false SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
+.PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
 	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
 	./platform/ios/scripts/package.sh
 
+.PHONY: ifabric
 ifabric: $(IOS_PROJ_PATH)
 	FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO SELF_CONTAINED=YES \
 	./platform/ios/scripts/package.sh
 
+.PHONY: idocument
 idocument:
 	OUTPUT=$(OUTPUT) ./platform/ios/scripts/document.sh
 
-#### Android targets #####################################################
-
-ANDROID_ENV = platform/android/scripts/toolchain.sh
-ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
-
-style-code-android:
-	node platform/android/scripts/generate-style-code.js
-
-define ANDROID_RULES
-build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
-
-build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config.gypi $(GYP_DEPENDENCIES)
-	$$(shell $(ANDROID_ENV) $1) $(GYP) -f make-android -I build/android-$1/config.gypi \
-	  --generator-output=build/android-$1 $$<
-
-android-lib-$1: build/android-$1/Makefile
-	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
-
-android-$1: android-lib-$1 style-code-android
-	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
-
-apackage: android-lib-$1
-endef
-
-$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
-
-android: android-arm-v7
-
-test-android:
-	cd platform/android && ./gradlew testReleaseUnitTest --continue
-
-apackage:
-	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
-
-#### Node targets #####################################################
-
-NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
-NODE_OUTPUT_PATH = build/node-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-
-ifeq ($(BUILDTYPE), Debug)
-	NODE_DEBUG = "--debug"
 endif
-
-$(NODE_OUTPUT_PATH)/config.gypi: platform/$(BUILD_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
-
-node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
-	$(NODE_PRE_GYP) configure --clang $(NODE_DEBUG) -- -I$< \
-	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
-	$(NODE_PRE_GYP) build --clang
-
-xnode: $(NODE_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(NODE_PRE_GYP) configure --clang -- -I$< \
-	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs= \
-	  -f xcode
-	./platform/node/scripts/create_node_scheme.sh "node test" "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
-	./platform/node/scripts/create_node_scheme.sh "npm run test-suite" "platform/node/test/render.test.js"
-	open ./build/binding.xcodeproj
-
-.PHONY: test-node
-test-node: node
-	npm test
-	npm run test-memory
-	npm run test-suite
-
-#### Qt targets #####################################################
-
-QT_OUTPUT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
-QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
-
-# Cross compilation support
-QT_ENV = $(shell MASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) ./platform/qt/scripts/toolchain.sh)
-
-$(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	$(QT_ENV) ./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
-
-GYP_FLAVOR = make
-ifneq ($(HOST_PLATFORM),$(BUILD_PLATFORM))
-  ifeq ($(BUILD_PLATFORM), linux)
-    GYP_FLAVOR = make-linux
-  else ifeq ($(BUILD_PLATFORM), macos)
-    GYP_FLAVOR = make-mac
-  endif
-endif
-
-$(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(QT_ENV) $(GYP) -f $(GYP_FLAVOR) -I $(QT_OUTPUT_PATH)/config.gypi \
-	  --generator-output=$(QT_OUTPUT_PATH) $<
-
-qt-lib: $(QT_MAKEFILE)
-	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-lib
-
-qt-app: $(QT_MAKEFILE)
-	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-app
-
-qt-qml-app: $(QT_MAKEFILE)
-	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-qml-app
-
-test-qt-%: $(QT_MAKEFILE) node_modules
-	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
-	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
-
-test-qt: test-qt-*
-
-run-qt-app: qt-app
-	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qmapboxgl
-
-run-qt-qml-app: qt-qml-app
-	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qquickmapboxgl
-
-test-valgrind-qt-%: $(QT_MAKEFILE) node_modules
-	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
-	.mason/mason install valgrind latest
-	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
-
-test-valgrind-qt: test-valgrind-qt-*
-
-run-valgrind-qt-app: qt-app
-	.mason/mason install valgrind latest
-	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/qmapboxgl --test -platform offscreen
 
 #### Linux targets #####################################################
 
-LINUX_OUTPUT_PATH = build/linux-$(BUILD_PLATFORM_VERSION)
-LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
+ifeq ($(HOST_PLATFORM), linux)
 
-$(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ linux $(BUILD_PLATFORM_VERSION)
+export PATH := $(shell pwd)/platform/linux:$(PATH)
+export LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)/$(BUILDTYPE)
+LINUX_BUILD = $(LINUX_OUTPUT_PATH)/build.ninja
+NINJA = platform/linux/ninja
 
-$(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(GYP) -f make -I $(LINUX_OUTPUT_PATH)/config.gypi \
-	  --generator-output=$(LINUX_OUTPUT_PATH) $<
+$(LINUX_BUILD): $(BUILD_DEPS)
+	mkdir -p $(LINUX_OUTPUT_PATH)
+	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
+.PHONY: linux
 linux: glfw-app render offline
 
-test-linux: node_modules test-*
+test-linux: run-test-*
 
-render: $(LINUX_MAKEFILE)
-	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
+.PHONY: linux-render
+render: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
 
-offline: $(LINUX_MAKEFILE)
-	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
+.PHONY: linux-offline
+offline: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
 
-glfw-app: $(LINUX_MAKEFILE)
-	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) glfw-app
+.PHONY: glfw-app
+glfw-app: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
 
-test: $(LINUX_MAKEFILE)
-	$(MAKE) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) test
+.PHONY: test
+test: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
+.PHONY: run-glfw-app
 run-glfw-app: glfw-app
-	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && ./mapbox-glfw
+	cd $(LINUX_OUTPUT_PATH) && ./mbgl-glfw
+
+.PHONY: node
+node: $(LINUX_BUILD)
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
 
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
 endif
 
-test-%: test
-	$(GDB) $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
+run-test-%: test
+	$(GDB) $(LINUX_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
 
+.PHONY: coverage
 coverage: test
-	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)
 
-# Generates a compilation database with ninja for use in clang tooling
-compdb: node_modules compdb-$(BUILD_PLATFORM)
+.PHONY: compdb
+compdb: $(LINUX_BUILD)
+	# Ninja generator already outputs the file at the right location
 
-compdb-linux: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
-	$(GYP) -f ninja -I $(LINUX_OUTPUT_PATH)/config.gypi \
-	  --generator-output=$(LINUX_OUTPUT_PATH) $<
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) \
-		-t compdb cc cc_s cxx objc objcxx > $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
+.PHONY: tidy
+tidy: compdb
+	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
+	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)
 
-compdb-macos: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
-	$(GYP) -f ninja -I $(MACOS_OUTPUT_PATH)/config.gypi \
-	  --generator-output=$(MACOS_OUTPUT_PATH) $<
-	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) \
-		-t compdb cc cc_s cxx objc objcxx > $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
-
-tidy: compdb tidy-$(BUILD_PLATFORM)
-
-clang-tools-linux:
+.PHONY: clang-tools
+clang-tools:
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
 	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) headers
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH) headers
 
-tidy-linux: clang-tools-linux
-	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+.PHONY: tidy
+tidy: clang-tools
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)
 
-clang-tools-macos:
-	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
-	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
-	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) headers
+.PHONY: check
+check: compdb clang-tools
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
 
-tidy-macos: clang-tools-macos
-	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+endif
 
-check: compdb check-$(BUILD_PLATFORM)
+#### Node targets ##############################################################
 
-check-linux: clang-tools-linux
-	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) --diff
-
-check-macos: clang-tools-macos
-	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
+.PHONY: test-node
+test-node: node
+	npm test
+	npm run test-suite
 
 #### Miscellaneous targets #####################################################
 
 style-code:
 	node scripts/generate-style-code.js
 
+.PHONY: clean
 clean:
-	-find ./deps/gyp -name "*.pyc" -exec rm {} \;
 	-rm -rf ./build \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
@@ -380,6 +344,7 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/main/jniLibs \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
 
+.PHONY: distclean
 distclean: clean
 	-rm -rf ./mason_packages
 	-rm -rf ./node_modules

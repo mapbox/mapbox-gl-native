@@ -11,6 +11,6 @@
       location = "group:uitest/KIF/KIF.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:../../build/ios/platform/ios/platform.xcodeproj">
+      location = "group:../../build/ios/mbgl.xcodeproj">
    </FileRef>
 </Workspace>

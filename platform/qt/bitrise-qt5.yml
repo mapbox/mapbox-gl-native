@@ -29,6 +29,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew install cmake
             brew install qt5
             brew link qt5 --force
             brew linkapps qt5

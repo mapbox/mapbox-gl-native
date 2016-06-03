@@ -14,10 +14,17 @@
 
 #include <unistd.h>
 
+#ifndef NODE_EXECUTABLE
+#define NODE_EXECUTABLE node
+#endif
+
+#define xstr(s) str(s)
+#define str(s) #s
+
 namespace mbgl {
 namespace test {
 
-Server::Server(const char* executable) {
+Server::Server(const char* script) {
     int input[2];
     int output[2];
 
@@ -48,14 +55,18 @@ Server::Server(const char* executable) {
         close(output[1]);
         close(output[0]);
 
+        const char* executable = xstr(NODE_EXECUTABLE);
+
+        fprintf(stderr, "executable: %s\n", executable);
+
         // Launch the actual server process.
-        int ret = execl(executable, executable, nullptr);
+        int ret = execl(executable, executable, script, nullptr);
 
         // This call should not return. In case execl failed, we exit anyway.
         if (ret < 0) {
             Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
         }
-        exit(0);
+        abort();
     } else {
         // This is the parent process.
 

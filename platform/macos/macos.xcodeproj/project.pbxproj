@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		52BECB0A1CC5A26F009CD791 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */; };
+		5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
+		5548BE7D1D0ACCD6005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
+		558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 558F18211D0B13B000123F46 /* libmbgl-loop.a */; };
+		55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		DA0CD58E1CF56F5800A5F5A5 /* MGLFeatureTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */; };
 		DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2A61CC9EB2700E826B2 /* MGLCoordinateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */; };
@@ -31,7 +35,6 @@
 		DA8933AE1CCD290700E68420 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933AB1CCD290700E68420 /* Localizable.strings */; };
 		DA8933B51CCD2C2500E68420 /* Foundation.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B31CCD2C2500E68420 /* Foundation.strings */; };
 		DA8933B81CCD2C2D00E68420 /* Foundation.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DA8933B61CCD2C2D00E68420 /* Foundation.stringsdict */; };
-		DAB6924A1CC75A31005AAB54 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
 		DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22121CF3D3E200D220D9 /* MGLFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACC22131CF3D3E200D220D9 /* MGLFeature.mm */; };
@@ -46,8 +49,6 @@
 		DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3281CC30DB200DB3429 /* Mapbox.framework */; };
 		DAE6C33D1CC30DB200DB3429 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3281CC30DB200DB3429 /* Mapbox.framework */; };
 		DAE6C33E1CC30DB200DB3429 /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3281CC30DB200DB3429 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DAE6C3471CC31D1200DB3429 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
-		DAE6C3481CC31D1200DB3429 /* libmbgl-platform-macos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3461CC31D1200DB3429 /* libmbgl-platform-macos.a */; };
 		DAE6C35A1CC31E0400DB3429 /* MGLAccountManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DAE6C34A1CC31E0400DB3429 /* MGLAccountManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAE6C35B1CC31E0400DB3429 /* MGLAnnotation.h in Headers */ = {isa = PBXBuildFile; fileRef = DAE6C34B1CC31E0400DB3429 /* MGLAnnotation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAE6C35C1CC31E0400DB3429 /* MGLGeometry.h in Headers */ = {isa = PBXBuildFile; fileRef = DAE6C34C1CC31E0400DB3429 /* MGLGeometry.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -148,6 +149,11 @@
 
 /* Begin PBXFileReference section */
 		52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		5548BE791D0ACBB2005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
+		5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
+		558F18211D0B13B000123F46 /* libmbgl-loop.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop.a"; path = "../../build/osx/Debug/libmbgl-loop.a"; sourceTree = "<group>"; };
+		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
 		DA0CD58D1CF56F5800A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
 		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCoordinateFormatter.m; sourceTree = "<group>"; };
@@ -255,7 +261,6 @@
 		DAE6C3BB1CC31F2E00DB3429 /* default_marker.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = default_marker.pdf; sourceTree = "<group>"; };
 		DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = mapbox.pdf; sourceTree = "<group>"; };
 		DAE6C3C11CC31F4500DB3429 /* Mapbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Mapbox.h; path = src/Mapbox.h; sourceTree = SOURCE_ROOT; };
-		DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mbgl.xcconfig; path = ../../build/macos/mbgl.xcconfig; sourceTree = "<group>"; };
 		DAE6C3C61CC3499100DB3429 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		DAE6C3C81CC34BD800DB3429 /* MGLGeometryTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLGeometryTests.mm; path = ../../darwin/test/MGLGeometryTests.mm; sourceTree = "<group>"; };
 		DAE6C3C91CC34BD800DB3429 /* MGLOfflinePackTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflinePackTests.m; path = ../../darwin/test/MGLOfflinePackTests.m; sourceTree = "<group>"; };
@@ -278,9 +283,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				52BECB0A1CC5A26F009CD791 /* SystemConfiguration.framework in Frameworks */,
-				DAE6C3471CC31D1200DB3429 /* libmbgl-core.a in Frameworks */,
-				DAE6C3481CC31D1200DB3429 /* libmbgl-platform-macos.a in Frameworks */,
+				5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */,
+				558F18221D0B13B100123F46 /* libmbgl-loop.a in Frameworks */,
 				DAE6C3C71CC3499100DB3429 /* libsqlite3.tbd in Frameworks */,
+				55D9B4B11D005D3900C1CCE2 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,8 +294,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAB6924A1CC75A31005AAB54 /* libmbgl-core.a in Frameworks */,
 				DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */,
+				5548BE7D1D0ACCD6005DDE81 /* libmbgl-core.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,6 +457,10 @@
 		DAE6C31E1CC308BC00DB3429 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				558F18211D0B13B000123F46 /* libmbgl-loop.a */,
+				5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */,
+				5548BE791D0ACBB2005DDE81 /* libmbgl-loop-darwin.a */,
+				55D9B4B01D005D3900C1CCE2 /* libz.tbd */,
 				52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */,
 				DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */,
 				DAE6C3461CC31D1200DB3429 /* libmbgl-platform-macos.a */,
@@ -538,7 +548,7 @@
 		DAE6C3C41CC31F7800DB3429 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */,
+				55FE0E8D1D100A0900FD240B /* config.xcconfig */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
@@ -924,7 +934,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SYMROOT = "$(PROJECT_DIR)/cmake";
 			};
 			name = Debug;
 		};
@@ -961,7 +971,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				SDKROOT = macosx;
+				SYMROOT = "$(PROJECT_DIR)/cmake";
 			};
 			name = Release;
 		};
@@ -1016,7 +1026,7 @@
 		};
 		DAE6C33F1CC30DB200DB3429 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */;
+			baseConfigurationReference = 55FE0E8D1D100A0900FD240B /* config.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1026,25 +1036,15 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
-					../default,
-					../../include,
-					../../src,
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_loop_INCLUDE_DIRECTORIES)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"$(zlib_cflags)",
-					"$(rapidjson_cflags)",
-					"$(variant_cflags)",
-					"$(geometry_cflags)",
-					"$(geojson_cflags)",
-				);
 				OTHER_LDFLAGS = (
-					"$(zlib_ldflags)",
-					"$(opengl_ldflags)",
-					"$(geojson_static_libs)",
+					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_loop_LINK_LIBRARIES)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;
@@ -1056,7 +1056,7 @@
 		};
 		DAE6C3401CC30DB200DB3429 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */;
+			baseConfigurationReference = 55FE0E8D1D100A0900FD240B /* config.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1066,25 +1066,15 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = (
-					../default,
-					../../include,
-					../../src,
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_loop_INCLUDE_DIRECTORIES)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"$(zlib_cflags)",
-					"$(rapidjson_cflags)",
-					"$(variant_cflags)",
-					"$(geometry_cflags)",
-					"$(geojson_cflags)",
-				);
 				OTHER_LDFLAGS = (
-					"$(zlib_ldflags)",
-					"$(opengl_ldflags)",
-					"$(geojson_static_libs)",
+					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_loop_LINK_LIBRARIES)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;
@@ -1096,10 +1086,10 @@
 		};
 		DAE6C3411CC30DB200DB3429 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */;
+			baseConfigurationReference = 55FE0E8D1D100A0900FD240B /* config.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -1115,10 +1105,10 @@
 		};
 		DAE6C3421CC30DB200DB3429 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DAE6C3C51CC31F9100DB3429 /* mbgl.xcconfig */;
+			baseConfigurationReference = 55FE0E8D1D100A0900FD240B /* config.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (

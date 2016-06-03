@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0720"
+   LastUpgradeVersion = "0730"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
-               BuildableName = "mbgl-offline"
-               BlueprintName = "mbgl-offline"
-               ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+               BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+               BuildableName = "{{BUILDABLE_NAME}}"
+               BlueprintName = "{{BLUEPRINT_NAME}}"
+               ReferencedContainer = "container:{{CONTAINER}}">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
-            BuildableName = "mbgl-offline"
-            BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -47,21 +38,37 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "$(PROJECT_DIR)/../.."
+      customWorkingDirectory = "{{WORKING_DIRECTORY}}"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <PathRunnable
+         runnableDebuggingMode = "0"
+         FilePath = "{{NODE_PATH}}/node">
+      </PathRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
-            BuildableName = "mbgl-offline"
-            BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+            BuildableName = "{{BUILDABLE_NAME}}"
+            BlueprintName = "{{BLUEPRINT_NAME}}"
+            ReferencedContainer = "container:{{CONTAINER}}">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "{{NODE_ARGUMENT}}"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "PATH"
+            value = "{{NODE_PATH}}:$PATH"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -71,16 +78,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "960D5BDFBD73C605ACCF58C2"
-            BuildableName = "mbgl-offline"
-            BlueprintName = "mbgl-offline"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+            BuildableName = "{{BUILDABLE_NAME}}"
+            BlueprintName = "{{BLUEPRINT_NAME}}"
+            ReferencedContainer = "container:{{CONTAINER}}">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -29,6 +29,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -eu -o pipefail
+            brew install cmake
             brew tap mapbox/homebrew-ios-sim-3
             brew install mapbox/homebrew-ios-sim-3/ios-sim
             gem install xcpretty --no-rdoc --no-ri

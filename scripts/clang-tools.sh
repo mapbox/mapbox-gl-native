@@ -18,6 +18,8 @@ command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
 
 cd $1
 
+CDUP=$(git rev-parse --show-cdup)
+
 function check_tidy() {
     echo "Running clang-tidy on $0..."
     if [[ -n $1 ]] && [[ $1 == "--fix" ]]; then
@@ -34,7 +36,7 @@ function check_tidy() {
 
 function check_format() {
     echo "Running clang-format on $0..."
-    ${CLANG_FORMAT} -i ../../../$0
+    ${CLANG_FORMAT} -i ${CDUP}/$0
 }
 
 export CLANG_TIDY CLANG_FORMAT
@@ -61,6 +63,6 @@ if [ -n $2 ] && [ $2 == "--diff" ]; then
     fi
     echo "All looks good!"
 else
-    git ls-files '../../../src/mbgl/*.cpp' '../../../platform/*.cpp' '../../../test/*.cpp' | \
+    git ls-files '${CDUP}/src/mbgl/*.cpp' '${CDUP}/platform/*.cpp' '${CDUP}/test/*.cpp' | \
         xargs -I{} -P ${JOBS} bash -c 'check_tidy' {}
 fi

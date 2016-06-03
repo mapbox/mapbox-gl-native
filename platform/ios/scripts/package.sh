@@ -5,9 +5,9 @@ set -o pipefail
 set -u
 
 NAME=Mapbox
-OUTPUT=build/ios/pkg
+OUTPUT=platform/ios/pkg
 DERIVED_DATA=build/ios
-PRODUCTS=${DERIVED_DATA}/Build/Products
+PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Debug}
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
@@ -150,7 +150,7 @@ if [[ "${BUILD_FOR_DEVICE}" == true ]]; then
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
-    
+
     cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${STATIC_SETTINGS_DIR}
 else
     if [[ ${BUILD_STATIC} == true ]]; then
@@ -175,7 +175,7 @@ else
                 ${OUTPUT}/dynamic/
         fi
     fi
-    
+
     cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${STATIC_SETTINGS_DIR}
 fi
 

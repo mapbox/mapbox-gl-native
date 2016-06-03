@@ -25,3 +25,4 @@ xcuserdata
 /platform/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6
 **/token
 /platform/macos/macos.xcworkspace/xcshareddata/macos.xcscmblueprint
+/platform/ios/pkg

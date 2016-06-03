@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0720"
+   LastUpgradeVersion = "0730"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DC37A7F85AC5E5958672B4F8"
-               BuildableName = "test"
-               BlueprintName = "test"
-               ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+               BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+               BuildableName = "{{BUILDABLE_NAME}}"
+               BlueprintName = "{{BLUEPRINT_NAME}}"
+               ReferencedContainer = "container:{{CONTAINER}}">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DC37A7F85AC5E5958672B4F8"
-            BuildableName = "test"
-            BlueprintName = "test"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+            BuildableName = "{{BUILDABLE_NAME}}"
+            BlueprintName = "{{BLUEPRINT_NAME}}"
+            ReferencedContainer = "container:{{CONTAINER}}">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -46,8 +46,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "$(PROJECT_DIR)/../.."
+      useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -56,10 +55,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DC37A7F85AC5E5958672B4F8"
-            BuildableName = "test"
-            BlueprintName = "test"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+            BuildableName = "{{BUILDABLE_NAME}}"
+            BlueprintName = "{{BLUEPRINT_NAME}}"
+            ReferencedContainer = "container:{{CONTAINER}}">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -68,6 +67,13 @@
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "MAPBOX_ACCESS_TOKEN"
+            value = "{{MAPBOX_ACCESS_TOKEN}}"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -81,10 +87,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DC37A7F85AC5E5958672B4F8"
-            BuildableName = "test"
-            BlueprintName = "test"
-            ReferencedContainer = "container:../../build/macos/platform/macos/platform.xcodeproj">
+            BlueprintIdentifier = "{{BLUEPRINT_ID}}"
+            BuildableName = "{{BUILDABLE_NAME}}"
+            BlueprintName = "{{BLUEPRINT_NAME}}"
+            ReferencedContainer = "container:{{CONTAINER}}">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

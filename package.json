@@ -13,7 +13,6 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "nan": "^2.3.5",
     "node-pre-gyp": "^0.6.28"
   },
   "devDependencies": {
@@ -24,7 +23,7 @@
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#4d1f89514bf03536c8e682439df165c33a37122a",
     "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#83b1a3e5837d785af582efd5ed1a212f2df6a4ae",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#8e38705747dee1279a8503d05593543eb9af3ce1",
-    "node-gyp": "^3.3.1",
+    "node-cmake": "^1.2.1",
     "request": "^2.72.0",
     "tape": "^4.5.1"
   },
@@ -33,7 +32,7 @@
   },
   "scripts": {
     "preinstall": "npm install node-pre-gyp",
-    "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "install": "node-pre-gyp install --fallback-to-build=false || BUILDTYPE=Release make node",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
     "test-suite": "node platform/node/test/render.test.js && node platform/node/test/query.test.js"

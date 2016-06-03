@@ -5,31 +5,32 @@ git:
 addons_shortcuts:
   addons_clang35: &clang35
     apt:
-      sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4',
+      sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
+      packages: [ 'clang-3.5', 'libstdc++-4.9-dev', 'libstdc++6', 'libllvm3.4', 'cmake', 'cmake-data',
                   'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
                   'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_gcc5: &gcc5
     apt:
-      sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5',
+      sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
+      packages: [ 'gdb', 'g++-5', 'gcc-5', 'cmake', 'cmake-data',
                   'mesa-utils', 'libxi-dev', 'libglu1-mesa-dev', 'x11proto-randr-dev', 'x11proto-xext-dev', 'libxrandr-dev',
                   'x11proto-xf86vidmode-dev', 'libxxf86vm-dev', 'libxcursor-dev', 'libxinerama-dev' ]
   addons_qt4: &qt4
     apt:
-      sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'g++-5', 'gcc-5', 'libjemalloc-dev',
+      sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
+      packages: [ 'g++-5', 'gcc-5', 'libjemalloc-dev', 'cmake', 'cmake-data',
                   'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
-      sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'g++-5', 'gcc-5',
+      sources:  [ 'ubuntu-toolchain-r-test', 'george-edison55-precise-backports' ]
+      packages: [ 'g++-5', 'gcc-5', 'cmake', 'cmake-data',
                   'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:
   global:
     - TERM: dumb
     - CCACHE: 1
+    - CCACHE_MAXSIZE: 384M
     # AWS
     - secure: "MZHblLZXG/jWf2w0ZFlxCLDwx2qtGgRDODQyg1BR7JIuMz6AtWv8XR/sUczWLbiABCL0a/NzJF1g4v2pI7X69IntcjOdIABBgTh7++6+1TJ0Kp8viEltb55nQG3lHy/R6fOaI7Pj9tuCX0PCRtGA5C/fGnodLGEjy3RVOJ09ln0="
     - secure: "KaSQbhgjtV7ZCkesHmvrNsbQVjk5SPfGKB1VkWenRGYhLF45HpSRNwSxMQddZ566Pg7qIFgF1iWl/B0QW3B6AWL5WmzQ5AOJgwS876pNIc/UT7ubMPtgAtjpvw1bQvQP3B8MrB+3OE5c6tD+a3LhR9krV//dOsfErR5Yy+3Mbkc="
@@ -41,6 +42,7 @@ install:
   - source ./scripts/travis_setup.sh
 before_script:
   - ccache --zero-stats
+  - cmake --version
 script:
   - make linux
   - make test-linux
@@ -119,37 +121,38 @@ matrix:
       script:
         - make tidy
 
-    # Qt 4 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "qt4-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
-      addons: *qt4
-      script:
-        - make qt-app
-        - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make test-qt-Memory.*:*.Load
+    # # Qt 4 - Release
+    # - os: linux
+    #   sudo: required
+    #   dist: trusty
+    #   language: cpp
+    #   compiler: "qt4-gcc5-release"
+    #   env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+    #   addons: *qt4
+    #   script:
+    #     - make qt-app
+    #     - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make test-qt-Memory.*:*.Load
 
-    # Qt 5 - Release
-    - os: linux
-      sudo: required
-      dist: trusty
-      language: cpp
-      compiler: "qt5-gcc5-release"
-      env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
-      addons: *qt5
-      script:
-        - make qt-app
-        - make qt-qml-app
-        - make test-valgrind-qt--*.Load
+    # # Qt 5 - Release
+    # - os: linux
+    #   sudo: required
+    #   dist: trusty
+    #   language: cpp
+    #   compiler: "qt5-gcc5-release"
+    #   env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
+    #   addons: *qt5
+    #   script:
+    #     - make qt-app
+    #     - make qt-qml-app
+    #     - make test-valgrind-qt--*.Load
 
 cache:
   directories:
     - $HOME/.ccache
     - $HOME/.cache/pip
-    - $HOME/build/mapbox/mapbox-gl-native/.binaries
-    - $HOME/build/mapbox/mapbox-gl-native/.scripts
+    - .mason
+    - node_modules
+    - mason_packages/.binaries
 
 notifications:
   slack:
