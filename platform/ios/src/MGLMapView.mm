@@ -98,6 +98,9 @@ const CGFloat MGLAnnotationImagePaddingForHitTest = 5;
 /// Distance from the callout’s anchor point to the annotation it points to.
 const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
+/// Minimum size of an annotation’s accessibility element.
+const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
+
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
 
@@ -2025,8 +2028,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     // Update the accessibility element.
-    MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-    CGRect annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
+    MGLAnnotationView *annotationView = annotationContext.annotationView;
+    CGRect annotationFrame;
+    if (annotationView && annotationView.superview)
+    {
+        annotationFrame = [self convertRect:annotationView.bounds fromView:annotationView];
+    }
+    else
+    {
+        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+        annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
+    }
+    CGPoint annotationFrameCenter = CGPointMake(CGRectGetMidX(annotationFrame), CGRectGetMidY(annotationFrame));
+    CGRect minimumFrame = CGRectInset({ annotationFrameCenter, CGSizeZero },
+                                      -MGLAnnotationAccessibilityElementMinimumSize.width / 2,
+                                      -MGLAnnotationAccessibilityElementMinimumSize.height / 2);
+    annotationFrame = CGRectUnion(annotationFrame, minimumFrame);
     CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
     annotationContext.accessibilityElement.accessibilityFrame = screenRect;
     annotationContext.accessibilityElement.accessibilityHint = NSLocalizedStringWithDefaultValue(@"ANNOTATION_A11Y_HINT", nil, nil, @"Shows more info", @"Accessibility hint");
