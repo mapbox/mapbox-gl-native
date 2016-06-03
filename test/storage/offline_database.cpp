@@ -113,7 +113,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
 }
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
@@ -129,7 +129,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
 
     auto observer = Log::removeObserver();
     auto flo = dynamic_cast<FixtureLogObserver*>(observer.get());
-    EXPECT_EQ(1ul, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
+    EXPECT_EQ(1u, flo->count({ EventSeverity::Warning, Event::Database, -1, "Removing existing incompatible offline database" }));
 }
 
 TEST(OfflineDatabase, PutDoesNotStoreConnectionErrors) {
@@ -169,7 +169,7 @@ TEST(OfflineDatabase, PutResource) {
     response.data = std::make_shared<std::string>("first");
     auto insertPutResult = db.put(resource, response);
     EXPECT_TRUE(insertPutResult.first);
-    EXPECT_EQ(5, insertPutResult.second);
+    EXPECT_EQ(5u, insertPutResult.second);
 
     auto insertGetResult = db.get(resource);
     EXPECT_EQ(nullptr, insertGetResult->error.get());
@@ -178,7 +178,7 @@ TEST(OfflineDatabase, PutResource) {
     response.data = std::make_shared<std::string>("second");
     auto updatePutResult = db.put(resource, response);
     EXPECT_FALSE(updatePutResult.first);
-    EXPECT_EQ(6, updatePutResult.second);
+    EXPECT_EQ(6u, updatePutResult.second);
 
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
@@ -203,7 +203,7 @@ TEST(OfflineDatabase, PutTile) {
     response.data = std::make_shared<std::string>("first");
     auto insertPutResult = db.put(resource, response);
     EXPECT_TRUE(insertPutResult.first);
-    EXPECT_EQ(5, insertPutResult.second);
+    EXPECT_EQ(5u, insertPutResult.second);
 
     auto insertGetResult = db.get(resource);
     EXPECT_EQ(nullptr, insertGetResult->error.get());
@@ -212,7 +212,7 @@ TEST(OfflineDatabase, PutTile) {
     response.data = std::make_shared<std::string>("second");
     auto updatePutResult = db.put(resource, response);
     EXPECT_FALSE(updatePutResult.first);
-    EXPECT_EQ(6, updatePutResult.second);
+    EXPECT_EQ(6u, updatePutResult.second);
 
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
@@ -284,7 +284,7 @@ TEST(OfflineDatabase, ListRegions) {
     OfflineRegion region = db.createRegion(definition, metadata);
     std::vector<OfflineRegion> regions = db.listRegions();
 
-    ASSERT_EQ(1, regions.size());
+    ASSERT_EQ(1u, regions.size());
     EXPECT_EQ(region.getID(), regions.at(0).getID());
     EXPECT_EQ(definition.styleURL, regions.at(0).getDefinition().styleURL);
     EXPECT_EQ(definition.bounds, regions.at(0).getDefinition().bounds);
@@ -327,7 +327,7 @@ TEST(OfflineDatabase, DeleteRegion) {
 
     db.deleteRegion(std::move(region));
 
-    ASSERT_EQ(0, db.listRegions().size());
+    ASSERT_EQ(0u, db.listRegions().size());
 }
 
 TEST(OfflineDatabase, CreateRegionInfiniteMaxZoom) {
@@ -391,15 +391,15 @@ TEST(OfflineDatabase, PutReturnsSize) {
 
     Response compressible;
     compressible.data = std::make_shared<std::string>(1024, 0);
-    EXPECT_EQ(17, db.put(Resource::style("http://example.com/compressible"), compressible).second);
+    EXPECT_EQ(17u, db.put(Resource::style("http://example.com/compressible"), compressible).second);
 
     Response incompressible;
     incompressible.data = randomString(1024);
-    EXPECT_EQ(1024, db.put(Resource::style("http://example.com/incompressible"), incompressible).second);
+    EXPECT_EQ(1024u, db.put(Resource::style("http://example.com/incompressible"), incompressible).second);
 
     Response noContent;
     noContent.noContent = true;
-    EXPECT_EQ(0, db.put(Resource::style("http://example.com/noContent"), noContent).second);
+    EXPECT_EQ(0u, db.put(Resource::style("http://example.com/noContent"), noContent).second);
 }
 
 TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
@@ -458,10 +458,10 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     OfflineRegion region = db.createRegion(definition, metadata);
 
     OfflineRegionStatus status1 = db.getRegionCompletedStatus(region.getID());
-    EXPECT_EQ(0, status1.completedResourceCount);
-    EXPECT_EQ(0, status1.completedResourceSize);
-    EXPECT_EQ(0, status1.completedTileCount);
-    EXPECT_EQ(0, status1.completedTileSize);
+    EXPECT_EQ(0u, status1.completedResourceCount);
+    EXPECT_EQ(0u, status1.completedResourceSize);
+    EXPECT_EQ(0u, status1.completedTileCount);
+    EXPECT_EQ(0u, status1.completedTileSize);
 
     Response response;
     response.data = std::make_shared<std::string>("data");
@@ -469,17 +469,17 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     uint64_t styleSize = db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
 
     OfflineRegionStatus status2 = db.getRegionCompletedStatus(region.getID());
-    EXPECT_EQ(1, status2.completedResourceCount);
+    EXPECT_EQ(1u, status2.completedResourceCount);
     EXPECT_EQ(styleSize, status2.completedResourceSize);
-    EXPECT_EQ(0, status2.completedTileCount);
-    EXPECT_EQ(0, status2.completedTileSize);
+    EXPECT_EQ(0u, status2.completedTileCount);
+    EXPECT_EQ(0u, status2.completedTileSize);
 
     uint64_t tileSize = db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0), response);
 
     OfflineRegionStatus status3 = db.getRegionCompletedStatus(region.getID());
-    EXPECT_EQ(2, status3.completedResourceCount);
+    EXPECT_EQ(2u, status3.completedResourceCount);
     EXPECT_EQ(styleSize + tileSize, status3.completedResourceSize);
-    EXPECT_EQ(1, status3.completedTileCount);
+    EXPECT_EQ(1u, status3.completedTileCount);
     EXPECT_EQ(tileSize, status3.completedTileSize);
 }
 
@@ -501,43 +501,43 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     response.data = std::make_shared<std::string>("data");
 
     // Count is initially zero.
-    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after putting a non-tile resource.
     db.putRegionResource(region1.getID(), Resource::style("http://example.com/"), response);
-    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after putting a non-Mapbox tile.
     db.putRegionResource(region1.getID(), nonMapboxTile, response);
-    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
 
     // Count increases after putting a Mapbox tile not used by another region.
     db.putRegionResource(region1.getID(), mapboxTile1, response);
-    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(1u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after putting a Mapbox tile used by another region.
     db.putRegionResource(region2.getID(), mapboxTile1, response);
-    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(1u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after putting a Mapbox tile used by the same region.
     db.putRegionResource(region2.getID(), mapboxTile1, response);
-    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(1u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after deleting a region when the tile is still used by another region.
     db.deleteRegion(std::move(region2));
-    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(1u, db.getOfflineMapboxTileCount());
 
     // Count stays the same after the putting a non-offline Mapbox tile.
     db.put(mapboxTile2, response);
-    EXPECT_EQ(1, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(1u, db.getOfflineMapboxTileCount());
 
     // Count increases after putting a pre-existing, but non-offline Mapbox tile.
     db.putRegionResource(region1.getID(), mapboxTile2, response);
-    EXPECT_EQ(2, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(2u, db.getOfflineMapboxTileCount());
 
     // Count decreases after deleting a region when the tiles are not used by other regions.
     db.deleteRegion(std::move(region1));
-    EXPECT_EQ(0, db.getOfflineMapboxTileCount());
+    EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
 }
 
 static int databasePageCount(const std::string& path) {

@@ -57,7 +57,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line, anchor, shapedText, textBoxScale, textPadding, textAlongLine, indexedFeature),
     iconCollisionFeature(line, anchor, shapedIcon, iconBoxScale, iconPadding, iconAlongLine, indexedFeature)
-    {};
+    {}
 
 
 SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, const std::string& bucketName_, const std::string& sourceLayerName_)

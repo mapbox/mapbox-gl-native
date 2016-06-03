@@ -68,21 +68,21 @@ TEST(Image, PNGReadProfileAlpha) {
 
 TEST(Image, PNGTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.png"));
-    EXPECT_EQ(256, image.width);
-    EXPECT_EQ(256, image.height);
+    EXPECT_EQ(256u, image.width);
+    EXPECT_EQ(256u, image.height);
 }
 
 TEST(Image, JPEGTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.jpeg"));
-    EXPECT_EQ(256, image.width);
-    EXPECT_EQ(256, image.height);
+    EXPECT_EQ(256u, image.width);
+    EXPECT_EQ(256u, image.height);
 }
 
 #if !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 TEST(Image, WebPTile) {
     PremultipliedImage image = decodeImage(util::read_file("test/fixtures/image/tile.webp"));
-    EXPECT_EQ(256, image.width);
-    EXPECT_EQ(256, image.height);
+    EXPECT_EQ(256u, image.width);
+    EXPECT_EQ(256u, image.height);
 }
 #endif // !defined(__ANDROID__) && !defined(__APPLE__) && !defined(QT_IMAGE_DECODERS)
 

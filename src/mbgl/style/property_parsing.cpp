@@ -58,7 +58,7 @@ optional<Color> parseConstant(const char* name, const JSValue& value) {
 MBGL_DEFINE_ENUM_CLASS(TranslateAnchorTypeClass, TranslateAnchorType, {
     { TranslateAnchorType::Map, "map" },
     { TranslateAnchorType::Viewport, "viewport" },
-});
+})
 
 template <>
 optional<TranslateAnchorType> parseConstant(const char* name, const JSValue& value) {
@@ -73,7 +73,7 @@ optional<TranslateAnchorType> parseConstant(const char* name, const JSValue& val
 MBGL_DEFINE_ENUM_CLASS(RotateAnchorTypeClass, RotateAnchorType, {
     { RotateAnchorType::Map, "map" },
     { RotateAnchorType::Viewport, "viewport" },
-});
+})
 
 template <>
 optional<RotateAnchorType> parseConstant<RotateAnchorType>(const char* name, const JSValue& value) {
@@ -89,7 +89,7 @@ MBGL_DEFINE_ENUM_CLASS(LineCapTypeClass, LineCapType, {
     { LineCapType::Round, "round" },
     { LineCapType::Butt, "butt" },
     { LineCapType::Square, "square" },
-});
+})
 
 template <>
 optional<LineCapType> parseConstant<LineCapType>(const char* name, const JSValue& value) {
@@ -107,7 +107,7 @@ MBGL_DEFINE_ENUM_CLASS(LineJoinTypeClass, LineJoinType, {
     { LineJoinType::Round, "round" },
     { LineJoinType::FakeRound, "fakeround" },
     { LineJoinType::FlipBevel, "flipbevel" },
-});
+})
 
 template <>
 optional<LineJoinType> parseConstant<LineJoinType>(const char* name, const JSValue& value) {
@@ -122,7 +122,7 @@ optional<LineJoinType> parseConstant<LineJoinType>(const char* name, const JSVal
 MBGL_DEFINE_ENUM_CLASS(SymbolPlacementTypeClass, SymbolPlacementType, {
     { SymbolPlacementType::Point, "point" },
     { SymbolPlacementType::Line, "line" },
-});
+})
 
 template <>
 optional<SymbolPlacementType> parseConstant<SymbolPlacementType>(const char* name, const JSValue& value) {
@@ -144,7 +144,7 @@ MBGL_DEFINE_ENUM_CLASS(TextAnchorTypeClass, TextAnchorType, {
     { TextAnchorType::TopRight, "top-right" },
     { TextAnchorType::BottomLeft, "bottom-left" },
     { TextAnchorType::BottomRight, "bottom-right" }
-});
+})
 
 template <>
 optional<TextAnchorType> parseConstant<TextAnchorType>(const char* name, const JSValue& value) {
@@ -160,7 +160,7 @@ MBGL_DEFINE_ENUM_CLASS(TextJustifyTypeClass, TextJustifyType, {
     { TextJustifyType::Center, "center" },
     { TextJustifyType::Left, "left" },
     { TextJustifyType::Right, "right" },
-});
+})
 
 template <>
 optional<TextJustifyType> parseConstant<TextJustifyType>(const char* name, const JSValue& value) {
@@ -176,7 +176,7 @@ MBGL_DEFINE_ENUM_CLASS(TextTransformTypeClass, TextTransformType, {
     { TextTransformType::None, "none" },
     { TextTransformType::Uppercase, "uppercase" },
     { TextTransformType::Lowercase, "lowercase" },
-});
+})
 
 template <>
 optional<TextTransformType> parseConstant<TextTransformType>(const char* name, const JSValue& value) {
@@ -191,7 +191,7 @@ optional<TextTransformType> parseConstant<TextTransformType>(const char* name, c
 MBGL_DEFINE_ENUM_CLASS(AlignmentTypeClass, AlignmentType, {
     { AlignmentType::Map, "map" },
     { AlignmentType::Viewport, "viewport" },
-});
+})
 
 template <>
 optional<AlignmentType> parseConstant<AlignmentType>(const char* name, const JSValue& value) {

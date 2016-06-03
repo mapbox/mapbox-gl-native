@@ -197,4 +197,4 @@ void GlyphAtlas::bind(gl::ObjectStore& store) {
     } else {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
-};
+}

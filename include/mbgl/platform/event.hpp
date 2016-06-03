@@ -19,7 +19,7 @@ MBGL_DEFINE_ENUM_CLASS(EventSeverityClass, EventSeverity, {
     { EventSeverity::Warning, "WARNING" },
     { EventSeverity::Error, "ERROR" },
     { EventSeverity(-1), "UNKNOWN" },
-});
+})
 
 enum class Event : uint8_t {
     General,
@@ -58,7 +58,7 @@ MBGL_DEFINE_ENUM_CLASS(EventClass, Event, {
     { Event::Crash, "Crash" },
     { Event::Glyph, "Glyph" },
     { Event(-1), "Unknown" },
-});
+})
 
 
 struct EventPermutation {

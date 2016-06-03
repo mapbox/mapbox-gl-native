@@ -21,15 +21,15 @@ template <> inline std::vector<std::string> defaultStopsValue() { return {{}}; }
 template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
 
 template <> inline std::string defaultStopsValue() { return {}; }
-template <> inline TranslateAnchorType defaultStopsValue() { return {}; };
-template <> inline RotateAnchorType defaultStopsValue() { return {}; };
-template <> inline LineCapType defaultStopsValue() { return {}; };
-template <> inline LineJoinType defaultStopsValue() { return {}; };
-template <> inline SymbolPlacementType defaultStopsValue() { return {}; };
-template <> inline TextAnchorType defaultStopsValue() { return {}; };
-template <> inline TextJustifyType defaultStopsValue() { return {}; };
-template <> inline TextTransformType defaultStopsValue() { return {}; };
-template <> inline AlignmentType defaultStopsValue() { return {}; };
+template <> inline TranslateAnchorType defaultStopsValue() { return {}; }
+template <> inline RotateAnchorType defaultStopsValue() { return {}; }
+template <> inline LineCapType defaultStopsValue() { return {}; }
+template <> inline LineJoinType defaultStopsValue() { return {}; }
+template <> inline SymbolPlacementType defaultStopsValue() { return {}; }
+template <> inline TextAnchorType defaultStopsValue() { return {}; }
+template <> inline TextJustifyType defaultStopsValue() { return {}; }
+template <> inline TextTransformType defaultStopsValue() { return {}; }
+template <> inline AlignmentType defaultStopsValue() { return {}; }
 
 template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {

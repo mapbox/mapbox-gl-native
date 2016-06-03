@@ -17,7 +17,7 @@ GridIndex<T>::GridIndex(int32_t extent_, int32_t n_, int32_t padding_) :
     max(extent + double(padding) / n * extent)
     {
         cells.resize(d * d);
-    };
+    }
 
 template <class T>
 void GridIndex<T>::insert(T&& t, const BBox& bbox) {

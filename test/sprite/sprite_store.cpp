@@ -181,14 +181,14 @@ Response successfulSpriteImageResponse(const Resource& resource) {
     Response response;
     response.data = std::make_shared<std::string>(util::read_file(resource.url));
     return response;
-};
+}
 
 Response successfulSpriteJSONResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.json", resource.url);
     Response response;
     response.data = std::make_shared<std::string>(util::read_file(resource.url));
     return response;
-};
+}
 
 Response failedSpriteResponse(const Resource&) {
     Response response;
@@ -196,13 +196,13 @@ Response failedSpriteResponse(const Resource&) {
         Response::Error::Reason::Other,
         "Failed by the test case");
     return response;
-};
+}
 
 Response corruptSpriteResponse(const Resource&) {
     Response response;
     response.data = std::make_shared<std::string>("CORRUPT");
     return response;
-};
+}
 
 TEST(SpriteStore, LoadingSuccess) {
     SpriteStoreTest test;

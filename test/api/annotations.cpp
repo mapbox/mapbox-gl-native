@@ -195,7 +195,7 @@ TEST(Annotations, QueryRenderedFeatures) {
     test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
 
     test::render(test.map);
-    
+
     auto features = test.map.queryRenderedFeatures(test.map.pixelForLatLng({ 0, 0 }));
-    EXPECT_EQ(features.size(), 1);
+    EXPECT_EQ(features.size(), 1u);
 }

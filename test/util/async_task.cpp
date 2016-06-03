@@ -49,7 +49,7 @@ TEST(AsyncTask, RequestCoalescing) {
 
     loop.runOnce();
 
-    EXPECT_EQ(count, 1);
+    EXPECT_EQ(count, 1u);
 }
 
 TEST(AsyncTask, DestroyShouldNotRunQueue) {
@@ -61,7 +61,7 @@ TEST(AsyncTask, DestroyShouldNotRunQueue) {
     async->send();
     async.reset();
 
-    EXPECT_EQ(count, 0);
+    EXPECT_EQ(count, 0u);
 }
 
 TEST(AsyncTask, DestroyAfterSignaling) {
@@ -114,7 +114,7 @@ TEST(AsyncTask, RequestCoalescingMultithreaded) {
 
     loop.runOnce();
 
-    EXPECT_EQ(count, 1);
+    EXPECT_EQ(count, 1u);
 }
 
 TEST(AsyncTask, ThreadSafety) {
@@ -149,5 +149,5 @@ TEST(AsyncTask, ThreadSafety) {
 
     // We expect here more than 1 but 1 would also be
     // a valid result, although very unlikely (I hope).
-    EXPECT_GT(count, 0);
+    EXPECT_GT(count, 0u);
 }

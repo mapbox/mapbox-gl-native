@@ -19,7 +19,7 @@ MBGL_DEFINE_ENUM_CLASS(SourceTypeClass, SourceType, {
     { SourceType::GeoJSON, "geojson" },
     { SourceType::Video, "video" },
     { SourceType::Annotations, "annotations" },
-});
+})
 
 namespace style {
 

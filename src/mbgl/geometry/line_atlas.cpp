@@ -119,7 +119,7 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     bind(store);
 
     return position;
-};
+}
 
 void LineAtlas::upload(gl::ObjectStore& store) {
     if (dirty) {
@@ -171,4 +171,4 @@ void LineAtlas::bind(gl::ObjectStore& store) {
 
         dirty = false;
     }
-};
+}

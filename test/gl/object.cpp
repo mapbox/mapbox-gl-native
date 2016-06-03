@@ -15,7 +15,7 @@ namespace {
 static bool getFlag = false;
 static bool setFlag = false;
 
-}; // namespace
+} // namespace
 
 struct MockGLObject {
     using Type = bool;
@@ -74,35 +74,35 @@ TEST(GLObject, Store) {
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueProgram program = store.createProgram();
-    EXPECT_NE(program.get(), 0);
+    EXPECT_NE(program.get(), 0u);
     program.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueShader shader = store.createShader(GL_VERTEX_SHADER);
-    EXPECT_NE(shader.get(), 0);
+    EXPECT_NE(shader.get(), 0u);
     shader.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueBuffer buffer = store.createBuffer();
-    EXPECT_NE(buffer.get(), 0);
+    EXPECT_NE(buffer.get(), 0u);
     buffer.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueTexture texture = store.createTexture();
-    EXPECT_NE(texture.get(), 0);
+    EXPECT_NE(texture.get(), 0u);
     texture.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
     EXPECT_TRUE(store.empty());
 
     mbgl::gl::UniqueVAO vao = store.createVAO();
-    EXPECT_NE(vao.get(), 0);
+    EXPECT_NE(vao.get(), 0u);
     vao.reset();
     EXPECT_FALSE(store.empty());
     store.performCleanup();
@@ -110,7 +110,7 @@ TEST(GLObject, Store) {
 
     mbgl::gl::UniqueTexturePool texturePool = store.createTexturePool();
     for (auto& id : texturePool.get()) {
-        EXPECT_NE(id, 0);
+        EXPECT_NE(id, 0u);
     }
     EXPECT_TRUE(texturePool.get().size() == size_t(mbgl::gl::TextureMax));
     texturePool.reset();
@@ -150,7 +150,7 @@ TEST(GLObject, TexturePool) {
     // Trigger a new texture pool creation.
     {
         mbgl::gl::PooledTexture id = pool.acquireTexture(store);
-        EXPECT_EQ(id, mbgl::gl::TextureMax + 1);
+        EXPECT_EQ(id, GLuint(mbgl::gl::TextureMax + 1));
         EXPECT_TRUE(store.empty());
 
         id.reset();
@@ -164,7 +164,7 @@ TEST(GLObject, TexturePool) {
 
     // First pool is still full, thus creating a new pool.
     mbgl::gl::PooledTexture id1 = pool.acquireTexture(store);
-    EXPECT_GT(id1.get(), mbgl::gl::TextureMax);
+    EXPECT_GT(id1.get(), GLuint(mbgl::gl::TextureMax));
     EXPECT_TRUE(store.empty());
 
     // Release all textures from the first pool.

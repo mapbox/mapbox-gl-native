@@ -35,7 +35,7 @@ constexpr double PITCH_MAX = M_PI / 3;
 constexpr double MIN_ZOOM = 0.0;
 constexpr double MAX_ZOOM = 25.5;
 
-constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;;
+constexpr uint64_t DEFAULT_MAX_CACHE_SIZE = 50 * 1024 * 1024;
 
 constexpr Duration DEFAULT_FADE_DURATION = Milliseconds(300);
 constexpr Seconds CLOCK_SKEW_RETRY_TIMEOUT { 30 };

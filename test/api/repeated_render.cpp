@@ -42,8 +42,8 @@ TEST(API, RepeatedRender) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256, result.width);
-        ASSERT_EQ(512, result.height);
+        ASSERT_EQ(256u, result.width);
+        ASSERT_EQ(512u, result.height);
 #if !TEST_READ_ONLY
         util::write_file("test/fixtures/api/1.png", encodePNG(result));
 #endif
@@ -60,8 +60,8 @@ TEST(API, RepeatedRender) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256, result.width);
-        ASSERT_EQ(512, result.height);
+        ASSERT_EQ(256u, result.width);
+        ASSERT_EQ(512u, result.height);
 #if !TEST_READ_ONLY
         util::write_file("test/fixtures/api/2.png", encodePNG(result));
 #endif

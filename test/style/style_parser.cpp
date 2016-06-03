@@ -61,7 +61,7 @@ TEST_P(StyleParserTest, ParseStyle) {
             std::cerr << "Unchecked Log Messages (" << base << "/" << name << "): " << std::endl << unchecked;
         }
 
-        ASSERT_EQ(0ul, unchecked.size());
+        ASSERT_EQ(0u, unchecked.size());
     }
 }
 
@@ -81,7 +81,7 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
         closedir(dir);
     }
 
-    EXPECT_GT(names.size(), 0ul);
+    EXPECT_GT(names.size(), 0u);
     return names;
 }()));
 
@@ -119,7 +119,7 @@ TEST(StyleParser, FontStacks) {
     style::Parser parser;
     parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
     auto result = parser.fontStacks();
-    ASSERT_EQ(3, result.size());
+    ASSERT_EQ(3u, result.size());
     ASSERT_EQ(FontStack({"a"}), result[0]);
     ASSERT_EQ(FontStack({"a", "b"}), result[1]);
     ASSERT_EQ(FontStack({"a", "b", "c"}), result[2]);

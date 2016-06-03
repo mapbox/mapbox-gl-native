@@ -243,7 +243,7 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore) {
         //                               pixelWidth, pixelHeight, pixelWidth, pixelHeight);
 #endif
     }
-};
+}
 
 SpriteAtlas::~SpriteAtlas() = default;
 

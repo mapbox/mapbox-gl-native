@@ -6,9 +6,9 @@ using namespace mbgl;
 
 TEST(TileID, Canonical) {
     CanonicalTileID id_0_0_0(0, 0, 0);
-    EXPECT_EQ(0, id_0_0_0.z);
-    EXPECT_EQ(0, id_0_0_0.x);
-    EXPECT_EQ(0, id_0_0_0.y);
+    EXPECT_EQ(0u, id_0_0_0.z);
+    EXPECT_EQ(0u, id_0_0_0.x);
+    EXPECT_EQ(0u, id_0_0_0.y);
 
     EXPECT_TRUE(CanonicalTileID(4, 2, 3) == CanonicalTileID(4, 2, 3));
     EXPECT_FALSE(CanonicalTileID(4, 2, 3) != CanonicalTileID(4, 2, 3));
@@ -157,11 +157,11 @@ TEST(TileID, Overscaled) {
     EXPECT_TRUE(OverscaledTileID(4, 2, 3) < OverscaledTileID(7, { 4, 2, 3 }));
     EXPECT_FALSE(OverscaledTileID(7, { 4, 2, 3 }) < OverscaledTileID(4, 2, 3));
 
-    EXPECT_EQ(8, OverscaledTileID(7, { 4, 2, 3 }).overscaleFactor());
-    EXPECT_EQ(4, OverscaledTileID(6, { 4, 2, 3 }).overscaleFactor());
-    EXPECT_EQ(2, OverscaledTileID(5, { 4, 2, 3 }).overscaleFactor());
-    EXPECT_EQ(1, OverscaledTileID(4, { 4, 2, 3 }).overscaleFactor());
-    EXPECT_EQ(2147483648, OverscaledTileID(31, { 0, 0, 0 }).overscaleFactor());
+    EXPECT_EQ(8u, OverscaledTileID(7, { 4, 2, 3 }).overscaleFactor());
+    EXPECT_EQ(4u, OverscaledTileID(6, { 4, 2, 3 }).overscaleFactor());
+    EXPECT_EQ(2u, OverscaledTileID(5, { 4, 2, 3 }).overscaleFactor());
+    EXPECT_EQ(1u, OverscaledTileID(4, { 4, 2, 3 }).overscaleFactor());
+    EXPECT_EQ(2147483648u, OverscaledTileID(31, { 0, 0, 0 }).overscaleFactor());
 
     EXPECT_EQ(OverscaledTileID(0, { 0, 0, 0 }), OverscaledTileID(4, 2, 3).scaledTo(0));
     EXPECT_EQ(OverscaledTileID(1, { 1, 0, 0 }), OverscaledTileID(4, 2, 3).scaledTo(1));
@@ -214,58 +214,58 @@ TEST(TileID, Overscaled) {
 
 TEST(TileID, Unwrapped) {
     UnwrappedTileID id_0_0_0(0, 0, 0);
-    EXPECT_EQ(0, id_0_0_0.canonical.z);
-    EXPECT_EQ(0, id_0_0_0.canonical.x);
-    EXPECT_EQ(0, id_0_0_0.canonical.y);
+    EXPECT_EQ(0u, id_0_0_0.canonical.z);
+    EXPECT_EQ(0u, id_0_0_0.canonical.x);
+    EXPECT_EQ(0u, id_0_0_0.canonical.y);
     EXPECT_EQ(0, id_0_0_0.wrap);
 
     UnwrappedTileID id_0_1_0(0, 1, 0);
-    EXPECT_EQ(0, id_0_1_0.canonical.z);
-    EXPECT_EQ(0, id_0_1_0.canonical.x);
-    EXPECT_EQ(0, id_0_1_0.canonical.y);
+    EXPECT_EQ(0u, id_0_1_0.canonical.z);
+    EXPECT_EQ(0u, id_0_1_0.canonical.x);
+    EXPECT_EQ(0u, id_0_1_0.canonical.y);
     EXPECT_EQ(1, id_0_1_0.wrap);
 
     UnwrappedTileID id_0_4_0(0, 4, 0);
-    EXPECT_EQ(0, id_0_4_0.canonical.z);
-    EXPECT_EQ(0, id_0_4_0.canonical.x);
-    EXPECT_EQ(0, id_0_4_0.canonical.y);
+    EXPECT_EQ(0u, id_0_4_0.canonical.z);
+    EXPECT_EQ(0u, id_0_4_0.canonical.x);
+    EXPECT_EQ(0u, id_0_4_0.canonical.y);
     EXPECT_EQ(4, id_0_4_0.wrap);
 
     UnwrappedTileID id_0_n1_0(0, -1, 0);
-    EXPECT_EQ(0, id_0_n1_0.canonical.z);
-    EXPECT_EQ(0, id_0_n1_0.canonical.x);
-    EXPECT_EQ(0, id_0_n1_0.canonical.y);
+    EXPECT_EQ(0u, id_0_n1_0.canonical.z);
+    EXPECT_EQ(0u, id_0_n1_0.canonical.x);
+    EXPECT_EQ(0u, id_0_n1_0.canonical.y);
     EXPECT_EQ(-1, id_0_n1_0.wrap);
 
     UnwrappedTileID id_0_0_1(0, 0, 1);
-    EXPECT_EQ(0, id_0_0_1.canonical.z);
-    EXPECT_EQ(0, id_0_0_1.canonical.x);
-    EXPECT_EQ(0, id_0_0_1.canonical.y);
+    EXPECT_EQ(0u, id_0_0_1.canonical.z);
+    EXPECT_EQ(0u, id_0_0_1.canonical.x);
+    EXPECT_EQ(0u, id_0_0_1.canonical.y);
     EXPECT_EQ(0, id_0_0_1.wrap);
 
     UnwrappedTileID id_0_0_n1(0, 0, -1);
-    EXPECT_EQ(0, id_0_0_n1.canonical.z);
-    EXPECT_EQ(0, id_0_0_n1.canonical.x);
-    EXPECT_EQ(0, id_0_0_n1.canonical.y);
+    EXPECT_EQ(0u, id_0_0_n1.canonical.z);
+    EXPECT_EQ(0u, id_0_0_n1.canonical.x);
+    EXPECT_EQ(0u, id_0_0_n1.canonical.y);
     EXPECT_EQ(0, id_0_0_n1.wrap);
 
     UnwrappedTileID id_18_262143_0(18, 262143, 0);
-    EXPECT_EQ(18, id_18_262143_0.canonical.z);
-    EXPECT_EQ(262143, id_18_262143_0.canonical.x);
-    EXPECT_EQ(0, id_18_262143_0.canonical.y);
+    EXPECT_EQ(18u, id_18_262143_0.canonical.z);
+    EXPECT_EQ(262143u, id_18_262143_0.canonical.x);
+    EXPECT_EQ(0u, id_18_262143_0.canonical.y);
     EXPECT_EQ(0, id_18_262143_0.wrap);
 
     UnwrappedTileID id_18_262144_0(18, 262144, 0);
-    EXPECT_EQ(18, id_18_262144_0.canonical.z);
-    EXPECT_EQ(0, id_18_262144_0.canonical.x);
-    EXPECT_EQ(0, id_18_262144_0.canonical.y);
+    EXPECT_EQ(18u, id_18_262144_0.canonical.z);
+    EXPECT_EQ(0u, id_18_262144_0.canonical.x);
+    EXPECT_EQ(0u, id_18_262144_0.canonical.y);
     EXPECT_EQ(1, id_18_262144_0.wrap);
 
     UnwrappedTileID a(2, 4, 3);
     UnwrappedTileID b(a);
-    EXPECT_EQ(2, b.canonical.z);
-    EXPECT_EQ(0, b.canonical.x);
-    EXPECT_EQ(3, b.canonical.y);
+    EXPECT_EQ(2u, b.canonical.z);
+    EXPECT_EQ(0u, b.canonical.x);
+    EXPECT_EQ(3u, b.canonical.y);
     EXPECT_EQ(1, b.wrap);
 
     EXPECT_TRUE(UnwrappedTileID(0, 0, 0) < UnwrappedTileID(1, 0, 0));

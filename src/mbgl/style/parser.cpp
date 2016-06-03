@@ -484,7 +484,7 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
 MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
     { VisibilityType::Visible, "visible" },
     { VisibilityType::None, "none" },
-});
+})
 
 void Parser::parseVisibility(Layer& layer, const JSValue& value) {
     Layer::Impl& impl = *layer.baseImpl;

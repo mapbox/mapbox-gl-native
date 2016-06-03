@@ -9,9 +9,9 @@ TEST(GeometryTile, classifyRings1) {
     });
 
     // output: 1 polygon
-    ASSERT_EQ(polygons.size(), 1);
+    ASSERT_EQ(polygons.size(), 1u);
     // output: polygon 1 has 1 exterior
-    ASSERT_EQ(polygons[0].size(), 1);
+    ASSERT_EQ(polygons[0].size(), 1u);
 }
 
 TEST(GeometryTile, classifyRings2) {
@@ -21,9 +21,9 @@ TEST(GeometryTile, classifyRings2) {
     });
 
     // output: 1 polygon
-    ASSERT_EQ(polygons.size(), 1);
+    ASSERT_EQ(polygons.size(), 1u);
     // output: polygon 1 has 1 exterior, 1 interior
-    ASSERT_EQ(polygons[0].size(), 2);
+    ASSERT_EQ(polygons[0].size(), 2u);
 }
 
 TEST(GeometryTile, limitHoles1) {
@@ -36,7 +36,7 @@ TEST(GeometryTile, limitHoles1) {
     limitHoles(polygon, 1);
 
     // output: polygon 1 has 1 exterior, 1 interior
-    ASSERT_EQ(polygon.size(), 2);
+    ASSERT_EQ(polygon.size(), 2u);
 
     // ensure we've kept the right rings (ones with largest areas)
     ASSERT_EQ(polygon[0][0].x, 0);
@@ -53,7 +53,7 @@ TEST(GeometryTile, limitHoles2) {
     limitHoles(polygon, 1);
 
     // output: polygon 1 has 1 exterior, 1 interior
-    ASSERT_EQ(polygon.size(), 2);
+    ASSERT_EQ(polygon.size(), 2u);
 
     // ensure we've kept the right rings (ones with largest areas)
     ASSERT_EQ(polygon[0][0].x, 0);

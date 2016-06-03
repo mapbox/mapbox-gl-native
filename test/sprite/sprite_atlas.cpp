@@ -52,8 +52,8 @@ TEST(Sprite, SpriteAtlas) {
     EXPECT_EQ(20, metro.pos.h);
     EXPECT_EQ(18, metro.spriteImage->getWidth());
     EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18, metro.spriteImage->image.width);
-    EXPECT_EQ(18, metro.spriteImage->image.height);
+    EXPECT_EQ(18u, metro.spriteImage->image.width);
+    EXPECT_EQ(18u, metro.spriteImage->image.height);
     EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     EXPECT_TRUE(atlas.getData());
@@ -108,8 +108,8 @@ TEST(Sprite, SpriteAtlasSize) {
     EXPECT_EQ(16, metro.pos.h);
     EXPECT_EQ(18, metro.spriteImage->getWidth());
     EXPECT_EQ(18, metro.spriteImage->getHeight());
-    EXPECT_EQ(18, metro.spriteImage->image.width);
-    EXPECT_EQ(18, metro.spriteImage->image.height);
+    EXPECT_EQ(18u, metro.spriteImage->image.width);
+    EXPECT_EQ(18u, metro.spriteImage->image.height);
     EXPECT_EQ(1.0f, metro.spriteImage->pixelRatio);
 
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlassize.png"),
@@ -135,8 +135,8 @@ TEST(Sprite, SpriteAtlasUpdates) {
     EXPECT_EQ(16, one.pos.h);
     EXPECT_EQ(16, one.spriteImage->getWidth());
     EXPECT_EQ(12, one.spriteImage->getHeight());
-    EXPECT_EQ(16, one.spriteImage->image.width);
-    EXPECT_EQ(12, one.spriteImage->image.height);
+    EXPECT_EQ(16u, one.spriteImage->image.width);
+    EXPECT_EQ(12u, one.spriteImage->image.height);
     EXPECT_EQ(1.0f, one.spriteImage->pixelRatio);
 
     EXPECT_EQ(readImage("test/fixtures/annotations/result-spriteatlas-empty.png"),

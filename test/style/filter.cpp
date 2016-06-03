@@ -57,7 +57,7 @@ TEST(Filter, EqualsString) {
     Filter f = parse("[\"==\", \"foo\", \"bar\"]");
     ASSERT_TRUE(evaluate(f, {{ "foo", std::string("bar") }}));
     ASSERT_FALSE(evaluate(f, {{ "foo", std::string("baz") }}));
-};
+}
 
 TEST(Filter, EqualsNumber) {
     Filter f = parse("[\"==\", \"foo\", 0]");

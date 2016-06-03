@@ -6,7 +6,7 @@ using namespace mbgl;
 FrameHistory::FrameHistory() {
     changeOpacities.fill(0);
     opacities.fill(0);
-};
+}
 
 void FrameHistory::record(const TimePoint& now, float zoom, const Duration& duration) {
 
