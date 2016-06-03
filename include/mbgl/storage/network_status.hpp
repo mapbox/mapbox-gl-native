@@ -1,6 +1,7 @@
 #pragma once
 
-#include <atomic>
+#include <mbgl/util/atomic.hpp>
+
 #include <mutex>
 #include <set>
 
@@ -26,7 +27,7 @@ public:
     static void Unsubscribe(util::AsyncTask* async);
 
 private:
-    static std::atomic<bool> online;
+    static util::Atomic<bool> online;
     static std::mutex mtx;
     static std::set<util::AsyncTask*> observers;
 };
