@@ -19,10 +19,10 @@ endif
 default: test-$(HOST_PLATFORM)
 
 ifneq (,$(wildcard .git/.))
-.mason:
+.mason/mason:
 	git submodule update --init
 else
-.mason: ;
+.mason/mason: ;
 endif
 
 node_modules: package.json
@@ -30,7 +30,7 @@ node_modules: package.json
 
 GYP = deps/run_gyp --depth=. -Goutput_dir=.
 
-CONFIG_DEPENDENCIES = .mason configure
+CONFIG_DEPENDENCIES = .mason/mason configure
 
 # Depend on gyp includes plus directories, so that projects are regenerated when
 # files are added or removed.
