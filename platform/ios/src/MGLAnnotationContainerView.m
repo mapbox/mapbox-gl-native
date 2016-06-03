@@ -35,4 +35,18 @@
     }
 }
 
+#pragma mark UIAccessibility methods
+
+- (UIAccessibilityTraits)accessibilityTraits {
+    return UIAccessibilityTraitAdjustable;
+}
+
+- (void)accessibilityIncrement {
+    [self.superview.superview accessibilityIncrement];
+}
+
+- (void)accessibilityDecrement {
+    [self.superview.superview accessibilityDecrement];
+}
+
 @end

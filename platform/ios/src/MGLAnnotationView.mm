@@ -1,6 +1,8 @@
 #import "MGLAnnotationView.h"
 #import "MGLAnnotationView_Private.h"
-#import "MGLMapView.h"
+#import "MGLMapView_Internal.h"
+
+#import "NSBundle+MGLAdditions.h"
 
 #include <mbgl/util/constants.hpp>
 
@@ -101,6 +103,45 @@
         return [NSNull null];
     }
     return [super actionForLayer:layer forKey:event];
+}
+
+#pragma mark UIAccessibility methods
+
+- (BOOL)isAccessibilityElement {
+    return !self.hidden;
+}
+
+- (UIAccessibilityTraits)accessibilityTraits {
+    return UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
+}
+
+- (NSString *)accessibilityLabel {
+    return [self.annotation respondsToSelector:@selector(title)] ? self.annotation.title : super.accessibilityLabel;
+}
+
+- (NSString *)accessibilityValue {
+    return [self.annotation respondsToSelector:@selector(subtitle)] ? self.annotation.subtitle : super.accessibilityValue;
+}
+
+- (NSString *)accessibilityHint {
+    return NSLocalizedStringWithDefaultValue(@"ANNOTATION_A11Y_HINT", nil, nil, @"Shows more info", @"Accessibility hint");
+}
+
+- (CGRect)accessibilityFrame {
+    CGRect accessibilityFrame = self.frame;
+    CGRect minimumFrame = CGRectInset({ self.center, CGSizeZero },
+                                      -MGLAnnotationAccessibilityElementMinimumSize.width / 2,
+                                      -MGLAnnotationAccessibilityElementMinimumSize.height / 2);
+    accessibilityFrame = CGRectUnion(accessibilityFrame, minimumFrame);
+    return accessibilityFrame;
+}
+
+- (void)accessibilityIncrement {
+    [self.superview accessibilityIncrement];
+}
+
+- (void)accessibilityDecrement {
+    [self.superview accessibilityDecrement];
 }
 
 @end

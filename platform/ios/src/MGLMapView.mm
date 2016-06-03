@@ -98,7 +98,6 @@ const CGFloat MGLAnnotationImagePaddingForHitTest = 5;
 /// Distance from the callout’s anchor point to the annotation it points to.
 const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
-/// Minimum size of an annotation’s accessibility element.
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
 /// Unique identifier representing a single annotation in mbgl.
@@ -2021,6 +2020,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     id <MGLAnnotation> annotation = annotationContext.annotation;
     
+    // Let the annotation view serve as its own accessibility element.
+    MGLAnnotationView *annotationView = annotationContext.annotationView;
+    if (annotationView && annotationView.superview)
+    {
+        return annotationView;
+    }
+    
     // Lazily create an accessibility element for the found annotation.
     if ( ! annotationContext.accessibilityElement)
     {
@@ -2028,17 +2034,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     // Update the accessibility element.
-    MGLAnnotationView *annotationView = annotationContext.annotationView;
-    CGRect annotationFrame;
-    if (annotationView && annotationView.superview)
-    {
-        annotationFrame = [self convertRect:annotationView.bounds fromView:annotationView];
-    }
-    else
-    {
-        MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-        annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
-    }
+    MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+    CGRect annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
     CGPoint annotationFrameCenter = CGPointMake(CGRectGetMidX(annotationFrame), CGRectGetMidY(annotationFrame));
     CGRect minimumFrame = CGRectInset({ annotationFrameCenter, CGSizeZero },
                                       -MGLAnnotationAccessibilityElementMinimumSize.width / 2,
@@ -2075,17 +2072,28 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         return 1;
     }
-    if ( ! [element isKindOfClass:[MGLAnnotationAccessibilityElement class]] &&
-        element != self.attributionButton)
+    
+    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
+    
+    MGLAnnotationTag tag = MGLAnnotationTagNotFound;
+    if ([element isKindOfClass:[MGLAnnotationView class]])
+    {
+        id <MGLAnnotation> annotation = [(MGLAnnotationView *)element annotation];
+        tag = [self annotationTagForAnnotation:annotation];
+    }
+    else if ([element isKindOfClass:[MGLAnnotationAccessibilityElement class]])
+    {
+        tag = [(MGLAnnotationAccessibilityElement *)element tag];
+    }
+    else if (element == self.attributionButton)
+    {
+        return !!self.userLocationAnnotationView + visibleAnnotations.size();
+    }
+    else
     {
         return NSNotFound;
     }
     
-    std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-    if (element == self.attributionButton)
-    {
-        return !!self.userLocationAnnotationView + visibleAnnotations.size();
-    }
     std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
     auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(),
                                   ((MGLAnnotationAccessibilityElement *)element).tag);
