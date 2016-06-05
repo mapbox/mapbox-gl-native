@@ -128,6 +128,9 @@ public class MapboxEventManager {
             Log.w(TAG, "Error getting Encryption Algorithm: " + e);
         }
 
+        // Create Initial Session Id
+        rotateSessionId();
+
         SharedPreferences prefs = context.getSharedPreferences(MapboxConstants.MAPBOX_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
         // Determine if Telemetry Should Be Enabled
@@ -146,9 +149,6 @@ public class MapboxEventManager {
             editor.apply();
             editor.commit();
         }
-
-        // Create Initial Session Id
-        rotateSessionId();
 
         // Get DisplayMetrics Setup
         displayMetrics = new DisplayMetrics();
@@ -444,7 +444,7 @@ public class MapboxEventManager {
      */
     private void rotateSessionId() {
         long now = System.currentTimeMillis();
-        if (now - mapboxSessionIdLastSet > (SESSION_ID_ROTATION_HOURS * hourInMillis)) {
+        if ((TextUtils.isEmpty(mapboxSessionId)) || (now - mapboxSessionIdLastSet > (SESSION_ID_ROTATION_HOURS * hourInMillis))) {
             mapboxSessionId = UUID.randomUUID().toString();
             mapboxSessionIdLastSet = System.currentTimeMillis();
         }
