@@ -56,7 +56,7 @@
 
 - (void)setCenter:(CGPoint)center
 {
-    [self setCenter:center pitch:0];
+    [self setCenter:center pitch:self.mapView.camera.pitch];
 }
 
 - (void)setCenter:(CGPoint)center pitch:(CGFloat)pitch

@@ -911,8 +911,8 @@
 			children = (
 				40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */,
 				40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */,
-				4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */,
 				4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */,
+				4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */,
 				4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */,
 				DA8848341CBAFB8500AB86E3 /* MGLAnnotationImage.h */,
 				DA8848401CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h */,
