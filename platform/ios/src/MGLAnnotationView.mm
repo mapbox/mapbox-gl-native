@@ -54,31 +54,46 @@
     [self didChangeValueForKey:@"selected"];
 }
 
-- (void)setCenter:(CGPoint)center
+- (CGPoint)center
 {
-    [self setCenter:center pitch:self.mapView.camera.pitch];
+    CGPoint center = super.center;
+    center.x -= _centerOffset.dx;
+    center.y -= _centerOffset.dy;
+    return center;
 }
 
-- (void)setCenter:(CGPoint)center pitch:(CGFloat)pitch
+- (void)setCenter:(CGPoint)center
 {
     center.x += _centerOffset.dx;
     center.y += _centerOffset.dy;
     
-    [super setCenter:center];
-    
-    // Omit applying a new transformation while the view is being dragged.
-    if (self.dragState == MGLAnnotationViewDragStateDragging) {
-        return;
-    }
-    
-    if (self.scalesWithViewingDistance)
+    super.center = center;
+    [self updateTransform];
+}
+
+- (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
+{
+    if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
-        [self updateScaleForPitch:pitch];
+        _scalesWithViewingDistance = scalesWithViewingDistance;
+        [self updateTransform];
     }
 }
 
-- (void)updateScaleForPitch:(CGFloat)pitch
+- (void)updateTransform
 {
+    // Omit applying a new transformation while the view is being dragged.
+    if (self.dragState == MGLAnnotationViewDragStateDragging)
+    {
+        return;
+    }
+    
+    self.layer.transform = CATransform3DIdentity;
+    if ( ! self.scalesWithViewingDistance)
+    {
+        return;
+    }
+    
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
     if (superviewHeight > 0.0) {
         // Find the maximum amount of scale reduction to apply as the view's center moves from the top
@@ -93,7 +108,7 @@
         // as the map view will allow). The map view's maximum pitch is defined in `mbgl::util::PITCH_MAX`.
         // Since it is possible for the map view to report a pitch less than 0 due to the nature of
         // how the gesture information is captured, the value is guarded with MAX.
-        CGFloat pitchIntensity = MAX(pitch, 0) / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
+        CGFloat pitchIntensity = MAX(self.mapView.camera.pitch, 0) / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
        
         // The pitch adjusted scale is the inverse proportion of the maximum possible scale reduction
         // multiplied by the pitch intensity. For example, if the maximum scale reduction is 75% and the
@@ -174,8 +189,7 @@
 
 - (void)handlePan:(UIPanGestureRecognizer *)sender
 {
-    CGPoint center = [sender locationInView:sender.view.superview];
-    [self setCenter:center pitch:self.mapView.camera.pitch];
+    self.center = [sender locationInView:sender.view.superview];
 
     if (sender.state == UIGestureRecognizerStateEnded) {
         self.dragState = MGLAnnotationViewDragStateNone;
@@ -203,11 +217,7 @@
     {
         if ([self.mapView.delegate respondsToSelector:@selector(mapView:didDragAnnotationView:toCoordinate:)])
         {
-            CGPoint offsetAdjustedCenter = self.center;
-            offsetAdjustedCenter.x -= self.centerOffset.dx;
-            offsetAdjustedCenter.y -= self.centerOffset.dy;
-            
-            CLLocationCoordinate2D coordinate = [self.mapView convertPoint:offsetAdjustedCenter toCoordinateFromView:self.mapView];
+            CLLocationCoordinate2D coordinate = [self.mapView convertPoint:self.center toCoordinateFromView:self.mapView];
             [self.mapView.delegate mapView:self.mapView didDragAnnotationView:self toCoordinate:coordinate];
         }
     }

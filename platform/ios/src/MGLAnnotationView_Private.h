@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, nullable) id <MGLAnnotation> annotation;
 @property (nonatomic, weak) MGLMapView *mapView;
 
-- (void)setCenter:(CGPoint)center pitch:(CGFloat)pitch;
-
 @end
 
 NS_ASSUME_NONNULL_END
