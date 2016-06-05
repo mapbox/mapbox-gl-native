@@ -1773,11 +1773,18 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
 
-            NSString *symbolName;
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            if (annotationContext.annotationView)
+            {
+                // Redundantly move the associated annotation view outside the scope of the animation-less transaction block in -updateAnnotationViews.
+                annotationContext.annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            }
+            
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            symbolName = annotationImage.styleIconIdentifier;
+            NSString *symbolName = annotationImage.styleIconIdentifier;
 
-            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String});
+            // Update the annotation’s backing geometry to match the annotation model object. Any associated annotation view is also moved by side effect. However, -updateAnnotationViews disables the view’s animation actions, because it can’t distinguish between moves due to the viewport changing and moves due to the annotation’s coordinate changing.
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String });
             if (annotationTag == _selectedAnnotationTag)
             {
                 [self deselectAnnotation:annotation animated:YES];
@@ -4556,6 +4563,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return;
     }
     
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    
     for (auto &pair : _annotationContextsByAnnotationTag)
     {
         CGRect viewPort = CGRectInset(self.bounds,
@@ -4592,6 +4602,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
     }
+    
+    [CATransaction commit];
 }
 
 - (void)enqueueAnnotationViewForAnnotationContext:(MGLAnnotationContext &)annotationContext

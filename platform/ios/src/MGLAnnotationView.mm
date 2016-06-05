@@ -243,7 +243,7 @@
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
     // Allow mbgl to drive animation of this view’s bounds.
-    if ([event isEqualToString:@"bounds"])
+    if ([event isEqualToString:@"bounds"] || [event isEqualToString:@"position"])
     {
         return [NSNull null];
     }
