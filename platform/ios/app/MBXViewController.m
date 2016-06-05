@@ -575,7 +575,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
     // Use GL backed pins for dropped pin annotations
-    if ([annotation isMemberOfClass:[MBXDroppedPinAnnotation class]])
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]])
     {
         return nil;
     }

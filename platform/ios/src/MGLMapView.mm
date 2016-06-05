@@ -2835,7 +2835,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
-            // The multipoint knows how to style itself (with the map view’s help).
+            // Actual multipoints aren’t supported as annotations.
+            if ([annotation isMemberOfClass:[MGLMultiPoint class]]
+                || [annotation isMemberOfClass:[MGLMultiPointFeature class]])
+            {
+                continue;
+            }
+            
+            // The polyline or polygon knows how to style itself (with the map view’s help).
             MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
             if (!multiPoint.pointCount) {
                 continue;
@@ -2846,13 +2853,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
         }
-        else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
-                 || [annotation isKindOfClass:[MGLMultiPolygon class]]
-                 || [annotation isKindOfClass:[MGLShapeCollection class]])
-        {
-            continue;
-        }
-        else
+        else if ( ! [annotation isKindOfClass:[MGLMultiPolyline class]]
+                 || ![annotation isKindOfClass:[MGLMultiPolygon class]]
+                 || ![annotation isKindOfClass:[MGLShapeCollection class]])
         {
             MGLAnnotationView *annotationView;
             NSString *symbolName;
