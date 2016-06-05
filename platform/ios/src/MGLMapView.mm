@@ -3395,10 +3395,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         
-        if (annotationContext.annotationView)
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        if (annotationView)
         {
             // Annotations represented by views use the view frame as the positioning rect.
-            positioningRect = annotationContext.annotationView.frame;
+            positioningRect = annotationView.frame;
+            
+            [annotationView.superview bringSubviewToFront:annotationView];
         }
     }
     
