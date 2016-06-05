@@ -1711,7 +1711,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if (!annotationView)
     {
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
-        annotationView.frame = CGRectMake(0, 0, 10, 10);
+        annotationView.frame = CGRectMake(0, 0, 30, 30);
         annotationView.backgroundColor = [UIColor whiteColor];
 
         // Note that having two long press gesture recognizers on overlapping
@@ -1720,9 +1720,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
 
-        // uncomment to flatten the annotation view against the map when the map is tilted
+        // uncomment to lay the annotation view flat against the map when the map is tilted
         // this currently causes severe performance issues when more than 2k annotations are visible
-        // annotationView.flat = YES;
+//        annotationView.freeAxes = MGLAnnotationViewBillboardAxisX;
         
         // Uncomment to force annotation view to maintain a constant size when
         // the map is tilted. By default, annotation views will shrink and grow

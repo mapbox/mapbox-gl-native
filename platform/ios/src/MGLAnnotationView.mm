@@ -53,8 +53,12 @@
         _reuseIdentifier = [decoder decodeObjectOfClass:[NSString class] forKey:@"reuseIdentifier"];
         _annotation = [decoder decodeObjectOfClass:[NSObject class] forKey:@"annotation"];
         _centerOffset = [decoder decodeCGVectorForKey:@"centerOffset"];
+        NSInteger freeAxes = [decoder decodeIntegerForKey:@"freeAxes"];
+        if (freeAxes < 0 || freeAxes > MGLAnnotationViewBillboardAxisAll) {
+            return nil;
+        }
+        _freeAxes = freeAxes;
         _scalesWithViewingDistance = [decoder decodeBoolForKey:@"scalesWithViewingDistance"];
-        _rotatesToMatchCamera = [decoder decodeBoolForKey:@"rotatesToMatchCamera"];
         _selected = [decoder decodeBoolForKey:@"selected"];
         _enabled = [decoder decodeBoolForKey:@"enabled"];
         self.draggable = [decoder decodeBoolForKey:@"draggable"];
@@ -67,8 +71,8 @@
     [coder encodeObject:_reuseIdentifier forKey:@"reuseIdentifier"];
     [coder encodeObject:_annotation forKey:@"annotation"];
     [coder encodeCGVector:_centerOffset forKey:@"centerOffset"];
+    [coder encodeInteger:_freeAxes forKey:@"freeAxes"];
     [coder encodeBool:_scalesWithViewingDistance forKey:@"scalesWithViewingDistance"];
-    [coder encodeBool:_rotatesToMatchCamera forKey:@"rotatesToMatchCamera"];
     [coder encodeBool:_selected forKey:@"selected"];
     [coder encodeBool:_enabled forKey:@"enabled"];
     [coder encodeBool:_draggable forKey:@"draggable"];
@@ -111,8 +115,7 @@
     center.y += _centerOffset.dy;
 
     super.center = center;
-    [self updateScaleTransformForViewingDistance];
-    [self updateRotateTransform];
+    [self updateTransform];
 }
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
@@ -120,16 +123,36 @@
     if (_scalesWithViewingDistance != scalesWithViewingDistance)
     {
         _scalesWithViewingDistance = scalesWithViewingDistance;
-        [self updateScaleTransformForViewingDistance];
+        [self updateTransform];
     }
 }
 
-- (void)updateScaleTransformForViewingDistance
+- (void)setFreeAxes:(MGLAnnotationViewBillboardAxis)freeAxes
 {
-    if (self.scalesWithViewingDistance == NO || self.dragState == MGLAnnotationViewDragStateDragging) return;
+    if (_freeAxes != freeAxes)
+    {
+        _freeAxes = freeAxes;
+        [self updateTransform];
+    }
+}
 
+- (void)updateTransform
+{
+    if (self.dragState == MGLAnnotationViewDragStateDragging) return;
+
+    CATransform3D t = CATransform3DIdentity;
+    MGLMapCamera *camera = self.mapView.camera;
+    if (camera.pitch >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisX))
+    {
+        t = CATransform3DRotate(t, MGLRadiansFromDegrees(camera.pitch), 1.0, 0, 0);
+    }
+    if (camera.heading >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisY))
+    {
+        t = CATransform3DRotate(t, MGLRadiansFromDegrees(-camera.heading), 0.0, 0.0, 1.0);
+    }
+    
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
-    if (superviewHeight > 0.0) {
+    if ( ! self.scalesWithViewingDistance && superviewHeight > 0.0) {
         // Find the maximum amount of scale reduction to apply as the view's center moves from the top
         // of the superview to the bottom. For example, if this view's center has moved 25% of the way
         // from the top of the superview towards the bottom then the maximum scale reduction is 1 - .25
@@ -159,26 +182,6 @@
         self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
         _lastAppliedScaleTransform = newScaleTransform;
     }
-}
-
-- (void)setRotatesToMatchCamera:(BOOL)rotatesToMatchCamera
-{
-    if (_rotatesToMatchCamera != rotatesToMatchCamera)
-    {
-        _rotatesToMatchCamera = rotatesToMatchCamera;
-        [self updateRotateTransform];
-    }
-}
-
-- (void)updateRotateTransform
-{
-    if (self.rotatesToMatchCamera == NO) return;
-
-    CGFloat directionRad = self.mapView.direction * M_PI / 180.0;
-    CATransform3D newRotateTransform = CATransform3DMakeRotation(-directionRad, 0, 0, 1);
-    self.layer.transform = CATransform3DConcat(CATransform3DIdentity, newRotateTransform);
-    
-    _lastAppliedRotateTransform = newRotateTransform;
 }
 
 #pragma mark - Draggable

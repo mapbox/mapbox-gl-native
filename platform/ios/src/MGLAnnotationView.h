@@ -37,6 +37,57 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 };
 
 /**
+ Options for locking the orientation of an `MGLAnnotationView` along one or more
+ axes for a billboard effect.
+ */
+typedef NS_OPTIONS(NSUInteger, MGLAnnotationViewBillboardAxis)
+{
+    /**
+     Orients the annotation view such that its x-axis is always fixed with
+     respect to the map.
+     
+     If this option is unset, the annotation view remains unchanged as the map’s
+     pitch increases, so that the view appears to stand upright on the tilted
+     map. If this option is set, the annotation view tilts as the map’s pitch
+     increases, so that the view appears to lie flat against the tilted map.
+     
+     For example, you would set this option if the annotation view depicts an
+     arrow that should always point due south. You would unset this option if
+     the arrow should always point down towards the ground.
+     */
+    MGLAnnotationViewBillboardAxisX = 0x1 << 0,
+    
+    /**
+     Orients the annotation view such that its y-axis is always fixed with
+     respect to the map.
+     
+     If this option is unset, the annotation view remains unchanged as the map
+     is rotated. If this option is set, the annotation view rotates as the map
+     rotates.
+     
+     For example, you would set this option if the annotation view should be
+     aligned with a street, regardless of the direction from which the user
+     views the street.
+     */
+    MGLAnnotationViewBillboardAxisY = 0x1 << 1,
+    
+    /**
+     Orients the annotation view such that its z-axis is always fixed with
+     respect to the map.
+     
+     Because `MGLMapView` does not support changes to its bank, or roll, this
+     option has no effect.
+     */
+    MGLAnnotationViewBillboardAxisZ = 0x1 << 2,
+    
+    /**
+     Orients the annotation view such that all three axes are always fixed with
+     respect to the map.
+     */
+    MGLAnnotationViewBillboardAxisAll = (MGLAnnotationViewBillboardAxisX | MGLAnnotationViewBillboardAxisY | MGLAnnotationViewBillboardAxisZ),
+};
+
+/**
  The `MGLAnnotationView` class is responsible for marking a point annotation
  with a view. Annotation views represent an annotation object, which is an
  object that corresponds to the `MGLAnnotation` protocol. When an annotation’s
@@ -126,8 +177,14 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 
  You specify the reuse identifier when you create the view. You use the
  identifier later to retrieve an annotation view that was created previously but
+<<<<<<< HEAD
  which is currently unused because its annotation is not on-screen.
 
+=======
+ which is currently unused because its annotation does not lie within the map
+ view’s viewport.
+ 
+>>>>>>> 8d2bb2d42... [ios] Annotation view degrees of freedom
  If you define distinctly different types of annotations (with distinctly
  different annotation views to go with them), you can differentiate between the
  annotation types by specifying different reuse identifiers for each one.
@@ -155,19 +212,13 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 @property (nonatomic) CGVector centerOffset;
 
 /**
- A Boolean value indicating whether the view lies flat against the map as it
- tilts.
+ An option that specifies the annotation view’s degrees of freedom.
  
- If this option is unset, the annotation view remains unchanged as the map’s
- pitch increases, so that the view appears to stand upright on the tilted map.
- If this option is set, the annotation view tilts as the map’s pitch increases,
- so that the view appears to lie flat against the tilted map.
- 
- For example, you would set this option if the annotation view depicts an arrow
- that should always point due south. You would unset this option if the arrow
- should always point down towards the ground.
+ By default, none of the axes are free; in other words, the annotation view is
+ oriented like a billboard with respect to the x-, y-, and z-axes. See
+ `MGLAnnotationViewBillboardAxis` for available options.
  */
-@property (nonatomic, assign, getter=isFlat) BOOL flat;
+@property (nonatomic, assign) MGLAnnotationViewBillboardAxis freeAxes;
 
 /**
  A Boolean value that determines whether the annotation view grows and shrinks
@@ -185,19 +236,6 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  view’s legibility is important.
  */
 @property (nonatomic, assign) BOOL scalesWithViewingDistance;
-
-/**
- A Boolean value that determines whether the annotation view rotates together
- with the map.
-
- When the value of this property is `YES` and the map is rotated, the annotation
- view rotates. This is also the behavior of `MGLAnnotationImage` objects. When the
- value of this property is `NO` the annotation has its rotation angle fixed.
-
- The default value of this property is `NO`. Set this property to `YES` if the
- view’s rotation is important.
- */
-@property (nonatomic, assign) BOOL rotatesToMatchCamera;
 
 #pragma mark Managing the Selection State
 
