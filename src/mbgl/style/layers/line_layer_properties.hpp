@@ -20,7 +20,7 @@ public:
     LayoutProperty<LineCapType> lineCap { LineCapType::Butt };
     LayoutProperty<LineJoinType> lineJoin { LineJoinType::Miter };
     LayoutProperty<float> lineMiterLimit { 2 };
-    LayoutProperty<float> lineRoundLimit { 1.05 };
+    LayoutProperty<float> lineRoundLimit { 1 };
 };
 
 class LinePaintProperties {
