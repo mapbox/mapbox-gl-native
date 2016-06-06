@@ -27,10 +27,10 @@ namespace mbgl {
 
 using namespace style;
 
-enum class RenderState {
-    never,
-    partial,
-    fully
+enum class RenderState : uint8_t {
+    Never,
+    Partial,
+    Fully,
 };
 
 class Map::Impl : public style::Observer {
@@ -48,7 +48,7 @@ public:
     View& view;
     FileSource& fileSource;
 
-    RenderState renderState = RenderState::never;
+    RenderState renderState = RenderState::Never;
     Transform transform;
 
     const MapMode mode;
@@ -164,7 +164,7 @@ void Map::render() {
         return;
     }
 
-    if (impl->renderState == RenderState::never) {
+    if (impl->renderState == RenderState::Never) {
         impl->view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
@@ -179,9 +179,9 @@ void Map::render() {
         MapChangeDidFinishRenderingFrame);
 
     if (!isFullyLoaded()) {
-        impl->renderState = RenderState::partial;
-    } else if (impl->renderState != RenderState::fully) {
-        impl->renderState = RenderState::fully;
+        impl->renderState = RenderState::Partial;
+    } else if (impl->renderState != RenderState::Fully) {
+        impl->renderState = RenderState::Fully;
         impl->view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
         if (impl->loading) {
             impl->loading = false;
