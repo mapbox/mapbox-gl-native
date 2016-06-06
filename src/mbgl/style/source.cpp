@@ -198,7 +198,6 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
             overscaledTileID.canonical.y, overscaledTileID.canonical.z);
         auto data = std::make_unique<RasterTileData>(overscaledTileID, parameters.texturePool,
                                                      parameters.worker);
-        data->setObserver(this);
         data->setTileSource(
             std::make_unique<ImageTileSource>(*data, resource, parameters.fileSource));
 
@@ -212,7 +211,6 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
             overscaledTileID.canonical.y, overscaledTileID.canonical.z);
         auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
-        data->setObserver(this);
         data->setTileSource(
             std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
 
@@ -222,7 +220,6 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
     } else if (type == SourceType::Annotations) {
         auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
-        data->setObserver(this);
         data->setTileSource(std::make_unique<AnnotationTileSource>(
             *data, overscaledTileID, parameters.annotationManager));
 
@@ -232,7 +229,6 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
     } else if (type == SourceType::GeoJSON) {
         auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
-        data->setObserver(this);
         data->setTileSource(
             std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
 
@@ -296,6 +292,9 @@ bool Source::update(const UpdateParameters& parameters) {
         std::unique_ptr<TileData> data = cache.get(dataTileID);
         if (!data) {
             data = createTile(dataTileID, parameters);
+            if (data) {
+                data->setObserver(this);
+            }
         }
         if (data) {
             return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
