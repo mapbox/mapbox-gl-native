@@ -4,20 +4,32 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 
+#include <unique_resource.hpp>
+
 #include <memory>
 
 namespace mbgl {
 namespace gl {
+
+class TexturePool;
+
+struct TextureReleaser {
+    TexturePool* pool;
+    void operator()(GLuint) const;
+};
+
+using SharedTexture = std_experimental::unique_resource<GLuint, TextureReleaser>;
 
 class TexturePool : private util::noncopyable {
 public:
     TexturePool();
     ~TexturePool();
 
-    GLuint getTextureID(gl::ObjectStore&);
-    void releaseTextureID(GLuint&);
+    SharedTexture acquireTexture(gl::ObjectStore&);
 
 private:
+    friend TextureReleaser;
+
     class Impl;
     const std::unique_ptr<Impl> impl;
 };
