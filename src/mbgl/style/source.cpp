@@ -24,8 +24,10 @@
 #include <mbgl/tile/annotation_tile_source.hpp>
 #include <mbgl/tile/image_tile_source.hpp>
 
-#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
+#include <mbgl/tile/annotation_tile_data.hpp>
+#include <mbgl/tile/geojson_tile_data.hpp>
+#include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
@@ -209,7 +211,7 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
         const auto resource = Resource::tile(
             tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
             overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+        auto data = std::make_unique<VectorTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
         data->setTileSource(
             std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
@@ -218,7 +220,7 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
         // std::unique_ptr<GeometryTileData>.
         return std::move(data);
     } else if (type == SourceType::Annotations) {
-        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+        auto data = std::make_unique<AnnotationTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
         data->setTileSource(std::make_unique<AnnotationTileSource>(
             *data, overscaledTileID, parameters.annotationManager));
@@ -227,7 +229,7 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
         // std::unique_ptr<GeometryTileData>.
         return std::move(data);
     } else if (type == SourceType::GeoJSON) {
-        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+        auto data = std::make_unique<GeoJSONTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
         data->setTileSource(
             std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
