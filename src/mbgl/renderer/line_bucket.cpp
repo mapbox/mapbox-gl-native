@@ -1,4 +1,5 @@
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/line_renderable.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/renderer/painter.hpp>
@@ -15,7 +16,8 @@ namespace mbgl {
 
 using namespace style;
 
-LineBucket::LineBucket(uint32_t overscaling_) : overscaling(overscaling_) {
+LineBucket::LineBucket(uint32_t overscaling_)
+    : overscaling(overscaling_), renderable(std::make_unique<LineRenderable>()) {
 }
 
 LineBucket::~LineBucket() {
@@ -55,6 +57,10 @@ const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
 const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
 
 void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     const GLsizei len = [&vertices] {
         GLsizei l = static_cast<GLsizei>(vertices.size());
         // If the line has duplicate vertices at the end, adjust length to remove them.
@@ -357,7 +363,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& vertices) {
     {
         if (triangleGroups.empty() || (triangleGroups.back()->vertex_length + vertexCount > 65535)) {
             // Move to a new group because the old one can't hold the geometry.
-            triangleGroups.emplace_back(std::make_unique<TriangleGroup>());
+            triangleGroups.emplace_back(std::make_unique<LineRenderable::TriangleGroup>());
         }
 
         assert(triangleGroups.back());
@@ -381,6 +387,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentVertex,
                                   bool round,
                                   GLint startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
+    auto& vertexBuffer = renderable->vertexBuffer;
     int8_t tx = round ? 1 : 0;
 
     Point<double> extrude = normal;
@@ -421,6 +428,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    bool lineTurnsLeft,
                                    GLint startVertex,
                                   std::vector<TriangleElement>& triangleStore) {
+    auto& vertexBuffer = renderable->vertexBuffer;
     int8_t ty = lineTurnsLeft;
 
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
@@ -438,8 +446,10 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
 }
 
 void LineBucket::upload(gl::ObjectStore& store) {
-    vertexBuffer.upload(store);
-    triangleElementsBuffer.upload(store);
+    if (renderable) {
+        renderable->vertexBuffer.upload(store);
+        renderable->triangleElementsBuffer.upload(store);
+    }
 
     // From now on, we're only going to render during the translucent pass.
     uploaded = true;
@@ -453,7 +463,7 @@ void LineBucket::render(Painter& painter,
 }
 
 bool LineBucket::hasData() const {
-    return !triangleGroups.empty();
+    return renderable && !renderable->triangleGroups.empty();
 }
 
 bool LineBucket::needsClipping() const {
@@ -461,6 +471,13 @@ bool LineBucket::needsClipping() const {
 }
 
 void LineBucket::drawLines(LineShader& shader, gl::ObjectStore& store) {
+    if (!renderable) {
+        return;
+    }
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
@@ -477,6 +494,13 @@ void LineBucket::drawLines(LineShader& shader, gl::ObjectStore& store) {
 }
 
 void LineBucket::drawLineSDF(LineSDFShader& shader, gl::ObjectStore& store) {
+    if (!renderable) {
+        return;
+    }
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {
@@ -493,6 +517,13 @@ void LineBucket::drawLineSDF(LineSDFShader& shader, gl::ObjectStore& store) {
 }
 
 void LineBucket::drawLinePatterns(LinepatternShader& shader, gl::ObjectStore& store) {
+    if (!renderable) {
+        return;
+    }
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     GLbyte* vertex_index = BUFFER_OFFSET(0);
     GLbyte* elements_index = BUFFER_OFFSET(0);
     for (auto& group : triangleGroups) {

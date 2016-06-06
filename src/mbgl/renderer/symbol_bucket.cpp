@@ -1,4 +1,5 @@
 #include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/symbol_renderable.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
@@ -75,12 +76,12 @@ SymbolBucket::~SymbolBucket() {
 
 void SymbolBucket::upload(gl::ObjectStore& store) {
     if (hasTextData()) {
-        renderData->text.vertices.upload(store);
-        renderData->text.triangles.upload(store);
+        renderable->text.vertices.upload(store);
+        renderable->text.triangles.upload(store);
     }
     if (hasIconData()) {
-        renderData->icon.vertices.upload(store);
-        renderData->icon.triangles.upload(store);
+        renderable->icon.vertices.upload(store);
+        renderable->icon.triangles.upload(store);
     }
 
     uploaded = true;
@@ -95,11 +96,11 @@ void SymbolBucket::render(Painter& painter,
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }
 
-bool SymbolBucket::hasTextData() const { return renderData && !renderData->text.groups.empty(); }
+bool SymbolBucket::hasTextData() const { return renderable && !renderable->text.groups.empty(); }
 
-bool SymbolBucket::hasIconData() const { return renderData && !renderData->icon.groups.empty(); }
+bool SymbolBucket::hasIconData() const { return renderable && !renderable->icon.groups.empty(); }
 
-bool SymbolBucket::hasCollisionBoxData() const { return renderData && !renderData->collisionBox.groups.empty(); }
+bool SymbolBucket::hasCollisionBoxData() const { return renderable && !renderable->collisionBox.groups.empty(); }
 
 bool SymbolBucket::needsClipping() const {
     return mode == MapMode::Still;
@@ -388,7 +389,7 @@ bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repe
 
 void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
 
-    renderDataInProgress = std::make_unique<SymbolRenderData>();
+    renderableInProgress = std::make_unique<SymbolRenderable>();
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
@@ -456,8 +457,8 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         if (hasText) {
             collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.textIgnorePlacement);
             if (glyphScale < collisionTile.maxScale) {
-                addSymbols<SymbolRenderData::TextBuffer, TextElementGroup>(
-                    renderDataInProgress->text, symbolInstance.glyphQuads, glyphScale,
+                addSymbols<SymbolRenderable::TextBuffer, SymbolRenderable::TextElementGroup>(
+                    renderableInProgress->text, symbolInstance.glyphQuads, glyphScale,
                     layout.textKeepUpright, textAlongLine, collisionTile.config.angle);
             }
         }
@@ -465,8 +466,8 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
         if (hasIcon) {
             collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.iconIgnorePlacement);
             if (iconScale < collisionTile.maxScale) {
-                addSymbols<SymbolRenderData::IconBuffer, IconElementGroup>(
-                    renderDataInProgress->icon, symbolInstance.iconQuads, iconScale,
+                addSymbols<SymbolRenderable::IconBuffer, SymbolRenderable::IconElementGroup>(
+                    renderableInProgress->icon, symbolInstance.iconQuads, iconScale,
                     layout.iconKeepUpright, iconAlongLine, collisionTile.config.angle);
             }
         }
@@ -569,10 +570,11 @@ void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
                 const float maxZoom = util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.maxScale) / log(2))));
                 const float placementZoom= util::max(0.0f, util::min(25.0f, static_cast<float>(zoom + log(box.placementScale) / log(2))));
 
-                auto& collisionBox = renderDataInProgress->collisionBox;
+                auto& collisionBox = renderableInProgress->collisionBox;
                 if (collisionBox.groups.empty()) {
                     // Move to a new group because the old one can't hold the geometry.
-                    collisionBox.groups.emplace_back(std::make_unique<CollisionBoxElementGroup>());
+                    collisionBox.groups.emplace_back(
+                        std::make_unique<SymbolRenderable::CollisionBoxElementGroup>());
                 }
 
                 collisionBox.vertices.add(anchor.x, anchor.y, tl.x, tl.y, maxZoom, placementZoom);
@@ -591,9 +593,9 @@ void SymbolBucket::addToDebugBuffers(CollisionTile &collisionTile) {
     }
 }
 
-void SymbolBucket::swapRenderData() {
-    if (renderDataInProgress) {
-        renderData = std::move(renderDataInProgress);
+void SymbolBucket::swapRenderable() {
+    if (renderableInProgress) {
+        renderable = std::move(renderableInProgress);
         uploaded = false;
     }
 }
@@ -601,7 +603,7 @@ void SymbolBucket::swapRenderData() {
 void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& text = renderData->text;
+    auto& text = renderable->text;
     for (auto &group : text.groups) {
         assert(group);
         group->array[0].bind(shader, text.vertices, text.triangles, vertex_index, store);
@@ -614,7 +616,7 @@ void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store) {
 void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& icon = renderData->icon;
+    auto& icon = renderable->icon;
     for (auto &group : icon.groups) {
         assert(group);
         group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
@@ -627,7 +629,7 @@ void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store) {
 void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& icon = renderData->icon;
+    auto& icon = renderable->icon;
     for (auto &group : icon.groups) {
         assert(group);
         group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
@@ -639,7 +641,7 @@ void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store) {
 
 void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader, gl::ObjectStore& store) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
-    auto& collisionBox = renderData->collisionBox;
+    auto& collisionBox = renderable->collisionBox;
     for (auto &group : collisionBox.groups) {
         group->array[0].bind(shader, collisionBox.vertices, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));

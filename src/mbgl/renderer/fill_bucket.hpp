@@ -2,8 +2,6 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/fill_buffer.hpp>
 
 #include <vector>
 #include <memory>
@@ -14,6 +12,7 @@ class OutlinePatternShader;
 class PlainShader;
 class PatternShader;
 class OutlineShader;
+class FillRenderable;
 
 class FillBucket : public Bucket {
 public:
@@ -33,15 +32,7 @@ public:
     void drawVertices(OutlinePatternShader&, gl::ObjectStore&);
 
 private:
-    FillVertexBuffer vertexBuffer;
-    TriangleElementsBuffer triangleElementsBuffer;
-    LineElementsBuffer lineElementsBuffer;
-
-    typedef ElementGroup<2> TriangleGroup;
-    typedef ElementGroup<2> LineGroup;
-
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
-    std::vector<std::unique_ptr<LineGroup>> lineGroups;
+    std::unique_ptr<FillRenderable> renderable;
 };
 
 } // namespace mbgl

@@ -1,19 +1,15 @@
 #pragma once
 
 #include <mbgl/renderer/bucket.hpp>
-#include <mbgl/map/mode.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/circle_buffer.hpp>
+#include <mbgl/map/mode.hpp>
 
 namespace mbgl {
 
-class CircleVertexBuffer;
+class CircleRenderable;
 class CircleShader;
 
 class CircleBucket : public Bucket {
-    using TriangleGroup = ElementGroup<3>;
-
 public:
     CircleBucket(const MapMode);
     ~CircleBucket() override;
@@ -28,12 +24,9 @@ public:
     void drawCircles(CircleShader&, gl::ObjectStore&);
 
 private:
-    CircleVertexBuffer vertexBuffer_;
-    TriangleElementsBuffer elementsBuffer_;
-
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups_;
-
     const MapMode mode;
+
+    std::unique_ptr<CircleRenderable> renderable;
 };
 
 } // namespace mbgl

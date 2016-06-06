@@ -1,4 +1,5 @@
 #include <mbgl/renderer/circle_bucket.hpp>
+#include <mbgl/renderer/circle_renderable.hpp>
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
@@ -9,7 +10,8 @@ namespace mbgl {
 
 using namespace style;
 
-CircleBucket::CircleBucket(MapMode mode_) : mode(mode_) {
+CircleBucket::CircleBucket(MapMode mode_)
+    : mode(mode_), renderable(std::make_unique<CircleRenderable>()) {
 }
 
 CircleBucket::~CircleBucket() {
@@ -17,8 +19,10 @@ CircleBucket::~CircleBucket() {
 }
 
 void CircleBucket::upload(gl::ObjectStore& store) {
-    vertexBuffer_.upload(store);
-    elementsBuffer_.upload(store);
+    if (renderable) {
+        renderable->vertexBuffer.upload(store);
+        renderable->elementsBuffer.upload(store);
+    }
     uploaded = true;
 }
 
@@ -30,7 +34,7 @@ void CircleBucket::render(Painter& painter,
 }
 
 bool CircleBucket::hasData() const {
-    return !triangleGroups_.empty();
+    return renderable && !renderable->triangleGroups.empty();
 }
 
 bool CircleBucket::needsClipping() const {
@@ -38,6 +42,10 @@ bool CircleBucket::needsClipping() const {
 }
 
 void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& elementsBuffer = renderable->elementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     for (auto& circle : geometryCollection) {
         for(auto & geometry : circle) {
             auto x = geometry.x;
@@ -58,23 +66,23 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             // │ 1     2 │
             // └─────────┘
             //
-            vertexBuffer_.add(x, y, -1, -1); // 1
-            vertexBuffer_.add(x, y, 1, -1); // 2
-            vertexBuffer_.add(x, y, 1, 1); // 3
-            vertexBuffer_.add(x, y, -1, 1); // 4
+            vertexBuffer.add(x, y, -1, -1); // 1
+            vertexBuffer.add(x, y, 1, -1); // 2
+            vertexBuffer.add(x, y, 1, 1); // 3
+            vertexBuffer.add(x, y, -1, 1); // 4
 
-            if (!triangleGroups_.size() || (triangleGroups_.back()->vertex_length + 4 > 65535)) {
+            if (!triangleGroups.size() || (triangleGroups.back()->vertex_length + 4 > 65535)) {
                 // Move to a new group because the old one can't hold the geometry.
-                triangleGroups_.emplace_back(std::make_unique<TriangleGroup>());
+                triangleGroups.emplace_back(std::make_unique<CircleRenderable::TriangleGroup>());
             }
 
-            TriangleGroup& group = *triangleGroups_.back();
+            auto& group = *triangleGroups.back();
             auto index = group.vertex_length;
 
             // 1, 2, 3
             // 1, 4, 3
-            elementsBuffer_.add(index, index + 1, index + 2);
-            elementsBuffer_.add(index, index + 3, index + 2);
+            elementsBuffer.add(index, index + 1, index + 2);
+            elementsBuffer.add(index, index + 3, index + 2);
 
             group.vertex_length += 4;
             group.elements_length += 2;
@@ -83,21 +91,28 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
 }
 
 void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
+    if (!renderable) {
+        return;
+    }
+    auto& vertexBuffer = renderable->vertexBuffer;
+    auto& elementsBuffer = renderable->elementsBuffer;
+    auto& triangleGroups = renderable->triangleGroups;
+
     GLbyte* vertexIndex = BUFFER_OFFSET(0);
     GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
-    for (auto& group : triangleGroups_) {
+    for (auto& group : triangleGroups) {
         assert(group);
 
         if (!group->elements_length) continue;
 
-        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, store);
+        group->array[0].bind(shader, vertexBuffer, elementsBuffer, vertexIndex, store);
 
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
 
-        vertexIndex += group->vertex_length * vertexBuffer_.itemSize;
-        elementsIndex += group->elements_length * elementsBuffer_.itemSize;
+        vertexIndex += group->vertex_length * vertexBuffer.itemSize;
+        elementsIndex += group->elements_length * elementsBuffer.itemSize;
     }
 }
 
-}
+} // namespace mbgl

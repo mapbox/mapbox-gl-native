@@ -3,34 +3,20 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/text_buffer.hpp>
-#include <mbgl/geometry/icon_buffer.hpp>
-#include <mbgl/geometry/collision_box_buffer.hpp>
-#include <mbgl/text/glyph.hpp>
 #include <mbgl/text/collision_feature.hpp>
-#include <mbgl/text/shaping.hpp>
 #include <mbgl/text/quads.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
-
-#include <memory>
-#include <map>
-#include <set>
-#include <vector>
+#include <mbgl/text/glyph_range.hpp>
 
 namespace mbgl {
 
 class SDFShader;
 class IconShader;
 class CollisionBoxShader;
-class CollisionTile;
-class SpriteAtlas;
-class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
-class IndexedSubfeature;
+class SymbolRenderable;
 
 class SymbolFeature {
 public:
@@ -39,8 +25,6 @@ public:
     std::string sprite;
     std::size_t index;
 };
-
-struct Anchor;
 
 class SymbolInstance {
     public:
@@ -61,10 +45,6 @@ class SymbolInstance {
 };
 
 class SymbolBucket : public Bucket {
-    typedef ElementGroup<1> TextElementGroup;
-    typedef ElementGroup<2> IconElementGroup;
-    typedef ElementGroup<1> CollisionBoxElementGroup;
-
 public:
     SymbolBucket(uint32_t overscaling, float zoom, const MapMode, const std::string& bucketName_, const std::string& sourceLayerName_);
     ~SymbolBucket() override;
@@ -98,10 +78,10 @@ private:
             const size_t index);
     bool anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor);
     std::map<std::u32string, std::vector<Anchor>> compareText;
-    
+
     void addToDebugBuffers(CollisionTile &collisionTile);
 
-    void swapRenderData() override;
+    void swapRenderable() override;
 
     // Adds placed items to the buffer.
     template <typename Buffer, typename GroupType>
@@ -118,7 +98,6 @@ public:
     bool iconsNeedLinear = false;
 
 private:
-
     const float overscaling;
     const float zoom;
     const uint32_t tileSize;
@@ -131,27 +110,8 @@ private:
     std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 
-    struct SymbolRenderData {
-        struct TextBuffer {
-            TextVertexBuffer vertices;
-            TriangleElementsBuffer triangles;
-            std::vector<std::unique_ptr<TextElementGroup>> groups;
-        } text;
-
-        struct IconBuffer {
-            IconVertexBuffer vertices;
-            TriangleElementsBuffer triangles;
-            std::vector<std::unique_ptr<IconElementGroup>> groups;
-        } icon;
-
-        struct CollisionBoxBuffer {
-            CollisionBoxVertexBuffer vertices;
-            std::vector<std::unique_ptr<CollisionBoxElementGroup>> groups;
-        } collisionBox;
-    };
-
-    std::unique_ptr<SymbolRenderData> renderData;
-    std::unique_ptr<SymbolRenderData> renderDataInProgress;
+    std::unique_ptr<SymbolRenderable> renderable;
+    std::unique_ptr<SymbolRenderable> renderableInProgress;
 };
 
 } // namespace mbgl

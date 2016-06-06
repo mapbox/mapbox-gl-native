@@ -107,7 +107,7 @@ TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
 std::unique_ptr<CollisionTile> TileWorker::placeLayers(const PlacementConfig config) {
     auto collisionTile = redoPlacement(&placementPending, config);
     for (auto &p : placementPending) {
-        p.second->swapRenderData();
+        p.second->swapRenderable();
         insertBucket(p.first, std::move(p.second));
     }
     placementPending.clear();
