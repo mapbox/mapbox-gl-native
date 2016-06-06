@@ -28,8 +28,6 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        selectAnimatorResource(in.readInt());
-        deselectAnimatorResource(in.readInt());
         rotation(in.readInt());
         visible(in.readByte() != 0);
         if (in.readByte() != 0) {
@@ -61,8 +59,6 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getSelectAnimRes());
-        out.writeInt(getDeselectAnimRes());
         out.writeInt(getRotation());
         out.writeByte((byte) (isVisible() ? 1 : 0));
         Icon icon = getIcon();

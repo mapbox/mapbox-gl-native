@@ -9,7 +9,7 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,TextMarkerViewOptions> {
+public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView, TextMarkerViewOptions> {
 
     private String text;
 
@@ -23,8 +23,6 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        selectAnimatorResource(in.readInt());
-        deselectAnimatorResource(in.readInt());
         rotation(in.readInt());
         if (in.readByte() != 0) {
             // this means we have an icon
@@ -56,8 +54,6 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getSelectAnimRes());
-        out.writeInt(getDeselectAnimRes());
         out.writeInt(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));

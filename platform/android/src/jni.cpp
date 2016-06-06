@@ -738,27 +738,19 @@ jlong nativeAddMarker(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jn
     return nativeMapView->getMap().addPointAnnotation(mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), id));
 }
 
-void nativeUpdateMarker(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* marker) {
+void nativeUpdateMarker(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong markerId, jdouble lat, jdouble lon, jni::jstring* jid) {
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeUpdateMarker");
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
 
-    jlong markerId = jni::GetField<jlong>(*env, marker, *markerIdId);
     if (markerId == -1) {
         return;
     }
 
-    jni::jobject* position = jni::GetField<jni::jobject*>(*env, marker, *markerPositionId);
-    jni::jobject* icon = jni::GetField<jni::jobject*>(*env, marker, *markerIconId);
-
-    jni::jstring* jid = reinterpret_cast<jni::jstring*>(jni::GetField<jni::jobject*>(*env, icon, *iconIdId));
     std::string iconId = std_string_from_jstring(env, jid);
 
-    jdouble latitude = jni::GetField<jdouble>(*env, position, *latLngLatitudeId);
-    jdouble longitude = jni::GetField<jdouble>(*env, position, *latLngLongitudeId);
-
     // Because Java only has int, not unsigned int, we need to bump the annotation id up to a long.
-    nativeMapView->getMap().updatePointAnnotation(markerId, mbgl::PointAnnotation(mbgl::LatLng(latitude, longitude), iconId));
+    nativeMapView->getMap().updatePointAnnotation(markerId, mbgl::PointAnnotation(mbgl::LatLng(lat, lon), iconId));
 }
 
 jni::jarray<jlong>* nativeAddMarkers(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jobject* jlist) {
@@ -1853,7 +1845,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddPolylines, "(JLjava/util/List;)[J"),
         MAKE_NATIVE_METHOD(nativeAddPolygon, "(JLcom/mapbox/mapboxsdk/annotations/Polygon;)J"),
         MAKE_NATIVE_METHOD(nativeAddPolygons, "(JLjava/util/List;)[J"),
-        MAKE_NATIVE_METHOD(nativeUpdateMarker, "(JLcom/mapbox/mapboxsdk/annotations/Marker;)V"),
+        MAKE_NATIVE_METHOD(nativeUpdateMarker, "(JJDDLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveAnnotation, "(JJ)V"),
         MAKE_NATIVE_METHOD(nativeRemoveAnnotations, "(J[J)V"),
         MAKE_NATIVE_METHOD(nativeGetAnnotationsInBounds, "(JLcom/mapbox/mapboxsdk/geometry/LatLngBounds;)[J"),

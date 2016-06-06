@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -31,16 +32,23 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerOptions;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerView;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerViewOptions;
 import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerView;
 import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerViewOptions;
 
+import java.util.Random;
+
 public class MarkerViewActivity extends AppCompatActivity {
 
     private MapboxMap mMapboxMap;
     private MapView mMapView;
+
+    private MarkerView movingMarkerOne, movingMarkerTwo;
+    private Random randomAnimator = new Random();
+    private Handler locationUpdateHandler = new Handler();
+    private Runnable moveMarkerRunnable = new MoveMarkerRunnable();
+    private int rotation = 0;
 
     private final static LatLng[] LAT_LNGS = new LatLng[]{
             new LatLng(38.897424, -77.036508),
@@ -83,8 +91,6 @@ public class MarkerViewActivity extends AppCompatActivity {
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
                             .icon(usFlag)
-                            .selectAnimatorResource(R.animator.scale_up)
-                            .deselectAnimatorResource(R.animator.scale_down)
                     );
                 }
 
@@ -94,8 +100,6 @@ public class MarkerViewActivity extends AppCompatActivity {
                 options.abbrevName("Mapbox");
                 options.title("Hello");
                 options.position(new LatLng(38.899774, -77.023237));
-                options.selectAnimatorResource(R.animator.rotate_360);
-                options.deselectAnimatorResource(R.animator.rotate_360);
                 options.flat(true);
                 mapboxMap.addMarker(options);
 
@@ -119,6 +123,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                         .position(new LatLng(38.897642, -77.041980))
                 );
 
+                // if you want to customise a ViewMarker you need to extend ViewMarker and provide an adapter implementation
                 // set adapters for child classes of ViewMarker
                 markerViewManager.addMarkerViewAdapter(new CountryAdapter(MarkerViewActivity.this, mapboxMap));
                 markerViewManager.addMarkerViewAdapter(new TextAdapter(MarkerViewActivity.this, mapboxMap));
@@ -143,8 +148,51 @@ public class MarkerViewActivity extends AppCompatActivity {
                         return false;
                     }
                 });
+
+                movingMarkerOne = mMapboxMap.addMarker(new MarkerViewOptions()
+                        .position(CarLocation.CAR_0_LNGS[0])
+                        .icon(IconFactory.getInstance(mMapView.getContext())
+                                .fromResource(R.drawable.ic_chelsea))
+                );
+
+                movingMarkerTwo = mapboxMap.addMarker(new MarkerViewOptions()
+                        .position(CarLocation.CAR_1_LNGS[0])
+                        .icon(IconFactory.getInstance(mMapView.getContext())
+                                .fromResource(R.drawable.ic_arsenal))
+                );
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loopMarkerMove();
+    }
+
+    private void loopMarkerMove() {
+        locationUpdateHandler.postDelayed(moveMarkerRunnable, randomAnimator.nextInt(3000) + 1000);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        locationUpdateHandler.removeCallbacks(moveMarkerRunnable);
+    }
+
+    private class MoveMarkerRunnable implements Runnable {
+        @Override
+        public void run() {
+            int i = randomAnimator.nextInt(9);
+            if (randomAnimator.nextInt() % 2 == 0) {
+                movingMarkerOne.setPosition(CarLocation.CAR_0_LNGS[i]);
+                movingMarkerOne.setRotation(rotation = rotation + 45);
+            } else {
+                movingMarkerTwo.setPosition(CarLocation.CAR_1_LNGS[i]);
+                movingMarkerTwo.setRotation(rotation = rotation + 90);
+            }
+            loopMarkerMove();
+        }
     }
 
     private static class CountryAdapter extends MapboxMap.MarkerViewAdapter<CountryMarkerView> {
@@ -352,5 +400,33 @@ public class MarkerViewActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private static class CarLocation {
+
+        public static LatLng[] CAR_0_LNGS = new LatLng[]{
+                new LatLng(38.92334425495122, -77.0533673443786),
+                new LatLng(38.9234737236897, -77.05389484528261),
+                new LatLng(38.9257094658146, -76.98819752280579),
+                new LatLng(38.8324328369647, -77.00690648325929),
+                new LatLng(38.87540698725855, -77.0093148713099),
+                new LatLng(38.96499498141065, -77.07707916040054),
+                new LatLng(38.90794910679896, -76.99695304153806),
+                new LatLng(38.86234025281626, -76.9950528034839),
+                new LatLng(38.862930274733635, -76.99647808241964)
+        };
+
+        public static LatLng[] CAR_1_LNGS = new LatLng[]{
+                new LatLng(38.94237975070426, -76.98324549005675),
+                new LatLng(38.941520236084486, -76.98234257804742),
+                new LatLng(38.85972219720714, -76.98955808483929),
+                new LatLng(38.944289166113776, -76.98584257252891),
+                new LatLng(38.94375860578053, -76.98470344318412),
+                new LatLng(38.943167431929645, -76.98373163938666),
+                new LatLng(38.882834728904605, -77.02862535635137),
+                new LatLng(38.882869724926245, -77.02992539231113),
+                new LatLng(38.9371988177896, -76.97786740676564)
+        };
+
     }
 }

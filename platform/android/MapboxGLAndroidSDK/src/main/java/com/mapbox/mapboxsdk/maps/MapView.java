@@ -445,6 +445,7 @@ public class MapView extends FrameLayout {
                             callback.onMapReady(mMapboxMap);
                             iterator.remove();
                         }
+                        mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
@@ -672,11 +673,11 @@ public class MapView extends FrameLayout {
         return mContentPaddingBottom;
     }
 
-    int getContentWidth(){
+    int getContentWidth() {
         return getWidth() - mContentPaddingLeft - mContentPaddingRight;
     }
 
-    int getContentHeight(){
+    int getContentHeight() {
         return getHeight() - mContentPaddingBottom - mContentPaddingTop;
     }
 
@@ -993,7 +994,10 @@ public class MapView extends FrameLayout {
             Log.w(MapboxConstants.TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
         }
 
-        ensureIconLoaded(updatedMarker);
+        if (!(updatedMarker instanceof MarkerView)) {
+            ensureIconLoaded(updatedMarker);
+        }
+
         mNativeMapView.updateMarker(updatedMarker);
     }
 
@@ -1021,7 +1025,7 @@ public class MapView extends FrameLayout {
     }
 
     long addMarker(@NonNull Marker marker) {
-        if(mDestroyed){
+        if (mDestroyed) {
             return 0l;
         }
         return mNativeMapView.addMarker(marker);

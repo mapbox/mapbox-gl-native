@@ -1,15 +1,12 @@
 package com.mapbox.mapboxsdk.testapp.model.annotations;
 
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.PointF;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarkerView, CountryMarkerViewOptions> {
@@ -27,8 +24,6 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        selectAnimatorResource(in.readInt());
-        deselectAnimatorResource(in.readInt());
         rotation(in.readInt());
         if (in.readByte() != 0) {
             // this means we have an icon
@@ -61,10 +56,8 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getSelectAnimRes());
-        out.writeInt(getDeselectAnimRes());
         out.writeInt(getRotation());
-        out.writeByte((byte) (selected ? 1 :0));
+        out.writeByte((byte) (selected ? 1 : 0));
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
