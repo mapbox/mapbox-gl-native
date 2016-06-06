@@ -20,6 +20,7 @@ FOUNDATION_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLMapView.h"
 #import "MGLMapView+IBAdditions.h"
 #import "MGLMapView+MGLCustomStyleLayerAdditions.h"
+#import "MGLMapViewDelegate.h"
 #import "MGLMultiPoint.h"
 #import "MGLOfflinePack.h"
 #import "MGLOfflineRegion.h"
