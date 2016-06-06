@@ -1826,7 +1826,7 @@ public class MapboxMap {
         public MarkerViewAdapter(Context context) {
             this.context = context;
             persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            mViewReusePool = new Pools.SimplePool<>(20);
+            mViewReusePool = new Pools.SimplePool<>(10000);
         }
 
         /**
