@@ -110,5 +110,7 @@ T smoothstep(T edge0, T edge1, T x) {
 // (== number of bits required to store x)
 uint32_t ceil_log2(uint64_t x);
 
+double log2(double x);
+
 } // namespace util
 } // namespace mbgl
