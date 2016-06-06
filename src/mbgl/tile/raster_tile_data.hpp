@@ -7,18 +7,20 @@ namespace mbgl {
 
 class RasterTileSource;
 class AsyncRequest;
+class Tileset;
 
 namespace gl { class TexturePool; }
 
 namespace style {
 class Layer;
+class UpdateParameters;
 }
 
 class RasterTileData : public TileData {
 public:
     RasterTileData(const OverscaledTileID&,
-                   gl::TexturePool&,
-                   Worker&);
+                   const style::UpdateParameters&,
+                   const Tileset&);
     ~RasterTileData();
 
     void setError(std::exception_ptr err);

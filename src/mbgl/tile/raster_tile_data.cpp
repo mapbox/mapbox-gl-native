@@ -1,6 +1,8 @@
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/update_parameters.hpp>
 #include <mbgl/tile/tile_data_observer.hpp>
+#include <mbgl/tile/image_tile_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -10,11 +12,17 @@
 using namespace mbgl;
 
 RasterTileData::RasterTileData(const OverscaledTileID& id_,
-                               gl::TexturePool& texturePool_,
-                               Worker& worker_)
+                               const style::UpdateParameters& parameters,
+                               const Tileset& tileset)
     : TileData(id_),
-      texturePool(texturePool_),
-      worker(worker_) {
+      texturePool(parameters.texturePool),
+      worker(parameters.worker) {
+    assert(!tileset.tiles.empty());
+    const auto resource = Resource::tile(
+        tileset.tiles.at(0), parameters.pixelRatio, id_.canonical.x,
+        id_.canonical.y, id_.canonical.z);
+    setTileSource(
+        std::make_unique<ImageTileSource>(*this, resource, parameters.fileSource));
 }
 
 void RasterTileData::setError(std::exception_ptr err) {

@@ -2,6 +2,7 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/tile/tile.hpp>
+#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -18,11 +19,6 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
-
-#include <mbgl/tile/vector_tile_source.hpp>
-#include <mbgl/tile/geojson_tile_source.hpp>
-#include <mbgl/tile/annotation_tile_source.hpp>
-#include <mbgl/tile/image_tile_source.hpp>
 
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/tile/annotation_tile_data.hpp>
@@ -194,49 +190,13 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
                                              const UpdateParameters& parameters) {
     // If we don't find working tile data, we're just going to load it.
     if (type == SourceType::Raster) {
-        assert(!tileset->tiles.empty());
-        const auto resource = Resource::tile(
-            tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
-            overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-        auto data = std::make_unique<RasterTileData>(overscaledTileID, parameters.texturePool,
-                                                     parameters.worker);
-        data->setTileSource(
-            std::make_unique<ImageTileSource>(*data, resource, parameters.fileSource));
-
-        // Need a std::move here to create a std::unique_ptr<TileData> from
-        // std::unique_ptr<GeometryTileData>.
-        return std::move(data);
+        return std::make_unique<RasterTileData>(overscaledTileID, parameters, *tileset);
     } else if (type == SourceType::Vector) {
-        assert(!tileset->tiles.empty());
-        const auto resource = Resource::tile(
-            tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
-            overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-        auto data = std::make_unique<VectorTileData>(overscaledTileID, id, parameters.style,
-                                                       parameters.mode);
-        data->setTileSource(
-            std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
-
-        // Need a std::move here to create a std::unique_ptr<TileData> from
-        // std::unique_ptr<GeometryTileData>.
-        return std::move(data);
+        return std::make_unique<VectorTileData>(overscaledTileID, id, parameters, *tileset);
     } else if (type == SourceType::Annotations) {
-        auto data = std::make_unique<AnnotationTileData>(overscaledTileID, id, parameters.style,
-                                                       parameters.mode);
-        data->setTileSource(std::make_unique<AnnotationTileSource>(
-            *data, overscaledTileID, parameters.annotationManager));
-
-        // Need a std::move here to create a std::unique_ptr<TileData> from
-        // std::unique_ptr<GeometryTileData>.
-        return std::move(data);
+        return std::make_unique<AnnotationTileData>(overscaledTileID, id, parameters);
     } else if (type == SourceType::GeoJSON) {
-        auto data = std::make_unique<GeoJSONTileData>(overscaledTileID, id, parameters.style,
-                                                       parameters.mode);
-        data->setTileSource(
-            std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
-
-        // Need a std::move here to create a std::unique_ptr<TileData> from
-        // std::unique_ptr<GeometryTileData>.
-        return std::move(data);
+        return std::make_unique<GeoJSONTileData>(overscaledTileID, id, parameters, geojsonvt.get());
     } else {
         Log::Warning(Event::Style, "Source type '%s' is not implemented",
                      SourceTypeClass(type).c_str());

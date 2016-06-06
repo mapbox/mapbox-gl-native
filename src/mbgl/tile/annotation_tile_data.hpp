@@ -4,9 +4,15 @@
 
 namespace mbgl {
 
+namespace style {
+class UpdateParameters;
+}
+
 class AnnotationTileData : public GeometryTileData {
 public:
-    using GeometryTileData::GeometryTileData;
+    AnnotationTileData(const OverscaledTileID&,
+                       std::string sourceID,
+                       const style::UpdateParameters&);
 };
 
 } // namespace mbgl

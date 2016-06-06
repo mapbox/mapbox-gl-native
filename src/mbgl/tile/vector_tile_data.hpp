@@ -4,9 +4,18 @@
 
 namespace mbgl {
 
+class Tileset;
+
+namespace style {
+class UpdateParameters;
+}
+
 class VectorTileData : public GeometryTileData {
 public:
-    using GeometryTileData::GeometryTileData;
+    VectorTileData(const OverscaledTileID&,
+                   std::string sourceID,
+                   const style::UpdateParameters&,
+                   const Tileset&);
 };
 
 } // namespace mbgl
