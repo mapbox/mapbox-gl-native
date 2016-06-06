@@ -154,4 +154,9 @@
 
     <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently Located</string>
 
+    <string name="dynamic_marker_chelsea_title">Chelsea</string>
+    <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
+    <string name="dynamic_marker_arsenal_title">Arsenal</string>
+    <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
+
 </resources>

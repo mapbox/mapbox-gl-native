@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.annotations;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -91,8 +90,9 @@ public class Marker extends Annotation {
         }
     }
 
-    void setSnippet(String snippet) {
+    public void setSnippet(String snippet) {
         this.snippet = snippet;
+        refreshInfoWindowContent();
     }
 
     /**
@@ -112,8 +112,25 @@ public class Marker extends Annotation {
         return icon;
     }
 
-    void setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
+        refreshInfoWindowContent();
+    }
+
+    /**
+     * Update only for default Marker's InfoWindow content for Title and Snippet
+     */
+    private void refreshInfoWindowContent() {
+        if (isInfoWindowShown() && mapView != null  && mapboxMap != null && mapboxMap.getInfoWindowAdapter() == null) {
+            InfoWindow infoWindow = getInfoWindow(mapView);
+            if (mapView.getContext() != null) {
+                infoWindow.adaptDefaultMarker(this, mapboxMap, mapView);
+            }
+            MapboxMap map = getMapboxMap();
+            if (map != null) {
+                map.updateMarker(this);
+            }
+        }
     }
 
     /**
@@ -121,6 +138,7 @@ public class Marker extends Annotation {
      */
     public InfoWindow showInfoWindow(@NonNull MapboxMap mapboxMap, @NonNull MapView mapView) {
         setMapboxMap(mapboxMap);
+        setMapView(mapView);
         MapboxMap.InfoWindowAdapter infoWindowAdapter = getMapboxMap().getInfoWindowAdapter();
         if (infoWindowAdapter != null) {
             // end developer is using a custom InfoWindowAdapter
