@@ -165,7 +165,7 @@ public class MarkerViewManager {
     /**
      * Animate a MarkerView to a deselected state.
      * <p>
-     * The {@link ImageMarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onDeselect(MarkerView, View)} will be called to execute an animation.
      * </p>
      *
      * @param marker the MarkerView to deselect
@@ -181,6 +181,11 @@ public class MarkerViewManager {
         }
     }
 
+    /**
+     * Animate a MarkerView to a selected state.
+     *
+     * @param marker the MarkerView object to select
+     */
     public void select(@NonNull MarkerView marker) {
         final View convertView = markerViewMap.get(marker);
         for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
@@ -190,6 +195,15 @@ public class MarkerViewManager {
         }
     }
 
+    /**
+     * Animate a MarkerView to a selected state.
+     * <p>
+     * The {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter#onSelect(MarkerView, View, boolean)} will be called to execute an animation.
+     * </p>
+     * @param marker the MarkerView object to select
+     * @param convertView the View presentation of the MarkerView
+     * @param adapter the adapter used to adapt the marker to the convertView
+     */
     public void select(@NonNull MarkerView marker, View convertView, MapboxMap.MarkerViewAdapter adapter) {
         if (convertView != null) {
             if (adapter.onSelect(marker, convertView, false)) {
@@ -197,6 +211,20 @@ public class MarkerViewManager {
             }
             marker.setSelected(true);
         }
+    }
+
+    /**
+     * Get view representation from a MarkerView.
+     * <p>
+     * If marker is not found in current viewport, null is returned.
+     * </p>
+     *
+     * @param marker the marker to get the view for
+     * @return the android SDK View object
+     */
+    @Nullable
+    public View getView(MarkerView marker) {
+        return markerViewMap.get(marker);
     }
 
     /**
@@ -367,6 +395,9 @@ public class MarkerViewManager {
         }
     }
 
+    /**
+     * Default MarkerViewAdapter used for base class of MarkerView to adapt a MarkerView to an ImageView
+     */
     public static class ImageMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<MarkerView> {
 
         private LayoutInflater inflater;
