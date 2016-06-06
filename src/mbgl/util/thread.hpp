@@ -6,6 +6,7 @@
 #include <utility>
 #include <functional>
 
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/platform/platform.hpp>

@@ -2,6 +2,7 @@
 
 #include <mbgl/map/mode.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/ptr.hpp>
@@ -12,7 +13,6 @@
 #include <memory>
 #include <mutex>
 #include <list>
-#include <atomic>
 #include <unordered_map>
 
 namespace mbgl {
@@ -47,7 +47,7 @@ public:
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
-               const std::atomic<bool>&,
+               const util::Atomic<bool>&,
                const MapMode);
     ~TileWorker();
 
@@ -72,7 +72,7 @@ private:
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;
     GlyphStore& glyphStore;
-    const std::atomic<bool>& obsolete;
+    const util::Atomic<bool>& obsolete;
     const MapMode mode;
 
     bool partialParse = false;

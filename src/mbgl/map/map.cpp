@@ -518,7 +518,7 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
         scaleY -= (padding->top + padding->bottom) / height;
     }
     double minScale = ::fmin(scaleX, scaleY);
-    double zoom = ::log2(getScale() * minScale);
+    double zoom = util::log2(getScale() * minScale);
     zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.

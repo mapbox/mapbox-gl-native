@@ -2,10 +2,9 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
-
-#include <atomic>
 
 #define BUFFER_OFFSET_0  ((GLbyte*)nullptr)
 #define BUFFER_OFFSET(i) ((BUFFER_OFFSET_0) + (i))
@@ -47,7 +46,7 @@ public:
     virtual void swapRenderData() {}
 
 protected:
-    std::atomic<bool> uploaded;
+    util::Atomic<bool> uploaded;
 
 };
 
