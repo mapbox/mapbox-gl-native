@@ -209,32 +209,44 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
         // Need a std::move here to create a std::unique_ptr<TileData> from
         // std::unique_ptr<GeometryTileData>.
         return std::move(data);
-    } else {
+    } else if (type == SourceType::Vector) {
+        assert(!tileset->tiles.empty());
+        const auto resource = Resource::tile(
+            tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
+            overscaledTileID.canonical.y, overscaledTileID.canonical.z);
         auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
                                                        parameters.mode);
         data->setObserver(this);
-        if (type == SourceType::Vector) {
-            assert(!tileset->tiles.empty());
-            const auto resource = Resource::tile(
-                tileset->tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
-                overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-            data->setTileSource(
-                std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
-        } else if (type == SourceType::Annotations) {
-            data->setTileSource(std::make_unique<AnnotationTileSource>(
-                *data, overscaledTileID, parameters.annotationManager));
-        } else if (type == SourceType::GeoJSON) {
-            data->setTileSource(
-                std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
-        } else {
-            Log::Warning(Event::Style, "Source type '%s' is not implemented",
-                         SourceTypeClass(type).c_str());
-            return nullptr;
-        }
+        data->setTileSource(
+            std::make_unique<VectorTileSource>(*data, resource, parameters.fileSource));
 
         // Need a std::move here to create a std::unique_ptr<TileData> from
         // std::unique_ptr<GeometryTileData>.
         return std::move(data);
+    } else if (type == SourceType::Annotations) {
+        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+                                                       parameters.mode);
+        data->setObserver(this);
+        data->setTileSource(std::make_unique<AnnotationTileSource>(
+            *data, overscaledTileID, parameters.annotationManager));
+
+        // Need a std::move here to create a std::unique_ptr<TileData> from
+        // std::unique_ptr<GeometryTileData>.
+        return std::move(data);
+    } else if (type == SourceType::GeoJSON) {
+        auto data = std::make_unique<GeometryTileData>(overscaledTileID, id, parameters.style,
+                                                       parameters.mode);
+        data->setObserver(this);
+        data->setTileSource(
+            std::make_unique<GeoJSONTileSource>(*data, geojsonvt.get(), overscaledTileID));
+
+        // Need a std::move here to create a std::unique_ptr<TileData> from
+        // std::unique_ptr<GeometryTileData>.
+        return std::move(data);
+    } else {
+        Log::Warning(Event::Style, "Source type '%s' is not implemented",
+                     SourceTypeClass(type).c_str());
+        return nullptr;
     }
 }
 
