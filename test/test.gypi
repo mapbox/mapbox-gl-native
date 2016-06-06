@@ -18,7 +18,6 @@
       ],
 
       'sources': [
-        'util/assert.cpp',
         'util/async_task.cpp',
         'util/geo.cpp',
         'util/image.cpp',

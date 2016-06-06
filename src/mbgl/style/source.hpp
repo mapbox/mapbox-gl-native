@@ -4,7 +4,6 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/renderer/renderable.hpp>
 
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
