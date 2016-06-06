@@ -2,9 +2,6 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/annotation/annotation_tile.hpp>
-#include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
