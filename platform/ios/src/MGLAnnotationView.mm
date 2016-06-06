@@ -10,8 +10,7 @@
 @interface MGLAnnotationView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
-@property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
-@property (nonatomic, readwrite) CATransform3D lastAppliedRotateTransform;
+@property (nonatomic, readwrite) CATransform3D lastAppliedTransform;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -41,7 +40,7 @@
 }
 
 - (void)commonInitWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
-    _lastAppliedScaleTransform = CATransform3DIdentity;
+    _lastAppliedTransform = CATransform3DIdentity;
     _annotation = annotation;
     _reuseIdentifier = [reuseIdentifier copy];
     _scalesWithViewingDistance = YES;
@@ -139,20 +138,31 @@
 - (void)updateTransform
 {
     if (self.dragState == MGLAnnotationViewDragStateDragging) return;
-
-    CATransform3D t = CATransform3DIdentity;
+    
+    // We keep track of each viewing distance scale transform that we apply. Each iteration,
+    // we can account for it so that we don't get cumulative scaling every time we move.
+    // We also avoid clobbering any existing transform passed in by the client, too.
+    CATransform3D undoOfLastScaleTransform = CATransform3DInvert(_lastAppliedTransform);
+    
+    CATransform3D freeTransform = CATransform3DIdentity;
     MGLMapCamera *camera = self.mapView.camera;
     if (camera.pitch >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisX))
     {
-        t = CATransform3DRotate(t, MGLRadiansFromDegrees(camera.pitch), 1.0, 0, 0);
+        // https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/CoreAnimation_guide/AdvancedAnimationTricks/AdvancedAnimationTricks.html#//apple_ref/doc/uid/TP40004514-CH8-SW13
+        // FIXME: This is a rough, eyeballed value. Replace this transform with one derived from mbgl::TransformState::coordinatePointMatrix().
+        CGRect superBounds = self.superview.bounds;
+        freeTransform.m34 = -1.0 / (1000 - CGRectGetWidth(superBounds));
+        
+        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(camera.pitch), 1.0, 0, 0);
     }
     if (camera.heading >= 0 && (self.freeAxes & MGLAnnotationViewBillboardAxisY))
     {
-        t = CATransform3DRotate(t, MGLRadiansFromDegrees(-camera.heading), 0.0, 0.0, 1.0);
+        freeTransform = CATransform3DRotate(freeTransform, MGLRadiansFromDegrees(-camera.heading), 0.0, 0.0, 1.0);
     }
     
+    CATransform3D scaleTransform = CATransform3DIdentity;
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
-    if ( ! self.scalesWithViewingDistance && superviewHeight > 0.0) {
+    if (self.scalesWithViewingDistance && superviewHeight > 0.0) {
         // Find the maximum amount of scale reduction to apply as the view's center moves from the top
         // of the superview to the bottom. For example, if this view's center has moved 25% of the way
         // from the top of the superview towards the bottom then the maximum scale reduction is 1 - .25
@@ -172,16 +182,12 @@
         // map view is 50% pitched then the annotation view should be reduced by 37.5% (.75 * .5). The
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
-
-        // We keep track of each viewing distance scale transform that we apply. Each iteration,
-        // we can account for it so that we don't get cumulative scaling every time we move.
-        // We also avoid clobbering any existing transform passed in by the client, too.
-        CATransform3D undoOfLastScaleTransform = CATransform3DInvert(_lastAppliedScaleTransform);
-        CATransform3D newScaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
-        CATransform3D effectiveTransform = CATransform3DConcat(undoOfLastScaleTransform, newScaleTransform);
-        self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
-        _lastAppliedScaleTransform = newScaleTransform;
+        scaleTransform = CATransform3DMakeScale(pitchAdjustedScale, pitchAdjustedScale, 1);
     }
+    
+    CATransform3D effectiveTransform = CATransform3DConcat(freeTransform, scaleTransform);
+    self.layer.transform = CATransform3DConcat(self.layer.transform, CATransform3DConcat(undoOfLastScaleTransform, effectiveTransform));
+    _lastAppliedTransform = effectiveTransform;
 }
 
 #pragma mark - Draggable
