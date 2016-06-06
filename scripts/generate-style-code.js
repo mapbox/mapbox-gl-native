@@ -46,6 +46,11 @@ global.propertyType = function (property) {
 }
 
 global.defaultValue = function (property) {
+  // https://github.com/mapbox/mapbox-gl-native/issues/5258
+  if (property.name === 'line-round-limit') {
+    return 1;
+  }
+
   switch (property.type) {
   case 'number':
     return property.default;
