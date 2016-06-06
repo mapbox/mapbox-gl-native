@@ -1,10 +1,12 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
@@ -76,7 +78,7 @@ public class MarkerView extends Marker {
      * @param u u-coordinate of the anchor, as a ratio of the image width (in the range [0, 1])
      * @param v v-coordinate of the anchor, as a ratio of the image height (in the range [0, 1])
      */
-    public void setAnchor(float u, float v) {
+    public void setAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
     }
@@ -154,7 +156,7 @@ public class MarkerView extends Marker {
      * @param v v-coordinate of the info window anchor, as a ratio of the image height (in the range [0, 1])
      * @see #setAnchor(float, float) for more details.
      */
-    public void setInfoWindowAnchor(float u, float v) {
+    public void setInfoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.infoWindowAnchorU = u;
         this.infoWindowAnchorV = v;
     }
@@ -209,7 +211,7 @@ public class MarkerView extends Marker {
      *
      * @param tiltValue the tilted value to set
      */
-    void setTilt(float tiltValue) {
+    void setTilt(@FloatRange(from = 0.0, to = MapboxConstants.MAXIMUM_TILT) float tiltValue) {
         this.tiltValue = tiltValue;
     }
 
@@ -277,7 +279,7 @@ public class MarkerView extends Marker {
      *
      * @param alpha the alpha value to animate to
      */
-    public void setAlpha(float alpha) {
+    public void setAlpha(@FloatRange(from=0.0, to=255.0)float alpha) {
         this.alpha = alpha;
         if (markerViewManager != null) {
             markerViewManager.animateAlpha(this, alpha);

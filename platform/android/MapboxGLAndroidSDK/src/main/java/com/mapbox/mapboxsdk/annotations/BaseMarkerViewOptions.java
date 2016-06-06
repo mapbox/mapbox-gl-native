@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.os.Parcelable;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -97,7 +98,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param v the v-value
      * @return the object for which the method was called
      */
-    public T anchor(float u, float v) {
+    public T anchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
         return getThis();
@@ -110,7 +111,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param v the v-values
      * @return the object for which the method was called
      */
-    public T infoWindowAnchor(float u, float v) {
+    public T infoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.infoWindowAnchorU = u;
         this.infoWindowAnchorV = v;
         return getThis();
