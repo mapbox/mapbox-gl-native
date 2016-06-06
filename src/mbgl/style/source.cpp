@@ -190,10 +190,6 @@ const std::map<UnwrappedTileID, Tile>& Source::getTiles() const {
 
 std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledTileID,
                                              const UpdateParameters& parameters) {
-    if (auto data = cache.get(overscaledTileID)) {
-        return data;
-    }
-
     // If we don't find working tile data, we're just going to load it.
     if (type == SourceType::Raster) {
         assert(!tileset->tiles.empty());
@@ -297,7 +293,11 @@ bool Source::update(const UpdateParameters& parameters) {
         return getTileData(dataTileID);
     };
     auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
-        if (auto data = createTile(dataTileID, parameters)) {
+        std::unique_ptr<TileData> data = cache.get(dataTileID);
+        if (!data) {
+            data = createTile(dataTileID, parameters);
+        }
+        if (data) {
             return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
         } else {
             return nullptr;
