@@ -23,8 +23,8 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         title(in.readString());
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
-        infoWindowAnchor(in.readFloat(), in.readFloat());
-        rotation(in.readInt());
+        selected = in.readByte() != 0;
+        rotation(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -56,8 +56,8 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getRotation());
         out.writeByte((byte) (selected ? 1 : 0));
+        out.writeFloat(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {

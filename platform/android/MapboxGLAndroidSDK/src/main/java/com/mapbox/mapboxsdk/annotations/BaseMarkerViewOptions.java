@@ -25,7 +25,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected float anchorV = 1f;
     protected float infoWindowAnchorU = 0.5f;
     protected float infoWindowAnchorV = 0.0f;
-    protected int rotation;
+    protected float rotation;
     protected boolean visible = true;
     protected boolean selected;
 
@@ -122,7 +122,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param rotation the rotation value
      * @return the object for which the method was called
      */
-    public T rotation(int rotation) {
+    public T rotation(float rotation) {
         this.rotation = rotation;
         return getThis();
     }
@@ -224,7 +224,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      *
      * @return the rotation value
      */
-    public int getRotation() {
+    public float getRotation() {
         return rotation;
     }
 

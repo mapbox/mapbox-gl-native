@@ -23,7 +23,7 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        rotation(in.readInt());
+        rotation(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -54,7 +54,7 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getRotation());
+        out.writeFloat(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
