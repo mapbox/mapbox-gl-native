@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  The center point (specified as a map coordinate) of the annotation. (required)
  (read-only)
  */
-@property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
+@property (nonatomic, readwrite) CLLocationCoordinate2D coordinate;
 
 @optional
 
