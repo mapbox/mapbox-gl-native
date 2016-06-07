@@ -18,14 +18,14 @@ struct TextureReleaser {
     void operator()(GLuint) const;
 };
 
-using SharedTexture = std_experimental::unique_resource<GLuint, TextureReleaser>;
+using PooledTexture = std_experimental::unique_resource<GLuint, TextureReleaser>;
 
 class TexturePool : private util::noncopyable {
 public:
     TexturePool();
     ~TexturePool();
 
-    SharedTexture acquireTexture(gl::ObjectStore&);
+    PooledTexture acquireTexture(gl::ObjectStore&);
 
 private:
     friend TextureReleaser;

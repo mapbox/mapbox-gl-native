@@ -34,7 +34,7 @@ public:
     GLsizei height = 0;
 
     // GL buffer object handle.
-    mbgl::optional<gl::SharedTexture> texture;
+    mbgl::optional<gl::PooledTexture> texture;
 
     // texture opacity
     double opacity = 0;

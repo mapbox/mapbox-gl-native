@@ -67,8 +67,8 @@ TexturePool::TexturePool() : impl(std::make_unique<Impl>()) {
 TexturePool::~TexturePool() {
 }
 
-SharedTexture TexturePool::acquireTexture(gl::ObjectStore& store) {
-    return SharedTexture { impl->acquireTexture(store) , { this } };
+PooledTexture TexturePool::acquireTexture(gl::ObjectStore& store) {
+    return PooledTexture { impl->acquireTexture(store) , { this } };
 }
 
 } // namespace gl
