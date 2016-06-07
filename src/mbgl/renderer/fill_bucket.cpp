@@ -104,13 +104,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
 }
 
 void FillBucket::upload(gl::ObjectStore& store) {
-    if (renderable) {
-        renderable->vertexBuffer.upload(store);
-        renderable->triangleElementsBuffer.upload(store);
-        renderable->lineElementsBuffer.upload(store);
-    }
-
-    // From now on, we're going to render during the opaque and translucent pass.
+    renderable->upload(store);
     uploaded = true;
 }
 

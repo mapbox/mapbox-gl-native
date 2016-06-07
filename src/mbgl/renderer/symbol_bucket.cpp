@@ -77,15 +77,7 @@ SymbolRenderable& SymbolBucket::getRenderable() const {
 }
 
 void SymbolBucket::upload(gl::ObjectStore& store) {
-    if (hasTextData()) {
-        renderable->text.vertices.upload(store);
-        renderable->text.triangles.upload(store);
-    }
-    if (hasIconData()) {
-        renderable->icon.vertices.upload(store);
-        renderable->icon.triangles.upload(store);
-    }
-
+    renderable->upload(store);
     uploaded = true;
 }
 

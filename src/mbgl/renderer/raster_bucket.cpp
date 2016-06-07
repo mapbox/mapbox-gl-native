@@ -19,10 +19,7 @@ RasterRenderable& RasterBucket::getRenderable() const {
 }
 
 void RasterBucket::upload(gl::ObjectStore& store) {
-    if (hasData()) {
-        renderable->raster.upload(store);
-    }
-
+    renderable->upload(store);
     uploaded = true;
 }
 

@@ -451,12 +451,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
 }
 
 void LineBucket::upload(gl::ObjectStore& store) {
-    if (renderable) {
-        renderable->vertexBuffer.upload(store);
-        renderable->triangleElementsBuffer.upload(store);
-    }
-
-    // From now on, we're only going to render during the translucent pass.
+    renderable->upload(store);
     uploaded = true;
 }
 

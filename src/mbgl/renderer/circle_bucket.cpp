@@ -26,10 +26,7 @@ CircleRenderable& CircleBucket::getRenderable() const {
 }
 
 void CircleBucket::upload(gl::ObjectStore& store) {
-    if (renderable) {
-        renderable->vertexBuffer.upload(store);
-        renderable->elementsBuffer.upload(store);
-    }
+    renderable->upload(store);
     uploaded = true;
 }
 
