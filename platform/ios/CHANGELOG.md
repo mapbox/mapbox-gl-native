@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone.  Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## master
+## 3.3.0
 
 - Applications linking against the SDK static framework no longer need to add `-ObjC` to the Other Linker Flags (`OTHER_LDFLAGS`) build setting. If you previously added this flag solely for this SDK, removing the flag may potentially reduce the overall size of your application. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
 - Removed the `armv7s` slice from the SDK to reduce its size. iPhone 5 and iPhone 5c automatically use the `armv7` slice instead. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
