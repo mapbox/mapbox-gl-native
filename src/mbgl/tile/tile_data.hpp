@@ -46,7 +46,6 @@ public:
 
     virtual bool parsePending() { return true; }
     virtual void redoPlacement(PlacementConfig) {}
-    virtual void redoPlacement() {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

@@ -39,8 +39,7 @@ public:
 
     bool parsePending() override;
 
-    void redoPlacement(PlacementConfig config) override;
-    void redoPlacement() override;
+    void redoPlacement(PlacementConfig) override;
 
     void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -51,6 +50,8 @@ public:
     void cancel() override;
 
 private:
+    void redoPlacement();
+
     style::Style& style;
     Worker& worker;
     TileWorker tileWorker;
