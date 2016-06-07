@@ -1,6 +1,5 @@
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
 
@@ -16,16 +15,6 @@ TileData::~TileData() = default;
 
 void TileData::setObserver(TileDataObserver* observer_) {
     observer = observer_;
-}
-
-void TileData::setTileSource(std::unique_ptr<TileSource> tileSource_) {
-    assert(!tileSource);
-    assert(tileSource_);
-    tileSource = std::move(tileSource_);
-}
-
-void TileData::setNecessity(Necessity necessity) {
-    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
 }
 
 void TileData::setTriedOptional() {

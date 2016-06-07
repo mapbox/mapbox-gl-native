@@ -10,6 +10,8 @@ class GeoJSONVT;
 
 namespace mbgl {
 
+class TileSource;
+
 namespace style {
 class UpdateParameters;
 }
@@ -20,6 +22,12 @@ public:
                    std::string sourceID,
                    const style::UpdateParameters&,
                    mapbox::geojsonvt::GeoJSONVT*);
+    ~GeoJSONTileData();
+
+    void setNecessity(Necessity) final;
+
+private:
+    std::unique_ptr<TileSource> tileSource;
 };
 
 } // namespace mbgl

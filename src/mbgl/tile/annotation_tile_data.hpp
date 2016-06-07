@@ -4,6 +4,8 @@
 
 namespace mbgl {
 
+class TileSource;
+
 namespace style {
 class UpdateParameters;
 }
@@ -13,6 +15,12 @@ public:
     AnnotationTileData(const OverscaledTileID&,
                        std::string sourceID,
                        const style::UpdateParameters&);
+    ~AnnotationTileData();
+
+    void setNecessity(Necessity) final;
+
+private:
+    std::unique_ptr<TileSource> tileSource;
 };
 
 } // namespace mbgl

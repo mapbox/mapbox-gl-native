@@ -9,9 +9,13 @@ GeoJSONTileData::GeoJSONTileData(const OverscaledTileID& overscaledTileID,
                                  const style::UpdateParameters& parameters,
                                  mapbox::geojsonvt::GeoJSONVT* geojsonvt)
     : GeometryTileData(overscaledTileID, sourceID, parameters.style, parameters.mode) {
-    setTileSource(
-        std::make_unique<GeoJSONTileSource>(*this, geojsonvt, overscaledTileID));
+    tileSource = std::make_unique<GeoJSONTileSource>(*this, geojsonvt, overscaledTileID);
 }
 
+GeoJSONTileData::~GeoJSONTileData() = default;
+
+void GeoJSONTileData::setNecessity(Necessity necessity) {
+    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
+}
 
 } // namespace mbgl

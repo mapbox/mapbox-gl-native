@@ -5,6 +5,7 @@
 namespace mbgl {
 
 class Tileset;
+class TileSource;
 
 namespace style {
 class UpdateParameters;
@@ -16,6 +17,12 @@ public:
                    std::string sourceID,
                    const style::UpdateParameters&,
                    const Tileset&);
+    ~VectorTileData();
+
+    void setNecessity(Necessity) final;
+
+private:
+    std::unique_ptr<TileSource> tileSource;
 };
 
 } // namespace mbgl

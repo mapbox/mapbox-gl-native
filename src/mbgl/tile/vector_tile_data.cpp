@@ -15,8 +15,13 @@ VectorTileData::VectorTileData(const OverscaledTileID& overscaledTileID,
     const auto resource = Resource::tile(
         tileset.tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
         overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-    setTileSource(
-        std::make_unique<VectorTileSource>(*this, resource, parameters.fileSource));
+    tileSource = std::make_unique<VectorTileSource>(*this, resource, parameters.fileSource);
+}
+
+VectorTileData::~VectorTileData() = default;
+
+void VectorTileData::setNecessity(Necessity necessity) {
+    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
 }
 
 } // namespace mbgl

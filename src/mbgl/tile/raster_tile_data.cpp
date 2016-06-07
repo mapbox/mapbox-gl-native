@@ -21,8 +21,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
     const auto resource = Resource::tile(
         tileset.tiles.at(0), parameters.pixelRatio, id_.canonical.x,
         id_.canonical.y, id_.canonical.z);
-    setTileSource(
-        std::make_unique<ImageTileSource>(*this, resource, parameters.fileSource));
+    tileSource = std::make_unique<ImageTileSource>(*this, resource, parameters.fileSource);
 }
 
 void RasterTileData::setError(std::exception_ptr err) {
@@ -66,6 +65,10 @@ RasterTileData::~RasterTileData() {
 
 Bucket* RasterTileData::getBucket(const style::Layer&) {
     return bucket.get();
+}
+
+void RasterTileData::setNecessity(Necessity necessity) {
+    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
 }
 
 void RasterTileData::cancel() {

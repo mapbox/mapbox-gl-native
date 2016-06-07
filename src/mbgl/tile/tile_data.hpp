@@ -19,7 +19,6 @@ namespace mbgl {
 class Worker;
 class DebugBucket;
 class TransformState;
-class TileSource;
 class TileDataObserver;
 
 namespace style {
@@ -38,7 +37,7 @@ public:
         Required = true,
     };
 
-    void setNecessity(Necessity);
+    virtual void setNecessity(Necessity) = 0;
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
@@ -103,9 +102,6 @@ protected:
     };
 
     DataAvailability availableData = DataAvailability::None;
-
-    void setTileSource(std::unique_ptr<TileSource>);
-    std::unique_ptr<TileSource> tileSource;
 
     TileDataObserver* observer = nullptr;
 };

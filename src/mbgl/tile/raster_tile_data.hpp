@@ -8,6 +8,7 @@ namespace mbgl {
 class RasterTileSource;
 class AsyncRequest;
 class Tileset;
+class TileSource;
 
 namespace gl { class TexturePool; }
 
@@ -23,6 +24,8 @@ public:
                    const Tileset&);
     ~RasterTileData();
 
+    void setNecessity(Necessity) final;
+
     void setError(std::exception_ptr err);
 
     void setData(std::shared_ptr<const std::string> data,
@@ -36,6 +39,7 @@ private:
     gl::TexturePool& texturePool;
     Worker& worker;
 
+    std::unique_ptr<TileSource> tileSource;
     std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains the Bucket object for the tile. Buckets are render

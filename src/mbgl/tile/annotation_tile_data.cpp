@@ -8,8 +8,13 @@ AnnotationTileData::AnnotationTileData(const OverscaledTileID& overscaledTileID,
                                        std::string sourceID,
                                        const style::UpdateParameters& parameters)
     : GeometryTileData(overscaledTileID, sourceID, parameters.style, parameters.mode) {
-    setTileSource(std::make_unique<AnnotationTileSource>(
-        *this, overscaledTileID, parameters.annotationManager));
+    tileSource = std::make_unique<AnnotationTileSource>(*this, overscaledTileID, parameters.annotationManager);
+}
+
+AnnotationTileData::~AnnotationTileData() = default;
+
+void AnnotationTileData::setNecessity(Necessity necessity) {
+    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
 }
 
 } // namespace mbgl
