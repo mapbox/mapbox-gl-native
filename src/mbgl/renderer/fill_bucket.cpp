@@ -129,7 +129,7 @@ bool FillBucket::needsClipping() const {
     return true;
 }
 
-void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawFill(PlainShader& shader, gl::ObjectStore& store) {
     if (!renderable) {
         return;
     }
@@ -148,7 +148,7 @@ void FillBucket::drawElements(PlainShader& shader, gl::ObjectStore& store) {
     }
 }
 
-void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawFill(PatternShader& shader, gl::ObjectStore& store) {
     if (!renderable) {
         return;
     }
@@ -167,7 +167,7 @@ void FillBucket::drawElements(PatternShader& shader, gl::ObjectStore& store) {
     }
 }
 
-void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawFillOutline(OutlineShader& shader, gl::ObjectStore& store) {
     if (!renderable) {
         return;
     }
@@ -186,7 +186,7 @@ void FillBucket::drawVertices(OutlineShader& shader, gl::ObjectStore& store) {
     }
 }
 
-void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& store) {
+void FillBucket::drawFillOutline(OutlinePatternShader& shader, gl::ObjectStore& store) {
     if (!renderable) {
         return;
     }

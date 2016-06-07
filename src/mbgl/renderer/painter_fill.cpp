@@ -64,7 +64,7 @@ void Painter::renderFill(FillBucket& bucket,
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawFillOutline(*outlineShader, store);
     }
 
     if (pattern) {
@@ -119,7 +119,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, store);
+            bucket.drawFill(*patternShader, store);
 
             if (properties.fillAntialias && stroke_color == fill_color) {
                 config.program = outlinePatternShader->getID();
@@ -156,7 +156,7 @@ void Painter::renderFill(FillBucket& bucket,
                 spriteAtlas->bind(true, store);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, store);
+                bucket.drawFillOutline(*outlinePatternShader, store);
             }
         }
     } else if (!wireframe) {
@@ -173,7 +173,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, store);
+            bucket.drawFill(*plainShader, store);
         }
     }
 
@@ -194,7 +194,7 @@ void Painter::renderFill(FillBucket& bucket,
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawFillOutline(*outlineShader, store);
     }
 }
 

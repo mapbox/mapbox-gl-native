@@ -26,10 +26,10 @@ public:
 
     void addGeometry(const GeometryCollection&);
 
-    void drawElements(PlainShader&, gl::ObjectStore&);
-    void drawElements(PatternShader&, gl::ObjectStore&);
-    void drawVertices(OutlineShader&, gl::ObjectStore&);
-    void drawVertices(OutlinePatternShader&, gl::ObjectStore&);
+    void drawFill(PlainShader&, gl::ObjectStore&);
+    void drawFill(PatternShader&, gl::ObjectStore&);
+    void drawFillOutline(OutlineShader&, gl::ObjectStore&);
+    void drawFillOutline(OutlinePatternShader&, gl::ObjectStore&);
 
 private:
     std::unique_ptr<FillRenderable> renderable;
