@@ -44,14 +44,6 @@ public:
     }
 
 private:
-    bool isOptional() const {
-        return necessity == Necessity::Optional;
-    }
-
-    bool isRequired() const {
-        return necessity == Necessity::Required;
-    }
-
     // called when the tile is one of the ideal tiles that we want to show definitely. the tile source
     // should try to make every effort (e.g. fetch from internet, or revalidate existing resources).
     void makeRequired();

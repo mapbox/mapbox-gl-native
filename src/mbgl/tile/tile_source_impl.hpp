@@ -34,7 +34,7 @@ TileSource<T>::TileSource(T& tileData_,
     } else {
         // When the FileSource doesn't support optional requests, we do nothing until the
         // data is definitely required.
-        if (isRequired()) {
+        if (necessity == Necessity::Required) {
             loadRequired();
         } else {
             // We're using this field to check whether the pending request is optional or required.
@@ -62,7 +62,7 @@ void TileSource<T>::loadOptional() {
             loadedData(res);
         }
 
-        if (isRequired()) {
+        if (necessity == Necessity::Required) {
             loadRequired();
         }
     });
