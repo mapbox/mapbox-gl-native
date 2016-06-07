@@ -10,7 +10,7 @@ class Response;
 
 template <typename T, typename I>
 class FileBasedTileSource : public T {
-protected:
+public:
     FileBasedTileSource(typename T::data_type&, const Resource&, FileSource&);
     virtual ~FileBasedTileSource() = default;
 

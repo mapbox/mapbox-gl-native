@@ -6,6 +6,7 @@ namespace mbgl {
 
 class Tileset;
 class TileSource;
+class GeometryTile;
 
 namespace style {
 class UpdateParameters;
@@ -20,6 +21,8 @@ public:
     ~VectorTileData();
 
     void setNecessity(Necessity) final;
+
+    static std::unique_ptr<GeometryTile> parseData(std::shared_ptr<const std::string>);
 
 private:
     std::unique_ptr<TileSource> tileSource;
