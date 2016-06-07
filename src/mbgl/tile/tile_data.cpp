@@ -24,6 +24,10 @@ void TileData::setTileSource(std::unique_ptr<TileSource> tileSource_) {
     tileSource = std::move(tileSource_);
 }
 
+void TileData::setNecessity(Necessity necessity) {
+    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
+}
+
 void TileData::setTriedOptional() {
     triedOptional = true;
     observer->onNeedsRepaint();

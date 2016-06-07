@@ -2,7 +2,6 @@
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -244,8 +243,8 @@ bool Source::update(const UpdateParameters& parameters) {
 
     auto retainTileDataFn = [&retain](TileData& tileData, bool required) -> void {
         retain.emplace(tileData.id);
-        tileData.getTileSource()->setNecessity(required ? TileSource::Necessity::Required
-                                                        : TileSource::Necessity::Optional);
+        tileData.setNecessity(required ? TileData::Necessity::Required
+                                       : TileData::Necessity::Optional);
     };
     auto getTileDataFn = [this](const OverscaledTileID& dataTileID) -> TileData* {
         return getTileData(dataTileID);
@@ -288,7 +287,7 @@ bool Source::update(const UpdateParameters& parameters) {
     auto retainIt = retain.begin();
     while (dataIt != tileDataMap.end()) {
         if (retainIt == retain.end() || dataIt->first < *retainIt) {
-            dataIt->second->getTileSource()->setNecessity(TileSource::Necessity::Optional);
+            dataIt->second->setNecessity(TileData::Necessity::Optional);
             cache.add(dataIt->first, std::move(dataIt->second));
             tileDataMap.erase(dataIt++);
         } else {

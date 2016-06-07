@@ -32,8 +32,13 @@ public:
     virtual ~TileData();
 
     void setObserver(TileDataObserver* observer);
-    void setTileSource(std::unique_ptr<TileSource>);
-    TileSource* getTileSource() { return tileSource.get(); }
+
+    enum class Necessity : bool {
+        Optional = false,
+        Required = true,
+    };
+
+    void setNecessity(Necessity);
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
@@ -99,6 +104,7 @@ protected:
 
     DataAvailability availableData = DataAvailability::None;
 
+    void setTileSource(std::unique_ptr<TileSource>);
     std::unique_ptr<TileSource> tileSource;
 
     TileDataObserver* observer = nullptr;
