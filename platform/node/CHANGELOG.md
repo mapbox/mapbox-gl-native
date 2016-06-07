@@ -1,3 +1,7 @@
+# 3.2.2
+
+- Fixes a deleter mismatch in `mbgl::Map::render` ([#5273](https://github.com/mapbox/mapbox-gl-native/pull/5273))
+
 # 3.2.1
 
 - Fixes a memory leak in raster image data ([#5269](https://github.com/mapbox/mapbox-gl-native/pull/5269))
