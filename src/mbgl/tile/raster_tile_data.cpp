@@ -2,9 +2,7 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/file_based_tile_source.hpp>
-#include <mbgl/tile/file_based_tile_source_impl.hpp>
-#include <mbgl/tile/tile_source.hpp>
+#include <mbgl/tile/tile_source_impl.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -19,7 +17,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
     : TileData(id_),
       texturePool(parameters.texturePool),
       worker(parameters.worker),
-      tileSource(std::make_unique<FileBasedTileSource<RasterTileData>>(*this, id_, parameters, tileset)) {
+      tileSource(*this, id_, parameters, tileset) {
 }
 
 void RasterTileData::setError(std::exception_ptr err) {
@@ -66,7 +64,7 @@ Bucket* RasterTileData::getBucket(const style::Layer&) {
 }
 
 void RasterTileData::setNecessity(Necessity necessity) {
-    tileSource->setNecessity(static_cast<TileSource::Necessity>(necessity));
+    tileSource.setNecessity(static_cast<TileSource<RasterTileData>::Necessity>(necessity));
 }
 
 void RasterTileData::cancel() {

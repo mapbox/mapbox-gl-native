@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/tile/file_based_tile_source.hpp>
+#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
@@ -10,11 +10,12 @@
 namespace mbgl {
 
 template <typename T>
-FileBasedTileSource<T>::FileBasedTileSource(T& tileData_,
-                                            const OverscaledTileID& id,
-                                            const style::UpdateParameters& parameters,
-                                            const Tileset& tileset)
+TileSource<T>::TileSource(T& tileData_,
+                          const OverscaledTileID& id,
+                          const style::UpdateParameters& parameters,
+                          const Tileset& tileset)
     : tileData(tileData_),
+      necessity(Necessity::Optional),
       resource(Resource::tile(
         tileset.tiles.at(0),
         parameters.pixelRatio,
@@ -43,7 +44,7 @@ FileBasedTileSource<T>::FileBasedTileSource(T& tileData_,
 }
 
 template <typename T>
-void FileBasedTileSource<T>::loadOptional() {
+void TileSource<T>::loadOptional() {
     assert(!request);
 
     resource.necessity = Resource::Optional;
@@ -68,14 +69,14 @@ void FileBasedTileSource<T>::loadOptional() {
 }
 
 template <typename T>
-void FileBasedTileSource<T>::makeRequired() {
+void TileSource<T>::makeRequired() {
     if (!request) {
         loadRequired();
     }
 }
 
 template <typename T>
-void FileBasedTileSource<T>::makeOptional() {
+void TileSource<T>::makeOptional() {
     if (resource.necessity == Resource::Required && request) {
         // Abort a potential HTTP request.
         request.reset();
@@ -83,7 +84,7 @@ void FileBasedTileSource<T>::makeOptional() {
 }
 
 template <typename T>
-void FileBasedTileSource<T>::loadedData(const Response& res) {
+void TileSource<T>::loadedData(const Response& res) {
     if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
         tileData.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
@@ -100,7 +101,7 @@ void FileBasedTileSource<T>::loadedData(const Response& res) {
 }
 
 template <typename T>
-void FileBasedTileSource<T>::loadRequired() {
+void TileSource<T>::loadRequired() {
     assert(!request);
 
     resource.necessity = Resource::Required;

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_source.hpp>
 
 namespace mbgl {
 
 class Tileset;
-class TileSource;
 class GeometryTile;
 
 namespace style {
@@ -25,7 +25,7 @@ public:
     static std::unique_ptr<GeometryTile> parseData(std::shared_ptr<const std::string>);
 
 private:
-    std::unique_ptr<TileSource> tileSource;
+    TileSource<VectorTileData> tileSource;
 };
 
 } // namespace mbgl

@@ -2,13 +2,12 @@
 
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/tile/tile_source.hpp>
 
 namespace mbgl {
 
-class RasterTileSource;
 class AsyncRequest;
 class Tileset;
-class TileSource;
 
 namespace gl { class TexturePool; }
 
@@ -41,7 +40,7 @@ private:
     gl::TexturePool& texturePool;
     Worker& worker;
 
-    std::unique_ptr<TileSource> tileSource;
+    TileSource<RasterTileData> tileSource;
     std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains the Bucket object for the tile. Buckets are render
