@@ -7,11 +7,11 @@
 
 namespace mbgl {
 
-template <typename T, typename I>
-FileBasedTileSource<T, I>::FileBasedTileSource(typename T::data_type& tileData_,
-                                               const Resource& resource_,
-                                               FileSource& fileSource_)
-    : T(tileData_), resource(resource_), fileSource(fileSource_) {
+template <typename T>
+FileBasedTileSource<T>::FileBasedTileSource(T& tileData_,
+                                            const Resource& resource_,
+                                            FileSource& fileSource_)
+    : tileData(tileData_), resource(resource_), fileSource(fileSource_) {
     assert(!request);
     if (fileSource.supportsOptionalRequests()) {
         // When supported, the first request is always optional, even if the TileSource
@@ -23,7 +23,7 @@ FileBasedTileSource<T, I>::FileBasedTileSource(typename T::data_type& tileData_,
     } else {
         // When the FileSource doesn't support optional requests, we do nothing until the
         // data is definitely required.
-        if (T::isRequired()) {
+        if (isRequired()) {
             loadRequired();
         } else {
             // We're using this field to check whether the pending request is optional or required.
@@ -32,15 +32,15 @@ FileBasedTileSource<T, I>::FileBasedTileSource(typename T::data_type& tileData_,
     }
 }
 
-template <typename T, typename I>
-void FileBasedTileSource<T, I>::loadOptional() {
+template <typename T>
+void FileBasedTileSource<T>::loadOptional() {
     assert(!request);
 
     resource.necessity = Resource::Optional;
     request = fileSource.request(resource, [this](Response res) {
         request.reset();
 
-        T::tileData.setTriedOptional();
+        tileData.setTriedOptional();
 
         if (res.error && res.error->reason == Response::Error::Reason::NotFound) {
             // When the optional request could not be satisfied, don't treat it as an error.
@@ -51,31 +51,31 @@ void FileBasedTileSource<T, I>::loadOptional() {
             loadedData(res);
         }
 
-        if (T::isRequired()) {
+        if (isRequired()) {
             loadRequired();
         }
     });
 }
 
-template <typename T, typename I>
-void FileBasedTileSource<T, I>::makeRequired() {
+template <typename T>
+void FileBasedTileSource<T>::makeRequired() {
     if (!request) {
         loadRequired();
     }
 }
 
-template <typename T, typename I>
-void FileBasedTileSource<T, I>::makeOptional() {
+template <typename T>
+void FileBasedTileSource<T>::makeOptional() {
     if (resource.necessity == Resource::Required && request) {
         // Abort a potential HTTP request.
         request.reset();
     }
 }
 
-template <typename T, typename I>
-void FileBasedTileSource<T, I>::loadedData(const Response& res) {
+template <typename T>
+void FileBasedTileSource<T>::loadedData(const Response& res) {
     if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
-        T::tileData.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        tileData.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
         resource.priorExpires = res.expires;
         // Do not notify the TileData object; when we get this message, it already has the current
@@ -84,13 +84,13 @@ void FileBasedTileSource<T, I>::loadedData(const Response& res) {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        T::tileData.setData(res.noContent ? nullptr : I::parseData(res.data), res.modified,
+        tileData.setData(res.noContent ? nullptr : T::parseData(res.data), res.modified,
                             res.expires);
     }
 }
 
-template <typename T, typename I>
-void FileBasedTileSource<T, I>::loadRequired() {
+template <typename T>
+void FileBasedTileSource<T>::loadRequired() {
     assert(!request);
 
     resource.necessity = Resource::Required;

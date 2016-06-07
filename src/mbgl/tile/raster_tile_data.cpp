@@ -23,7 +23,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
     const auto resource = Resource::tile(
         tileset.tiles.at(0), parameters.pixelRatio, id_.canonical.x,
         id_.canonical.y, id_.canonical.z);
-    tileSource = std::make_unique<FileBasedTileSource<RasterTileSource, RasterTileData>>(
+    tileSource = std::make_unique<FileBasedTileSource<RasterTileData>>(
         *this, resource, parameters.fileSource);
 }
 

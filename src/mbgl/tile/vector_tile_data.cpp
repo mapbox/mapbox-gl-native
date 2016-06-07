@@ -18,7 +18,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& overscaledTileID,
     const auto resource = Resource::tile(
         tileset.tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
         overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-    tileSource = std::make_unique<FileBasedTileSource<GeometryTileSource, VectorTileData>>(
+    tileSource = std::make_unique<FileBasedTileSource<VectorTileData>>(
         *this, resource, parameters.fileSource);
 }
 
