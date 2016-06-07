@@ -16,3 +16,4 @@ BreakBeforeBraces: Attach
 ColumnLimit: 100
 Cpp11BracedListStyle: false
 SpacesBeforeTrailingComments: 1
+SortIncludes: false

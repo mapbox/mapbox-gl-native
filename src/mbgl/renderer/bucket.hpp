@@ -46,7 +46,7 @@ public:
     }
 
     virtual void placeFeatures(CollisionTile&) {}
-    virtual void swapRenderData() {}
+    virtual void swapRenderable() {}
 
 protected:
     util::Atomic<bool> uploaded;

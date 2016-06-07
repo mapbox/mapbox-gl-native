@@ -2,27 +2,20 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/geometry/vao.hpp>
-#include <mbgl/geometry/elements_buffer.hpp>
-#include <mbgl/geometry/line_buffer.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 
 #include <vector>
 
 namespace mbgl {
 
-class LineVertexBuffer;
-class TriangleElementsBuffer;
-class LineShader;
-class LineSDFShader;
-class LinepatternShader;
+class LineRenderable;
 
 class LineBucket : public Bucket {
-    using TriangleGroup = ElementGroup<3>;
-
 public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
+
+    LineRenderable& getRenderable() const;
 
     void upload(gl::ObjectStore&) override;
     void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
@@ -31,10 +24,6 @@ public:
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
-
-    void drawLines(LineShader&, gl::ObjectStore&);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&);
 
 private:
     struct TriangleElement {
@@ -52,16 +41,13 @@ public:
     style::LineLayoutProperties layout;
 
 private:
-    LineVertexBuffer vertexBuffer;
-    TriangleElementsBuffer triangleElementsBuffer;
-
     GLint e1;
     GLint e2;
     GLint e3;
 
-    std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
-
     const uint32_t overscaling;
+
+    std::unique_ptr<LineRenderable> renderable;
 };
 
 } // namespace mbgl

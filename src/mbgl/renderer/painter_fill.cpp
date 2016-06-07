@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/renderer/fill_renderable.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -11,6 +12,68 @@
 namespace mbgl {
 
 using namespace style;
+
+namespace {
+
+void drawFill(FillRenderable& renderable, PlainShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+        group->array[0].bind(shader, renderable.vertexBuffer, renderable.triangleElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.triangleElementsBuffer.itemSize;
+    }
+}
+
+void drawFill(FillRenderable& renderable, PatternShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+        group->array[1].bind(shader, renderable.vertexBuffer, renderable.triangleElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.triangleElementsBuffer.itemSize;
+    }
+}
+
+void drawFillOutline(FillRenderable& renderable, OutlineShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.lineGroups) {
+        assert(group);
+        group->array[0].bind(shader, renderable.vertexBuffer, renderable.lineElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.lineElementsBuffer.itemSize;
+    }
+}
+
+void drawFillOutline(FillRenderable& renderable,
+                     OutlinePatternShader& shader,
+                     gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.lineGroups) {
+        assert(group);
+        group->array[1].bind(shader, renderable.vertexBuffer, renderable.lineElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_LINES, group->elements_length * 2, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.lineElementsBuffer.itemSize;
+    }
+}
+
+} // namespace
 
 void Painter::renderFill(FillBucket& bucket,
                          const FillLayer& layer,
@@ -64,7 +127,7 @@ void Painter::renderFill(FillBucket& bucket,
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader, store);
+        drawFillOutline(bucket.getRenderable(), *outlineShader, store);
     }
 
     if (pattern) {
@@ -119,7 +182,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, store);
+            drawFill(bucket.getRenderable(), *patternShader, store);
 
             if (properties.fillAntialias && stroke_color == fill_color) {
                 config.program = outlinePatternShader->getID();
@@ -156,7 +219,7 @@ void Painter::renderFill(FillBucket& bucket,
                 spriteAtlas->bind(true, store);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, store);
+                drawFillOutline(bucket.getRenderable(), *outlinePatternShader, store);
             }
         }
     } else if (!wireframe) {
@@ -173,7 +236,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, store);
+            drawFill(bucket.getRenderable(), *plainShader, store);
         }
     }
 
@@ -194,7 +257,7 @@ void Painter::renderFill(FillBucket& bucket,
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, store);
+        drawFillOutline(bucket.getRenderable(), *outlineShader, store);
     }
 }
 

@@ -170,7 +170,7 @@ void VectorTileData::redoPlacement(const std::function<void()>& callback) {
         placedConfig = config;
 
         for (auto& bucket : buckets) {
-            bucket.second->swapRenderData();
+            bucket.second->swapRenderable();
         }
 
         if (featureIndex) {

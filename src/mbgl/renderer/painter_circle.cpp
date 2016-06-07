@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/circle_bucket.hpp>
+#include <mbgl/renderer/circle_renderable.hpp>
 
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
@@ -9,6 +10,32 @@
 namespace mbgl {
 
 using namespace style;
+
+namespace {
+
+void drawCircles(CircleRenderable& renderable, CircleShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertexIndex = BUFFER_OFFSET_0;
+    GLbyte* elementsIndex = BUFFER_OFFSET_0;
+
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+
+        if (!group->elements_length) {
+            continue;
+        }
+
+        group->array[0].bind(shader, renderable.vertexBuffer, renderable.elementsBuffer,
+                             vertexIndex, store);
+
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elementsIndex));
+
+        vertexIndex += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elementsIndex += group->elements_length * renderable.elementsBuffer.itemSize;
+    }
+}
+
+} // namespace
 
 void Painter::renderCircle(CircleBucket& bucket,
                            const CircleLayer& layer,
@@ -43,7 +70,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     circleShader->u_blur = std::max<float>(properties.circleBlur, antialiasing);
     circleShader->u_opacity = properties.circleOpacity;
 
-    bucket.drawCircles(*circleShader, store);
+    drawCircles(bucket.getRenderable(), *circleShader, store);
 }
 
-}
+} // namespace mbgl

@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/renderer/raster_renderable.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
 #include <mbgl/shader/raster_shader.hpp>
@@ -8,6 +9,20 @@
 namespace mbgl {
 
 using namespace style;
+
+namespace {
+
+void drawRaster(RasterRenderable& renderable,
+                RasterShader& shader,
+                StaticVertexBuffer& vertices,
+                VertexArrayObject& array,
+                gl::ObjectStore& store) {
+    renderable.raster.bind(true, store);
+    array.bind(shader, vertices, BUFFER_OFFSET_0, store);
+    MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
+}
+
+} // namespace
 
 void Painter::renderRaster(RasterBucket& bucket,
                            const RasterLayer& layer,
@@ -37,7 +52,8 @@ void Painter::renderRaster(RasterBucket& bucket,
         config.depthTest = GL_TRUE;
         config.depthMask = GL_FALSE;
         setDepthSublayer(0);
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, store);
+        drawRaster(bucket.getRenderable(), *rasterShader, tileStencilBuffer, coveringRasterArray,
+                   store);
     }
 }
 

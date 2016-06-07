@@ -91,10 +91,10 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
-    RenderData renderData = style.getRenderData();
-    const std::vector<RenderItem>& order = renderData.order;
-    const std::set<Source*>& sources = renderData.sources;
-    const Color& background = renderData.backgroundColor;
+    RenderData renderable = style.getRenderData();
+    const std::vector<RenderItem>& order = renderable.order;
+    const std::set<Source*>& sources = renderable.sources;
+    const Color& background = renderable.backgroundColor;
 
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
