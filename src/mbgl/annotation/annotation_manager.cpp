@@ -5,7 +5,7 @@
 #include <mbgl/annotation/fill_annotation_impl.hpp>
 #include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/tile/annotation_tile_source.hpp>
+#include <mbgl/tile/annotation_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -135,18 +135,18 @@ void AnnotationManager::updateStyle(Style& style) {
 
     obsoleteShapeAnnotationLayers.clear();
 
-    for (auto& monitor : monitors) {
-        monitor->update(getTile(monitor->tileID.canonical));
+    for (auto& data : monitors) {
+        data->setData(getTile(data->id.canonical), {}, {});
     }
 }
 
-void AnnotationManager::addTileSource(AnnotationTileSource& monitor) {
-    monitors.insert(&monitor);
-    monitor.update(getTile(monitor.tileID.canonical));
+void AnnotationManager::addTileData(AnnotationTileData& data) {
+    monitors.insert(&data);
+    data.setData(getTile(data.id.canonical), {}, {});
 }
 
-void AnnotationManager::removeTileSource(AnnotationTileSource& monitor) {
-    monitors.erase(&monitor);
+void AnnotationManager::removeTileData(AnnotationTileData& data) {
+    monitors.erase(&data);
 }
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {

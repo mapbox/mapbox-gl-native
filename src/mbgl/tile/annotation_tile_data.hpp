@@ -4,7 +4,7 @@
 
 namespace mbgl {
 
-class TileSource;
+class AnnotationManager;
 
 namespace style {
 class UpdateParameters;
@@ -20,7 +20,7 @@ public:
     void setNecessity(Necessity) final;
 
 private:
-    std::unique_ptr<TileSource> tileSource;
+    AnnotationManager& annotationManager;
 };
 
 } // namespace mbgl
