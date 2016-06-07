@@ -21,8 +21,9 @@ public:
     ~VectorTileData();
 
     void setNecessity(Necessity) final;
-
-    static std::unique_ptr<GeometryTile> parseData(std::shared_ptr<const std::string>);
+    void setData(std::shared_ptr<const std::string> data,
+                 optional<Timestamp> modified,
+                 optional<Timestamp> expires);
 
 private:
     TileSource<VectorTileData> tileSource;

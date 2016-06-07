@@ -70,7 +70,3 @@ void RasterTileData::setNecessity(Necessity necessity) {
 void RasterTileData::cancel() {
     workRequest.reset();
 }
-
-std::shared_ptr<const std::string> RasterTileData::parseData(std::shared_ptr<const std::string> data) {
-    return data;
-}

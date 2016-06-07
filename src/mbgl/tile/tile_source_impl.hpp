@@ -95,8 +95,7 @@ void TileSource<T>::loadedData(const Response& res) {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        tileData.setData(res.noContent ? nullptr : T::parseData(res.data), res.modified,
-                            res.expires);
+        tileData.setData(res.noContent ? nullptr : res.data, res.modified, res.expires);
     }
 }
 

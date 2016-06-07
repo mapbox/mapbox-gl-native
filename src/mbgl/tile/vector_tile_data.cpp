@@ -21,8 +21,10 @@ void VectorTileData::setNecessity(Necessity necessity) {
     tileSource.setNecessity(static_cast<TileSource<VectorTileData>::Necessity>(necessity));
 }
 
-std::unique_ptr<GeometryTile> VectorTileData::parseData(std::shared_ptr<const std::string> data) {
-    return data ? std::make_unique<VectorTile>(data) : nullptr;
+void VectorTileData::setData(std::shared_ptr<const std::string> data,
+                             optional<Timestamp> modified,
+                             optional<Timestamp> expires) {
+    GeometryTileData::setData(data ? std::make_unique<VectorTile>(data) : nullptr, modified, expires);
 }
 
 } // namespace mbgl
