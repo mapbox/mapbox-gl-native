@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/noncopyable.hpp>
+
 #include <string>
 #include <memory>
 #include <algorithm>
@@ -12,7 +14,7 @@ enum ImageAlphaMode {
 };
 
 template <ImageAlphaMode Mode>
-class Image {
+class Image : private util::noncopyable {
 public:
     Image() = default;
 
@@ -25,6 +27,18 @@ public:
         : width(w),
           height(h),
           data(std::move(data_)) {}
+
+    Image(Image&& o)
+        : width(o.width),
+          height(o.height),
+          data(std::move(o.data)) {}
+
+    Image& operator=(Image&& o) {
+        width = o.width;
+        height = o.height;
+        data = std::move(o.data);
+        return *this;
+    }
 
     bool operator==(const Image& rhs) const {
         return width == rhs.width && height == rhs.height &&
