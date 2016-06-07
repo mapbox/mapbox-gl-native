@@ -2103,8 +2103,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
-    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(),
-                                  ((MGLAnnotationAccessibilityElement *)element).tag);
+    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(), tag);
     if (foundElement == visibleAnnotations.end())
     {
         return NSNotFound;
@@ -3846,9 +3845,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
             [self.locationManager stopUpdatingHeading];
 
-            if (self.userLocationAnnotationView)
+            CLLocation *location = self.userLocation.location;
+            if (location && self.userLocationAnnotationView)
             {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+                [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
             }
 
             break;
@@ -3896,7 +3896,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _userLocationVerticalAlignment = alignment;
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
-        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+        CLLocation *location = self.userLocation.location;
+        if (location)
+        {
+            [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
+        }
     }
 }
 
