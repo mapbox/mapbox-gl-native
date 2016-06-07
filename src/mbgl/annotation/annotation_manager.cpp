@@ -5,7 +5,6 @@
 #include <mbgl/annotation/fill_annotation_impl.hpp>
 #include <mbgl/annotation/style_sourced_annotation_impl.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/tile/annotation_tile_data.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>

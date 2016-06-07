@@ -2,10 +2,25 @@
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/update_parameters.hpp>
 
 #include <utility>
 
 namespace mbgl {
+
+AnnotationTileData::AnnotationTileData(const OverscaledTileID& overscaledTileID,
+                                       std::string sourceID,
+                                       const style::UpdateParameters& parameters)
+    : GeometryTileData(overscaledTileID, sourceID, parameters.style, parameters.mode),
+      annotationManager(parameters.annotationManager) {
+    annotationManager.addTileData(*this);
+}
+
+AnnotationTileData::~AnnotationTileData() {
+    annotationManager.removeTileData(*this);
+}
+
+void AnnotationTileData::setNecessity(Necessity) {}
 
 AnnotationTileFeature::AnnotationTileFeature(FeatureType type_, GeometryCollection geometries_,
                                  std::unordered_map<std::string, std::string> properties_)
