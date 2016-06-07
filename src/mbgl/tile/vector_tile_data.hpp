@@ -18,7 +18,6 @@ public:
                    std::string sourceID,
                    const style::UpdateParameters&,
                    const Tileset&);
-    ~VectorTileData();
 
     void setNecessity(Necessity) final;
     void setData(std::shared_ptr<const std::string> data,

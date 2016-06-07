@@ -55,10 +55,6 @@ void RasterTileData::setData(std::shared_ptr<const std::string> data,
     });
 }
 
-RasterTileData::~RasterTileData() {
-    cancel();
-}
-
 Bucket* RasterTileData::getBucket(const style::Layer&) {
     return bucket.get();
 }

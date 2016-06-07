@@ -15,8 +15,6 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
       tileSource(*this, id_, parameters, tileset) {
 }
 
-VectorTileData::~VectorTileData() = default;
-
 void VectorTileData::setNecessity(Necessity necessity) {
     tileSource.setNecessity(static_cast<TileSource<VectorTileData>::Necessity>(necessity));
 }
