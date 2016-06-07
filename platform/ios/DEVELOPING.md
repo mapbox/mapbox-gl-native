@@ -8,30 +8,42 @@ The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. Th
 
 ## Building the SDK
 
-[Install core dependencies](../../INSTALL.md), then run
+Make sure that you have the [core dependencies](../../INSTALL.md) installed.
+
+Create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications by running:
 
 ```bash
 make iproj
 ```
 
-which will create and open an Xcode workspace that includes both the SDK source and some Objective-C test applications. Before building, use the scheme picker button in the toolbar to change the scheme to “iosapp” and the destination to one of the simulators or connected devices listed in the menu.
+### Xcode schemes
 
-“iosapp” is only one of several shared schemes. Others include:
+Before building, use the scheme picker button in the toolbar to change the scheme to **iosapp** and the destination to one of the simulators or connected devices listed in the menu.
 
-* “CI” builds exactly what gets built for continuous integration on Bitrise.
-* “bench” is a simple benchmarking application. For more consistent results between runs, run platform/ios/benchmark/assets/{glyphs,tiles}/download.sh to download any necessary resources.
-* “dynamic” builds the SDK as a dynamic framework.
-* “static” builds the SDK as a static library and separate resource bundle.
-* “dynamic+static” is a combination of the “dynamic” and “static” schemes.
+**iosapp** is only one of several shared schemes. Others include:
+
+* **CI** builds exactly what gets built for continuous integration on Bitrise.
+* **bench** is a simple benchmarking application. For more consistent results between runs, run `platform/ios/benchmark/assets/{glyphs,tiles}/download.sh` to download any necessary resources.
+* **dynamic** builds the SDK as a dynamic framework.
+* **static** builds the SDK as a static library and separate resource bundle.
+* **dynamic+static** is a combination of the **dynamic** and **static** schemes.
 
 If you don’t have an Apple Developer account, change the destination to a simulator such as “iPhone 6s” before you run and build the app.
 
-`iproj` is only one of several available `make` rules. Others include:
+### Packaging builds
 
-* `make ipackage` builds both dynamic and static frameworks in the Release configuration for devices and the iOS Simulator.
+Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
+
+```bash
+[sudo] gem install jazzy
+```
+
+Build and package the SDK by using one of the following commands:
+
+* `make ipackage` builds both dynamic and static frameworks in the Debug configuration for devices and the iOS Simulator.
+* `make iframework` builds a dynamic framework in the Debug configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
 * `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
-* `make ipackage-strip` builds both dynamic and static frameworks in the Release configuration, stripped of debug symbols, for devices and the iOS Simulator.
-* `make iframework` builds a dynamic framework in the Release configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
+* `make ipackage-strip` builds both dynamic and static frameworks in the Debug configuration, stripped of debug symbols, for devices and the iOS Simulator.
 * `make ifabric` builds a special static framework for compatibility with the Fabric Mac application.
 
 You can customize the build output by passing the following arguments into the `make` invocation:
@@ -41,11 +53,13 @@ You can customize the build output by passing the following arguments into the `
 * `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for compatibility with iOS 7.x.
 * `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries.
 
-These targets require that you install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
+An example command that creates a dynamic framework suitable for eventual App Store distribution:
 
 ```bash
-[sudo] gem install jazzy
+make iframework BUILDTYPE=Release SYMBOLS=NO
 ```
+
+The products of these build commands can be found in the `build/ios/pkg` folder at the base of the repository.
 
 ## Contributing
 
