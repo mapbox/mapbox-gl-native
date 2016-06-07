@@ -35,6 +35,8 @@ public:
     void cancel() override;
     Bucket* getBucket(const style::Layer&) override;
 
+    static std::shared_ptr<const std::string> parseData(std::shared_ptr<const std::string>);
+
 private:
     gl::TexturePool& texturePool;
     Worker& worker;

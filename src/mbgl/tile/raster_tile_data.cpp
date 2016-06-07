@@ -2,7 +2,9 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/image_tile_source.hpp>
+#include <mbgl/tile/file_based_tile_source.hpp>
+#include <mbgl/tile/file_based_tile_source_impl.hpp>
+#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -21,7 +23,8 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
     const auto resource = Resource::tile(
         tileset.tiles.at(0), parameters.pixelRatio, id_.canonical.x,
         id_.canonical.y, id_.canonical.z);
-    tileSource = std::make_unique<ImageTileSource>(*this, resource, parameters.fileSource);
+    tileSource = std::make_unique<FileBasedTileSource<RasterTileSource, RasterTileData>>(
+        *this, resource, parameters.fileSource);
 }
 
 void RasterTileData::setError(std::exception_ptr err) {
@@ -73,4 +76,8 @@ void RasterTileData::setNecessity(Necessity necessity) {
 
 void RasterTileData::cancel() {
     workRequest.reset();
+}
+
+std::shared_ptr<const std::string> RasterTileData::parseData(std::shared_ptr<const std::string> data) {
+    return data;
 }
