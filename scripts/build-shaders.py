@@ -28,7 +28,7 @@ def replace_uniform_pragmas(line):
     if pragma_mapbox_regex.match(line):
         params = line.split()
         u_method = params[2]
-        u_name = "color" if color_regex.match(params[3]) else params[3]
+        u_name = params[3]
         u_precision = params[4]
         u_type = "vec4" if color_regex.match(u_name) else "float"
         if u_method == "define":
@@ -37,10 +37,9 @@ def replace_uniform_pragmas(line):
                     type_ = u_type,
                     name = u_name)
         else:
-            return """    {precision} {type_} {glsl_name} = u_{name};""".format(
+            return """    {precision} {type_} {name} = u_{name};""".format(
                     precision = u_precision,
                     type_ = u_type,
-                    glsl_name = params[3],
                     name = u_name)
     else:
         return line
