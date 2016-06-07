@@ -1,10 +1,12 @@
 #include <mbgl/renderer/circle_bucket.hpp>
+
 #include <mbgl/renderer/circle_renderable.hpp>
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/shader/circle_shader.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/util/constants.hpp>
+
+#include <cassert>
 
 namespace mbgl {
 
@@ -16,6 +18,11 @@ CircleBucket::CircleBucket(MapMode mode_)
 
 CircleBucket::~CircleBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
+}
+
+CircleRenderable& CircleBucket::getRenderable() const {
+    assert(renderable);
+    return *renderable;
 }
 
 void CircleBucket::upload(gl::ObjectStore& store) {
@@ -87,31 +94,6 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
             group.vertex_length += 4;
             group.elements_length += 2;
         }
-    }
-}
-
-void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
-    if (!renderable) {
-        return;
-    }
-    auto& vertexBuffer = renderable->vertexBuffer;
-    auto& elementsBuffer = renderable->elementsBuffer;
-    auto& triangleGroups = renderable->triangleGroups;
-
-    GLbyte* vertexIndex = BUFFER_OFFSET(0);
-    GLbyte* elementsIndex = BUFFER_OFFSET(0);
-
-    for (auto& group : triangleGroups) {
-        assert(group);
-
-        if (!group->elements_length) continue;
-
-        group->array[0].bind(shader, vertexBuffer, elementsBuffer, vertexIndex, store);
-
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
-
-        vertexIndex += group->vertex_length * vertexBuffer.itemSize;
-        elementsIndex += group->elements_length * elementsBuffer.itemSize;
     }
 }
 

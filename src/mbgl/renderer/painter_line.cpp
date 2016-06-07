@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
+#include <mbgl/renderer/line_renderable.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/shader/line_shader.hpp>
@@ -12,6 +13,63 @@
 namespace mbgl {
 
 using namespace style;
+
+namespace {
+
+void drawLines(LineRenderable& renderable, LineShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+        if (!group->elements_length) {
+            continue;
+        }
+        group->array[0].bind(shader, renderable.vertexBuffer, renderable.triangleElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.triangleElementsBuffer.itemSize;
+    }
+}
+
+void drawLineSDF(LineRenderable& renderable, LineSDFShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+        if (!group->elements_length) {
+            continue;
+        }
+        group->array[2].bind(shader, renderable.vertexBuffer, renderable.triangleElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.triangleElementsBuffer.itemSize;
+    }
+}
+
+void drawLinePatterns(LineRenderable& renderable,
+                      LinepatternShader& shader,
+                      gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : renderable.triangleGroups) {
+        assert(group);
+        if (!group->elements_length) {
+            continue;
+        }
+        group->array[1].bind(shader, renderable.vertexBuffer, renderable.triangleElementsBuffer,
+                             vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * renderable.vertexBuffer.itemSize;
+        elements_index += group->elements_length * renderable.triangleElementsBuffer.itemSize;
+    }
+}
+
+} // namespace
 
 void Painter::renderLine(LineBucket& bucket,
                          const LineLayer& layer,
@@ -100,7 +158,7 @@ void Painter::renderLine(LineBucket& bucket,
         config.activeTexture = GL_TEXTURE0;
         lineAtlas->bind(store);
 
-        bucket.drawLineSDF(*linesdfShader, store);
+        drawLineSDF(bucket.getRenderable(), *linesdfShader, store);
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -142,7 +200,7 @@ void Painter::renderLine(LineBucket& bucket,
         config.activeTexture = GL_TEXTURE0;
         spriteAtlas->bind(true, store);
 
-        bucket.drawLinePatterns(*linepatternShader, store);
+        drawLinePatterns(bucket.getRenderable(), *linepatternShader, store);
 
     } else {
         config.program = lineShader->getID();
@@ -160,7 +218,7 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader->u_color = color;
         lineShader->u_opacity = opacity;
 
-        bucket.drawLines(*lineShader, store);
+        drawLines(bucket.getRenderable(), *lineShader, store);
     }
 }
 

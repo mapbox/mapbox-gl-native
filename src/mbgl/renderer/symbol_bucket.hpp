@@ -11,9 +11,6 @@
 
 namespace mbgl {
 
-class SDFShader;
-class IconShader;
-class CollisionBoxShader;
 class GlyphAtlas;
 class GlyphStore;
 class SymbolRenderable;
@@ -49,6 +46,8 @@ public:
     SymbolBucket(uint32_t overscaling, float zoom, const MapMode, const std::string& bucketName_, const std::string& sourceLayerName_);
     ~SymbolBucket() override;
 
+    SymbolRenderable& getRenderable() const;
+
     void upload(gl::ObjectStore&) override;
     void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
@@ -61,11 +60,6 @@ public:
                      SpriteAtlas&,
                      GlyphAtlas&,
                      GlyphStore&);
-
-    void drawGlyphs(SDFShader&, gl::ObjectStore&);
-    void drawIcons(SDFShader&, gl::ObjectStore&);
-    void drawIcons(IconShader&, gl::ObjectStore&);
-    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
     void parseFeatures(const GeometryTileLayer&, const style::Filter&);
     bool needsDependencies(GlyphStore&, SpriteStore&);

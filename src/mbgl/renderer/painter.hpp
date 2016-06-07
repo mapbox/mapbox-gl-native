@@ -39,6 +39,7 @@ class FillBucket;
 class LineBucket;
 class CircleBucket;
 class SymbolBucket;
+class SymbolRenderable;
 class RasterBucket;
 
 class SDFShader;
@@ -131,13 +132,13 @@ private:
 
     void setClipping(const ClipID&);
 
-    void renderSDF(SymbolBucket &bucket,
+    void renderSDF(SymbolRenderable &renderable,
                    const UnwrappedTileID &tileID,
                    const mat4 &matrixSymbol,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
+                   void (*drawSDF)(SymbolRenderable&, SDFShader&, gl::ObjectStore&),
 
                    // Layout
                    style::RotationAlignmentType rotationAlignment,

@@ -16,9 +16,6 @@
 #include <mbgl/text/glyph_set.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/text/collision_tile.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/collision_box_shader.hpp>
 
 #include <mbgl/util/utf.hpp>
 #include <mbgl/util/token.hpp>
@@ -72,6 +69,11 @@ SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mod
 
 SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
+}
+
+SymbolRenderable& SymbolBucket::getRenderable() const {
+    assert(renderable);
+    return *renderable;
 }
 
 void SymbolBucket::upload(gl::ObjectStore& store) {
@@ -600,51 +602,4 @@ void SymbolBucket::swapRenderable() {
     }
 }
 
-void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& text = renderable->text;
-    for (auto &group : text.groups) {
-        assert(group);
-        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group->vertex_length * text.vertices.itemSize;
-        elements_index += group->elements_length * text.triangles.itemSize;
-    }
-}
-
-void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& icon = renderable->icon;
-    for (auto &group : icon.groups) {
-        assert(group);
-        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group->vertex_length * icon.vertices.itemSize;
-        elements_index += group->elements_length * icon.triangles.itemSize;
-    }
-}
-
-void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    auto& icon = renderable->icon;
-    for (auto &group : icon.groups) {
-        assert(group);
-        group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
-        vertex_index += group->vertex_length * icon.vertices.itemSize;
-        elements_index += group->elements_length * icon.triangles.itemSize;
-    }
-}
-
-void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    auto& collisionBox = renderable->collisionBox;
-    for (auto &group : collisionBox.groups) {
-        group->array[0].bind(shader, collisionBox.vertices, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
-    }
-}
 } // namespace mbgl

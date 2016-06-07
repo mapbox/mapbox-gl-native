@@ -24,6 +24,11 @@ LineBucket::~LineBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
+LineRenderable& LineBucket::getRenderable() const {
+    assert(renderable);
+    return *renderable;
+}
+
 void LineBucket::addGeometry(const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
         addGeometry(line);
@@ -468,75 +473,6 @@ bool LineBucket::hasData() const {
 
 bool LineBucket::needsClipping() const {
     return true;
-}
-
-void LineBucket::drawLines(LineShader& shader, gl::ObjectStore& store) {
-    if (!renderable) {
-        return;
-    }
-    auto& vertexBuffer = renderable->vertexBuffer;
-    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
-    auto& triangleGroups = renderable->triangleGroups;
-
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
-            continue;
-        }
-        group->array[0].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
-    }
-}
-
-void LineBucket::drawLineSDF(LineSDFShader& shader, gl::ObjectStore& store) {
-    if (!renderable) {
-        return;
-    }
-    auto& vertexBuffer = renderable->vertexBuffer;
-    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
-    auto& triangleGroups = renderable->triangleGroups;
-
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
-            continue;
-        }
-        group->array[2].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
-    }
-}
-
-void LineBucket::drawLinePatterns(LinepatternShader& shader, gl::ObjectStore& store) {
-    if (!renderable) {
-        return;
-    }
-    auto& vertexBuffer = renderable->vertexBuffer;
-    auto& triangleElementsBuffer = renderable->triangleElementsBuffer;
-    auto& triangleGroups = renderable->triangleGroups;
-
-    GLbyte* vertex_index = BUFFER_OFFSET(0);
-    GLbyte* elements_index = BUFFER_OFFSET(0);
-    for (auto& group : triangleGroups) {
-        assert(group);
-        if (!group->elements_length) {
-            continue;
-        }
-        group->array[1].bind(shader, vertexBuffer, triangleElementsBuffer, vertex_index, store);
-        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
-                                        elements_index));
-        vertex_index += group->vertex_length * vertexBuffer.itemSize;
-        elements_index += group->elements_length * triangleElementsBuffer.itemSize;
-    }
 }
 
 }

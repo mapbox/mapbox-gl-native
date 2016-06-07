@@ -1,14 +1,14 @@
 #pragma once
 
-#include <mbgl/tile/tile_data.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/geometry/debug_font_buffer.hpp>
-#include <mbgl/geometry/vao.hpp>
+#include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
-class PlainShader;
+class OverscaledTileID;
+class DebugRenderable;
 
 namespace gl {
 class ObjectStore;
@@ -17,24 +17,23 @@ class ObjectStore;
 class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(const OverscaledTileID& id,
-                bool renderable,
-                bool complete,
+                bool isRenderable,
+                bool isComplete,
                 optional<Timestamp> modified,
                 optional<Timestamp> expires,
                 MapDebugOptions);
+    ~DebugBucket();
 
-    void drawLines(PlainShader&, gl::ObjectStore&);
-    void drawPoints(PlainShader&, gl::ObjectStore&);
+    DebugRenderable& getRenderable() const;
 
-    const bool renderable;
-    const bool complete;
+    const bool isRenderable;
+    const bool isComplete;
     const optional<Timestamp> modified;
     const optional<Timestamp> expires;
     const MapDebugOptions debugMode;
 
 private:
-    DebugFontBuffer fontBuffer;
-    VertexArrayObject array;
+    std::unique_ptr<DebugRenderable> renderable;
 };
 
 } // namespace mbgl

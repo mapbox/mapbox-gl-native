@@ -8,15 +8,14 @@
 
 namespace mbgl {
 
-class LineShader;
-class LineSDFShader;
-class LinepatternShader;
 class LineRenderable;
 
 class LineBucket : public Bucket {
 public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
+
+    LineRenderable& getRenderable() const;
 
     void upload(gl::ObjectStore&) override;
     void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
@@ -25,10 +24,6 @@ public:
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
-
-    void drawLines(LineShader&, gl::ObjectStore&);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&);
 
 private:
     struct TriangleElement {

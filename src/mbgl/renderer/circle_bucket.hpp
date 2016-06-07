@@ -7,12 +7,13 @@
 namespace mbgl {
 
 class CircleRenderable;
-class CircleShader;
 
 class CircleBucket : public Bucket {
 public:
     CircleBucket(const MapMode);
     ~CircleBucket() override;
+
+    CircleRenderable& getRenderable() const;
 
     void upload(gl::ObjectStore&) override;
     void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
@@ -20,8 +21,6 @@ public:
     bool hasData() const override;
     bool needsClipping() const override;
     void addGeometry(const GeometryCollection&);
-
-    void drawCircles(CircleShader&, gl::ObjectStore&);
 
 private:
     const MapMode mode;

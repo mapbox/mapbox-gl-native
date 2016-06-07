@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/symbol_renderable.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
@@ -15,13 +16,70 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderSDF(SymbolBucket &bucket,
+namespace {
+
+void drawGlyphs(SymbolRenderable& renderable, SDFShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    auto& text = renderable.text;
+    for (auto& group : text.groups) {
+        assert(group);
+        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * text.vertices.itemSize;
+        elements_index += group->elements_length * text.triangles.itemSize;
+    }
+}
+
+void drawIcons(SymbolRenderable& renderable, SDFShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    auto& icon = renderable.icon;
+    for (auto& group : icon.groups) {
+        assert(group);
+        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * icon.vertices.itemSize;
+        elements_index += group->elements_length * icon.triangles.itemSize;
+    }
+}
+
+void drawIcons(SymbolRenderable& renderable, IconShader& shader, gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    auto& icon = renderable.icon;
+    for (auto& group : icon.groups) {
+        assert(group);
+        group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
+                                        elements_index));
+        vertex_index += group->vertex_length * icon.vertices.itemSize;
+        elements_index += group->elements_length * icon.triangles.itemSize;
+    }
+}
+
+void drawCollisionBoxes(SymbolRenderable& renderable,
+                        CollisionBoxShader& shader,
+                        gl::ObjectStore& store) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    auto& collisionBox = renderable.collisionBox;
+    for (auto& group : collisionBox.groups) {
+        group->array[0].bind(shader, collisionBox.vertices, vertex_index, store);
+        MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
+    }
+}
+
+} // namespace
+
+void Painter::renderSDF(SymbolRenderable &renderable,
                         const UnwrappedTileID &tileID,
                         const mat4 &matrix,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
+                        void (*drawSDF)(SymbolRenderable&, SDFShader&, gl::ObjectStore&),
 
                         // Layout
                         RotationAlignmentType rotationAlignment,
@@ -89,7 +147,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
 
         setDepthSublayer(0);
-        (bucket.*drawSDF)(sdfShader, store);
+        drawSDF(renderable, sdfShader, store);
     }
 
     // Then, we draw the text/icon over the halo
@@ -100,7 +158,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
         setDepthSublayer(1);
-        (bucket.*drawSDF)(sdfShader, store);
+        drawSDF(renderable, sdfShader, store);
     }
 }
 
@@ -159,13 +217,13 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store);
 
         if (sdf) {
-            renderSDF(bucket,
+            renderSDF(bucket.getRenderable(),
                       tileID,
                       matrix,
                       1.0f,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
                       *sdfIconShader,
-                      &SymbolBucket::drawIcons,
+                      &drawIcons,
                       layout.iconRotationAlignment,
                       layout.iconSize,
                       paint.iconOpacity,
@@ -207,7 +265,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             iconShader->u_fadetexture = 1;
 
             setDepthSublayer(0);
-            bucket.drawIcons(*iconShader, store);
+            drawIcons(bucket.getRenderable(), *iconShader, store);
         }
     }
 
@@ -222,13 +280,13 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         config.activeTexture = GL_TEXTURE0;
         glyphAtlas->bind(store);
 
-        renderSDF(bucket,
+        renderSDF(bucket.getRenderable(),
                   tileID,
                   matrix,
                   24.0f,
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
                   *sdfGlyphShader,
-                  &SymbolBucket::drawGlyphs,
+                  &drawGlyphs,
                   layout.textRotationAlignment,
                   layout.textSize,
                   paint.textOpacity,
@@ -254,11 +312,10 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         config.lineWidth = 1.0f;
 
         setDepthSublayer(0);
-        bucket.drawCollisionBoxes(*collisionBoxShader, store);
-
+        drawCollisionBoxes(bucket.getRenderable(), *collisionBoxShader, store);
     }
 
     config.activeTexture = GL_TEXTURE0;
 }
 
-}
+} // namespace mbgl
