@@ -21,7 +21,7 @@
 
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
-#include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/gl/debugging.hpp>

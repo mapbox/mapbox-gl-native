@@ -1,13 +1,28 @@
 #include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/style/source.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/util/url.hpp>
+#include <mbgl/tile/tile_source_impl.hpp>
+#include <mbgl/style/update_parameters.hpp>
 
 #include <utility>
 
 namespace mbgl {
+
+VectorTileData::VectorTileData(const OverscaledTileID& id_,
+                               std::string sourceID,
+                               const style::UpdateParameters& parameters,
+                               const Tileset& tileset)
+    : GeometryTileData(id_, sourceID, parameters.style, parameters.mode),
+      tileSource(*this, id_, parameters, tileset) {
+}
+
+void VectorTileData::setNecessity(Necessity necessity) {
+    tileSource.setNecessity(static_cast<TileSource<VectorTileData>::Necessity>(necessity));
+}
+
+void VectorTileData::setData(std::shared_ptr<const std::string> data,
+                             optional<Timestamp> modified,
+                             optional<Timestamp> expires) {
+    GeometryTileData::setData(data ? std::make_unique<VectorTile>(data) : nullptr, modified, expires);
+}
 
 Value parseValue(protozero::pbf_reader data) {
     while (data.next())
