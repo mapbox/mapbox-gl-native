@@ -4,22 +4,16 @@
 #include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/style/update_parameters.hpp>
-#include <mbgl/util/tileset.hpp>
 #include <mbgl/util/async_request.hpp>
 
 namespace mbgl {
 
-VectorTileData::VectorTileData(const OverscaledTileID& overscaledTileID,
+VectorTileData::VectorTileData(const OverscaledTileID& id_,
                                std::string sourceID,
                                const style::UpdateParameters& parameters,
                                const Tileset& tileset)
-    : GeometryTileData(overscaledTileID, sourceID, parameters.style, parameters.mode) {
-    assert(!tileset.tiles.empty());
-    const auto resource = Resource::tile(
-        tileset.tiles.at(0), parameters.pixelRatio, overscaledTileID.canonical.x,
-        overscaledTileID.canonical.y, overscaledTileID.canonical.z);
-    tileSource = std::make_unique<FileBasedTileSource<VectorTileData>>(
-        *this, resource, parameters.fileSource);
+    : GeometryTileData(id_, sourceID, parameters.style, parameters.mode),
+      tileSource(std::make_unique<FileBasedTileSource<VectorTileData>>(*this, id_, parameters, tileset)) {
 }
 
 VectorTileData::~VectorTileData() = default;

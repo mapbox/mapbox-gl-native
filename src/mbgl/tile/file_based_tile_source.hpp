@@ -12,7 +12,10 @@ class Response;
 template <typename T>
 class FileBasedTileSource : public TileSource {
 public:
-    FileBasedTileSource(T&, const Resource&, FileSource&);
+    FileBasedTileSource(T&,
+                        const OverscaledTileID&,
+                        const style::UpdateParameters&,
+                        const Tileset&);
     virtual ~FileBasedTileSource() = default;
 
 protected:

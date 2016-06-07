@@ -18,13 +18,8 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
                                const Tileset& tileset)
     : TileData(id_),
       texturePool(parameters.texturePool),
-      worker(parameters.worker) {
-    assert(!tileset.tiles.empty());
-    const auto resource = Resource::tile(
-        tileset.tiles.at(0), parameters.pixelRatio, id_.canonical.x,
-        id_.canonical.y, id_.canonical.z);
-    tileSource = std::make_unique<FileBasedTileSource<RasterTileData>>(
-        *this, resource, parameters.fileSource);
+      worker(parameters.worker),
+      tileSource(std::make_unique<FileBasedTileSource<RasterTileData>>(*this, id_, parameters, tileset)) {
 }
 
 void RasterTileData::setError(std::exception_ptr err) {

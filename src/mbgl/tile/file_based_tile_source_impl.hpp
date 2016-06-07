@@ -2,6 +2,8 @@
 
 #include <mbgl/tile/file_based_tile_source.hpp>
 #include <mbgl/storage/file_source.hpp>
+#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <cassert>
 
@@ -9,9 +11,17 @@ namespace mbgl {
 
 template <typename T>
 FileBasedTileSource<T>::FileBasedTileSource(T& tileData_,
-                                            const Resource& resource_,
-                                            FileSource& fileSource_)
-    : tileData(tileData_), resource(resource_), fileSource(fileSource_) {
+                                            const OverscaledTileID& id,
+                                            const style::UpdateParameters& parameters,
+                                            const Tileset& tileset)
+    : tileData(tileData_),
+      resource(Resource::tile(
+        tileset.tiles.at(0),
+        parameters.pixelRatio,
+        id.canonical.x,
+        id.canonical.y,
+        id.canonical.z)),
+      fileSource(parameters.fileSource) {
     assert(!request);
     if (fileSource.supportsOptionalRequests()) {
         // When supported, the first request is always optional, even if the TileSource
