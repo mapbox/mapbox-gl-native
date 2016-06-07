@@ -10,7 +10,7 @@ Pod::Spec.new do |m|
   m.author            = { 'Mapbox' => 'mobile@mapbox.com' }
   m.screenshot        = 'https://raw.githubusercontent.com/mapbox/mapbox-gl-native/master/platform/ios/screenshot.png'
   m.social_media_url  = 'https://twitter.com/mapbox'
-  m.documentation_url = 'https://www.mapbox.com/ios-sdk/'
+  m.documentation_url = 'https://www.mapbox.com/ios-sdk/api/'
 
   m.source = {
     :http => "https://mapbox.s3.amazonaws.com/mapbox-gl-native/ios/builds/mapbox-ios-sdk-#{m.version.to_s}-dynamic.zip",
