@@ -4454,11 +4454,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         case mbgl::MapChangeDidFinishRenderingFrame:
         case mbgl::MapChangeDidFinishRenderingFrameFullyRendered:
         {
+            [self updateAnnotationViews];
             if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
             {
                 [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:(change == mbgl::MapChangeDidFinishRenderingFrameFullyRendered)];
             }
-            [self updateAnnotationViews];
             break;
         }
     }
