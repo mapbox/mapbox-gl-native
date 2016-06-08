@@ -18,13 +18,13 @@ addons_shortcuts:
   addons_qt4: &qt4
     apt:
       sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5',
+      packages: [ 'g++-5', 'gcc-5',
                   'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
       sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'gdb', 'g++-5', 'gcc-5',
-                  'mesa-utils', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
+      packages: [ 'g++-5', 'gcc-5',
+                  'mesa-utils', 'libc6-dbg', 'qt5-default', 'libqt5opengl5-dev', 'qtdeclarative5-dev', 'qtpositioning5-dev', 'qtlocation5-dev' ]
 
 env:
   global:
@@ -112,7 +112,8 @@ matrix:
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
       script:
-        - make qt-app test-qt
+        - make qt-app
+        - make test-qt
 
     # Qt 5 - Release
     - os: linux
@@ -123,7 +124,9 @@ matrix:
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt5
       script:
-        - make qt-app qt-qml-app test-qt
+        - make qt-app
+        - make qt-qml-app
+        - make test-valgrind-qt
 
 cache:
   directories:
