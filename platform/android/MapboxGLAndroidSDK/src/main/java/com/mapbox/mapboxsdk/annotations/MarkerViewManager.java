@@ -231,7 +231,7 @@ public class MarkerViewManager {
      * Remove a MarkerView from a map.
      * <p>
      * The {@link MarkerView} will be removed using an alpha animation and related {@link View}
-     * will be released to the {@link android.support.v4.util.Pools.SimplePool} from the related
+     * will be released to the android.support.v4.util.Pools.SimplePool from the related
      * {@link com.mapbox.mapboxsdk.maps.MapboxMap.MarkerViewAdapter}. It's possible to remove
      * the {@link MarkerView} from the underlying collection if needed.
      * </p>
