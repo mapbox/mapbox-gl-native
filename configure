@@ -123,6 +123,7 @@ print_flags webp static_libs cflags ldflags
 print_flags jni.hpp cflags
 print_flags earcut cflags
 print_flags benchmark static_libs cflags ldflags
+print_flags valgrind
 
 CONFIG+="  }
 }
