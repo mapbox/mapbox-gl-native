@@ -34,9 +34,6 @@ public:
 
     void release();
 
-    inline bool isLoaded() { return loaded; }
-    inline bool isValid() { return valid; }
-
     static RenderOptions ParseOptions(v8::Local<v8::Object>);
     static Nan::Persistent<v8::Function> constructor;
 
@@ -56,7 +53,6 @@ public:
     uv_async_t *async;
 
     bool loaded = false;
-    bool valid = true;
 };
 
 }

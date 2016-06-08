@@ -166,8 +166,7 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  */
 NAN_METHOD(NodeMap::Load) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-
-    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     // Reset the flag as this could be the second time
     // we are calling this (being the previous successful).
@@ -286,8 +285,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
  */
 NAN_METHOD(NodeMap::Render) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-
-    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsObject()) {
         return Nan::ThrowTypeError("First argument must be an options object");
@@ -297,7 +295,7 @@ NAN_METHOD(NodeMap::Render) {
         return Nan::ThrowTypeError("Second argument must be a callback function");
     }
 
-    if (!nodeMap->isLoaded()) {
+    if (!nodeMap->loaded) {
         return Nan::ThrowTypeError("Style is not loaded");
     }
 
@@ -417,8 +415,7 @@ void NodeMap::renderFinished() {
  */
 NAN_METHOD(NodeMap::Release) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-
-    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     try {
         nodeMap->release();
@@ -430,21 +427,18 @@ NAN_METHOD(NodeMap::Release) {
 }
 
 void NodeMap::release() {
-    if (!isValid()) throw mbgl::util::Exception(releasedMessage());
-
-    valid = false;
+    if (!map) throw mbgl::util::Exception(releasedMessage());
 
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
         delete reinterpret_cast<uv_async_t *>(h);
     });
 
-    map.reset(nullptr);
+    map.reset();
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-
-    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     nodeMap->map->dumpDebugLogs();
     info.GetReturnValue().SetUndefined();
@@ -452,9 +446,7 @@ NAN_METHOD(NodeMap::DumpDebugLogs) {
 
 NAN_METHOD(NodeMap::QueryRenderedFeatures) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
-    Nan::HandleScope scope;
-
-    if (!nodeMap->isValid()) return Nan::ThrowError(releasedMessage());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
     if (info.Length() <= 0 || !info[0]->IsArray()) {
         return Nan::ThrowTypeError("First argument must be an array");
@@ -521,7 +513,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options) :
 }
 
 NodeMap::~NodeMap() {
-    if (valid) release();
+    if (map) release();
 }
 
 std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback callback_) {
