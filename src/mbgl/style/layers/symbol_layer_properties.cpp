@@ -19,6 +19,7 @@ void SymbolLayoutProperties::parse(const JSValue& value) {
     iconPadding.parse("icon-padding", value);
     iconKeepUpright.parse("icon-keep-upright", value);
     iconOffset.parse("icon-offset", value);
+    textPitchAlignment.parse("text-pitch-alignment", value);
     textRotationAlignment.parse("text-rotation-alignment", value);
     textField.parse("text-field", value);
     textFont.parse("text-font", value);
@@ -53,6 +54,7 @@ void SymbolLayoutProperties::recalculate(const CalculationParameters& parameters
     iconPadding.calculate(parameters);
     iconKeepUpright.calculate(parameters);
     iconOffset.calculate(parameters);
+    textPitchAlignment.calculate(parameters);
     textRotationAlignment.calculate(parameters);
     textField.calculate(parameters);
     textFont.calculate(parameters);

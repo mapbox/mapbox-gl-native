@@ -68,6 +68,9 @@ public:
     PropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(PropertyValue<std::array<float, 2>>);
 
+    PropertyValue<RotationAlignmentType> getTextPitchAlignment() const;
+    void setTextPitchAlignment(PropertyValue<RotationAlignmentType>);
+
     PropertyValue<RotationAlignmentType> getTextRotationAlignment() const;
     void setTextRotationAlignment(PropertyValue<RotationAlignmentType>);
 

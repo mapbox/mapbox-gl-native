@@ -495,7 +495,7 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         const auto &anchorPoint = symbol.anchorPoint;
 
         // drop upside down versions of glyphs
-        const float a = std::fmod(symbol.angle + placementAngle + M_PI, M_PI * 2);
+        const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
         if (keepUpright && alongLine && (a <= M_PI / 2 || a > M_PI * 3 / 2)) continue;
 
 
@@ -521,15 +521,18 @@ void SymbolBucket::addSymbols(Buffer &buffer, const SymbolQuads &symbols, float 
         auto &triangleGroup = *buffer.groups.back();
         GLsizei triangleIndex = triangleGroup.vertex_length;
 
+        // Encode angle of glyph
+        uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
+
         // coordinates (2 triangles)
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tl.x, tl.y, tex.x, tex.y, minZoom,
-                            maxZoom, placementZoom);
+                            maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, tr.x, tr.y, tex.x + tex.w, tex.y,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, bl.x, bl.y, tex.x, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
         buffer.vertices.add(anchorPoint.x, anchorPoint.y, br.x, br.y, tex.x + tex.w, tex.y + tex.h,
-                            minZoom, maxZoom, placementZoom);
+                            minZoom, maxZoom, placementZoom, glyphAngle);
 
         // add the two triangles, referencing the four coordinates we just inserted.
         buffer.triangles.add(triangleIndex + 0, triangleIndex + 1, triangleIndex + 2);

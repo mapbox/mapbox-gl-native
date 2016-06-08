@@ -30,6 +30,7 @@ public:
     LayoutProperty<float> iconPadding { 2 };
     LayoutProperty<bool> iconKeepUpright { false };
     LayoutProperty<std::array<float, 2>> iconOffset { {{ 0, 0 }} };
+    LayoutProperty<RotationAlignmentType> textPitchAlignment { RotationAlignmentType::Map };
     LayoutProperty<RotationAlignmentType> textRotationAlignment { RotationAlignmentType::Viewport };
     LayoutProperty<std::string> textField { "" };
     LayoutProperty<std::vector<std::string>> textFont { { "Open Sans Regular", "Arial Unicode MS Regular" } };

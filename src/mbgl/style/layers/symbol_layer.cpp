@@ -141,6 +141,13 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
 void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
     impl->layout.iconOffset.set(value);
 }
+PropertyValue<RotationAlignmentType> SymbolLayer::getTextPitchAlignment() const {
+    return impl->layout.textPitchAlignment.get();
+}
+
+void SymbolLayer::setTextPitchAlignment(PropertyValue<RotationAlignmentType> value) {
+    impl->layout.textPitchAlignment.set(value);
+}
 PropertyValue<RotationAlignmentType> SymbolLayer::getTextRotationAlignment() const {
     return impl->layout.textRotationAlignment.get();
 }

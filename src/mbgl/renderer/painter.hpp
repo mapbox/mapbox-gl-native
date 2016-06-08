@@ -141,6 +141,7 @@ private:
 
                    // Layout
                    style::RotationAlignmentType rotationAlignment,
+                   style::RotationAlignmentType pitchAlignment,
                    float layoutSize,
 
                    // Paint

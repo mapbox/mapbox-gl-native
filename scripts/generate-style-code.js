@@ -21,7 +21,7 @@ global.propertyType = function (property) {
   if (/-translate-anchor$/.test(property.name)) {
     return 'TranslateAnchorType';
   }
-  if (/-rotation-alignment$/.test(property.name)) {
+  if (/-(rotation|pitch)-alignment$/.test(property.name)) {
     return 'RotationAlignmentType';
   }
   switch (property.type) {
