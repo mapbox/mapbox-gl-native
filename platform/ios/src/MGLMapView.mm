@@ -3376,7 +3376,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         self.userTrackingMode = MGLUserTrackingModeNone;
     }
 
-    [self deselectAnnotation:self.selectedAnnotation animated:NO];
+    [self deselectAnnotation:self.selectedAnnotation animated:animated];
     
     // Add the annotation to the map if it hasn’t been added yet.
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
@@ -3401,6 +3401,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             positioningRect = annotationView.frame;
             
             [annotationView.superview bringSubviewToFront:annotationView];
+            
+            [annotationView setSelected:YES animated:animated];
         }
     }
     
@@ -3554,6 +3556,19 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         // dismiss popup
         [self.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
+        
+        // deselect annotation view
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        if (annotationTag != MGLAnnotationTagNotFound)
+        {
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            MGLAnnotationView *annotationView = annotationContext.annotationView;
+            
+            if (annotationView)
+            {
+                [annotationView setSelected:NO animated:animated];
+            }
+        }
 
         // clean up
         self.calloutViewForSelectedAnnotation = nil;
