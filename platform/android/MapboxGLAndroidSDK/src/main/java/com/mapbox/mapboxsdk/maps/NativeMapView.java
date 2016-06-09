@@ -371,9 +371,7 @@ final class NativeMapView {
     }
 
     public void updateMarker(Marker marker) {
-        LatLng position = marker.getPosition();
-        Icon icon = marker.getIcon();
-        nativeUpdateMarker(mNativeMapViewPtr, marker.getId(), position.getLatitude(), position.getLongitude(), icon.getId());
+        nativeUpdateMarker(mNativeMapViewPtr, marker);
     }
 
     public void removeAnnotation(long id) {
