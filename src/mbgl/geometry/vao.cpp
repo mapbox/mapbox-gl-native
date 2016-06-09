@@ -16,7 +16,7 @@ VertexArrayObject::VertexArrayObject() {
 VertexArrayObject::~VertexArrayObject() {
 }
 
-void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
+void VertexArrayObject::bindVertexArrayObject() {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {
         static bool reported = false;
         if (!reported) {
@@ -27,7 +27,7 @@ void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     }
 
     if (!vao) {
-        vao = store.createVAO();
+        vao = gl::ObjectStore::get().createVAO();
     }
     MBGL_CHECK_ERROR(gl::BindVertexArray(*vao));
 }

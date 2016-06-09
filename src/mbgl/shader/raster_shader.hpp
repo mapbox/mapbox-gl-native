@@ -7,7 +7,7 @@ namespace mbgl {
 
 class RasterShader : public Shader {
 public:
-    RasterShader(gl::ObjectStore&);
+    RasterShader();
 
     void bind(GLbyte *offset) final;
 

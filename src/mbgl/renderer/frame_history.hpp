@@ -3,9 +3,9 @@
 #include <array>
 
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/gl/object_store.hpp>
 
 namespace mbgl {
 
@@ -15,8 +15,8 @@ public:
     void record(const TimePoint&, float zoom, const Duration&);
 
     bool needsAnimation(const Duration&) const;
-    void bind(gl::ObjectStore&);
-    void upload(gl::ObjectStore&);
+    void bind();
+    void upload();
 
 private:
     const int width = 256;

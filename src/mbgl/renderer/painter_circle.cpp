@@ -43,7 +43,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     circleShader->u_blur = std::max<float>(properties.circleBlur, antialiasing);
     circleShader->u_opacity = properties.circleOpacity;
 
-    bucket.drawCircles(*circleShader, store);
+    bucket.drawCircles(*circleShader);
 }
 
 }

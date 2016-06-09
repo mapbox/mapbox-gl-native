@@ -64,7 +64,7 @@ void Painter::renderFill(FillBucket& bucket,
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawVertices(*outlineShader);
     }
 
     if (pattern) {
@@ -115,11 +115,11 @@ void Painter::renderFill(FillBucket& bucket,
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
             config.activeTexture = GL_TEXTURE0;
-            spriteAtlas->bind(true, store);
+            spriteAtlas->bind(true);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, store);
+            bucket.drawElements(*patternShader);
 
             if (properties.fillAntialias && stroke_color == fill_color) {
                 config.program = outlinePatternShader->getID();
@@ -153,10 +153,10 @@ void Painter::renderFill(FillBucket& bucket,
                 outlinePatternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
                 config.activeTexture = GL_TEXTURE0;
-                spriteAtlas->bind(true, store);
+                spriteAtlas->bind(true);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, store);
+                bucket.drawVertices(*outlinePatternShader);
             }
         }
     } else if (!wireframe) {
@@ -173,7 +173,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, store);
+            bucket.drawElements(*plainShader);
         }
     }
 
@@ -194,7 +194,7 @@ void Painter::renderFill(FillBucket& bucket,
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawVertices(*outlineShader);
     }
 }
 

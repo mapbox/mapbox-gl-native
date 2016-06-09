@@ -20,10 +20,10 @@ public:
     void load(PremultipliedImage);
 
     // bind current texture
-    void bind(bool linear, gl::ObjectStore&);
+    void bind(bool linear);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::ObjectStore&);
+    void upload();
 
     // loaded status
     bool isLoaded() const;

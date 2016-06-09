@@ -13,11 +13,11 @@
 
 namespace mbgl {
 
-Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource, gl::ObjectStore& store)
+Shader::Shader(const char *name_, const GLchar *vertSource, const GLchar *fragSource)
     : name(name_)
-    , program(store.createProgram())
-    , vertexShader(store.createShader(GL_VERTEX_SHADER))
-    , fragmentShader(store.createShader(GL_FRAGMENT_SHADER))
+    , program(gl::ObjectStore::get().createProgram())
+    , vertexShader(gl::ObjectStore::get().createShader(GL_VERTEX_SHADER))
+    , fragmentShader(gl::ObjectStore::get().createShader(GL_FRAGMENT_SHADER))
 {
     util::stopwatch stopwatch("shader compilation", Event::Shader);
 

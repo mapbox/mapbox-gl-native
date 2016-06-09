@@ -25,7 +25,7 @@ public:
     TexturePool();
     ~TexturePool();
 
-    PooledTexture acquireTexture(gl::ObjectStore&);
+    PooledTexture acquireTexture();
 
 private:
     friend TextureReleaser;

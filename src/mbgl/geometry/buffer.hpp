@@ -36,11 +36,11 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::ObjectStore& store) {
+    void bind() {
         if (buffer) {
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
         } else {
-            buffer = store.createBuffer();
+            buffer = gl::ObjectStore::get().createBuffer();
             MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
@@ -65,9 +65,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    inline void upload(gl::ObjectStore& store) {
+    inline void upload() {
         if (!buffer) {
-            bind(store);
+            bind();
         }
     }
 

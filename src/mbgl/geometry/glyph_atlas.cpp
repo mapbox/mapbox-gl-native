@@ -142,10 +142,10 @@ void GlyphAtlas::removeGlyphs(uintptr_t tileUID) {
     }
 }
 
-void GlyphAtlas::upload(gl::ObjectStore& store) {
+void GlyphAtlas::upload() {
     if (dirty) {
         const bool first = !texture;
-        bind(store);
+        bind();
 
         std::lock_guard<std::mutex> lock(mtx);
 
@@ -183,9 +183,9 @@ void GlyphAtlas::upload(gl::ObjectStore& store) {
     }
 }
 
-void GlyphAtlas::bind(gl::ObjectStore& store) {
+void GlyphAtlas::bind() {
     if (!texture) {
-        texture = store.createTexture();
+        texture = gl::ObjectStore::get().createTexture();
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));

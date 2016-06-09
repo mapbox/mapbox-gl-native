@@ -11,7 +11,7 @@ class TexturePool::Impl : private util::noncopyable {
 public:
     class Pool : private util::noncopyable {
         public:
-            Pool(gl::ObjectStore& store) : pool(store.createTexturePool()), availableIDs(gl::TextureMax) {
+            Pool() : pool(ObjectStore::get().createTexturePool()), availableIDs(gl::TextureMax) {
                 std::copy(pool.get().begin(), pool.get().end(), availableIDs.begin());
             }
 
@@ -22,7 +22,7 @@ public:
             std::vector<GLuint> availableIDs;
     };
 
-    GLuint acquireTexture(gl::ObjectStore& store) {
+    GLuint acquireTexture() {
         auto nextAvailableID = [](auto& pool_) {
             auto it = pool_.availableIDs.begin();
             GLuint id = *it;
@@ -36,7 +36,7 @@ public:
         }
 
         // All texture IDs are in use.
-        pools.emplace_back(Pool { store });
+        pools.emplace_back(Pool {});
         return nextAvailableID(pools.back());
     }
 
@@ -67,8 +67,8 @@ TexturePool::TexturePool() : impl(std::make_unique<Impl>()) {
 TexturePool::~TexturePool() {
 }
 
-PooledTexture TexturePool::acquireTexture(gl::ObjectStore& store) {
-    return PooledTexture { impl->acquireTexture(store) , { this } };
+PooledTexture TexturePool::acquireTexture() {
+    return PooledTexture { impl->acquireTexture() , { this } };
 }
 
 } // namespace gl

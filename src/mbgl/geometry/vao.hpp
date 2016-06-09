@@ -2,7 +2,6 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 
@@ -20,10 +19,10 @@ public:
     ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset, gl::ObjectStore& store) {
-        bindVertexArrayObject(store);
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset) {
+        bindVertexArrayObject();
         if (bound_shader == 0) {
-            vertexBuffer.bind(store);
+            vertexBuffer.bind();
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
@@ -34,11 +33,11 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset, gl::ObjectStore& store) {
-        bindVertexArrayObject(store);
+    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset) {
+        bindVertexArrayObject();
         if (bound_shader == 0) {
-            vertexBuffer.bind(store);
-            elementsBuffer.bind(store);
+            vertexBuffer.bind();
+            elementsBuffer.bind();
             shader.bind(offset);
             if (vao) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
@@ -53,7 +52,7 @@ public:
     }
 
 private:
-    void bindVertexArrayObject(gl::ObjectStore&);
+    void bindVertexArrayObject();
     void storeBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
     void verifyBinding(Shader &shader, GLuint vertexBuffer, GLuint elementsBuffer, GLbyte *offset);
 

@@ -7,7 +7,7 @@ namespace mbgl {
 
 class IconShader : public Shader {
 public:
-    IconShader(gl::ObjectStore&);
+    IconShader();
 
     void bind(GLbyte *offset) final;
 

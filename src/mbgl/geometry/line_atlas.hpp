@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 namespace mbgl {
 
@@ -21,14 +22,14 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::ObjectStore&);
+    void bind();
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::ObjectStore&);
+    void upload();
 
-    LinePatternPos getDashPosition(const std::vector<float>&, bool, gl::ObjectStore&);
-    LinePatternPos addDash(const std::vector<float> &dasharray, bool round, gl::ObjectStore&);
+    LinePatternPos getDashPosition(const std::vector<float>&, bool);
+    LinePatternPos addDash(const std::vector<float> &dasharray, bool round);
 
     const GLsizei width;
     const GLsizei height;

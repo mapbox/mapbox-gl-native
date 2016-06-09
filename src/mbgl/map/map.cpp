@@ -57,7 +57,6 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
 
@@ -114,7 +113,7 @@ Map::~Map() {
     impl->texturePool.reset();
     impl->annotationManager.reset();
 
-    impl->store.performCleanup();
+    gl::ObjectStore::get().performCleanup();
 
     impl->view.deactivate();
 }
@@ -250,7 +249,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), store);
+        painter = std::make_unique<Painter>(transform.getState());
     }
 
     FrameData frameData { view.getFramebufferSize(),
@@ -269,7 +268,7 @@ void Map::Impl::render() {
         callback = nullptr;
     }
 
-    store.performCleanup();
+    gl::ObjectStore::get().performCleanup();
 
     if (style->hasTransitions()) {
         updateFlags |= Update::RecalculateStyle;
@@ -830,7 +829,7 @@ void Map::setSourceTileCacheSize(size_t size) {
 }
 
 void Map::onLowMemory() {
-    impl->store.performCleanup();
+    gl::ObjectStore::get().performCleanup();
     if (!impl->style) return;
     impl->style->onLowMemory();
     impl->view.invalidate();
