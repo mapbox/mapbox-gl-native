@@ -314,10 +314,10 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
     const float iconPadding = layout.iconPadding * tilePixelRatio;
     const float textMaxAngle = layout.textMaxAngle * util::DEG2RAD;
     const bool textAlongLine =
-        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.textRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.iconRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||
         layout.textIgnorePlacement || layout.iconIgnorePlacement;
@@ -394,10 +394,10 @@ void SymbolBucket::placeFeatures(CollisionTile& collisionTile) {
     // create the bufers used for rendering.
 
     const bool textAlongLine =
-        layout.textRotationAlignment == RotationAlignmentType::Map &&
+        layout.textRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
     const bool iconAlongLine =
-        layout.iconRotationAlignment == RotationAlignmentType::Map &&
+        layout.iconRotationAlignment == AlignmentType::Map &&
         layout.symbolPlacement == SymbolPlacementType::Line;
 
     const bool mayOverlap = layout.textAllowOverlap || layout.iconAllowOverlap ||

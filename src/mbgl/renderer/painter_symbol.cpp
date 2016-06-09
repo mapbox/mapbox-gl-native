@@ -24,8 +24,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
 
                         // Layout
-                        RotationAlignmentType rotationAlignment,
-                        RotationAlignmentType pitchAlignment,
+                        AlignmentType rotationAlignment,
+                        AlignmentType pitchAlignment,
                         float layoutSize,
 
                         // Paint
@@ -46,8 +46,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     float scale = fontScale;
     std::array<float, 2> exScale = extrudeScale;
-    bool rotateWithMap = rotationAlignment == RotationAlignmentType::Map;
-    bool pitchWithMap = pitchAlignment == RotationAlignmentType::Map;
+    bool rotateWithMap = rotationAlignment == AlignmentType::Map;
+    bool pitchWithMap = pitchAlignment == AlignmentType::Map;
     float gammaScale = 1.0f;
 
     if (pitchWithMap) {
@@ -141,7 +141,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     }
 
     if (bucket.hasIconData()) {
-        if (layout.iconRotationAlignment == RotationAlignmentType::Map) {
+        if (layout.iconRotationAlignment == AlignmentType::Map) {
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
         } else {
@@ -151,7 +151,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
-            layout.iconRotationAlignment == RotationAlignmentType::Map
+            layout.iconRotationAlignment == AlignmentType::Map
                 ? state.getAngle()
                 : 0;
 
@@ -160,7 +160,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
 
         SpriteAtlas* activeSpriteAtlas = layer.impl->spriteAtlas;
         const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
-        const bool iconTransformed = layout.iconRotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
+        const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
         config.activeTexture = GL_TEXTURE0;
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store);
 
@@ -191,7 +191,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
 
             float scale = fontScale;
             std::array<float, 2> exScale = extrudeScale;
-            const bool alignedWithMap = layout.iconRotationAlignment == RotationAlignmentType::Map;
+            const bool alignedWithMap = layout.iconRotationAlignment == AlignmentType::Map;
             if (alignedWithMap) {
                 scale *= tileID.pixelsToTileUnits(1, state.getZoom());
                 exScale.fill(scale);
@@ -221,7 +221,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     }
 
     if (bucket.hasTextData()) {
-        if (layout.textRotationAlignment == RotationAlignmentType::Map) {
+        if (layout.textRotationAlignment == AlignmentType::Map) {
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
         } else {

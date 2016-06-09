@@ -58,7 +58,7 @@ enum class SymbolPlacementType : bool {
     Line,
 };
 
-enum class RotationAlignmentType : bool {
+enum class AlignmentType : bool {
     Map,
     Viewport,
 };

@@ -22,7 +22,7 @@ global.propertyType = function (property) {
     return 'TranslateAnchorType';
   }
   if (/-(rotation|pitch)-alignment$/.test(property.name)) {
-    return 'RotationAlignmentType';
+    return 'AlignmentType';
   }
   switch (property.type) {
   case 'boolean':
