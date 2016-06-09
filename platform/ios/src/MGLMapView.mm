@@ -3382,17 +3382,22 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // By default attempt to use the GL annotation image frame as the positioning rect.
     CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
     
+    MGLAnnotationView *annotationView = nil;
+    
     if (annotation != self.userLocation)
     {
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
-        if (annotationView)
+        annotationView = annotationContext.annotationView;
+        
+        if (annotationView && annotationView.enabled)
         {
             // Annotations represented by views use the view frame as the positioning rect.
             positioningRect = annotationView.frame;
             
             [annotationView.superview bringSubviewToFront:annotationView];
+            
+            annotationView.selected = YES;
         }
     }
     
@@ -3474,6 +3479,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         [self.delegate mapView:self didSelectAnnotation:annotation];
     }
+    
+    if (annotationView && [self.delegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)])
+    {
+        [self.delegate mapView:self didSelectAnnotationView:annotationView];
+    }
 }
 
 - (MGLCompactCalloutView *)calloutViewForAnnotation:(id <MGLAnnotation>)annotation
@@ -3546,6 +3556,17 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         // dismiss popup
         [self.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
+        
+        // deselect annotation view
+        MGLAnnotationView *annotationView = nil;
+        MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+        
+        if (annotationTag != MGLAnnotationTagNotFound)
+        {
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            annotationView = annotationContext.annotationView;
+            annotationView.selected = NO;
+        }
 
         // clean up
         self.calloutViewForSelectedAnnotation = nil;
@@ -3555,6 +3576,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if ([self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotation:)])
         {
             [self.delegate mapView:self didDeselectAnnotation:annotation];
+        }
+        
+        if (annotationView && [self.delegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)])
+        {
+            [self.delegate mapView:self didDeselectAnnotationView:annotationView];
         }
     }
 }
