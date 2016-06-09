@@ -210,6 +210,7 @@ public class MarkerViewManager {
                 mapboxMap.selectMarker(marker);
             }
             marker.setSelected(true);
+            convertView.bringToFront();
         }
     }
 
