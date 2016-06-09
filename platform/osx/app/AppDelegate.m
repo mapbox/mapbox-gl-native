@@ -53,6 +53,22 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     return self.progress.countOfBytesCompleted;
 }
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfTilesCompleted {
+    return [NSSet setWithObjects:@"progress", nil];
+}
+
+- (uint64_t)countOfTilesCompleted {
+    return self.progress.countOfTilesCompleted;
+}
+
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfTileBytesCompleted {
+    return [NSSet setWithObjects:@"progress", nil];
+}
+
+- (uint64_t)countOfTileBytesCompleted {
+    return self.progress.countOfTileBytesCompleted;
+}
+
 @end
 
 @interface AppDelegate ()
