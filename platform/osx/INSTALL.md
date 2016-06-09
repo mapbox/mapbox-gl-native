@@ -21,7 +21,15 @@ Grab a [prebuilt release](https://github.com/mapbox/mapbox-gl-native/releases/) 
 
 ## Usage
 
-In a storyboard or XIB, add a view to your view controller. (Drag Custom View from the Object library to the View Controller scene on the Interface Builder canvas.) In the Identity inspector, set the view’s custom class to `MGLMapView`. If you need to manipulate the map view programmatically:
+In a storyboard or XIB:
+
+1. Add a view to your view controller or window. (Drag Custom View from the Object library to the View Controller scene on the Interface Builder canvas. In a XIB, drag it instead to the window on the canvas.)
+2. In the Identity inspector, set the view’s custom class to `MGLMapView`.
+3. MGLMapView needs to be layer-backed:
+  * You can make the window layer-backed by selecting the window and checking Full Size Content View in the Attributes inspector. This allows the map view to underlap the title bar and toolbar.
+  * Alternatively, if you don’t want the entire window to be layer-backed, you can make just the map view layer-backed by selecting it and checking its entry under the View Effects inspector’s Core Animation Layer section.
+
+If you need to manipulate the map view programmatically:
 
 1. Switch to the Assistant Editor.
 1. Import the `Mapbox` module.

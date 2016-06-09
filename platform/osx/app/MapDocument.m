@@ -18,7 +18,18 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSMutableArray *flattenedShapes = [NSMutableArray arrayWithCapacity:shapes.count];
     for (id <MGLAnnotation> shape in shapes) {
         NSArray *subshapes;
-        if ([shape isKindOfClass:[MGLMultiPolyline class]]) {
+        // Flatten multipoints but not polylines or polygons.
+        if ([shape isMemberOfClass:[MGLMultiPoint class]]) {
+            NSUInteger pointCount = [(MGLMultiPoint *)shape pointCount];
+            CLLocationCoordinate2D *coordinates = [(MGLMultiPoint *)shape coordinates];
+            NSMutableArray *pointAnnotations = [NSMutableArray arrayWithCapacity:pointCount];
+            for (NSUInteger i = 0; i < pointCount; i++) {
+                MGLPointAnnotation *pointAnnotation = [[MGLPointAnnotation alloc] init];
+                pointAnnotation.coordinate = coordinates[i];
+                [pointAnnotations addObject:pointAnnotation];
+            }
+            subshapes = pointAnnotations;
+        } else if ([shape isKindOfClass:[MGLMultiPolyline class]]) {
             subshapes = [(MGLMultiPolyline *)shape polylines];
         } else if ([shape isKindOfClass:[MGLMultiPolygon class]]) {
             subshapes = [(MGLMultiPolygon *)shape polygons];

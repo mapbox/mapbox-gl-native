@@ -882,9 +882,10 @@ IB_DESIGNABLE
  Adds an annotation to the map view.
  
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
-    cannot be added to the map view at this time. Any multipolyline,
-    multipolygon, or shape collection object that is passed into this method is
-    silently ignored.
+    cannot be added to the map view at this time. Nor can `MGLMultiPoint`
+    objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
+    multipoint, multipolyline, multipolygon, or shape collection object that is
+    specified is silently ignored.
  
  @param annotation The annotation object to add to the receiver. This object
     must conform to the `MGLAnnotation` protocol. The map view retains the
@@ -895,9 +896,10 @@ IB_DESIGNABLE
  Adds an array of annotations to the map view.
  
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, and `MGLShapeCollection` objects
-    cannot be added to the map view at this time. Any multipolyline,
-    multipolygon, or shape collection objects that are passed in are silently
-    ignored.
+    cannot be added to the map view at this time. Nor can `MGLMultiPoint`
+    objects that are not instances of `MGLPolyline` or `MGLPolygon`. Any
+    multipoint, multipolyline, multipolygon, or shape collection objects that
+    are specified are silently ignored.
  
  @param annotations An array of annotation objects. Each object in the array
     must conform to the `MGLAnnotation` protocol. The map view retains each

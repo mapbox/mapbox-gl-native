@@ -4,33 +4,34 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
 
-#include <algorithm>
+#include <unique_resource.hpp>
+
 #include <memory>
-#include <vector>
 
 namespace mbgl {
 namespace gl {
 
+class TexturePool;
+
+struct TextureReleaser {
+    TexturePool* pool;
+    void operator()(GLuint) const;
+};
+
+using PooledTexture = std_experimental::unique_resource<GLuint, TextureReleaser>;
+
 class TexturePool : private util::noncopyable {
 public:
-    GLuint getTextureID(gl::ObjectStore&);
-    void releaseTextureID(GLuint&);
+    TexturePool();
+    ~TexturePool();
+
+    PooledTexture acquireTexture(gl::ObjectStore&);
 
 private:
-    class Impl : private util::noncopyable {
-    public:
-        Impl(gl::ObjectStore& store) : pool(store.createTexturePool()), availableIDs(gl::TextureMax) {
-            std::copy(pool.get().begin(), pool.get().end(), availableIDs.begin());
-        }
+    friend TextureReleaser;
 
-        Impl(Impl&& o) : pool(std::move(o.pool)), availableIDs(std::move(o.availableIDs)) {}
-        Impl& operator=(Impl&& o) { pool = std::move(o.pool); availableIDs = std::move(o.availableIDs); return *this; }
-
-        gl::UniqueTexturePool pool;
-        std::vector<GLuint> availableIDs;
-    };
-
-    std::vector<Impl> pools;
+    class Impl;
+    const std::unique_ptr<Impl> impl;
 };
 
 } // namespace gl

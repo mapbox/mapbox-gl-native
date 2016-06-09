@@ -53,7 +53,7 @@ private:
     BinPack<uint16_t> bin;
     std::unordered_map<FontStack, std::map<uint32_t, GlyphValue>, FontStackHash> index;
     const std::unique_ptr<uint8_t[]> data;
-    std::atomic<bool> dirty;
+    util::Atomic<bool> dirty;
     mbgl::optional<gl::UniqueTexture> texture;
 };
 

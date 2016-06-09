@@ -13,12 +13,6 @@ Raster::Raster(gl::TexturePool& texturePool_)
     : texturePool(texturePool_)
 {}
 
-Raster::~Raster() {
-    if (textured) {
-        texturePool.releaseTextureID(textureID);
-    }
-}
-
 bool Raster::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
@@ -42,10 +36,10 @@ void Raster::bind(bool linear, gl::ObjectStore& store) {
         return;
     }
 
-    if (img.data && !textured) {
+    if (img.data && !texture) {
         upload(store);
-    } else if (textured) {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
+    } else if (texture) {
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 
     GLint new_filter = linear ? GL_LINEAR : GL_NEAREST;
@@ -57,15 +51,15 @@ void Raster::bind(bool linear, gl::ObjectStore& store) {
 }
 
 void Raster::upload(gl::ObjectStore& store) {
-    if (img.data && !textured) {
-        textureID = texturePool.getTextureID(store);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, textureID));
+    if (img.data && !texture) {
+        texture = texturePool.acquireTexture(store);
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data.release()));
-        textured = true;
+        MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data.get()));
+        img.data.reset();
     }
 }

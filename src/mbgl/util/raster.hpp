@@ -5,6 +5,7 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <mutex>
 
@@ -14,7 +15,6 @@ class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
     Raster(gl::TexturePool&);
-    ~Raster();
 
     // load image data
     void load(PremultipliedImage);
@@ -33,11 +33,8 @@ public:
     GLsizei width = 0;
     GLsizei height = 0;
 
-    // has been uploaded to texture
-    bool textured = false;
-
-    // the uploaded texture
-    GLuint textureID = 0;
+    // GL buffer object handle.
+    mbgl::optional<gl::PooledTexture> texture;
 
     // texture opacity
     double opacity = 0;

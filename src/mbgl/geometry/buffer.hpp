@@ -88,19 +88,6 @@ protected:
         return reinterpret_cast<char *>(array) + (pos - itemSize);
     }
 
-    // Get a pointer to the item at a given index.
-    inline void *getElement(size_t i) {
-        if (array == nullptr) {
-            throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
-        }
-
-        if (i * itemSize >= pos) {
-            throw std::runtime_error("Can't get element after array bounds");
-        } else {
-            return reinterpret_cast<char *>(array) + (i * itemSize);
-        }
-    }
-
 public:
     static const size_t itemSize = item_size;
 

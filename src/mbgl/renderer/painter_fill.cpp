@@ -55,7 +55,7 @@ void Painter::renderFill(FillBucket& bucket,
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->u_color = stroke_color;
+        outlineShader->u_outline_color = stroke_color;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line
@@ -184,7 +184,7 @@ void Painter::renderFill(FillBucket& bucket,
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->u_color = fill_color;
+        outlineShader->u_outline_color = fill_color;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line

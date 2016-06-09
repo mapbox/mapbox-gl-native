@@ -239,6 +239,13 @@ run-qt-app: qt-app
 run-qt-qml-app: qt-qml-app
 	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qquickmapboxgl
 
+test-valgrind-qt: $(QT_MAKEFILE) node_modules
+	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
+	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=-*.Load
+
+run-valgrind-qt-app: qt-app
+	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/qmapboxgl --test -platform offscreen
+
 #### Linux targets #####################################################
 
 LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)
@@ -269,9 +276,6 @@ test: $(LINUX_MAKEFILE)
 
 run-glfw-app: glfw-app
 	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && ./mapbox-glfw
-
-run-valgrind-glfw-app: glfw-app
-	cd $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) && valgrind --leak-check=full --suppressions=../../../scripts/valgrind.sup ./mapbox-glfw
 
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args

@@ -1779,8 +1779,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if (annotation == [self annotationWithTag:annotationTag])
         {
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
-            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, annotationImage.styleIconIdentifier.UTF8String ?: "" });
+            
+            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+            NSString *symbolName;
+            if (!annotationContext.annotationView)
+            {
+                MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+                symbolName = annotationImage.styleIconIdentifier;
+            }
+            
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String ?: "" });
             if (annotationTag == _selectedAnnotationTag)
             {
                 [self deselectAnnotation:annotation animated:YES];
@@ -2095,8 +2103,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     
     std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
-    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(),
-                                  ((MGLAnnotationAccessibilityElement *)element).tag);
+    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(), tag);
     if (foundElement == visibleAnnotations.end())
     {
         return NSNotFound;
@@ -2835,7 +2842,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if ([annotation isKindOfClass:[MGLMultiPoint class]])
         {
-            // The multipoint knows how to style itself (with the map view’s help).
+            // Actual multipoints aren’t supported as annotations.
+            if ([annotation isMemberOfClass:[MGLMultiPoint class]]
+                || [annotation isMemberOfClass:[MGLMultiPointFeature class]])
+            {
+                continue;
+            }
+            
+            // The polyline or polygon knows how to style itself (with the map view’s help).
             MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotation;
             if (!multiPoint.pointCount) {
                 continue;
@@ -2846,13 +2860,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
         }
-        else if ([annotation isKindOfClass:[MGLMultiPolyline class]]
-                 || [annotation isKindOfClass:[MGLMultiPolygon class]]
-                 || [annotation isKindOfClass:[MGLShapeCollection class]])
-        {
-            continue;
-        }
-        else
+        else if ( ! [annotation isKindOfClass:[MGLMultiPolyline class]]
+                 || ![annotation isKindOfClass:[MGLMultiPolygon class]]
+                 || ![annotation isKindOfClass:[MGLShapeCollection class]])
         {
             MGLAnnotationView *annotationView;
             NSString *symbolName;
@@ -3384,10 +3394,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         
-        if (annotationContext.annotationView)
+        MGLAnnotationView *annotationView = annotationContext.annotationView;
+        if (annotationView)
         {
             // Annotations represented by views use the view frame as the positioning rect.
-            positioningRect = annotationContext.annotationView.frame;
+            positioningRect = annotationView.frame;
+            
+            [annotationView.superview bringSubviewToFront:annotationView];
         }
     }
     
@@ -3832,9 +3845,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
             [self.locationManager stopUpdatingHeading];
 
-            if (self.userLocationAnnotationView)
+            CLLocation *location = self.userLocation.location;
+            if (location && self.userLocationAnnotationView)
             {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+                [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
             }
 
             break;
@@ -3882,7 +3896,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     _userLocationVerticalAlignment = alignment;
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
-        [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+        CLLocation *location = self.userLocation.location;
+        if (location)
+        {
+            [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
+        }
     }
 }
 
