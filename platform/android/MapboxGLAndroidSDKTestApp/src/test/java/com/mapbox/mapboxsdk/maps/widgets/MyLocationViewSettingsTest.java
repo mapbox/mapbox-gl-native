@@ -16,6 +16,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MyLocationViewSettingsTest {
 
@@ -41,6 +42,9 @@ public class MyLocationViewSettingsTest {
     public void testForegroundDrawables() {
         Drawable foregroundDrawable = mock(Drawable.class);
         Drawable foregroundBearingDrawable = mock(Drawable.class);
+        Drawable.ConstantState constantState = mock(Drawable.ConstantState.class);
+        when(foregroundDrawable.getConstantState()).thenReturn(constantState);
+        when(constantState.newDrawable()).thenReturn(foregroundDrawable);
         locationViewSettings.setForegroundDrawable(foregroundDrawable, foregroundBearingDrawable);
         assertEquals("foreground should match", foregroundDrawable, locationViewSettings.getForegroundDrawable());
         assertEquals("foreground bearing should match", foregroundBearingDrawable, locationViewSettings.getForegroundBearingDrawable());

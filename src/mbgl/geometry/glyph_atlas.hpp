@@ -2,6 +2,7 @@
 
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/text/glyph_store.hpp>
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -11,7 +12,6 @@
 #include <set>
 #include <unordered_map>
 #include <mutex>
-#include <atomic>
 
 namespace mbgl {
 

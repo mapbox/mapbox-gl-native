@@ -36,9 +36,10 @@
 
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
+    <string name="activity_back_to_map">Back to map activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
     <string name="activity_user_tracking_mode">User tracking mode</string>
-    <string name="activity_user_tracking_customization">User location customization</string>
+    <string name="activity_user_tracking_customization">User location drawable</string>
     <string name="activity_user_dot_color">User location tint color</string>
     <string name="activity_user_location_toggle">User location toggle</string>
     <string name="activity_custom_layer">Custom Layer</string>
@@ -77,6 +78,7 @@
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
+    <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
@@ -151,5 +153,10 @@
     <string name="dialog_camera_position">Animate to new position</string>
 
     <string name="geocoder_instructions">Tap Map To Geocode Where Black Marker Is Currently Located</string>
+
+    <string name="dynamic_marker_chelsea_title">Chelsea</string>
+    <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
+    <string name="dynamic_marker_arsenal_title">Arsenal</string>
+    <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
 
 </resources>

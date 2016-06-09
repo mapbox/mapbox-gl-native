@@ -2,10 +2,10 @@
 
 #include "jni.hpp"
 
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <atomic>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -47,7 +47,7 @@ private:
     bool detach = false;
 
     ALooper* loop = nullptr;
-    std::atomic<bool> running;
+    util::Atomic<bool> running;
 
     std::recursive_mutex mtx;
     std::list<Runnable*> runnables;

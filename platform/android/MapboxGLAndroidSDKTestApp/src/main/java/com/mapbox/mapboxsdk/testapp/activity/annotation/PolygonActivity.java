@@ -44,7 +44,7 @@ public class PolygonActivity extends AppCompatActivity {
         MapboxMapOptions options = new MapboxMapOptions()
                 .attributionTintColor(Color.RED)
                 .accessToken(getString(R.string.mapbox_access_token))
-                .styleUrl(Style.getMapboxStreetsUrl(AppConstant.STYLE_VERSION))
+                .styleUrl(Style.MAPBOX_STREETS)
                 .camera(new CameraPosition.Builder()
                         .target(new LatLng(45.520486, -122.673541))
                         .zoom(12)

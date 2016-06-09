@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -58,11 +57,12 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
                 // Create marker
                 MarkerOptions markerOptions = new MarkerOptions()
                         .position(LAT_LNG_CHELSEA)
-                        .icon(mIconFactory.fromResource(R.drawable.ic_chelsea));
+                        .icon(mIconFactory.fromResource(R.drawable.ic_chelsea))
+                        .title(getString(R.string.dynamic_marker_chelsea_title))
+                        .snippet(getString(R.string.dynamic_marker_chelsea_snippet));
                 mMarker = mapboxMap.addMarker(markerOptions);
             }
         });
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
@@ -84,6 +84,8 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
         // update marker
         mMarker.setPosition(first ? LAT_LNG_CHELSEA : LAT_LNG_ARSENAL);
         mMarker.setIcon(mIconFactory.fromResource(first ? R.drawable.ic_chelsea : R.drawable.ic_arsenal));
+        mMarker.setTitle(first ? getString(R.string.dynamic_marker_chelsea_title) : getString(R.string.dynamic_marker_arsenal_title));
+        mMarker.setSnippet(first ? getString(R.string.dynamic_marker_chelsea_snippet) :  getString(R.string.dynamic_marker_arsenal_snippet));
     }
 
     @Override

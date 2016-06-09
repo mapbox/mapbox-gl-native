@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.os.Parcelable;
-import android.support.annotation.AnimatorRes;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -26,10 +26,9 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     protected float anchorV = 1f;
     protected float infoWindowAnchorU = 0.5f;
     protected float infoWindowAnchorV = 0.0f;
-    protected int selectAnimRes;
-    protected int deselectAnimRes;
-    protected int rotation;
+    protected float rotation;
     protected boolean visible = true;
+    protected boolean selected;
 
     /**
      * Default constructor
@@ -99,7 +98,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param v the v-value
      * @return the object for which the method was called
      */
-    public T anchor(float u, float v) {
+    public T anchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
         return getThis();
@@ -112,31 +111,9 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param v the v-values
      * @return the object for which the method was called
      */
-    public T infoWindowAnchor(float u, float v) {
+    public T infoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.infoWindowAnchorU = u;
         this.infoWindowAnchorV = v;
-        return getThis();
-    }
-
-    /**
-     * Set the animator resource to be used when an MarkerView is selected.
-     *
-     * @param selectAnimRes the used animator resource
-     * @return the object for which the method was called
-     */
-    public T selectAnimatorResource(@AnimatorRes int selectAnimRes) {
-        this.selectAnimRes = selectAnimRes;
-        return getThis();
-    }
-
-    /**
-     * Set the animator resource to be used when an MarkerView is deselected.
-     *
-     * @param deselectAnimRes the used animator resource
-     * @return the object for which the method was called
-     */
-    public T deselectAnimatorResource(@AnimatorRes int deselectAnimRes) {
-        this.deselectAnimRes = deselectAnimRes;
         return getThis();
     }
 
@@ -146,7 +123,7 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
      * @param rotation the rotation value
      * @return the object for which the method was called
      */
-    public T rotation(int rotation) {
+    public T rotation(float rotation) {
         this.rotation = rotation;
         return getThis();
     }
@@ -244,29 +221,11 @@ public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends Base
     }
 
     /**
-     * Get the animator resource used for selecting the MarkerView.
-     *
-     * @return the animator resource
-     */
-    public int getSelectAnimRes() {
-        return selectAnimRes;
-    }
-
-    /**
-     * Get the animator resource used for deselecting the MarkerView.
-     *
-     * @return the animator resource
-     */
-    public int getDeselectAnimRes() {
-        return deselectAnimRes;
-    }
-
-    /**
      * Get the rotation of the MarkerView.
      *
      * @return the rotation value
      */
-    public int getRotation() {
+    public float getRotation() {
         return rotation;
     }
 

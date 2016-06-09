@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -72,7 +71,6 @@ public class MapboxMap {
 
     private List<InfoWindow> mInfoWindows;
     private MapboxMap.InfoWindowAdapter mInfoWindowAdapter;
-    private Bitmap mViewMarkerBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
 
     private boolean mMyLocationEnabled;
     private boolean mAllowConcurrentMultipleInfoWindows;
@@ -291,7 +289,7 @@ public class MapboxMap {
      * it will return the current location of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update) {
@@ -306,7 +304,7 @@ public class MapboxMap {
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
      *                   positive, otherwise an IllegalArgumentException will be thrown.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs) {
@@ -327,7 +325,7 @@ public class MapboxMap {
      *                   will be notified with onFinish(). If the animation stops due to interruption
      *                   by a later camera movement or a user gesture, onCancel() will be called.
      *                   Do not update or ease the camera from within onCancel().
-     * @see {@link CameraUpdateFactory} for a set of camera updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void easeCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
@@ -368,7 +366,7 @@ public class MapboxMap {
      * of the camera in flight.
      *
      * @param update The change that should be applied to the camera.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update) {
@@ -385,7 +383,7 @@ public class MapboxMap {
      * @param callback The callback to invoke from the main thread when the animation stops. If the
      *                 animation completes normally, onFinish() is called; otherwise, onCancel() is
      *                 called. Do not update or animate the camera from within onCancel().
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, MapboxMap.CancelableCallback callback) {
@@ -401,7 +399,7 @@ public class MapboxMap {
      * @param update     The change that should be applied to the camera.
      * @param durationMs The duration of the animation in milliseconds. This must be strictly
      *                   positive, otherwise an IllegalArgumentException will be thrown.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs) {
@@ -424,7 +422,7 @@ public class MapboxMap {
      *                   by a later camera movement or a user gesture, onCancel() will be called.
      *                   Do not update or animate the camera from within onCancel(). If a callback
      *                   isn't required, leave it as null.
-     * @see {@link CameraUpdateFactory} for a set of updates.
+     * @see com.mapbox.mapboxsdk.camera.CameraUpdateFactory for a set of updates.
      */
     @UiThread
     public final void animateCamera(CameraUpdate update, int durationMs, final MapboxMap.CancelableCallback callback) {
@@ -550,7 +548,7 @@ public class MapboxMap {
      * <li>{@code asset://...}:
      * reads the style from the APK {@code assets/} directory.
      * This is used to load a style bundled with your app.</li>
-     * <li>{@code null}: loads the default {@link Style#getMapboxStreetsUrl(int)} style.</li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
      * <p>
      * This method is asynchronous and will return immediately before the style finishes loading.
@@ -703,10 +701,11 @@ public class MapboxMap {
     @NonNull
     public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
         MarkerView marker = prepareViewMarker(markerOptions);
-        long id = mMapView.addMarker(marker);
         marker.setMapboxMap(this);
+        long id = mMapView.addMarker(marker);
         marker.setId(id);
         mAnnotations.put(id, marker);
+        mMarkerViewManager.invalidateViewMarkersInBounds();
         return marker;
     }
 
@@ -952,7 +951,7 @@ public class MapboxMap {
             Marker marker = (Marker) annotation;
             marker.hideInfoWindow();
             if (marker instanceof MarkerView) {
-                mMarkerViewManager.removeMarkerView((MarkerView) marker, true);
+                mMarkerViewManager.removeMarkerView((MarkerView) marker);
             }
         }
         long id = annotation.getId();
@@ -986,7 +985,7 @@ public class MapboxMap {
                 Marker marker = (Marker) annotation;
                 marker.hideInfoWindow();
                 if (marker instanceof MarkerView) {
-                    mMarkerViewManager.removeMarkerView((MarkerView) marker, true);
+                    mMarkerViewManager.removeMarkerView((MarkerView) marker);
                 }
             }
             ids[i] = annotationList.get(i).getId();
@@ -1012,7 +1011,7 @@ public class MapboxMap {
                 Marker marker = (Marker) annotation;
                 marker.hideInfoWindow();
                 if (marker instanceof MarkerView) {
-                    mMarkerViewManager.removeMarkerView((MarkerView) marker, true);
+                    mMarkerViewManager.removeMarkerView((MarkerView) marker);
                 }
             }
         }
@@ -1209,8 +1208,7 @@ public class MapboxMap {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-        Icon icon = IconFactory.recreate("markerViewSettings", mViewMarkerBitmap);
-        marker.setIcon(icon);
+        marker.setIcon(markerViewOptions.getIcon());
         return marker;
     }
 
@@ -1287,9 +1285,11 @@ public class MapboxMap {
     //
 
     /**
+     * <p>
      * Sets the distance from the edges of the map view’s frame to the edges of the map
      * view’s logical viewport.
-     * <p/>
+     * </p>
+     * <p>
      * When the value of this property is equal to {0,0,0,0}, viewport
      * properties such as `centerCoordinate` assume a viewport that matches the map
      * view’s frame. Otherwise, those properties are inset, excluding part of the
@@ -1826,7 +1826,7 @@ public class MapboxMap {
         public MarkerViewAdapter(Context context) {
             this.context = context;
             persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-            mViewReusePool = new Pools.SimplePool<>(20);
+            mViewReusePool = new Pools.SimplePool<>(10000);
         }
 
         /**
@@ -1841,11 +1841,56 @@ public class MapboxMap {
         public abstract View getView(@NonNull U marker, @NonNull View convertView, @NonNull ViewGroup parent);
 
         /**
+         * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
+         * <p>
+         * <p>
+         * This method should be used to reset an animated view back to it's original state for view reuse.
+         * </p>
+         * <p>
+         * Returning true indicates you want to the view reuse to be handled automatically.
+         * Returning false indicates you want to perform an animation and you are required calling {@link #releaseView(View)} yourself.
+         * </p>
+         *
+         * @param marker      the model representing the MarkerView
+         * @param convertView the reusable view
+         * @return true if you want reuse to occur automatically, false if you want to manage this yourself.
+         */
+        public boolean prepareViewForReuse(@NonNull MarkerView marker, @NonNull View convertView) {
+            return true;
+        }
+
+        /**
+         * Called when a MarkerView is selected from the MapView.
+         * <p>
+         * Returning true from this method indicates you want to move the MarkerView to the selected state.
+         * Returning false indicates you want to animate the View first an manually select the MarkerView when appropriate.
+         * </p>
+         *
+         * @param marker                   the model representing the MarkerView
+         * @param convertView              the reusable view
+         * @param reselectionFromRecycling indicates if the onSelect callback is the initial selection
+         *                                 callback or that selection occurs due to recreation of selected marker
+         * @return true if you want to select the Marker immediately, false if you want to manage this yourself.
+         */
+        public boolean onSelect(@NonNull U marker, @NonNull View convertView, boolean reselectionFromRecycling) {
+            return true;
+        }
+
+        /**
+         * Called when a MarkerView is deselected from the MapView.
+         *
+         * @param marker      the model representing the MarkerView
+         * @param convertView the reusable view
+         */
+        public void onDeselect(@NonNull U marker, @NonNull View convertView) {
+        }
+
+        /**
          * Returns the generic type of the used MarkerView.
          *
          * @return the generic type
          */
-        public Class<U> getMarkerClass() {
+        public final Class<U> getMarkerClass() {
             return persistentClass;
         }
 
@@ -1854,7 +1899,7 @@ public class MapboxMap {
          *
          * @return the pool associated to this adapter
          */
-        public Pools.SimplePool<View> getViewReusePool() {
+        public final Pools.SimplePool<View> getViewReusePool() {
             return mViewReusePool;
         }
 
@@ -1863,8 +1908,18 @@ public class MapboxMap {
          *
          * @return the context used
          */
-        public Context getContext() {
+        public final Context getContext() {
             return context;
+        }
+
+        /**
+         * Release a View to the ViewPool.
+         *
+         * @param view the view to be released
+         */
+        public final void releaseView(View view) {
+            view.setVisibility(View.GONE);
+            mViewReusePool.release(view);
         }
     }
 

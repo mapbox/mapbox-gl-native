@@ -3,8 +3,10 @@ package com.mapbox.mapboxsdk.maps.widgets;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
@@ -15,6 +17,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -22,6 +26,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -33,7 +38,6 @@ import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
-import com.mapbox.mapboxsdk.maps.UiSettings;
 
 import java.lang.ref.WeakReference;
 
@@ -45,7 +49,6 @@ public class MyLocationView extends View {
     private MyLocationBehavior myLocationBehavior;
     private MapboxMap mapboxMap;
     private Projection projection;
-    private int maxSize;
     private int[] contentPadding = new int[4];
 
     private Location location;
@@ -57,12 +60,12 @@ public class MyLocationView extends View {
     private float gpsDirection;
     private float previousDirection;
 
-    private float accuracy = 0;
-    private Paint accuracyPaint = new Paint();
+    private float accuracy;
+    private Paint accuracyPaint;
 
     private ValueAnimator locationChangeAnimator;
     private ValueAnimator accuracyAnimator;
-    private ObjectAnimator directionAnimator;
+    private ValueAnimator directionAnimator;
 
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
@@ -78,6 +81,11 @@ public class MyLocationView extends View {
     private int backgroundOffsetTop;
     private int backgroundOffsetRight;
     private int backgroundOffsetBottom;
+
+    private Matrix matrix;
+    private Camera camera;
+    private PointF screenLocation;
+    private float tilt;
 
     @MyLocationTracking.Mode
     private int myLocationTrackingMode;
@@ -105,15 +113,39 @@ public class MyLocationView extends View {
 
     private void init(Context context) {
         setEnabled(false);
+
+        // setup LayoutParams
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        setLayoutParams(lp);
+
+        matrix = new Matrix();
+        camera = new Camera();
+        camera.setLocation(0, 0, -1000);
+        accuracyPaint = new Paint();
+
         myLocationBehavior = new MyLocationBehaviorFactory().getBehavioralModel(MyLocationTracking.TRACKING_NONE);
         compassListener = new CompassListener(context);
-        maxSize = (int) context.getResources().getDimension(R.dimen.my_locationview_size);
     }
 
     public final void setForegroundDrawables(Drawable defaultDrawable, Drawable bearingDrawable) {
-        if (defaultDrawable == null || bearingDrawable == null) {
+        if (defaultDrawable == null) {
             return;
         }
+
+        if (bearingDrawable == null) {
+            // if user only provided one resource
+            // use same for bearing mode
+            bearingDrawable = defaultDrawable.getConstantState().newDrawable();
+        }
+
+        if (backgroundDrawable == null) {
+            // if the user didn't provide a background resource we will use the foreground resource instead,
+            // we need to create a new drawable to handle tinting correctly
+            backgroundDrawable = defaultDrawable.getConstantState().newDrawable();
+        }
+
         if (defaultDrawable.getIntrinsicWidth() != bearingDrawable.getIntrinsicWidth() || defaultDrawable.getIntrinsicHeight() != bearingDrawable.getIntrinsicHeight()) {
             throw new RuntimeException("The dimensions from location and bearing drawables should be match");
         }
@@ -151,7 +183,6 @@ public class MyLocationView extends View {
         backgroundOffsetTop = top;
         backgroundOffsetRight = right;
         backgroundOffsetBottom = bottom;
-
         setShadowDrawableTint(backgroundTintColor);
 
         invalidateBounds();
@@ -187,19 +218,18 @@ public class MyLocationView extends View {
 
         int backgroundWidth = backgroundDrawable.getIntrinsicWidth();
         int backgroundHeight = backgroundDrawable.getIntrinsicHeight();
+        int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
+        int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
+        backgroundBounds = new Rect(-backgroundWidth / 2 + horizontalOffset, -backgroundHeight / 2 + verticalOffset, backgroundWidth / 2 + horizontalOffset, backgroundHeight / 2 + verticalOffset);
+        backgroundDrawable.setBounds(backgroundBounds);
 
         int foregroundWidth = foregroundDrawable.getIntrinsicWidth();
         int foregroundHeight = foregroundDrawable.getIntrinsicHeight();
+        foregroundBounds = new Rect(-foregroundWidth / 2, -foregroundHeight / 2, foregroundWidth / 2, foregroundHeight / 2);
+        foregroundDrawable.setBounds(foregroundBounds);
+        foregroundBearingDrawable.setBounds(foregroundBounds);
 
-        int horizontalOffset = backgroundOffsetLeft - backgroundOffsetRight;
-        int verticalOffset = backgroundOffsetTop - backgroundOffsetBottom;
-
-        int accuracyWidth = 2 * maxSize;
-
-        backgroundBounds = new Rect(accuracyWidth - (backgroundWidth / 2) + horizontalOffset, accuracyWidth + verticalOffset - (backgroundWidth / 2), accuracyWidth + (backgroundWidth / 2) + horizontalOffset, accuracyWidth + (backgroundHeight / 2) + verticalOffset);
-        foregroundBounds = new Rect(accuracyWidth - (foregroundWidth / 2), accuracyWidth - (foregroundHeight / 2), accuracyWidth + (foregroundWidth / 2), accuracyWidth + (foregroundHeight / 2));
-
-        // invoke a new measure
+        // invoke a new draw
         invalidate();
     }
 
@@ -207,23 +237,51 @@ public class MyLocationView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (location == null || foregroundBounds == null || backgroundBounds == null || accuracyAnimator == null) {
+        if (location == null || foregroundBounds == null || backgroundBounds == null || accuracyAnimator == null || screenLocation == null) {
             // Not ready yet
             return;
         }
 
-        // Draw circle
-        float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
-        float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel;
-        float maxRadius = getWidth() / 2;
-        canvas.drawCircle(foregroundBounds.centerX(), foregroundBounds.centerY(), accuracyPixels <= maxRadius ? accuracyPixels : maxRadius, accuracyPaint);
+        final PointF pointF = screenLocation;
 
-        // Draw shadow
+        float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
+        float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel / 2;
+        float maxRadius = getWidth() / 2;
+        accuracyPixels = accuracyPixels <= maxRadius ? accuracyPixels : maxRadius;
+
+        // put matrix in origin
+        matrix.reset();
+
+        // apply tilt to camera
+        camera.save();
+        camera.rotate(tilt, 0, 0);
+
+        // map camera matrix on our matrix
+        camera.getMatrix(matrix);
+
+        //
+        if (myBearingTrackingMode != MyBearingTracking.NONE) {
+            matrix.postRotate((Float) directionAnimator.getAnimatedValue());
+        }
+
+        // put matrix at location of MyLocationView
+        matrix.postTranslate(pointF.x, pointF.y);
+
+        // concat our matrix on canvas
+        canvas.concat(matrix);
+
+        // restore orientation from camera
+        camera.restore();
+
+        // draw circle
+        canvas.drawCircle(0, 0, accuracyPixels, accuracyPaint);
+
+        // draw shadow
         if (backgroundDrawable != null) {
             backgroundDrawable.draw(canvas);
         }
 
-        // Draw foreground
+        // draw foreground
         if (myBearingTrackingMode == MyBearingTracking.NONE) {
             if (foregroundDrawable != null) {
                 foregroundDrawable.draw(canvas);
@@ -233,27 +291,8 @@ public class MyLocationView extends View {
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        if (foregroundDrawable != null && foregroundBounds != null) {
-            foregroundDrawable.setBounds(foregroundBounds);
-        }
-
-        if (foregroundBearingDrawable != null && foregroundBounds != null) {
-            foregroundBearingDrawable.setBounds(foregroundBounds);
-        }
-
-        if (backgroundDrawable != null && backgroundBounds != null) {
-            backgroundDrawable.setBounds(backgroundBounds);
-        }
-
-        setMeasuredDimension(4 * maxSize, 4 * maxSize);
-    }
-
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
-        setRotationX((float) tilt);
+        this.tilt = (float) tilt;
     }
 
     void updateOnNextFrame() {
@@ -292,6 +331,24 @@ public class MyLocationView extends View {
         super.setEnabled(enabled);
         setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
         toggleGps(enabled);
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putFloat("tilt", tilt);
+        return bundle;
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state){
+        if (state instanceof Bundle){
+            Bundle bundle = (Bundle) state;
+            tilt = bundle.getFloat("tilt");
+            state = bundle.getParcelable("superState");
+        }
+        super.onRestoreInstanceState(state);
     }
 
     /**
@@ -385,8 +442,8 @@ public class MyLocationView extends View {
         }
         previousDirection = newDir;
 
-        directionAnimator = ObjectAnimator.ofFloat(this, View.ROTATION, oldDir, newDir);
-        directionAnimator.setDuration(1000);
+        directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
+        directionAnimator.setDuration(375);
         directionAnimator.start();
     }
 
@@ -626,9 +683,9 @@ public class MyLocationView extends View {
         @Override
         void invalidate() {
             int[] mapPadding = mapboxMap.getPadding();
-            UiSettings uiSettings = mapboxMap.getUiSettings();
-            setX((uiSettings.getWidth() - getWidth() + mapPadding[0] - mapPadding[2]) / 2 + (contentPadding[0] - contentPadding[2]) / 2);
-            setY((uiSettings.getHeight() - getHeight() - mapPadding[3] + mapPadding[1]) / 2 + (contentPadding[1] - contentPadding[3]) / 2);
+            float x = (getWidth() + mapPadding[0] - mapPadding[2]) / 2 + (contentPadding[0] - contentPadding[2]) / 2;
+            float y = (getHeight() - mapPadding[3] + mapPadding[1]) / 2 + (contentPadding[1] - contentPadding[3]) / 2;
+            screenLocation = new PointF(x, y);
             MyLocationView.this.invalidate();
         }
     }
@@ -659,7 +716,7 @@ public class MyLocationView extends View {
             // calculate updateLatLng time + add some extra offset to improve animation
             long previousUpdateTimeStamp = locationUpdateTimestamp;
             locationUpdateTimestamp = SystemClock.elapsedRealtime();
-            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.1);
+            long locationUpdateDuration = (long) ((locationUpdateTimestamp - previousUpdateTimeStamp) * 1.3);
 
             // calculate interpolated entity
             interpolatedLocation = new LatLng((latLng.getLatitude() + previousLocation.getLatitude()) / 2, (latLng.getLongitude() + previousLocation.getLongitude()) / 2);
@@ -694,11 +751,7 @@ public class MyLocationView extends View {
 
         @Override
         void invalidate() {
-            PointF screenLocation = projection.toScreenLocation(latLng);
-            if (screenLocation != null) {
-                setX((screenLocation.x - getWidth() / 2));
-                setY((screenLocation.y - getHeight() / 2));
-            }
+            screenLocation = projection.toScreenLocation(latLng);
             MyLocationView.this.invalidate();
         }
     }

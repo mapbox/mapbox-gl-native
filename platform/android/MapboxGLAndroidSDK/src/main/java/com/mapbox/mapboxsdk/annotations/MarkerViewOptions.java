@@ -28,9 +28,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
-        selectAnimatorResource(in.readInt());
-        deselectAnimatorResource(in.readInt());
-        rotation(in.readInt());
+        rotation(in.readFloat());
         visible(in.readByte() != 0);
         if (in.readByte() != 0) {
             // this means we have an icon
@@ -61,9 +59,7 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeInt(getSelectAnimRes());
-        out.writeInt(getDeselectAnimRes());
-        out.writeInt(getRotation());
+        out.writeFloat(getRotation());
         out.writeByte((byte) (isVisible() ? 1 : 0));
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
@@ -82,8 +78,6 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
         marker.setFlat(flat);
         marker.setAnchor(anchorU, anchorV);
         marker.setInfoWindowAnchor(infoWindowAnchorU, infoWindowAnchorV);
-        marker.setSelectAnimRes(selectAnimRes);
-        marker.setDeselectAnimRes(deselectAnimRes);
         marker.setRotation(rotation);
         marker.setVisible(visible);
         return marker;

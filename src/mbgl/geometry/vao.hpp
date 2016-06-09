@@ -25,7 +25,7 @@ public:
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
             shader.bind(offset);
-            if (vao) {
+            if (vao.created()) {
                 storeBinding(shader, vertexBuffer.getID(), 0, offset);
             }
         } else {
@@ -40,7 +40,7 @@ public:
             vertexBuffer.bind(store);
             elementsBuffer.bind(store);
             shader.bind(offset);
-            if (vao) {
+            if (vao.created()) {
                 storeBinding(shader, vertexBuffer.getID(), elementsBuffer.getID(), offset);
             }
         } else {

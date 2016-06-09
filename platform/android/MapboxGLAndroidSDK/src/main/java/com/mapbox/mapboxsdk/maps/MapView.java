@@ -252,6 +252,7 @@ public class MapView extends FrameLayout {
         CameraPosition position = options.getCamera();
         if (position != null) {
             mMapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+            mMyLocationView.setTilt(position.tilt);
         }
 
         String accessToken = null;
@@ -407,7 +408,6 @@ public class MapView extends FrameLayout {
 
             // User location
             try {
-                //noinspection ResourceType
                 mMapboxMap.setMyLocationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED));
             } catch (SecurityException ignore) {
                 // User did not accept location permissions
@@ -445,6 +445,7 @@ public class MapView extends FrameLayout {
                             callback.onMapReady(mMapboxMap);
                             iterator.remove();
                         }
+                        mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
@@ -672,11 +673,11 @@ public class MapView extends FrameLayout {
         return mContentPaddingBottom;
     }
 
-    int getContentWidth(){
+    int getContentWidth() {
         return getWidth() - mContentPaddingLeft - mContentPaddingRight;
     }
 
-    int getContentHeight(){
+    int getContentHeight() {
         return getHeight() - mContentPaddingBottom - mContentPaddingTop;
     }
 
@@ -783,7 +784,7 @@ public class MapView extends FrameLayout {
      * <li>{@code asset://...}:
      * reads the style from the APK {@code assets/} directory.
      * This is used to load a style bundled with your app.</li>
-     * <li>{@code null}: loads the default {@link Style#getMapboxStreetsUrl(int)} style.</li>
+     * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
      * </ul>
      * <p>
      * This method is asynchronous and will return immediately before the style finishes loading.
@@ -874,7 +875,7 @@ public class MapView extends FrameLayout {
      * <p>
      * DEPRECATED @see MapboxAccountManager#getAccessToken()
      * </p>
-     * <p/>
+     * <p>
      * Returns the current Mapbox access token used to load map styles and tiles.
      * </p>
      *
@@ -993,7 +994,10 @@ public class MapView extends FrameLayout {
             Log.w(MapboxConstants.TAG, "marker has an id of -1, possibly was not added yet, doing nothing");
         }
 
-        ensureIconLoaded(updatedMarker);
+        if (!(updatedMarker instanceof MarkerView)) {
+            ensureIconLoaded(updatedMarker);
+        }
+
         mNativeMapView.updateMarker(updatedMarker);
     }
 
@@ -1021,7 +1025,7 @@ public class MapView extends FrameLayout {
     }
 
     long addMarker(@NonNull Marker marker) {
-        if(mDestroyed){
+        if (mDestroyed) {
             return 0l;
         }
         return mNativeMapView.addMarker(marker);
@@ -2708,7 +2712,7 @@ public class MapView extends FrameLayout {
         private boolean mDefaultStyle;
 
         StyleInitializer(@NonNull Context context) {
-            mStyle = Style.getMapboxStreetsUrl(context.getResources().getInteger(R.integer.style_version));
+            mStyle = Style.MAPBOX_STREETS;
             mDefaultStyle = true;
         }
 

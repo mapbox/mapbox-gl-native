@@ -31,7 +31,7 @@
 
     <com.mapbox.mapboxsdk.maps.widgets.MyLocationView
         android:id="@+id/userLocationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </merge>

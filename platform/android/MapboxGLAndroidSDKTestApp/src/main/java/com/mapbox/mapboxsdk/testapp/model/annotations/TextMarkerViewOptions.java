@@ -9,21 +9,20 @@ import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarkerView, CountryMarkerViewOptions> {
+public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView, TextMarkerViewOptions> {
 
-    private String abbrevName;
-    private int flagRes;
+    private String text;
 
-    public CountryMarkerViewOptions() {
+    public TextMarkerViewOptions() {
     }
 
-    protected CountryMarkerViewOptions(Parcel in) {
+    protected TextMarkerViewOptions(Parcel in) {
         position((LatLng) in.readParcelable(LatLng.class.getClassLoader()));
         snippet(in.readString());
         title(in.readString());
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
-        selected = in.readByte() != 0;
+        infoWindowAnchor(in.readFloat(), in.readFloat());
         rotation(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
@@ -32,12 +31,11 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
             Icon icon = IconFactory.recreate(iconId, iconBitmap);
             icon(icon);
         }
-        abbrevName(in.readString());
-        flagRes(in.readInt());
+        text(in.readString());
     }
 
     @Override
-    public CountryMarkerViewOptions getThis() {
+    public TextMarkerViewOptions getThis() {
         return this;
     }
 
@@ -56,7 +54,6 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeByte((byte) (selected ? 1 : 0));
         out.writeFloat(getRotation());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
@@ -64,22 +61,16 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
             out.writeString(getIcon().getId());
             out.writeParcelable(getIcon().getBitmap(), flags);
         }
-        out.writeString(abbrevName);
-        out.writeInt(flagRes);
+        out.writeString(text);
     }
 
     @Override
-    public CountryMarkerView getMarker() {
-        return new CountryMarkerView(this, abbrevName, flagRes);
+    public TextMarkerView getMarker() {
+        return new TextMarkerView(this, text);
     }
 
-    public CountryMarkerViewOptions abbrevName(String abbrevName) {
-        this.abbrevName = abbrevName;
-        return getThis();
-    }
-
-    public CountryMarkerViewOptions flagRes(int flagRes) {
-        this.flagRes = flagRes;
+    public TextMarkerViewOptions text(String text) {
+        this.text = text;
         return getThis();
     }
 
@@ -93,6 +84,4 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
             return new CountryMarkerViewOptions[size];
         }
     };
-
-
 }

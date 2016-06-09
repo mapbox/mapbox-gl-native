@@ -1,5 +1,12 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.graphics.Bitmap;
+import android.support.annotation.FloatRange;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.View;
+
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
@@ -28,12 +35,13 @@ public class MarkerView extends Marker {
     private boolean flat;
     private boolean visible = true;
 
-    private int selectAnimRes;
-    private int deselectAnimRes;
-
     private float tiltValue;
     private float rotation;
     private float alpha = 1;
+
+    private Icon markerViewIcon;
+
+    private boolean selected;
 
     /**
      * Publicly hidden default constructor
@@ -53,12 +61,11 @@ public class MarkerView extends Marker {
         this.infoWindowAnchorU = baseMarkerViewOptions.getInfoWindowAnchorU();
         this.infoWindowAnchorV = baseMarkerViewOptions.getInfoWindowAnchorV();
         this.flat = baseMarkerViewOptions.isFlat();
-        this.selectAnimRes = baseMarkerViewOptions.getSelectAnimRes();
-        this.deselectAnimRes = baseMarkerViewOptions.getDeselectAnimRes();
         this.infoWindowAnchorU = baseMarkerViewOptions.infoWindowAnchorU;
         this.infoWindowAnchorV = baseMarkerViewOptions.infoWindowAnchorV;
         this.anchorU = baseMarkerViewOptions.anchorU;
         this.anchorV = baseMarkerViewOptions.anchorV;
+        this.selected = baseMarkerViewOptions.selected;
     }
 
     /**
@@ -71,7 +78,7 @@ public class MarkerView extends Marker {
      * @param u u-coordinate of the anchor, as a ratio of the image width (in the range [0, 1])
      * @param v v-coordinate of the anchor, as a ratio of the image height (in the range [0, 1])
      */
-    public void setAnchor(float u, float v) {
+    public void setAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
     }
@@ -149,7 +156,7 @@ public class MarkerView extends Marker {
      * @param v v-coordinate of the info window anchor, as a ratio of the image height (in the range [0, 1])
      * @see #setAnchor(float, float) for more details.
      */
-    public void setInfoWindowAnchor(float u, float v) {
+    public void setInfoWindowAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.infoWindowAnchorU = u;
         this.infoWindowAnchorV = v;
     }
@@ -191,42 +198,6 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Get the animator resource used to animate to the selected state of a MarkerView.
-     *
-     * @return the animator resource used
-     */
-    public int getSelectAnimRes() {
-        return selectAnimRes;
-    }
-
-    /**
-     * Set the animator resource used to animate to the deselected state of a MarkerView.
-     *
-     * @param selectAnimRes the animator resource used
-     */
-    public void setSelectAnimRes(int selectAnimRes) {
-        this.selectAnimRes = selectAnimRes;
-    }
-
-    /**
-     * Get the animator resource used to animate to the deslected state of a MarkerView.
-     *
-     * @return the animator resource used
-     */
-    public int getDeselectAnimRes() {
-        return deselectAnimRes;
-    }
-
-    /**
-     * Set the animator resource used to animate to the selected state of a MarkerView.
-     *
-     * @param deselectAnimRes the animator resource used
-     */
-    public void setDeselectAnimRes(int deselectAnimRes) {
-        this.deselectAnimRes = deselectAnimRes;
-    }
-
-    /**
      * Internal method to get the current tilted value of a MarkerView.
      *
      * @return the tilted value
@@ -240,7 +211,7 @@ public class MarkerView extends Marker {
      *
      * @param tiltValue the tilted value to set
      */
-    void setTilt(float tiltValue) {
+    void setTilt(@FloatRange(from = 0.0, to = MapboxConstants.MAXIMUM_TILT) float tiltValue) {
         this.tiltValue = tiltValue;
     }
 
@@ -308,11 +279,50 @@ public class MarkerView extends Marker {
      *
      * @param alpha the alpha value to animate to
      */
-    public void setAlpha(float alpha) {
+    public void setAlpha(@FloatRange(from=0.0, to=255.0)float alpha) {
         this.alpha = alpha;
         if (markerViewManager != null) {
             markerViewManager.animateAlpha(this, alpha);
         }
+    }
+
+    /**
+     * Set the icon of the MarkerView.
+     *
+     * @param icon the icon to be used as Marker image
+     */
+    @Override
+    public void setIcon(@Nullable Icon icon) {
+        if (icon != null) {
+            markerViewIcon = IconFactory.recreate("icon", icon.getBitmap());
+        }
+        Bitmap bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        Icon transparentIcon = IconFactory.recreate("markerViewSettings", bitmap);
+        if (markerViewManager != null) {
+            markerViewManager.updateIcon(this);
+        }
+        super.setIcon(transparentIcon);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    /**
+     * For internal use only, use {@link MapboxMap#selectMarker(Marker)} instead.
+     */
+    void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    /**
+     * Get the icon of the MarkerView.
+     *
+     * @return the icon use as Marker image
+     */
+    @Override
+    public Icon getIcon() {
+        return markerViewIcon;
     }
 
     /**

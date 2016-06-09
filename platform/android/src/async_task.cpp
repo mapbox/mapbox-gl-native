@@ -1,9 +1,9 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/run_loop.hpp>
 
-#include <atomic>
 #include <functional>
 
 namespace mbgl {
@@ -12,7 +12,7 @@ namespace util {
 class AsyncTask::Impl : public RunLoop::Impl::Runnable {
 public:
     Impl(std::function<void()>&& fn)
-        : task(std::move(fn)) {
+        : queued(true), task(std::move(fn)) {
         loop->initRunnable(this);
     }
 
@@ -21,7 +21,8 @@ public:
     }
 
     void maySend() {
-        if (!queued.test_and_set()) {
+        if (queued) {
+            queued = false;
             loop->addRunnable(this);
         }
     }
@@ -32,7 +33,7 @@ public:
 
     void runTask() override {
         loop->removeRunnable(this);
-        queued.clear();
+        queued = true;
         task();
     }
 
@@ -42,7 +43,9 @@ private:
 
     RunLoop::Impl* loop = reinterpret_cast<RunLoop::Impl*>(RunLoop::getLoopHandle());
 
-    std::atomic_flag queued = ATOMIC_FLAG_INIT;
+    // TODO: Use std::atomic_flag if we ever drop
+    // support for ARMv5
+    util::Atomic<bool> queued;
     std::function<void()> task;
 };
 

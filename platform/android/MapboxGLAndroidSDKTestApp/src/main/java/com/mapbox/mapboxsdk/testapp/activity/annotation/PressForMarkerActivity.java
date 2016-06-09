@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -17,6 +18,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -50,7 +52,7 @@ public class PressForMarkerActivity extends AppCompatActivity {
             @Override
             public void onMapReady(final MapboxMap map) {
                 mapboxMap = map;
-                mapboxMap.setStyleUrl(Style.getOutdoorsStyleUrl(9));
+                mapboxMap.setStyleUrl(Style.OUTDOORS);
                 resetMap();
 
                 mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {

@@ -463,6 +463,16 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     *
+     * @param myLocationForegroundDrawable
+     * @return This
+     */
+    public MapboxMapOptions myLocationForegroundDrawable(Drawable myLocationForegroundDrawable) {
+        this.myLocationForegroundDrawable = myLocationForegroundDrawable;
+        return this;
+    }
+
+    /**
      * @param myLocationBackgroundDrawable
      * @return This
      */
