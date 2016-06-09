@@ -387,7 +387,7 @@ public class MarkerViewManager {
 
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
-                                mapView.addView(adaptedView);
+                                mapView.getMarkerViewContainer().addView(adaptedView);
                             }
                         }
                     }

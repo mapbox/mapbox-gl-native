@@ -48,6 +48,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -124,6 +125,7 @@ public class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
     private boolean mHasSurface = false;
 
+    private ViewGroup mMarkerViewContainer;
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
@@ -223,6 +225,8 @@ public class MapView extends FrameLayout {
 
         // Connectivity
         onConnectivityChanged(isConnected());
+
+        mMarkerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
 
         mMyLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         mMyLocationView.setMapboxMap(mMapboxMap);
@@ -1130,6 +1134,13 @@ public class MapView extends FrameLayout {
         }
 
         return new ArrayList<>(annotations);
+    }
+
+    /**
+     * @return the ViewGroup containing the marker views
+     */
+    public ViewGroup getMarkerViewContainer() {
+        return mMarkerViewContainer;
     }
 
 
