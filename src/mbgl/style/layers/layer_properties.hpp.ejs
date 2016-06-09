@@ -1,0 +1,50 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
+#pragma once
+
+#include <mbgl/style/layout_property.hpp>
+#include <mbgl/style/paint_property.hpp>
+#include <mbgl/util/rapidjson.hpp>
+
+namespace mbgl {
+namespace style {
+
+class CascadeParameters;
+class CalculationParameters;
+
+<% if (layoutProperties.length) { -%>
+class <%- camelize(type) %>LayoutProperties {
+public:
+    void parse(const JSValue&);
+    void recalculate(const CalculationParameters&);
+
+<% for (const property of layoutProperties) { -%>
+    LayoutProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
+<% } -%>
+};
+
+<% } -%>
+class <%- camelize(type) %>PaintProperties {
+public:
+    void parse(const JSValue&);
+    void cascade(const CascadeParameters&);
+    bool recalculate(const CalculationParameters&);
+
+<% for (const property of paintProperties) { -%>
+<% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
+    PaintProperty<<%- propertyType(property) %>, CrossFadedPropertyEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
+<% } else if (property.name === 'fill-outline-color') { -%>
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { {{ 0, 0, 0, -1 }} };
+<% } else { -%>
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
+<% } -%>
+<% } -%>
+};
+
+} // namespace style
+} // namespace mbgl

@@ -1,0 +1,92 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
+
+#include <mbgl/style/layers/<%- type %>_layer.hpp>
+#include <mbgl/style/layers/<%- type %>_layer_impl.hpp>
+
+namespace mbgl {
+namespace style {
+
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
+    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+}
+
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const Impl& other)
+    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>(other))
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+}
+
+<%- camelize(type) %>Layer::~<%- camelize(type) %>Layer() = default;
+
+std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::clone() const {
+    return std::make_unique<<%- camelize(type) %>Layer>(*this);
+}
+
+<% if (type === 'raster') { -%>
+// Source
+
+void <%- camelize(type) %>Layer::setSource(const std::string& sourceID) {
+    impl->source = sourceID;
+}
+
+const std::string& <%- camelize(type) %>Layer::getSourceID() const {
+    return impl->source;
+}
+<% } else if (type !== 'background') { -%>
+// Source
+
+void <%- camelize(type) %>Layer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
+    impl->source = sourceID;
+    impl->sourceLayer = sourceLayer;
+}
+
+const std::string& <%- camelize(type) %>Layer::getSourceID() const {
+    return impl->source;
+}
+
+const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
+    return impl->sourceLayer;
+}
+
+// Filter
+
+void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
+    impl->filter = filter;
+}
+
+const Filter& <%- camelize(type) %>Layer::getFilter() const {
+    return impl->filter;
+}
+<% } -%>
+
+// Layout properties
+
+<% for (const property of layoutProperties) { -%>
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.get();
+}
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+    impl->layout.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
+}
+<% } -%>
+
+// Paint properties
+<% for (const property of paintProperties) { %>
+PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get();
+}
+
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
+    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
+}
+<% } -%>
+
+} // namespace style
+} // namespace mbgl

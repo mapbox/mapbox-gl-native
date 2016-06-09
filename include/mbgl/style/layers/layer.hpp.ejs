@@ -1,0 +1,76 @@
+<%
+  const type = locals.type;
+  const layoutProperties = locals.layoutProperties;
+  const paintProperties = locals.paintProperties;
+-%>
+// This file is generated. Do not edit.
+
+#pragma once
+
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/filter.hpp>
+#include <mbgl/style/property_value.hpp>
+
+#include <mbgl/util/color.hpp>
+
+<% if (type === 'line' || type === 'symbol') { -%>
+#include <vector>
+
+<% } -%>
+namespace mbgl {
+namespace style {
+
+class <%- camelize(type) %>Layer : public Layer {
+public:
+    <%- camelize(type) %>Layer(const std::string& layerID);
+    ~<%- camelize(type) %>Layer() final;
+
+<% if (type === 'raster') { -%>
+    // Source
+
+    void setSource(const std::string& sourceID);
+    const std::string& getSourceID() const;
+
+<% } else if (type !== 'background') { -%>
+    // Source
+
+    void setSource(const std::string& sourceID, const std::string& sourceLayer);
+    const std::string& getSourceID() const;
+    const std::string& getSourceLayer() const;
+
+    void setFilter(const Filter&);
+    const Filter& getFilter() const;
+
+<% } -%>
+<% if (layoutProperties.length) { -%>
+    // Layout properties
+
+<% for (const property of layoutProperties) { -%>
+    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
+
+<% } -%>
+<% } -%>
+    // Paint properties
+
+<% for (const property of paintProperties) { -%>
+    PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
+
+<% } -%>
+    // Private implementation
+
+    class Impl;
+    Impl* const impl;
+
+    <%- camelize(type) %>Layer(const Impl&);
+    <%- camelize(type) %>Layer(const <%- camelize(type) %>Layer&) = delete;
+};
+
+template <>
+inline bool Layer::is<<%- camelize(type) %>Layer>() const {
+    return type == Type::<%- camelize(type) %>;
+}
+
+} // namespace style
+} // namespace mbgl
