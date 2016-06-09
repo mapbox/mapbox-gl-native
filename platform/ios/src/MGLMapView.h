@@ -31,6 +31,17 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentBottom,
 };
 
+/**
+  How the map view should adjust its center coordinate in response to
+  a user-initiated zoom gesture.
+ */
+typedef NS_ENUM(NSUInteger, MGLZoomGestureCentering) {
+    /** Adjusts the center of the map relative to the user's touch position. */
+    MGLZoomGestureCenteringFollowsTouch = 0,
+    /** Locks the zoom to the center of the map view. */
+    MGLZoomGestureCenteringLockedInPlace,
+};
+
 /** Options for enabling debugging features in an MGLMapView instance. */
 typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Edges of tile boundaries are shown as thick, red lines to help diagnose
@@ -299,6 +310,13 @@ IB_DESIGNABLE
     instantaneously moves to its new position.
  */
 - (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
+
+/**
+ How to adjust the center coordinate of the map during a zoom operation that
+ occurs in response to a user gesture. The default value is
+ `MGLZoomGestureCenteringFollowsTouch`.
+ */
+@property (nonatomic, assign) MGLZoomGestureCentering zoomGestureCentering;
 
 /**
  Whether the map view should display a heading calibration alert when necessary.

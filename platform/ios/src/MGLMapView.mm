@@ -1235,7 +1235,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     _mbglMap->cancelTransitions();
     
-    CGPoint centerPoint = [pinch locationInView:pinch.view];
+    CGPoint centerPoint = self.zoomGestureCentering == MGLZoomGestureCenteringFollowsTouch ? [pinch locationInView:pinch.view] : self.contentCenter;
     if (self.userTrackingMode != MGLUserTrackingModeNone)
     {
         centerPoint = self.userLocationAnnotationViewCenter;
@@ -1311,7 +1311,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self unrotateIfNeededForGesture];
     }
     
-    _previousPinchCenterCoordinate = [self convertPoint:[pinch locationInView:pinch.view] toCoordinateFromView:self];
+    _previousPinchCenterCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
     _previousPinchNumberOfTouches = pinch.numberOfTouches;
 }
 
@@ -1454,7 +1454,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
+        CGPoint gesturePoint = self.zoomGestureCentering == MGLZoomGestureCenteringFollowsTouch ? [doubleTap locationInView:doubleTap.view] : self.contentCenter;
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
             gesturePoint = self.userLocationAnnotationViewCenter;
@@ -1486,7 +1486,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
+        CGPoint gesturePoint = self.zoomGestureCentering == MGLZoomGestureCenteringFollowsTouch ? [twoFingerTap locationInView:twoFingerTap.view] : self.contentCenter;
         if (self.userTrackingMode != MGLUserTrackingModeNone)
         {
             gesturePoint = self.userLocationAnnotationViewCenter;
