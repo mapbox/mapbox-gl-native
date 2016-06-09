@@ -4,6 +4,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MGLAnnotation;
+
 /** The MGLAnnotationView class is responsible for representing point-based annotation markers as a view. Annotation views represent an annotation object, which is an object that corresponds to the MGLAnnotation protocol. When an annotation’s coordinate point is visible on the map view, the map view delegate is asked to provide a corresponding annotation view. If an annotation view is created with a reuse identifier, the map view may recycle the view when it goes offscreen. */
 @interface MGLAnnotationView : UIView
 
@@ -14,6 +16,13 @@ NS_ASSUME_NONNULL_BEGIN
  @return The initialized annotation view object.
  */
 - (instancetype)initWithReuseIdentifier:(nullable NSString *)reuseIdentifier;
+
+/**
+ This property will be set to the associated annotation when the view is visible.
+ 
+ When the view is queued and waiting to be reused, the value will be set to nil.
+ */
+@property (nonatomic, readonly, nullable) id <MGLAnnotation> annotation;
 
 /**
  The string that identifies that this annotation view is reusable. (read-only)
