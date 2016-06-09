@@ -11,8 +11,6 @@ class VertexArrayObject;
 
 class RasterBucket : public Bucket {
 public:
-    RasterBucket(gl::TexturePool&);
-
     void upload() override;
     void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;

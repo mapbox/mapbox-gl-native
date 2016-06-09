@@ -7,10 +7,6 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(gl::TexturePool& texturePool)
-: raster(texturePool) {
-}
-
 void RasterBucket::upload() {
     if (hasData()) {
         raster.upload();

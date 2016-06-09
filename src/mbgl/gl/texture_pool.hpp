@@ -11,10 +11,7 @@
 namespace mbgl {
 namespace gl {
 
-class TexturePool;
-
 struct TextureReleaser {
-    TexturePool* pool;
     void operator()(GLuint) const;
 };
 
@@ -22,12 +19,19 @@ using PooledTexture = std_experimental::unique_resource<GLuint, TextureReleaser>
 
 class TexturePool : private util::noncopyable {
 public:
-    TexturePool();
+    static TexturePool& get() {
+        static TexturePool pool;
+        return pool;
+    }
+
     ~TexturePool();
 
     PooledTexture acquireTexture();
+    void clear();
 
 private:
+    TexturePool();
+
     friend TextureReleaser;
 
     class Impl;

@@ -14,8 +14,6 @@ namespace mbgl {
 class Raster : public std::enable_shared_from_this<Raster> {
 
 public:
-    Raster(gl::TexturePool&);
-
     // load image data
     void load(PremultipliedImage);
 
@@ -44,9 +42,6 @@ private:
 
     // raw pixels have been loaded
     bool loaded = false;
-
-    // shared texture pool
-    gl::TexturePool& texturePool;
 
     // min/mag filter
     GLint filter = 0;

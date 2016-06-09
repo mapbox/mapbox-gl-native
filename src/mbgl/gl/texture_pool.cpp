@@ -52,13 +52,11 @@ public:
         }
     }
 
-private:
     std::vector<Pool> pools;
 };
 
 void TextureReleaser::operator()(GLuint id) const {
-    assert(pool);
-    pool->impl->releaseTexture(id);
+    TexturePool::get().impl->releaseTexture(id);
 }
 
 TexturePool::TexturePool() : impl(std::make_unique<Impl>()) {
@@ -68,7 +66,11 @@ TexturePool::~TexturePool() {
 }
 
 PooledTexture TexturePool::acquireTexture() {
-    return PooledTexture { impl->acquireTexture() , { this } };
+    return PooledTexture { impl->acquireTexture() , TextureReleaser {} };
+}
+
+void TexturePool::clear() {
+    impl->pools.clear();
 }
 
 } // namespace gl

@@ -11,12 +11,10 @@ using namespace mbgl;
 RasterTileData::RasterTileData(const OverscaledTileID& id_,
                                float pixelRatio,
                                const std::string& urlTemplate,
-                               gl::TexturePool &texturePool_,
                                Worker& worker_,
                                FileSource& fileSource,
                                const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
-      texturePool(texturePool_),
       worker(worker_) {
     const Resource resource =
         Resource::tile(urlTemplate, pixelRatio, id.canonical.x, id.canonical.y, id.canonical.z);
@@ -38,7 +36,7 @@ RasterTileData::RasterTileData(const OverscaledTileID& id_,
             expires = res.expires;
 
             workRequest.reset();
-            workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), res.data, [this, callback] (RasterTileParseResult result) {
+            workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(), res.data, [this, callback] (RasterTileParseResult result) {
                 workRequest.reset();
 
                 std::exception_ptr error;

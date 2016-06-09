@@ -128,7 +128,7 @@ TEST(GLObject, TexturePool) {
     auto& store = mbgl::gl::ObjectStore::get();
     EXPECT_TRUE(store.empty());
 
-    mbgl::gl::TexturePool pool;
+    auto& pool = mbgl::gl::TexturePool::get();
 
     std::vector<mbgl::gl::PooledTexture> ids;
 
@@ -183,6 +183,16 @@ TEST(GLObject, TexturePool) {
 
     // Last used texture from the pool triggers pool recycling.
     id1.reset();
+    EXPECT_FALSE(store.empty());
+
+    store.performCleanup();
+    EXPECT_TRUE(store.empty());
+
+    // Force texture pool clearing.
+    id1 = pool.acquireTexture();
+    EXPECT_TRUE(store.empty());
+
+    pool.clear();
     EXPECT_FALSE(store.empty());
 
     store.performCleanup();
