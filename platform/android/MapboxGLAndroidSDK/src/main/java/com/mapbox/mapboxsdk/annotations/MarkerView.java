@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -55,6 +56,7 @@ public class MarkerView extends Marker {
     private long startTime;
     private long duration;
     private long remainingTime;
+    private AnimatorUtils.OnAnimationEndListener animationEndListener;
 
     /**
      * Publicly hidden default constructor
@@ -358,6 +360,12 @@ public class MarkerView extends Marker {
     }
 
     public void setPosition(LatLng position, long duration) {
+        setPosition(position, duration, null);
+    }
+
+    public void setPosition(LatLng position, long duration, AnimatorUtils.OnAnimationEndListener animationEndListener) {
+        this.animationEndListener = animationEndListener;
+
         if (duration <= 0) {
             // update position instantly
             super.setPosition(position);
@@ -412,6 +420,10 @@ public class MarkerView extends Marker {
 
     void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    AnimatorUtils.OnAnimationEndListener getAnimationEndListener() {
+        return animationEndListener;
     }
 
     PointF getScreenLocation(@NonNull View convertView) {
