@@ -22,7 +22,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
-#include <mbgl/tile/vector_tile_data.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -215,8 +215,8 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
             return nullptr;
         }
 
-        data = std::make_unique<VectorTileData>(overscaledTileID, std::move(monitor), id,
-                                                parameters.style, parameters.mode, callback);
+        data = std::make_unique<GeometryTileData>(overscaledTileID, std::move(monitor), id,
+                                                  parameters.style, parameters.mode, callback);
     }
 
     return data;
