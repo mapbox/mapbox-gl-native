@@ -199,8 +199,8 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
     // If we don't find working tile data, we're just going to load it.
     if (type == SourceType::Raster) {
         data = std::make_unique<RasterTileData>(overscaledTileID, parameters.pixelRatio,
-                                                tileset->tiles.at(0), parameters.texturePool,
-                                                parameters.worker, parameters.fileSource, callback);
+                                                tileset->tiles.at(0), parameters.worker,
+                                                parameters.fileSource, callback);
     } else {
         std::unique_ptr<GeometryTileMonitor> monitor;
 

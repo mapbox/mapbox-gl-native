@@ -7,12 +7,8 @@
 
 using namespace mbgl;
 
-PatternShader::PatternShader(gl::ObjectStore& store)
-    : Shader(
-        "pattern",
-        shaders::pattern::vertex, shaders::pattern::fragment,
-        store
-    ) {
+PatternShader::PatternShader()
+    : Shader("pattern", shaders::pattern::vertex, shaders::pattern::fragment) {
 }
 
 void PatternShader::bind(GLbyte *offset) {

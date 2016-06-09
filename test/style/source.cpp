@@ -10,7 +10,6 @@
 
 #include <mbgl/map/transform.hpp>
 #include <mbgl/util/worker.hpp>
-#include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -28,7 +27,6 @@ public:
     Transform transform;
     TransformState transformState;
     Worker worker { 1 };
-    gl::TexturePool texturePool;
     AnnotationManager annotationManager { 1.0 };
     style::Style style { fileSource, 1.0 };
 
@@ -39,7 +37,6 @@ public:
         transformState,
         worker,
         fileSource,
-        texturePool,
         true,
         MapMode::Continuous,
         annotationManager,

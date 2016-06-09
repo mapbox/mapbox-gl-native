@@ -7,12 +7,8 @@
 
 using namespace mbgl;
 
-OutlinePatternShader::OutlinePatternShader(gl::ObjectStore& store)
-    : Shader(
-        "outlinepattern",
-        shaders::outlinepattern::vertex, shaders::outlinepattern::fragment,
-        store
-    ) {
+OutlinePatternShader::OutlinePatternShader()
+    : Shader("outlinepattern", shaders::outlinepattern::vertex, shaders::outlinepattern::fragment) {
 }
 
 void OutlinePatternShader::bind(GLbyte *offset) {

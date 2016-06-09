@@ -7,8 +7,8 @@
 
 using namespace mbgl;
 
-CollisionBoxShader::CollisionBoxShader(gl::ObjectStore& store)
-    : Shader("collisionbox", shaders::collisionbox::vertex, shaders::collisionbox::fragment, store)
+CollisionBoxShader::CollisionBoxShader()
+    : Shader("collisionbox", shaders::collisionbox::vertex, shaders::collisionbox::fragment)
     , a_extrude(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_extrude")))
     , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }

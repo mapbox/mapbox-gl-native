@@ -10,10 +10,6 @@ namespace mbgl {
 
 class PlainShader;
 
-namespace gl {
-class ObjectStore;
-}
-
 class DebugBucket : private util::noncopyable {
 public:
     DebugBucket(const OverscaledTileID& id,
@@ -23,8 +19,8 @@ public:
                 optional<Timestamp> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader&, gl::ObjectStore&);
-    void drawPoints(PlainShader&, gl::ObjectStore&);
+    void drawLines(PlainShader&);
+    void drawPoints(PlainShader&);
 
     const bool renderable;
     const bool complete;

@@ -7,8 +7,8 @@
 
 using namespace mbgl;
 
-LineShader::LineShader(gl::ObjectStore& store)
-    : Shader("line", shaders::line::vertex, shaders::line::fragment, store)
+LineShader::LineShader()
+    : Shader("line", shaders::line::vertex, shaders::line::fragment)
     , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 

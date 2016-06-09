@@ -57,11 +57,11 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     return (time - previousTime) < duration;
 }
 
-void FrameHistory::upload(gl::ObjectStore& store) {
+void FrameHistory::upload() {
 
     if (changed) {
         const bool first = !texture;
-        bind(store);
+        bind();
 
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
@@ -94,9 +94,9 @@ void FrameHistory::upload(gl::ObjectStore& store) {
     }
 }
 
-void FrameHistory::bind(gl::ObjectStore& store) {
+void FrameHistory::bind() {
     if (!texture) {
-        texture = store.createTexture();
+        texture = gl::ObjectStore::get().createTexture();
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));

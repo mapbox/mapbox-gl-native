@@ -16,37 +16,29 @@ namespace gl {
 
 constexpr GLsizei TextureMax = 64;
 
-class ObjectStore;
-
 struct ProgramDeleter {
-    ObjectStore* store;
     void operator()(GLuint) const;
 };
 
 struct ShaderDeleter {
-    ObjectStore* store;
     void operator()(GLuint) const;
 };
 
 struct BufferDeleter {
-    ObjectStore* store;
     void operator()(GLuint) const;
 };
 
 struct TextureDeleter {
-    ObjectStore* store;
     void operator()(GLuint) const;
 };
 
 struct VAODeleter {
-    ObjectStore* store;
     void operator()(GLuint) const;
 };
 
 using ObjectPool = std::array<GLuint, TextureMax>;
 
 struct TexturePoolDeleter {
-    ObjectStore* store;
     void operator()(ObjectPool ids) const;
 };
 
@@ -59,39 +51,44 @@ using UniqueTexturePool = std_experimental::unique_resource<ObjectPool, TextureP
 
 class ObjectStore : private util::noncopyable {
 public:
+    static ObjectStore& get() {
+        static ObjectStore store;
+        return store;
+    }
+
     ~ObjectStore();
 
     UniqueProgram createProgram() {
-        return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), { this } };
+        return UniqueProgram { MBGL_CHECK_ERROR(glCreateProgram()), ProgramDeleter {} };
     }
 
     UniqueShader createShader(GLenum type) {
-        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(type)), { this } };
+        return UniqueShader { MBGL_CHECK_ERROR(glCreateShader(type)), ShaderDeleter {} };
     }
 
     UniqueBuffer createBuffer() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(glGenBuffers(1, &id));
-        return UniqueBuffer { std::move(id), { this } };
+        return UniqueBuffer { std::move(id), BufferDeleter {} };
     }
 
     UniqueTexture createTexture() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(glGenTextures(1, &id));
-        return UniqueTexture { std::move(id), { this } };
+        return UniqueTexture { std::move(id), TextureDeleter {} };
     }
 
     UniqueVAO createVAO() {
         GLuint id = 0;
         MBGL_CHECK_ERROR(gl::GenVertexArrays(1, &id));
-        return UniqueVAO { std::move(id), { this } };
+        return UniqueVAO { std::move(id), VAODeleter {} };
     }
 
     UniqueTexturePool createTexturePool() {
         ObjectPool ids;
         MBGL_CHECK_ERROR(glGenTextures(TextureMax, ids.data()));
         assert(ids.size() == size_t(TextureMax));
-        return UniqueTexturePool { std::move(ids), { this } };
+        return UniqueTexturePool { std::move(ids), TexturePoolDeleter {} };
     }
 
     // Actually remove the objects we marked as abandoned with the above methods.
@@ -107,6 +104,8 @@ public:
     }
 
 private:
+    ObjectStore() = default;
+
     friend ProgramDeleter;
     friend ShaderDeleter;
     friend BufferDeleter;

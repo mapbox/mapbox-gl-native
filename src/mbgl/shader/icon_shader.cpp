@@ -7,8 +7,8 @@
 
 using namespace mbgl;
 
-IconShader::IconShader(gl::ObjectStore& store)
-    : Shader("icon", shaders::icon::vertex, shaders::icon::fragment, store)
+IconShader::IconShader()
+    : Shader("icon", shaders::icon::vertex, shaders::icon::fragment)
     , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
     , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
     , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {

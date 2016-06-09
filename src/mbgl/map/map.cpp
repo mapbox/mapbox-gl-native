@@ -57,12 +57,10 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
 
     std::unique_ptr<AnnotationManager> annotationManager;
-    std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
 
@@ -98,8 +96,7 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
-      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
-      texturePool(std::make_unique<gl::TexturePool>()) {
+      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
 Map::~Map() {
@@ -111,10 +108,10 @@ Map::~Map() {
     // cleaned up by store.performCleanup();
     impl->style.reset();
     impl->painter.reset();
-    impl->texturePool.reset();
     impl->annotationManager.reset();
 
-    impl->store.performCleanup();
+    gl::TexturePool::get().clear();
+    gl::ObjectStore::get().performCleanup();
 
     impl->view.deactivate();
 }
@@ -229,7 +226,6 @@ void Map::Impl::update() {
                                        transform.getState(),
                                        style->workers,
                                        fileSource,
-                                       *texturePool,
                                        style->shouldReparsePartialTiles,
                                        mode,
                                        *annotationManager,
@@ -250,7 +246,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), store);
+        painter = std::make_unique<Painter>(transform.getState());
     }
 
     FrameData frameData { view.getFramebufferSize(),
@@ -269,7 +265,7 @@ void Map::Impl::render() {
         callback = nullptr;
     }
 
-    store.performCleanup();
+    gl::ObjectStore::get().performCleanup();
 
     if (style->hasTransitions()) {
         updateFlags |= Update::RecalculateStyle;
@@ -830,7 +826,7 @@ void Map::setSourceTileCacheSize(size_t size) {
 }
 
 void Map::onLowMemory() {
-    impl->store.performCleanup();
+    gl::ObjectStore::get().performCleanup();
     if (!impl->style) return;
     impl->style->onLowMemory();
     impl->view.invalidate();

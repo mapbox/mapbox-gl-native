@@ -75,8 +75,8 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader->u_color = color;
         linesdfShader->u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, store);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, store);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
@@ -98,9 +98,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linesdfShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        lineAtlas->bind(store);
+        lineAtlas->bind();
 
-        bucket.drawLineSDF(*linesdfShader, store);
+        bucket.drawLineSDF(*linesdfShader);
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -140,9 +140,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linepatternShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        spriteAtlas->bind(true, store);
+        spriteAtlas->bind(true);
 
-        bucket.drawLinePatterns(*linepatternShader, store);
+        bucket.drawLinePatterns(*linepatternShader);
 
     } else {
         config.program = lineShader->getID();
@@ -160,7 +160,7 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader->u_color = color;
         lineShader->u_opacity = opacity;
 
-        bucket.drawLines(*lineShader, store);
+        bucket.drawLines(*lineShader);
     }
 }
 

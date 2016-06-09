@@ -6,35 +6,30 @@ namespace mbgl {
 namespace gl {
 
 void ProgramDeleter::operator()(GLuint id) const {
-    assert(store);
-    store->abandonedPrograms.push_back(id);
+    gl::ObjectStore::get().abandonedPrograms.push_back(id);
 }
 
 void ShaderDeleter::operator()(GLuint id) const {
-    assert(store);
-    store->abandonedShaders.push_back(id);
+    gl::ObjectStore::get().abandonedShaders.push_back(id);
 }
 
 void BufferDeleter::operator()(GLuint id) const {
-    assert(store);
-    store->abandonedBuffers.push_back(id);
+    gl::ObjectStore::get().abandonedBuffers.push_back(id);
 }
 
 void TextureDeleter::operator()(GLuint id) const {
-    assert(store);
-    store->abandonedTextures.push_back(id);
+    gl::ObjectStore::get().abandonedTextures.push_back(id);
 }
 
 void VAODeleter::operator()(GLuint id) const {
-    assert(store);
-    store->abandonedVAOs.push_back(id);
+    gl::ObjectStore::get().abandonedVAOs.push_back(id);
 }
 
 void TexturePoolDeleter::operator()(ObjectPool ids) const {
-    assert(store);
+    auto& store = gl::ObjectStore::get();
     for (GLuint& id : ids) {
         if (id) {
-            store->abandonedTextures.push_back(id);
+            store.abandonedTextures.push_back(id);
             id = 0;
         };
     }

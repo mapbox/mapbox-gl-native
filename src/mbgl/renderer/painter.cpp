@@ -49,24 +49,22 @@ namespace mbgl {
 
 using namespace style;
 
-Painter::Painter(const TransformState& state_, gl::ObjectStore& store_)
-    : state(state_),
-      store(store_) {
+Painter::Painter(const TransformState& state_) : state(state_) {
     gl::debugging::enable();
 
-    plainShader = std::make_unique<PlainShader>(store);
-    outlineShader = std::make_unique<OutlineShader>(store);
-    outlinePatternShader = std::make_unique<OutlinePatternShader>(store);
-    lineShader = std::make_unique<LineShader>(store);
-    linesdfShader = std::make_unique<LineSDFShader>(store);
-    linepatternShader = std::make_unique<LinepatternShader>(store);
-    patternShader = std::make_unique<PatternShader>(store);
-    iconShader = std::make_unique<IconShader>(store);
-    rasterShader = std::make_unique<RasterShader>(store);
-    sdfGlyphShader = std::make_unique<SDFGlyphShader>(store);
-    sdfIconShader = std::make_unique<SDFIconShader>(store);
-    collisionBoxShader = std::make_unique<CollisionBoxShader>(store);
-    circleShader = std::make_unique<CircleShader>(store);
+    plainShader = std::make_unique<PlainShader>();
+    outlineShader = std::make_unique<OutlineShader>();
+    outlinePatternShader = std::make_unique<OutlinePatternShader>();
+    lineShader = std::make_unique<LineShader>();
+    linesdfShader = std::make_unique<LineSDFShader>();
+    linepatternShader = std::make_unique<LinepatternShader>();
+    patternShader = std::make_unique<PatternShader>();
+    iconShader = std::make_unique<IconShader>();
+    rasterShader = std::make_unique<RasterShader>();
+    sdfGlyphShader = std::make_unique<SDFGlyphShader>();
+    sdfIconShader = std::make_unique<SDFIconShader>();
+    collisionBoxShader = std::make_unique<CollisionBoxShader>();
+    circleShader = std::make_unique<CircleShader>();
 
     // Reset GL values
     config.reset();
@@ -117,17 +115,17 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(store);
-        tileBorderBuffer.upload(store);
-        spriteAtlas->upload(store);
-        lineAtlas->upload(store);
-        glyphAtlas->upload(store);
-        frameHistory.upload(store);
-        annotationSpriteAtlas.upload(store);
+        tileStencilBuffer.upload();
+        tileBorderBuffer.upload();
+        spriteAtlas->upload();
+        lineAtlas->upload();
+        glyphAtlas->upload();
+        frameHistory.upload();
+        annotationSpriteAtlas.upload();
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(store);
+                item.bucket->upload();
             }
         }
     }

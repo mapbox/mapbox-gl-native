@@ -7,7 +7,7 @@ namespace mbgl {
 
 class SDFShader : public Shader {
 public:
-    SDFShader(gl::ObjectStore&);
+    SDFShader();
 
     UniformMatrix<4>                u_matrix        = {"u_matrix",        *this};
     Uniform<std::array<GLfloat, 2>> u_extrude_scale = {"u_extrude_scale", *this};
@@ -29,13 +29,13 @@ protected:
 
 class SDFGlyphShader : public SDFShader {
 public:
-    SDFGlyphShader(gl::ObjectStore& store) : SDFShader(store) {}
+    SDFGlyphShader() : SDFShader() {}
     void bind(GLbyte *offset) final;
 };
 
 class SDFIconShader : public SDFShader {
 public:
-    SDFIconShader(gl::ObjectStore& store) : SDFShader(store) {}
+    SDFIconShader() : SDFShader() {}
     void bind(GLbyte *offset) final;
 };
 
