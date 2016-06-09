@@ -149,6 +149,7 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
+    style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 

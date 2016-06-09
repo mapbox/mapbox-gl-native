@@ -736,6 +736,10 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
 
 #pragma mark - Style API
 
+style::Layer* Map::getLayer(const std::string& layerID) {
+    return impl->style ? impl->style->getLayer(layerID) : nullptr;
+}
+
 void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
     impl->view.activate();
 
