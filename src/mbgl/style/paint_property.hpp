@@ -36,7 +36,7 @@ public:
     }
 
     void set(const PropertyValue<T>& value_) {
-        values.emplace(ClassID::Default, value_);
+        values[ClassID::Default] = value_;
     }
 
     void parse(const char* name, const JSValue& layer) {
