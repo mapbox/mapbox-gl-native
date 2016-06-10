@@ -6,6 +6,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/cascade_parameters.hpp>
 #include <mbgl/style/calculation_parameters.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/std.hpp>
 #include <mbgl/util/rapidjson.hpp>
@@ -124,18 +125,18 @@ private:
         }
 
         Result calculate(const Evaluator<T>& evaluator, const TimePoint& now) {
-            Result final = PropertyValue<T>::visit(value, evaluator);
+            Result finalValue = PropertyValue<T>::visit(value, evaluator);
             if (!prior) {
                 // No prior value.
-                return final;
+                return finalValue;
             } else if (now >= end) {
                 // Transition from prior value is now complete.
                 prior.reset();
-                return final;
+                return finalValue;
             } else {
                 // Interpolate between recursively-calculated prior value and final.
                 float t = std::chrono::duration<float>(now - begin) / (end - begin);
-                return util::interpolate(prior->calculate(evaluator, now), final, t);
+                return util::interpolate(prior->calculate(evaluator, now), finalValue, util::DEFAULT_TRANSITION_EASE.solve(t, 0.001));
             }
         }
 
