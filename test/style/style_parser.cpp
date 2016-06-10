@@ -3,6 +3,7 @@
 
 #include <mbgl/style/parser.hpp>
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <rapidjson/document.h>
 
@@ -46,8 +47,8 @@ TEST_P(StyleParserTest, ParseStyle) {
 
                 const uint32_t count = js_entry[rapidjson::SizeType(0)].GetUint();
                 const FixtureLogObserver::LogMessage message {
-                    EventSeverityClass(js_entry[rapidjson::SizeType(1)].GetString()),
-                    EventClass(js_entry[rapidjson::SizeType(2)].GetString()),
+                    *Enum<EventSeverity>::toEnum(js_entry[rapidjson::SizeType(1)].GetString()),
+                    *Enum<Event>::toEnum(js_entry[rapidjson::SizeType(2)].GetString()),
                     int64_t(-1),
                     js_entry[rapidjson::SizeType(3)].GetString()
                 };
