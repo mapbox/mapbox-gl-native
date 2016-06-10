@@ -22,6 +22,7 @@
         'util/geo.cpp',
         'util/image.cpp',
         'util/mapbox.cpp',
+        'util/memory.cpp',
         'util/merge_lines.cpp',
         'util/run_loop.cpp',
         'util/number_conversions.cpp',
