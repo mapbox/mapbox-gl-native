@@ -67,8 +67,8 @@ inline bool operator!=(const LatLng& a, const LatLng& b) {
 
 class ProjectedMeters {
 public:
-    double northing = 0;
-    double easting = 0;
+    double northing;
+    double easting;
 
     ProjectedMeters(double n = 0, double e = 0)
         : northing(n), easting(e) {}
@@ -77,6 +77,10 @@ public:
         return !(std::isnan(northing) || std::isnan(easting));
     }
 };
+
+inline bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
+    return a.northing == b.northing && a.easting == b.easting;
+}
 
 class LatLngBounds {
 public:

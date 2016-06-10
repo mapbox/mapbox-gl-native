@@ -32,6 +32,7 @@
         'util/timer.cpp',
         'util/token.cpp',
         'util/work_queue.cpp',
+        'util/projection.cpp',
 
         'algorithm/covered_by_children.cpp',
         'algorithm/generate_clip_ids.cpp',
