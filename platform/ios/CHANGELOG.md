@@ -14,6 +14,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - An MGLPolygon can now have interior polygons, representing holes knocked out of the overall shape. ([#5110](https://github.com/mapbox/mapbox-gl-native/pull/5110))
 - `MGLOfflinePackProgress` now indicates how many tiles have been downloaded and how much space they take up. ([#4874](https://github.com/mapbox/mapbox-gl-native/pull/4874))
 - The compass, user dot, and visible annotations are now accessible to VoiceOver users. ([#1496](https://github.com/mapbox/mapbox-gl-native/pull/1496))
+- Added a method to MGLMapView, `-anchorPointForGesture:`, that you can override to anchor gestures at a point other than the user location. ([#5302](https://github.com/mapbox/mapbox-gl-native/pull/5302))
 - Fixed an issue (speculatively) where the tile cache could be included in iCloud backups. ([#5124](https://github.com/mapbox/mapbox-gl-native/pull/5124))
 - Improved performance viewing regions with large landcover polygons when viewing a style that uses the Mapbox Streets source. ([#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444))
 - Fixed a memory leak when using raster resources. ([#5141](https://github.com/mapbox/mapbox-gl-native/pull/5141))
