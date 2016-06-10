@@ -33,6 +33,8 @@ public class UiSettings {
 
     private boolean zoomControlsEnabled;
 
+    private boolean deselectMarkersOnTap = true;
+
     UiSettings(@NonNull MapView mapView) {
         this.mapView = mapView;
         this.compassSettings = new ViewSettings();
@@ -481,6 +483,26 @@ public class UiSettings {
      */
     public boolean isZoomControlsEnabled() {
         return zoomControlsEnabled;
+    }
+
+    /**
+     * Gets whether the markers are automatically deselected (and therefore, their infowindows
+     * closed) when a map tap is detected.
+
+     * @return If true, markers are deselected on a map tap.
+     */
+    public boolean isDeselectMarkersOnTap() {
+        return deselectMarkersOnTap;
+    }
+
+    /**
+     * Sets whether the markers are automatically deselected (and therefore, their infowindows
+     * closed) when a map tap is detected.
+     *
+     * @param deselectMarkersOnTap
+     */
+    public void setDeselectMarkersOnTap(boolean deselectMarkersOnTap) {
+        this.deselectMarkersOnTap = deselectMarkersOnTap;
     }
 
     /**

@@ -82,6 +82,10 @@ public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyC
         mapboxMap.setAllowConcurrentMultipleOpenInfoWindows(allowConcurrentInfoWindow);
     }
 
+    private void toggleDeselectMarkersOnTap(boolean deselectMarkersOnTap) {
+        mapboxMap.getUiSettings().setDeselectMarkersOnTap(deselectMarkersOnTap);
+    }
+
     @Override
     public boolean onInfoWindowClick(@NonNull Marker marker) {
         Toast.makeText(getApplicationContext(), "OnClick: " + marker.getTitle(), Toast.LENGTH_LONG).show();
@@ -155,6 +159,10 @@ public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyC
         switch (item.getItemId()) {
             case R.id.action_toggle_concurrent_infowindow:
                 toggleConcurrentInfoWindow(!item.isChecked());
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.action_toggle_deselect_markers_on_tap:
+                toggleDeselectMarkersOnTap(!item.isChecked());
                 item.setChecked(!item.isChecked());
                 return true;
             case android.R.id.home:
