@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -116,24 +118,13 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     }
 
     private void animateMarker(final Marker marker, LatLng from, LatLng to) {
-        ValueAnimator markerAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), (Object[]) new LatLng[]{from, to});
-        markerAnimator.setDuration(5000);
-        markerAnimator.setInterpolator(new LinearInterpolator());
 
-        markerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (marker != null) {
-                    marker.setPosition((LatLng) animation.getAnimatedValue());
-                }
-            }
-        });
+        final ValueAnimator markerAnimator = ObjectAnimator.ofObject(marker, "position", new LatLngEvaluator(), from, to);
+        markerAnimator.setDuration((long) (10 * from.distanceTo(to)));
+        markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
-        markerAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                // Nothing
-            }
+        //Add listener to restart animation on end
+        markerAnimator.addListener(new AnimatorListenerAdapter() {
 
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -143,15 +134,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
                 animateMarker(carMarker, carMarker.getPosition(), passengerMarker.getPosition());
             }
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                // Nothing
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-                // Nothing
-            }
         });
 
         // Start
@@ -205,14 +187,17 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         mMapView.onLowMemory();
     }
 
-    private class LatLngEvaluator implements TypeEvaluator<LatLng> {
+    /**
+     * Evaluator for LatLng pairs
+     */
+    private static class LatLngEvaluator implements TypeEvaluator<LatLng> {
 
         private LatLng mLatLng = new LatLng();
 
         @Override
         public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
-            mLatLng.setLatitude(startValue.getLatitude() + (endValue.getLatitude() - startValue.getLatitude()) * fraction);
-            mLatLng.setLongitude(startValue.getLongitude() + (endValue.getLongitude() - startValue.getLongitude()) * fraction);
+            mLatLng.setLatitude(startValue.getLatitude() + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
+            mLatLng.setLongitude(startValue.getLongitude() + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
             return mLatLng;
         }
     }
