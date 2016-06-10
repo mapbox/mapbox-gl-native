@@ -19,7 +19,7 @@
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/renderer/render_item.hpp>
-#include <mbgl/tile/tile.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/platform/log.hpp>
@@ -289,7 +289,7 @@ RenderData Style::getRenderData() const {
             continue;
         }
 
-        for (auto& pair : source->getTiles()) {
+        for (auto& pair : source->getRenderTiles()) {
             auto& tile = pair.second;
             if (!tile.data.isRenderable()) {
                 continue;

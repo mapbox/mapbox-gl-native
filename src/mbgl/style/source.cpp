@@ -1,7 +1,7 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/tile/tile.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/constants.hpp>
@@ -156,7 +156,7 @@ void Source::load(FileSource& fileSource) {
             if (reloadTiles) {
                 // Tile information changed because we got new GeoJSON data, or a new tile URL.
                 tileDataMap.clear();
-                tiles.clear();
+                renderTiles.clear();
                 cache.clear();
             }
 
@@ -167,7 +167,7 @@ void Source::load(FileSource& fileSource) {
 }
 
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
-    for (auto& pair : tiles) {
+    for (auto& pair : renderTiles) {
         auto& tile = pair.second;
         transform.matrixFor(tile.matrix, tile.id);
         matrix::multiply(tile.matrix, projMatrix, tile.matrix);
@@ -175,14 +175,14 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
 }
 
 void Source::finishRender(Painter &painter) {
-    for (auto& pair : tiles) {
+    for (auto& pair : renderTiles) {
         auto& tile = pair.second;
         painter.renderTileDebug(tile);
     }
 }
 
-const std::map<UnwrappedTileID, Tile>& Source::getTiles() const {
-    return tiles;
+const std::map<UnwrappedTileID, RenderTile>& Source::getRenderTiles() const {
+    return renderTiles;
 }
 
 std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledTileID,
@@ -264,10 +264,10 @@ bool Source::update(const UpdateParameters& parameters) {
         }
     };
     auto renderTileFn = [this](const UnwrappedTileID& renderTileID, TileData& tileData) {
-        tiles.emplace(renderTileID, Tile{ renderTileID, tileData });
+        renderTiles.emplace(renderTileID, RenderTile{ renderTileID, tileData });
     };
 
-    tiles.clear();
+    renderTiles.clear();
     algorithm::updateRenderables(getTileDataFn, createTileDataFn, retainTileDataFn, renderTileFn,
                                  idealTiles, *tileset, dataTileZoom);
 
@@ -341,8 +341,8 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
 
     std::unordered_map<std::string, std::vector<Feature>> result;
 
-    for (const auto& tilePtr : tiles) {
-        const Tile& tile = tilePtr.second;
+    for (const auto& tilePtr : renderTiles) {
+        const RenderTile& tile = tilePtr.second;
 
         Point<int16_t> tileSpaceBoundsMin = coordinateToTilePoint(tile.id, box.min);
         Point<int16_t> tileSpaceBoundsMax = coordinateToTilePoint(tile.id, box.max);

@@ -27,7 +27,7 @@
 
 namespace mbgl {
 
-class Tile;
+class RenderTile;
 class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
@@ -93,7 +93,7 @@ public:
                 SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
-    void renderTileDebug(const Tile& tile);
+    void renderTileDebug(const RenderTile&);
 
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);

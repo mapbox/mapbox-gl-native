@@ -1,6 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
-#include <mbgl/tile/tile.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/string.hpp>
@@ -11,7 +11,7 @@
 
 using namespace mbgl;
 
-void Painter::renderTileDebug(const Tile& tile) {
+void Painter::renderTileDebug(const RenderTile& tile) {
     MBGL_DEBUG_GROUP(std::string { "debug " } + util::toString(tile.id));
     if (frame.debugOptions != MapDebugOptions::NoDebug) {
         setClipping(tile.clip);

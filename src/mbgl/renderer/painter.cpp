@@ -1,7 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 
 #include <mbgl/style/source.hpp>
-#include <mbgl/tile/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>

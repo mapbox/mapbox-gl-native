@@ -28,7 +28,7 @@ class Painter;
 class FileSource;
 class AsyncRequest;
 class TransformState;
-class Tile;
+class RenderTile;
 struct ClipID;
 
 namespace style {
@@ -63,13 +63,13 @@ public:
 
     template <typename ClipIDGenerator>
     void updateClipIDs(ClipIDGenerator& generator) {
-        generator.update(tiles);
+        generator.update(renderTiles);
     }
 
     void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
     void finishRender(Painter &painter);
 
-    const std::map<UnwrappedTileID, Tile>& getTiles() const;
+    const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
 
     TileData* getTileData(const OverscaledTileID&) const;
 
@@ -104,7 +104,7 @@ private:
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
 
-    std::map<UnwrappedTileID, Tile> tiles;
+    std::map<UnwrappedTileID, RenderTile> renderTiles;
     std::map<OverscaledTileID, std::unique_ptr<TileData>> tileDataMap;
     TileCache cache;
 

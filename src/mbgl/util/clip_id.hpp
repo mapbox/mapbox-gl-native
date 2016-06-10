@@ -11,8 +11,6 @@
 
 namespace mbgl {
 
-class Tile;
-
 struct ClipID {
     inline ClipID() {}
     inline ClipID(const std::string &mask_, const std::string &reference_) : mask(mask_), reference(reference_) {}

@@ -9,15 +9,15 @@ namespace mbgl {
 
 class TileData;
 
-class Tile {
+class RenderTile {
 public:
-    Tile(const UnwrappedTileID& id_, TileData& data_) : id(id_), data(data_) {
+    RenderTile(const UnwrappedTileID& id_, TileData& data_) : id(id_), data(data_) {
     }
 
-    Tile(const Tile&) = delete;
-    Tile(Tile&&) = default;
-    Tile& operator=(const Tile&) = delete;
-    Tile& operator=(Tile&&) = default;
+    RenderTile(const RenderTile&) = delete;
+    RenderTile(RenderTile&&) = default;
+    RenderTile& operator=(const RenderTile&) = delete;
+    RenderTile& operator=(RenderTile&&) = default;
 
     const UnwrappedTileID id;
     TileData& data;
