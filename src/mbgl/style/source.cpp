@@ -18,6 +18,7 @@
 #include <mbgl/util/token.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <mbgl/tile/raster_tile_data.hpp>
 #include <mbgl/tile/annotation_tile_data.hpp>
@@ -197,8 +198,7 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
     } else if (type == SourceType::GeoJSON) {
         return std::make_unique<GeoJSONTileData>(overscaledTileID, id, parameters, geojsonvt.get());
     } else {
-        Log::Warning(Event::Style, "Source type '%s' is not implemented",
-                     SourceTypeClass(type).c_str());
+        Log::Warning(Event::Style, "Source type '%s' is not implemented", Enum<SourceType>::toString(type));
         return nullptr;
     }
 }

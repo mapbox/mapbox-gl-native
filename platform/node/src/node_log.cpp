@@ -1,6 +1,8 @@
 #include "node_log.hpp"
 #include "util/async_queue.hpp"
 
+#include <mbgl/util/enum.hpp>
+
 namespace node_mbgl {
 
 struct NodeLogObserver::LogMessage {
@@ -23,10 +25,10 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
           auto msg = Nan::New<v8::Object>();
 
           Nan::Set(msg, Nan::New("class").ToLocalChecked(),
-              Nan::New(mbgl::EventClass(message.event).c_str()).ToLocalChecked());
+              Nan::New(mbgl::Enum<mbgl::Event>::toString(message.event)).ToLocalChecked());
 
           Nan::Set(msg, Nan::New("severity").ToLocalChecked(),
-              Nan::New(mbgl::EventSeverityClass(message.severity).c_str()).ToLocalChecked());
+              Nan::New(mbgl::Enum<mbgl::EventSeverity>::toString(message.severity)).ToLocalChecked());
 
           if (message.code != -1) {
               Nan::Set(msg, Nan::New("code").ToLocalChecked(),
