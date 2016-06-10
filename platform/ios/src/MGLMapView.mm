@@ -1235,11 +1235,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     _mbglMap->cancelTransitions();
     
-    CGPoint centerPoint = [pinch locationInView:pinch.view];
-    if (self.userTrackingMode != MGLUserTrackingModeNone)
-    {
-        centerPoint = self.userLocationAnnotationViewCenter;
-    }
+    CGPoint centerPoint = [self anchorPointForGesture:pinch];
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -1311,7 +1307,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self unrotateIfNeededForGesture];
     }
     
-    _previousPinchCenterCoordinate = [self convertPoint:[pinch locationInView:pinch.view] toCoordinateFromView:self];
+    _previousPinchCenterCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
     _previousPinchNumberOfTouches = pinch.numberOfTouches;
 }
 
@@ -1321,11 +1317,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
     _mbglMap->cancelTransitions();
     
-    CGPoint centerPoint = [rotate locationInView:rotate.view];
-    if (self.userTrackingMode != MGLUserTrackingModeNone)
-    {
-        centerPoint = self.userLocationAnnotationViewCenter;
-    }
+    CGPoint centerPoint = [self anchorPointForGesture:rotate];
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -1454,11 +1446,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
         [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
-        CGPoint gesturePoint = [doubleTap locationInView:doubleTap.view];
-        if (self.userTrackingMode != MGLUserTrackingModeNone)
-        {
-            gesturePoint = self.userLocationAnnotationViewCenter;
-        }
+        CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(2, center, MGLDurationInSeconds(MGLAnimationDuration));
@@ -1486,11 +1474,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
-        CGPoint gesturePoint = [twoFingerTap locationInView:twoFingerTap.view];
-        if (self.userTrackingMode != MGLUserTrackingModeNone)
-        {
-            gesturePoint = self.userLocationAnnotationViewCenter;
-        }
+        CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
 
         mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
         _mbglMap->scaleBy(0.5, center, MGLDurationInSeconds(MGLAnimationDuration));
@@ -1528,11 +1512,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         if (newZoom < _mbglMap->getMinZoom()) return;
         
-        CGPoint centerPoint = self.contentCenter;
-        if (self.userTrackingMode != MGLUserTrackingModeNone)
-        {
-            centerPoint = self.userLocationAnnotationViewCenter;
-        }
+        CGPoint centerPoint = [self anchorPointForGesture:quickZoom];
+
         _mbglMap->scaleBy(powf(2, newZoom) / _mbglMap->getScale(),
                           mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
@@ -1564,11 +1545,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         CGFloat pitchNew = currentPitch - (gestureDistance / slowdown);
         
-        CGPoint centerPoint = self.contentCenter;
-        if (self.userTrackingMode != MGLUserTrackingModeNone)
-        {
-            centerPoint = self.userLocationAnnotationViewCenter;
-        }
+        CGPoint centerPoint = [self anchorPointForGesture:twoFingerDrag];
+
         _mbglMap->setPitch(pitchNew, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
 
         [self notifyMapChange:mbgl::MapChangeRegionIsChanging];
@@ -1578,7 +1556,21 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         [self notifyGestureDidEndWithDrift:NO];
         [self unrotateIfNeededForGesture];
     }
+}
 
+- (CGPoint)anchorPointForGesture:(UIGestureRecognizer *)gesture {
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        return self.userLocationAnnotationViewCenter;
+    }
+
+    // Special case for two-finger drag and quickzoom
+    if ([gesture isKindOfClass:[UIPanGestureRecognizer class]] || [gesture isKindOfClass:[UILongPressGestureRecognizer class]])
+    {
+        return self.contentCenter;
+    }
+  
+    return [gesture locationInView:gesture.view];
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer

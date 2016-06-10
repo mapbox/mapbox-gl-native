@@ -763,6 +763,25 @@ IB_DESIGNABLE
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
 
 /**
+ Returns the point in this view's coordinate system on which to "anchor" in
+ response to a user-initiated gesture.
+ 
+ For example, a pinch-to-zoom gesture would anchor the map at the midpoint of
+ the pinch.
+ 
+ If the `userTrackingMode` property is not `MGLUserTrackingModeNone`, the
+ user annotation is used as the anchor point.
+ 
+ Subclasses may override this method to provide specialized behavior - for
+ example, anchoring on the map's center point to provide a "locked" zooming
+ mode.
+ 
+ @param gesture An anchorable user gesture.
+ @return The point on which to anchor in response to the gesture.
+ */
+- (CGPoint)anchorPointForGesture:(UIGestureRecognizer *)gesture;
+
+/**
  The distance from the edges of the map view’s frame to the edges of the map
  view’s logical viewport.
  
