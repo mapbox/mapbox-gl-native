@@ -584,7 +584,7 @@ void Transform::startTransition(const CameraOptions& camera,
         if (t >= 1.0) {
             result = frame(1.0);
         } else {
-            util::UnitBezier ease = animation.easing ? *animation.easing : util::UnitBezier(0, 0, 0.25, 1);
+            util::UnitBezier ease = animation.easing ? *animation.easing : util::DEFAULT_TRANSITION_EASE;
             result = frame(ease.solve(t, 0.001));
         }
         
