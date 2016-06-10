@@ -6,14 +6,12 @@ const spec = require('mapbox-gl-style-spec').latest;
 var parseCSSColor = require('csscolorparser').parseCSSColor;
 
 global.camelize = function (str) {
-  str = str === undefined ? 'undefined' : str;
   return str.replace(/(?:^|-)(.)/g, function (_, x) {
     return x.toUpperCase();
   });
 }
 
 global.camelizeWithLeadingLowercase = function (str) {
-  str = str === undefined ? 'undefined' : str;
   return str.replace(/-(.)/g, function (_, x) {
     return x.toUpperCase();
   });
@@ -59,7 +57,11 @@ global.defaultValue = function (property) {
   case 'string':
     return JSON.stringify(property.default || "");
   case 'enum':
-    return `${propertyType(property)}::${camelize(property.default)}`;
+    if (property.default === undefined) {
+      return `${propertyType(property)}::Undefined`;
+    } else {
+      return `${propertyType(property)}::${camelize(property.default)}`;
+    }
   case 'color':
     return `{{ ${parseCSSColor(property.default).join(', ')} }}`
   case 'array':
