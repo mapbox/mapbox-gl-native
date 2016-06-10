@@ -889,7 +889,7 @@ void nativeSetVisibleCoordinateBounds(JNIEnv *env, jni::jobject* obj, jlong nati
     if (duration > 0) {
         animationOptions.duration.emplace(mbgl::Milliseconds(duration));
         // equivalent to kCAMediaTimingFunctionDefault in iOS
-        animationOptions.easing = mbgl::util::UnitBezier(0.25, 0.1, 0.25, 0.1);
+        animationOptions.easing.emplace(mbgl::util::UnitBezier { 0.25, 0.1, 0.25, 0.1 });
     }
 
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
@@ -1054,7 +1054,7 @@ void nativeEaseTo(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jdoubl
 
     if (!easing) {
        // add a linear interpolator instead of easing
-       animationOptions.easing = mbgl::util::UnitBezier(0, 0, 1, 1);
+       animationOptions.easing.emplace(mbgl::util::UnitBezier { 0, 0, 1, 1 });
     }
 
     nativeMapView->getMap().easeTo(cameraOptions, animationOptions);
