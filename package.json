@@ -23,7 +23,7 @@
     "express": "^4.11.1",
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#8dfd9653e6659cb2837a4b98f3e8e1d559b29a09",
     "mapbox-gl-style-spec": "^8.5.1",
-    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#f45fd7aba98650c7f3bf778c9cbbfd3b548a4ee8",
+    "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#3e27bc27ea050952481ef1f9a655538590eccb26",
     "node-gyp": "^3.3.1",
     "request": "^2.72.0",
     "tape": "^4.5.1"
