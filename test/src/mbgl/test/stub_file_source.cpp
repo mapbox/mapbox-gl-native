@@ -11,20 +11,24 @@ public:
     }
 
     ~StubFileRequest() override {
-        fileSource.pending.erase(this);
+        fileSource.remove(this);
     }
 
     StubFileSource& fileSource;
 };
 
 StubFileSource::StubFileSource() {
-    timer.start(10ms, 10ms, [this] {
+    timer.start(1ms, 1ms, [this] {
         // Explicit copy to avoid iterator invalidation if ~StubFileRequest gets called within the loop.
         auto pending_ = pending;
         for (auto& pair : pending_) {
             optional<Response> res = std::get<1>(pair.second)(std::get<0>(pair.second));
             if (res) {
                 std::get<2>(pair.second)(*res);
+
+                if (!res->error) {
+                    remove(pair.first);
+                }
             }
         }
     });
@@ -36,6 +40,13 @@ std::unique_ptr<AsyncRequest> StubFileSource::request(const Resource& resource, 
     auto req = std::make_unique<StubFileRequest>(*this);
     pending.emplace(req.get(), std::make_tuple(resource, response, callback));
     return std::move(req);
+}
+
+void StubFileSource::remove(AsyncRequest* req) {
+    auto it = pending.find(req);
+    if (it != pending.end()) {
+        pending.erase(it);
+    }
 }
 
 optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
