@@ -47,7 +47,7 @@ using ObjectPool = std::array<GLuint, TextureMax>;
 
 struct TexturePoolDeleter {
     ObjectStore* store;
-    void operator()(ObjectPool ids) const;
+    void operator()(ObjectPool) const;
 };
 
 using UniqueProgram = std_experimental::unique_resource<GLuint, ProgramDeleter>;

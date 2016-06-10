@@ -32,11 +32,8 @@ void VAODeleter::operator()(GLuint id) const {
 
 void TexturePoolDeleter::operator()(ObjectPool ids) const {
     assert(store);
-    for (GLuint& id : ids) {
-        if (id) {
-            store->abandonedTextures.push_back(id);
-            id = 0;
-        };
+    for (const auto& id : ids) {
+        store->abandonedTextures.push_back(id);
     }
 }
 
