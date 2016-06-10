@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -17,6 +16,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -64,8 +64,13 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
                 setupMap();
 
                 addPassenger();
-                addCar();
-                animateMarker(carMarker, carMarker.getPosition(), passengerMarker.getPosition());
+                addMainCar();
+                animateMoveToPassenger(carMarker);
+
+                for (int i = 0; i < 10; i++) {
+                    addRandomCar();
+                }
+
             }
         });
     }
@@ -92,15 +97,11 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         }
     }
 
-    private void addCar() {
+    private void addMainCar() {
         LatLng randomLatLng = getLatLngInBounds();
 
         if (carMarker == null) {
-            Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
-                    .fromResource(R.drawable.ic_directions_car_black_24dp);
-            carMarker = mMapboxMap.addMarker(new MarkerViewOptions()
-                    .position(randomLatLng)
-                    .icon(icon));
+            carMarker = createCarMarker(randomLatLng);
         } else {
             carMarker.setPosition(randomLatLng);
         }
@@ -109,35 +110,70 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         mMapboxMap.selectMarker(carMarker);
     }
 
+    private void animateMoveToPassenger(final Marker car) {
+
+        ValueAnimator animator = animateMoveMarker(car, passengerMarker.getPosition());
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                addPassenger();
+                animateMoveToPassenger(car);
+            }
+        });
+    }
+
+    protected void addRandomCar() {
+        Marker car = createCarMarker(getLatLngInBounds());
+        randomlyMoveMarker(car);
+    }
+
+    private void randomlyMoveMarker(final Marker marker) {
+        ValueAnimator animator = animateMoveMarker(marker, getLatLngInBounds());
+
+        //Add listener to restart animation on end
+        animator.addListener(new AnimatorListenerAdapter() {
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                randomlyMoveMarker(marker);
+            }
+
+        });
+    }
+
+    private ValueAnimator animateMoveMarker(final Marker marker, LatLng to) {
+        final ValueAnimator markerAnimator = ObjectAnimator.ofObject(marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
+        markerAnimator.setDuration((long) (10 * marker.getPosition().distanceTo(to)));
+        markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        // Start
+        markerAnimator.start();
+
+        return markerAnimator;
+    }
+
+    private Marker createCarMarker(LatLng start) {
+        Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
+                .fromResource(R.drawable.ic_directions_car_black_24dp);
+
+        //View Markers
+        return mMapboxMap.addMarker(new MarkerViewOptions()
+                .position(start)
+                .icon(icon));
+
+        //GL Markers
+//        return mMapboxMap.addMarker(new MarkerOptions()
+//                .position(start)
+//                .icon(icon));
+
+    }
+
     private LatLng getLatLngInBounds() {
         LatLngBounds bounds = mMapboxMap.getProjection().getVisibleRegion().latLngBounds;
         Random generator = new Random();
         double randomLat = bounds.getLatSouth() + generator.nextDouble() * (bounds.getLatNorth() - bounds.getLatSouth());
         double randomLon = bounds.getLonWest() + generator.nextDouble() * (bounds.getLonEast() - bounds.getLonWest());
         return new LatLng(randomLat, randomLon);
-    }
-
-    private void animateMarker(final Marker marker, LatLng from, LatLng to) {
-
-        final ValueAnimator markerAnimator = ObjectAnimator.ofObject(marker, "position", new LatLngEvaluator(), from, to);
-        markerAnimator.setDuration((long) (10 * from.distanceTo(to)));
-        markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        //Add listener to restart animation on end
-        markerAnimator.addListener(new AnimatorListenerAdapter() {
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                Log.d(LOG_TAG, "Animation ended.");
-
-                addPassenger();
-                animateMarker(carMarker, carMarker.getPosition(), passengerMarker.getPosition());
-            }
-
-        });
-
-        // Start
-        markerAnimator.start();
     }
 
     @Override
