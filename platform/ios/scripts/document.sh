@@ -40,6 +40,7 @@ jazzy \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
     --root-url https://www.mapbox.com/ios-sdk/api/${RELEASE_VERSION}/ \
+    --theme platform/darwin/docs/theme \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \
