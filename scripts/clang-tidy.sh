@@ -12,6 +12,11 @@ command -v ${CLANG_TIDY:-clang-tidy} >/dev/null 2>&1 || {
     if [ -z ${CLANG_TIDY} ]; then
         echo "Alternatively, you can set CLANG_TIDY to point to clang-tidy."
     fi
+    if [ `uname -s` = 'Linux' ]; then
+        echo "On Debian-based distros, you can install them via 'apt-get install clang-tidy'"
+    elif [ `uname -s` = 'Darwin' ]; then
+        echo "On OS X, you can install them via 'brew install llvm --with-clang --with-clang-extra-tools'"
+    fi
     exit 1
 }
 

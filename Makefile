@@ -288,15 +288,29 @@ check: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
-compdb: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
+compdb: compdb-$(HOST_PLATFORM)
+
+compdb-linux: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
 	$(GYP) -f ninja -I $(LINUX_OUTPUT_PATH)/config.gypi \
 	  --generator-output=$(LINUX_OUTPUT_PATH) $<
 	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) \
 		-t compdb cc cc_s cxx objc objcxx > $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
 
-tidy: compdb
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) version shaders
+compdb-osx: platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi
+	$(GYP) -f ninja -I $(OSX_OUTPUT_PATH)/config.gypi \
+	  --generator-output=$(OSX_OUTPUT_PATH) $<
+	deps/ninja/ninja-osx -C $(OSX_OUTPUT_PATH)/$(BUILDTYPE) \
+		-t compdb cc cc_s cxx objc objcxx > $(OSX_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
+
+tidy: compdb tidy-$(HOST_PLATFORM)
+
+tidy-linux:
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) platform-lib test
 	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+
+tidy-osx:
+	deps/ninja/ninja-osx -C $(OSX_OUTPUT_PATH)/$(BUILDTYPE) platform-lib test
+	scripts/clang-tidy.sh $(OSX_OUTPUT_PATH)/$(BUILDTYPE)
 
 #### Miscellaneous targets #####################################################
 
