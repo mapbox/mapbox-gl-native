@@ -49,6 +49,11 @@ std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters& parame
         bucket->layout.textRotationAlignment.value = AlignmentType::Map;
     };
 
+    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
+    if (bucket->layout.textPitchAlignment.value == AlignmentType::Undefined) {
+        bucket->layout.textPitchAlignment.value = bucket->layout.textRotationAlignment.value;
+    };
+
     bucket->layout.recalculate(p);
 
     bucket->layout.iconSize.calculate(CalculationParameters(18));

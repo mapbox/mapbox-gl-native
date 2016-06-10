@@ -6,12 +6,14 @@ const spec = require('mapbox-gl-style-spec').latest;
 var parseCSSColor = require('csscolorparser').parseCSSColor;
 
 global.camelize = function (str) {
+  str = str === undefined ? 'undefined' : str;
   return str.replace(/(?:^|-)(.)/g, function (_, x) {
     return x.toUpperCase();
   });
 }
 
 global.camelizeWithLeadingLowercase = function (str) {
+  str = str === undefined ? 'undefined' : str;
   return str.replace(/-(.)/g, function (_, x) {
     return x.toUpperCase();
   });

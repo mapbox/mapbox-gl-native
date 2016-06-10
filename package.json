@@ -22,7 +22,7 @@
     "ejs": "^2.4.1",
     "express": "^4.11.1",
     "mapbox-gl-shaders": "mapbox/mapbox-gl-shaders#adcc18ad79b363ff17443d746d26c2ecee6bcb5e",
-    "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#586dbf48f7ebd79ed623c5ad809a564013173acf",
+    "mapbox-gl-style-spec": "mapbox/mapbox-gl-style-spec#2461efc3d883f2f2e56a6c6b2bfd7d54bbfe9f86",
     "mapbox-gl-test-suite": "mapbox/mapbox-gl-test-suite#fd5e956e948fb430d1b56659c6bd93d3d27b8962",
     "node-gyp": "^3.3.1",
     "request": "^2.72.0",
