@@ -6,13 +6,9 @@
 namespace mbgl {
 namespace style {
 
-class TransitionOptions {
-public:
-    TransitionOptions(optional<Duration> duration_ = {}, optional<Duration> delay_ = {})
-        : duration(std::move(duration_)), delay(std::move(delay_)) {}
-
-    optional<Duration> duration;
-    optional<Duration> delay;
+struct TransitionOptions {
+    optional<Duration> duration = {};
+    optional<Duration> delay = {};
 };
 
 } // namespace style

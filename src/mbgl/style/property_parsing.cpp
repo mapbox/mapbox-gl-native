@@ -150,7 +150,7 @@ optional<TransitionOptions> parseTransitionOptions(const char *, const JSValue& 
         return {};
     }
 
-    return TransitionOptions(duration, delay);
+    return TransitionOptions { duration, delay };
 }
 
 } // namespace style

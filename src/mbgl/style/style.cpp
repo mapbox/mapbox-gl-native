@@ -180,7 +180,7 @@ void Style::update(const UpdateParameters& parameters) {
 void Style::cascade(const TimePoint& timePoint, MapMode mode) {
     // When in continuous mode, we can either have user- or style-defined
     // transitions. Still mode is always immediate.
-    static const TransitionOptions immediateTransition;
+    static const TransitionOptions immediateTransition {};
 
     std::vector<ClassID> classIDs;
     for (const auto& className : classes) {
