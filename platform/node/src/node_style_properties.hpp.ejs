@@ -1,0 +1,35 @@
+#include "node_style.hpp"
+
+<% for (const layer of locals.layers) { -%>
+#include <mbgl/style/layers/<%- layer.type %>_layer.hpp>
+<% } -%>
+
+namespace node_mbgl {
+
+inline PropertySetters makeLayoutPropertySetters() {
+    using namespace mbgl::style;
+    PropertySetters result;
+
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.layoutProperties) { -%>
+    result["<%- property.name %>"] = makePropertySetter(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+<% } -%>
+
+<% } -%>
+    return result;
+}
+
+inline PropertySetters makePaintPropertySetters() {
+    using namespace mbgl::style;
+    PropertySetters result;
+
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.paintProperties) { -%>
+    result["<%- property.name %>"] = makePropertySetter(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+<% } -%>
+
+<% } -%>
+    return result;
+}
+
+}

@@ -1,9 +1,12 @@
 #include "node_map.hpp"
 #include "node_request.hpp"
 #include "node_feature.hpp"
+#include "node_style_properties.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
 
 #include <unistd.h>
 
@@ -48,8 +51,13 @@ NAN_MODULE_INIT(NodeMap::Init) {
     tpl->SetClassName(Nan::New("Map").ToLocalChecked());
 
     Nan::SetPrototypeMethod(tpl, "load", Load);
+    Nan::SetPrototypeMethod(tpl, "loaded", Loaded);
     Nan::SetPrototypeMethod(tpl, "render", Render);
     Nan::SetPrototypeMethod(tpl, "release", Release);
+
+    Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
+    Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
+
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
     Nan::SetPrototypeMethod(tpl, "queryRenderedFeatures", QueryRenderedFeatures);
 
@@ -195,6 +203,21 @@ NAN_METHOD(NodeMap::Load) {
     nodeMap->loaded = true;
 
     info.GetReturnValue().SetUndefined();
+}
+
+NAN_METHOD(NodeMap::Loaded) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    bool loaded = false;
+
+    try {
+        loaded = nodeMap->map->isFullyLoaded();
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().Set(Nan::New(loaded));
 }
 
 NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
@@ -434,6 +457,59 @@ void NodeMap::release() {
     });
 
     map.reset();
+}
+
+NAN_METHOD(NodeMap::AddClass) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() <= 0 || !info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    try {
+        nodeMap->map->addClass(*Nan::Utf8String(info[0]));
+    } catch (const std::exception &ex) {
+        return Nan::ThrowError(ex.what());
+    }
+
+    info.GetReturnValue().SetUndefined();
+}
+
+NAN_METHOD(NodeMap::SetPaintProperty) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() < 3) {
+        return Nan::ThrowTypeError("Three arguments required");
+    }
+
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    mbgl::style::Layer* layer = nodeMap->map->getLayer(*Nan::Utf8String(info[0]));
+    if (!layer) {
+        return Nan::ThrowTypeError("layer not found");
+    }
+
+    if (!info[1]->IsString()) {
+        return Nan::ThrowTypeError("Second argument must be a string");
+    }
+
+    static const PropertySetters setters = makePaintPropertySetters();
+
+    auto it = setters.find(*Nan::Utf8String(info[1]));
+    if (it == setters.end()) {
+        return Nan::ThrowTypeError("property not found");
+    }
+
+    if (!it->second(*layer, info[2])) {
+        return;
+    }
+
+    nodeMap->map->update(mbgl::Update::RecalculateStyle);
+    info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {

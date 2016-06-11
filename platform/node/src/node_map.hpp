@@ -24,8 +24,11 @@ public:
 
     static NAN_METHOD(New);
     static NAN_METHOD(Load);
+    static NAN_METHOD(Loaded);
     static NAN_METHOD(Render);
     static NAN_METHOD(Release);
+    static NAN_METHOD(AddClass);
+    static NAN_METHOD(SetPaintProperty);
     static NAN_METHOD(DumpDebugLogs);
     static NAN_METHOD(QueryRenderedFeatures);
 

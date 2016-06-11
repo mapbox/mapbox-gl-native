@@ -81,7 +81,7 @@ const layerCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer.cpp.ej
 const propertiesHpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.hpp.ejs', 'utf8'), {strict: true});
 const propertiesCpp = ejs.compile(fs.readFileSync('src/mbgl/style/layers/layer_properties.cpp.ejs', 'utf8'), {strict: true});
 
-for (const type of spec.layer.type.values) {
+const layers = spec.layer.type.values.map((type) => {
   const layoutProperties = Object.keys(spec[`layout_${type}`]).reduce((memo, name) => {
     if (name !== 'visibility') {
       spec[`layout_${type}`][name].name = name;
@@ -96,15 +96,20 @@ for (const type of spec.layer.type.values) {
     return memo;
   }, []);
 
-  const layer = {
+  return {
     type: type,
     layoutProperties: layoutProperties,
     paintProperties: paintProperties,
   };
+});
 
-  fs.writeFileSync(`include/mbgl/style/layers/${type}_layer.hpp`, layerHpp(layer));
-  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer.cpp`, layerCpp(layer));
+for (const layer of layers) {
+  fs.writeFileSync(`include/mbgl/style/layers/${layer.type}_layer.hpp`, layerHpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer.cpp`, layerCpp(layer));
 
-  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer_properties.hpp`, propertiesHpp(layer));
-  fs.writeFileSync(`src/mbgl/style/layers/${type}_layer_properties.cpp`, propertiesCpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer_properties.hpp`, propertiesHpp(layer));
+  fs.writeFileSync(`src/mbgl/style/layers/${layer.type}_layer_properties.cpp`, propertiesCpp(layer));
 }
+
+const nodeStyleCpp = ejs.compile(fs.readFileSync('platform/node/src/node_style_properties.hpp.ejs', 'utf8'), {strict: true});
+fs.writeFileSync('platform/node/src/node_style_properties.hpp', nodeStyleCpp({layers: layers}));
