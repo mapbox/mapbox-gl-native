@@ -28,6 +28,7 @@ public:
     static NAN_METHOD(Release);
     static NAN_METHOD(DumpDebugLogs);
     static NAN_METHOD(QueryRenderedFeatures);
+    static NAN_METHOD(OnLowMemory);
 
     void startRender(RenderOptions options);
     void renderFinished();
