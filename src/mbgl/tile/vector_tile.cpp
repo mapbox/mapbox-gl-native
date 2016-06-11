@@ -83,7 +83,10 @@ void VectorTile::setNecessity(Necessity necessity) {
 void VectorTile::setData(std::shared_ptr<const std::string> data_,
                          optional<Timestamp> modified_,
                          optional<Timestamp> expires_) {
-    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr, modified_, expires_);
+    modified = modified_;
+    expires = expires_;
+
+    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
 }
 
 Value parseValue(protozero::pbf_reader data) {

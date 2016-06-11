@@ -33,12 +33,7 @@ void GeometryTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_,
-                           optional<Timestamp> modified_,
-                           optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
-
+void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
     if (!data_) {
         // This is a 404 response. We're treating these as empty tiles.
         workRequest.reset();

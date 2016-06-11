@@ -29,10 +29,7 @@ public:
     ~GeometryTile();
 
     void setError(std::exception_ptr err);
-
-    void setData(std::unique_ptr<GeometryTileData>,
-                 optional<Timestamp> modified_,
-                 optional<Timestamp> expires_);
+    void setData(std::unique_ptr<GeometryTileData>);
 
     Bucket* getBucket(const style::Layer&) override;
 

@@ -112,7 +112,7 @@ GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
                          mapbox::geojsonvt::GeoJSONVT* geojsonvt)
     : GeometryTile(overscaledTileID, sourceID, parameters.style, parameters.mode) {
     if (geojsonvt) {
-        setData(convertTile(geojsonvt->getTile(id.canonical.z, id.canonical.x, id.canonical.y)), {}, {});
+        setData(convertTile(geojsonvt->getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
     }
 }
 

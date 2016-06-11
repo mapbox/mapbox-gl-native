@@ -135,13 +135,13 @@ void AnnotationManager::updateStyle(Style& style) {
     obsoleteShapeAnnotationLayers.clear();
 
     for (auto& tile : tiles) {
-        tile->setData(getTileData(tile->id.canonical), {}, {});
+        tile->setData(getTileData(tile->id.canonical));
     }
 }
 
 void AnnotationManager::addTile(AnnotationTile& tile) {
     tiles.insert(&tile);
-    tile.setData(getTileData(tile.id.canonical), {}, {});
+    tile.setData(getTileData(tile.id.canonical));
 }
 
 void AnnotationManager::removeTile(AnnotationTile& tile) {
