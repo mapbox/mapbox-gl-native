@@ -7,6 +7,7 @@
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/color.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -17,25 +18,32 @@
 namespace mbgl {
 namespace style {
 
-template <typename T>
+template <typename T, typename = std::enable_if_t<!std::is_enum<T>::value>>
 optional<T> parseConstant(const char* name, const JSValue&);
 
 template <> optional<bool> parseConstant(const char*, const JSValue&);
 template <> optional<float> parseConstant(const char*, const JSValue&);
 template <> optional<std::string> parseConstant(const char*, const JSValue&);
 template <> optional<Color> parseConstant(const char*, const JSValue&);
-template <> optional<TranslateAnchorType> parseConstant(const char*, const JSValue&);
-template <> optional<RotateAnchorType> parseConstant(const char*, const JSValue&);
-template <> optional<LineCapType> parseConstant(const char*, const JSValue&);
-template <> optional<LineJoinType> parseConstant(const char*, const JSValue&);
-template <> optional<SymbolPlacementType> parseConstant(const char*, const JSValue&);
-template <> optional<TextAnchorType> parseConstant(const char*, const JSValue&);
-template <> optional<TextJustifyType> parseConstant(const char*, const JSValue&);
-template <> optional<TextTransformType> parseConstant(const char*, const JSValue&);
-template <> optional<AlignmentType> parseConstant(const char*, const JSValue&);
 template <> optional<std::array<float, 2>> parseConstant(const char*, const JSValue&);
 template <> optional<std::vector<float>> parseConstant(const char*, const JSValue&);
 template <> optional<std::vector<std::string>> parseConstant(const char*, const JSValue&);
+
+template <typename T>
+optional<T> parseConstant(const char* name, const JSValue& value,
+                          typename std::enable_if_t<std::is_enum<T>::value, void*> = nullptr) {
+    if (!value.IsString()) {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
+        return {};
+    }
+
+    const auto result = Enum<T>::toEnum({ value.GetString(), value.GetStringLength() });
+    if (!result) {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a valid enumeration value", name);
+    }
+
+    return result;
+}
 
 template <typename T>
 PropertyValue<T> parseProperty(const char* name, const JSValue& value) {

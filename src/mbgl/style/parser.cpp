@@ -14,6 +14,7 @@
 
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mapbox.hpp>
+#include <mbgl/util/enum.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -161,11 +162,15 @@ void Parser::parseSources(const JSValue& value) {
 
         const JSValue& typeVal = sourceVal["type"];
         if (!typeVal.IsString()) {
-            Log::Warning(Event::ParseStyle, "source type must have one of the enum values");
+            Log::Warning(Event::ParseStyle, "source type must be a string");
             continue;
         }
 
-        const auto type = SourceTypeClass({ typeVal.GetString(), typeVal.GetStringLength() });
+        const auto type = Enum<SourceType>::toEnum({ typeVal.GetString(), typeVal.GetStringLength() });
+        if (!type) {
+            Log::Warning(Event::ParseStyle, "source type must have one of the enum values");
+            continue;
+        }
 
         // Sources can have URLs, either because they reference an external TileJSON file, or
         // because reference a GeoJSON file. They don't have to have one though when all source
@@ -177,7 +182,7 @@ void Parser::parseSources(const JSValue& value) {
         std::unique_ptr<Tileset> tileset;
         std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
-        switch (type) {
+        switch (*type) {
         case SourceType::Raster:
             if (sourceVal.HasMember("tileSize")) {
                 const JSValue& tileSizeVal = sourceVal["tileSize"];
@@ -236,7 +241,7 @@ void Parser::parseSources(const JSValue& value) {
         }
 
         const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
-        std::unique_ptr<Source> source = std::make_unique<Source>(type, id, url, tileSize, std::move(tileset), std::move(geojsonvt));
+        std::unique_ptr<Source> source = std::make_unique<Source>(*type, id, url, tileSize, std::move(tileset), std::move(geojsonvt));
 
         sourcesMap.emplace(id, source.get());
         sources.emplace_back(std::move(source));
@@ -481,21 +486,25 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
     }
 }
 
-MBGL_DEFINE_ENUM_CLASS(VisibilityTypeClass, VisibilityType, {
-    { VisibilityType::Visible, "visible" },
-    { VisibilityType::None, "none" },
-})
-
 void Parser::parseVisibility(Layer& layer, const JSValue& value) {
     Layer::Impl& impl = *layer.baseImpl;
+
     if (!value.HasMember("visibility")) {
         return;
-    } else if (!value["visibility"].IsString()) {
+    }
+
+    if (!value["visibility"].IsString()) {
         Log::Warning(Event::ParseStyle, "value of 'visibility' must be a string");
-        impl.visibility = VisibilityType::Visible;
         return;
     }
-    impl.visibility = VisibilityTypeClass({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
+
+    const auto enumValue = Enum<VisibilityType>::toEnum({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
+    if (!enumValue) {
+        Log::Warning(Event::ParseStyle, "value of 'visibility' must be a valid enumeration value");
+        return;
+    }
+
+    impl.visibility = *enumValue;
 }
 
 Value parseFeatureType(const Value& value) {

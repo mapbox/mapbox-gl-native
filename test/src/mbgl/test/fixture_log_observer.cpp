@@ -1,5 +1,6 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/util/enum.hpp>
 
 namespace mbgl {
 
@@ -96,7 +97,8 @@ std::vector<FixtureLog::Message> FixtureLogObserver::unchecked() const {
 }
 
 ::std::ostream& operator<<(::std::ostream& os, const FixtureLog::Message& message) {
-    os << "[\"" << message.severity << "\", \"" << message.event << "\"";
+    os << "[\"" << Enum<EventSeverity>::toString(message.severity) << "\", \"";
+    os << Enum<Event>::toString(message.event) << "\"";
     os << ", " << message.code;
     os << ", \"" << message.msg << "\"";
     return os << "]" << std::endl;
