@@ -5,6 +5,7 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
@@ -72,6 +73,48 @@ static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFul
 namespace {
 
 QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
+
+// Convertion helper functions.
+
+auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
+    const CoordinateSegments &segments = shapeAnnotation.first;
+    const QString &styleLayer = shapeAnnotation.second;
+
+    mbgl::Polygon<double> polygon;
+    polygon.reserve(segments.size());
+
+    for (const Coordinates &coordinates : segments) {
+        mbgl::LinearRing<double> linearRing;
+        linearRing.reserve(coordinates.size());
+
+        for (const Coordinate &coordinate : coordinates) {
+            linearRing.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
+        }
+
+        polygon.push_back(std::move(linearRing));
+    }
+
+    return mbgl::StyleSourcedAnnotation { std::move(polygon), styleLayer.toStdString() };
+}
+
+auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
+    auto convert = [](auto& value) -> mbgl::optional<mbgl::Duration> {
+        if (value.isValid()) {
+            return std::chrono::duration_cast<mbgl::Duration>(mbgl::Milliseconds(value.template value<qint64>()));
+        };
+        return {};
+    };
+    return mbgl::style::TransitionOptions { convert(options.duration), convert(options.delay) };
+}
+
+auto fromQStringList(const QStringList &list)
+{
+    std::vector<std::string> strings(list.size());
+    for (const QString &string : list) {
+        strings.emplace_back(string.toStdString());
+    }
+    return strings;
+}
 
 }
 
@@ -345,9 +388,19 @@ void QMapboxGL::addClass(const QString &className)
     d_ptr->mapObj->addClass(className.toStdString());
 }
 
+void QMapboxGL::addClass(const QString &className, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->addClass(className.toStdString(), fromQMapboxTransitionOptions(options));
+}
+
 void QMapboxGL::removeClass(const QString &className)
 {
     d_ptr->mapObj->removeClass(className.toStdString());
+}
+
+void QMapboxGL::removeClass(const QString &className, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->removeClass(className.toStdString(), fromQMapboxTransitionOptions(options));
 }
 
 bool QMapboxGL::hasClass(const QString &className) const
@@ -357,14 +410,12 @@ bool QMapboxGL::hasClass(const QString &className) const
 
 void QMapboxGL::setClasses(const QStringList &classNames)
 {
-    std::vector<std::string> mbglClassNames;
-    mbglClassNames.reserve(classNames.size());
+    d_ptr->mapObj->setClasses(fromQStringList(classNames));
+}
 
-    for (const QString &className : classNames) {
-        mbglClassNames.emplace_back(className.toStdString());
-    }
-
-    d_ptr->mapObj->setClasses(mbglClassNames);
+void QMapboxGL::setClasses(const QStringList &classNames, const QMapbox::TransitionOptions &options)
+{
+    d_ptr->mapObj->setClasses(fromQStringList(classNames), fromQMapboxTransitionOptions(options));
 }
 
 QStringList QMapboxGL::getClasses() const
@@ -390,27 +441,6 @@ AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotatio
 void QMapboxGL::updatePointAnnotation(AnnotationID id, const PointAnnotation &pointAnnotation)
 {
     d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(pointAnnotation));
-}
-
-mbgl::Annotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
-    const CoordinateSegments &segments = shapeAnnotation.first;
-    const QString &styleLayer = shapeAnnotation.second;
-
-    mbgl::Polygon<double> polygon;
-    polygon.reserve(segments.size());
-
-    for (const Coordinates &coordinates : segments) {
-        mbgl::LinearRing<double> linearRing;
-        linearRing.reserve(coordinates.size());
-
-        for (const Coordinate &coordinate : coordinates) {
-            linearRing.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
-        }
-
-        polygon.push_back(std::move(linearRing));
-    }
-
-    return mbgl::StyleSourcedAnnotation { polygon, styleLayer.toStdString() };
 }
 
 AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)

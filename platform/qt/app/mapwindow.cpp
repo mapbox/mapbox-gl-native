@@ -67,12 +67,21 @@ void MapWindow::changeStyle()
 
 void MapWindow::keyPressEvent(QKeyEvent *ev)
 {
+    static const QMapbox::TransitionOptions transition { 300, {} };
+
     switch (ev->key()) {
     case Qt::Key_S:
         changeStyle();
         break;
     case Qt::Key_Tab:
         m_map.cycleDebugOptions();
+        break;
+    case Qt::Key_R:
+        if (m_map.hasClass("night")) {
+            m_map.removeClass("night", transition);
+        } else {
+            m_map.addClass("night", transition);
+        }
         break;
     default:
         break;

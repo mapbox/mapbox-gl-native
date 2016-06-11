@@ -159,9 +159,12 @@ public:
     void setGestureInProgress(bool inProgress);
 
     void addClass(const QString &);
+    void addClass(const QString &, const QMapbox::TransitionOptions &);
     void removeClass(const QString &);
+    void removeClass(const QString &, const QMapbox::TransitionOptions &);
     bool hasClass(const QString &) const;
     void setClasses(const QStringList &);
+    void setClasses(const QStringList &, const QMapbox::TransitionOptions &);
     QStringList getClasses() const;
 
     QMapbox::AnnotationID addPointAnnotation(const QMapbox::PointAnnotation &);
