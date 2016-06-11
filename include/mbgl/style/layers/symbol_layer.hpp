@@ -47,8 +47,8 @@ public:
     PropertyValue<bool> getIconOptional() const;
     void setIconOptional(PropertyValue<bool>);
 
-    PropertyValue<RotationAlignmentType> getIconRotationAlignment() const;
-    void setIconRotationAlignment(PropertyValue<RotationAlignmentType>);
+    PropertyValue<AlignmentType> getIconRotationAlignment() const;
+    void setIconRotationAlignment(PropertyValue<AlignmentType>);
 
     PropertyValue<float> getIconSize() const;
     void setIconSize(PropertyValue<float>);
@@ -68,8 +68,11 @@ public:
     PropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(PropertyValue<std::array<float, 2>>);
 
-    PropertyValue<RotationAlignmentType> getTextRotationAlignment() const;
-    void setTextRotationAlignment(PropertyValue<RotationAlignmentType>);
+    PropertyValue<AlignmentType> getTextPitchAlignment() const;
+    void setTextPitchAlignment(PropertyValue<AlignmentType>);
+
+    PropertyValue<AlignmentType> getTextRotationAlignment() const;
+    void setTextRotationAlignment(PropertyValue<AlignmentType>);
 
     PropertyValue<std::string> getTextField() const;
     void setTextField(PropertyValue<std::string>);

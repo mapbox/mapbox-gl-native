@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float minzoom, float maxzoom, float labelminzoom) {
+size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t tx, uint16_t ty, float minzoom, float maxzoom, float labelminzoom, uint8_t labelangle) {
     const size_t idx = index();
     void *data = addElement();
 
@@ -21,6 +21,7 @@ size_t TextVertexBuffer::add(int16_t x, int16_t y, float ox, float oy, uint16_t 
     ubytes[8] /* tex */ = tx / 4;
     ubytes[9] /* tex */ = ty / 4;
     ubytes[10] /* labelminzoom */ = labelminzoom * 10;
+    ubytes[11] /* labelangle */ = labelangle;
 
     // a_data2
     ubytes[12] /* minzoom */ = minzoom * 10; // 1/10 zoom levels: z16 == 160.

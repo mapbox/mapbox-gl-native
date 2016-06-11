@@ -16,7 +16,7 @@ public:
     Uniform<GLfloat>                u_zoom          = {"u_zoom",          *this};
     Uniform<GLfloat>                u_opacity       = {"u_opacity",       *this};
     Uniform<std::array<GLfloat, 2>> u_texsize       = {"u_texsize",       *this};
-    Uniform<GLint>                  u_skewed        = {"u_skewed",        *this};
+    Uniform<GLint>                  u_rotate_with_map = {"u_rotate_with_map", *this};
     Uniform<GLint>                  u_texture       = {"u_texture",       *this};
     Uniform<GLint>                  u_fadetexture   = {"u_fadetexture",   *this};
 

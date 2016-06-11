@@ -45,8 +45,13 @@ std::unique_ptr<Bucket> SymbolLayer::Impl::createBucket(BucketParameters& parame
     CalculationParameters p(parameters.tileID.overscaledZ);
     bucket->layout.symbolPlacement.calculate(p);
     if (bucket->layout.symbolPlacement.value == SymbolPlacementType::Line) {
-        bucket->layout.iconRotationAlignment.value = RotationAlignmentType::Map;
-        bucket->layout.textRotationAlignment.value = RotationAlignmentType::Map;
+        bucket->layout.iconRotationAlignment.value = AlignmentType::Map;
+        bucket->layout.textRotationAlignment.value = AlignmentType::Map;
+    };
+
+    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
+    if (bucket->layout.textPitchAlignment.value == AlignmentType::Undefined) {
+        bucket->layout.textPitchAlignment.value = bucket->layout.textRotationAlignment.value;
     };
 
     bucket->layout.recalculate(p);

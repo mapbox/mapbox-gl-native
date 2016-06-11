@@ -188,19 +188,19 @@ optional<TextTransformType> parseConstant<TextTransformType>(const char* name, c
     return { TextTransformTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-MBGL_DEFINE_ENUM_CLASS(RotationAlignmentTypeClass, RotationAlignmentType, {
-    { RotationAlignmentType::Map, "map" },
-    { RotationAlignmentType::Viewport, "viewport" },
+MBGL_DEFINE_ENUM_CLASS(AlignmentTypeClass, AlignmentType, {
+    { AlignmentType::Map, "map" },
+    { AlignmentType::Viewport, "viewport" },
 });
 
 template <>
-optional<RotationAlignmentType> parseConstant<RotationAlignmentType>(const char* name, const JSValue& value) {
+optional<AlignmentType> parseConstant<AlignmentType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
     }
 
-    return { RotationAlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return { AlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template <>

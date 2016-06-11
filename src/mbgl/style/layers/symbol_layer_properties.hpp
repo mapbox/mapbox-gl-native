@@ -23,14 +23,15 @@ public:
     LayoutProperty<bool> iconAllowOverlap { false };
     LayoutProperty<bool> iconIgnorePlacement { false };
     LayoutProperty<bool> iconOptional { false };
-    LayoutProperty<RotationAlignmentType> iconRotationAlignment { RotationAlignmentType::Viewport };
+    LayoutProperty<AlignmentType> iconRotationAlignment { AlignmentType::Viewport };
     LayoutProperty<float> iconSize { 1 };
     LayoutProperty<std::string> iconImage { "" };
     LayoutProperty<float> iconRotate { 0 };
     LayoutProperty<float> iconPadding { 2 };
     LayoutProperty<bool> iconKeepUpright { false };
     LayoutProperty<std::array<float, 2>> iconOffset { {{ 0, 0 }} };
-    LayoutProperty<RotationAlignmentType> textRotationAlignment { RotationAlignmentType::Viewport };
+    LayoutProperty<AlignmentType> textPitchAlignment { AlignmentType::Undefined };
+    LayoutProperty<AlignmentType> textRotationAlignment { AlignmentType::Viewport };
     LayoutProperty<std::string> textField { "" };
     LayoutProperty<std::vector<std::string>> textFont { { "Open Sans Regular", "Arial Unicode MS Regular" } };
     LayoutProperty<float> textSize { 16 };

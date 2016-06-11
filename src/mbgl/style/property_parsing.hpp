@@ -32,7 +32,7 @@ template <> optional<SymbolPlacementType> parseConstant(const char*, const JSVal
 template <> optional<TextAnchorType> parseConstant(const char*, const JSValue&);
 template <> optional<TextJustifyType> parseConstant(const char*, const JSValue&);
 template <> optional<TextTransformType> parseConstant(const char*, const JSValue&);
-template <> optional<RotationAlignmentType> parseConstant(const char*, const JSValue&);
+template <> optional<AlignmentType> parseConstant(const char*, const JSValue&);
 template <> optional<std::array<float, 2>> parseConstant(const char*, const JSValue&);
 template <> optional<std::vector<float>> parseConstant(const char*, const JSValue&);
 template <> optional<std::vector<std::string>> parseConstant(const char*, const JSValue&);

@@ -92,11 +92,11 @@ PropertyValue<bool> SymbolLayer::getIconOptional() const {
 void SymbolLayer::setIconOptional(PropertyValue<bool> value) {
     impl->layout.iconOptional.set(value);
 }
-PropertyValue<RotationAlignmentType> SymbolLayer::getIconRotationAlignment() const {
+PropertyValue<AlignmentType> SymbolLayer::getIconRotationAlignment() const {
     return impl->layout.iconRotationAlignment.get();
 }
 
-void SymbolLayer::setIconRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+void SymbolLayer::setIconRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.iconRotationAlignment.set(value);
 }
 PropertyValue<float> SymbolLayer::getIconSize() const {
@@ -141,11 +141,18 @@ PropertyValue<std::array<float, 2>> SymbolLayer::getIconOffset() const {
 void SymbolLayer::setIconOffset(PropertyValue<std::array<float, 2>> value) {
     impl->layout.iconOffset.set(value);
 }
-PropertyValue<RotationAlignmentType> SymbolLayer::getTextRotationAlignment() const {
+PropertyValue<AlignmentType> SymbolLayer::getTextPitchAlignment() const {
+    return impl->layout.textPitchAlignment.get();
+}
+
+void SymbolLayer::setTextPitchAlignment(PropertyValue<AlignmentType> value) {
+    impl->layout.textPitchAlignment.set(value);
+}
+PropertyValue<AlignmentType> SymbolLayer::getTextRotationAlignment() const {
     return impl->layout.textRotationAlignment.get();
 }
 
-void SymbolLayer::setTextRotationAlignment(PropertyValue<RotationAlignmentType> value) {
+void SymbolLayer::setTextRotationAlignment(PropertyValue<AlignmentType> value) {
     impl->layout.textRotationAlignment.set(value);
 }
 PropertyValue<std::string> SymbolLayer::getTextField() const {

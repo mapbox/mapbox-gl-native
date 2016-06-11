@@ -24,7 +24,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
 
                         // Layout
-                        RotationAlignmentType rotationAlignment,
+                        AlignmentType rotationAlignment,
+                        AlignmentType pitchAlignment,
                         float layoutSize,
 
                         // Paint
@@ -45,10 +46,11 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     float scale = fontScale;
     std::array<float, 2> exScale = extrudeScale;
-    bool alignedWithMap = rotationAlignment == RotationAlignmentType::Map;
+    bool rotateWithMap = rotationAlignment == AlignmentType::Map;
+    bool pitchWithMap = pitchAlignment == AlignmentType::Map;
     float gammaScale = 1.0f;
 
-    if (alignedWithMap) {
+    if (pitchWithMap) {
         scale *= tileID.pixelsToTileUnits(1, state.getZoom());
         exScale.fill(scale);
         gammaScale /= std::cos(state.getPitch());
@@ -60,8 +62,12 @@ void Painter::renderSDF(SymbolBucket &bucket,
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_extrude_scale = exScale;
     sdfShader.u_texsize = texsize;
-    sdfShader.u_skewed = alignedWithMap;
+    sdfShader.u_rotate_with_map = rotateWithMap;
+    sdfShader.u_pitch_with_map = pitchWithMap;
     sdfShader.u_texture = 0;
+    sdfShader.u_pitch = state.getPitch() * util::DEG2RAD;
+    sdfShader.u_bearing = -1.0f * state.getAngle();
+    sdfShader.u_aspect_ratio = (state.getWidth() * 1.0f) / (state.getHeight() * 1.0f);
 
     // adjust min/max zooms for variable font sies
     float zoomAdjust = std::log(fontSize / layoutSize) / std::log(2);
@@ -135,7 +141,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     }
 
     if (bucket.hasIconData()) {
-        if (layout.iconRotationAlignment == RotationAlignmentType::Map) {
+        if (layout.iconRotationAlignment == AlignmentType::Map) {
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
         } else {
@@ -145,7 +151,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         bool sdf = bucket.sdfIcons;
 
         const float angleOffset =
-            layout.iconRotationAlignment == RotationAlignmentType::Map
+            layout.iconRotationAlignment == AlignmentType::Map
                 ? state.getAngle()
                 : 0;
 
@@ -154,7 +160,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
 
         SpriteAtlas* activeSpriteAtlas = layer.impl->spriteAtlas;
         const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
-        const bool iconTransformed = layout.iconRotationAlignment == RotationAlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
+        const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
         config.activeTexture = GL_TEXTURE0;
         activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store);
 
@@ -166,6 +172,9 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
                       *sdfIconShader,
                       &SymbolBucket::drawIcons,
+                      layout.iconRotationAlignment,
+                      // icon-pitch-alignment is not yet implemented
+                      // and we simply inherit the rotation alignment
                       layout.iconRotationAlignment,
                       layout.iconSize,
                       paint.iconOpacity,
@@ -182,7 +191,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
 
             float scale = fontScale;
             std::array<float, 2> exScale = extrudeScale;
-            const bool alignedWithMap = layout.iconRotationAlignment == RotationAlignmentType::Map;
+            const bool alignedWithMap = layout.iconRotationAlignment == AlignmentType::Map;
             if (alignedWithMap) {
                 scale *= tileID.pixelsToTileUnits(1, state.getZoom());
                 exScale.fill(scale);
@@ -194,7 +203,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_extrude_scale = exScale;
             iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
-            iconShader->u_skewed = alignedWithMap;
+            iconShader->u_rotate_with_map = alignedWithMap;
             iconShader->u_texture = 0;
 
             // adjust min/max zooms for variable font sies
@@ -212,7 +221,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     }
 
     if (bucket.hasTextData()) {
-        if (layout.textRotationAlignment == RotationAlignmentType::Map) {
+        if (layout.textRotationAlignment == AlignmentType::Map) {
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
         } else {
@@ -230,6 +239,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                   *sdfGlyphShader,
                   &SymbolBucket::drawGlyphs,
                   layout.textRotationAlignment,
+                  layout.textPitchAlignment,
                   layout.textSize,
                   paint.textOpacity,
                   paint.textColor,

@@ -58,9 +58,10 @@ enum class SymbolPlacementType : bool {
     Line,
 };
 
-enum class RotationAlignmentType : bool {
+enum class AlignmentType : uint8_t {
     Map,
     Viewport,
+    Undefined,
 };
 
 enum class TextJustifyType : uint8_t {

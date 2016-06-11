@@ -140,7 +140,8 @@ private:
                    void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
 
                    // Layout
-                   style::RotationAlignmentType rotationAlignment,
+                   style::AlignmentType rotationAlignment,
+                   style::AlignmentType pitchAlignment,
                    float layoutSize,
 
                    // Paint
