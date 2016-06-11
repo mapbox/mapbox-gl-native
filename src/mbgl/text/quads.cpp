@@ -202,8 +202,8 @@ SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
             // Prevent label from extending past the end of the line
             const float glyphMinScale = std::max(instance.minScale, anchor.scale);
 
-            const float anchorAngle = std::fmod((anchor.angle + textRotate + instance.offset + 2 * M_PI), (2 * M_PI));
-            const float glyphAngle = std::fmod((instance.angle + textRotate + instance.offset + 2 * M_PI), (2 * M_PI));
+            const float anchorAngle = std::fmod((anchor.angle + instance.offset + 2 * M_PI), (2 * M_PI));
+            const float glyphAngle = std::fmod((instance.angle + instance.offset + 2 * M_PI), (2 * M_PI));
             quads.emplace_back(tl, tr, bl, br, rect, anchorAngle, glyphAngle, instance.anchorPoint, glyphMinScale, instance.maxScale);
 
         }
