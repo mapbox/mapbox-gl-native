@@ -8,8 +8,8 @@ namespace style {
 
 class TransitionOptions {
 public:
-    TransitionOptions(const optional<Duration>& duration_ = {}, const optional<Duration>& delay_ = {})
-        : duration(duration_), delay(delay_) {}
+    TransitionOptions(optional<Duration> duration_ = {}, optional<Duration> delay_ = {})
+        : duration(std::move(duration_)), delay(std::move(delay_)) {}
 
     optional<Duration> duration;
     optional<Duration> delay;

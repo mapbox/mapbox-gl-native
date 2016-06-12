@@ -9,9 +9,9 @@ namespace mbgl {
 
 using namespace style;
 
-StyleSourcedAnnotationImpl::StyleSourcedAnnotationImpl(const AnnotationID id_, const StyleSourcedAnnotation& annotation_, const uint8_t maxZoom_)
+StyleSourcedAnnotationImpl::StyleSourcedAnnotationImpl(AnnotationID id_, StyleSourcedAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(annotation_) {
+      annotation(std::move(annotation_)) {
 }
 
 void StyleSourcedAnnotationImpl::updateStyle(Style& style) const {

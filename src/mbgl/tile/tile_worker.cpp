@@ -19,14 +19,14 @@ namespace mbgl {
 
 using namespace mbgl::style;
 
-TileWorker::TileWorker(const OverscaledTileID& id_,
+TileWorker::TileWorker(OverscaledTileID id_,
                        std::string sourceID_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        const util::Atomic<bool>& obsolete_,
                        const MapMode mode_)
-    : id(id_),
+    : id(std::move(id_)),
       sourceID(std::move(sourceID_)),
       spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),

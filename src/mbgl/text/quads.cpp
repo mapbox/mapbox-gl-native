@@ -62,10 +62,10 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
 }
 
 struct GlyphInstance {
-    explicit GlyphInstance(const Point<float> &anchorPoint_) : anchorPoint(anchorPoint_) {}
-    explicit GlyphInstance(const Point<float> &anchorPoint_, float offset_, float minScale_, float maxScale_,
+    explicit GlyphInstance(Point<float> anchorPoint_) : anchorPoint(std::move(anchorPoint_)) {}
+    explicit GlyphInstance(Point<float> anchorPoint_, float offset_, float minScale_, float maxScale_,
             float angle_)
-        : anchorPoint(anchorPoint_), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
+        : anchorPoint(std::move(anchorPoint_)), offset(offset_), minScale(minScale_), maxScale(maxScale_), angle(angle_) {}
 
     const Point<float> anchorPoint;
     const float offset = 0.0f;

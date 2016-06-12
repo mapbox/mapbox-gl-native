@@ -12,7 +12,7 @@ namespace mbgl {
 class FixtureLog {
 public:
     struct Message {
-        Message(EventSeverity severity_, Event event_, int64_t code_, const std::string &msg_);
+        Message(EventSeverity severity_, Event event_, int64_t code_, std::string msg_);
         Message();
 
         bool operator==(const Message& rhs) const;

@@ -45,7 +45,7 @@ using TileParseResult = variant<
 
 class TileWorker : public util::noncopyable {
 public:
-    TileWorker(const OverscaledTileID&,
+    TileWorker(OverscaledTileID,
                std::string sourceID,
                SpriteStore&,
                GlyphAtlas&,

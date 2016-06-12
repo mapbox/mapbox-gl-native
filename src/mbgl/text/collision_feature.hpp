@@ -10,8 +10,8 @@
 namespace mbgl {
     class CollisionBox {
         public:
-            explicit CollisionBox(const Point<float> &_anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
-                anchor(_anchor), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
+            explicit CollisionBox(Point<float> _anchor, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
+                anchor(std::move(_anchor)), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
 
             // the box is centered around the anchor point
             Point<float> anchor;
@@ -51,7 +51,7 @@ namespace mbgl {
             explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const float top, const float bottom, const float left, const float right,
                     const float boxScale, const float padding, const bool alongLine,
-                    const IndexedSubfeature&, const bool straight);
+                    IndexedSubfeature, const bool straight);
 
 
             std::vector<CollisionBox> boxes;

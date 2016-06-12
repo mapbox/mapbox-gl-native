@@ -18,8 +18,8 @@ OfflineDatabase::Statement::~Statement() {
     stmt.clearBindings();
 }
 
-OfflineDatabase::OfflineDatabase(const std::string& path_, uint64_t maximumCacheSize_)
-    : path(path_),
+OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
+    : path(std::move(path_)),
       maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
 }

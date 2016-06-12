@@ -66,7 +66,7 @@ class SymbolBucket : public Bucket {
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
-    SymbolBucket(uint32_t overscaling, float zoom, const MapMode, const std::string& bucketName_, const std::string& sourceLayerName_);
+    SymbolBucket(uint32_t overscaling, float zoom, const MapMode, std::string bucketName_, std::string sourceLayerName_);
     ~SymbolBucket() override;
 
     void upload(gl::ObjectStore&) override;

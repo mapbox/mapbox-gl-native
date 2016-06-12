@@ -75,7 +75,7 @@ private:
     const float pixelRatio;
 
     struct Holder : private util::noncopyable {
-        inline Holder(const std::shared_ptr<const SpriteImage>&, const Rect<dimension>&);
+        inline Holder(std::shared_ptr<const SpriteImage>, Rect<dimension>);
         inline Holder(Holder&&);
         std::shared_ptr<const SpriteImage> spriteImage;
         const Rect<dimension> pos;

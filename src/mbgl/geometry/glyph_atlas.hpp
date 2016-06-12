@@ -39,8 +39,8 @@ public:
 
 private:
     struct GlyphValue {
-        GlyphValue(const Rect<uint16_t>& rect_, uintptr_t id)
-            : rect(rect_), ids({ id }) {}
+        GlyphValue(Rect<uint16_t> rect_, uintptr_t id)
+            : rect(std::move(rect_)), ids({ id }) {}
         Rect<uint16_t> rect;
         std::set<uintptr_t> ids;
     };

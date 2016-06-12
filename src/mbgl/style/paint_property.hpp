@@ -118,8 +118,8 @@ private:
                       TimePoint end_,
                       PropertyValue<T> value_)
             : prior(std::move(prior_)),
-              begin(begin_),
-              end(end_),
+              begin(std::move(begin_)),
+              end(std::move(end_)),
               value(std::move(value_)) {
         }
 

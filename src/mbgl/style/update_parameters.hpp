@@ -29,7 +29,7 @@ public:
                           Style& style_)
         : pixelRatio(pixelRatio_),
           debugOptions(debugOptions_),
-          animationTime(animationTime_),
+          animationTime(std::move(animationTime_)),
           transformState(transformState_),
           worker(worker_),
           fileSource(fileSource_),

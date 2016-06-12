@@ -27,7 +27,7 @@ class Layer;
 
 class Tile : private util::noncopyable {
 public:
-    Tile(const OverscaledTileID&);
+    Tile(OverscaledTileID);
     virtual ~Tile();
 
     void setObserver(TileObserver* observer);

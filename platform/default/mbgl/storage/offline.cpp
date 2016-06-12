@@ -11,9 +11,9 @@
 namespace mbgl {
 
 OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
-    const std::string& styleURL_, const LatLngBounds& bounds_, double minZoom_, double maxZoom_, float pixelRatio_)
-    : styleURL(styleURL_),
-      bounds(bounds_),
+    std::string styleURL_, LatLngBounds bounds_, double minZoom_, double maxZoom_, float pixelRatio_)
+    : styleURL(std::move(styleURL_)),
+      bounds(std::move(bounds_)),
       minZoom(minZoom_),
       maxZoom(maxZoom_),
       pixelRatio(pixelRatio_) {
@@ -97,11 +97,11 @@ std::string encodeOfflineRegionDefinition(const OfflineRegionDefinition& region)
 }
 
 OfflineRegion::OfflineRegion(int64_t id_,
-                             const OfflineRegionDefinition& definition_,
-                             const OfflineRegionMetadata& metadata_)
+                             OfflineRegionDefinition definition_,
+                             OfflineRegionMetadata metadata_)
     : id(id_),
-      definition(definition_),
-      metadata(metadata_) {
+      definition(std::move(definition_)),
+      metadata(std::move(metadata_)) {
 }
 
 OfflineRegion::OfflineRegion(OfflineRegion&&) = default;

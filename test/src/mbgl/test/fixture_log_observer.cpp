@@ -6,8 +6,8 @@ namespace mbgl {
 FixtureLog::Message::Message(EventSeverity severity_,
                              Event event_,
                              int64_t code_,
-                             const std::string& msg_)
-    : severity(severity_), event(event_), code(code_), msg(msg_) {
+                             std::string msg_)
+    : severity(severity_), event(event_), code(code_), msg(std::move(msg_)) {
 }
 
 bool FixtureLog::Message::operator==(const Message& rhs) const {

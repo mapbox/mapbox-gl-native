@@ -29,9 +29,8 @@ struct GlyphMetrics {
 
 struct Glyph {
     inline explicit Glyph() : rect(0, 0, 0, 0), metrics() {}
-    inline explicit Glyph(const Rect<uint16_t> &rect_,
-                          const GlyphMetrics &metrics_)
-        : rect(rect_), metrics(metrics_) {}
+    inline explicit Glyph(Rect<uint16_t> rect_, GlyphMetrics metrics_)
+        : rect(std::move(rect_)), metrics(std::move(metrics_)) {}
 
     operator bool() const {
         return metrics || rect.hasArea();

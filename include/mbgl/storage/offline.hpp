@@ -27,7 +27,7 @@ class Tileset;
  */
 class OfflineTilePyramidRegionDefinition {
 public:
-    OfflineTilePyramidRegionDefinition(const std::string&, const LatLngBounds&, double, double, float);
+    OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float);
 
     /* Private */
     std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Tileset&) const;
@@ -200,8 +200,8 @@ private:
     friend class OfflineDatabase;
 
     OfflineRegion(int64_t id,
-                  const OfflineRegionDefinition&,
-                  const OfflineRegionMetadata&);
+                  OfflineRegionDefinition,
+                  OfflineRegionMetadata);
 
     const int64_t id;
     const OfflineRegionDefinition definition;

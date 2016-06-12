@@ -16,8 +16,8 @@ typedef std::multimap<std::string, mbgl::Value> Properties;
 
 class StubFeature : public GeometryTileFeature {
 public:
-    inline StubFeature(const Properties& properties_, FeatureType type_)
-        : properties(properties_)
+    inline StubFeature(Properties properties_, FeatureType type_)
+        : properties(std::move(properties_))
         , type(type_)
     {}
 

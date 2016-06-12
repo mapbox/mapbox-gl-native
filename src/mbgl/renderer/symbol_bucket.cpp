@@ -60,14 +60,14 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
     {}
 
 
-SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, const std::string& bucketName_, const std::string& sourceLayerName_)
+SymbolBucket::SymbolBucket(uint32_t overscaling_, float zoom_, const MapMode mode_, std::string bucketName_, std::string sourceLayerName_)
     : overscaling(overscaling_),
       zoom(zoom_),
       tileSize(util::tileSize * overscaling_),
       tilePixelRatio(float(util::EXTENT) / tileSize),
       mode(mode_),
-      bucketName(bucketName_),
-      sourceLayerName(sourceLayerName_) {}
+      bucketName(std::move(bucketName_)),
+      sourceLayerName(std::move(sourceLayerName_)) {}
 
 SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.

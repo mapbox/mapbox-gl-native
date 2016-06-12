@@ -41,8 +41,8 @@ class SourceObserver;
 class Source : public TileObserver, private util::noncopyable {
 public:
     Source(SourceType,
-           const std::string& id,
-           const std::string& url,
+           std::string id,
+           std::string url,
            uint16_t tileSize,
            std::unique_ptr<Tileset>&&,
            std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);

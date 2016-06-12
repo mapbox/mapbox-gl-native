@@ -14,8 +14,8 @@ namespace mbgl {
 
 class AssetFileSource::Impl {
 public:
-    Impl(const std::string& root_)
-        : root(root_) {
+    Impl(std::string root_)
+        : root(std::move(root_)) {
     }
 
     void request(const std::string& url, FileSource::Callback callback) {

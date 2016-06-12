@@ -247,9 +247,8 @@ void SpriteAtlas::bind(bool linear, gl::ObjectStore& objectStore) {
 
 SpriteAtlas::~SpriteAtlas() = default;
 
-SpriteAtlas::Holder::Holder(const std::shared_ptr<const SpriteImage>& spriteImage_,
-                            const Rect<dimension>& pos_)
-    : spriteImage(spriteImage_), pos(pos_) {
+SpriteAtlas::Holder::Holder(std::shared_ptr<const SpriteImage> spriteImage_, Rect<dimension> pos_)
+    : spriteImage(std::move(spriteImage_)), pos(std::move(pos_)) {
 }
 
 SpriteAtlas::Holder::Holder(Holder&& h) : spriteImage(std::move(h.spriteImage)), pos(h.pos) {

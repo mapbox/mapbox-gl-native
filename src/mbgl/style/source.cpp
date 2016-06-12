@@ -43,14 +43,14 @@ namespace style {
 static SourceObserver nullObserver;
 
 Source::Source(SourceType type_,
-               const std::string& id_,
-               const std::string& url_,
+               std::string id_,
+               std::string url_,
                uint16_t tileSize_,
                std::unique_ptr<Tileset>&& tileset_,
                std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
     : type(type_),
-      id(id_),
-      url(url_),
+      id(std::move(id_)),
+      url(std::move(url_)),
       tileSize(tileSize_),
       tileset(std::move(tileset_)),
       geojsonvt(std::move(geojsonvt_)),

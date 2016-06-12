@@ -7,9 +7,9 @@ namespace mbgl {
 
 using namespace style;
 
-LineAnnotationImpl::LineAnnotationImpl(const AnnotationID id_, const LineAnnotation& annotation_, const uint8_t maxZoom_)
+LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(annotation_) {
+      annotation(std::move(annotation_)) {
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {

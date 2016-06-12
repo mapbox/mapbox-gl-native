@@ -5,9 +5,9 @@
 
 namespace mbgl {
 
-SymbolAnnotationImpl::SymbolAnnotationImpl(const AnnotationID id_, const SymbolAnnotation& annotation_)
+SymbolAnnotationImpl::SymbolAnnotationImpl(AnnotationID id_, SymbolAnnotation annotation_)
 : id(id_),
-  annotation(annotation_) {
+  annotation(std::move(annotation_)) {
 }
 
 void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, AnnotationTileLayer& layer) const {

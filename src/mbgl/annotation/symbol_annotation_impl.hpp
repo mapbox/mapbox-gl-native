@@ -37,7 +37,7 @@ class CanonicalTileID;
 
 class SymbolAnnotationImpl {
 public:
-    SymbolAnnotationImpl(const AnnotationID, const SymbolAnnotation&);
+    SymbolAnnotationImpl(AnnotationID, SymbolAnnotation);
 
     void updateLayer(const CanonicalTileID&, AnnotationTileLayer&) const;
 

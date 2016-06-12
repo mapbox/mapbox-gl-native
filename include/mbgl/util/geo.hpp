@@ -161,8 +161,8 @@ private:
     LatLng sw;
     LatLng ne;
 
-    LatLngBounds(const LatLng& sw_, const LatLng& ne_)
-        : sw(sw_), ne(ne_) {}
+    LatLngBounds(LatLng sw_, LatLng ne_)
+        : sw(std::move(sw_)), ne(std::move(ne_)) {}
 
     friend bool operator==(const LatLngBounds&, const LatLngBounds&);
     friend bool operator!=(const LatLngBounds&, const LatLngBounds&);

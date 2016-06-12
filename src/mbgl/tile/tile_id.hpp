@@ -45,8 +45,7 @@ std::string toString(const CanonicalTileID&);
 // z/x/y describe the
 class OverscaledTileID {
 public:
-    OverscaledTileID(uint8_t overscaledZ, const CanonicalTileID&);
-    OverscaledTileID(uint8_t overscaledZ, CanonicalTileID&&);
+    OverscaledTileID(uint8_t overscaledZ, CanonicalTileID);
     OverscaledTileID(uint8_t overscaledZ, uint8_t z, uint32_t x, uint32_t y);
     OverscaledTileID(uint8_t z, uint32_t x, uint32_t y);
     explicit OverscaledTileID(const CanonicalTileID&);
@@ -75,8 +74,7 @@ std::string toString(const OverscaledTileID&);
 class UnwrappedTileID {
 public:
     UnwrappedTileID(uint8_t z, int64_t x, int64_t y);
-    UnwrappedTileID(int16_t wrap, const CanonicalTileID&);
-    UnwrappedTileID(int16_t wrap, CanonicalTileID&&);
+    UnwrappedTileID(int16_t wrap, CanonicalTileID);
     bool operator==(const UnwrappedTileID&) const;
     bool operator!=(const UnwrappedTileID&) const;
     bool operator<(const UnwrappedTileID&) const;
@@ -143,13 +141,8 @@ inline std::array<CanonicalTileID, 4> CanonicalTileID::children() const {
     } };
 }
 
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, const CanonicalTileID& canonical_)
-    : overscaledZ(overscaledZ_), canonical(canonical_) {
-    assert(overscaledZ >= canonical.z);
-}
-
-inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, CanonicalTileID&& canonical_)
-    : overscaledZ(overscaledZ_), canonical(std::forward<CanonicalTileID>(canonical_)) {
+inline OverscaledTileID::OverscaledTileID(uint8_t overscaledZ_, CanonicalTileID canonical_)
+    : overscaledZ(overscaledZ_), canonical(std::move(canonical_)) {
     assert(overscaledZ >= canonical.z);
 }
 
@@ -216,12 +209,8 @@ inline UnwrappedTileID::UnwrappedTileID(uint8_t z_, int64_t x_, int64_t y_)
           y_ < 0 ? 0 : std::min(static_cast<uint32_t>(y_), static_cast<uint32_t>(1ull << z_) - 1)) {
 }
 
-inline UnwrappedTileID::UnwrappedTileID(int16_t wrap_, const CanonicalTileID& canonical_)
-    : wrap(wrap_), canonical(canonical_) {
-}
-
-inline UnwrappedTileID::UnwrappedTileID(int16_t wrap_, CanonicalTileID&& canonical_)
-    : wrap(wrap_), canonical(std::forward<CanonicalTileID>(canonical_)) {
+inline UnwrappedTileID::UnwrappedTileID(int16_t wrap_, CanonicalTileID canonical_)
+    : wrap(wrap_), canonical(std::move(canonical_)) {
 }
 
 inline bool UnwrappedTileID::operator==(const UnwrappedTileID& rhs) const {
