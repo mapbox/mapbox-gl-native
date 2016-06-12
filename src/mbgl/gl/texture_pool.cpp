@@ -2,6 +2,7 @@
 #include <mbgl/gl/object_store.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <vector>
 
 namespace mbgl {
