@@ -65,7 +65,7 @@ private:
     const char *bound_shader_name = "";
     GLuint bound_vertex_buffer = 0;
     GLuint bound_elements_buffer = 0;
-    GLbyte *bound_offset = 0;
+    GLbyte *bound_offset = nullptr;
 };
 
 } // namespace mbgl
