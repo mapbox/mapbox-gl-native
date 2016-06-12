@@ -80,8 +80,8 @@ TEST(ThreadLocalStorage, AutoReclaim) {
 
     unsigned counter = 0;
 
-    DtorCounter* dtorCounter1 = new DtorCounter{ &counter };
-    DtorCounter* dtorCounter2 = new DtorCounter{ &counter };
+    auto dtorCounter1 = new DtorCounter{ &counter };
+    auto dtorCounter2 = new DtorCounter{ &counter };
 
     ThreadContext context = {"Test"};
 

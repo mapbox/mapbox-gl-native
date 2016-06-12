@@ -26,7 +26,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
-    FixtureLogObserver* observer = new FixtureLogObserver();
+    auto observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
     style::Parser parser;
