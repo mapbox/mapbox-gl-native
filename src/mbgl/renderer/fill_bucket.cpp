@@ -33,8 +33,7 @@ struct GeometryTooLongException : std::exception {};
 FillBucket::FillBucket() {
 }
 
-FillBucket::~FillBucket() {
-}
+FillBucket::~FillBucket() = default;
 
 void FillBucket::addGeometry(const GeometryCollection& geometry) {
     for (auto& polygon : classifyRings(geometry)) {

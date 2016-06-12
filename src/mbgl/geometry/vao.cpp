@@ -13,8 +13,7 @@ void VertexArrayObject::Unbind() {
 VertexArrayObject::VertexArrayObject() {
 }
 
-VertexArrayObject::~VertexArrayObject() {
-}
+VertexArrayObject::~VertexArrayObject() = default;
 
 void VertexArrayObject::bindVertexArrayObject(gl::ObjectStore& store) {
     if (!gl::GenVertexArrays || !gl::BindVertexArray) {

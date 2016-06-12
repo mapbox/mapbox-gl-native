@@ -64,8 +64,7 @@ void TextureReleaser::operator()(GLuint id) const {
 TexturePool::TexturePool() : impl(std::make_unique<Impl>()) {
 }
 
-TexturePool::~TexturePool() {
-}
+TexturePool::~TexturePool() = default;
 
 PooledTexture TexturePool::acquireTexture(gl::ObjectStore& store) {
     return PooledTexture { impl->acquireTexture(store) , { this } };

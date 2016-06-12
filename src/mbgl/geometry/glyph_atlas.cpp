@@ -19,8 +19,7 @@ GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
       dirty(true) {
 }
 
-GlyphAtlas::~GlyphAtlas() {
-}
+GlyphAtlas::~GlyphAtlas() = default;
 
 void GlyphAtlas::addGlyphs(uintptr_t tileUID,
                            const std::u32string& text,

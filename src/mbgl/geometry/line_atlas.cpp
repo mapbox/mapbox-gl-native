@@ -18,8 +18,7 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
       dirty(true) {
 }
 
-LineAtlas::~LineAtlas() {
-}
+LineAtlas::~LineAtlas() = default;
 
 LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round, gl::ObjectStore& store) {
     size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
