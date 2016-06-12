@@ -306,11 +306,11 @@ compdb-osx: platform/osx/platform.gyp $(OSX_OUTPUT_PATH)/config.gypi
 tidy: compdb tidy-$(HOST_PLATFORM)
 
 tidy-linux:
-	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) platform-lib test
+	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) headers
 	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 tidy-osx:
-	deps/ninja/ninja-osx -C $(OSX_OUTPUT_PATH)/$(BUILDTYPE) platform-lib test
+	deps/ninja/ninja-osx -C $(OSX_OUTPUT_PATH)/$(BUILDTYPE) headers
 	scripts/clang-tidy.sh $(OSX_OUTPUT_PATH)/$(BUILDTYPE)
 
 #### Miscellaneous targets #####################################################

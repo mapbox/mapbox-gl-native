@@ -1,1 +1,1 @@
-Checks: '-clang-analyzer-security.insecureAPI.rand'
+Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn'
