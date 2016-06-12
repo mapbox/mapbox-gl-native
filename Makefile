@@ -25,6 +25,7 @@ else
 .mason/mason: ;
 endif
 
+.NOTPARALLEL: node_modules
 node_modules: package.json
 	npm update # Install dependencies but don't run our own install script.
 
