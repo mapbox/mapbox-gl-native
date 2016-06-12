@@ -46,7 +46,7 @@ public:
            uint16_t tileSize,
            std::unique_ptr<Tileset>&&,
            std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
-    ~Source();
+    ~Source() override;
 
     bool loaded = false;
     void load(FileSource&);

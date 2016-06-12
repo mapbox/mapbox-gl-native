@@ -37,7 +37,7 @@ class Style : public GlyphStoreObserver,
               public util::noncopyable {
 public:
     Style(FileSource&, float pixelRatio);
-    ~Style();
+    ~Style() override;
 
     void setJSON(const std::string&);
 

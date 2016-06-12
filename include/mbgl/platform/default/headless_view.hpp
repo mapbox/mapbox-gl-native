@@ -31,7 +31,7 @@ class HeadlessView : public View {
 public:
     HeadlessView(float pixelRatio, uint16_t width = 256, uint16_t height = 256);
     HeadlessView(std::shared_ptr<HeadlessDisplay> display, float pixelRatio, uint16_t width = 256, uint16_t height = 256);
-    ~HeadlessView();
+    ~HeadlessView() override;
 
     float getPixelRatio() const override;
     std::array<uint16_t, 2> getSize() const override;

@@ -26,7 +26,7 @@ public:
                  style::Style&,
                  const MapMode);
 
-    ~GeometryTile();
+    ~GeometryTile() override;
 
     void setError(std::exception_ptr err);
     void setData(std::unique_ptr<GeometryTileData>);

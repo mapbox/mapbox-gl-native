@@ -30,10 +30,10 @@ public:
         using LogMessage = Message;
 
         Observer(FixtureLog* log = nullptr);
-        ~Observer();
+        ~Observer() override;
 
         // Log::Observer implementation
-        virtual bool onRecord(EventSeverity severity,
+        bool onRecord(EventSeverity severity,
                               Event event,
                               int64_t code,
                               const std::string& msg) override;

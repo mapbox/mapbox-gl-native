@@ -10,7 +10,7 @@ public:
         : fileSource(fileSource_) {
     }
 
-    ~StubFileRequest() {
+    ~StubFileRequest() override {
         fileSource.pending.erase(this);
     }
 

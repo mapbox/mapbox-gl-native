@@ -27,7 +27,7 @@ public:
     using Callback = std::function<void (Response)>;
 
     OnlineFileRequest(Resource, Callback, OnlineFileSource::Impl&);
-    ~OnlineFileRequest();
+    ~OnlineFileRequest() override;
 
     void networkIsReachableAgain();
     void schedule(optional<Timestamp> expires);
