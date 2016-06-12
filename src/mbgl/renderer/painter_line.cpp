@@ -164,4 +164,4 @@ void Painter::renderLine(LineBucket& bucket,
     }
 }
 
-}
+} // namespace mbgl

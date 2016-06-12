@@ -27,7 +27,7 @@ struct AnimationOptions;
 
 namespace style {
 class Layer;
-}
+} // namespace style
 
 class Map : private util::noncopyable {
 public:

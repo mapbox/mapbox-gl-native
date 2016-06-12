@@ -9,5 +9,5 @@ bool multiPolygonIntersectsBufferedMultiPoint(const GeometryCollection&, const G
 bool multiPolygonIntersectsBufferedMultiLine(const GeometryCollection&, const GeometryCollection&, float radius);
 bool multiPolygonIntersectsMultiPolygon(const GeometryCollection&, const GeometryCollection&);
 
-}
+} // namespace util
 } // namespace mbgl

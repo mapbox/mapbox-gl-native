@@ -86,4 +86,4 @@ Resource Resource::tile(const std::string& urlTemplate,
     };
 }
 
-}
+} // namespace mbgl

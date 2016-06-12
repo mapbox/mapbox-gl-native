@@ -69,4 +69,4 @@ std::array<float, 3> Painter::spinWeights(float spin) {
     return spin_weights;
 }
 
-}
+} // namespace mbgl

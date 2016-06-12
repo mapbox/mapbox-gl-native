@@ -12,7 +12,7 @@ class PlainShader;
 
 namespace gl {
 class ObjectStore;
-}
+} // namespace gl
 
 class DebugBucket : private util::noncopyable {
 public:

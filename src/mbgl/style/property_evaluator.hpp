@@ -61,6 +61,6 @@ namespace util {
 template <typename T>
 struct Interpolator<style::Faded<T>>
     : Uninterpolated {};
-}
+} // namespace util
 
 } // namespace mbgl

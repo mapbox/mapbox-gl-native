@@ -12,7 +12,7 @@ namespace mbgl {
 
 namespace style {
 class UpdateParameters;
-}
+} // namespace style
 
 class GeoJSONTile : public GeometryTile {
 public:

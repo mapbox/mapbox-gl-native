@@ -14,7 +14,7 @@ class CanonicalTileID;
 
 namespace style {
 class Style;
-}
+} // namespace style
 
 class ShapeAnnotationImpl {
 public:

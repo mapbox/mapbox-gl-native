@@ -100,4 +100,4 @@ void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
     }
 }
 
-}
+} // namespace mbgl

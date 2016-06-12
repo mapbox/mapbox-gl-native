@@ -12,7 +12,7 @@ class PositionedIcon;
 
 namespace style {
 class SymbolLayoutProperties;
-}
+} // namespace style
 
 struct SymbolQuad {
     explicit SymbolQuad(const Point<float> &tl_, const Point<float> &tr_,

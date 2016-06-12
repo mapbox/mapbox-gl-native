@@ -61,7 +61,7 @@ struct ClipID;
 
 namespace util {
 class ObjectStore;
-}
+} // namespace util
 
 namespace style {
 class Style;
@@ -72,7 +72,7 @@ class CircleLayer;
 class SymbolLayer;
 class RasterLayer;
 class BackgroundLayer;
-}
+} // namespace style
 
 struct FrameData {
     std::array<uint16_t, 2> framebufferSize;

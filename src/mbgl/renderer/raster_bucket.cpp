@@ -43,4 +43,4 @@ bool RasterBucket::needsClipping() const {
     return false;
 }
 
-}
+} // namespace mbgl

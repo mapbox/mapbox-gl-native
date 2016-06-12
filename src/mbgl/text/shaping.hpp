@@ -11,7 +11,7 @@ struct SpriteAtlasElement;
 
 namespace style {
 class SymbolLayoutProperties;
-}
+} // namespace style
 
 class PositionedIcon {
     public:

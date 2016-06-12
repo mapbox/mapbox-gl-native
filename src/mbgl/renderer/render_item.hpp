@@ -13,7 +13,7 @@ class Bucket;
 namespace style {
 class Layer;
 class Source;
-}
+} // namespace style
 
 class RenderItem {
 public:

@@ -508,4 +508,4 @@ void LineBucket::drawLinePatterns(LinepatternShader& shader, gl::ObjectStore& st
     }
 }
 
-}
+} // namespace mbgl

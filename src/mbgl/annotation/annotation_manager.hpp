@@ -21,7 +21,7 @@ class ShapeAnnotationImpl;
 
 namespace style {
 class Style;
-}
+} // namespace style
 
 class AnnotationManager : private util::noncopyable {
 public:

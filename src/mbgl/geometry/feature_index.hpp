@@ -13,7 +13,7 @@ namespace mbgl {
 
 namespace style {
 class Style;
-}
+} // namespace style
 
 class CollisionTile;
 class CanonicalTileID;
@@ -73,4 +73,4 @@ private:
 
     std::unordered_map<std::string, std::vector<std::string>> bucketLayerIDs;
 };
-}
+} // namespace mbgl

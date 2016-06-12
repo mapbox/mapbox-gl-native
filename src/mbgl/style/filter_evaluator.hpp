@@ -159,5 +159,5 @@ private:
     const GeometryTileFeature& feature;
 };
 
-} // namespace mbgl
+} // namespace style
 } // namespace mbgl

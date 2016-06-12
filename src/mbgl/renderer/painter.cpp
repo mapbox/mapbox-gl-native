@@ -310,4 +310,4 @@ void Painter::setDepthSublayer(int n) {
     config.depthRange = { nearDepth, farDepth };
 }
 
-}
+} // namespace mbgl

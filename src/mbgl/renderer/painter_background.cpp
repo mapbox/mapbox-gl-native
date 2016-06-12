@@ -110,4 +110,4 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     }
 }
 
-}
+} // namespace mbgl

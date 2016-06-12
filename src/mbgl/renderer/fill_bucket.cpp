@@ -21,8 +21,8 @@ template <> struct nth<0, mbgl::GeometryCoordinate> {
 template <> struct nth<1, mbgl::GeometryCoordinate> {
     inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
 };
-}
-}
+} // namespace util
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -168,4 +168,4 @@ void FillBucket::drawVertices(OutlinePatternShader& shader, gl::ObjectStore& sto
     }
 }
 
-}
+} // namespace mbgl

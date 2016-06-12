@@ -23,7 +23,7 @@ class TileObserver;
 
 namespace style {
 class Layer;
-}
+} // namespace style
 
 class Tile : private util::noncopyable {
 public:

@@ -198,4 +198,4 @@ void Painter::renderFill(FillBucket& bucket,
     }
 }
 
-}
+} // namespace mbgl

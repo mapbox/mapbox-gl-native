@@ -17,5 +17,5 @@ class utf8_to_utf32 {
     }
 };
 
-} // namespace mbgl
 } // namespace util
+} // namespace mbgl

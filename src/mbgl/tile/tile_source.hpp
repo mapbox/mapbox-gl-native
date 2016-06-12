@@ -12,7 +12,7 @@ class Tileset;
 
 namespace style {
 class UpdateParameters;
-}
+} // namespace style
 
 template <typename T>
 class TileSource : private util::noncopyable {

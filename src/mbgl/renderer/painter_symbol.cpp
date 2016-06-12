@@ -271,4 +271,4 @@ void Painter::renderSymbol(SymbolBucket& bucket,
     config.activeTexture = GL_TEXTURE0;
 }
 
-}
+} // namespace mbgl

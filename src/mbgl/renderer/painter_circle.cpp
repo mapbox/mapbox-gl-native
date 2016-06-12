@@ -46,4 +46,4 @@ void Painter::renderCircle(CircleBucket& bucket,
     bucket.drawCircles(*circleShader, store);
 }
 
-}
+} // namespace mbgl

@@ -14,7 +14,7 @@ namespace gl { class TexturePool; }
 namespace style {
 class Layer;
 class UpdateParameters;
-}
+} // namespace style
 
 class RasterTile : public Tile {
 public:

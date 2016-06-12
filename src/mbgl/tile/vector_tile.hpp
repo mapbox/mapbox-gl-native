@@ -9,7 +9,7 @@ class Tileset;
 
 namespace style {
 class UpdateParameters;
-}
+} // namespace style
 
 class VectorTile : public GeometryTile {
 public:

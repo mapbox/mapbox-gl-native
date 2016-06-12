@@ -35,4 +35,4 @@ private:
 
 };
 
-}
+} // namespace mbgl

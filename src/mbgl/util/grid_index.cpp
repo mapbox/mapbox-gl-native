@@ -79,4 +79,4 @@ int32_t GridIndex<T>::convertToCellCoord(int32_t x) const {
 }
 
 template class GridIndex<IndexedSubfeature>;
-}
+} // namespace mbgl

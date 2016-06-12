@@ -188,4 +188,4 @@ void TileWorker::insertBucket(const std::string& name, std::unique_ptr<Bucket> b
     }
 }
 
-}
+} // namespace mbgl

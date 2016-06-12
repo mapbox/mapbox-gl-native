@@ -17,11 +17,11 @@ class CollisionTile;
 
 namespace gl {
 class ObjectStore;
-}
+} // namespace gl
 
 namespace style {
 class Layer;
-}
+} // namespace style
 
 class Bucket : private util::noncopyable {
 public:

@@ -78,7 +78,7 @@ private:
     bool locked = false;
 };
 
-}
+} // namespace
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
     using namespace mbgl;

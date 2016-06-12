@@ -15,8 +15,8 @@ namespace mapbox {
 namespace sqlite {
 class Database;
 class Statement;
-}
-}
+} // namespace sqlite
+} // namespace mapbox
 
 namespace mbgl {
 
