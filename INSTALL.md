@@ -37,7 +37,7 @@ dependencies:
 
  - [`libcurl`](http://curl.haxx.se/libcurl/) (depends on OpenSSL)
 
-### Additional Dependencies for OS X
+### Additional Dependencies for macOS
 
  - Apple Command Line Tools (available at [Apple Developer](https://developer.apple.com/downloads))
  - [Homebrew](http://brew.sh)
@@ -50,7 +50,7 @@ See the relevant SDK documentation for next steps:
 
 * [Mapbox Android SDK](platform/android/)
 * [Mapbox iOS SDK](platform/ios/)
-* [Mapbox OS X SDK](platform/osx/)
+* [Mapbox macOS SDK](platform/macos/)
 * [Mapbox Qt SDK](platform/qt/)
 * [Mapbox GL Native on Linux](platform/linux/)
 * [node-mapbox-gl-native](platform/node/)

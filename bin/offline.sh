@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-OFFLINE=./build/osx/Release/mbgl-offline
+OFFLINE=./build/macos/Release/mbgl-offline
 
 # Barcelona
 $OFFLINE --north 41.4664 --west 2.0407 --south 41.2724 --east 2.2680 --output barcelona.db
