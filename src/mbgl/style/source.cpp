@@ -100,13 +100,15 @@ bool Source::update(const UpdateParameters& parameters) {
         return allTilesUpdated;
     }
 
+    const Range<uint8_t> zoomRange = getZoomRange();
+
     // Determine the overzooming/underzooming amounts and required tiles.
     int32_t overscaledZoom = util::coveringZoomLevel(parameters.transformState.getZoom(), type, tileSize);
     int32_t dataTileZoom = overscaledZoom;
 
     std::vector<UnwrappedTileID> idealTiles;
-    if (overscaledZoom >= tileset->zoomRange.min) {
-        int32_t idealZoom = std::min<int32_t>(tileset->zoomRange.max, overscaledZoom);
+    if (overscaledZoom >= zoomRange.min) {
+        int32_t idealZoom = std::min<int32_t>(zoomRange.max, overscaledZoom);
 
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
@@ -150,7 +152,7 @@ bool Source::update(const UpdateParameters& parameters) {
 
     renderTiles.clear();
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
-                                 idealTiles, tileset->zoomRange, dataTileZoom);
+                                 idealTiles, zoomRange, dataTileZoom);
 
     if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
         size_t conservativeCacheSize =

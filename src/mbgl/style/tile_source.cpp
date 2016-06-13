@@ -16,6 +16,10 @@ TileSource::TileSource(SourceType type_,
 
 TileSource::~TileSource() = default;
 
+Range<uint8_t> TileSource::getZoomRange() {
+    return tileset->zoomRange;
+}
+
 void TileSource::load(FileSource& fileSource) {
     if (url.empty()) {
         // If the URL is empty, the TileJSON was specified inline in the stylesheet.

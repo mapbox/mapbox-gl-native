@@ -24,6 +24,8 @@ public:
     void load(FileSource&) final;
 
 private:
+    Range<uint8_t> getZoomRange() final;
+
     std::unique_ptr<AsyncRequest> req;
 };
 

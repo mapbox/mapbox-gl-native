@@ -53,7 +53,6 @@ std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id,
     } else if (dataVal.IsObject()) {
         // We need to parse dataVal as a GeoJSON object
         geojsonvt = parseGeoJSON(dataVal);
-        tileset->zoomRange.max = geojsonvt->options.maxZoom;
     } else {
         Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
         return nullptr;
@@ -71,6 +70,10 @@ GeoJSONSource::GeoJSONSource(std::string id_,
 }
 
 GeoJSONSource::~GeoJSONSource() = default;
+
+Range<uint8_t> GeoJSONSource::getZoomRange() {
+    return { 0, geojsonvt->options.maxZoom };
+}
 
 void GeoJSONSource::load(FileSource& fileSource) {
     if (url.empty()) {

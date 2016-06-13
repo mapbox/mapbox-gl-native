@@ -8,6 +8,10 @@ AnnotationSource::AnnotationSource()
     : Source(SourceType::Annotations, AnnotationManager::SourceID, "", util::tileSize, std::make_unique<Tileset>()) {
 }
 
+Range<uint8_t> AnnotationSource::getZoomRange() {
+    return { 0, 22 };
+}
+
 void AnnotationSource::load(FileSource&) {
     loaded = true;
 }

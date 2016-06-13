@@ -30,6 +30,7 @@ public:
     void load(FileSource&) final;
 
 private:
+    Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;

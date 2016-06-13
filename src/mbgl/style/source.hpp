@@ -85,6 +85,7 @@ private:
     void onTileError(Tile&, std::exception_ptr) override;
     void onNeedsRepaint() override;
 
+    virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
 protected:
