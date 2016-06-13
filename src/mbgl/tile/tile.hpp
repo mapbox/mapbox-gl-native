@@ -7,7 +7,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <string>
 #include <memory>
@@ -19,18 +19,18 @@ namespace mbgl {
 class Worker;
 class DebugBucket;
 class TransformState;
-class TileDataObserver;
+class TileObserver;
 
 namespace style {
 class Layer;
 }
 
-class TileData : private util::noncopyable {
+class Tile : private util::noncopyable {
 public:
-    TileData(const OverscaledTileID&);
-    virtual ~TileData();
+    Tile(const OverscaledTileID&);
+    virtual ~Tile();
 
-    void setObserver(TileDataObserver* observer);
+    void setObserver(TileObserver* observer);
 
     enum class Necessity : bool {
         Optional = false,
@@ -91,18 +91,18 @@ protected:
         // Still waiting for data to load or parse.
         None,
 
-        // TileData is partially parsed, some buckets are still waiting for dependencies
+        // Tile is partially parsed, some buckets are still waiting for dependencies
         // to arrive, but it is good for rendering. Partial tiles can also be re-parsed,
         // but might remain in the same state if dependencies are still missing.
         Some,
 
-        // TileData is fully parsed, and all buckets are available if they exist.
+        // Tile is fully parsed, and all buckets are available if they exist.
         All,
     };
 
     DataAvailability availableData = DataAvailability::None;
 
-    TileDataObserver* observer = nullptr;
+    TileObserver* observer = nullptr;
 };
 
 } // namespace mbgl

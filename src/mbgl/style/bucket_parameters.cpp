@@ -1,6 +1,6 @@
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 namespace mbgl {
 namespace style {

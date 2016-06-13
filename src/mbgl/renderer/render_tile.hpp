@@ -7,11 +7,11 @@
 
 namespace mbgl {
 
-class TileData;
+class Tile;
 
 class RenderTile {
 public:
-    RenderTile(const UnwrappedTileID& id_, TileData& data_) : id(id_), data(data_) {
+    RenderTile(const UnwrappedTileID& id_, Tile& tile_) : id(id_), tile(tile_) {
     }
 
     RenderTile(const RenderTile&) = delete;
@@ -20,7 +20,7 @@ public:
     RenderTile& operator=(RenderTile&&) = default;
 
     const UnwrappedTileID id;
-    TileData& data;
+    Tile& tile;
     ClipID clip;
     mat4 matrix;
 };

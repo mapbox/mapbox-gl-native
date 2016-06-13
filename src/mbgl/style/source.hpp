@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_cache.hpp>
 #include <mbgl/style/types.hpp>
 
@@ -38,7 +38,7 @@ class UpdateParameters;
 class QueryParameters;
 class SourceObserver;
 
-class Source : public TileDataObserver, private util::noncopyable {
+class Source : public TileObserver, private util::noncopyable {
 public:
     Source(SourceType,
            const std::string& id,
@@ -71,7 +71,7 @@ public:
 
     const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
 
-    TileData* getTileData(const OverscaledTileID&) const;
+    Tile* getTile(const OverscaledTileID&) const;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const QueryParameters&) const;
@@ -89,12 +89,12 @@ public:
     bool enabled = false;
 
 private:
-    // TileDataObserver implementation.
-    void onTileLoaded(TileData&, bool isNewTile) override;
-    void onTileError(TileData&, std::exception_ptr) override;
+    // TileObserver implementation.
+    void onTileLoaded(Tile&, bool isNewTile) override;
+    void onTileError(Tile&, std::exception_ptr) override;
     void onNeedsRepaint() override;
 
-    std::unique_ptr<TileData> createTile(const OverscaledTileID&, const UpdateParameters&);
+    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&);
 
 private:
     std::unique_ptr<const Tileset> tileset;
@@ -104,8 +104,8 @@ private:
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
 
+    std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     std::map<UnwrappedTileID, RenderTile> renderTiles;
-    std::map<OverscaledTileID, std::unique_ptr<TileData>> tileDataMap;
     TileCache cache;
 
     std::unique_ptr<AsyncRequest> req;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <type_traits>
 

@@ -18,7 +18,7 @@
 namespace mbgl {
 
 class CollisionTile;
-class GeometryTile;
+class GeometryTileData;
 class SpriteStore;
 class GlyphAtlas;
 class GlyphStore;
@@ -36,7 +36,7 @@ public:
     bool complete = false;
     std::unordered_map<std::string, std::unique_ptr<Bucket>> buckets;
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTile> geometryTile;
+    std::unique_ptr<const GeometryTileData> tileData;
 };
 
 using TileParseResult = variant<
@@ -55,7 +55,7 @@ public:
     ~TileWorker();
 
     TileParseResult parseAllLayers(std::vector<std::unique_ptr<style::Layer>>,
-                                   std::unique_ptr<const GeometryTile> geometryTile,
+                                   std::unique_ptr<const GeometryTileData> tileData,
                                    PlacementConfig);
 
     TileParseResult parsePendingLayers(PlacementConfig);
@@ -83,7 +83,7 @@ private:
     std::vector<std::unique_ptr<style::Layer>> layers;
 
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTile> geometryTile;
+    std::unique_ptr<const GeometryTileData> tileData;
 
     // Contains buckets that we couldn't parse so far due to missing resources.
     // They will be attempted on subsequent parses.

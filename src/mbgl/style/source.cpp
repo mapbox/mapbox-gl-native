@@ -19,7 +19,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
-#include <mbgl/tile/raster_tile_data.hpp>
+#include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
@@ -62,7 +62,7 @@ Source::~Source() = default;
 bool Source::isLoaded() const {
     if (!loaded) return false;
 
-    for (const auto& pair : tileDataMap) {
+    for (const auto& pair : tiles) {
         if (!pair.second->isComplete()) {
             return false;
         }
@@ -155,7 +155,7 @@ void Source::load(FileSource& fileSource) {
 
             if (reloadTiles) {
                 // Tile information changed because we got new GeoJSON data, or a new tile URL.
-                tileDataMap.clear();
+                tiles.clear();
                 renderTiles.clear();
                 cache.clear();
             }
@@ -185,17 +185,17 @@ const std::map<UnwrappedTileID, RenderTile>& Source::getRenderTiles() const {
     return renderTiles;
 }
 
-std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledTileID,
+std::unique_ptr<Tile> Source::createTile(const OverscaledTileID& overscaledTileID,
                                              const UpdateParameters& parameters) {
     // If we don't find working tile data, we're just going to load it.
     if (type == SourceType::Raster) {
-        return std::make_unique<RasterTileData>(overscaledTileID, parameters, *tileset);
+        return std::make_unique<RasterTile>(overscaledTileID, parameters, *tileset);
     } else if (type == SourceType::Vector) {
-        return std::make_unique<VectorTileData>(overscaledTileID, id, parameters, *tileset);
+        return std::make_unique<VectorTile>(overscaledTileID, id, parameters, *tileset);
     } else if (type == SourceType::Annotations) {
-        return std::make_unique<AnnotationTileData>(overscaledTileID, id, parameters);
+        return std::make_unique<AnnotationTile>(overscaledTileID, id, parameters);
     } else if (type == SourceType::GeoJSON) {
-        return std::make_unique<GeoJSONTileData>(overscaledTileID, id, parameters, geojsonvt.get());
+        return std::make_unique<GeoJSONTile>(overscaledTileID, id, parameters, geojsonvt.get());
     } else {
         Log::Warning(Event::Style, "Source type '%s' is not implemented",
                      SourceTypeClass(type).c_str());
@@ -203,9 +203,9 @@ std::unique_ptr<TileData> Source::createTile(const OverscaledTileID& overscaledT
     }
 }
 
-TileData* Source::getTileData(const OverscaledTileID& overscaledTileID) const {
-    auto it = tileDataMap.find(overscaledTileID);
-    if (it != tileDataMap.end()) {
+Tile* Source::getTile(const OverscaledTileID& overscaledTileID) const {
+    auto it = tiles.find(overscaledTileID);
+    if (it != tiles.end()) {
         return it->second.get();
     } else {
         return nullptr;
@@ -241,16 +241,16 @@ bool Source::update(const UpdateParameters& parameters) {
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
 
-    auto retainTileDataFn = [&retain](TileData& tileData, bool required) -> void {
-        retain.emplace(tileData.id);
-        tileData.setNecessity(required ? TileData::Necessity::Required
-                                       : TileData::Necessity::Optional);
+    auto retainTileFn = [&retain](Tile& tile, bool required) -> void {
+        retain.emplace(tile.id);
+        tile.setNecessity(required ? Tile::Necessity::Required
+                                   : Tile::Necessity::Optional);
     };
-    auto getTileDataFn = [this](const OverscaledTileID& dataTileID) -> TileData* {
-        return getTileData(dataTileID);
+    auto getTileFn = [this](const OverscaledTileID& dataTileID) -> Tile* {
+        return getTile(dataTileID);
     };
-    auto createTileDataFn = [this, &parameters](const OverscaledTileID& dataTileID) -> TileData* {
-        std::unique_ptr<TileData> data = cache.get(dataTileID);
+    auto createTileFn = [this, &parameters](const OverscaledTileID& dataTileID) -> Tile* {
+        std::unique_ptr<Tile> data = cache.get(dataTileID);
         if (!data) {
             data = createTile(dataTileID, parameters);
             if (data) {
@@ -258,17 +258,17 @@ bool Source::update(const UpdateParameters& parameters) {
             }
         }
         if (data) {
-            return tileDataMap.emplace(dataTileID, std::move(data)).first->second.get();
+            return tiles.emplace(dataTileID, std::move(data)).first->second.get();
         } else {
             return nullptr;
         }
     };
-    auto renderTileFn = [this](const UnwrappedTileID& renderTileID, TileData& tileData) {
-        renderTiles.emplace(renderTileID, RenderTile{ renderTileID, tileData });
+    auto renderTileFn = [this](const UnwrappedTileID& renderTileID, Tile& tile) {
+        renderTiles.emplace(renderTileID, RenderTile{ renderTileID, tile });
     };
 
     renderTiles.clear();
-    algorithm::updateRenderables(getTileDataFn, createTileDataFn, retainTileDataFn, renderTileFn,
+    algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, *tileset, dataTileZoom);
 
     if (type != SourceType::Raster && type != SourceType::Annotations && cache.getSize() == 0) {
@@ -281,15 +281,15 @@ bool Source::update(const UpdateParameters& parameters) {
     }
 
     // Remove stale data tiles from the active set of tiles.
-    // This goes through the (sorted!) tileDataMap and retain set in lockstep and removes items from
-    // tileDataMap that don't have the corresponding key in the retain set.
-    auto dataIt = tileDataMap.begin();
+    // This goes through the (sorted!) tiles and retain set in lockstep and removes items from
+    // tiles that don't have the corresponding key in the retain set.
+    auto dataIt = tiles.begin();
     auto retainIt = retain.begin();
-    while (dataIt != tileDataMap.end()) {
+    while (dataIt != tiles.end()) {
         if (retainIt == retain.end() || dataIt->first < *retainIt) {
-            dataIt->second->setNecessity(TileData::Necessity::Optional);
+            dataIt->second->setNecessity(Tile::Necessity::Optional);
             cache.add(dataIt->first, std::move(dataIt->second));
-            tileDataMap.erase(dataIt++);
+            tiles.erase(dataIt++);
         } else {
             if (!(*retainIt < dataIt->first)) {
                 ++dataIt;
@@ -301,14 +301,14 @@ bool Source::update(const UpdateParameters& parameters) {
     const PlacementConfig newConfig{ parameters.transformState.getAngle(),
                                      parameters.transformState.getPitch(),
                                      parameters.debugOptions & MapDebugOptions::Collision };
-    for (auto& pair : tileDataMap) {
-        auto tileData = pair.second.get();
-        if (parameters.shouldReparsePartialTiles && tileData->isIncomplete()) {
-            if (!tileData->parsePending()) {
+    for (auto& pair : tiles) {
+        auto tile = pair.second.get();
+        if (parameters.shouldReparsePartialTiles && tile->isIncomplete()) {
+            if (!tile->parsePending()) {
                 allTilesUpdated = false;
             }
         } else {
-            tileData->redoPlacement(newConfig);
+            tile->redoPlacement(newConfig);
         }
     }
 
@@ -356,7 +356,7 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
             tileSpaceQueryGeometry.push_back(coordinateToTilePoint(tile.id, c));
         }
 
-        tile.data.queryRenderedFeatures(result,
+        tile.tile.queryRenderedFeatures(result,
                                         tileSpaceQueryGeometry,
                                         parameters.transformState,
                                         parameters.layerIDs);
@@ -377,12 +377,12 @@ void Source::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 
-void Source::onTileLoaded(TileData& tileData, bool isNewTile) {
-    observer->onTileLoaded(*this, tileData.id, isNewTile);
+void Source::onTileLoaded(Tile& tile, bool isNewTile) {
+    observer->onTileLoaded(*this, tile.id, isNewTile);
 }
 
-void Source::onTileError(TileData& tileData, std::exception_ptr error) {
-    observer->onTileError(*this, tileData.id, error);
+void Source::onTileError(Tile& tile, std::exception_ptr error) {
+    observer->onTileError(*this, tile.id, error);
 }
 
 void Source::onNeedsRepaint() {
@@ -393,9 +393,9 @@ void Source::dumpDebugLogs() const {
     Log::Info(Event::General, "Source::id: %s", id.c_str());
     Log::Info(Event::General, "Source::loaded: %d", loaded);
 
-    for (const auto& pair : tileDataMap) {
-        auto& tileData = pair.second;
-        tileData->dumpDebugLogs();
+    for (const auto& pair : tiles) {
+        auto& tile = pair.second;
+        tile->dumpDebugLogs();
     }
 }
 

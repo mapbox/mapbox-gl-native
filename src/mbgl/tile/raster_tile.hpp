@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mbgl/tile/tile_data.hpp>
-#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_source.hpp>
+#include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
 
@@ -16,9 +16,9 @@ class Layer;
 class UpdateParameters;
 }
 
-class RasterTileData : public TileData {
+class RasterTile : public Tile {
 public:
-    RasterTileData(const OverscaledTileID&,
+    RasterTile(const OverscaledTileID&,
                    const style::UpdateParameters&,
                    const Tileset&);
 
@@ -37,7 +37,7 @@ private:
     gl::TexturePool& texturePool;
     Worker& worker;
 
-    TileSource<RasterTileData> tileSource;
+    TileSource<RasterTile> tileSource;
     std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains the Bucket object for the tile. Buckets are render

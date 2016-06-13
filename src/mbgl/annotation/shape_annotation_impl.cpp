@@ -85,7 +85,7 @@ private:
     }
 };
 
-void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTile& tile) {
+void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, AnnotationTileData& data) {
     static const double baseTolerance = 4;
 
     if (!shapeTiler) {
@@ -108,7 +108,7 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
     if (!shapeTile)
         return;
 
-    AnnotationTileLayer& layer = *tile.layers.emplace(layerID,
+    AnnotationTileLayer& layer = *data.layers.emplace(layerID,
         std::make_unique<AnnotationTileLayer>(layerID)).first->second;
 
     for (auto& shapeFeature : shapeTile.features) {

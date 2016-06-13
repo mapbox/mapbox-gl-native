@@ -80,13 +80,13 @@ AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds&
     return result;
 }
 
-std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID& tileID) {
+std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const CanonicalTileID& tileID) {
     if (symbolAnnotations.empty() && shapeAnnotations.empty())
         return nullptr;
 
-    auto tile = std::make_unique<AnnotationTile>();
+    auto tileData = std::make_unique<AnnotationTileData>();
 
-    AnnotationTileLayer& pointLayer = *tile->layers.emplace(
+    AnnotationTileLayer& pointLayer = *tileData->layers.emplace(
         PointLayerID,
         std::make_unique<AnnotationTileLayer>(PointLayerID)).first->second;
 
@@ -98,10 +98,10 @@ std::unique_ptr<AnnotationTile> AnnotationManager::getTile(const CanonicalTileID
         }));
 
     for (const auto& shape : shapeAnnotations) {
-        shape.second->updateTile(tileID, *tile);
+        shape.second->updateTileData(tileID, *tileData);
     }
 
-    return tile;
+    return tileData;
 }
 
 void AnnotationManager::updateStyle(Style& style) {
@@ -134,18 +134,18 @@ void AnnotationManager::updateStyle(Style& style) {
 
     obsoleteShapeAnnotationLayers.clear();
 
-    for (auto& data : monitors) {
-        data->setData(getTile(data->id.canonical), {}, {});
+    for (auto& tile : tiles) {
+        tile->setData(getTileData(tile->id.canonical), {}, {});
     }
 }
 
-void AnnotationManager::addTileData(AnnotationTileData& data) {
-    monitors.insert(&data);
-    data.setData(getTile(data.id.canonical), {}, {});
+void AnnotationManager::addTile(AnnotationTile& tile) {
+    tiles.insert(&tile);
+    tile.setData(getTileData(tile.id.canonical), {}, {});
 }
 
-void AnnotationManager::removeTileData(AnnotationTileData& data) {
-    monitors.erase(&data);
+void AnnotationManager::removeTile(AnnotationTile& tile) {
+    tiles.erase(&tile);
 }
 
 void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const SpriteImage> sprite) {

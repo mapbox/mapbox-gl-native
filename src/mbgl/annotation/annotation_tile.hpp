@@ -11,12 +11,12 @@ namespace style {
 class UpdateParameters;
 }
 
-class AnnotationTileData : public GeometryTileData {
+class AnnotationTile : public GeometryTile {
 public:
-    AnnotationTileData(const OverscaledTileID&,
+    AnnotationTile(const OverscaledTileID&,
                        std::string sourceID,
                        const style::UpdateParameters&);
-    ~AnnotationTileData();
+    ~AnnotationTile();
 
     void setNecessity(Necessity) final;
 
@@ -52,7 +52,7 @@ private:
     std::string name;
 };
 
-class AnnotationTile : public GeometryTile {
+class AnnotationTileData : public GeometryTileData {
 public:
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 

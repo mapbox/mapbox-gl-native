@@ -57,7 +57,7 @@ void FeatureIndex::query(
         const double tileSize,
         const double scale,
         const optional<std::vector<std::string>>& filterLayerIDs,
-        const GeometryTile& geometryTile,
+        const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
         const style::Style& style) const {
 
@@ -75,7 +75,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTile, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 
     // query symbol features
@@ -83,7 +83,7 @@ void FeatureIndex::query(
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(box, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTile, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 }
 
@@ -92,7 +92,7 @@ void FeatureIndex::addFeature(
     const IndexedSubfeature& indexedFeature,
     const GeometryCollection& queryGeometry,
     const optional<std::vector<std::string>>& filterLayerIDs,
-    const GeometryTile& geometryTile,
+    const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
     const style::Style& style,
     const float bearing,
@@ -103,7 +103,7 @@ void FeatureIndex::addFeature(
         return;
     }
 
-    auto sourceLayer = geometryTile.getLayer(indexedFeature.sourceLayerName);
+    auto sourceLayer = geometryTileData.getLayer(indexedFeature.sourceLayerName);
     assert(sourceLayer);
 
     auto geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);

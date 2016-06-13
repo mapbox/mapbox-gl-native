@@ -291,7 +291,7 @@ RenderData Style::getRenderData() const {
 
         for (auto& pair : source->getRenderTiles()) {
             auto& tile = pair.second;
-            if (!tile.data.isRenderable()) {
+            if (!tile.tile.isRenderable()) {
                 continue;
             }
 
@@ -304,7 +304,7 @@ RenderData Style::getRenderData() const {
                 // already a bucket from this layer that is a parent of this tile. Tiles are ordered
                 // by zoom level when we obtain them from getTiles().
                 for (auto it = result.order.rbegin(); it != result.order.rend() && (&it->layer == layer.get()); ++it) {
-                    if (tile.data.id.isChildOf(it->tile->data.id)) {
+                    if (tile.tile.id.isChildOf(it->tile->tile.id)) {
                         skip = true;
                         break;
                     }
@@ -314,7 +314,7 @@ RenderData Style::getRenderData() const {
                 }
             }
 
-            auto bucket = tile.data.getBucket(*layer);
+            auto bucket = tile.tile.getBucket(*layer);
             if (bucket) {
                 result.order.emplace_back(*layer, &tile, bucket);
             }

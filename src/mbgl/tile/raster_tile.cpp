@@ -1,8 +1,8 @@
-#include <mbgl/tile/raster_tile_data.hpp>
+#include <mbgl/tile/raster_tile.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/tile/tile_source_impl.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/update_parameters.hpp>
-#include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/tile_source_impl.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
@@ -11,20 +11,20 @@
 
 using namespace mbgl;
 
-RasterTileData::RasterTileData(const OverscaledTileID& id_,
-                               const style::UpdateParameters& parameters,
-                               const Tileset& tileset)
-    : TileData(id_),
+RasterTile::RasterTile(const OverscaledTileID& id_,
+                       const style::UpdateParameters& parameters,
+                       const Tileset& tileset)
+    : Tile(id_),
       texturePool(parameters.texturePool),
       worker(parameters.worker),
       tileSource(*this, id_, parameters, tileset) {
 }
 
-void RasterTileData::setError(std::exception_ptr err) {
+void RasterTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void RasterTileData::setData(std::shared_ptr<const std::string> data,
+void RasterTile::setData(std::shared_ptr<const std::string> data,
                              optional<Timestamp> modified_,
                              optional<Timestamp> expires_) {
     modified = modified_;
@@ -55,14 +55,14 @@ void RasterTileData::setData(std::shared_ptr<const std::string> data,
     });
 }
 
-Bucket* RasterTileData::getBucket(const style::Layer&) {
+Bucket* RasterTile::getBucket(const style::Layer&) {
     return bucket.get();
 }
 
-void RasterTileData::setNecessity(Necessity necessity) {
-    tileSource.setNecessity(static_cast<TileSource<RasterTileData>::Necessity>(necessity));
+void RasterTile::setNecessity(Necessity necessity) {
+    tileSource.setNecessity(static_cast<TileSource<RasterTile>::Necessity>(necessity));
 }
 
-void RasterTileData::cancel() {
+void RasterTile::cancel() {
     workRequest.reset();
 }

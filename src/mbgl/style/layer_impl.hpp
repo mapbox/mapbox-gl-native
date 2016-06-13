@@ -6,7 +6,7 @@
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/rapidjson.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <memory>
 #include <string>

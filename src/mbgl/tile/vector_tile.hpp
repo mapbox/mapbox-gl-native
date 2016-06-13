@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/tile_source.hpp>
 
 namespace mbgl {
@@ -11,12 +11,12 @@ namespace style {
 class UpdateParameters;
 }
 
-class VectorTileData : public GeometryTileData {
+class VectorTile : public GeometryTile {
 public:
-    VectorTileData(const OverscaledTileID&,
-                   std::string sourceID,
-                   const style::UpdateParameters&,
-                   const Tileset&);
+    VectorTile(const OverscaledTileID&,
+               std::string sourceID,
+               const style::UpdateParameters&,
+               const Tileset&);
 
     void setNecessity(Necessity) final;
     void setData(std::shared_ptr<const std::string> data,
@@ -24,7 +24,7 @@ public:
                  optional<Timestamp> expires);
 
 private:
-    TileSource<VectorTileData> tileSource;
+    TileSource<VectorTile> tileSource;
 };
 
 } // namespace mbgl

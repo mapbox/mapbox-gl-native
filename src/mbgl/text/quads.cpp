@@ -1,6 +1,6 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/util/math.hpp>

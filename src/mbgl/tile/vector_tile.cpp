@@ -1,6 +1,6 @@
 #include <mbgl/tile/vector_tile.hpp>
 #include <mbgl/tile/tile_source_impl.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/update_parameters.hpp>
 
 #include <protozero/pbf_reader.hpp>
@@ -44,7 +44,7 @@ public:
     std::string getName() const override;
 
 private:
-    friend class VectorTile;
+    friend class VectorTileData;
     friend class VectorTileFeature;
 
     std::string name;
@@ -56,9 +56,9 @@ private:
     std::vector<protozero::pbf_reader> features;
 };
 
-class VectorTile : public GeometryTile {
+class VectorTileData : public GeometryTileData {
 public:
-    VectorTile(std::shared_ptr<const std::string> data);
+    VectorTileData(std::shared_ptr<const std::string> data);
 
     util::ptr<GeometryTileLayer> getLayer(const std::string&) const override;
 
@@ -68,22 +68,22 @@ private:
     mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
 };
 
-VectorTileData::VectorTileData(const OverscaledTileID& id_,
-                               std::string sourceID,
-                               const style::UpdateParameters& parameters,
-                               const Tileset& tileset)
-    : GeometryTileData(id_, sourceID, parameters.style, parameters.mode),
+VectorTile::VectorTile(const OverscaledTileID& id_,
+                       std::string sourceID,
+                       const style::UpdateParameters& parameters,
+                       const Tileset& tileset)
+    : GeometryTile(id_, sourceID, parameters.style, parameters.mode),
       tileSource(*this, id_, parameters, tileset) {
 }
 
-void VectorTileData::setNecessity(Necessity necessity) {
-    tileSource.setNecessity(static_cast<TileSource<VectorTileData>::Necessity>(necessity));
+void VectorTile::setNecessity(Necessity necessity) {
+    tileSource.setNecessity(static_cast<TileSource<VectorTile>::Necessity>(necessity));
 }
 
-void VectorTileData::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified,
-                             optional<Timestamp> expires) {
-    GeometryTileData::setData(data ? std::make_unique<VectorTile>(data) : nullptr, modified, expires);
+void VectorTile::setData(std::shared_ptr<const std::string> data_,
+                         optional<Timestamp> modified_,
+                         optional<Timestamp> expires_) {
+    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr, modified_, expires_);
 }
 
 Value parseValue(protozero::pbf_reader data) {
@@ -236,11 +236,11 @@ GeometryCollection VectorTileFeature::getGeometries() const {
     return fixupPolygons(lines);
 }
 
-VectorTile::VectorTile(std::shared_ptr<const std::string> data_)
+VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_)
     : data(std::move(data_)) {
 }
 
-util::ptr<GeometryTileLayer> VectorTile::getLayer(const std::string& name) const {
+util::ptr<GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
     if (!parsed) {
         parsed = true;
         protozero::pbf_reader tile_pbf(*data);

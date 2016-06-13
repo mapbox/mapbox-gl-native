@@ -2,7 +2,7 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/circle_buffer.hpp>
 

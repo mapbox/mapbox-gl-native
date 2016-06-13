@@ -2,7 +2,7 @@
 
 #include <mbgl/geometry/anchor.hpp>
 #include <mbgl/text/shaping.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
 #include <vector>

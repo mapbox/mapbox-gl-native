@@ -1,206 +1,210 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/tile/tile_data_observer.hpp>
-#include <mbgl/tile/tile_source.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/util/worker.hpp>
-#include <mbgl/util/work_request.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/text/collision_tile.hpp>
-#include <mbgl/map/transform_state.hpp>
+#include <mbgl/tile/tile_id.hpp>
+
+#include <clipper/clipper.hpp>
 
 namespace mbgl {
 
-GeometryTileData::GeometryTileData(const OverscaledTileID& id_,
-                                   std::string sourceID,
-                                   style::Style& style_,
-                                   const MapMode mode_)
-    : TileData(id_),
-      style(style_),
-      worker(style_.workers),
-      tileWorker(id_,
-                 sourceID,
-                 *style_.spriteStore,
-                 *style_.glyphAtlas,
-                 *style_.glyphStore,
-                 obsolete,
-                 mode_) {
-}
+static double signedArea(const GeometryCoordinates& ring) {
+    double sum = 0;
 
-void GeometryTileData::setError(std::exception_ptr err) {
-    observer->onTileError(*this, err);
-}
-
-void GeometryTileData::setData(std::unique_ptr<GeometryTile> tile,
-                               optional<Timestamp> modified_,
-                               optional<Timestamp> expires_) {
-    modified = modified_;
-    expires = expires_;
-
-    if (!tile) {
-        // This is a 404 response. We're treating these as empty tiles.
-        workRequest.reset();
-        availableData = DataAvailability::All;
-        buckets.clear();
-        redoPlacement();
-        observer->onTileLoaded(*this, true);
-        return;
+    for (std::size_t i = 0, len = ring.size(), j = len - 1; i < len; j = i++) {
+        const GeometryCoordinate& p1 = ring[i];
+        const GeometryCoordinate& p2 = ring[j];
+        sum += (p2.x - p1.x) * (p1.y + p2.y);
     }
 
-    // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    if (availableData == DataAvailability::All) {
-        availableData = DataAvailability::Some;
+    return sum;
+}
+
+static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
+    ClipperLib::Path result;
+    result.reserve(ring.size());
+    for (const auto& p : ring) {
+        result.emplace_back(p.x, p.y);
+    }
+    return result;
+}
+
+static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
+    GeometryCoordinates result;
+    result.reserve(path.size());
+    for (const auto& p : path) {
+        using Coordinate = GeometryCoordinates::coordinate_type;
+        assert(p.x >= std::numeric_limits<Coordinate>::min());
+        assert(p.x <= std::numeric_limits<Coordinate>::max());
+        assert(p.y >= std::numeric_limits<Coordinate>::min());
+        assert(p.y <= std::numeric_limits<Coordinate>::max());
+        result.emplace_back(Coordinate(p.x), Coordinate(p.y));
+    }
+    return result;
+}
+
+static void processPolynodeBranch(ClipperLib::PolyNode* polynode, GeometryCollection& rings) {
+    // Exterior ring.
+    rings.push_back(fromClipperPath(polynode->Contour));
+    assert(signedArea(rings.back()) > 0);
+
+    // Interior rings.
+    for (auto * ring : polynode->Childs) {
+        rings.push_back(fromClipperPath(ring->Contour));
+        assert(signedArea(rings.back()) < 0);
     }
 
-    // Kick off a fresh parse of this tile. This happens when the tile is new, or
-    // when tile data changed. Replacing the workdRequest will cancel a pending work
-    // request in case there is one.
-    workRequest.reset();
-    workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [this, config = targetConfig] (TileParseResult result) {
-        workRequest.reset();
+    // PolyNodes may be nested in the case of a polygon inside a hole.
+    for (auto * ring : polynode->Childs) {
+        for (auto * subRing : ring->Childs) {
+            processPolynodeBranch(subRing, rings);
+        }
+    }
+}
 
-        if (result.is<TileParseResultData>()) {
-            auto& resultBuckets = result.get<TileParseResultData>();
-            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
+GeometryCollection fixupPolygons(const GeometryCollection& rings) {
+    ClipperLib::Clipper clipper;
+    clipper.StrictlySimple(true);
 
-            // Persist the configuration we just placed so that we can later check whether we need to
-            // place again in case the configuration has changed.
-            placedConfig = config;
+    for (const auto& ring : rings) {
+        clipper.AddPath(toClipperPath(ring), ClipperLib::ptSubject, true);
+    }
 
-            // Move over all buckets we received in this parse request, potentially overwriting
-            // existing buckets in case we got a refresh parse.
-            buckets = std::move(resultBuckets.buckets);
+    ClipperLib::PolyTree polygons;
+    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+    clipper.Clear();
 
-            if (isComplete()) {
-                featureIndex = std::move(resultBuckets.featureIndex);
-                geometryTile = std::move(resultBuckets.geometryTile);
+    GeometryCollection result;
+    for (auto * polynode : polygons.Childs) {
+        processPolynodeBranch(polynode, result);
+    }
+    return result;
+}
+
+std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
+    std::vector<GeometryCollection> polygons;
+
+    std::size_t len = rings.size();
+
+    if (len <= 1) {
+        polygons.push_back(rings);
+        return polygons;
+    }
+
+    GeometryCollection polygon;
+    int8_t ccw = 0;
+
+    for (std::size_t i = 0; i < len; i++) {
+        double area = signedArea(rings[i]);
+
+        if (area == 0)
+            continue;
+
+        if (ccw == 0)
+            ccw = (area < 0 ? -1 : 1);
+
+        if (ccw == (area < 0 ? -1 : 1) && !polygon.empty()) {
+            polygons.push_back(polygon);
+            polygon.clear();
+        }
+
+        polygon.push_back(rings[i]);
+    }
+
+    if (!polygon.empty())
+        polygons.push_back(polygon);
+
+    return polygons;
+}
+
+void limitHoles(GeometryCollection& polygon, uint32_t maxHoles) {
+    if (polygon.size() > 1 + maxHoles) {
+        std::nth_element(polygon.begin() + 1,
+                         polygon.begin() + 1 + maxHoles,
+                         polygon.end(),
+                         [] (const auto& a, const auto& b) {
+                             return signedArea(a) > signedArea(b);
+                         });
+        polygon.resize(1 + maxHoles);
+    }
+}
+
+static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
+    const double size = util::EXTENT * std::pow(2, tileID.z);
+    const double x0 = util::EXTENT * tileID.x;
+    const double y0 = util::EXTENT * tileID.y;
+
+    auto tileCoordinatesToLatLng = [&] (const Point<int16_t>& p) {
+        double y2 = 180 - (p.y + y0) * 360 / size;
+        return Point<double>(
+            (p.x + x0) * 360 / size - 180,
+            360.0 / M_PI * std::atan(std::exp(y2 * M_PI / 180)) - 90.0
+        );
+    };
+
+    GeometryCollection geometries = geometryTileFeature.getGeometries();
+
+    switch (geometryTileFeature.getType()) {
+        case FeatureType::Unknown: {
+            assert(false);
+            return Point<double>(NAN, NAN);
+        }
+
+        case FeatureType::Point: {
+            MultiPoint<double> multiPoint;
+            for (const auto& p : geometries.at(0)) {
+                multiPoint.push_back(tileCoordinatesToLatLng(p));
             }
-
-            redoPlacement();
-            observer->onTileLoaded(*this, true);
-        } else {
-            availableData = DataAvailability::All;
-            observer->onTileError(*this, result.get<std::exception_ptr>());
-        }
-    });
-}
-
-GeometryTileData::~GeometryTileData() {
-    cancel();
-}
-
-bool GeometryTileData::parsePending() {
-    if (workRequest) {
-        // There's already parsing or placement going on.
-        return false;
-    }
-
-    workRequest.reset();
-    workRequest = worker.parsePendingGeometryTileLayers(tileWorker, targetConfig, [this, config = targetConfig] (TileParseResult result) {
-        workRequest.reset();
-
-        if (result.is<TileParseResultData>()) {
-            auto& resultBuckets = result.get<TileParseResultData>();
-            availableData = resultBuckets.complete ? DataAvailability::All : DataAvailability::Some;
-
-            // Move over all buckets we received in this parse request, potentially overwriting
-            // existing buckets in case we got a refresh parse.
-            for (auto& bucket : resultBuckets.buckets) {
-                buckets[bucket.first] = std::move(bucket.second);
+            if (multiPoint.size() == 1) {
+                return multiPoint[0];
+            } else {
+                return multiPoint;
             }
+        }
 
-            // Persist the configuration we just placed so that we can later check whether we need to
-            // place again in case the configuration has changed.
-            placedConfig = config;
-
-            if (isComplete()) {
-                featureIndex = std::move(resultBuckets.featureIndex);
-                geometryTile = std::move(resultBuckets.geometryTile);
+        case FeatureType::LineString: {
+            MultiLineString<double> multiLineString;
+            for (const auto& g : geometries) {
+                LineString<double> lineString;
+                for (const auto& p : g) {
+                    lineString.push_back(tileCoordinatesToLatLng(p));
+                }
+                multiLineString.push_back(std::move(lineString));
             }
-
-            redoPlacement();
-            observer->onTileLoaded(*this, false);
-        } else {
-            availableData = DataAvailability::All;
-            observer->onTileError(*this, result.get<std::exception_ptr>());
+            if (multiLineString.size() == 1) {
+                return multiLineString[0];
+            } else {
+                return multiLineString;
+            }
         }
-    });
 
-    return true;
-}
-
-Bucket* GeometryTileData::getBucket(const style::Layer& layer) {
-    const auto it = buckets.find(layer.baseImpl->bucketName());
-    if (it == buckets.end()) {
-        return nullptr;
+        case FeatureType::Polygon: {
+            MultiPolygon<double> multiPolygon;
+            for (const auto& pg : classifyRings(geometries)) {
+                Polygon<double> polygon;
+                for (const auto& r : pg) {
+                    LinearRing<double> linearRing;
+                    for (const auto& p : r) {
+                        linearRing.push_back(tileCoordinatesToLatLng(p));
+                    }
+                    polygon.push_back(std::move(linearRing));
+                }
+                multiPolygon.push_back(std::move(polygon));
+            }
+            if (multiPolygon.size() == 1) {
+                return multiPolygon[0];
+            } else {
+                return multiPolygon;
+            }
+        }
     }
 
-    assert(it->second);
-    return it->second.get();
+    // Unreachable, but placate GCC.
+    return Point<double>();
 }
 
-void GeometryTileData::redoPlacement(const PlacementConfig newConfig) {
-    targetConfig = newConfig;
-    redoPlacement();
-}
-
-void GeometryTileData::redoPlacement() {
-    // Don't start a new placement request when the current one hasn't completed yet, or when
-    // we are parsing buckets.
-    if (workRequest || targetConfig == placedConfig) {
-        return;
-    }
-
-    workRequest = worker.redoPlacement(tileWorker, buckets, targetConfig, [this, config = targetConfig](std::unique_ptr<CollisionTile> collisionTile) {
-        workRequest.reset();
-
-        // Persist the configuration we just placed so that we can later check whether we need to
-        // place again in case the configuration has changed.
-        placedConfig = config;
-
-        for (auto& bucket : buckets) {
-            bucket.second->swapRenderData();
-        }
-
-        if (featureIndex) {
-            featureIndex->setCollisionTile(std::move(collisionTile));
-        }
-
-        // The target configuration could have changed since we started placement. In this case,
-        // we're starting another placement run.
-        if (placedConfig != targetConfig) {
-            redoPlacement();
-        } else {
-            observer->onNeedsRepaint();
-        }
-    });
-}
-
-void GeometryTileData::queryRenderedFeatures(
-    std::unordered_map<std::string, std::vector<Feature>>& result,
-    const GeometryCoordinates& queryGeometry,
-    const TransformState& transformState,
-    const optional<std::vector<std::string>>& layerIDs) {
-
-    if (!featureIndex || !geometryTile) return;
-
-    featureIndex->query(result,
-                        { queryGeometry },
-                        transformState.getAngle(),
-                        util::tileSize * id.overscaleFactor(),
-                        std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        layerIDs,
-                        *geometryTile,
-                        id.canonical,
-                        style);
-}
-
-void GeometryTileData::cancel() {
-    obsolete = true;
-    workRequest.reset();
+Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
+    Feature feature { convertGeometry(geometryTileFeature, tileID) };
+    feature.properties = geometryTileFeature.getProperties();
+    feature.id = geometryTileFeature.getID();
+    return feature;
 }
 
 } // namespace mbgl

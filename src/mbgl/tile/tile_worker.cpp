@@ -1,6 +1,6 @@
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/tile/tile_worker.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
@@ -40,14 +40,14 @@ TileWorker::~TileWorker() {
 }
 
 TileParseResult TileWorker::parseAllLayers(std::vector<std::unique_ptr<Layer>> layers_,
-                                           std::unique_ptr<const GeometryTile> geometryTile_,
+                                           std::unique_ptr<const GeometryTileData> tileData_,
                                            PlacementConfig config) {
     // We're doing a fresh parse of the tile, because the underlying data has changed.
     pending.clear();
     placementPending.clear();
     partialParse = false;
     featureIndex = std::make_unique<FeatureIndex>();
-    geometryTile = std::move(geometryTile_);
+    tileData = std::move(tileData_);
 
     // Store the layers for use in redoPlacement.
     layers = std::move(layers_);
@@ -98,7 +98,7 @@ TileParseResult TileWorker::prepareResult(const PlacementConfig& config) {
     if (result.complete) {
         featureIndex->setCollisionTile(placeLayers(config));
         result.featureIndex = std::move(featureIndex);
-        result.geometryTile = std::move(geometryTile);
+        result.tileData = std::move(tileData);
     }
 
     return std::move(result);
@@ -147,7 +147,7 @@ void TileWorker::parseLayer(const Layer* layer) {
         return;
     }
 
-    auto geometryLayer = geometryTile->getLayer(layer->baseImpl->sourceLayer);
+    auto geometryLayer = tileData->getLayer(layer->baseImpl->sourceLayer);
     if (!geometryLayer) {
         // The layer specified in the bucket does not exist. Do nothing.
         if (debug::tileParseWarnings) {

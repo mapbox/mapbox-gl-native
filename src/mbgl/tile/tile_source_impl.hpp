@@ -10,11 +10,11 @@
 namespace mbgl {
 
 template <typename T>
-TileSource<T>::TileSource(T& tileData_,
+TileSource<T>::TileSource(T& tile_,
                           const OverscaledTileID& id,
                           const style::UpdateParameters& parameters,
                           const Tileset& tileset)
-    : tileData(tileData_),
+    : tile(tile_),
       necessity(Necessity::Optional),
       resource(Resource::tile(
         tileset.tiles.at(0),
@@ -51,7 +51,7 @@ void TileSource<T>::loadOptional() {
     request = fileSource.request(resource, [this](Response res) {
         request.reset();
 
-        tileData.setTriedOptional();
+        tile.setTriedOptional();
 
         if (res.error && res.error->reason == Response::Error::Reason::NotFound) {
             // When the optional request could not be satisfied, don't treat it as an error.
@@ -86,16 +86,16 @@ void TileSource<T>::makeOptional() {
 template <typename T>
 void TileSource<T>::loadedData(const Response& res) {
     if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
-        tileData.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
+        tile.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
         resource.priorExpires = res.expires;
-        // Do not notify the TileData object; when we get this message, it already has the current
+        // Do not notify the tile; when we get this message, it already has the current
         // version of the data.
     } else {
         resource.priorModified = res.modified;
         resource.priorExpires = res.expires;
         resource.priorEtag = res.etag;
-        tileData.setData(res.noContent ? nullptr : res.data, res.modified, res.expires);
+        tile.setData(res.noContent ? nullptr : res.data, res.modified, res.expires);
     }
 }
 

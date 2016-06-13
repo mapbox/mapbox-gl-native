@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/style/types.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
 
@@ -40,7 +40,7 @@ public:
             const double tileSize,
             const double scale,
             const optional<std::vector<std::string>>& layerIDs,
-            const GeometryTile&,
+            const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&) const;
 
@@ -61,7 +61,7 @@ private:
             const IndexedSubfeature&,
             const GeometryCollection& queryGeometry,
             const optional<std::vector<std::string>>& filterLayerIDs,
-            const GeometryTile&,
+            const GeometryTileData&,
             const CanonicalTileID&,
             const style::Style&,
             const float bearing,

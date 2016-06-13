@@ -7,15 +7,15 @@
 namespace mbgl {
 namespace algorithm {
 
-template <typename GetTileDataFn,
-          typename CreateTileDataFn,
-          typename RetainTileDataFn,
+template <typename GetTileFn,
+          typename CreateTileFn,
+          typename RetainTileFn,
           typename RenderTileFn,
           typename IdealTileIDs,
           typename SourceInfo>
-void updateRenderables(GetTileDataFn getTileData,
-                       CreateTileDataFn createTileData,
-                       RetainTileDataFn retainTileData,
+void updateRenderables(GetTileFn getTile,
+                       CreateTileFn createTile,
+                       RetainTileFn retainTile,
                        RenderTileFn renderTile,
                        const IdealTileIDs& idealTileIDs,
                        const SourceInfo& info,
@@ -31,29 +31,29 @@ void updateRenderables(GetTileDataFn getTileData,
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
         const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
-        auto data = getTileData(idealDataTileID);
+        auto data = getTile(idealDataTileID);
         if (!data) {
-            data = createTileData(idealDataTileID);
+            data = createTile(idealDataTileID);
             assert(data);
         }
 
         // if (source has the tile and bucket is loaded) {
         if (data->isRenderable()) {
-            retainTileData(*data, true);
+            retainTile(*data, true);
             renderTile(idealRenderTileID, *data);
         } else {
             bool triedPrevious = data->hasTriedOptional();
 
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
-            retainTileData(*data, true);
+            retainTile(*data, true);
             covered = true;
             overscaledZ = dataTileZoom + 1;
             if (overscaledZ > info.maxZoom) {
                 // We're looking for an overzoomed child tile.
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
-                data = getTileData(childDataTileID);
+                data = getTile(childDataTileID);
                 if (data && data->isRenderable()) {
-                    retainTileData(*data, false);
+                    retainTile(*data, false);
                     renderTile(idealRenderTileID, *data);
                 } else {
                     covered = false;
@@ -62,9 +62,9 @@ void updateRenderables(GetTileDataFn getTileData,
                 // Check all four actual child tiles.
                 for (const auto& childTileID : idealDataTileID.canonical.children()) {
                     const OverscaledTileID childDataTileID(overscaledZ, childTileID);
-                    data = getTileData(childDataTileID);
+                    data = getTile(childDataTileID);
                     if (data && data->isRenderable()) {
-                        retainTileData(*data, false);
+                        retainTile(*data, false);
                         renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *data);
                     } else {
                         // At least one child tile doesn't exist, so we are going to look for
@@ -89,14 +89,14 @@ void updateRenderables(GetTileDataFn getTileData,
                         checked.emplace(parentRenderTileID);
                     }
 
-                    data = getTileData(parentDataTileID);
+                    data = getTile(parentDataTileID);
                     if (!data && triedPrevious) {
-                        data = createTileData(parentDataTileID);
+                        data = createTile(parentDataTileID);
                     }
 
                     if (data) {
                         triedPrevious = data->hasTriedOptional();
-                        retainTileData(*data, false);
+                        retainTile(*data, false);
 
                         if (data->isRenderable()) {
                             renderTile(parentRenderTileID, *data);

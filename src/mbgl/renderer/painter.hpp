@@ -32,7 +32,7 @@ class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
 struct FrameData;
-class TileData;
+class Tile;
 
 class DebugBucket;
 class FillBucket;
@@ -100,7 +100,7 @@ public:
 
     void renderClipMasks();
 
-    void renderDebugText(TileData&, const mat4&);
+    void renderDebugText(Tile&, const mat4&);
     void renderFill(FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
     void renderLine(LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
     void renderCircle(CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);

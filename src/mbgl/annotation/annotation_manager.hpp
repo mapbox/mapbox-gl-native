@@ -41,8 +41,8 @@ public:
 
     void updateStyle(style::Style&);
 
-    void addTileData(AnnotationTileData&);
-    void removeTileData(AnnotationTileData&);
+    void addTile(AnnotationTile&);
+    void removeTile(AnnotationTile&);
 
     static const std::string SourceID;
     static const std::string PointLayerID;
@@ -53,7 +53,7 @@ private:
     void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
     void add(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
 
-    std::unique_ptr<AnnotationTile> getTile(const CanonicalTileID&);
+    std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
 
     AnnotationID nextID = 0;
 
@@ -65,7 +65,7 @@ private:
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;
-    std::set<AnnotationTileData*> monitors;
+    std::set<AnnotationTile*> tiles;
 
     SpriteStore spriteStore;
     SpriteAtlas spriteAtlas;

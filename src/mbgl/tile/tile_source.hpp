@@ -58,7 +58,7 @@ private:
     void loadedData(const Response&);
     void loadRequired();
 
-    T& tileData;
+    T& tile;
     Necessity necessity;
     Resource resource;
     FileSource& fileSource;
