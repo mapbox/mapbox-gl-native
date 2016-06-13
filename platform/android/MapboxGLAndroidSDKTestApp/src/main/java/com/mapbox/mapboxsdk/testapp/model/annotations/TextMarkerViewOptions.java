@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView, TextMarkerViewOptions> {
@@ -24,6 +25,8 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         anchor(in.readFloat(), in.readFloat());
         infoWindowAnchor(in.readFloat(), in.readFloat());
         rotation(in.readFloat());
+        visible(in.readByte() != 0);
+        alpha(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -55,6 +58,8 @@ public class TextMarkerViewOptions extends BaseMarkerViewOptions<TextMarkerView,
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
         out.writeFloat(getRotation());
+        out.writeByte((byte) (isVisible() ? 1 : 0));
+        out.writeFloat(alpha);
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {

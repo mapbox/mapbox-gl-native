@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarkerView, CountryMarkerViewOptions> {
@@ -23,8 +24,10 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         title(in.readString());
         flat(in.readByte() != 0);
         anchor(in.readFloat(), in.readFloat());
-        selected = in.readByte() != 0;
+        infoWindowAnchor(in.readFloat(), in.readFloat());
         rotation(in.readFloat());
+        visible(in.readByte() != 0);
+        alpha(in.readFloat());
         if (in.readByte() != 0) {
             // this means we have an icon
             String iconId = in.readString();
@@ -56,8 +59,9 @@ public class CountryMarkerViewOptions extends BaseMarkerViewOptions<CountryMarke
         out.writeFloat(getAnchorV());
         out.writeFloat(getInfoWindowAnchorU());
         out.writeFloat(getInfoWindowAnchorV());
-        out.writeByte((byte) (selected ? 1 : 0));
         out.writeFloat(getRotation());
+        out.writeByte((byte) (isVisible() ? 1 : 0));
+        out.writeFloat(getAlpha());
         Icon icon = getIcon();
         out.writeByte((byte) (icon != null ? 1 : 0));
         if (icon != null) {
