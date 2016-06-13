@@ -30,6 +30,7 @@ template <> inline TextAnchorType defaultStopsValue() { return {}; }
 template <> inline TextJustifyType defaultStopsValue() { return {}; }
 template <> inline TextTransformType defaultStopsValue() { return {}; }
 template <> inline AlignmentType defaultStopsValue() { return {}; }
+template <> inline IconTextFitType defaultStopsValue() { return {}; };
 
 template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
@@ -98,6 +99,7 @@ template class PropertyEvaluator<TextAnchorType>;
 template class PropertyEvaluator<TextJustifyType>;
 template class PropertyEvaluator<TextTransformType>;
 template class PropertyEvaluator<AlignmentType>;
+template class PropertyEvaluator<IconTextFitType>;
 
 template <typename T>
 Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Undefined&) const {

@@ -106,6 +106,20 @@ PropertyValue<float> SymbolLayer::getIconSize() const {
 void SymbolLayer::setIconSize(PropertyValue<float> value) {
     impl->layout.iconSize.set(value);
 }
+PropertyValue<IconTextFitType> SymbolLayer::getIconTextFit() const {
+    return impl->layout.iconTextFit.get();
+}
+
+void SymbolLayer::setIconTextFit(PropertyValue<IconTextFitType> value) {
+    impl->layout.iconTextFit.set(value);
+}
+PropertyValue<std::array<float, 2>> SymbolLayer::getIconTextFitPadding() const {
+    return impl->layout.iconTextFitPadding.get();
+}
+
+void SymbolLayer::setIconTextFitPadding(PropertyValue<std::array<float, 2>> value) {
+    impl->layout.iconTextFitPadding.set(value);
+}
 PropertyValue<std::string> SymbolLayer::getIconImage() const {
     return impl->layout.iconImage.get();
 }

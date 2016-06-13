@@ -51,7 +51,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor, const GeometryCoordinates& line,
 
     // Create the quad used for rendering the icon.
     iconQuads(addToBuffers && shapedIcon ?
-            getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine) :
+            getIconQuads(anchor, shapedIcon, line, layout, iconAlongLine, shapedText) :
             SymbolQuads()),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed

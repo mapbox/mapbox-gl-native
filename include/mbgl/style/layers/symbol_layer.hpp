@@ -53,6 +53,12 @@ public:
     PropertyValue<float> getIconSize() const;
     void setIconSize(PropertyValue<float>);
 
+    PropertyValue<IconTextFitType> getIconTextFit() const;
+    void setIconTextFit(PropertyValue<IconTextFitType>);
+
+    PropertyValue<std::array<float, 2>> getIconTextFitPadding() const;
+    void setIconTextFitPadding(PropertyValue<std::array<float, 2>>);
+
     PropertyValue<std::string> getIconImage() const;
     void setIconImage(PropertyValue<std::string>);
 

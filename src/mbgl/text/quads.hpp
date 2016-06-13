@@ -40,7 +40,7 @@ typedef std::vector<SymbolQuad> SymbolQuads;
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const style::SymbolLayoutProperties&,
-        const bool alongLine);
+        const bool alongLine, const Shaping& shapedText);
 
 SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
         const float boxScale, const GeometryCoordinates& line, const style::SymbolLayoutProperties&,

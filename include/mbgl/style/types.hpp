@@ -80,5 +80,12 @@ enum class TextTransformType : uint8_t {
     Lowercase,
 };
 
+enum class IconTextFitType : uint8_t {
+    None,
+    Both,
+    Width,
+    Height
+};
+
 } // namespace style
 } // namespace mbgl
