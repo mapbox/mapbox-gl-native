@@ -4,7 +4,7 @@ This document explains how to build the Mapbox iOS SDK from source. It is intend
 
 ## Requirements
 
-The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running OS X.
+The Mapbox iOS SDK and iosapp demo application build against the iOS 7.0 SDK. The SDK is intended to run on iOS 7.0 and above, while iosapp is intended to run on iOS 8.0 and above due to the use of a dynamic framework. Both require Xcode on a computer running macOS.
 
 ## Building the SDK
 
@@ -69,14 +69,14 @@ To add an Objective-C header or implementation file to the iOS SDK:
 
 1. Add the file to the Headers or Compile Sources build phase, as appropriate, of both the “dynamic” and “static” targets. You can either use the Build Phases tab of the project editor or the Target Membership section of the File inspector.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the iOS SDK’s umbrella header](./src/Mapbox.h).
-1. _(Optional.)_ If the file would also be used by the OS X SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion OS X document](../osx/DEVELOPING.md#adding-a-source-code-file) for further instructions.
+1. _(Optional.)_ If the file would also be used by the macOS SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
 
 ### Adding a resource
 
 To add a resource (such as an image, SSL certificate, property list, or strings table) to the iOS SDK:
 
 1. Add the header to the Copy Bundle Resources build phase of both the “dynamic” and “bundle” targets. You can either use the Build Phases tab of the project editor or the Target Membership section of the File inspector.
-1. _(Optional.)_ If the resource would also be used by the OS X SDK, make sure it’s in [platform/darwin/resources/](../darwin/resources/), then consult [the companion OS X document](../osx/DEVELOPING.md#adding-a-resource) for further instructions.
+1. _(Optional.)_ If the resource would also be used by the macOS SDK, make sure it’s in [platform/darwin/resources/](../darwin/resources/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-resource) for further instructions.
 
 ### Adding user-facing text
 
@@ -85,11 +85,11 @@ To add or update text that the user may see in the iOS SDK:
 1. Make sure the implementation file imports [NSBundle+MGLAdditions.h](../darwin/src/NSBundle+MGLAdditions.h).
 1. Use the `NSLocalizedStringWithDefaultValue()` macro:
   * `key` is a unique identifier that won’t change if the user-facing text ever needs to change.
-  * `tbl` is `Foundation` in code shared between the iOS and OS X SDKs, or `nil` otherwise.
+  * `tbl` is `Foundation` in code shared between the iOS and macOS SDKs, or `nil` otherwise.
   * `bundle` is `nil`; the redefined macro looks for the SDK bundle at runtime and ignores this argument.
   * `val` is the English string.
 1. _(Optional.)_ When dealing with a number followed by a pluralized word, do not split the string. Instead, use a format string and make `val` ambiguous, like `%d file(s)`. Then pluralize for English in the appropriate [.stringsdict file](https://developer.apple.com/library/ios/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html). See [platform/darwin/resources/en.lproj/Foundation.stringsdict](../darwin/resources/en.lproj/Foundation.stringsdict) for an example. Localizers should do likewise for their languages.
-1. Run `make genstrings` and commit any changes it makes to .strings files. The make rule also updates the OS X SDK’s strings tables.
+1. Run `make genstrings` and commit any changes it makes to .strings files. The make rule also updates the macOS SDK’s strings tables.
 
 ## Testing
 

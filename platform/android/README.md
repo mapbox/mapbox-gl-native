@@ -15,7 +15,7 @@ A library based on [Mapbox GL Native](../../README.md) for embedding interactive
 Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications.
 
 * [Contributing on Linux](CONTRIBUTING_LINUX.md)
-* [Contributing on OS X](CONTRIBUTING_OSX.md)
+* [Contributing on macOS](CONTRIBUTING_MACOS.md)
 
 ### Setting up the Android emulator
 

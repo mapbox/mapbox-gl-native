@@ -37,7 +37,7 @@ import ycm_core
 
 compilation_database_folders = [
   'build/linux-x86_64/Release',
-  'build/osx/Release',
+  'build/macos/Release',
 ]
 
 subprocess.call(['make compdb'], shell=True)
