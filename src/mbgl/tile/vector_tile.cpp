@@ -77,7 +77,7 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
 }
 
 void VectorTile::setNecessity(Necessity necessity) {
-    loader.setNecessity(static_cast<TileLoader<VectorTile>::Necessity>(necessity));
+    loader.setNecessity(necessity);
 }
 
 void VectorTile::setData(std::shared_ptr<const std::string> data_,

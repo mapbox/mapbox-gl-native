@@ -60,7 +60,7 @@ Bucket* RasterTile::getBucket(const style::Layer&) {
 }
 
 void RasterTile::setNecessity(Necessity necessity) {
-    loader.setNecessity(static_cast<TileLoader<RasterTile>::Necessity>(necessity));
+    loader.setNecessity(necessity);
 }
 
 void RasterTile::cancel() {

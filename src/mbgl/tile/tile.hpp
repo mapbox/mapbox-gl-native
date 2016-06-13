@@ -8,6 +8,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/storage/resource.hpp>
 
 #include <string>
 #include <memory>
@@ -32,10 +33,12 @@ public:
 
     void setObserver(TileObserver* observer);
 
-    enum class Necessity : bool {
-        Optional = false,
-        Required = true,
-    };
+    // Tiles can have two states: optional or required.
+    // - optional means that only low-cost actions should be taken to obtain the data
+    //   (e.g. load from cache, but accept stale data)
+    // - required means that every effort should be taken to obtain the data (e.g. load
+    //   from internet and keep the data fresh if it expires)
+    using Necessity = Resource::Necessity;
 
     virtual void setNecessity(Necessity) = 0;
 

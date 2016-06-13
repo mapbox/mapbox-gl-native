@@ -2,6 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/storage/resource.hpp>
+#include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
 
@@ -17,20 +18,12 @@ class UpdateParameters;
 template <typename T>
 class TileLoader : private util::noncopyable {
 public:
-    // TileSources can have two states: optional or required.
-    // - optional means that only low-cost actions should be taken to obtain the data
-    //   (e.g. load from cache, but accept stale data)
-    // - required means that every effort should be taken to obtain the data (e.g. load
-    //   from internet and keep the data fresh if it expires)
-    enum class Necessity : bool {
-        Optional = false,
-        Required = true,
-    };
-
     TileLoader(T&,
                const OverscaledTileID&,
                const style::UpdateParameters&,
                const Tileset&);
+
+    using Necessity = Resource::Necessity;
 
     void setNecessity(Necessity newNecessity) {
         if (newNecessity != necessity) {
