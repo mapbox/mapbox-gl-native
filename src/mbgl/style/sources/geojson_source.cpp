@@ -22,6 +22,8 @@ GeoJSONSource::GeoJSONSource(std::string id_,
       geojsonvt(std::move(geojsonvt_)) {
 }
 
+GeoJSONSource::~GeoJSONSource() = default;
+
 void GeoJSONSource::load(FileSource& fileSource) {
     if (url.empty()) {
         // If the URL is empty, the GeoJSON was specified inline in the stylesheet.

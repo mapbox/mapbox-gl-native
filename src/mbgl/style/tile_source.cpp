@@ -14,6 +14,8 @@ TileSource::TileSource(SourceType type_,
     : Source(type_, std::move(id_), std::move(url_), tileSize_, std::move(tileset_)) {
 }
 
+TileSource::~TileSource() = default;
+
 void TileSource::load(FileSource& fileSource) {
     if (url.empty()) {
         // If the URL is empty, the TileJSON was specified inline in the stylesheet.

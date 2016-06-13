@@ -9,6 +9,9 @@ class GeoJSONVT;
 } // namespace mapbox
 
 namespace mbgl {
+
+class AsyncRequest;
+
 namespace style {
 
 class GeoJSONSource : public Source {
@@ -18,6 +21,7 @@ public:
                   uint16_t tileSize,
                   std::unique_ptr<Tileset>&&,
                   std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
+    ~GeoJSONSource() final;
 
     void load(FileSource&) final;
 
@@ -25,6 +29,7 @@ private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
+    std::unique_ptr<AsyncRequest> req;
 };
 
 } // namespace style

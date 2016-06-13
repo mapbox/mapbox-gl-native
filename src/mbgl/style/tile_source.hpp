@@ -3,6 +3,9 @@
 #include <mbgl/style/source.hpp>
 
 namespace mbgl {
+
+class AsyncRequest;
+
 namespace style {
 
 /*
@@ -16,8 +19,12 @@ public:
                std::string url,
                uint16_t tileSize,
                std::unique_ptr<Tileset>&&);
+    ~TileSource() override;
 
     void load(FileSource&) final;
+
+private:
+    std::unique_ptr<AsyncRequest> req;
 };
 
 } // namespace style

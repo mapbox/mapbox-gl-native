@@ -20,7 +20,6 @@ namespace mbgl {
 
 class Painter;
 class FileSource;
-class AsyncRequest;
 class TransformState;
 class RenderTile;
 struct ClipID;
@@ -92,7 +91,6 @@ protected:
     void invalidateTiles();
 
     std::unique_ptr<const Tileset> tileset;
-    std::unique_ptr<AsyncRequest> req;
 
     SourceObserver* observer = nullptr;
 
