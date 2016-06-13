@@ -130,7 +130,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
         }
     }
     
-    // Avoid %s here because it inserts hidden bidirectional markers on OS X when the system
+    // Avoid %s here because it inserts hidden bidirectional markers on macOS when the system
     // language is set to a right-to-left language.
     [userAgentComponents addObject:[NSString stringWithFormat:@"MapboxGL/%@ (%@)",
                                     CFSTR(MBGL_VERSION_STRING), CFSTR(MBGL_VERSION_REV)]];
@@ -139,7 +139,7 @@ NSString *HTTPFileSource::Impl::getUserAgent() const {
 #if TARGET_OS_IPHONE
     systemName = @"iOS";
 #elif TARGET_OS_MAC
-    systemName = @"OS X";
+    systemName = @"macOS";
 #elif TARGET_OS_WATCH
     systemName = @"watchOS";
 #elif TARGET_OS_TV

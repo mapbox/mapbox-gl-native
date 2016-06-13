@@ -43,8 +43,8 @@ workflows:
         inputs:
         - webhook_url: "$SLACK_HOOK_URL"
         - channel: "#gl-bots"
-        - from_username: 'Bitrise Node OS X'
-        - from_username_on_error: 'Bitrise Node OS X'
+        - from_username: 'Bitrise Node macOS'
+        - from_username_on_error: 'Bitrise Node macOS'
         - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}>
             for <https://github.com/mapbox/mapbox-gl-native/compare/${BITRISE_GIT_BRANCH}|mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}>
             by ${GIT_CLONE_COMMIT_COMMITER_NAME}

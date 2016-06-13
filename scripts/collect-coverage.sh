@@ -15,7 +15,7 @@ function usage() {
     if [ `uname -s` = 'Linux' ]; then
         echo "On Debian-based distros, you can install them via 'apt-get install lcov'"
     elif [ `uname -s` = 'Darwin' ]; then
-        echo "On OS X, you can install them via 'brew install lcov'"
+        echo "On macOS, you can install them via 'brew install lcov'"
     fi
     exit 1
 }
