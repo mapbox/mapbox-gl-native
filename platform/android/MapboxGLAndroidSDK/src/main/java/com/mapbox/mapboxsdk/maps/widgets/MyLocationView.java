@@ -67,6 +67,14 @@ public class MyLocationView extends View {
     private ValueAnimator accuracyAnimator;
     private ValueAnimator directionAnimator;
 
+    private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
+            new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    invalidate();
+                }
+            };
+
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
     private Drawable backgroundDrawable;
@@ -444,6 +452,7 @@ public class MyLocationView extends View {
 
         directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
         directionAnimator.setDuration(375);
+        directionAnimator.addUpdateListener(invalidateSelfOnUpdateListener);
         directionAnimator.start();
     }
 
