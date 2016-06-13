@@ -1688,8 +1688,10 @@ public class MapView extends FrameLayout {
                     }
                 }
             } else {
-                // deselect any selected marker
-                mMapboxMap.deselectMarkers();
+                if (mMapboxMap.getUiSettings().isDeselectMarkersOnTap()) {
+                    // deselect any selected marker
+                    mMapboxMap.deselectMarkers();
+                }
 
                 // notify app of map click
                 MapboxMap.OnMapClickListener listener = mMapboxMap.getOnMapClickListener();
