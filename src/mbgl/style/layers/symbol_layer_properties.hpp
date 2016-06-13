@@ -26,7 +26,7 @@ public:
     LayoutProperty<AlignmentType> iconRotationAlignment { AlignmentType::Viewport };
     LayoutProperty<float> iconSize { 1 };
     LayoutProperty<IconTextFitType> iconTextFit { IconTextFitType::None };
-    LayoutProperty<std::array<float, 2>> iconTextFitPadding { {{ 0, 0 }} };
+    LayoutProperty<std::array<float, 4>> iconTextFitPadding { {{ 0, 0, 0, 0 }} };
     LayoutProperty<std::string> iconImage { "" };
     LayoutProperty<float> iconRotate { 0 };
     LayoutProperty<float> iconPadding { 2 };

@@ -27,11 +27,14 @@ inline PropertySetters makeLayoutPropertySetters() {
     result["icon-optional"] = makePropertySetter(&SymbolLayer::setIconOptional);
     result["icon-rotation-alignment"] = makePropertySetter(&SymbolLayer::setIconRotationAlignment);
     result["icon-size"] = makePropertySetter(&SymbolLayer::setIconSize);
+    result["icon-text-fit"] = makePropertySetter(&SymbolLayer::setIconTextFit);
+    result["icon-text-fit-padding"] = makePropertySetter(&SymbolLayer::setIconTextFitPadding);
     result["icon-image"] = makePropertySetter(&SymbolLayer::setIconImage);
     result["icon-rotate"] = makePropertySetter(&SymbolLayer::setIconRotate);
     result["icon-padding"] = makePropertySetter(&SymbolLayer::setIconPadding);
     result["icon-keep-upright"] = makePropertySetter(&SymbolLayer::setIconKeepUpright);
     result["icon-offset"] = makePropertySetter(&SymbolLayer::setIconOffset);
+    result["text-pitch-alignment"] = makePropertySetter(&SymbolLayer::setTextPitchAlignment);
     result["text-rotation-alignment"] = makePropertySetter(&SymbolLayer::setTextRotationAlignment);
     result["text-field"] = makePropertySetter(&SymbolLayer::setTextField);
     result["text-font"] = makePropertySetter(&SymbolLayer::setTextFont);

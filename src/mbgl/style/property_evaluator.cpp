@@ -19,6 +19,7 @@ template <> inline Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
 template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
 template <> inline std::vector<std::string> defaultStopsValue() { return {{}}; }
 template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
+template <> inline std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
 
 template <> inline std::string defaultStopsValue() { return {}; }
 template <> inline TranslateAnchorType defaultStopsValue() { return {}; }
@@ -88,6 +89,7 @@ template class PropertyEvaluator<Color>;
 template class PropertyEvaluator<std::vector<float>>;
 template class PropertyEvaluator<std::vector<std::string>>;
 template class PropertyEvaluator<std::array<float, 2>>;
+template class PropertyEvaluator<std::array<float, 4>>;
 
 template class PropertyEvaluator<std::string>;
 template class PropertyEvaluator<TranslateAnchorType>;

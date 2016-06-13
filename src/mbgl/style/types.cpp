@@ -77,4 +77,11 @@ MBGL_DEFINE_ENUM(AlignmentType, {
     { AlignmentType::Undefined, "undefined" },
 });
 
+MBGL_DEFINE_ENUM(IconTextFitType, {
+    { IconTextFitType::None, "none" },
+    { IconTextFitType::Both, "both" },
+    { IconTextFitType::Width, "width" },
+    { IconTextFitType::Height, "height" },
+});
+
 } // namespace mbgl
