@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -161,6 +162,8 @@ public class MarkerViewActivity extends AppCompatActivity {
                         .icon(IconFactory.getInstance(mMapView.getContext())
                                 .fromResource(R.drawable.ic_arsenal))
                 );
+
+                mMapboxMap.getUiSettings().setFocalPoint(new PointF(mMapView.getMeasuredWidth() / 2, mMapView.getMeasuredHeight() / 4));
             }
         });
     }
