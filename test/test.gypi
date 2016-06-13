@@ -56,6 +56,8 @@
         'math/minmax.cpp',
         'math/clamp.cpp',
 
+        'text/quads.cpp',
+
         'tile/geometry_tile_data.cpp',
         'tile/tile_id.cpp',
 
