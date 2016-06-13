@@ -260,7 +260,7 @@ public class MyLocationView extends View {
         camera.getMatrix(matrix);
 
         //
-        if (myBearingTrackingMode != MyBearingTracking.NONE) {
+        if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
             matrix.postRotate((Float) directionAnimator.getAnimatedValue());
         }
 
