@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -16,7 +15,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.maps.MapView;
-
 import java.text.DecimalFormat;
 
 public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyCallback, MapboxMap.OnInfoWindowCloseListener, MapboxMap.OnMapLongClickListener, MapboxMap.OnInfoWindowClickListener, MapboxMap.OnInfoWindowLongClickListener {
@@ -60,6 +58,12 @@ public class InfoWindowActivity extends AppCompatActivity implements OnMapReadyC
         mapboxMap.addMarker(new MarkerOptions().title("Intersection")
                 .snippet("E St NW with 17th St NW")
                 .position(new LatLng(38.8954236, -77.0394623)));
+
+        mapboxMap.addMarker(new MarkerOptions().title("The Ellipse").position(new LatLng(38.89393, -77.03654)));
+
+        mapboxMap.addMarker(new MarkerOptions().position(new LatLng(38.89596, -77.03434)));
+
+        mapboxMap.addMarker(new MarkerOptions().snippet("Lafayette Square").position(new LatLng(38.89949, -77.03656)));
 
         Marker marker = mapboxMap.addMarker(new MarkerOptions()
                 .title("White House")
