@@ -13,6 +13,8 @@ public:
                   std::unique_ptr<Tileset>&&,
                   std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
 
+    void load(FileSource&) final;
+
 private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 };

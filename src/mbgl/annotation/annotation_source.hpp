@@ -8,6 +8,8 @@ class AnnotationSource : public style::Source {
 public:
     AnnotationSource();
 
+    void load(FileSource&) final;
+
 private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const style::UpdateParameters&) final;
 };

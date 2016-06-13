@@ -7,7 +7,6 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/query_parameters.hpp>
@@ -20,7 +19,6 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
 
-#include <mbgl/style/parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
@@ -29,10 +27,7 @@
 #include <mapbox/geojsonvt/convert.hpp>
 #include <mapbox/geometry/envelope.hpp>
 
-#include <rapidjson/error/en.h>
-
 #include <algorithm>
-#include <sstream>
 
 namespace mbgl {
 namespace style {
@@ -70,95 +65,10 @@ bool Source::isLoading() const {
     return !loaded && req.operator bool();
 }
 
-void Source::load(FileSource& fileSource) {
-    if (url.empty()) {
-        // In case there is no URL set, we assume that we already have all of the data because the
-        // TileJSON was specified inline in the stylesheet.
-        loaded = true;
-        return;
-    }
-
-    if (req) {
-        // We don't have a Tileset object yet, but there's already a request underway to load
-        // the data.
-        return;
-    }
-
-    // URL may either be a TileJSON file, or a GeoJSON file.
-    req = fileSource.request(Resource::source(url), [this](Response res) {
-        if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty source")));
-        } else {
-            bool reloadTiles = false;
-
-            if (type == SourceType::Vector || type == SourceType::Raster) {
-                std::unique_ptr<Tileset> newTileset;
-
-                // Create a new copy of the Tileset object that holds the base values we've parsed
-                // from the stylesheet. Then merge in the values parsed from the TileJSON we retrieved
-                // via the URL.
-                try {
-                    newTileset = style::parseTileJSON(*res.data, url, type, tileSize);
-                } catch (...) {
-                    observer->onSourceError(*this, std::current_exception());
-                    return;
-                }
-
-                // Check whether previous information specifies different tile
-                if (tileset && tileset->tiles != newTileset->tiles) {
-                    reloadTiles = true;
-
-                    // Tile size changed: We need to recalculate the tiles we need to load because we
-                    // might have to load tiles for a different zoom level
-                    // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                    // Min/Max zoom changed: We need to recalculate what tiles to load, if we have tiles
-                    // loaded that are outside the new zoom range
-                    // This is done automatically when we trigger the onSourceLoaded observer below.
-
-                    // Attribution changed: We need to notify the embedding application that this
-                    // changed. See https://github.com/mapbox/mapbox-gl-native/issues/2723
-                    // This is not yet implemented.
-
-                    // Center/bounds changed: We're not using these values currently
-                }
-
-                tileset = std::move(newTileset);
-            } else if (type == SourceType::GeoJSON) {
-                std::unique_ptr<Tileset> newTileset = std::make_unique<Tileset>();
-
-                rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
-                d.Parse<0>(res.data->c_str());
-
-                if (d.HasParseError()) {
-                    std::stringstream message;
-                    message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-                    observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
-                    return;
-                }
-
-                geojsonvt = style::parseGeoJSON(d);
-                reloadTiles = true;
-
-                newTileset->maxZoom = geojsonvt->options.maxZoom;
-                tileset = std::move(newTileset);
-            }
-
-            if (reloadTiles) {
-                // Tile information changed because we got new GeoJSON data, or a new tile URL.
-                tiles.clear();
-                renderTiles.clear();
-                cache.clear();
-            }
-
-            loaded = true;
-            observer->onSourceLoaded(*this);
-        }
-    });
+void Source::invalidateTiles() {
+    tiles.clear();
+    renderTiles.clear();
+    cache.clear();
 }
 
 void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {

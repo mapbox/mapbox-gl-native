@@ -16,6 +16,8 @@ public:
                std::string url,
                uint16_t tileSize,
                std::unique_ptr<Tileset>&&);
+
+    void load(FileSource&) final;
 };
 
 } // namespace style

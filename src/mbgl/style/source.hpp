@@ -48,7 +48,7 @@ public:
     ~Source() override;
 
     bool loaded = false;
-    void load(FileSource&);
+    virtual void load(FileSource&) = 0;
     bool isLoading() const;
     bool isLoaded() const;
 
@@ -96,8 +96,13 @@ private:
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
 protected:
+    void invalidateTiles();
+
     std::unique_ptr<const Tileset> tileset;
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
+    std::unique_ptr<AsyncRequest> req;
+
+    SourceObserver* observer = nullptr;
 
 private:
     // Stores the time when this source was most recently updated.
@@ -106,10 +111,6 @@ private:
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     std::map<UnwrappedTileID, RenderTile> renderTiles;
     TileCache cache;
-
-    std::unique_ptr<AsyncRequest> req;
-
-    SourceObserver* observer = nullptr;
 };
 
 } // namespace style

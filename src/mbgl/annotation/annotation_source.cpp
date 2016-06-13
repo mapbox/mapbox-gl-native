@@ -8,6 +8,10 @@ AnnotationSource::AnnotationSource()
     : Source(SourceType::Annotations, AnnotationManager::SourceID, "", util::tileSize, std::make_unique<Tileset>()) {
 }
 
+void AnnotationSource::load(FileSource&) {
+    loaded = true;
+}
+
 std::unique_ptr<Tile> AnnotationSource::createTile(const OverscaledTileID& tileID,
                                                    const style::UpdateParameters& parameters) {
     return std::make_unique<AnnotationTile>(tileID, id, parameters);
