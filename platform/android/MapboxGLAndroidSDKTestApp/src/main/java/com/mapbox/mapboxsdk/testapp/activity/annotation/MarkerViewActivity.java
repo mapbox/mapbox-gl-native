@@ -92,6 +92,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                     mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
+                            .alpha(0.5f)
                             .icon(usFlag)
                     );
                 }
