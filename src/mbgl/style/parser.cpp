@@ -1,4 +1,7 @@
 #include <mbgl/style/parser.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -182,6 +185,21 @@ void Parser::parseSources(const JSValue& value) {
         std::unique_ptr<Tileset> tileset;
         std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
+        const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
+        std::unique_ptr<Source> source;
+
+        if (sourceVal.HasMember("url")) {
+            const JSValue& urlVal = sourceVal["url"];
+            if (urlVal.IsString()) {
+                url = { urlVal.GetString(), urlVal.GetStringLength() };
+            } else {
+                Log::Error(Event::ParseStyle, "source url must be a string");
+                continue;
+            }
+        } else {
+            tileset = parseTileJSON(sourceVal);
+        }
+
         switch (*type) {
         case SourceType::Raster:
             if (sourceVal.HasMember("tileSize")) {
@@ -193,20 +211,12 @@ void Parser::parseSources(const JSValue& value) {
                     continue;
                 }
             }
-            // Fall through. Vector sources are forbidden from having a tileSize.
+
+            source = std::make_unique<RasterSource>(id, url, tileSize, std::move(tileset), std::move(geojsonvt));
+            break;
 
         case SourceType::Vector:
-            if (sourceVal.HasMember("url")) {
-                const JSValue& urlVal = sourceVal["url"];
-                if (urlVal.IsString()) {
-                    url = { urlVal.GetString(), urlVal.GetStringLength() };
-                } else {
-                    Log::Error(Event::ParseStyle, "source url must be a string");
-                    continue;
-                }
-            } else {
-                tileset = parseTileJSON(sourceVal);
-            }
+            source = std::make_unique<VectorSource>(id, url, tileSize, std::move(tileset), std::move(geojsonvt));
             break;
 
         case SourceType::GeoJSON:
@@ -233,15 +243,13 @@ void Parser::parseSources(const JSValue& value) {
                 continue;
             }
 
+            source = std::make_unique<GeoJSONSource>(id, url, tileSize, std::move(tileset), std::move(geojsonvt));
             break;
 
         default:
             Log::Error(Event::ParseStyle, "source type '%s' is not supported", typeVal.GetString());
             continue;
         }
-
-        const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
-        std::unique_ptr<Source> source = std::make_unique<Source>(*type, id, url, tileSize, std::move(tileset), std::move(geojsonvt));
 
         sourcesMap.emplace(id, source.get());
         sources.emplace_back(std::move(source));
