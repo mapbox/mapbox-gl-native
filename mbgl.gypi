@@ -125,26 +125,17 @@
   },
   'targets': [
     {
-      'target_name': 'core',
-      'product_name': 'mbgl-core',
-      'type': 'static_library',
-      'standalone_static_library': 1,
-      'hard_dependency': 1,
+      'target_name': 'headers',
+      'type': 'none',
 
       'sources': [
-        '<!@(find <(DEPTH)/src -name "*.hpp")',
-        '<!@(find <(DEPTH)/src -name "*.cpp")',
-        '<!@(find <(DEPTH)/src -name "*.c")',
-        '<!@(find <(DEPTH)/src -name "*.h")',
-        '<!@(find <(DEPTH)/include -name "*.hpp")',
-        '<!@(find <(DEPTH)/include -name "*.h")',
         '<!@(find -H <(DEPTH)/node_modules/mapbox-gl-shaders -name "*.glsl")',
         '<(SHARED_INTERMEDIATE_DIR)/include/mbgl/util/version.hpp',
       ],
 
       'rules': [
         {
-          'rule_name': 'Build Shaders',
+          'rule_name': 'shaders',
           'message': 'Building shader',
           'extension': 'glsl',
           'inputs': [ '<(DEPTH)/scripts/build-shaders.py' ],
@@ -156,17 +147,43 @@
 
       'actions': [
         {
-          'action_name': 'Build Version Header',
+          'action_name': 'version',
+          'message': 'Bulding version header',
           'inputs': [ '<(DEPTH)/scripts/build-version.py', ],
           'outputs': [ '<(SHARED_INTERMEDIATE_DIR)/include/mbgl/util/version.hpp', ],
           'action': [ '<@(_inputs)', '<(SHARED_INTERMEDIATE_DIR)' ],
-        }
+        },
+      ],
+
+      'direct_dependent_settings': {
+        'include_dirs': [
+          '<(SHARED_INTERMEDIATE_DIR)/include',
+        ],
+      },
+    },
+    {
+      'target_name': 'core',
+      'product_name': 'mbgl-core',
+      'type': 'static_library',
+      'standalone_static_library': 1,
+      'hard_dependency': 1,
+
+      'dependencies': [
+        'headers',
+      ],
+
+      'sources': [
+        '<!@(find <(DEPTH)/src -name "*.hpp")',
+        '<!@(find <(DEPTH)/src -name "*.cpp")',
+        '<!@(find <(DEPTH)/src -name "*.c")',
+        '<!@(find <(DEPTH)/src -name "*.h")',
+        '<!@(find <(DEPTH)/include -name "*.hpp")',
+        '<!@(find <(DEPTH)/include -name "*.h")',
       ],
 
       'include_dirs': [
         'include',
         'src',
-        '<(SHARED_INTERMEDIATE_DIR)/include',
       ],
 
       'variables': {
