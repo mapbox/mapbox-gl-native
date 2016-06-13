@@ -43,7 +43,6 @@ public:
 
     bool loaded = false;
     virtual void load(FileSource&) = 0;
-    bool isLoading() const;
     bool isLoaded() const;
 
     const Tileset* getTileset() const { return tileset.get(); }

@@ -59,10 +59,6 @@ bool Source::isLoaded() const {
     return true;
 }
 
-bool Source::isLoading() const {
-    return !loaded && req.operator bool();
-}
-
 void Source::invalidateTiles() {
     tiles.clear();
     renderTiles.clear();

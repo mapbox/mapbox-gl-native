@@ -214,7 +214,7 @@ void Style::recalculate(float z, const TimePoint& timePoint, MapMode mode) {
         Source* source = getSource(layer->baseImpl->source);
         if (source && layer->baseImpl->needsRendering()) {
             source->enabled = true;
-            if (!source->loaded && !source->isLoading()) {
+            if (!source->loaded) {
                 source->load(fileSource);
             }
         }
