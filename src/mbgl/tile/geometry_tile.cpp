@@ -1,6 +1,5 @@
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/tile/tile_source.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/util/worker.hpp>

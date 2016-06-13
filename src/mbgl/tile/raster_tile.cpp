@@ -1,6 +1,6 @@
 #include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/tile/tile_observer.hpp>
-#include <mbgl/tile/tile_source_impl.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/storage/resource.hpp>
@@ -17,7 +17,7 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
     : Tile(id_),
       texturePool(parameters.texturePool),
       worker(parameters.worker),
-      tileSource(*this, id_, parameters, tileset) {
+      loader(*this, id_, parameters, tileset) {
 }
 
 void RasterTile::setError(std::exception_ptr err) {
@@ -60,7 +60,7 @@ Bucket* RasterTile::getBucket(const style::Layer&) {
 }
 
 void RasterTile::setNecessity(Necessity necessity) {
-    tileSource.setNecessity(static_cast<TileSource<RasterTile>::Necessity>(necessity));
+    loader.setNecessity(static_cast<TileLoader<RasterTile>::Necessity>(necessity));
 }
 
 void RasterTile::cancel() {

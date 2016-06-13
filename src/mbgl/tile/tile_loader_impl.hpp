@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/tile/tile_source.hpp>
+#include <mbgl/tile/tile_loader.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
@@ -10,7 +10,7 @@
 namespace mbgl {
 
 template <typename T>
-TileSource<T>::TileSource(T& tile_,
+TileLoader<T>::TileLoader(T& tile_,
                           const OverscaledTileID& id,
                           const style::UpdateParameters& parameters,
                           const Tileset& tileset)
@@ -25,9 +25,9 @@ TileSource<T>::TileSource(T& tile_,
       fileSource(parameters.fileSource) {
     assert(!request);
     if (fileSource.supportsOptionalRequests()) {
-        // When supported, the first request is always optional, even if the TileSource
+        // When supported, the first request is always optional, even if the TileLoader
         // is marked as required. That way, we can let the first optional request continue
-        // to load when the TileSource is later changed from required to optional. If we
+        // to load when the TileLoader is later changed from required to optional. If we
         // started out with a required request, we'd have to cancel everything, including the
         // initial optional part of the request.
         loadOptional();
@@ -44,7 +44,7 @@ TileSource<T>::TileSource(T& tile_,
 }
 
 template <typename T>
-void TileSource<T>::loadOptional() {
+void TileLoader<T>::loadOptional() {
     assert(!request);
 
     resource.necessity = Resource::Optional;
@@ -69,14 +69,14 @@ void TileSource<T>::loadOptional() {
 }
 
 template <typename T>
-void TileSource<T>::makeRequired() {
+void TileLoader<T>::makeRequired() {
     if (!request) {
         loadRequired();
     }
 }
 
 template <typename T>
-void TileSource<T>::makeOptional() {
+void TileLoader<T>::makeOptional() {
     if (resource.necessity == Resource::Required && request) {
         // Abort a potential HTTP request.
         request.reset();
@@ -84,7 +84,7 @@ void TileSource<T>::makeOptional() {
 }
 
 template <typename T>
-void TileSource<T>::loadedData(const Response& res) {
+void TileLoader<T>::loadedData(const Response& res) {
     if (res.error && res.error->reason != Response::Error::Reason::NotFound) {
         tile.setError(std::make_exception_ptr(std::runtime_error(res.error->message)));
     } else if (res.notModified) {
@@ -100,7 +100,7 @@ void TileSource<T>::loadedData(const Response& res) {
 }
 
 template <typename T>
-void TileSource<T>::loadRequired() {
+void TileLoader<T>::loadRequired() {
     assert(!request);
 
     resource.necessity = Resource::Required;

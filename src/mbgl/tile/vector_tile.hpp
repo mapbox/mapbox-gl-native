@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/tile/tile_source.hpp>
+#include <mbgl/tile/tile_loader.hpp>
 
 namespace mbgl {
 
@@ -24,7 +24,7 @@ public:
                  optional<Timestamp> expires);
 
 private:
-    TileSource<VectorTile> tileSource;
+    TileLoader<VectorTile> loader;
 };
 
 } // namespace mbgl

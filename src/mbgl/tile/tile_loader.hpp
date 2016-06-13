@@ -15,7 +15,7 @@ class UpdateParameters;
 } // namespace style
 
 template <typename T>
-class TileSource : private util::noncopyable {
+class TileLoader : private util::noncopyable {
 public:
     // TileSources can have two states: optional or required.
     // - optional means that only low-cost actions should be taken to obtain the data
@@ -27,7 +27,7 @@ public:
         Required = true,
     };
 
-    TileSource(T&,
+    TileLoader(T&,
                const OverscaledTileID&,
                const style::UpdateParameters&,
                const Tileset&);

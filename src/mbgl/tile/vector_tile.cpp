@@ -1,5 +1,5 @@
 #include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/tile/tile_source_impl.hpp>
+#include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/update_parameters.hpp>
 
@@ -73,11 +73,11 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
                        const style::UpdateParameters& parameters,
                        const Tileset& tileset)
     : GeometryTile(id_, sourceID, parameters.style, parameters.mode),
-      tileSource(*this, id_, parameters, tileset) {
+      loader(*this, id_, parameters, tileset) {
 }
 
 void VectorTile::setNecessity(Necessity necessity) {
-    tileSource.setNecessity(static_cast<TileSource<VectorTile>::Necessity>(necessity));
+    loader.setNecessity(static_cast<TileLoader<VectorTile>::Necessity>(necessity));
 }
 
 void VectorTile::setData(std::shared_ptr<const std::string> data_,

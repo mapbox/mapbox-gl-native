@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/tile/tile_source.hpp>
+#include <mbgl/tile/tile_loader.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 
 namespace mbgl {
@@ -37,7 +37,7 @@ private:
     gl::TexturePool& texturePool;
     Worker& worker;
 
-    TileSource<RasterTile> tileSource;
+    TileLoader<RasterTile> loader;
     std::unique_ptr<AsyncRequest> workRequest;
 
     // Contains the Bucket object for the tile. Buckets are render
