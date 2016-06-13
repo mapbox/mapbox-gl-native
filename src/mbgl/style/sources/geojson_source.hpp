@@ -12,6 +12,9 @@ public:
                   uint16_t tileSize,
                   std::unique_ptr<Tileset>&&,
                   std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
+
+private:
+    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 };
 
 } // namespace style

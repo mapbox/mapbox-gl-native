@@ -93,12 +93,10 @@ private:
     void onTileError(Tile&, std::exception_ptr) override;
     void onNeedsRepaint() override;
 
-    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&);
-
-private:
-    std::unique_ptr<const Tileset> tileset;
+    virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
 protected:
+    std::unique_ptr<const Tileset> tileset;
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
 private:

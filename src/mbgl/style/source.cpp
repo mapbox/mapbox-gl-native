@@ -20,10 +20,6 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
 
-#include <mbgl/tile/raster_tile.hpp>
-#include <mbgl/tile/geojson_tile.hpp>
-#include <mbgl/tile/vector_tile.hpp>
-#include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/gl/debugging.hpp>
 
@@ -182,23 +178,6 @@ void Source::finishRender(Painter &painter) {
 
 const std::map<UnwrappedTileID, RenderTile>& Source::getRenderTiles() const {
     return renderTiles;
-}
-
-std::unique_ptr<Tile> Source::createTile(const OverscaledTileID& overscaledTileID,
-                                             const UpdateParameters& parameters) {
-    // If we don't find working tile data, we're just going to load it.
-    if (type == SourceType::Raster) {
-        return std::make_unique<RasterTile>(overscaledTileID, parameters, *tileset);
-    } else if (type == SourceType::Vector) {
-        return std::make_unique<VectorTile>(overscaledTileID, id, parameters, *tileset);
-    } else if (type == SourceType::Annotations) {
-        return std::make_unique<AnnotationTile>(overscaledTileID, id, parameters);
-    } else if (type == SourceType::GeoJSON) {
-        return std::make_unique<GeoJSONTile>(overscaledTileID, id, parameters, geojsonvt.get());
-    } else {
-        Log::Warning(Event::Style, "Source type '%s' is not implemented", Enum<SourceType>::toString(type));
-        return nullptr;
-    }
 }
 
 Tile* Source::getTile(const OverscaledTileID& overscaledTileID) const {

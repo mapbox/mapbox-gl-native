@@ -11,6 +11,9 @@ public:
                  std::string url,
                  uint16_t tileSize,
                  std::unique_ptr<Tileset>&&);
+
+private:
+    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 };
 
 } // namespace style

@@ -20,6 +20,8 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
       loader(*this, id_, parameters, tileset) {
 }
 
+RasterTile::~RasterTile() = default;
+
 void RasterTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
