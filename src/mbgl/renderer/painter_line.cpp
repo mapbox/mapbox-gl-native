@@ -53,9 +53,9 @@ void Painter::renderLine(LineBucket& bucket,
 
     // calculate how much longer the real world distance is at the top of the screen
     // than at the middle of the screen.
-    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2) / 4  * (1 + std::pow(state.getAltitude(), 2)));
+    float topedgelength = std::sqrt(std::pow(state.getHeight(), 2.0f) / 4.0f  * (1.0f + std::pow(state.getAltitude(), 2.0f)));
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
-    float extra = (topedgelength + x) / topedgelength - 1;
+    float extra = (topedgelength + x) / topedgelength - 1.0f;
 
     mat4 vtxMatrix =
         translatedMatrix(matrix, properties.lineTranslate, tileID, properties.lineTranslateAnchor);
