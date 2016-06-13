@@ -526,24 +526,19 @@ public class MyLocationView extends View {
                 return;
             }
 
-            long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime < mCompassUpdateNextTimestamp) {
-                return;
-            }
-
             int type = event.sensor.getType();
-            float[] data;
             if (type == Sensor.TYPE_ACCELEROMETER) {
-                data = mGData;
+                System.arraycopy(event.values, 0, mGData, 0, 3);
             } else if (type == Sensor.TYPE_MAGNETIC_FIELD) {
-                data = mMData;
+                System.arraycopy(event.values, 0, mMData, 0, 3);
             } else {
                 // we should not be here.
                 return;
             }
 
-            for (int i = 0; i < 3; i++) {
-                data[i] = event.values[i];
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime < mCompassUpdateNextTimestamp) {
+                return;
             }
 
             SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
