@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/util/range.hpp>
 
 #include <set>
 
@@ -11,14 +12,13 @@ template <typename GetTileFn,
           typename CreateTileFn,
           typename RetainTileFn,
           typename RenderTileFn,
-          typename IdealTileIDs,
-          typename SourceInfo>
+          typename IdealTileIDs>
 void updateRenderables(GetTileFn getTile,
                        CreateTileFn createTile,
                        RetainTileFn retainTile,
                        RenderTileFn renderTile,
                        const IdealTileIDs& idealTileIDs,
-                       const SourceInfo& info,
+                       const Range<uint8_t>& zoomRange,
                        const uint8_t dataTileZoom) {
     std::set<UnwrappedTileID> checked;
     bool covered;
@@ -26,8 +26,8 @@ void updateRenderables(GetTileFn getTile,
 
     // for (all in the set of ideal tiles of the source) {
     for (const auto& idealRenderTileID : idealTileIDs) {
-        assert(idealRenderTileID.canonical.z >= info.minZoom);
-        assert(idealRenderTileID.canonical.z <= info.maxZoom);
+        assert(idealRenderTileID.canonical.z >= zoomRange.min);
+        assert(idealRenderTileID.canonical.z <= zoomRange.max);
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
         const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
@@ -48,7 +48,7 @@ void updateRenderables(GetTileFn getTile,
             retainTile(*data, true);
             covered = true;
             overscaledZ = dataTileZoom + 1;
-            if (overscaledZ > info.maxZoom) {
+            if (overscaledZ > zoomRange.max) {
                 // We're looking for an overzoomed child tile.
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
                 data = getTile(childDataTileID);
@@ -76,7 +76,7 @@ void updateRenderables(GetTileFn getTile,
 
             if (!covered) {
                 // We couldn't find child tiles that entirely cover the ideal tile.
-                for (overscaledZ = dataTileZoom - 1; overscaledZ >= info.minZoom; --overscaledZ) {
+                for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
                     const auto parentRenderTileID =
                         parentDataTileID.unwrapTo(idealRenderTileID.wrap);

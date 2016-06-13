@@ -23,9 +23,9 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
     }
 }
 
-std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
-    double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), tileset.minZoom);
-    double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), tileset.maxZoom);
+std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+    double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), zoomRange.min);
+    double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), zoomRange.max);
 
     assert(minZ >= 0);
     assert(maxZ >= 0);

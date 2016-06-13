@@ -254,8 +254,8 @@ std::unique_ptr<Tileset> parseTileJSON(const std::string& json, const std::strin
 std::unique_ptr<Tileset> parseTileJSON(const JSValue& value) {
     auto tileset = std::make_unique<Tileset>();
     parseTileJSONMember(value, tileset->tiles, "tiles");
-    parseTileJSONMember(value, tileset->minZoom, "minzoom");
-    parseTileJSONMember(value, tileset->maxZoom, "maxzoom");
+    parseTileJSONMember(value, tileset->zoomRange.min, "minzoom");
+    parseTileJSONMember(value, tileset->zoomRange.max, "maxzoom");
     parseTileJSONMember(value, tileset->attribution, "attribution");
 
     std::array<double, 4> array;

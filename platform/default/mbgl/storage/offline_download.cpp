@@ -74,7 +74,7 @@ std::vector<Resource> OfflineDownload::glyphResources(const style::Parser& parse
 std::vector<Resource> OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
     std::vector<Resource> result;
 
-    for (const auto& tile : definition.tileCover(type, tileSize, tileset)) {
+    for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
         result.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
     }
 

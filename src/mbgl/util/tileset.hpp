@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/range.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <array>
@@ -13,8 +14,7 @@ namespace mbgl {
 class Tileset {
 public:
     std::vector<std::string> tiles;
-    uint8_t minZoom = 0;
-    uint8_t maxZoom = 22;
+    Range<uint8_t> zoomRange { 0, 22 };
     std::string attribution;
     LatLng center;
     double zoom = 0;

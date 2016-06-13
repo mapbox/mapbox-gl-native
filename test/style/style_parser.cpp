@@ -93,8 +93,8 @@ TEST(StyleParser, ParseTileJSONRaster) {
         SourceType::Raster,
         256);
 
-    EXPECT_EQ(0, result->minZoom);
-    EXPECT_EQ(15, result->maxZoom);
+    EXPECT_EQ(0, result->zoomRange.min);
+    EXPECT_EQ(15, result->zoomRange.max);
     EXPECT_EQ("attribution", result->attribution);
 #if !defined(__ANDROID__) && !defined(__APPLE__)
     EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp", result->tiles[0]);
@@ -110,8 +110,8 @@ TEST(StyleParser, ParseTileJSONVector) {
         SourceType::Vector,
         256);
 
-    EXPECT_EQ(0, result->minZoom);
-    EXPECT_EQ(15, result->maxZoom);
+    EXPECT_EQ(0, result->zoomRange.min);
+    EXPECT_EQ(15, result->zoomRange.max);
     EXPECT_EQ("attribution", result->attribution);
     EXPECT_EQ("mapbox://tiles/mapbox.streets/{z}/{x}/{y}.vector.pbf", result->tiles[0]);
 }
