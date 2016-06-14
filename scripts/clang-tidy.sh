@@ -5,7 +5,7 @@ set -o pipefail
 
 export PATH="`pwd`/.mason:${PATH}" MASON_DIR="`pwd`/.mason"
 
-CLANG_TIDY=${CLANG_TIDY:-$(mason prefix clang-tidy 3.8)/bin/clang-tidy}
+CLANG_TIDY=${CLANG_TIDY:-$(mason prefix clang-tidy 3.8.0)/bin/clang-tidy}
 
 command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
     echo "Can't find ${CLANG_TIDY} in PATH."
@@ -18,9 +18,10 @@ command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
 cd $1
 
 function check_tidy() {
+    echo "Checking $0..."
     OUTPUT=$(${CLANG_TIDY} -p=$PWD $0 2>/dev/null)
     if [[ -n $OUTPUT ]]; then
-        echo "Error: A clang-tidy warning/error happened:"
+        echo "Caught clang-tidy warning/error:"
         echo -e "$OUTPUT"
         exit 1
     fi

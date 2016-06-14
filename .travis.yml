@@ -104,6 +104,17 @@ matrix:
       env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
       addons: *clang35
 
+    # Clang 3.5 - tidy
+    - os: linux
+      sudo: required
+      dist: trusty
+      language: cpp
+      compiler: "tidy-clang35-release"
+      env: BUILDTYPE=Release _CXX=clang++-3.5 _CC=clang-3.5
+      addons: *clang35
+      script:
+        - make tidy
+
     # Qt 4 - Release
     - os: linux
       sudo: false

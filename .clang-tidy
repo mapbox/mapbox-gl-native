@@ -1,2 +1,2 @@
-Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn'
-HeaderFilterRegex: 'mbgl'
+Checks: 'modernize-*,misc-static-assert,llvm-namespace-comment,-clang-analyzer-security.insecureAPI.rand,-clang-analyzer-core.uninitialized.UndefReturn,-clang-analyzer-core.StackAddressEscape,-clang-analyzer-core.CallAndMessage'
+HeaderFilterRegex: '\/mbgl\/'
