@@ -127,7 +127,9 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::GeoJSON: {
             style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
-            if (!geojsonSource->getURL().empty()) {
+            const variant<std::string, style::GeoJSONSource::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+
+            if (urlOrGeoJSON.is<std::string>()) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -188,8 +190,10 @@ void OfflineDownload::activateDownload() {
 
             case SourceType::GeoJSON: {
                 style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
-                if (!geojsonSource->getURL().empty()) {
-                    ensureResource(Resource::source(geojsonSource->getURL()));
+                const variant<std::string, style::GeoJSONSource::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+
+                if (urlOrGeoJSON.is<std::string>()) {
+                    ensureResource(Resource::source(urlOrGeoJSON.get<std::string>()));
                 }
                 break;
             }

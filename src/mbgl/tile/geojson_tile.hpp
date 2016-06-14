@@ -19,7 +19,7 @@ public:
     GeoJSONTile(const OverscaledTileID&,
                 std::string sourceID,
                 const style::UpdateParameters&,
-                mapbox::geojsonvt::GeoJSONVT*);
+                mapbox::geojsonvt::GeoJSONVT&);
 
     void setNecessity(Necessity) final;
 };

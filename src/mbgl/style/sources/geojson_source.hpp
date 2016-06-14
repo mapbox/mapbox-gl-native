@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
-
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/variant.hpp>
 
 namespace mapbox {
 namespace geojsonvt {
@@ -18,25 +18,29 @@ namespace style {
 
 class GeoJSONSource : public Source {
 public:
-    static std::unique_ptr<GeoJSONSource> parse(const std::string& id,
-                                                const JSValue&);
+    using GeoJSON = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
 
-    GeoJSONSource(std::string id,
-                  std::string url,
-                  std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
+    static std::unique_ptr<GeoJSONSource> parse(const std::string& id, const JSValue&);
+    static GeoJSON parseGeoJSON(const JSValue&);
+
+    GeoJSONSource(std::string id, variant<std::string, GeoJSON> urlOrGeoJSON);
     ~GeoJSONSource() final;
 
     void load(FileSource&) final;
 
-    const std::string& getURL() const { return url; }
+    uint16_t getTileSize() const final {
+        return util::tileSize;
+    }
+
+    const variant<std::string, GeoJSON>& getURLOrGeoJSON() const {
+        return urlOrGeoJSON;
+    }
 
 private:
-    uint16_t getTileSize() const final { return util::tileSize; }
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
-    const std::string url;
-    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
+    variant<std::string, GeoJSON> urlOrGeoJSON;
     std::unique_ptr<AsyncRequest> req;
 };
 
