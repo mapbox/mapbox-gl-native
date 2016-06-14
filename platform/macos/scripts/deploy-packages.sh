@@ -37,9 +37,14 @@ buildPackageStyle() {
     else
         file_name=mapbox-macos-sdk-${PUBLISH_VERSION}-${style}.zip        
     fi
+    echo "compress ${file_name}"
+    cd build/macos/pkg
+    rm -f ../${file_name}
+    zip -r ../${file_name} *
+    cd -
     if [[ "${GITHUB_RELEASE}" == true ]]; then
         echo "publish ${file_name} to GitHub"
-        github-release --verbose upload --tag "macos-v${PUBLISH_VERSION}" --name ${file_name} --file "build/macos/pkg/${file_name}"
+        github-release --verbose upload --tag "macos-v${PUBLISH_VERSION}" --name ${file_name} --file "build/macos/${file_name}"
     fi        
 }
 
