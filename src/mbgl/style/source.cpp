@@ -3,23 +3,12 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/util/exception.hpp>
-#include <mbgl/util/constants.hpp>
-#include <mbgl/storage/resource.hpp>
-#include <mbgl/storage/response.hpp>
-#include <mbgl/style/layer.hpp>
 #include <mbgl/style/update_parameters.hpp>
 #include <mbgl/style/query_parameters.hpp>
 #include <mbgl/platform/log.hpp>
-#include <mbgl/math/minmax.hpp>
 #include <mbgl/math/clamp.hpp>
-#include <mbgl/util/std.hpp>
-#include <mbgl/util/token.hpp>
-#include <mbgl/util/string.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
-
-#include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
 #include <mbgl/algorithm/generate_clip_ids.hpp>

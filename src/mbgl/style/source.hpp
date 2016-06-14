@@ -8,10 +8,11 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/mat4.hpp>
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/range.hpp>
 
+#include <memory>
+#include <unordered_map>
 #include <vector>
 #include <map>
 
@@ -21,7 +22,6 @@ class Painter;
 class FileSource;
 class TransformState;
 class RenderTile;
-struct ClipID;
 
 namespace algorithm {
 class ClipIDGenerator;
@@ -29,7 +29,6 @@ class ClipIDGenerator;
 
 namespace style {
 
-class Style;
 class UpdateParameters;
 class QueryParameters;
 class SourceObserver;
@@ -39,7 +38,6 @@ public:
     Source(SourceType, std::string id);
     ~Source() override;
 
-    bool loaded = false;
     virtual void load(FileSource&) = 0;
     bool isLoaded() const;
 
@@ -64,12 +62,19 @@ public:
     void setCacheSize(size_t);
     void onLowMemory();
 
-    void setObserver(SourceObserver* observer);
+    void setObserver(SourceObserver*);
     void dumpDebugLogs() const;
 
     const SourceType type;
     const std::string id;
+
+    bool loaded = false;
     bool enabled = false;
+
+protected:
+    void invalidateTiles();
+
+    SourceObserver* observer = nullptr;
 
 private:
     // TileObserver implementation.
@@ -81,12 +86,6 @@ private:
     virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 
-protected:
-    void invalidateTiles();
-
-    SourceObserver* observer = nullptr;
-
-private:
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
 
