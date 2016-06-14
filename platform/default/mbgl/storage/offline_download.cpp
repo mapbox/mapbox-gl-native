@@ -5,6 +5,7 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/tile_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
@@ -110,10 +111,10 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 result.requiredResourceCount += tileResources(source->type, source->tileSize, *tileSource->getTileset()).size();
             } else {
                 result.requiredResourceCount += 1;
-                optional<Response> sourceResponse = offlineDatabase.get(Resource::source(source->url));
+                optional<Response> sourceResponse = offlineDatabase.get(Resource::source(tileSource->getURL()));
                 if (sourceResponse) {
                     result.requiredResourceCount += tileResources(source->type, source->tileSize,
-                        *style::parseTileJSON(*sourceResponse->data, source->url, source->type, source->tileSize)).size();
+                        *style::parseTileJSON(*sourceResponse->data, tileSource->getURL(), source->type, source->tileSize)).size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -121,11 +122,13 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
             break;
         }
 
-        case SourceType::GeoJSON:
-            if (!source->url.empty()) {
+        case SourceType::GeoJSON: {
+            style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
+            if (!geojsonSource->getURL().empty()) {
                 result.requiredResourceCount += 1;
             }
             break;
+        }
 
         case SourceType::Video:
         case SourceType::Annotations:
@@ -154,7 +157,6 @@ void OfflineDownload::activateDownload() {
         for (const auto& source : parser.sources) {
             SourceType type = source->type;
             uint16_t tileSize = source->tileSize;
-            std::string url = source->url;
 
             switch (type) {
             case SourceType::Vector:
@@ -163,6 +165,7 @@ void OfflineDownload::activateDownload() {
                 if (tileSource->getTileset()) {
                     ensureTiles(type, tileSize, *tileSource->getTileset());
                 } else {
+                    std::string url = tileSource->getURL();
                     status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
 
@@ -178,11 +181,13 @@ void OfflineDownload::activateDownload() {
                 break;
             }
 
-            case SourceType::GeoJSON:
-                if (!source->url.empty()) {
-                    ensureResource(Resource::source(source->url));
+            case SourceType::GeoJSON: {
+                style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
+                if (!geojsonSource->getURL().empty()) {
+                    ensureResource(Resource::source(geojsonSource->getURL()));
                 }
                 break;
+            }
 
             case SourceType::Video:
             case SourceType::Annotations:

@@ -32,10 +32,7 @@ class SourceObserver;
 
 class Source : public TileObserver, private util::noncopyable {
 public:
-    Source(SourceType,
-           std::string id,
-           std::string url,
-           uint16_t tileSize);
+    Source(SourceType, std::string id, uint16_t tileSize);
     ~Source() override;
 
     bool loaded = false;
@@ -71,7 +68,6 @@ public:
 
     const SourceType type;
     const std::string id;
-    const std::string url;
     uint16_t tileSize = util::tileSize;
     bool enabled = false;
 

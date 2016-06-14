@@ -82,7 +82,7 @@ TEST(Source, LoadingFail) {
     };
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ("url", source.url);
+        EXPECT_EQ("source", source.id);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
     };
@@ -105,7 +105,7 @@ TEST(Source, LoadingCorrupt) {
     };
 
     test.observer.sourceError = [&] (Source& source, std::exception_ptr error) {
-        EXPECT_EQ("url", source.url);
+        EXPECT_EQ("source", source.id);
         EXPECT_EQ("0 - Invalid value.", util::toString(error));
         test.end();
     };

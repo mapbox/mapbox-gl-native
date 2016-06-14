@@ -63,7 +63,8 @@ std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id,
 GeoJSONSource::GeoJSONSource(std::string id_,
                              std::string url_,
                              std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
-    : Source(SourceType::GeoJSON, std::move(id_), std::move(url_), util::tileSize),
+    : Source(SourceType::GeoJSON, std::move(id_), util::tileSize),
+      url(url_),
       geojsonvt(std::move(geojsonvt_)) {
 }
 

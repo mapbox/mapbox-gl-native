@@ -32,13 +32,9 @@ namespace style {
 
 static SourceObserver nullObserver;
 
-Source::Source(SourceType type_,
-               std::string id_,
-               std::string url_,
-               uint16_t tileSize_)
+Source::Source(SourceType type_, std::string id_, uint16_t tileSize_)
     : type(type_),
       id(std::move(id_)),
-      url(std::move(url_)),
       tileSize(tileSize_),
       observer(&nullObserver) {
 }

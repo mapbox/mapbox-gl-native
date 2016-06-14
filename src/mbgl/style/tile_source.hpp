@@ -24,11 +24,13 @@ public:
 
     void load(FileSource&) final;
 
+    const std::string& getURL() const { return url; }
     const Tileset* getTileset() const { return tileset.get(); }
 
 protected:
     Range<uint8_t> getZoomRange() final;
 
+    const std::string url;
     std::unique_ptr<const Tileset> tileset;
     std::unique_ptr<AsyncRequest> req;
 };

@@ -28,10 +28,13 @@ public:
 
     void load(FileSource&) final;
 
+    const std::string& getURL() const { return url; }
+
 private:
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 
+    const std::string url;
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
     std::unique_ptr<AsyncRequest> req;
 };
