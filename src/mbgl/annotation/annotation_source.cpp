@@ -1,12 +1,10 @@
 #include <mbgl/annotation/annotation_source.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 
 namespace mbgl {
 
-AnnotationSource::AnnotationSource(std::string id_,
-                                   std::string url_,
-                                   uint16_t tileSize_,
-                                   std::unique_ptr<Tileset>&& tileset_)
-    : Source(SourceType::Annotations, std::move(id_), std::move(url_), tileSize_, std::move(tileset_)) {
+AnnotationSource::AnnotationSource()
+    : Source(SourceType::Annotations, AnnotationManager::SourceID, "", util::tileSize, std::make_unique<Tileset>()) {
 }
 
 } // namespace mbgl
