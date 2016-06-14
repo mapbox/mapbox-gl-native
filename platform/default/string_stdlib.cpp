@@ -11,7 +11,7 @@ namespace mbgl { namespace platform {
 std::string uppercase(const std::string& str)
 {
     std::stringstream output;
-    char const *itr = str.c_str(), *nitr = itr;
+    char const *itr = str.c_str(), *nitr;
     char const *end = itr + str.length();
     char lo[5] = { 0 };
 
@@ -44,7 +44,7 @@ std::string uppercase(const std::string& str)
 std::string lowercase(const std::string& str)
 {
     std::stringstream output;
-    char const *itr = str.c_str(), *nitr = itr;
+    char const *itr = str.c_str(), *nitr;
     char const *end = itr + str.length();
     char lo[5] = { 0 };
 
