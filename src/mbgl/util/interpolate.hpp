@@ -5,6 +5,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace util {
@@ -38,6 +39,20 @@ private:
 public:
     Array operator()(const Array& a, const Array& b, const double t) {
         return operator()(a, b, t, std::make_index_sequence<N>());
+    }
+};
+
+template <>
+struct Interpolator<Color> {
+public:
+    Color operator()(const Color& a, const Color& b, const double t) {
+        Color color(
+            interpolate(a.r, b.r, t),
+            interpolate(a.g, b.g, t),
+            interpolate(a.b, b.b, t),
+            interpolate(a.a, b.a, t)
+        );
+        return color;
     }
 };
 

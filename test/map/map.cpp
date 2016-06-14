@@ -9,6 +9,7 @@
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/util/color.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -67,7 +68,7 @@ TEST(Map, AddLayer) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
-    layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
+    layer->setBackgroundColor({Color(1, 0, 0, 1)});
     map.addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/map/add_layer", test::render(map));
@@ -80,7 +81,7 @@ TEST(Map, RemoveLayer) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
-    layer->setBackgroundColor({{{ 1, 0, 0, 1 }}});
+    layer->setBackgroundColor({Color(1, 0, 0, 1)});
     map.addLayer(std::move(layer));
     map.removeLayer("background");
 

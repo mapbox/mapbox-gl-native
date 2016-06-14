@@ -63,7 +63,7 @@ global.defaultValue = function (property) {
       return `${propertyType(property)}::${camelize(property.default)}`;
     }
   case 'color':
-    return `{{ ${parseCSSColor(property.default).join(', ')} }}`
+    return `Color(${parseCSSColor(property.default).join(', ')})`
   case 'array':
     const defaults = (property.default || []).map((e) => defaultValue({ type: property.value, default: e }));
     if (property.length) {

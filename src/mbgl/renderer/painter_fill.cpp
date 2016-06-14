@@ -24,7 +24,7 @@ void Painter::renderFill(FillBucket& bucket,
     float opacity = properties.fillOpacity;
 
     Color stroke_color = properties.fillOutlineColor;
-    if (stroke_color[3] < 0) {
+    if (stroke_color.a < 0) {
         stroke_color = fill_color;
     }
 
@@ -34,8 +34,8 @@ void Painter::renderFill(FillBucket& bucket,
 
     bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
     if (wireframe) {
-        fill_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
-        stroke_color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+        fill_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+        stroke_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
         opacity = 1.0f;
         pattern = false;
         outline = true;
@@ -161,7 +161,7 @@ void Painter::renderFill(FillBucket& bucket,
         }
     } else if (!wireframe) {
         // No image fill.
-        if ((fill_color[3] >= 1.0f && opacity >= 1.0f) == (pass == RenderPass::Opaque)) {
+        if ((fill_color.a >= 1.0f && opacity >= 1.0f) == (pass == RenderPass::Opaque)) {
             // Only draw the fill when it's either opaque and we're drawing opaque
             // fragments or when it's translucent and we're drawing translucent
             // fragments

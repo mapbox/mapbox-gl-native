@@ -37,7 +37,7 @@ void Painter::renderLine(LineBucket& bucket,
 
     float blur = properties.lineBlur + antialiasing;
 
-    Color color = {{ 1.0f, 1.0f, 1.0f, 1.0f }};
+    Color color(1.0f, 1.0f, 1.0f, 1.0f);
     float opacity = 1.0f;
     if (!wireframe) {
         color = properties.lineColor;

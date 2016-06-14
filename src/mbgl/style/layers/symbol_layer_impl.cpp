@@ -26,8 +26,8 @@ bool SymbolLayer::Impl::recalculate(const CalculationParameters& parameters) {
     iconSize = layout.iconSize;
     textSize = layout.textSize;
 
-    passes = ((paint.iconOpacity > 0 && (paint.iconColor.value[3] > 0 || paint.iconHaloColor.value[3] > 0) && iconSize > 0)
-           || (paint.textOpacity > 0 && (paint.textColor.value[3] > 0 || paint.textHaloColor.value[3] > 0) && textSize > 0))
+    passes = ((paint.iconOpacity > 0 && (paint.iconColor.value.a > 0 || paint.iconHaloColor.value.a > 0) && iconSize > 0)
+           || (paint.textOpacity > 0 && (paint.textColor.value.a > 0 || paint.textHaloColor.value.a > 0) && textSize > 0))
         ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;

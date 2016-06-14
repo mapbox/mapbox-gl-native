@@ -711,7 +711,7 @@ static mbgl::Color toColor(jint color) {
     float g = (color >> 8) & 0xFF;
     float b = (color) & 0xFF;
     float a = (color >> 24) & 0xFF;
-    return {{ r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f }};
+    return mbgl::Color(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
 }
 
 template <class Geometry>

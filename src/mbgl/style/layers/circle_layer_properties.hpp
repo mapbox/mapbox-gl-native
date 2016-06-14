@@ -19,7 +19,7 @@ public:
     bool recalculate(const CalculationParameters&);
 
     PaintProperty<float> circleRadius { 5 };
-    PaintProperty<Color> circleColor { {{ 0, 0, 0, 1 }} };
+    PaintProperty<Color> circleColor { Color(0, 0, 0, 1) };
     PaintProperty<float> circleBlur { 0 };
     PaintProperty<float> circleOpacity { 1 };
     PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };

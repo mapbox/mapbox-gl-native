@@ -45,7 +45,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
     } else {
         if (wireframe) {
-            plainShader->u_color = {{ 0.0f, 0.0f, 0.0f, 1.0f }};
+            plainShader->u_color = Color(0.0f, 0.0f, 0.0f, 1.0f);
             plainShader->u_opacity = 1.0f;
         } else {
             plainShader->u_color = properties.backgroundColor;

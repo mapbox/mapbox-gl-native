@@ -39,7 +39,7 @@ public:
 <% if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') { -%>
     PaintProperty<<%- propertyType(property) %>, CrossFadedPropertyEvaluator> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
 <% } else if (property.name === 'fill-outline-color') { -%>
-    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { {{ 0, 0, 0, -1 }} };
+    PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { Color(0, 0, 0, -1) };
 <% } else { -%>
     PaintProperty<<%- propertyType(property) %>> <%- camelizeWithLeadingLowercase(property.name) %> { <%- defaultValue(property) %> };
 <% } -%>

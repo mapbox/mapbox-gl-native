@@ -126,11 +126,11 @@ mbgl::Color MGLColorObjectFromUIColor(UIColor *color)
 {
     if (!color)
     {
-        return {{ 0, 0, 0, 0 }};
+        return mbgl::Color(0, 0, 0, 0);
     }
     CGFloat r, g, b, a;
     [color getRed:&r green:&g blue:&b alpha:&a];
-    return {{ (float)r, (float)g, (float)b, (float)a }};
+    return mbgl::Color((float)r, (float)g, (float)b, (float)a);
 }
 
 @interface MGLAnnotationAccessibilityElement : UIAccessibilityElement

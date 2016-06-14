@@ -5,11 +5,11 @@
 
 mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     if (!cgColor) {
-        return {{ 0, 0, 0, 0 }};
+        return mbgl::Color(0, 0, 0, 0);
     }
     NSCAssert(CGColorGetNumberOfComponents(cgColor) >= 4, @"Color must have at least 4 components");
     const CGFloat *components = CGColorGetComponents(cgColor);
-    return {{ (float)components[0], (float)components[1], (float)components[2], (float)components[3] }};
+    return mbgl::Color((float)components[0], (float)components[1], (float)components[2], (float)components[3]);
 }
 
 @implementation MGLMultiPoint

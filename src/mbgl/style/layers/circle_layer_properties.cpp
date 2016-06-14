@@ -1,7 +1,6 @@
 // This file is generated. Edit scripts/generate-style-code.js, then run `make style-code`.
 
 #include <mbgl/style/layers/circle_layer_properties.hpp>
-#include <utility>
 
 namespace mbgl {
 namespace style {

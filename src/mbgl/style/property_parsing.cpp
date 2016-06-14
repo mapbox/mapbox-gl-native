@@ -49,10 +49,10 @@ optional<Color> parseConstant(const char* name, const JSValue& value) {
     // Premultiply the color.
     const float factor = css_color.a / 255;
 
-    return Color{{(float)css_color.r * factor,
+    return Color( (float)css_color.r * factor,
                   (float)css_color.g * factor,
                   (float)css_color.b * factor,
-                  css_color.a}};
+                  css_color.a );
 }
 
 template <>

@@ -126,11 +126,11 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
 /// Converts the given color into an mbgl::Color in calibrated RGB space.
 mbgl::Color MGLColorObjectFromNSColor(NSColor *color) {
     if (!color) {
-        return {{ 0, 0, 0, 0 }};
+        return mbgl::Color(0, 0, 0, 0);
     }
     CGFloat r, g, b, a;
     [[color colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
-    return {{ (float)r, (float)g, (float)b, (float)a }};
+    return mbgl::Color((float)r, (float)g, (float)b, (float)a);
 }
 
 /// Lightweight container for metadata about an annotation, including the annotation itself.
