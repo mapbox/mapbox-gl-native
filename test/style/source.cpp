@@ -86,7 +86,7 @@ TEST(Source, LoadingFail) {
         test.end();
     };
 
-    VectorSource source("source", "url", 512, nullptr);
+    VectorSource source("source", "url", nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -109,7 +109,7 @@ TEST(Source, LoadingCorrupt) {
         test.end();
     };
 
-    VectorSource source("source", "url", 512, nullptr);
+    VectorSource source("source", "url", nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -166,7 +166,7 @@ TEST(Source, VectorTileEmpty) {
     auto tileset = std::make_unique<Tileset>();
     tileset->tiles = { "tiles" };
 
-    VectorSource source("source", "", 512, std::move(tileset));
+    VectorSource source("source", "", std::move(tileset));
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -224,7 +224,7 @@ TEST(Source, VectorTileFail) {
     auto tileset = std::make_unique<Tileset>();
     tileset->tiles = { "tiles" };
 
-    VectorSource source("source", "", 512, std::move(tileset));
+    VectorSource source("source", "", std::move(tileset));
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -284,7 +284,7 @@ TEST(Source, VectorTileCorrupt) {
     auto tileset = std::make_unique<Tileset>();
     tileset->tiles = { "tiles" };
 
-    VectorSource source("source", "", 512, std::move(tileset));
+    VectorSource source("source", "", std::move(tileset));
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -338,7 +338,7 @@ TEST(Source, VectorTileCancel) {
     auto tileset = std::make_unique<Tileset>();
     tileset->tiles = { "tiles" };
 
-    VectorSource source("source", "", 512, std::move(tileset));
+    VectorSource source("source", "", std::move(tileset));
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);

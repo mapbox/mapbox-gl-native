@@ -216,7 +216,7 @@ void Parser::parseSources(const JSValue& value) {
             break;
 
         case SourceType::Vector:
-            source = std::make_unique<VectorSource>(id, url, tileSize, std::move(tileset));
+            source = std::make_unique<VectorSource>(id, url, std::move(tileset));
             break;
 
         case SourceType::GeoJSON:
