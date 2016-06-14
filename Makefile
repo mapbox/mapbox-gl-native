@@ -306,10 +306,12 @@ compdb-macos: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
 tidy: compdb tidy-$(HOST_PLATFORM)
 
 tidy-linux:
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8; fi
 	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) headers
 	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 tidy-macos:
+	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8; fi
 	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) headers
 	scripts/clang-tidy.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
 

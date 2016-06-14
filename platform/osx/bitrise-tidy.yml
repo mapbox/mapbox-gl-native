@@ -31,7 +31,6 @@ workflows:
             set -eu -o pipefail
             export BUILDTYPE=Release
             make compdb
-            .mason/mason install clang-tidy 3.8
             make tidy
         - is_debug: 'no'
     - slack:

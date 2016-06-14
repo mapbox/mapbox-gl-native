@@ -18,7 +18,7 @@ command -v ${CLANG_TIDY} >/dev/null 2>&1 || {
 cd $1
 
 function check_tidy() {
-    OUTPUT=$(${CLANG_TIDY} $0 -p=. -header-filter='mbgl' 2>/dev/null)
+    OUTPUT=$(${CLANG_TIDY} -p=$PWD $0 2>/dev/null)
     if [[ -n $OUTPUT ]]; then
         echo "Error: A clang-tidy warning/error happened:"
         echo -e "$OUTPUT"
