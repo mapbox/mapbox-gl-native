@@ -2,6 +2,12 @@
 
 #include <mbgl/style/source.hpp>
 
+namespace mapbox {
+namespace geojsonvt {
+class GeoJSONVT;
+} // namespace geojsonvt
+} // namespace mapbox
+
 namespace mbgl {
 namespace style {
 
@@ -17,6 +23,8 @@ public:
 
 private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
+
+    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 };
 
 } // namespace style

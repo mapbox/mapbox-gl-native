@@ -16,12 +16,6 @@
 #include <vector>
 #include <map>
 
-namespace mapbox {
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-} // namespace mapbox
-
 namespace mbgl {
 
 class Painter;
@@ -99,7 +93,6 @@ protected:
     void invalidateTiles();
 
     std::unique_ptr<const Tileset> tileset;
-    std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
     std::unique_ptr<AsyncRequest> req;
 
     SourceObserver* observer = nullptr;

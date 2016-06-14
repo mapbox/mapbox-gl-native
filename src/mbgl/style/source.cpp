@@ -23,8 +23,6 @@
 
 #include <mbgl/algorithm/update_renderables.hpp>
 
-#include <mapbox/geojsonvt.hpp>
-#include <mapbox/geojsonvt/convert.hpp>
 #include <mapbox/geometry/envelope.hpp>
 
 #include <algorithm>

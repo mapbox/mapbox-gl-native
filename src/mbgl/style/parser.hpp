@@ -13,6 +13,12 @@
 #include <unordered_map>
 #include <forward_list>
 
+namespace mapbox {
+namespace geojsonvt {
+class GeoJSONVT;
+} // namespace geojsonvt
+} // namespace mapbox
+
 namespace mbgl {
 namespace style {
 
