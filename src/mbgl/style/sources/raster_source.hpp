@@ -7,10 +7,9 @@ namespace style {
 
 class RasterSource : public TileSource {
 public:
-    RasterSource(std::string id,
-                 std::string url,
-                 uint16_t tileSize,
-                 std::unique_ptr<Tileset>&&);
+    static std::unique_ptr<RasterSource> parse(std::string id, const JSValue&);
+
+    RasterSource(std::string id, variant<std::string, Tileset>, uint16_t tileSize);
 
 private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;

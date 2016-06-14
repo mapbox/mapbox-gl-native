@@ -107,14 +107,17 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         case SourceType::Vector:
         case SourceType::Raster: {
             style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
-            if (tileSource->getTileset()) {
-                result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(), *tileSource->getTileset()).size();
+            const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
+
+            if (urlOrTileset.is<Tileset>()) {
+                result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(), urlOrTileset.get<Tileset>()).size();
             } else {
                 result.requiredResourceCount += 1;
-                optional<Response> sourceResponse = offlineDatabase.get(Resource::source(tileSource->getURL()));
+                const std::string& url = urlOrTileset.get<std::string>();
+                optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
                     result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(),
-                        *style::parseTileJSON(*sourceResponse->data, tileSource->getURL(), source->type, tileSource->getTileSize())).size();
+                        style::TileSource::parseTileJSON(*sourceResponse->data, url, source->type, tileSource->getTileSize())).size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -161,16 +164,18 @@ void OfflineDownload::activateDownload() {
             case SourceType::Vector:
             case SourceType::Raster: {
                 const style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+                const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
                 const uint16_t tileSize = tileSource->getTileSize();
-                if (tileSource->getTileset()) {
-                    ensureTiles(type, tileSize, *tileSource->getTileset());
+
+                if (urlOrTileset.is<Tileset>()) {
+                    ensureTiles(type, tileSize, urlOrTileset.get<Tileset>());
                 } else {
-                    std::string url = tileSource->getURL();
+                    const std::string& url = urlOrTileset.get<std::string>();
                     status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=] (Response sourceResponse) {
-                        ensureTiles(type, tileSize, *style::parseTileJSON(*sourceResponse.data, url, type, tileSize));
+                        ensureTiles(type, tileSize, style::TileSource::parseTileJSON(*sourceResponse.data, url, type, tileSize));
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {

@@ -1,10 +1,13 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/tileset.hpp>
+#include <mbgl/util/variant.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 
-class Tileset;
 class AsyncRequest;
 
 namespace style {
@@ -15,25 +18,33 @@ namespace style {
 */
 class TileSource : public Source {
 public:
+    // A tile source can either specify a URL to TileJSON, or inline TileJSON.
+    static optional<variant<std::string, Tileset>> parseURLOrTileset(const JSValue&);
+    static Tileset parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
+
     TileSource(SourceType,
                std::string id,
-               std::string url,
-               uint16_t tileSize,
-               std::unique_ptr<Tileset>&&);
+               variant<std::string, Tileset> urlOrTileset,
+               uint16_t tileSize);
     ~TileSource() override;
 
     void load(FileSource&) final;
 
-    const std::string& getURL() const { return url; }
-    uint16_t getTileSize() const final { return tileSize; }
-    const Tileset* getTileset() const { return tileset.get(); }
+    uint16_t getTileSize() const final {
+        return tileSize;
+    }
+
+    const variant<std::string, Tileset>& getURLOrTileset() const {
+        return urlOrTileset;
+    }
 
 protected:
     Range<uint8_t> getZoomRange() final;
 
+    const variant<std::string, Tileset> urlOrTileset;
     const uint16_t tileSize;
-    const std::string url;
-    std::unique_ptr<const Tileset> tileset;
+
+    Tileset tileset;
     std::unique_ptr<AsyncRequest> req;
 };
 

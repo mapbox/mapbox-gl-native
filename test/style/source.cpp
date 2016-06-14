@@ -87,7 +87,7 @@ TEST(Source, LoadingFail) {
         test.end();
     };
 
-    VectorSource source("source", "url", nullptr);
+    VectorSource source("source", "url");
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -110,7 +110,7 @@ TEST(Source, LoadingCorrupt) {
         test.end();
     };
 
-    VectorSource source("source", "url", nullptr);
+    VectorSource source("source", "url");
     source.setObserver(&test.observer);
     source.load(test.fileSource);
 
@@ -135,10 +135,10 @@ TEST(Source, RasterTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    RasterSource source("source", "", 512, std::move(tileset));
+    RasterSource source("source", tileset, 512);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -164,10 +164,10 @@ TEST(Source, VectorTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    VectorSource source("source", "", std::move(tileset));
+    VectorSource source("source", tileset);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -193,10 +193,10 @@ TEST(Source, RasterTileFail) {
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    RasterSource source("source", "", 512, std::move(tileset));
+    RasterSource source("source", tileset, 512);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -222,10 +222,10 @@ TEST(Source, VectorTileFail) {
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    VectorSource source("source", "", std::move(tileset));
+    VectorSource source("source", tileset);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -250,10 +250,10 @@ TEST(Source, RasterTileCorrupt) {
         test.end();
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    RasterSource source("source", "", 512, std::move(tileset));
+    RasterSource source("source", tileset, 512);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -282,10 +282,10 @@ TEST(Source, VectorTileCorrupt) {
     layer->setSource("source", "water");
     test.style.addLayer(std::move(layer));
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    VectorSource source("source", "", std::move(tileset));
+    VectorSource source("source", tileset);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -309,10 +309,10 @@ TEST(Source, RasterTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    RasterSource source("source", "", 512, std::move(tileset));
+    RasterSource source("source", tileset, 512);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -336,10 +336,10 @@ TEST(Source, VectorTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto tileset = std::make_unique<Tileset>();
-    tileset->tiles = { "tiles" };
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
 
-    VectorSource source("source", "", std::move(tileset));
+    VectorSource source("source", tileset);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);

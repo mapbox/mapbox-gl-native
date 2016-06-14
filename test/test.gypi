@@ -73,6 +73,7 @@
         'style/source.cpp',
         'style/style.cpp',
         'style/style_layer.cpp',
+        'style/tile_source.cpp',
         'style/filter.cpp',
         'style/functions.cpp',
         'style/style_parser.cpp',

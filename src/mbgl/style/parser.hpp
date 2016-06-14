@@ -14,13 +14,7 @@
 #include <forward_list>
 
 namespace mbgl {
-
-class Tileset;
-
 namespace style {
-
-std::unique_ptr<Tileset> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
-std::unique_ptr<Tileset> parseTileJSON(const JSValue&);
 
 Filter parseFilter(const JSValue&);
 

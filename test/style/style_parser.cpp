@@ -87,36 +87,6 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
     return names;
 }()));
 
-TEST(StyleParser, ParseTileJSONRaster) {
-    auto result = style::parseTileJSON(
-        util::read_file("test/fixtures/style_parser/tilejson.raster.json"),
-        "mapbox://mapbox.satellite",
-        SourceType::Raster,
-        256);
-
-    EXPECT_EQ(0, result->zoomRange.min);
-    EXPECT_EQ(15, result->zoomRange.max);
-    EXPECT_EQ("attribution", result->attribution);
-#if !defined(__ANDROID__) && !defined(__APPLE__)
-    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.webp", result->tiles[0]);
-#else
-    EXPECT_EQ("mapbox://tiles/mapbox.satellite/{z}/{x}/{y}{ratio}.png", result->tiles[0]);
-#endif
-}
-
-TEST(StyleParser, ParseTileJSONVector) {
-    auto result = style::parseTileJSON(
-        util::read_file("test/fixtures/style_parser/tilejson.vector.json"),
-        "mapbox://mapbox.streets",
-        SourceType::Vector,
-        256);
-
-    EXPECT_EQ(0, result->zoomRange.min);
-    EXPECT_EQ(15, result->zoomRange.max);
-    EXPECT_EQ("attribution", result->attribution);
-    EXPECT_EQ("mapbox://tiles/mapbox.streets/{z}/{x}/{y}.vector.pbf", result->tiles[0]);
-}
-
 TEST(StyleParser, FontStacks) {
     style::Parser parser;
     parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));

@@ -13,7 +13,6 @@
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/tileset.hpp>
 
@@ -21,88 +20,10 @@
 #include <rapidjson/error/en.h>
 
 #include <algorithm>
-#include <sstream>
 #include <set>
 
 namespace mbgl {
 namespace style {
-
-namespace {
-
-void parseTileJSONMember(const JSValue& value, std::vector<std::string>& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsArray()) {
-        return;
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        if (!property[i].IsString()) {
-            return;
-        }
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        target.emplace_back(std::string(property[i].GetString(), property[i].GetStringLength()));
-    }
-}
-
-void parseTileJSONMember(const JSValue& value, std::string& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsString()) {
-        return;
-    }
-
-    target = { property.GetString(), property.GetStringLength() };
-}
-
-void parseTileJSONMember(const JSValue& value, uint8_t& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsUint()) {
-        return;
-    }
-
-    unsigned int uint = property.GetUint();
-    if (uint > std::numeric_limits<uint8_t>::max()) {
-        return;
-    }
-
-    target = uint;
-}
-
-void parseTileJSONMember(const JSValue& value, std::array<double, 4>& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsArray() || property.Size() > 4) {
-        return;
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        if (!property[i].IsNumber()) {
-            return;
-        }
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        target[i] = property[i].GetDouble();
-    }
-}
-
-} // end namespace
 
 Parser::~Parser() = default;
 
@@ -174,44 +95,16 @@ void Parser::parseSources(const JSValue& value) {
         }
 
         const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
-
-        std::unique_ptr<Tileset> tileset;
         std::unique_ptr<Source> source;
 
-        // Sources can have URLs, either because they reference an external TileJSON file, or
-        // because reference a GeoJSON file. They don't have to have one though when all source
-        // parameters are specified inline.
-        std::string url;
-        if (sourceVal.HasMember("url")) {
-            const JSValue& urlVal = sourceVal["url"];
-            if (urlVal.IsString()) {
-                url = { urlVal.GetString(), urlVal.GetStringLength() };
-            } else {
-                Log::Error(Event::ParseStyle, "source url must be a string");
-                continue;
-            }
-        } else {
-            tileset = parseTileJSON(sourceVal);
-        }
-
-        uint16_t tileSize = util::tileSize;
-        if (sourceVal.HasMember("tileSize")) {
-            const JSValue& tileSizeVal = sourceVal["tileSize"];
-            if (tileSizeVal.IsNumber() && tileSizeVal.GetUint64() <= std::numeric_limits<uint16_t>::max()) {
-                tileSize = tileSizeVal.GetUint64();
-            } else {
-                Log::Error(Event::ParseStyle, "invalid tileSize");
-                continue;
-            }
-        }
-
         switch (*type) {
-        case SourceType::Raster:
-            source = std::make_unique<RasterSource>(id, url, tileSize, std::move(tileset));
+        case SourceType::Raster: {
+            source = RasterSource::parse(id, sourceVal);
             break;
+        }
 
         case SourceType::Vector:
-            source = std::make_unique<VectorSource>(id, url, std::move(tileset));
+            source = VectorSource::parse(id, sourceVal);
             break;
 
         case SourceType::GeoJSON:
@@ -228,45 +121,6 @@ void Parser::parseSources(const JSValue& value) {
             sources.emplace_back(std::move(source));
         }
     }
-}
-
-std::unique_ptr<Tileset> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
-    document.Parse<0>(json.c_str());
-
-    if (document.HasParseError()) {
-        std::stringstream message;
-        message << document.GetErrorOffset() << " - " << rapidjson::GetParseError_En(document.GetParseError());
-        throw std::runtime_error(message.str());
-    }
-
-    std::unique_ptr<Tileset> result = parseTileJSON(document);
-
-    // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
-    if (util::mapbox::isMapboxURL(sourceURL)) {
-        for (auto& url : result->tiles) {
-            url = util::mapbox::canonicalizeTileURL(url, type, tileSize);
-        }
-    }
-
-    return result;
-}
-
-std::unique_ptr<Tileset> parseTileJSON(const JSValue& value) {
-    auto tileset = std::make_unique<Tileset>();
-    parseTileJSONMember(value, tileset->tiles, "tiles");
-    parseTileJSONMember(value, tileset->zoomRange.min, "minzoom");
-    parseTileJSONMember(value, tileset->zoomRange.max, "maxzoom");
-    parseTileJSONMember(value, tileset->attribution, "attribution");
-
-    std::array<double, 4> array;
-    parseTileJSONMember(value, array, "center");
-    tileset->center = { array[0], array[1] };
-    tileset->zoom = array[2];
-    parseTileJSONMember(value, array, "bounds");
-    tileset->bounds = LatLngBounds::hull({ array[0], array[1] }, { array[2], array[3] });
-
-    return tileset;
 }
 
 void Parser::parseLayers(const JSValue& value) {

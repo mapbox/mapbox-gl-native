@@ -7,9 +7,9 @@ namespace style {
 
 class VectorSource : public TileSource {
 public:
-    VectorSource(std::string id,
-                 std::string url,
-                 std::unique_ptr<Tileset>&&);
+    static std::unique_ptr<VectorSource> parse(std::string id, const JSValue&);
+
+    VectorSource(std::string id, variant<std::string, Tileset>);
 
 private:
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
