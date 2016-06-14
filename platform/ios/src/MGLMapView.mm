@@ -2866,6 +2866,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 if (annotationView)
                 {
                     annotationViewsForAnnotation[annotationValue] = annotationView;
+                    annotationView.annotation = annotation;
                     annotationView.center = [self convertCoordinate:annotation.coordinate toPointToView:self];
                     [newAnnotationViews addObject:annotationView];
                 }
@@ -3083,6 +3084,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
         MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
         MGLAnnotationView *annotationView = annotationContext.annotationView;
+        annotationView.annotation = nil;
         [annotationView removeFromSuperview];
 
         if (annotationTag == _selectedAnnotationTag)
@@ -4539,6 +4541,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     MGLAnnotationView *annotationView = annotationContext.annotationView;
     
     if (!annotationView) return;
+    
+    annotationView.annotation = nil;
     
     if (annotationContext.viewReuseIdentifier)
     {
