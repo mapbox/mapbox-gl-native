@@ -13,19 +13,11 @@
 #include <unordered_map>
 #include <forward_list>
 
-namespace mapbox {
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-} // namespace mapbox
-
 namespace mbgl {
 namespace style {
 
 std::unique_ptr<Tileset> parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
 std::unique_ptr<Tileset> parseTileJSON(const JSValue&);
-
-std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue&);
 
 Filter parseFilter(const JSValue&);
 

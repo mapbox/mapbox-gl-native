@@ -2,6 +2,8 @@
 
 #include <mbgl/style/source.hpp>
 
+#include <mbgl/util/rapidjson.hpp>
+
 namespace mapbox {
 namespace geojsonvt {
 class GeoJSONVT;
@@ -16,9 +18,11 @@ namespace style {
 
 class GeoJSONSource : public Source {
 public:
+    static std::unique_ptr<GeoJSONSource> parse(const std::string& id,
+                                                const JSValue&);
+
     GeoJSONSource(std::string id,
                   std::string url,
-                  uint16_t tileSize,
                   std::unique_ptr<Tileset>&&,
                   std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~GeoJSONSource() final;
