@@ -7,11 +7,11 @@
 
 using namespace mbgl;
 
-SDFShader::SDFShader(gl::GLObjectStore& glObjectStore)
-    : Shader("sdf", shaders::sdf::vertex, shaders::sdf::fragment, glObjectStore) {
-    a_offset = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset"));
-    a_data1 = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1"));
-    a_data2 = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"));
+SDFShader::SDFShader(gl::ObjectStore& store)
+    : Shader("sdf", shaders::sdf::vertex, shaders::sdf::fragment, store)
+    , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
+    , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
+    , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {
 }
 
 void SDFGlyphShader::bind(GLbyte* offset) {

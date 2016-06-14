@@ -7,10 +7,10 @@
 
 using namespace mbgl;
 
-CollisionBoxShader::CollisionBoxShader(gl::GLObjectStore& glObjectStore)
-    : Shader("collisionbox", shaders::collisionbox::vertex, shaders::collisionbox::fragment, glObjectStore) {
-    a_extrude = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_extrude"));
-    a_data = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"));
+CollisionBoxShader::CollisionBoxShader(gl::ObjectStore& store)
+    : Shader("collisionbox", shaders::collisionbox::vertex, shaders::collisionbox::fragment, store)
+    , a_extrude(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_extrude")))
+    , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 
 void CollisionBoxShader::bind(GLbyte *offset) {

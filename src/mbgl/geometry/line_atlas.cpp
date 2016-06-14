@@ -1,6 +1,6 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -21,7 +21,7 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
 LineAtlas::~LineAtlas() {
 }
 
-LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round, gl::GLObjectStore& glObjectStore) {
+LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round, gl::ObjectStore& store) {
     size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         boost::hash_combine<float>(key, part);
@@ -30,7 +30,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     // Note: We're not handling hash collisions here.
     const auto it = positions.find(key);
     if (it == positions.end()) {
-        auto inserted = positions.emplace(key, addDash(dasharray, round, glObjectStore));
+        auto inserted = positions.emplace(key, addDash(dasharray, round, store));
         assert(inserted.second);
         return inserted.first->second;
     } else {
@@ -38,7 +38,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     }
 }
 
-LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool round, gl::GLObjectStore& glObjectStore) {
+LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool round, gl::ObjectStore& store) {
 
     int n = round ? 7 : 0;
     int dashheight = 2 * n + 1;
@@ -116,29 +116,29 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     nextRow += dashheight;
 
     dirty = true;
-    bind(glObjectStore);
+    bind(store);
 
     return position;
 };
 
-void LineAtlas::upload(gl::GLObjectStore& glObjectStore) {
+void LineAtlas::upload(gl::ObjectStore& store) {
     if (dirty) {
-        bind(glObjectStore);
+        bind(store);
     }
 }
 
-void LineAtlas::bind(gl::GLObjectStore& glObjectStore) {
+void LineAtlas::bind(gl::ObjectStore& store) {
     bool first = false;
-    if (!texture.created()) {
-        texture.create(glObjectStore);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+    if (!texture) {
+        texture = store.createTexture();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 
     if (dirty) {

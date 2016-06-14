@@ -5,17 +5,16 @@
 #include <mbgl/tile/tile_id.hpp>
 
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/static_vertex_buffer.hpp>
 
 #include <mbgl/gl/gl_config.hpp>
-
-#include <mbgl/style/render_item.hpp>
-#include <mbgl/style/types.hpp>
-
 #include <mbgl/gl/gl.hpp>
+
+#include <mbgl/style/style.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -28,28 +27,19 @@
 
 namespace mbgl {
 
-class Style;
-class StyleLayer;
 class Tile;
 class SpriteAtlas;
 class GlyphAtlas;
 class LineAtlas;
-class Source;
 struct FrameData;
 class TileData;
 
 class DebugBucket;
 class FillBucket;
-class FillLayer;
 class LineBucket;
-class LineLayer;
 class CircleBucket;
-class CircleLayer;
 class SymbolBucket;
-class SymbolLayer;
 class RasterBucket;
-class RasterLayer;
-class BackgroundLayer;
 
 class SDFShader;
 class PlainShader;
@@ -70,7 +60,18 @@ class CollisionBoxShader;
 struct ClipID;
 
 namespace util {
-class GLObjectStore;
+class ObjectStore;
+}
+
+namespace style {
+class Style;
+class Source;
+class FillLayer;
+class LineLayer;
+class CircleLayer;
+class SymbolLayer;
+class RasterLayer;
+class BackgroundLayer;
 }
 
 struct FrameData {
@@ -84,11 +85,11 @@ struct FrameData {
 
 class Painter : private util::noncopyable {
 public:
-    Painter(const TransformState&, gl::GLObjectStore&);
+    Painter(const TransformState&, gl::ObjectStore&);
     ~Painter();
 
-    void render(const Style& style,
-                const FrameData& frame,
+    void render(const style::Style&,
+                const FrameData&,
                 SpriteAtlas& annotationSpriteAtlas);
 
     // Renders debug information for a tile.
@@ -100,12 +101,12 @@ public:
     void renderClipMasks();
 
     void renderDebugText(TileData&, const mat4&);
-    void renderFill(FillBucket&, const FillLayer&, const UnwrappedTileID&, const mat4&);
-    void renderLine(LineBucket&, const LineLayer&, const UnwrappedTileID&, const mat4&);
-    void renderCircle(CircleBucket&, const CircleLayer&, const UnwrappedTileID&, const mat4&);
-    void renderSymbol(SymbolBucket&, const SymbolLayer&, const UnwrappedTileID&, const mat4&);
-    void renderRaster(RasterBucket&, const RasterLayer&, const UnwrappedTileID&, const mat4&);
-    void renderBackground(const BackgroundLayer&);
+    void renderFill(FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
+    void renderLine(LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
+    void renderCircle(CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);
+    void renderSymbol(SymbolBucket&, const style::SymbolLayer&, const UnwrappedTileID&, const mat4&);
+    void renderRaster(RasterBucket&, const style::RasterLayer&, const UnwrappedTileID&, const mat4&);
+    void renderBackground(const style::BackgroundLayer&);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);
@@ -119,9 +120,9 @@ private:
     mat4 translatedMatrix(const mat4& matrix,
                           const std::array<float, 2>& translation,
                           const UnwrappedTileID& id,
-                          TranslateAnchorType anchor);
+                          style::TranslateAnchorType anchor);
 
-    std::vector<RenderItem> determineRenderOrder(const Style& style);
+    std::vector<RenderItem> determineRenderOrder(const style::Style&);
 
     template <class Iterator>
     void renderPass(RenderPass,
@@ -136,10 +137,11 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::GLObjectStore&),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
 
                    // Layout
-                   RotationAlignmentType rotationAlignment,
+                   style::AlignmentType rotationAlignment,
+                   style::AlignmentType pitchAlignment,
                    float layoutSize,
 
                    // Paint
@@ -149,14 +151,15 @@ private:
                    float haloWidth,
                    float haloBlur,
                    std::array<float, 2> translate,
-                   TranslateAnchorType translateAnchor,
+                   style::TranslateAnchorType translateAnchor,
                    float paintSize);
 
     void setDepthSublayer(int n);
 
     mat4 projMatrix;
     mat4 nativeMatrix;
-    mat4 extrudeMatrix;
+
+    std::array<float, 2> extrudeScale;
 
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
@@ -173,7 +176,7 @@ private:
     }();
 
     const TransformState& state;
-    gl::GLObjectStore& glObjectStore;
+    gl::ObjectStore& store;
 
     FrameData frame;
 

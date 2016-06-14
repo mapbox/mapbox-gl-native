@@ -2,6 +2,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/text/glyph_range.hpp>
+#include <mbgl/util/font_stack.hpp>
 
 #include <exception>
 

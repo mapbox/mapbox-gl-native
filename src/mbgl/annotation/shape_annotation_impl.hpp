@@ -3,35 +3,32 @@
 #include <mapbox/geojsonvt.hpp>
 
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
-#include <mbgl/util/geo.hpp>
 
-#include <memory>
 #include <string>
-#include <map>
+#include <memory>
 
 namespace mbgl {
 
-class Style;
 class AnnotationTile;
 class CanonicalTileID;
 
+namespace style {
+class Style;
+}
+
 class ShapeAnnotationImpl {
 public:
-    using Map = std::map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
+    ShapeAnnotationImpl(const AnnotationID, const uint8_t maxZoom);
+    virtual ~ShapeAnnotationImpl() = default;
 
-    ShapeAnnotationImpl(const AnnotationID, const ShapeAnnotation&, const uint8_t maxZoom);
+    virtual void updateStyle(style::Style&) const = 0;
+    virtual const ShapeAnnotationGeometry& geometry() const = 0;
 
-    void updateStyle(Style&);
     void updateTile(const CanonicalTileID&, AnnotationTile&);
 
     const AnnotationID id;
-    const std::string layerID;
-    const ShapeAnnotation shape;
-
-private:
     const uint8_t maxZoom;
-    mapbox::geojsonvt::ProjectedFeatureType type;
+    const std::string layerID;
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> shapeTiler;
 };
 

@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
-#include <mbgl/style/style_parser.hpp>
+#include <mbgl/style/parser.hpp>
 #include <mbgl/util/io.hpp>
 
 #include <rapidjson/document.h>
@@ -29,7 +29,7 @@ TEST_P(StyleParserTest, ParseStyle) {
     FixtureLogObserver* observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
-    StyleParser parser;
+    style::Parser parser;
     parser.parse(util::read_file(base + ".style.json"));
 
     for (auto it = infoDoc.MemberBegin(), end = infoDoc.MemberEnd(); it != end; it++) {
@@ -86,7 +86,7 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
 }()));
 
 TEST(StyleParser, ParseTileJSONRaster) {
-    auto result = StyleParser::parseTileJSON(
+    auto result = style::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.raster.json"),
         "mapbox://mapbox.satellite",
         SourceType::Raster,
@@ -103,7 +103,7 @@ TEST(StyleParser, ParseTileJSONRaster) {
 }
 
 TEST(StyleParser, ParseTileJSONVector) {
-    auto result = StyleParser::parseTileJSON(
+    auto result = style::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.vector.json"),
         "mapbox://mapbox.streets",
         SourceType::Vector,
@@ -116,7 +116,7 @@ TEST(StyleParser, ParseTileJSONVector) {
 }
 
 TEST(StyleParser, FontStacks) {
-    StyleParser parser;
+    style::Parser parser;
     parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
     auto result = parser.fontStacks();
     ASSERT_EQ(3, result.size());

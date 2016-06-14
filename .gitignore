@@ -24,3 +24,4 @@ xcuserdata
 /platform/ios/benchmark/assets/glyphs/DIN*
 /platform/ios/benchmark/assets/tiles/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6
 **/token
+/platform/osx/osx.xcworkspace/xcshareddata/osx.xcscmblueprint

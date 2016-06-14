@@ -16,30 +16,51 @@
 
 namespace mbgl {
 
-class StyleLayer;
 class Worker;
 class DebugBucket;
 class TransformState;
+class TileDataObserver;
+
+namespace style {
+class Layer;
+}
 
 class TileData : private util::noncopyable {
 public:
     TileData(const OverscaledTileID&);
     virtual ~TileData();
 
+    void setObserver(TileDataObserver* observer);
+
+    enum class Necessity : bool {
+        Optional = false,
+        Required = true,
+    };
+
+    virtual void setNecessity(Necessity) = 0;
+
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
 
-    virtual Bucket* getBucket(const StyleLayer&) = 0;
+    virtual Bucket* getBucket(const style::Layer&) = 0;
 
-    virtual bool parsePending(std::function<void (std::exception_ptr)>) { return true; }
-    virtual void redoPlacement(PlacementConfig, const std::function<void()>&) {}
-    virtual void redoPlacement(const std::function<void()>&) {}
+    virtual bool parsePending() { return true; }
+    virtual void redoPlacement(PlacementConfig) {}
+    virtual void redoPlacement() {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const optional<std::vector<std::string>>& layerIDs);
+
+    void setTriedOptional();
+
+    // Returns true when the tile source has received a first response, regardless of whether a load
+    // error occurred or actual data was loaded.
+    bool hasTriedOptional() const {
+        return triedOptional;
+    }
 
     // Tile data considered "Renderable" can be used for rendering. Data in
     // partial state is still waiting for network resources but can also
@@ -65,6 +86,8 @@ public:
     std::unique_ptr<DebugBucket> debugBucket;
 
 protected:
+    bool triedOptional = false;
+
     enum class DataAvailability : uint8_t {
         // Still waiting for data to load or parse.
         None,
@@ -79,6 +102,8 @@ protected:
     };
 
     DataAvailability availableData = DataAvailability::None;
+
+    TileDataObserver* observer = nullptr;
 };
 
 } // namespace mbgl

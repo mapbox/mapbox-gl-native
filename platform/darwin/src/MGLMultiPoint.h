@@ -17,7 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface MGLMultiPoint : MGLShape
 
-/** The number of points associated with the shape. (read-only) */
+/** The array of coordinates associated with the shape. */
+@property (nonatomic, readonly) CLLocationCoordinate2D *coordinates NS_RETURNS_INNER_POINTER;
+
+/** The number of coordinates associated with the shape. (read-only) */
 @property (nonatomic, readonly) NSUInteger pointCount;
 
 /**

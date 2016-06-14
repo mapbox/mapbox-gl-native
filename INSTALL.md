@@ -54,3 +54,7 @@ See the relevant SDK documentation for next steps:
 * [Mapbox Qt SDK](platform/qt/)
 * [Mapbox GL Native on Linux](platform/linux/)
 * [node-mapbox-gl-native](platform/node/)
+
+## 4: Keeping up to date
+
+This repository uses Git submodules, which should be automatically checked out when you first run a `make` command for one of the above platforms. These submodules are not updated automatically and we recommended that you run `git submodule update` after pulling down new commits to this repository.

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <memory>
 #include <cstdlib>
@@ -35,12 +36,12 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::GLObjectStore& glObjectStore) {
-        if (buffer.created()) {
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
+    void bind(gl::ObjectStore& store) {
+        if (buffer) {
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
         } else {
-            buffer.create(glObjectStore);
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, getID()));
+            buffer = store.createBuffer();
+            MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
                 pos = 0;
@@ -60,20 +61,20 @@ public:
     }
 
     GLuint getID() const {
-        return buffer.getID();
+        return buffer ? *buffer : 0;
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    inline void upload(gl::GLObjectStore& glObjectStore) {
-        if (!buffer.created()) {
-            bind(glObjectStore);
+    inline void upload(gl::ObjectStore& store) {
+        if (!buffer) {
+            bind(store);
         }
     }
 
 protected:
     // increase the buffer size by at least /required/ bytes.
     inline void *addElement() {
-        if (buffer.created()) {
+        if (buffer) {
             throw std::runtime_error("Can't add elements after buffer was bound to GPU");
         }
         if (length < pos + itemSize) {
@@ -85,19 +86,6 @@ protected:
         }
         pos += itemSize;
         return reinterpret_cast<char *>(array) + (pos - itemSize);
-    }
-
-    // Get a pointer to the item at a given index.
-    inline void *getElement(size_t i) {
-        if (array == nullptr) {
-            throw std::runtime_error("Buffer was already deleted or doesn't contain elements");
-        }
-
-        if (i * itemSize >= pos) {
-            throw std::runtime_error("Can't get element after array bounds");
-        } else {
-            return reinterpret_cast<char *>(array) + (i * itemSize);
-        }
     }
 
 public:
@@ -114,7 +102,7 @@ private:
     size_t length = 0;
 
     // GL buffer object handle.
-    gl::BufferHolder buffer;
+    mbgl::optional<gl::UniqueBuffer> buffer;
 };
 
 } // namespace mbgl

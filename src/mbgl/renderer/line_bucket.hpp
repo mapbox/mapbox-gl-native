@@ -5,13 +5,12 @@
 #include <mbgl/geometry/vao.hpp>
 #include <mbgl/geometry/elements_buffer.hpp>
 #include <mbgl/geometry/line_buffer.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/style/layers/line_layer_properties.hpp>
 
 #include <vector>
 
 namespace mbgl {
 
-class Style;
 class LineVertexBuffer;
 class TriangleElementsBuffer;
 class LineShader;
@@ -25,17 +24,17 @@ public:
     LineBucket(uint32_t overscaling);
     ~LineBucket() override;
 
-    void upload(gl::GLObjectStore&) override;
-    void render(Painter&, const StyleLayer&, const UnwrappedTileID&, const mat4&) override;
+    void upload(gl::ObjectStore&) override;
+    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::GLObjectStore&);
-    void drawLineSDF(LineSDFShader&, gl::GLObjectStore&);
-    void drawLinePatterns(LinepatternShader&, gl::GLObjectStore&);
+    void drawLines(LineShader&, gl::ObjectStore&);
+    void drawLineSDF(LineSDFShader&, gl::ObjectStore&);
+    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&);
 
 private:
     struct TriangleElement {
@@ -50,7 +49,7 @@ private:
             std::vector<TriangleElement>& triangleStore);
 
 public:
-    LineLayoutProperties layout;
+    style::LineLayoutProperties layout;
 
 private:
     LineVertexBuffer vertexBuffer;

@@ -2,7 +2,7 @@
 
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/style/types.hpp>
+#include <mbgl/util/font_stack.hpp>
 
 #include <string>
 

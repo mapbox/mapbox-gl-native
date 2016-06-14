@@ -57,11 +57,11 @@ bool FrameHistory::needsAnimation(const Duration& duration) const {
     return (time - previousTime) < duration;
 }
 
-void FrameHistory::upload(gl::GLObjectStore& glObjectStore) {
+void FrameHistory::upload(gl::ObjectStore& store) {
 
     if (changed) {
-        const bool first = !texture.created();
-        bind(glObjectStore);
+        const bool first = !texture;
+        bind(store);
 
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
@@ -94,10 +94,10 @@ void FrameHistory::upload(gl::GLObjectStore& glObjectStore) {
     }
 }
 
-void FrameHistory::bind(gl::GLObjectStore& glObjectStore) {
-    if (!texture.created()) {
-        texture.create(glObjectStore);
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+void FrameHistory::bind(gl::ObjectStore& store) {
+    if (!texture) {
+        texture = store.createTexture();
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
@@ -106,7 +106,7 @@ void FrameHistory::bind(gl::GLObjectStore& glObjectStore) {
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, texture.getID()));
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 
 }

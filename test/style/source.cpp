@@ -2,7 +2,7 @@
 #include <mbgl/test/stub_file_source.hpp>
 #include <mbgl/test/stub_style_observer.hpp>
 
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/io.hpp>
@@ -12,9 +12,11 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_update_parameters.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
+
+#include <mapbox/geojsonvt.hpp>
 
 using namespace mbgl;
 
@@ -28,9 +30,9 @@ public:
     Worker worker { 1 };
     gl::TexturePool texturePool;
     AnnotationManager annotationManager { 1.0 };
-    Style style { fileSource, 1.0 };
+    style::Style style { fileSource, 1.0 };
 
-    StyleUpdateParameters updateParameters {
+    style::UpdateParameters updateParameters {
         1.0,
         MapDebugOptions(),
         TimePoint(),
@@ -129,10 +131,10 @@ TEST(Source, RasterTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -158,10 +160,10 @@ TEST(Source, VectorTileEmpty) {
         FAIL() << "Should never be called";
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -187,10 +189,10 @@ TEST(Source, RasterTileFail) {
         test.end();
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -216,10 +218,10 @@ TEST(Source, VectorTileFail) {
         test.end();
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -244,10 +246,10 @@ TEST(Source, RasterTileCorrupt) {
         test.end();
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -272,15 +274,14 @@ TEST(Source, VectorTileCorrupt) {
     };
 
     // Need to have at least one layer that uses the source.
-    auto layer = std::make_unique<LineLayer>();
-    layer->source = "source";
-    layer->sourceLayer = "water";
+    auto layer = std::make_unique<LineLayer>("id");
+    layer->setSource("source", "water");
     test.style.addLayer(std::move(layer));
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -304,10 +305,10 @@ TEST(Source, RasterTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Raster, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Raster, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);
@@ -331,10 +332,10 @@ TEST(Source, VectorTileCancel) {
         FAIL() << "Should never be called";
     };
 
-    auto info = std::make_unique<SourceInfo>();
-    info->tiles = { "tiles" };
+    auto tileset = std::make_unique<Tileset>();
+    tileset->tiles = { "tiles" };
 
-    Source source(SourceType::Vector, "source", "", 512, std::move(info), nullptr);
+    Source source(SourceType::Vector, "source", "", 512, std::move(tileset), nullptr);
     source.setObserver(&test.observer);
     source.load(test.fileSource);
     source.update(test.updateParameters);

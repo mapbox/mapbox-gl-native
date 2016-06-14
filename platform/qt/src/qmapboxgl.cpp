@@ -1,14 +1,15 @@
 #include "qmapboxgl_p.hpp"
 
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
 
 #if QT_VERSION >= 0x050000
@@ -23,6 +24,7 @@
 #include <QMargins>
 #include <QString>
 #include <QStringList>
+#include <QThreadStorage>
 
 #include <memory>
 
@@ -66,6 +68,12 @@ static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingFrameF
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeWillStartRenderingMap) == mbgl::underlying_type(mbgl::MapChangeWillStartRenderingMap), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMap) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMap), "error");
 static_assert(mbgl::underlying_type(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered) == mbgl::underlying_type(mbgl::MapChangeDidFinishRenderingMapFullyRendered), "error");
+
+namespace {
+
+QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
+
+}
 
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
@@ -159,8 +167,14 @@ void QMapboxGLSettings::setAccessToken(const QString &token)
 
 QMapboxGL::QMapboxGL(QObject *parent_, const QMapboxGLSettings &settings)
     : QObject(parent_)
-    , d_ptr(new QMapboxGLPrivate(this, settings))
 {
+    // Multiple QMapboxGL running on the same thread
+    // will share the same mbgl::util::RunLoop
+    if (!loop.hasLocalData()) {
+        loop.setLocalData(std::make_shared<mbgl::util::RunLoop>());
+    }
+
+    d_ptr = new QMapboxGLPrivate(this, settings);
 }
 
 QMapboxGL::~QMapboxGL()
@@ -362,98 +376,51 @@ QStringList QMapboxGL::getClasses() const
     return classNames;
 }
 
-mbgl::PointAnnotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
+mbgl::Annotation fromPointAnnotation(const PointAnnotation &pointAnnotation) {
     const Coordinate &coordinate = pointAnnotation.first;
     const QString &icon = pointAnnotation.second;
-    return { { coordinate.first, coordinate.second }, icon.toStdString() };
+    return mbgl::SymbolAnnotation { mbgl::Point<double> { coordinate.second, coordinate.first }, icon.toStdString() };
 }
 
 AnnotationID QMapboxGL::addPointAnnotation(const PointAnnotation &pointAnnotation)
 {
-    return d_ptr->mapObj->addPointAnnotation(fromPointAnnotation(pointAnnotation));
-}
-
-AnnotationIDs QMapboxGL::addPointAnnotations(const PointAnnotations &pointAnnotations)
-{
-    std::vector<mbgl::PointAnnotation> mbglPointAnnotations;
-    mbglPointAnnotations.reserve(pointAnnotations.size());
-
-    for (const PointAnnotation &pointAnnotation : pointAnnotations) {
-        mbglPointAnnotations.emplace_back(fromPointAnnotation(pointAnnotation));
-    }
-
-    AnnotationIDs ids;
-    for (const mbgl::AnnotationID &id : d_ptr->mapObj->addPointAnnotations(mbglPointAnnotations)) {
-        ids << id;
-    }
-
-    return ids;
+    return d_ptr->mapObj->addAnnotation(fromPointAnnotation(pointAnnotation));
 }
 
 void QMapboxGL::updatePointAnnotation(AnnotationID id, const PointAnnotation &pointAnnotation)
 {
-    d_ptr->mapObj->updatePointAnnotation(id, fromPointAnnotation(pointAnnotation));
+    d_ptr->mapObj->updateAnnotation(id, fromPointAnnotation(pointAnnotation));
 }
 
-mbgl::ShapeAnnotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
+mbgl::Annotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
     const CoordinateSegments &segments = shapeAnnotation.first;
     const QString &styleLayer = shapeAnnotation.second;
 
-    mbgl::AnnotationSegments mbglAnnotationSegments;
-    mbglAnnotationSegments.reserve(segments.size());
+    mbgl::Polygon<double> polygon;
+    polygon.reserve(segments.size());
 
     for (const Coordinates &coordinates : segments) {
-        mbgl::AnnotationSegment mbglAnnotationSegment;
-        mbglAnnotationSegment.reserve(coordinates.size());
+        mbgl::LinearRing<double> linearRing;
+        linearRing.reserve(coordinates.size());
 
         for (const Coordinate &coordinate : coordinates) {
-            mbgl::LatLng mbglCoordinate(coordinate.first, coordinate.second);
-            mbglAnnotationSegment.emplace_back(mbglCoordinate);
+            linearRing.emplace_back(mbgl::Point<double>(coordinate.first, coordinate.second));
         }
 
-        mbglAnnotationSegments.emplace_back(mbglAnnotationSegment);
+        polygon.emplace_back(linearRing);
     }
 
-    return { mbglAnnotationSegments, styleLayer.toStdString() };
+    return mbgl::StyleSourcedAnnotation { polygon, styleLayer.toStdString() };
 }
 
 AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotation)
 {
-    return d_ptr->mapObj->addShapeAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
-}
-
-AnnotationIDs QMapboxGL::addShapeAnnotations(const ShapeAnnotations &shapeAnnotations)
-{
-    std::vector<mbgl::ShapeAnnotation> mbglShapeAnnotations;
-    mbglShapeAnnotations.reserve(shapeAnnotations.size());
-
-    for (const ShapeAnnotation &shapeAnnotation : shapeAnnotations) {
-        mbglShapeAnnotations.emplace_back(fromQMapboxGLShapeAnnotation(shapeAnnotation));
-    }
-
-    AnnotationIDs ids;
-    for (const mbgl::AnnotationID &id : d_ptr->mapObj->addShapeAnnotations(mbglShapeAnnotations)) {
-        ids << id;
-    }
-
-    return ids;
+    return d_ptr->mapObj->addAnnotation(fromQMapboxGLShapeAnnotation(shapeAnnotation));
 }
 
 void QMapboxGL::removeAnnotation(AnnotationID annotationID)
 {
     d_ptr->mapObj->removeAnnotation(annotationID);
-}
-
-void QMapboxGL::removeAnnotations(const AnnotationIDs &annotationIDs)
-{
-    std::vector<mbgl::AnnotationID> mbglAnnotationIds;
-    mbglAnnotationIds.reserve(annotationIDs.size());
-
-    for (const AnnotationID annotationID : annotationIDs) {
-        mbglAnnotationIds.emplace_back(annotationID);
-    }
-
-    d_ptr->mapObj->removeAnnotations(mbglAnnotationIds);
 }
 
 bool QMapboxGL::isRotating() const
@@ -497,7 +464,7 @@ void QMapboxGL::resize(const QSize& size)
     QSize converted = size / d_ptr->getPixelRatio();
     if (d_ptr->size == converted) return;
 
-    glViewport(0, 0, size.width(), size.height());
+    glViewport(0, 0, converted.width(), converted.height());
 
     d_ptr->size = converted;
     d_ptr->mapObj->update(mbgl::Update::Dimensions);
@@ -590,20 +557,20 @@ void QMapboxGL::addCustomLayer(const QString &id,
         void *context_,
         char *before)
 {
-    d_ptr->mapObj->addCustomLayer(
+    d_ptr->mapObj->addLayer(std::make_unique<mbgl::style::CustomLayer>(
             id.toStdString(),
-            reinterpret_cast<mbgl::CustomLayerInitializeFunction>(initFn),
+            reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initFn),
             // This cast is safe as long as both mbgl:: and QMapbox::
             // CustomLayerRenderParameters members remains the same.
-            (mbgl::CustomLayerRenderFunction)renderFn,
-            reinterpret_cast<mbgl::CustomLayerDeinitializeFunction>(deinitFn),
-            context_,
-            before == NULL ? nullptr : before);
+            (mbgl::style::CustomLayerRenderFunction)renderFn,
+            reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitFn),
+            context_),
+            before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
 void QMapboxGL::removeCustomLayer(const QString& id)
 {
-    d_ptr->mapObj->removeCustomLayer(id.toStdString());
+    d_ptr->mapObj->removeLayer(id.toStdString());
 }
 
 void QMapboxGL::render()

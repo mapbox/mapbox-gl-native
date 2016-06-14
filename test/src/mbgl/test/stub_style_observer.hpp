@@ -1,13 +1,14 @@
 #pragma once
 
-#include <mbgl/style/style_observer.hpp>
+#include <mbgl/style/observer.hpp>
 
-namespace mbgl {
+using namespace mbgl;
+using namespace mbgl::style;
 
 /**
- * An implementation of StyleObserver that forwards all methods to dynamically-settable lambas.
+ * An implementation of style::Observer that forwards all methods to dynamically-settable lambas.
  */
-class StubStyleObserver : public StyleObserver {
+class StubStyleObserver : public style::Observer {
 public:
     void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
         if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
@@ -42,8 +43,8 @@ public:
         if (tileError) tileError(source, tileID, error);
     }
 
-    void onResourceLoaded() override {
-        if (resourceLoaded) resourceLoaded();
+    void onNeedsRepaint() override {
+        if (needsRepaint) needsRepaint();
     };
 
     void onResourceError(std::exception_ptr error) override {
@@ -58,8 +59,6 @@ public:
     std::function<void (Source&, std::exception_ptr)> sourceError;
     std::function<void (Source&, const OverscaledTileID&, bool isNewTile)> tileLoaded;
     std::function<void (Source&, const OverscaledTileID&, std::exception_ptr)> tileError;
-    std::function<void ()> resourceLoaded;
+    std::function<void ()> needsRepaint;
     std::function<void (std::exception_ptr)> resourceError;
 };
-
-} // namespace mbgl

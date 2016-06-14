@@ -8,6 +8,7 @@
     '../../build/osx/config.gypi',
     '../../mbgl.gypi',
     '../../test/test.gypi',
+    '../../benchmark/benchmark.gypi',
     '../../bin/glfw.gypi',
     '../../bin/render.gypi',
     '../../bin/offline.gypi',
@@ -24,6 +25,19 @@
 
       'sources': [
         '../../test/src/main.cpp',
+      ],
+    },
+    {
+      'target_name': 'benchmark',
+      'type': 'executable',
+
+      'dependencies': [
+        'benchmark-lib',
+        'platform-lib',
+      ],
+
+      'sources': [
+        '../../benchmark/src/main.cpp',
       ],
     },
     {

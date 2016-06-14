@@ -1,14 +1,12 @@
 #pragma once
 
-#include <mbgl/style/render_item.hpp>
-#include <mbgl/style/zoom_history.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/property_transition.hpp>
-
-#include <mbgl/source/source_observer.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/observer.hpp>
+#include <mbgl/style/source_observer.hpp>
 #include <mbgl/text/glyph_store_observer.hpp>
 #include <mbgl/sprite/sprite_store_observer.hpp>
 #include <mbgl/map/mode.hpp>
+#include <mbgl/map/zoom_history.hpp>
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -19,25 +17,19 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <set>
 
 namespace mbgl {
 
 class FileSource;
 class GlyphAtlas;
-class GlyphStore;
-class SpriteStore;
 class SpriteAtlas;
 class LineAtlas;
-class StyleUpdateParameters;
-class StyleQueryParameters;
-class StyleObserver;
+class RenderData;
 
-struct RenderData {
-    Color backgroundColor = {{ 0, 0, 0, 0 }};
-    std::set<Source*> sources;
-    std::vector<RenderItem> order;
-};
+namespace style {
+
+class UpdateParameters;
+class QueryParameters;
 
 class Style : public GlyphStoreObserver,
               public SpriteStoreObserver,
@@ -47,15 +39,15 @@ public:
     Style(FileSource&, float pixelRatio);
     ~Style();
 
-    void setJSON(const std::string& data, const std::string& base);
+    void setJSON(const std::string&);
 
-    void setObserver(StyleObserver*);
+    void setObserver(Observer*);
 
     bool isLoaded() const;
 
     // Fetch the tiles needed by the current viewport and emit a signal when
     // a tile is ready so observers can render the tile.
-    void update(const StyleUpdateParameters&);
+    void update(const UpdateParameters&);
 
     void cascade(const TimePoint&, MapMode);
     void recalculate(float z, const TimePoint&, MapMode);
@@ -69,21 +61,21 @@ public:
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
 
-    std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
-    StyleLayer* getLayer(const std::string& id) const;
-    void addLayer(std::unique_ptr<StyleLayer>,
+    std::vector<std::unique_ptr<Layer>> getLayers() const;
+    Layer* getLayer(const std::string& id) const;
+    void addLayer(std::unique_ptr<Layer>,
                   optional<std::string> beforeLayerID = {});
     void removeLayer(const std::string& layerID);
 
-    bool addClass(const std::string&, const PropertyTransition& = {});
-    bool removeClass(const std::string&, const PropertyTransition& = {});
+    bool addClass(const std::string&, const TransitionOptions& = {});
+    bool removeClass(const std::string&, const TransitionOptions& = {});
     bool hasClass(const std::string&) const;
-    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
+    void setClasses(const std::vector<std::string>&, const TransitionOptions& = {});
     std::vector<std::string> getClasses() const;
 
     RenderData getRenderData() const;
 
-    std::vector<Feature> queryRenderedFeatures(const StyleQueryParameters&) const;
+    std::vector<Feature> queryRenderedFeatures(const QueryParameters&) const;
 
     float getQueryRadius() const;
 
@@ -101,11 +93,11 @@ public:
 
 private:
     std::vector<std::unique_ptr<Source>> sources;
-    std::vector<std::unique_ptr<StyleLayer>> layers;
+    std::vector<std::unique_ptr<Layer>> layers;
     std::vector<std::string> classes;
-    optional<PropertyTransition> transitionProperties;
+    optional<TransitionOptions> transitionProperties;
 
-    std::vector<std::unique_ptr<StyleLayer>>::const_iterator findLayer(const std::string& layerID) const;
+    std::vector<std::unique_ptr<Layer>>::const_iterator findLayer(const std::string& layerID) const;
 
     // GlyphStoreObserver implementation.
     void onGlyphsLoaded(const FontStack&, const GlyphRange&) override;
@@ -120,9 +112,10 @@ private:
     void onSourceError(Source&, std::exception_ptr) override;
     void onTileLoaded(Source&, const OverscaledTileID&, bool isNewTile) override;
     void onTileError(Source&, const OverscaledTileID&, std::exception_ptr) override;
-    void onPlacementRedone() override;
+    void onNeedsRepaint() override;
 
-    StyleObserver* observer = nullptr;
+    Observer nullObserver;
+    Observer* observer = &nullObserver;
 
     std::exception_ptr lastError;
 
@@ -135,4 +128,5 @@ public:
     Worker workers;
 };
 
+} // namespace style
 } // namespace mbgl

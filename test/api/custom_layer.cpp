@@ -4,12 +4,13 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
-#include <mbgl/layer/custom_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 using namespace mbgl;
+using namespace mbgl::style;
 
 static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
 static const GLchar * fragmentShaderSource = "void main() { gl_FragColor = vec4(0, 1, 0, 1); }";
@@ -76,8 +77,8 @@ TEST(CustomLayer, Basic) {
     StubFileSource fileSource;
 
     Map map(view, fileSource, MapMode::Still);
-    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"), "");
-    map.addCustomLayer(
+    map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    map.addLayer(std::make_unique<CustomLayer>(
         "custom",
         [] (void* context) {
             reinterpret_cast<TestLayer*>(context)->initialize();
@@ -87,7 +88,7 @@ TEST(CustomLayer, Basic) {
         },
         [] (void* context) {
             delete reinterpret_cast<TestLayer*>(context);
-        }, new TestLayer());
+        }, new TestLayer()));
 
     test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
 }

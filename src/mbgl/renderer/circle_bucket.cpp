@@ -2,10 +2,12 @@
 #include <mbgl/renderer/painter.hpp>
 
 #include <mbgl/shader/circle_shader.hpp>
-#include <mbgl/layer/circle_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/util/constants.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 CircleBucket::CircleBucket(MapMode mode_) : mode(mode_) {
 }
@@ -14,14 +16,14 @@ CircleBucket::~CircleBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void CircleBucket::upload(gl::GLObjectStore& glObjectStore) {
-    vertexBuffer_.upload(glObjectStore);
-    elementsBuffer_.upload(glObjectStore);
+void CircleBucket::upload(gl::ObjectStore& store) {
+    vertexBuffer_.upload(store);
+    elementsBuffer_.upload(store);
     uploaded = true;
 }
 
 void CircleBucket::render(Painter& painter,
-                        const StyleLayer& layer,
+                        const Layer& layer,
                         const UnwrappedTileID& tileID,
                         const mat4& matrix) {
     painter.renderCircle(*this, *layer.as<CircleLayer>(), tileID, matrix);
@@ -80,7 +82,7 @@ void CircleBucket::addGeometry(const GeometryCollection& geometryCollection) {
     }
 }
 
-void CircleBucket::drawCircles(CircleShader& shader, gl::GLObjectStore& glObjectStore) {
+void CircleBucket::drawCircles(CircleShader& shader, gl::ObjectStore& store) {
     GLbyte* vertexIndex = BUFFER_OFFSET(0);
     GLbyte* elementsIndex = BUFFER_OFFSET(0);
 
@@ -89,11 +91,13 @@ void CircleBucket::drawCircles(CircleShader& shader, gl::GLObjectStore& glObject
 
         if (!group->elements_length) continue;
 
-        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, glObjectStore);
+        group->array[0].bind(shader, vertexBuffer_, elementsBuffer_, vertexIndex, store);
 
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elementsIndex));
 
         vertexIndex += group->vertex_length * vertexBuffer_.itemSize;
         elementsIndex += group->elements_length * elementsBuffer_.itemSize;
     }
+}
+
 }

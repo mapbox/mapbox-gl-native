@@ -7,9 +7,9 @@
 
 using namespace mbgl;
 
-LinepatternShader::LinepatternShader(gl::GLObjectStore& glObjectStore)
-    : Shader("linepattern", shaders::linepattern::vertex, shaders::linepattern::fragment, glObjectStore) {
-    a_data = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"));
+LinepatternShader::LinepatternShader(gl::ObjectStore& store)
+    : Shader("linepattern", shaders::linepattern::vertex, shaders::linepattern::fragment, store)
+    , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 
 void LinepatternShader::bind(GLbyte* offset) {

@@ -7,7 +7,7 @@ namespace mbgl {
 
 class PatternShader : public Shader {
 public:
-    PatternShader(gl::GLObjectStore&);
+    PatternShader(gl::ObjectStore&);
 
     void bind(GLbyte *offset) final;
 

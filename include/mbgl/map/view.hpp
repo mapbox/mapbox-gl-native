@@ -36,8 +36,8 @@ public:
     // as a matched pair, in four situations:
     //
     //   1. When releasing GL resources during Map destruction
-    //   2. When calling a CustomLayerInitializeFunction, during Map::addCustomLayer
-    //   3. When calling a CustomLayerDeinitializeFunction, during Map::removeCustomLayer
+    //   2. When calling a CustomLayerInitializeFunction, during Map::addLayer
+    //   3. When calling a CustomLayerDeinitializeFunction, during Map::removeLayer
     //   4. When rendering for Map::renderStill
     //
     // They are *not* called for Map::render; it is assumed that the correct context is already

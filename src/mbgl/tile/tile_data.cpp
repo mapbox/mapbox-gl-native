@@ -1,14 +1,26 @@
 #include <mbgl/tile/tile_data.hpp>
+#include <mbgl/tile/tile_data_observer.hpp>
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/util/string.hpp>
 
 namespace mbgl {
 
+static TileDataObserver nullObserver;
+
 TileData::TileData(const OverscaledTileID& id_)
-    : id(id_) {
+    : id(id_), observer(&nullObserver) {
 }
 
 TileData::~TileData() = default;
+
+void TileData::setObserver(TileDataObserver* observer_) {
+    observer = observer_;
+}
+
+void TileData::setTriedOptional() {
+    triedOptional = true;
+    observer->onNeedsRepaint();
+}
 
 void TileData::dumpDebugLogs() const {
     Log::Info(Event::General, "TileData::id: %s", util::toString(id).c_str());

@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
-#include <mbgl/layer/line_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/shader/line_shader.hpp>
 #include <mbgl/shader/linesdf_shader.hpp>
 #include <mbgl/shader/linepattern_shader.hpp>
@@ -8,7 +9,9 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/mat2.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderLine(LineBucket& bucket,
                          const LineLayer& layer,
@@ -23,7 +26,7 @@ void Painter::renderLine(LineBucket& bucket,
     config.depthTest = GL_TRUE;
     config.depthMask = GL_FALSE;
 
-    const auto& properties = layer.paint;
+    const auto& properties = layer.impl->paint;
     const auto& layout = bucket.layout;
 
     // the distance over which the line edge fades out.
@@ -72,11 +75,11 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader->u_color = color;
         linesdfShader->u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, glObjectStore);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, glObjectStore);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, store);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, store);
 
-        const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.dashLineWidth;
-        const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.dashLineWidth;
+        const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
+        const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
 
         float scaleXA = 1.0 / tileID.pixelsToTileUnits(widthA, state.getIntegerZoom());
         float scaleYA = -posA.height / 2.0;
@@ -95,9 +98,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linesdfShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        lineAtlas->bind(glObjectStore);
+        lineAtlas->bind(store);
 
-        bucket.drawLineSDF(*linesdfShader, glObjectStore);
+        bucket.drawLineSDF(*linesdfShader, store);
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -137,9 +140,9 @@ void Painter::renderLine(LineBucket& bucket,
 
         linepatternShader->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
-        spriteAtlas->bind(true, glObjectStore);
+        spriteAtlas->bind(true, store);
 
-        bucket.drawLinePatterns(*linepatternShader, glObjectStore);
+        bucket.drawLinePatterns(*linepatternShader, store);
 
     } else {
         config.program = lineShader->getID();
@@ -157,6 +160,8 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader->u_color = color;
         lineShader->u_opacity = opacity;
 
-        bucket.drawLines(*lineShader, glObjectStore);
+        bucket.drawLines(*lineShader, store);
     }
+}
+
 }

@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     HeadlessView view(pixelRatio, width, height);
     Map map(view, fileSource, MapMode::Still);
 
-    map.setStyleJSON(style, ".");
+    map.setStyleJSON(style);
     map.setClasses(classes);
 
     map.setLatLngZoom({ lat, lon }, zoom);

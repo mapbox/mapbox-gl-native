@@ -1,3 +1,16 @@
+# 3.2.1
+
+- Fixes a memory leak in raster image data ([#5269](https://github.com/mapbox/mapbox-gl-native/pull/5269))
+
+# 3.2.0
+
+- Switches to [earcut.hpp](https://github.com/mapbox/earcut.hpp) for tessellation ([#2444](https://github.com/mapbox/mapbox-gl-native/pull/2444))
+
+# 3.1.3
+
+- Fixes a leak in TexturePoolHolder ([#5141](https://github.com/mapbox/mapbox-gl-native/pull/5141))
+- Fixes a bug where a callback would be fired after an AsyncRequest had been cancelled ([#5162](https://github.com/mapbox/mapbox-gl-native/pull/5162))
+
 # 3.1.2
 
 - Fixes a race condition with animated transitions ([#4836](https://github.com/mapbox/mapbox-gl-native/pull/4836))

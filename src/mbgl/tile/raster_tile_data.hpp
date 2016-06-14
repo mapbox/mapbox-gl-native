@@ -2,34 +2,50 @@
 
 #include <mbgl/tile/tile_data.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/tile/tile_source.hpp>
 
 namespace mbgl {
 
-class FileSource;
 class AsyncRequest;
-class StyleLayer;
+class Tileset;
+
 namespace gl { class TexturePool; }
+
+namespace style {
+class Layer;
+class UpdateParameters;
+}
 
 class RasterTileData : public TileData {
 public:
     RasterTileData(const OverscaledTileID&,
-                   float pixelRatio,
-                   const std::string& urlTemplate,
-                   gl::TexturePool&,
-                   Worker&,
-                   FileSource&,
-                   const std::function<void(std::exception_ptr)>& callback);
+                   const style::UpdateParameters&,
+                   const Tileset&);
     ~RasterTileData();
 
+    void setNecessity(Necessity) final;
+
+    void setError(std::exception_ptr err);
+
+    void setData(std::shared_ptr<const std::string> data,
+                 optional<Timestamp> modified_,
+                 optional<Timestamp> expires_);
+
     void cancel() override;
-    Bucket* getBucket(StyleLayer const &layer_desc) override;
+    Bucket* getBucket(const style::Layer&) override;
+
+    static std::shared_ptr<const std::string> parseData(std::shared_ptr<const std::string>);
 
 private:
     gl::TexturePool& texturePool;
     Worker& worker;
-    std::unique_ptr<AsyncRequest> req;
-    std::unique_ptr<Bucket> bucket;
+
+    TileSource<RasterTileData> tileSource;
     std::unique_ptr<AsyncRequest> workRequest;
+
+    // Contains the Bucket object for the tile. Buckets are render
+    // objects and they get added by tile parsing operations.
+    std::unique_ptr<Bucket> bucket;
 };
 
 } // namespace mbgl

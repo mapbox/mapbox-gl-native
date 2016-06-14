@@ -220,6 +220,26 @@ test('Map', function(t) {
             t.end();
         });
 
+        t.test('returns an error delayed', function(t) {
+            var delay = 0;
+            var map = new mbgl.Map({
+                request: function(req, callback) {
+                    delay += 100;
+                    setTimeout(function() {
+                        callback(new Error('not found'));
+                    }, delay);
+                },
+                ratio: 1
+            });
+            map.load(style);
+            map.render({ zoom: 1 }, function(err, data) {
+                map.release();
+
+                t.ok(err, 'returns error');
+                t.end();
+            });
+        });
+
         t.test('returns an error', function(t) {
             var map = new mbgl.Map(options);
             map.load(style);

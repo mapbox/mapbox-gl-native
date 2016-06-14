@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
@@ -10,9 +11,11 @@
 
 namespace mbgl {
 
+namespace style {
 class Style;
+}
+
 class CollisionTile;
-enum class TranslateAnchorType : bool;
 class CanonicalTileID;
 
 class IndexedSubfeature {
@@ -39,12 +42,12 @@ public:
             const optional<std::vector<std::string>>& layerIDs,
             const GeometryTile&,
             const CanonicalTileID&,
-            const Style&) const;
+            const style::Style&) const;
 
     static optional<GeometryCollection> translateQueryGeometry(
             const GeometryCollection& queryGeometry,
             const std::array<float, 2>& translate,
-            const TranslateAnchorType,
+            const style::TranslateAnchorType,
             const float bearing,
             const float pixelsToTileUnits);
 
@@ -60,7 +63,7 @@ private:
             const optional<std::vector<std::string>>& filterLayerIDs,
             const GeometryTile&,
             const CanonicalTileID&,
-            const Style&,
+            const style::Style&,
             const float bearing,
             const float pixelsToTileUnits) const;
 

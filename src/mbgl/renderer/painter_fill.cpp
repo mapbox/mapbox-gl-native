@@ -1,19 +1,22 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
-#include <mbgl/layer/fill_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/shader/outline_shader.hpp>
 #include <mbgl/shader/outlinepattern_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderFill(FillBucket& bucket,
                          const FillLayer& layer,
                          const UnwrappedTileID& tileID,
                          const mat4& matrix) {
-    const FillPaintProperties& properties = layer.paint;
+    const FillPaintProperties& properties = layer.impl->paint;
     mat4 vtxMatrix =
         translatedMatrix(matrix, properties.fillTranslate, tileID, properties.fillTranslateAnchor);
 
@@ -52,7 +55,7 @@ void Painter::renderFill(FillBucket& bucket,
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->u_color = stroke_color;
+        outlineShader->u_outline_color = stroke_color;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line
@@ -61,7 +64,7 @@ void Painter::renderFill(FillBucket& bucket,
             static_cast<float>(frame.framebufferSize[1])
         }};
         setDepthSublayer(0);
-        bucket.drawVertices(*outlineShader, glObjectStore);
+        bucket.drawVertices(*outlineShader, store);
     }
 
     if (pattern) {
@@ -112,11 +115,11 @@ void Painter::renderFill(FillBucket& bucket,
             patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
             config.activeTexture = GL_TEXTURE0;
-            spriteAtlas->bind(true, glObjectStore);
+            spriteAtlas->bind(true, store);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, glObjectStore);
+            bucket.drawElements(*patternShader, store);
 
             if (properties.fillAntialias && stroke_color == fill_color) {
                 config.program = outlinePatternShader->getID();
@@ -150,10 +153,10 @@ void Painter::renderFill(FillBucket& bucket,
                 outlinePatternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
 
                 config.activeTexture = GL_TEXTURE0;
-                spriteAtlas->bind(true, glObjectStore);
+                spriteAtlas->bind(true, store);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, glObjectStore);
+                bucket.drawVertices(*outlinePatternShader, store);
             }
         }
     } else if (!wireframe) {
@@ -170,7 +173,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, glObjectStore);
+            bucket.drawElements(*plainShader, store);
         }
     }
 
@@ -181,7 +184,7 @@ void Painter::renderFill(FillBucket& bucket,
         outlineShader->u_matrix = vtxMatrix;
         config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-        outlineShader->u_color = fill_color;
+        outlineShader->u_outline_color = fill_color;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line
@@ -191,6 +194,8 @@ void Painter::renderFill(FillBucket& bucket,
         }};
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, glObjectStore);
+        bucket.drawVertices(*outlineShader, store);
     }
+}
+
 }

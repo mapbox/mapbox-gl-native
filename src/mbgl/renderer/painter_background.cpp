@@ -1,18 +1,21 @@
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/layer/background_layer.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
-using namespace mbgl;
+namespace mbgl {
+
+using namespace style;
 
 void Painter::renderBackground(const BackgroundLayer& layer) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
-    const BackgroundPaintProperties& properties = layer.paint;
+    const BackgroundPaintProperties& properties = layer.impl->paint;
 
     bool isPatterned = !properties.backgroundPattern.value.to.empty();// && false;
     optional<SpriteAtlasPosition> imagePosA;
@@ -37,8 +40,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader->u_mix = properties.backgroundPattern.value.t;
         patternShader->u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, glObjectStore);
-        backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
+        spriteAtlas->bind(true, store);
+        backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
 
     } else {
         if (wireframe) {
@@ -50,7 +53,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         }
 
         config.program = plainShader->getID();
-        backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), glObjectStore);
+        backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
     }
 
     config.stencilTest = GL_FALSE;
@@ -105,4 +108,6 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
     }
+}
+
 }

@@ -1,15 +1,6 @@
 #pragma once
 
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/tile/tile_id.hpp>
-
-#include <unordered_map>
-
-namespace mapbox {
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-} // namespace mapbox
 
 namespace mbgl {
 
@@ -50,26 +41,6 @@ public:
 
 private:
     const std::shared_ptr<GeoJSONTileLayer> layer;
-};
-
-class GeoJSONTileMonitor : public GeometryTileMonitor {
-public:
-    GeoJSONTileMonitor(mapbox::geojsonvt::GeoJSONVT*, const OverscaledTileID&);
-    virtual ~GeoJSONTileMonitor();
-
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
-
-    void setGeoJSONVT(mapbox::geojsonvt::GeoJSONVT*);
-
-private:
-    void update();
-
-public:
-    const OverscaledTileID tileID;
-
-private:
-    mapbox::geojsonvt::GeoJSONVT* geojsonvt = nullptr;
-    GeometryTileMonitor::Callback callback;
 };
 
 } // namespace mbgl

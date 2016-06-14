@@ -3,21 +3,18 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_observer.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/property_transition.hpp>
-#include <mbgl/style/style_update_parameters.hpp>
-#include <mbgl/style/style_query_parameters.hpp>
-#include <mbgl/layer/custom_layer.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/observer.hpp>
+#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/style/query_parameters.hpp>
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
@@ -28,28 +25,30 @@
 
 namespace mbgl {
 
-enum class RenderState {
-    never,
-    partial,
-    fully
+using namespace style;
+
+enum class RenderState : uint8_t {
+    Never,
+    Partial,
+    Fully,
 };
 
-class Map::Impl : public StyleObserver {
+class Map::Impl : public style::Observer {
 public:
     Impl(View&, FileSource&, MapMode, GLContextMode, ConstrainMode, ViewportMode);
 
-    void onResourceLoaded() override;
+    void onNeedsRepaint() override;
     void onResourceError(std::exception_ptr) override;
 
     void update();
     void render();
 
-    void loadStyleJSON(const std::string& json, const std::string& base);
+    void loadStyleJSON(const std::string&);
 
     View& view;
     FileSource& fileSource;
 
-    RenderState renderState = RenderState::never;
+    RenderState renderState = RenderState::Never;
     Transform transform;
 
     const MapMode mode;
@@ -58,7 +57,7 @@ public:
 
     MapDebugOptions debugOptions { MapDebugOptions::NoDebug };
 
-    gl::GLObjectStore glObjectStore;
+    gl::ObjectStore store;
     Update updateFlags = Update::Nothing;
     util::AsyncTask asyncUpdate;
 
@@ -109,13 +108,13 @@ Map::~Map() {
     impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by glObjectStore.performCleanup();
+    // cleaned up by store.performCleanup();
     impl->style.reset();
     impl->painter.reset();
     impl->texturePool.reset();
     impl->annotationManager.reset();
 
-    impl->glObjectStore.performCleanup();
+    impl->store.performCleanup();
 
     impl->view.deactivate();
 }
@@ -165,7 +164,7 @@ void Map::render() {
         return;
     }
 
-    if (impl->renderState == RenderState::never) {
+    if (impl->renderState == RenderState::Never) {
         impl->view.notifyMapChange(MapChangeWillStartRenderingMap);
     }
 
@@ -180,9 +179,9 @@ void Map::render() {
         MapChangeDidFinishRenderingFrame);
 
     if (!isFullyLoaded()) {
-        impl->renderState = RenderState::partial;
-    } else if (impl->renderState != RenderState::fully) {
-        impl->renderState = RenderState::fully;
+        impl->renderState = RenderState::Partial;
+    } else if (impl->renderState != RenderState::Fully) {
+        impl->renderState = RenderState::Fully;
         impl->view.notifyMapChange(MapChangeDidFinishRenderingMapFullyRendered);
         if (impl->loading) {
             impl->loading = false;
@@ -224,17 +223,17 @@ void Map::Impl::update() {
         style->recalculate(transform.getZoom(), timePoint, mode);
     }
 
-    StyleUpdateParameters parameters(pixelRatio,
-                                     debugOptions,
-                                     timePoint,
-                                     transform.getState(),
-                                     style->workers,
-                                     fileSource,
-                                     *texturePool,
-                                     style->shouldReparsePartialTiles,
-                                     mode,
-                                     *annotationManager,
-                                     *style);
+    style::UpdateParameters parameters(pixelRatio,
+                                       debugOptions,
+                                       timePoint,
+                                       transform.getState(),
+                                       style->workers,
+                                       fileSource,
+                                       *texturePool,
+                                       style->shouldReparsePartialTiles,
+                                       mode,
+                                       *annotationManager,
+                                       *style);
 
     style->update(parameters);
 
@@ -251,7 +250,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), glObjectStore);
+        painter = std::make_unique<Painter>(transform.getState(), store);
     }
 
     FrameData frameData { view.getFramebufferSize(),
@@ -270,7 +269,7 @@ void Map::Impl::render() {
         callback = nullptr;
     }
 
-    glObjectStore.performCleanup();
+    store.performCleanup();
 
     if (style->hasTransitions()) {
         updateFlags |= Update::RecalculateStyle;
@@ -298,13 +297,7 @@ void Map::setStyleURL(const std::string& url) {
 
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
-    const size_t pos = impl->styleURL.rfind('/');
-    std::string base = "";
-    if (pos != std::string::npos) {
-        base = impl->styleURL.substr(0, pos + 1);
-    }
-
-    impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this, base](Response res) {
+    impl->styleRequest = impl->fileSource.request(Resource::style(impl->styleURL), [this](Response res) {
         if (res.error) {
             if (res.error->reason == Response::Error::Reason::NotFound &&
                 util::mapbox::isMapboxURL(impl->styleURL)) {
@@ -315,12 +308,12 @@ void Map::setStyleURL(const std::string& url) {
         } else if (res.notModified || res.noContent) {
             return;
         } else {
-            impl->loadStyleJSON(*res.data, base);
+            impl->loadStyleJSON(*res.data);
         }
     });
 }
 
-void Map::setStyleJSON(const std::string& json, const std::string& base) {
+void Map::setStyleJSON(const std::string& json) {
     if (impl->styleJSON == json) {
         return;
     }
@@ -333,11 +326,11 @@ void Map::setStyleJSON(const std::string& json, const std::string& base) {
     impl->styleJSON.clear();
     impl->style = std::make_unique<Style>(impl->fileSource, impl->pixelRatio);
 
-    impl->loadStyleJSON(json, base);
+    impl->loadStyleJSON(json);
 }
 
-void Map::Impl::loadStyleJSON(const std::string& json, const std::string& base) {
-    style->setJSON(json, base);
+void Map::Impl::loadStyleJSON(const std::string& json) {
+    style->setJSON(json);
     style->setObserver(this);
     styleJSON = json;
 
@@ -481,13 +474,12 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, optional<EdgeInsets> 
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, optional<EdgeInsets> padding) const {
-    AnnotationSegment segment = {
+    return cameraForLatLngs({
         bounds.northwest(),
         bounds.southwest(),
         bounds.southeast(),
         bounds.northeast(),
-    };
-    return cameraForLatLngs(segment, padding);
+    }, padding);
 }
 
 CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional<EdgeInsets> padding) const {
@@ -694,37 +686,19 @@ double Map::getTopOffsetPixelsForAnnotationIcon(const std::string& name) {
     return impl->annotationManager->getTopOffsetPixelsForIcon(name);
 }
 
-AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
-    return addPointAnnotations({ annotation }).front();
-}
-
-AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
-    auto result = impl->annotationManager->addPointAnnotations(annotations, getMaxZoom());
+AnnotationID Map::addAnnotation(const Annotation& annotation) {
+    auto result = impl->annotationManager->addAnnotation(annotation, getMaxZoom());
     update(Update::Annotations);
     return result;
 }
 
-AnnotationID Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
-    return addShapeAnnotations({ annotation }).front();
-}
-
-AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
-    auto result = impl->annotationManager->addShapeAnnotations(annotations, getMaxZoom());
-    update(Update::Annotations);
-    return result;
-}
-
-void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
-    impl->annotationManager->updatePointAnnotation(annotationId, annotation, getMaxZoom());
+void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
+    impl->annotationManager->updateAnnotation(id, annotation, getMaxZoom());
     update(Update::Annotations);
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
-    removeAnnotations({ annotation });
-}
-
-void Map::removeAnnotations(const AnnotationIDs& annotations) {
-    impl->annotationManager->removeAnnotations(annotations);
+    impl->annotationManager->removeAnnotation(annotation);
     update(Update::Annotations);
 }
 
@@ -762,24 +736,17 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
 
 #pragma mark - Style API
 
-void Map::addCustomLayer(const std::string& id,
-                         CustomLayerInitializeFunction initialize,
-                         CustomLayerRenderFunction render_,
-                         CustomLayerDeinitializeFunction deinitialize,
-                         void* context_,
-                         const char* before) {
+void Map::addLayer(std::unique_ptr<Layer> layer, const optional<std::string>& before) {
     impl->view.activate();
 
-    impl->style->addLayer(
-        std::make_unique<CustomLayer>(id, initialize, render_, deinitialize, context_),
-        before ? std::string(before) : optional<std::string>());
+    impl->style->addLayer(std::move(layer), before);
     impl->updateFlags |= Update::Classes;
     impl->asyncUpdate.send();
 
     impl->view.deactivate();
 }
 
-void Map::removeCustomLayer(const std::string& id) {
+void Map::removeLayer(const std::string& id) {
     impl->view.activate();
 
     impl->style->removeLayer(id);
@@ -828,19 +795,19 @@ bool Map::isFullyLoaded() const {
     return impl->style->isLoaded();
 }
 
-void Map::addClass(const std::string& className, const PropertyTransition& properties) {
+void Map::addClass(const std::string& className, const TransitionOptions& properties) {
     if (impl->style->addClass(className, properties)) {
         update(Update::Classes);
     }
 }
 
-void Map::removeClass(const std::string& className, const PropertyTransition& properties) {
+void Map::removeClass(const std::string& className, const TransitionOptions& properties) {
     if (impl->style->removeClass(className, properties)) {
         update(Update::Classes);
     }
 }
 
-void Map::setClasses(const std::vector<std::string>& classNames, const PropertyTransition& properties) {
+void Map::setClasses(const std::vector<std::string>& classNames, const TransitionOptions& properties) {
     impl->style->setClasses(classNames, properties);
     update(Update::Classes);
 }
@@ -863,12 +830,13 @@ void Map::setSourceTileCacheSize(size_t size) {
 }
 
 void Map::onLowMemory() {
+    impl->store.performCleanup();
     if (!impl->style) return;
     impl->style->onLowMemory();
     impl->view.invalidate();
 }
 
-void Map::Impl::onResourceLoaded() {
+void Map::Impl::onNeedsRepaint() {
     updateFlags |= Update::Repaint;
     asyncUpdate.send();
 }

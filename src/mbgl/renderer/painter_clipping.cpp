@@ -1,5 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/shader/plain_shader.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/string.hpp>
@@ -22,7 +22,7 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
     config.colorMask = { GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE };
     config.stencilMask = mask;
 
-    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET_0, glObjectStore);
+    coveringPlainArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET_0, store);
 
     for (const auto& stencil : stencils) {
         const auto& id = stencil.first;

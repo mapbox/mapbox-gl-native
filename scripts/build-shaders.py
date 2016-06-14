@@ -18,6 +18,28 @@ shader_name, shader_type, extension = os.path.basename(input_file).split('.')
 with open(input_file, "r") as f:
     data = f.read()
 
+# Replace uniform pragmas
+
+pragma_mapbox_regex = re.compile("(\s*)\#pragma \mapbox\: (define|initialize) (low|medium|high)p (float|vec(2|3|4)) (.*)")
+
+def replace_uniform_pragmas(line):
+    if pragma_mapbox_regex.match(line):
+        params = line.split()
+        if params[2] == "define":
+            return """uniform {u_precision} {u_type} u_{u_name};""".format(
+                    u_precision = params[3],
+                    u_type = params[4],
+                    u_name = params[5])
+        else:
+            return """    {u_precision} {u_type} {u_name} = u_{u_name};""".format(
+                    u_precision = params[3],
+                    u_type = params[4],
+                    u_name = params[5])
+    else:
+        return line
+
+data = "\n".join([replace_uniform_pragmas(line) for line in data.split("\n")])
+
 content = """#pragma once
 
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.

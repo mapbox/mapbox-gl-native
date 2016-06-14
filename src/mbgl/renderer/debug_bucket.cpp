@@ -38,16 +38,16 @@ DebugBucket::DebugBucket(const OverscaledTileID& id,
     }
 }
 
-void DebugBucket::drawLines(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
+void DebugBucket::drawLines(PlainShader& shader, gl::ObjectStore& store) {
     if (!fontBuffer.empty()) {
-        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
+        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, store);
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, (GLsizei)(fontBuffer.index())));
     }
 }
 
-void DebugBucket::drawPoints(PlainShader& shader, gl::GLObjectStore& glObjectStore) {
+void DebugBucket::drawPoints(PlainShader& shader, gl::ObjectStore& store) {
     if (!fontBuffer.empty()) {
-        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, glObjectStore);
+        array.bind(shader, fontBuffer, BUFFER_OFFSET_0, store);
         MBGL_CHECK_ERROR(glDrawArrays(GL_POINTS, 0, (GLsizei)(fontBuffer.index())));
     }
 }

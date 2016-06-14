@@ -43,6 +43,12 @@ else:
     tag = DEFAULT_TAG
     rev = DEFAULT_REV
 
+tag = tag + [0, 0, 0]
+tag = tag[0:3]
+
+print "Tag: {0}".format(tag)
+print "Rev: {0}".format(rev)
+
 header = """// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 #pragma once
 

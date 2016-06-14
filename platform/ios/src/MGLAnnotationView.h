@@ -11,9 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
  Initializes and returns a new annotation view object.
  
  @param reuseIdentifier The string that identifies that this annotation view is reusable.
- @return The initialized annotation view object or `nil` if there was a problem initializing the object.
+ @return The initialized annotation view object.
  */
-- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier;
+- (instancetype)initWithReuseIdentifier:(nullable NSString *)reuseIdentifier;
 
 /**
  The string that identifies that this annotation view is reusable. (read-only)
@@ -40,6 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, getter=isFlat) BOOL flat;
 
+/**
+ Setting this property to YES will cause the annotation view to shrink as it approaches the horizon and grow as it moves away from the
+ horizon when the associated map view is tilted. Conversely, setting this property to NO will ensure that the annotation view maintains
+ a constant size even when the map view is tilted. To maintain consistency with annotation representations that are not backed by an
+ MGLAnnotationView object, the default value of this property is YES.
+ */
+@property (nonatomic, assign, getter=isScaledWithViewingDistance) BOOL scalesWithViewingDistance;
 
 /**
  Called when the view is removed from the reuse queue.

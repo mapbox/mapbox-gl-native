@@ -1,6 +1,7 @@
 # Mapbox Qt SDK
 
 [![Travis](https://travis-ci.org/mapbox/mapbox-gl-native.svg?branch=master)](https://travis-ci.org/mapbox/mapbox-gl-native/builds)
+[![Bitrise](https://www.bitrise.io/app/96cfbc97e0245c22.svg?token=GxsqIOGPXhn0F23sSVSsYA&branch=master)](https://www.bitrise.io/app/96cfbc97e0245c22)
 
 Provides [Qt](http://www.qt.io/) example applications and APIs via `QMapboxGL`
 and `QQuickMapboxGL`:

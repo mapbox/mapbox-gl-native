@@ -2,36 +2,36 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 
-#include <algorithm>
+#include <unique_resource.hpp>
+
 #include <memory>
-#include <vector>
 
 namespace mbgl {
 namespace gl {
 
+class TexturePool;
+
+struct TextureReleaser {
+    TexturePool* pool;
+    void operator()(GLuint) const;
+};
+
+using PooledTexture = std_experimental::unique_resource<GLuint, TextureReleaser>;
+
 class TexturePool : private util::noncopyable {
 public:
-    GLuint getTextureID(gl::GLObjectStore&);
-    void releaseTextureID(GLuint);
+    TexturePool();
+    ~TexturePool();
+
+    PooledTexture acquireTexture(gl::ObjectStore&);
 
 private:
-    class Impl : private util::noncopyable {
-    public:
-        Impl(gl::GLObjectStore& glObjectStore) : ids(gl::TexturePoolHolder::TextureMax) {
-            pool.create(glObjectStore);
-            std::copy(pool.getIDs().begin(), pool.getIDs().end(), ids.begin());
-        }
+    friend TextureReleaser;
 
-        Impl(Impl&& o) : pool(std::move(o.pool)), ids(std::move(o.ids)) {}
-        Impl& operator=(Impl&& o) { pool = std::move(o.pool); ids = std::move(o.ids); return *this; }
-
-        gl::TexturePoolHolder pool;
-        std::vector<GLuint> ids;
-    };
-
-    std::vector<Impl> pools;
+    class Impl;
+    const std::unique_ptr<Impl> impl;
 };
 
 } // namespace gl

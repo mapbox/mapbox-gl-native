@@ -1,7 +1,8 @@
 #pragma once
 
 #include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <map>
@@ -20,14 +21,14 @@ public:
     ~LineAtlas();
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::GLObjectStore&);
+    void bind(gl::ObjectStore&);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::GLObjectStore&);
+    void upload(gl::ObjectStore&);
 
-    LinePatternPos getDashPosition(const std::vector<float>&, bool, gl::GLObjectStore&);
-    LinePatternPos addDash(const std::vector<float> &dasharray, bool round, gl::GLObjectStore&);
+    LinePatternPos getDashPosition(const std::vector<float>&, bool, gl::ObjectStore&);
+    LinePatternPos addDash(const std::vector<float> &dasharray, bool round, gl::ObjectStore&);
 
     const GLsizei width;
     const GLsizei height;
@@ -35,7 +36,7 @@ public:
 private:
     const std::unique_ptr<GLbyte[]> data;
     bool dirty;
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
     int nextRow = 0;
     std::map<size_t, LinePatternPos> positions;
 };

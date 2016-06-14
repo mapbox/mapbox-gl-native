@@ -5,7 +5,6 @@
 #include <mbgl/map/view.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #include <QMapboxGL>
 #include <QObject>
@@ -33,8 +32,6 @@ public:
     QSize size;
 
     QMapboxGL *q_ptr = nullptr;
-
-    mbgl::util::RunLoop loop;
 
     std::unique_ptr<mbgl::DefaultFileSource> fileSourceObj;
     std::unique_ptr<mbgl::Map> mapObj;

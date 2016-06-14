@@ -46,6 +46,7 @@ private:
     friend class VectorTileFeature;
 
     std::string name;
+    uint32_t version = 1;
     uint32_t extent = 4096;
     std::map<std::string, uint32_t> keysMap;
     std::vector<std::reference_wrapper<const std::string>> keys;
@@ -63,22 +64,6 @@ private:
     std::shared_ptr<const std::string> data;
     mutable bool parsed = false;
     mutable std::map<std::string, util::ptr<GeometryTileLayer>> layers;
-};
-
-class TileID;
-class FileSource;
-
-class VectorTileMonitor : public GeometryTileMonitor {
-public:
-    VectorTileMonitor(const OverscaledTileID&, float pixelRatio, const std::string& urlTemplate, FileSource&);
-
-    std::unique_ptr<AsyncRequest> monitorTile(const GeometryTileMonitor::Callback&) override;
-
-private:
-    OverscaledTileID tileID;
-    float pixelRatio;
-    std::string urlTemplate;
-    FileSource& fileSource;
 };
 
 } // namespace mbgl

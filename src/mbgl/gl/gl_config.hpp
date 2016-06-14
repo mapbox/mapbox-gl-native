@@ -12,7 +12,7 @@ namespace gl {
 template <typename T>
 class Value {
 public:
-    inline void operator=(const typename T::Type& value) {
+    void operator=(const typename T::Type& value) {
         if (dirty || current != value) {
             dirty = false;
             current = value;
@@ -20,14 +20,22 @@ public:
         }
     }
 
-    inline void reset() {
+    void reset() {
         dirty = true;
         current = T::Default;
         T::Set(current);
     }
 
-    inline void setDirty() {
+    void setDirty() {
         dirty = true;
+    }
+
+    typename T::Type getCurrent() {
+        return current;
+    }
+
+    bool getDirty() {
+        return dirty;
     }
 
 private:

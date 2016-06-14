@@ -7,11 +7,11 @@
 
 using namespace mbgl;
 
-IconShader::IconShader(gl::GLObjectStore& glObjectStore)
-    : Shader("icon", shaders::icon::vertex, shaders::icon::fragment, glObjectStore) {
-    a_offset = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset"));
-    a_data1 = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1"));
-    a_data2 = MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"));
+IconShader::IconShader(gl::ObjectStore& store)
+    : Shader("icon", shaders::icon::vertex, shaders::icon::fragment, store)
+    , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
+    , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
+    , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {
 }
 
 void IconShader::bind(GLbyte* offset) {

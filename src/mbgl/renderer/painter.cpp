@@ -1,17 +1,17 @@
 #include <mbgl/renderer/painter.hpp>
 
-#include <mbgl/source/source.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/tile/tile.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/style/style.hpp>
-#include <mbgl/style/style_layer.hpp>
-#include <mbgl/style/style_render_parameters.hpp>
+#include <mbgl/style/layer_impl.hpp>
 
-#include <mbgl/layer/background_layer.hpp>
-#include <mbgl/layer/custom_layer.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/custom_layer_impl.hpp>
 
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
@@ -45,26 +45,28 @@
 #include <algorithm>
 #include <iostream>
 
-using namespace mbgl;
+namespace mbgl {
 
-Painter::Painter(const TransformState& state_, gl::GLObjectStore& glObjectStore_)
+using namespace style;
+
+Painter::Painter(const TransformState& state_, gl::ObjectStore& store_)
     : state(state_),
-      glObjectStore(glObjectStore_) {
+      store(store_) {
     gl::debugging::enable();
 
-    plainShader = std::make_unique<PlainShader>(glObjectStore);
-    outlineShader = std::make_unique<OutlineShader>(glObjectStore);
-    outlinePatternShader = std::make_unique<OutlinePatternShader>(glObjectStore);
-    lineShader = std::make_unique<LineShader>(glObjectStore);
-    linesdfShader = std::make_unique<LineSDFShader>(glObjectStore);
-    linepatternShader = std::make_unique<LinepatternShader>(glObjectStore);
-    patternShader = std::make_unique<PatternShader>(glObjectStore);
-    iconShader = std::make_unique<IconShader>(glObjectStore);
-    rasterShader = std::make_unique<RasterShader>(glObjectStore);
-    sdfGlyphShader = std::make_unique<SDFGlyphShader>(glObjectStore);
-    sdfIconShader = std::make_unique<SDFIconShader>(glObjectStore);
-    collisionBoxShader = std::make_unique<CollisionBoxShader>(glObjectStore);
-    circleShader = std::make_unique<CircleShader>(glObjectStore);
+    plainShader = std::make_unique<PlainShader>(store);
+    outlineShader = std::make_unique<OutlineShader>(store);
+    outlinePatternShader = std::make_unique<OutlinePatternShader>(store);
+    lineShader = std::make_unique<LineShader>(store);
+    linesdfShader = std::make_unique<LineSDFShader>(store);
+    linepatternShader = std::make_unique<LinepatternShader>(store);
+    patternShader = std::make_unique<PatternShader>(store);
+    iconShader = std::make_unique<IconShader>(store);
+    rasterShader = std::make_unique<RasterShader>(store);
+    sdfGlyphShader = std::make_unique<SDFGlyphShader>(store);
+    sdfIconShader = std::make_unique<SDFIconShader>(store);
+    collisionBoxShader = std::make_unique<CollisionBoxShader>(store);
+    circleShader = std::make_unique<CircleShader>(store);
 
     // Reset GL values
     config.reset();
@@ -97,8 +99,10 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
-    // The extrusion matrix.
-    matrix::ortho(extrudeMatrix, 0, state.getWidth(), state.getHeight(), 0, 0, -1);
+    // The extrusion scale.
+    const float flippedY = state.getViewportMode() == ViewportMode::FlippedY;
+    extrudeScale = {{ 2.0f / state.getWidth() * state.getAltitude(),
+                      (flippedY ? 2.0f : -2.0f) / state.getHeight() * state.getAltitude() }};
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.
@@ -113,17 +117,17 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(glObjectStore);
-        tileBorderBuffer.upload(glObjectStore);
-        spriteAtlas->upload(glObjectStore);
-        lineAtlas->upload(glObjectStore);
-        glyphAtlas->upload(glObjectStore);
-        frameHistory.upload(glObjectStore);
-        annotationSpriteAtlas.upload(glObjectStore);
+        tileStencilBuffer.upload(store);
+        tileBorderBuffer.upload(store);
+        spriteAtlas->upload(store);
+        lineAtlas->upload(store);
+        glyphAtlas->upload(store);
+        frameHistory.upload(store);
+        annotationSpriteAtlas.upload(store);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(glObjectStore);
+                item.bucket->upload(store);
             }
         }
     }
@@ -237,9 +241,9 @@ void Painter::renderPass(RenderPass pass_,
         currentLayer = i;
 
         const auto& item = *it;
-        const StyleLayer& layer = item.layer;
+        const Layer& layer = item.layer;
 
-        if (!layer.hasRenderPass(pass))
+        if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
         if (pass == RenderPass::Translucent) {
@@ -256,12 +260,12 @@ void Painter::renderPass(RenderPass pass_,
             MBGL_DEBUG_GROUP("background");
             renderBackground(*layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
-            MBGL_DEBUG_GROUP(layer.id + " - custom");
+            MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
-            layer.as<CustomLayer>()->render(state);
+            layer.as<CustomLayer>()->impl->render(state);
             config.setDirty();
         } else {
-            MBGL_DEBUG_GROUP(layer.id + " - " + util::toString(item.tile->id));
+            MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }
@@ -304,4 +308,6 @@ void Painter::setDepthSublayer(int n) {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
     config.depthRange = { nearDepth, farDepth };
+}
+
 }

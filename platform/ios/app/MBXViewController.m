@@ -306,6 +306,22 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
             free(polygonCoordinates);
         }
+        
+        CLLocationCoordinate2D innerCoordinates[] = {
+            CLLocationCoordinate2DMake(-5, -5),
+            CLLocationCoordinate2DMake(-5, 5),
+            CLLocationCoordinate2DMake(5, 5),
+            CLLocationCoordinate2DMake(5, -5),
+        };
+        MGLPolygon *innerPolygon = [MGLPolygon polygonWithCoordinates:innerCoordinates count:sizeof(innerCoordinates) / sizeof(innerCoordinates[0])];
+        CLLocationCoordinate2D outerCoordinates[] = {
+            CLLocationCoordinate2DMake(-10, -20),
+            CLLocationCoordinate2DMake(-10, 10),
+            CLLocationCoordinate2DMake(10, 10),
+            CLLocationCoordinate2DMake(10, -10),
+        };
+        MGLPolygon *outerPolygon = [MGLPolygon polygonWithCoordinates:outerCoordinates count:sizeof(outerCoordinates) / sizeof(outerCoordinates[0]) interiorPolygons:@[innerPolygon]];
+        [self.mapView addAnnotation:outerPolygon];
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 10)
     {
@@ -395,13 +411,22 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
-        MBXDroppedPinAnnotation *point = [[MBXDroppedPinAnnotation alloc] init];
-        point.coordinate = [self.mapView convertPoint:[longPress locationInView:longPress.view]
+        CGPoint point = [longPress locationInView:longPress.view];
+        NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
+        NSString *title;
+        for (id <MGLFeature> feature in features) {
+            if (!title) {
+                title = [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            }
+        }
+        
+        MBXDroppedPinAnnotation *pin = [[MBXDroppedPinAnnotation alloc] init];
+        pin.coordinate = [self.mapView convertPoint:point
                                  toCoordinateFromView:self.mapView];
-        point.title = @"Dropped Pin";
-        point.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:point.coordinate];
+        pin.title = title ?: @"Dropped Pin";
+        pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
         // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
-        [self.mapView selectAnnotation:point animated:YES];
+        [self.mapView selectAnnotation:pin animated:YES];
     }
 }
 
@@ -549,94 +574,33 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
+    // Use GL backed pins for dropped pin annotations
+    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]])
+    {
+        return nil;
+    }
+    
     MBXAnnotationView *annotationView = (MBXAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
     if (!annotationView)
     {
         annotationView = [[MBXAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
-        annotationView.frame = CGRectMake(0, 0, 40, 40);
+        annotationView.frame = CGRectMake(0, 0, 10, 10);
         annotationView.centerColor = [UIColor whiteColor];
-        annotationView.flat = YES;
+       
+        // uncomment to flatten the annotation view against the map when the map is tilted
+        // this currently causes severe performance issues when more than 2k annotations are visible
+        // annotationView.flat = YES;
+       
+        // uncomment to force annotation view to maintain a constant size when the map is tilted
+        // by default, annotation views will shrink and grow as the move towards and away from the
+        // horizon. Relatedly, annotations backed by GL sprites ONLY scale with viewing distance currently.
+        // annotationView.scalesWithViewingDistance = NO;
+        
     } else {
         // orange indicates that the annotation view was reused
         annotationView.centerColor = [UIColor orangeColor];
     }
     return annotationView;
-}
-
-- (MGLAnnotationImage *)mapView:(MGLMapView * __nonnull)mapView imageForAnnotation:(id <MGLAnnotation> __nonnull)annotation
-{
-    if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]]
-        || [annotation isKindOfClass:[MBXCustomCalloutAnnotation class]])
-    {
-        return nil; // use default marker
-    }
-
-    NSString *title = [(MGLPointAnnotation *)annotation title];
-    if (!title.length) return nil;
-    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
-
-    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
-
-    if ( ! annotationImage)
-    {
-        UIColor *color;
-        
-        // make every tenth annotation blue
-        if ([lastTwoCharacters hasSuffix:@"0"]) {
-            color = [UIColor blueColor];
-        } else {
-            color = [UIColor redColor];
-        }
-        
-        UIImage *image = [self imageWithText:lastTwoCharacters backgroundColor:color];
-        annotationImage = [MGLAnnotationImage annotationImageWithImage:image reuseIdentifier:lastTwoCharacters];
-
-        // don't allow touches on blue annotations
-        if ([color isEqual:[UIColor blueColor]]) annotationImage.enabled = NO;
-    }
-
-    return annotationImage;
-}
-
-- (UIImage *)imageWithText:(NSString *)text backgroundColor:(UIColor *)color
-{
-    CGRect rect = CGRectMake(0, 0, 20, 15);
-    
-    UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
-    
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    
-    CGContextSetFillColorWithColor(ctx, [[color colorWithAlphaComponent:0.75] CGColor]);
-    CGContextFillRect(ctx, rect);
-    
-    CGContextSetStrokeColorWithColor(ctx, [[UIColor blackColor] CGColor]);
-    CGContextStrokeRectWithWidth(ctx, rect, 2);
-    
-    NSAttributedString *drawString = [[NSAttributedString alloc] initWithString:text attributes:@{
-        NSFontAttributeName: [UIFont fontWithName:@"Arial-BoldMT" size:12],
-        NSForegroundColorAttributeName: [UIColor whiteColor],
-    }];
-    CGSize stringSize = drawString.size;
-    CGRect stringRect = CGRectMake((rect.size.width - stringSize.width) / 2,
-                                   (rect.size.height - stringSize.height) / 2,
-                                   stringSize.width,
-                                   stringSize.height);
-    [drawString drawInRect:stringRect];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
-- (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id<MGLAnnotation>)annotation {
-    NSString *title = [(MGLPointAnnotation *)annotation title];
-    if ( ! title.length)
-    {
-        return;
-    }
-    NSString *lastTwoCharacters = [title substringFromIndex:title.length - 2];
-    MGLAnnotationImage *annotationImage = [mapView dequeueReusableAnnotationImageWithIdentifier:lastTwoCharacters];
-    annotationImage.image = annotationImage.image ? nil : [self imageWithText:lastTwoCharacters backgroundColor:[UIColor grayColor]];
 }
 
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation

@@ -1,8 +1,7 @@
 #include <mbgl/platform/default/glfw_view.hpp>
-#include <mbgl/annotation/point_annotation.hpp>
-#include <mbgl/annotation/shape_annotation.hpp>
+#include <mbgl/annotation/annotation.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
-#include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/transition_options.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/gl_values.hpp>
 #include <mbgl/gl/gl_helper.hpp>
@@ -147,7 +146,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             break;
         case GLFW_KEY_R:
             if (!mods) {
-                static const mbgl::PropertyTransition transition { { mbgl::Milliseconds(300) } };
+                static const mbgl::style::TransitionOptions transition { { mbgl::Milliseconds(300) } };
                 if (view->map->hasClass("night")) {
                     view->map->removeClass("night", transition);
                 } else {
@@ -208,10 +207,11 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
     }
 }
 
-mbgl::LatLng GLFWView::makeRandomPoint() const {
+mbgl::Point<double> GLFWView::makeRandomPoint() const {
     const double x = width * double(std::rand()) / RAND_MAX;
     const double y = height * double(std::rand()) / RAND_MAX;
-    return map->latLngForPixel({ x, y });
+    mbgl::LatLng latLng = map->latLngForPixel({ x, y });
+    return { latLng.longitude, latLng.latitude };
 }
 
 std::shared_ptr<const mbgl::SpriteImage>
@@ -254,59 +254,34 @@ void GLFWView::nextOrientation() {
 }
 
 void GLFWView::addRandomCustomPointAnnotations(int count) {
-    std::vector<mbgl::PointAnnotation> points;
-
     for (int i = 0; i < count; i++) {
         static int spriteID = 1;
         const auto name = std::string{ "marker-" } + mbgl::util::toString(spriteID++);
         map->addAnnotationIcon(name, makeSpriteImage(22, 22, 1));
         spriteIDs.push_back(name);
-        points.emplace_back(makeRandomPoint(), name);
+        annotationIDs.push_back(map->addAnnotation(mbgl::SymbolAnnotation { makeRandomPoint(), name }));
     }
-
-    auto newIDs = map->addPointAnnotations(points);
-    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
 }
 
 void GLFWView::addRandomPointAnnotations(int count) {
-    std::vector<mbgl::PointAnnotation> points;
-
     for (int i = 0; i < count; i++) {
-        points.emplace_back(makeRandomPoint(), "default_marker");
+        annotationIDs.push_back(map->addAnnotation(mbgl::SymbolAnnotation { makeRandomPoint(), "default_marker" }));
     }
-
-    auto newIDs = map->addPointAnnotations(points);
-    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
 }
 
 void GLFWView::addRandomShapeAnnotations(int count) {
-    std::vector<mbgl::ShapeAnnotation> shapes;
-
-    mbgl::FillAnnotationProperties properties;
-    properties.opacity = .1;
-
     for (int i = 0; i < count; i++) {
-        mbgl::AnnotationSegment triangle;
-        triangle.push_back(makeRandomPoint());
-        triangle.push_back(makeRandomPoint());
-        triangle.push_back(makeRandomPoint());
-
-        mbgl::AnnotationSegments segments;
-        segments.push_back(triangle);
-
-        shapes.emplace_back(segments, properties);
+        mbgl::Polygon<double> triangle;
+        triangle.push_back({ makeRandomPoint(), makeRandomPoint(), makeRandomPoint() });
+        annotationIDs.push_back(map->addAnnotation(mbgl::FillAnnotation { triangle, .1 }));
     }
-
-    auto newIDs = map->addShapeAnnotations(shapes);
-    annotationIDs.insert(annotationIDs.end(), newIDs.begin(), newIDs.end());
 }
 
 void GLFWView::clearAnnotations() {
-    if (annotationIDs.empty()) {
-        return;
+    for (const auto& id : annotationIDs) {
+        map->removeAnnotation(id);
     }
 
-    map->removeAnnotations(annotationIDs);
     annotationIDs.clear();
 }
 

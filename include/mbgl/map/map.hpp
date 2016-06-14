@@ -9,8 +9,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/style/property_transition.hpp>
+#include <mbgl/style/transition_options.hpp>
 
 #include <cstdint>
 #include <string>
@@ -23,10 +22,12 @@ namespace mbgl {
 class FileSource;
 class View;
 class SpriteImage;
-class PointAnnotation;
-class ShapeAnnotation;
 struct CameraOptions;
 struct AnimationOptions;
+
+namespace style {
+class Layer;
+}
 
 class Map : private util::noncopyable {
 public:
@@ -49,15 +50,15 @@ public:
     void update(Update update);
 
     // Styling
-    void addClass(const std::string&, const PropertyTransition& = {});
-    void removeClass(const std::string&, const PropertyTransition& = {});
-    void setClasses(const std::vector<std::string>&, const PropertyTransition& = {});
+    void addClass(const std::string&, const style::TransitionOptions& = {});
+    void removeClass(const std::string&, const style::TransitionOptions& = {});
+    void setClasses(const std::vector<std::string>&, const style::TransitionOptions& = {});
 
     bool hasClass(const std::string&) const;
     std::vector<std::string> getClasses() const;
 
-    void setStyleURL(const std::string& url);
-    void setStyleJSON(const std::string& json, const std::string& base = "");
+    void setStyleURL(const std::string&);
+    void setStyleJSON(const std::string&);
     std::string getStyleURL() const;
     std::string getStyleJSON() const;
 
@@ -142,26 +143,14 @@ public:
     void removeAnnotationIcon(const std::string&);
     double getTopOffsetPixelsForAnnotationIcon(const std::string&);
 
-    AnnotationID addPointAnnotation(const PointAnnotation&);
-    AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&);
-
-    AnnotationID addShapeAnnotation(const ShapeAnnotation&);
-    AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&);
-
-    void updatePointAnnotation(AnnotationID, const PointAnnotation&);
-
+    AnnotationID addAnnotation(const Annotation&);
+    void updateAnnotation(AnnotationID, const Annotation&);
     void removeAnnotation(AnnotationID);
-    void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
-    void addCustomLayer(const std::string& id,
-                        CustomLayerInitializeFunction,
-                        CustomLayerRenderFunction,
-                        CustomLayerDeinitializeFunction,
-                        void* context,
-                        const char* before = nullptr);
-    void removeCustomLayer(const std::string& id);
+    void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
+    void removeLayer(const std::string& layerID);
 
     // Feature queries
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const optional<std::vector<std::string>>& layerIDs = {});

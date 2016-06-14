@@ -1,8 +1,11 @@
 #include <mbgl/style/property_parsing.hpp>
 
+#include <mbgl/platform/log.hpp>
+
 #include <csscolorparser/csscolorparser.hpp>
 
 namespace mbgl {
+namespace style {
 
 template <>
 optional<bool> parseConstant(const char* name, const JSValue& value) {
@@ -185,19 +188,19 @@ optional<TextTransformType> parseConstant<TextTransformType>(const char* name, c
     return { TextTransformTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
-MBGL_DEFINE_ENUM_CLASS(RotationAlignmentTypeClass, RotationAlignmentType, {
-    { RotationAlignmentType::Map, "map" },
-    { RotationAlignmentType::Viewport, "viewport" },
+MBGL_DEFINE_ENUM_CLASS(AlignmentTypeClass, AlignmentType, {
+    { AlignmentType::Map, "map" },
+    { AlignmentType::Viewport, "viewport" },
 });
 
 template <>
-optional<RotationAlignmentType> parseConstant<RotationAlignmentType>(const char* name, const JSValue& value) {
+optional<AlignmentType> parseConstant<AlignmentType>(const char* name, const JSValue& value) {
     if (!value.IsString()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be a string", name);
         return {};
     }
 
-    return { RotationAlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
+    return { AlignmentTypeClass({ value.GetString(), value.GetStringLength() }) };
 }
 
 template <>
@@ -261,7 +264,7 @@ optional<std::vector<std::string>> parseConstant(const char* name, const JSValue
     return result;
 }
 
-optional<PropertyTransition> parsePropertyTransition(const char *, const JSValue& value) {
+optional<TransitionOptions> parseTransitionOptions(const char *, const JSValue& value) {
     if (!value.IsObject()) {
         return {};
     }
@@ -280,7 +283,8 @@ optional<PropertyTransition> parsePropertyTransition(const char *, const JSValue
         return {};
     }
 
-    return PropertyTransition(duration, delay);
+    return TransitionOptions(duration, delay);
 }
 
+} // namespace style
 } // namespace mbgl

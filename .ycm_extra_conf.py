@@ -33,11 +33,12 @@
 
 import os
 import subprocess
+import string
 import ycm_core
 
 compilation_database_folders = [
-  'build/linux-x86_64/Release',
-  'build/osx/Release',
+  'build/linux-x86_64/Debug',
+  'build/osx/Debug',
 ]
 
 subprocess.call(['make compdb'], shell=True)

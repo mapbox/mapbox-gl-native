@@ -4,6 +4,8 @@
 
 #include <mbgl/util/run_loop.hpp>
 
+#include <cassert>
+
 namespace mbgl {
 namespace util {
 
@@ -20,6 +22,8 @@ void AsyncTask::Impl::maySend() {
 }
 
 void AsyncTask::Impl::runTask() {
+    assert(runLoop == RunLoop::Get());
+
     queued.clear();
     task();
 }

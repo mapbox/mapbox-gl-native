@@ -29,11 +29,24 @@ custom_categories:
       - MGLAnnotation
       - MGLAnnotationImage
       - MGLMultiPoint
+      - MGLMultiPolygon
+      - MGLMultiPolyline
       - MGLPointAnnotation
       - MGLPolygon
       - MGLPolyline
       - MGLOverlay
       - MGLShape
+      - MGLShapeCollection
+  - name: Map Data
+    children:
+      - MGLFeature
+      - MGLMultiPointFeature
+      - MGLMultiPolygonFeature
+      - MGLMultiPolylineFeature
+      - MGLPointFeature
+      - MGLPolygonFeature
+      - MGLPolylineFeature
+      - MGLShapeCollectionFeature
   - name: Offline Maps
     children:
       - MGLOfflineRegion

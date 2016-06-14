@@ -20,11 +20,9 @@ typedef quint32 AnnotationID;
 typedef QList<AnnotationID> AnnotationIDs;
 
 typedef QPair<Coordinate, QString> PointAnnotation;
-typedef QList<PointAnnotation> PointAnnotations;
 
 // FIXME: We need to add support for custom style properties
 typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
-typedef QList<ShapeAnnotation> ShapeAnnotations;
 
 enum NetworkMode {
     Online, // Default

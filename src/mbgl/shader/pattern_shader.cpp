@@ -7,11 +7,11 @@
 
 using namespace mbgl;
 
-PatternShader::PatternShader(gl::GLObjectStore& glObjectStore)
+PatternShader::PatternShader(gl::ObjectStore& store)
     : Shader(
         "pattern",
         shaders::pattern::vertex, shaders::pattern::fragment,
-        glObjectStore
+        store
     ) {
 }
 

@@ -1,5 +1,8 @@
 #import <Mapbox/Mapbox.h>
 
+/// Minimum size of an annotation’s accessibility element.
+extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
+
 @interface MGLMapView (Internal)
 
 /** Triggers another render pass even when it is not necessary. */

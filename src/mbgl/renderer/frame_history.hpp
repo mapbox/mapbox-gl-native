@@ -3,8 +3,9 @@
 #include <array>
 
 #include <mbgl/platform/platform.hpp>
-#include <mbgl/gl/gl_object_store.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/chrono.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
 
@@ -14,8 +15,8 @@ public:
     void record(const TimePoint&, float zoom, const Duration&);
 
     bool needsAnimation(const Duration&) const;
-    void bind(gl::GLObjectStore&);
-    void upload(gl::GLObjectStore&);
+    void bind(gl::ObjectStore&);
+    void upload(gl::ObjectStore&);
 
 private:
     const int width = 256;
@@ -31,7 +32,7 @@ private:
     bool firstFrame = true;
     bool changed = true;
 
-    gl::TextureHolder texture;
+    mbgl::optional<gl::UniqueTexture> texture;
 };
 
 } // namespace mbgl
