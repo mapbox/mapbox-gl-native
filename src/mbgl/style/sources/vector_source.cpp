@@ -7,7 +7,7 @@ namespace style {
 VectorSource::VectorSource(std::string id_,
                            std::string url_,
                            std::unique_ptr<Tileset>&& tileset_)
-    : Source(SourceType::Vector, std::move(id_), std::move(url_), util::tileSize, std::move(tileset_)) {
+    : TileSource(SourceType::Vector, std::move(id_), std::move(url_), util::tileSize, std::move(tileset_)) {
 }
 
 std::unique_ptr<Tile> VectorSource::createTile(const OverscaledTileID& tileID,

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/tile_source.hpp>
 
 namespace mbgl {
 namespace style {
 
-class VectorSource : public Source {
+class VectorSource : public TileSource {
 public:
     VectorSource(std::string id,
                  std::string url,

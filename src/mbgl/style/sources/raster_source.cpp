@@ -8,7 +8,7 @@ RasterSource::RasterSource(std::string id_,
                            std::string url_,
                            uint16_t tileSize_,
                            std::unique_ptr<Tileset>&& tileset_)
-    : Source(SourceType::Raster, std::move(id_), std::move(url_), tileSize_, std::move(tileset_)) {
+    : TileSource(SourceType::Raster, std::move(id_), std::move(url_), tileSize_, std::move(tileset_)) {
 }
 
 std::unique_ptr<Tile> RasterSource::createTile(const OverscaledTileID& tileID,
