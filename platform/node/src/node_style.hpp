@@ -28,7 +28,7 @@ struct ValueConverter<float> {
             return {};
         }
 
-        return { value->NumberValue() };
+        return { float(value->NumberValue()) };
     }
 };
 
