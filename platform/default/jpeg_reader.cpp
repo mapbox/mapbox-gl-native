@@ -156,4 +156,4 @@ PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
     return image;
 }
 
-}
+} // namespace mbgl

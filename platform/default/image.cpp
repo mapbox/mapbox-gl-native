@@ -112,4 +112,4 @@ PremultipliedImage decodeImage(const std::string& string) {
     throw std::runtime_error("unsupported image type");
 }
 
-}
+} // namespace mbgl

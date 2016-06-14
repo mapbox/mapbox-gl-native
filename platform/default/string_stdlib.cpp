@@ -73,4 +73,5 @@ std::string lowercase(const std::string& str)
     return output.str();
 }
 
-}}
+} // namespace platform
+} // namespace mbgl
