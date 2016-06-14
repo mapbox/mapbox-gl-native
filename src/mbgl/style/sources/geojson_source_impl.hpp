@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/source_impl.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -16,15 +17,16 @@ class AsyncRequest;
 
 namespace style {
 
-class GeoJSONSource : public Source {
+class GeoJSONSource::Impl : public Source::Impl {
 public:
     using GeoJSON = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
 
     static std::unique_ptr<GeoJSONSource> parse(const std::string& id, const JSValue&);
     static GeoJSON parseGeoJSON(const JSValue&);
 
-    GeoJSONSource(std::string id, variant<std::string, GeoJSON> urlOrGeoJSON);
-    ~GeoJSONSource() final;
+    Impl(std::string id, Source&,
+         variant<std::string, GeoJSON> urlOrGeoJSON);
+    ~Impl() final;
 
     void load(FileSource&) final;
 

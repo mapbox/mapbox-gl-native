@@ -1,4 +1,4 @@
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/map/transform.hpp>
 #include <mbgl/renderer/render_tile.hpp>
@@ -23,15 +23,16 @@ namespace style {
 
 static SourceObserver nullObserver;
 
-Source::Source(SourceType type_, std::string id_)
+Source::Impl::Impl(SourceType type_, std::string id_, Source& base_)
     : type(type_),
       id(std::move(id_)),
+      base(base_),
       observer(&nullObserver) {
 }
 
-Source::~Source() = default;
+Source::Impl::~Impl() = default;
 
-bool Source::isLoaded() const {
+bool Source::Impl::isLoaded() const {
     if (!loaded) return false;
 
     for (const auto& pair : tiles) {
@@ -43,13 +44,13 @@ bool Source::isLoaded() const {
     return true;
 }
 
-void Source::invalidateTiles() {
+void Source::Impl::invalidateTiles() {
     tiles.clear();
     renderTiles.clear();
     cache.clear();
 }
 
-void Source::startRender(algorithm::ClipIDGenerator& generator,
+void Source::Impl::startRender(algorithm::ClipIDGenerator& generator,
                          const mat4& projMatrix,
                          const TransformState& transform) {
     if (type == SourceType::Vector ||
@@ -65,18 +66,18 @@ void Source::startRender(algorithm::ClipIDGenerator& generator,
     }
 }
 
-void Source::finishRender(Painter& painter) {
+void Source::Impl::finishRender(Painter& painter) {
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
         painter.renderTileDebug(tile);
     }
 }
 
-const std::map<UnwrappedTileID, RenderTile>& Source::getRenderTiles() const {
+const std::map<UnwrappedTileID, RenderTile>& Source::Impl::getRenderTiles() const {
     return renderTiles;
 }
 
-Tile* Source::getTile(const OverscaledTileID& overscaledTileID) const {
+Tile* Source::Impl::getTile(const OverscaledTileID& overscaledTileID) const {
     auto it = tiles.find(overscaledTileID);
     if (it != tiles.end()) {
         return it->second.get();
@@ -85,7 +86,7 @@ Tile* Source::getTile(const OverscaledTileID& overscaledTileID) const {
     }
 }
 
-bool Source::update(const UpdateParameters& parameters) {
+bool Source::Impl::update(const UpdateParameters& parameters) {
     bool allTilesUpdated = true;
 
     if (!loaded || parameters.animationTime <= updated) {
@@ -205,7 +206,7 @@ static Point<int16_t> coordinateToTilePoint(const UnwrappedTileID& tileID, const
     };
 }
 
-std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatures(const QueryParameters& parameters) const {
+std::unordered_map<std::string, std::vector<Feature>> Source::Impl::queryRenderedFeatures(const QueryParameters& parameters) const {
     LineString<double> queryGeometry;
 
     for (const auto& p : parameters.geometry) {
@@ -241,32 +242,32 @@ std::unordered_map<std::string, std::vector<Feature>> Source::queryRenderedFeatu
     return result;
 }
 
-void Source::setCacheSize(size_t size) {
+void Source::Impl::setCacheSize(size_t size) {
     cache.setSize(size);
 }
 
-void Source::onLowMemory() {
+void Source::Impl::onLowMemory() {
     cache.clear();
 }
 
-void Source::setObserver(SourceObserver* observer_) {
+void Source::Impl::setObserver(SourceObserver* observer_) {
     observer = observer_;
 }
 
-void Source::onTileLoaded(Tile& tile, bool isNewTile) {
-    observer->onTileLoaded(*this, tile.id, isNewTile);
+void Source::Impl::onTileLoaded(Tile& tile, bool isNewTile) {
+    observer->onTileLoaded(base, tile.id, isNewTile);
 }
 
-void Source::onTileError(Tile& tile, std::exception_ptr error) {
-    observer->onTileError(*this, tile.id, error);
+void Source::Impl::onTileError(Tile& tile, std::exception_ptr error) {
+    observer->onTileError(base, tile.id, error);
 }
 
-void Source::onNeedsRepaint() {
+void Source::Impl::onNeedsRepaint() {
     observer->onNeedsRepaint();
 }
 
-void Source::dumpDebugLogs() const {
-    Log::Info(Event::General, "Source::id: %s", id.c_str());
+void Source::Impl::dumpDebugLogs() const {
+    Log::Info(Event::General, "Source::id: %s", base.getID().c_str());
     Log::Info(Event::General, "Source::loaded: %d", loaded);
 
     for (const auto& pair : tiles) {

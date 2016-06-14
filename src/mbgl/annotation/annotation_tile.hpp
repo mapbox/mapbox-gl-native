@@ -14,8 +14,7 @@ class UpdateParameters;
 class AnnotationTile : public GeometryTile {
 public:
     AnnotationTile(const OverscaledTileID&,
-                       std::string sourceID,
-                       const style::UpdateParameters&);
+                   const style::UpdateParameters&);
     ~AnnotationTile() override;
 
     void setNecessity(Necessity) final;

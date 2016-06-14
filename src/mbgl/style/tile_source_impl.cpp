@@ -1,4 +1,4 @@
-#include <mbgl/style/tile_source.hpp>
+#include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/util/tileset.hpp>
@@ -81,7 +81,7 @@ Tileset parseTileJSON(const JSValue& value) {
 
 } // end namespace
 
-Tileset TileSource::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
+Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
     document.Parse<0>(json.c_str());
 
@@ -103,7 +103,7 @@ Tileset TileSource::parseTileJSON(const std::string& json, const std::string& so
     return result;
 }
 
-optional<variant<std::string, Tileset>> TileSource::parseURLOrTileset(const JSValue& value) {
+optional<variant<std::string, Tileset>> TileSourceImpl::parseURLOrTileset(const JSValue& value) {
     if (!value.HasMember("url")) {
         return { mbgl::style::parseTileJSON(value) };
     }
@@ -117,18 +117,17 @@ optional<variant<std::string, Tileset>> TileSource::parseURLOrTileset(const JSVa
     return { std::string(urlVal.GetString(), urlVal.GetStringLength()) };
 }
 
-TileSource::TileSource(SourceType type_,
-                       std::string id_,
-                       variant<std::string, Tileset> urlOrTileset_,
-                       uint16_t tileSize_)
-    : Source(type_, std::move(id_)),
+TileSourceImpl::TileSourceImpl(SourceType type_, std::string id_, Source& base_,
+                               variant<std::string, Tileset> urlOrTileset_,
+                               uint16_t tileSize_)
+    : Impl(type_, std::move(id_), base_),
       urlOrTileset(std::move(urlOrTileset_)),
       tileSize(tileSize_) {
 }
 
-TileSource::~TileSource() = default;
+TileSourceImpl::~TileSourceImpl() = default;
 
-void TileSource::load(FileSource& fileSource) {
+void TileSourceImpl::load(FileSource& fileSource) {
     if (urlOrTileset.is<Tileset>()) {
         tileset = urlOrTileset.get<Tileset>();
         loaded = true;
@@ -142,11 +141,11 @@ void TileSource::load(FileSource& fileSource) {
     const std::string& url = urlOrTileset.get<std::string>();
     req = fileSource.request(Resource::source(url), [this, url](Response res) {
         if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
+            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
         } else {
             Tileset newTileset;
 
@@ -156,7 +155,7 @@ void TileSource::load(FileSource& fileSource) {
             try {
                 newTileset = parseTileJSON(*res.data, url, type, tileSize);
             } catch (...) {
-                observer->onSourceError(*this, std::current_exception());
+                observer->onSourceError(base, std::current_exception());
                 return;
             }
 
@@ -183,12 +182,12 @@ void TileSource::load(FileSource& fileSource) {
             tileset = newTileset;
             loaded = true;
 
-            observer->onSourceLoaded(*this);
+            observer->onSourceLoaded(base);
         }
     });
 }
 
-Range<uint8_t> TileSource::getZoomRange() {
+Range<uint8_t> TileSourceImpl::getZoomRange() {
     assert(loaded);
     return tileset.zoomRange;
 }

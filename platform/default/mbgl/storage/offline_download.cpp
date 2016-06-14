@@ -4,8 +4,8 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/tile_source.hpp>
-#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/tile_source_impl.hpp>
+#include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
@@ -103,21 +103,21 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     result.requiredResourceCountIsPrecise = true;
 
     for (const auto& source : parser.sources) {
-        switch (source->type) {
+        switch (source->baseImpl->type) {
         case SourceType::Vector:
         case SourceType::Raster: {
-            style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+            style::TileSourceImpl* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
             const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
 
             if (urlOrTileset.is<Tileset>()) {
-                result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(), urlOrTileset.get<Tileset>()).size();
+                result.requiredResourceCount += tileResources(source->baseImpl->type, tileSource->getTileSize(), urlOrTileset.get<Tileset>()).size();
             } else {
                 result.requiredResourceCount += 1;
                 const std::string& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
-                    result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(),
-                        style::TileSource::parseTileJSON(*sourceResponse->data, url, source->type, tileSource->getTileSize())).size();
+                    result.requiredResourceCount += tileResources(source->baseImpl->type, tileSource->getTileSize(),
+                        style::TileSourceImpl::parseTileJSON(*sourceResponse->data, url, source->baseImpl->type, tileSource->getTileSize())).size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -126,8 +126,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         }
 
         case SourceType::GeoJSON: {
-            style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
-            const variant<std::string, style::GeoJSONSource::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+            style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
+            const variant<std::string, style::GeoJSONSource::Impl::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
 
             if (urlOrGeoJSON.is<std::string>()) {
                 result.requiredResourceCount += 1;
@@ -160,12 +160,12 @@ void OfflineDownload::activateDownload() {
         parser.parse(*styleResponse.data);
 
         for (const auto& source : parser.sources) {
-            SourceType type = source->type;
+            SourceType type = source->baseImpl->type;
 
             switch (type) {
             case SourceType::Vector:
             case SourceType::Raster: {
-                const style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+                const style::TileSourceImpl* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
                 const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
                 const uint16_t tileSize = tileSource->getTileSize();
 
@@ -177,7 +177,7 @@ void OfflineDownload::activateDownload() {
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=] (Response sourceResponse) {
-                        ensureTiles(type, tileSize, style::TileSource::parseTileJSON(*sourceResponse.data, url, type, tileSize));
+                        ensureTiles(type, tileSize, style::TileSourceImpl::parseTileJSON(*sourceResponse.data, url, type, tileSize));
 
                         requiredSourceURLs.erase(url);
                         if (requiredSourceURLs.empty()) {
@@ -189,8 +189,8 @@ void OfflineDownload::activateDownload() {
             }
 
             case SourceType::GeoJSON: {
-                style::GeoJSONSource* geojsonSource = static_cast<style::GeoJSONSource*>(source.get());
-                const variant<std::string, style::GeoJSONSource::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
+                style::GeoJSONSource::Impl* geojsonSource = static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
+                const variant<std::string, style::GeoJSONSource::Impl::GeoJSON>& urlOrGeoJSON = geojsonSource->getURLOrGeoJSON();
 
                 if (urlOrGeoJSON.is<std::string>()) {
                     ensureResource(Resource::source(urlOrGeoJSON.get<std::string>()));

@@ -1,12 +1,12 @@
-#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/raster_source_impl.hpp>
 #include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/platform/log.hpp>
 
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<RasterSource> RasterSource::parse(std::string id, const JSValue& value) {
-    optional<variant<std::string, Tileset>> urlOrTileset = TileSource::parseURLOrTileset(value);
+std::unique_ptr<RasterSource> RasterSource::Impl::parse(std::string id, const JSValue& value) {
+    optional<variant<std::string, Tileset>> urlOrTileset = TileSourceImpl::parseURLOrTileset(value);
     if (!urlOrTileset) {
         return nullptr;
     }
@@ -25,13 +25,13 @@ std::unique_ptr<RasterSource> RasterSource::parse(std::string id, const JSValue&
     return std::make_unique<RasterSource>(std::move(id), std::move(*urlOrTileset), tileSize);
 }
 
-RasterSource::RasterSource(std::string id_,
-                           variant<std::string, Tileset> urlOrTileset_,
-                           uint16_t tileSize_)
-    : TileSource(SourceType::Raster, std::move(id_), std::move(urlOrTileset_), tileSize_) {
+RasterSource::Impl::Impl(std::string id_, Source& base_,
+                         variant<std::string, Tileset> urlOrTileset_,
+                         uint16_t tileSize_)
+    : TileSourceImpl(SourceType::Raster, std::move(id_), base_, std::move(urlOrTileset_), tileSize_) {
 }
 
-std::unique_ptr<Tile> RasterSource::createTile(const OverscaledTileID& tileID,
+std::unique_ptr<Tile> RasterSource::Impl::createTile(const OverscaledTileID& tileID,
                                                const UpdateParameters& parameters) {
     return std::make_unique<RasterTile>(tileID, parameters, tileset);
 }

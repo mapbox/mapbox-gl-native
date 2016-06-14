@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/source_impl.hpp>
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/optional.hpp>
@@ -16,17 +16,16 @@ namespace style {
    Shared implementation for VectorSource and RasterSource. Should eventually
    be refactored to use composition rather than inheritance.
 */
-class TileSource : public Source {
+class TileSourceImpl : public Source::Impl {
 public:
     // A tile source can either specify a URL to TileJSON, or inline TileJSON.
     static optional<variant<std::string, Tileset>> parseURLOrTileset(const JSValue&);
     static Tileset parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
 
-    TileSource(SourceType,
-               std::string id,
-               variant<std::string, Tileset> urlOrTileset,
-               uint16_t tileSize);
-    ~TileSource() override;
+    TileSourceImpl(SourceType, std::string id, Source&,
+                   variant<std::string, Tileset> urlOrTileset,
+                   uint16_t tileSize);
+    ~TileSourceImpl() override;
 
     void load(FileSource&) final;
 

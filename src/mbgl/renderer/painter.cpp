@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/source_impl.hpp>
 
 #include <mbgl/platform/log.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -161,7 +162,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         // Update all clipping IDs.
         algorithm::ClipIDGenerator generator;
         for (const auto& source : sources) {
-            source->startRender(generator, projMatrix, state);
+            source->baseImpl->startRender(generator, projMatrix, state);
         }
 
         drawClippingMasks(generator.getStencils());
@@ -202,7 +203,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         // When only rendering layers via the stylesheet, it's possible that we don't
         // ever visit a tile during rendering.
         for (const auto& source : sources) {
-            source->finishRender(*this);
+            source->baseImpl->finishRender(*this);
         }
     }
 

@@ -1,13 +1,13 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/tile_source.hpp>
+#include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/util/io.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
 
-TEST(TileSource, ParseTileJSONRaster) {
-    auto result = TileSource::parseTileJSON(
+TEST(TileSourceImpl, ParseTileJSONRaster) {
+    auto result = TileSourceImpl::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.raster.json"),
         "mapbox://mapbox.satellite",
         SourceType::Raster,
@@ -23,8 +23,8 @@ TEST(TileSource, ParseTileJSONRaster) {
 #endif
 }
 
-TEST(TileSource, ParseTileJSONVector) {
-    auto result = TileSource::parseTileJSON(
+TEST(TileSourceImpl, ParseTileJSONVector) {
+    auto result = TileSourceImpl::parseTileJSON(
         util::read_file("test/fixtures/style_parser/tilejson.vector.json"),
         "mapbox://mapbox.streets",
         SourceType::Vector,

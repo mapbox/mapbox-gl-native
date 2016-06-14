@@ -1,7 +1,7 @@
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/sources/raster_source.hpp>
-#include <mbgl/style/sources/vector_source.hpp>
-#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/raster_source_impl.hpp>
+#include <mbgl/style/sources/vector_source_impl.hpp>
+#include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
@@ -99,16 +99,16 @@ void Parser::parseSources(const JSValue& value) {
 
         switch (*type) {
         case SourceType::Raster: {
-            source = RasterSource::parse(id, sourceVal);
+            source = RasterSource::Impl::parse(id, sourceVal);
             break;
         }
 
         case SourceType::Vector:
-            source = VectorSource::parse(id, sourceVal);
+            source = VectorSource::Impl::parse(id, sourceVal);
             break;
 
         case SourceType::GeoJSON:
-            source = GeoJSONSource::parse(id, sourceVal);
+            source = GeoJSONSource::Impl::parse(id, sourceVal);
             break;
 
         default:

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/style/source.hpp>
+
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/tile/tile.hpp>
@@ -33,10 +35,10 @@ class UpdateParameters;
 class QueryParameters;
 class SourceObserver;
 
-class Source : public TileObserver, private util::noncopyable {
+class Source::Impl : public TileObserver, private util::noncopyable {
 public:
-    Source(SourceType, std::string id);
-    ~Source() override;
+    Impl(SourceType, std::string id, Source&);
+    ~Impl() override;
 
     virtual void load(FileSource&) = 0;
     bool isLoaded() const;
@@ -74,6 +76,7 @@ public:
 protected:
     void invalidateTiles();
 
+    Source& base;
     SourceObserver* observer = nullptr;
 
 private:

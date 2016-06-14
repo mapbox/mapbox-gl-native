@@ -1,4 +1,4 @@
-#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/parser.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
@@ -15,7 +15,7 @@
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> GeoJSONSource::parseGeoJSON(const JSValue& value) {
+std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> GeoJSONSource::Impl::parseGeoJSON(const JSValue& value) {
     using namespace mapbox::geojsonvt;
 
     Options options;
@@ -32,7 +32,7 @@ std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> GeoJSONSource::parseGeoJSON(const 
     }
 }
 
-std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id, const JSValue& value) {
+std::unique_ptr<GeoJSONSource> GeoJSONSource::Impl::parse(const std::string& id, const JSValue& value) {
     // We should probably split this up to have URLs in the url property, and actual data
     // in the data property. Until then, we're going to detect the content based on the
     // object type.
@@ -43,23 +43,27 @@ std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id, const
 
     const JSValue& dataVal = value["data"];
     if (dataVal.IsString()) {
-        return std::make_unique<GeoJSONSource>(id, std::string(dataVal.GetString(), dataVal.GetStringLength()));
+        return std::make_unique<GeoJSONSource>([&] (Source& base) {
+            return std::make_unique<Impl>(id, base, std::string(dataVal.GetString(), dataVal.GetStringLength()));
+        });
     } else if (dataVal.IsObject()) {
-        return std::make_unique<GeoJSONSource>(id, parseGeoJSON(dataVal));
+        return std::make_unique<GeoJSONSource>([&] (Source& base) {
+            return std::make_unique<Impl>(id, base, parseGeoJSON(dataVal));
+        });
     } else {
         Log::Error(Event::ParseStyle, "GeoJSON data must be a URL or an object");
         return nullptr;
     }
 }
 
-GeoJSONSource::GeoJSONSource(std::string id_, variant<std::string, GeoJSON> urlOrGeoJSON_)
-    : Source(SourceType::GeoJSON, std::move(id_)),
+GeoJSONSource::Impl::Impl(std::string id_, Source& base_, variant<std::string, GeoJSON> urlOrGeoJSON_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_), base_),
       urlOrGeoJSON(std::move(urlOrGeoJSON_)) {
 }
 
-GeoJSONSource::~GeoJSONSource() = default;
+GeoJSONSource::Impl::~Impl() = default;
 
-void GeoJSONSource::load(FileSource& fileSource) {
+void GeoJSONSource::Impl::load(FileSource& fileSource) {
     if (urlOrGeoJSON.is<GeoJSON>()) {
         loaded = true;
         return;
@@ -72,11 +76,11 @@ void GeoJSONSource::load(FileSource& fileSource) {
     const std::string& url = urlOrGeoJSON.get<std::string>();
     req = fileSource.request(Resource::source(url), [this](Response res) {
         if (res.error) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(res.error->message)));
+            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(res.error->message)));
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
+            observer->onSourceError(base, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
         } else {
             rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
             d.Parse<0>(res.data->c_str());
@@ -84,7 +88,7 @@ void GeoJSONSource::load(FileSource& fileSource) {
             if (d.HasParseError()) {
                 std::stringstream message;
                 message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
-                observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(message.str())));
+                observer->onSourceError(base, std::make_exception_ptr(std::runtime_error(message.str())));
                 return;
             }
 
@@ -93,20 +97,20 @@ void GeoJSONSource::load(FileSource& fileSource) {
             urlOrGeoJSON = parseGeoJSON(d);
             loaded = true;
 
-            observer->onSourceLoaded(*this);
+            observer->onSourceLoaded(base);
         }
     });
 }
 
-Range<uint8_t> GeoJSONSource::getZoomRange() {
+Range<uint8_t> GeoJSONSource::Impl::getZoomRange() {
     assert(loaded);
     return { 0, urlOrGeoJSON.get<GeoJSON>()->options.maxZoom };
 }
 
-std::unique_ptr<Tile> GeoJSONSource::createTile(const OverscaledTileID& tileID,
+std::unique_ptr<Tile> GeoJSONSource::Impl::createTile(const OverscaledTileID& tileID,
                                                 const UpdateParameters& parameters) {
     assert(loaded);
-    return std::make_unique<GeoJSONTile>(tileID, id, parameters, *urlOrGeoJSON.get<GeoJSON>());
+    return std::make_unique<GeoJSONTile>(tileID, base.getID(), parameters, *urlOrGeoJSON.get<GeoJSON>());
 }
 
 } // namespace style
