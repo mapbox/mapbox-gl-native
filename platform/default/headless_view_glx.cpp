@@ -23,12 +23,12 @@ void HeadlessView::createContext() {
             if (!glXIsDirect(xDisplay, glContext)) {
                 Log::Error(Event::OpenGL, "failed to create direct OpenGL Legacy context");
                 glXDestroyContext(xDisplay, glContext);
-                glContext = 0;
+                glContext = nullptr;
             }
         }
     }
 
-    if (glContext == 0) {
+    if (glContext == nullptr) {
         throw std::runtime_error("Error creating GL context object.");
     }
 

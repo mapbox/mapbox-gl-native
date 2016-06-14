@@ -46,7 +46,7 @@ struct png_struct_guard {
           i_(info_ptr_ptr) {}
 
     ~png_struct_guard() {
-        png_destroy_read_struct(p_,i_,0);
+        png_destroy_read_struct(p_,i_,nullptr);
     }
 
     png_structpp p_;
@@ -66,7 +66,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     if (!is_png)
         throw std::runtime_error("File or stream is not a png");
 
-    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+    png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
     if (!png_ptr)
         throw std::runtime_error("failed to allocate png_ptr");
 
@@ -87,7 +87,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     png_uint_32 height = 0;
     int bit_depth = 0;
     int color_type = 0;
-    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, 0, 0, 0);
+    png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
     UnassociatedImage image { width, height };
 
@@ -125,7 +125,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
         rows[row] = image.data.get() + row * width * 4;
     png_read_image(png_ptr, rows.get());
 
-    png_read_end(png_ptr, 0);
+    png_read_end(png_ptr, nullptr);
 
     return util::premultiply(std::move(image));
 }

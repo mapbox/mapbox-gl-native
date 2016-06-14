@@ -55,7 +55,7 @@ static void skip(j_decompress_ptr cinfo, long count) {
     {
         wrap->stream->seekg(count - wrap->manager.bytes_in_buffer, std::ios_base::cur);
         // trigger buffer fill
-        wrap->manager.next_input_byte = 0;
+        wrap->manager.next_input_byte = nullptr;
         wrap->manager.bytes_in_buffer = 0; //bytes_in_buffer may be zero on return.
     }
 }
@@ -63,7 +63,7 @@ static void skip(j_decompress_ptr cinfo, long count) {
 static void term(j_decompress_ptr) {}
 
 static void attach_stream(j_decompress_ptr cinfo, input_stream* in) {
-    if (cinfo->src == 0) {
+    if (cinfo->src == nullptr) {
         cinfo->src = (struct jpeg_source_mgr *)
             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
     }
@@ -74,7 +74,7 @@ static void attach_stream(j_decompress_ptr cinfo, input_stream* in) {
     src->manager.resync_to_restart = jpeg_resync_to_restart;
     src->manager.term_source = term;
     src->manager.bytes_in_buffer = 0;
-    src->manager.next_input_byte = 0;
+    src->manager.next_input_byte = nullptr;
     src->stream = in;
 }
 

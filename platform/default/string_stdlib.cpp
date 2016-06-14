@@ -18,10 +18,10 @@ std::string uppercase(const std::string& str)
     for (; itr < end; itr = nitr)
     {
         uint32_t code_point = 0;
-        char const* buf = 0;
+        char const* buf = nullptr;
 
-        nitr = _nu_toupper(itr, end, nu_utf8_read, &code_point, &buf, 0);
-        if (buf != 0)
+        nitr = _nu_toupper(itr, end, nu_utf8_read, &code_point, &buf, nullptr);
+        if (buf != nullptr)
         {
             do
             {
@@ -51,10 +51,10 @@ std::string lowercase(const std::string& str)
     for (; itr < end; itr = nitr)
     {
         uint32_t code_point = 0;
-        char const* buf = 0;
+        char const* buf = nullptr;
 
-        nitr = _nu_tolower(itr, end, nu_utf8_read, &code_point, &buf, 0);
-        if (buf != 0)
+        nitr = _nu_tolower(itr, end, nu_utf8_read, &code_point, &buf, nullptr);
+        if (buf != nullptr)
         {
             do
             {
