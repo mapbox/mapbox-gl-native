@@ -25,7 +25,7 @@ class Layer;
 
 class Bucket : private util::noncopyable {
 public:
-    Bucket() : uploaded(false) {}
+    Bucket() = default;
 
     // As long as this bucket has a Prepare render pass, this function is getting called. Typically,
     // this only happens once when the bucket is being rendered for the first time.
@@ -49,8 +49,7 @@ public:
     virtual void swapRenderData() {}
 
 protected:
-    util::Atomic<bool> uploaded;
-
+    util::Atomic<bool> uploaded = { false };
 };
 
 } // namespace mbgl

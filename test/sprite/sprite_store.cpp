@@ -153,13 +153,12 @@ TEST(SpriteStore, ReplaceWithDifferentDimensions) {
 
 class SpriteStoreTest {
 public:
-    SpriteStoreTest()
-        : spriteStore(1.0) {}
+    SpriteStoreTest() = default;
 
     util::RunLoop loop;
     StubFileSource fileSource;
     StubStyleObserver observer;
-    SpriteStore spriteStore;
+    SpriteStore spriteStore = { 1.0 };
 
     void run() {
         // Squelch logging.
