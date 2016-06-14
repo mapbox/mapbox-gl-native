@@ -64,7 +64,7 @@ public:
 class HTTPRequest : public AsyncRequest {
 public:
     HTTPRequest(HTTPFileSource::Impl*, const Resource&, FileSource::Callback);
-    ~HTTPRequest();
+    ~HTTPRequest() override;
 
     void handleResult(CURLcode code);
 
