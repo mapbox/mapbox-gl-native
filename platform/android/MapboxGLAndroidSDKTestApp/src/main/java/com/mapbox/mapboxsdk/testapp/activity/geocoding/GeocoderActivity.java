@@ -118,7 +118,7 @@ public class GeocoderActivity extends AppCompatActivity {
                 final float circleDiameterSize = getResources().getDimension(R.dimen.circle_size);
                 mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
 
-                    private ObjectAnimator pulseAnimation;
+                    private Animation pulseAnimation;
 
                     @Override
                     public void onCameraChange(CameraPosition position) {
@@ -126,19 +126,12 @@ public class GeocoderActivity extends AppCompatActivity {
                         if (convertView != null) {
                             View backgroundView = convertView.findViewById(R.id.background_imageview);
                             if (pulseAnimation == null && position.target.distanceTo(markerPosition) < 0.5f * circleDiameterSize) {
-                                pulseAnimation = ObjectAnimator.ofPropertyValuesHolder(backgroundView,
-                                        PropertyValuesHolder.ofFloat("scaleX", 1.8f),
-                                        PropertyValuesHolder.ofFloat("scaleY", 1.8f));
-                                pulseAnimation.setDuration(310);
-                                pulseAnimation.setRepeatCount(ObjectAnimator.INFINITE);
-                                pulseAnimation.setRepeatMode(ObjectAnimator.REVERSE);
-                                pulseAnimation.start();
+                                pulseAnimation = AnimationUtils.loadAnimation(GeocoderActivity.this, R.anim.pulse);
+                                pulseAnimation.setRepeatCount(Animation.INFINITE);
+                                pulseAnimation.setRepeatMode(Animation.RESTART);
+                                backgroundView.startAnimation(pulseAnimation);
                             } else if (pulseAnimation != null && position.target.distanceTo(markerPosition) >= 0.6f * circleDiameterSize) {
-                                pulseAnimation.cancel();
-                                Animator initialStateAnimator = ObjectAnimator.ofPropertyValuesHolder(backgroundView,
-                                        PropertyValuesHolder.ofFloat("scaleX", 1.0f),
-                                        PropertyValuesHolder.ofFloat("scaleY", 1.0f));
-                                initialStateAnimator.start();
+                                backgroundView.clearAnimation();
                                 pulseAnimation = null;
                             }
                         }
