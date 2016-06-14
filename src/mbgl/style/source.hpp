@@ -23,6 +23,10 @@ class TransformState;
 class RenderTile;
 struct ClipID;
 
+namespace algorithm {
+class ClipIDGenerator;
+} // namespace algorithm
+
 namespace style {
 
 class Style;
@@ -45,13 +49,10 @@ public:
     // new data available that a tile in the "partial" state might be interested at.
     bool update(const UpdateParameters&);
 
-    template <typename ClipIDGenerator>
-    void updateClipIDs(ClipIDGenerator& generator) {
-        generator.update(renderTiles);
-    }
-
-    void updateMatrices(const mat4 &projMatrix, const TransformState &transform);
-    void finishRender(Painter &painter);
+    void startRender(algorithm::ClipIDGenerator&,
+                     const mat4& projMatrix,
+                     const TransformState&);
+    void finishRender(Painter&);
 
     const std::map<UnwrappedTileID, RenderTile>& getRenderTiles() const;
 

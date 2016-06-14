@@ -22,6 +22,8 @@
 #include <mbgl/gl/debugging.hpp>
 
 #include <mbgl/algorithm/update_renderables.hpp>
+#include <mbgl/algorithm/generate_clip_ids.hpp>
+#include <mbgl/algorithm/generate_clip_ids_impl.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -58,7 +60,15 @@ void Source::invalidateTiles() {
     cache.clear();
 }
 
-void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transform) {
+void Source::startRender(algorithm::ClipIDGenerator& generator,
+                         const mat4& projMatrix,
+                         const TransformState& transform) {
+    if (type == SourceType::Vector ||
+        type == SourceType::GeoJSON ||
+        type == SourceType::Annotations) {
+        generator.update(renderTiles);
+    }
+
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
         transform.matrixFor(tile.matrix, tile.id);
@@ -66,7 +76,7 @@ void Source::updateMatrices(const mat4 &projMatrix, const TransformState &transf
     }
 }
 
-void Source::finishRender(Painter &painter) {
+void Source::finishRender(Painter& painter) {
     for (auto& pair : renderTiles) {
         auto& tile = pair.second;
         painter.renderTileDebug(tile);

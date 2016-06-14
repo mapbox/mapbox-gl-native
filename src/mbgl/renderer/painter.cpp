@@ -161,11 +161,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         // Update all clipping IDs.
         algorithm::ClipIDGenerator generator;
         for (const auto& source : sources) {
-            if (source->type == SourceType::Vector || source->type == SourceType::GeoJSON ||
-                source->type == SourceType::Annotations) {
-                source->updateClipIDs(generator);
-            }
-            source->updateMatrices(projMatrix, state);
+            source->startRender(generator, projMatrix, state);
         }
 
         drawClippingMasks(generator.getStencils());
