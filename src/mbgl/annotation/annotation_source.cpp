@@ -5,7 +5,7 @@
 namespace mbgl {
 
 AnnotationSource::AnnotationSource()
-    : Source(SourceType::Annotations, AnnotationManager::SourceID, "", util::tileSize, std::make_unique<Tileset>()) {
+    : Source(SourceType::Annotations, AnnotationManager::SourceID, "", util::tileSize) {
 }
 
 Range<uint8_t> AnnotationSource::getZoomRange() {

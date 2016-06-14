@@ -15,6 +15,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>

@@ -10,9 +10,8 @@
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/tileset.hpp>
+#include <mbgl/util/range.hpp>
 
-#include <forward_list>
 #include <vector>
 #include <map>
 
@@ -36,15 +35,12 @@ public:
     Source(SourceType,
            std::string id,
            std::string url,
-           uint16_t tileSize,
-           std::unique_ptr<Tileset>&&);
+           uint16_t tileSize);
     ~Source() override;
 
     bool loaded = false;
     virtual void load(FileSource&) = 0;
     bool isLoaded() const;
-
-    const Tileset* getTileset() const { return tileset.get(); }
 
     // Request or parse all the tiles relevant for the "TransformState". This method
     // will return true if all the tiles were scheduled for updating of false if
@@ -90,8 +86,6 @@ private:
 
 protected:
     void invalidateTiles();
-
-    std::unique_ptr<const Tileset> tileset;
 
     SourceObserver* observer = nullptr;
 

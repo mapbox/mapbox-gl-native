@@ -34,7 +34,6 @@ std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> parseGeoJSON(const JSValue& value)
 
 std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id,
                                                     const JSValue& value) {
-    auto tileset = std::make_unique<Tileset>();
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
     std::string url;
 
@@ -58,14 +57,13 @@ std::unique_ptr<GeoJSONSource> GeoJSONSource::parse(const std::string& id,
         return nullptr;
     }
 
-    return std::make_unique<GeoJSONSource>(id, url, std::move(tileset), std::move(geojsonvt));
+    return std::make_unique<GeoJSONSource>(id, url, std::move(geojsonvt));
 }
 
 GeoJSONSource::GeoJSONSource(std::string id_,
                              std::string url_,
-                             std::unique_ptr<Tileset>&& tileset_,
                              std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&& geojsonvt_)
-    : Source(SourceType::GeoJSON, std::move(id_), std::move(url_), util::tileSize, std::move(tileset_)),
+    : Source(SourceType::GeoJSON, std::move(id_), std::move(url_), util::tileSize),
       geojsonvt(std::move(geojsonvt_)) {
 }
 
@@ -94,8 +92,6 @@ void GeoJSONSource::load(FileSource& fileSource) {
         } else if (res.noContent) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
         } else {
-            std::unique_ptr<Tileset> newTileset = std::make_unique<Tileset>();
-
             rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> d;
             d.Parse<0>(res.data->c_str());
 
@@ -107,11 +103,9 @@ void GeoJSONSource::load(FileSource& fileSource) {
             }
 
             geojsonvt = style::parseGeoJSON(d);
-            newTileset->zoomRange.max = geojsonvt->options.maxZoom;
 
             invalidateTiles();
 
-            tileset = std::move(newTileset);
             loaded = true;
             observer->onSourceLoaded(*this);
         }

@@ -4,10 +4,12 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/style/parser.hpp>
+#include <mbgl/style/tile_source.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <set>
 
@@ -102,9 +104,10 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     for (const auto& source : parser.sources) {
         switch (source->type) {
         case SourceType::Vector:
-        case SourceType::Raster:
-            if (source->getTileset()) {
-                result.requiredResourceCount += tileResources(source->type, source->tileSize, *source->getTileset()).size();
+        case SourceType::Raster: {
+            style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+            if (tileSource->getTileset()) {
+                result.requiredResourceCount += tileResources(source->type, source->tileSize, *tileSource->getTileset()).size();
             } else {
                 result.requiredResourceCount += 1;
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(source->url));
@@ -116,6 +119,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 }
             }
             break;
+        }
 
         case SourceType::GeoJSON:
             if (!source->url.empty()) {
@@ -154,9 +158,10 @@ void OfflineDownload::activateDownload() {
 
             switch (type) {
             case SourceType::Vector:
-            case SourceType::Raster:
-                if (source->getTileset()) {
-                    ensureTiles(type, tileSize, *source->getTileset());
+            case SourceType::Raster: {
+                style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+                if (tileSource->getTileset()) {
+                    ensureTiles(type, tileSize, *tileSource->getTileset());
                 } else {
                     status.requiredResourceCountIsPrecise = false;
                     requiredSourceURLs.insert(url);
@@ -171,6 +176,7 @@ void OfflineDownload::activateDownload() {
                     });
                 }
                 break;
+            }
 
             case SourceType::GeoJSON:
                 if (!source->url.empty()) {

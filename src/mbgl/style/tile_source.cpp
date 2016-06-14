@@ -1,6 +1,7 @@
 #include <mbgl/style/tile_source.hpp>
 #include <mbgl/style/source_observer.hpp>
 #include <mbgl/style/parser.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <mbgl/storage/file_source.hpp>
 
 namespace mbgl {
@@ -11,7 +12,8 @@ TileSource::TileSource(SourceType type_,
                        std::string url_,
                        uint16_t tileSize_,
                        std::unique_ptr<Tileset>&& tileset_)
-    : Source(type_, std::move(id_), std::move(url_), tileSize_, std::move(tileset_)) {
+    : Source(type_, std::move(id_), std::move(url_), tileSize_),
+      tileset(std::move(tileset_)) {
 }
 
 TileSource::~TileSource() = default;

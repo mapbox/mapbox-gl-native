@@ -23,7 +23,6 @@ public:
 
     GeoJSONSource(std::string id,
                   std::string url,
-                  std::unique_ptr<Tileset>&&,
                   std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
     ~GeoJSONSource() final;
 

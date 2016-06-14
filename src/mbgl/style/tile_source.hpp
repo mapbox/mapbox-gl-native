@@ -4,6 +4,7 @@
 
 namespace mbgl {
 
+class Tileset;
 class AsyncRequest;
 
 namespace style {
@@ -23,9 +24,12 @@ public:
 
     void load(FileSource&) final;
 
-private:
+    const Tileset* getTileset() const { return tileset.get(); }
+
+protected:
     Range<uint8_t> getZoomRange() final;
 
+    std::unique_ptr<const Tileset> tileset;
     std::unique_ptr<AsyncRequest> req;
 };
 

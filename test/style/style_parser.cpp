@@ -4,6 +4,7 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/enum.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #include <rapidjson/document.h>
 
