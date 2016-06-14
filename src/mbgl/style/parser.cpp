@@ -212,11 +212,11 @@ void Parser::parseSources(const JSValue& value) {
                 }
             }
 
-            source = std::make_unique<RasterSource>(id, url, tileSize, std::move(tileset), std::move(geojsonvt));
+            source = std::make_unique<RasterSource>(id, url, tileSize, std::move(tileset));
             break;
 
         case SourceType::Vector:
-            source = std::make_unique<VectorSource>(id, url, tileSize, std::move(tileset), std::move(geojsonvt));
+            source = std::make_unique<VectorSource>(id, url, tileSize, std::move(tileset));
             break;
 
         case SourceType::GeoJSON:

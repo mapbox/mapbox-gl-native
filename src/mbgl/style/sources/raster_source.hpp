@@ -10,8 +10,7 @@ public:
     RasterSource(std::string id,
                  std::string url,
                  uint16_t tileSize,
-                 std::unique_ptr<Tileset>&&,
-                 std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
+                 std::unique_ptr<Tileset>&&);
 };
 
 } // namespace style

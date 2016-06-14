@@ -107,7 +107,7 @@ std::unique_ptr<AnnotationTileData> AnnotationManager::getTileData(const Canonic
 void AnnotationManager::updateStyle(Style& style) {
     // Create annotation source, point layer, and point bucket
     if (!style.getSource(SourceID)) {
-        std::unique_ptr<Source> source = std::make_unique<AnnotationSource>(SourceID, "", util::tileSize, std::make_unique<Tileset>(), nullptr);
+        std::unique_ptr<Source> source = std::make_unique<AnnotationSource>(SourceID, "", util::tileSize, std::make_unique<Tileset>());
         source->enabled = true;
         style.addSource(std::move(source));
 

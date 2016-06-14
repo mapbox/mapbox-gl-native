@@ -44,8 +44,7 @@ public:
            std::string id,
            std::string url,
            uint16_t tileSize,
-           std::unique_ptr<Tileset>&&,
-           std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>&&);
+           std::unique_ptr<Tileset>&&);
     ~Source() override;
 
     bool loaded = false;
@@ -99,8 +98,10 @@ private:
 private:
     std::unique_ptr<const Tileset> tileset;
 
+protected:
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> geojsonvt;
 
+private:
     // Stores the time when this source was most recently updated.
     TimePoint updated = TimePoint::min();
 
