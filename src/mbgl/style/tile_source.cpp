@@ -12,7 +12,8 @@ TileSource::TileSource(SourceType type_,
                        std::string url_,
                        uint16_t tileSize_,
                        std::unique_ptr<Tileset>&& tileset_)
-    : Source(type_, std::move(id_), tileSize_),
+    : Source(type_, std::move(id_)),
+      tileSize(tileSize_),
       url(std::move(url_)),
       tileset(std::move(tileset_)) {
 }

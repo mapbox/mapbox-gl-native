@@ -32,10 +32,9 @@ namespace style {
 
 static SourceObserver nullObserver;
 
-Source::Source(SourceType type_, std::string id_, uint16_t tileSize_)
+Source::Source(SourceType type_, std::string id_)
     : type(type_),
       id(std::move(id_)),
-      tileSize(tileSize_),
       observer(&nullObserver) {
 }
 
@@ -94,6 +93,7 @@ bool Source::update(const UpdateParameters& parameters) {
         return allTilesUpdated;
     }
 
+    const uint16_t tileSize = getTileSize();
     const Range<uint8_t> zoomRange = getZoomRange();
 
     // Determine the overzooming/underzooming amounts and required tiles.

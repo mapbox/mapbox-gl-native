@@ -32,7 +32,7 @@ class SourceObserver;
 
 class Source : public TileObserver, private util::noncopyable {
 public:
-    Source(SourceType, std::string id, uint16_t tileSize);
+    Source(SourceType, std::string id);
     ~Source() override;
 
     bool loaded = false;
@@ -68,7 +68,6 @@ public:
 
     const SourceType type;
     const std::string id;
-    uint16_t tileSize = util::tileSize;
     bool enabled = false;
 
 private:
@@ -77,6 +76,7 @@ private:
     void onTileError(Tile&, std::exception_ptr) override;
     void onNeedsRepaint() override;
 
+    virtual uint16_t getTileSize() const = 0;
     virtual Range<uint8_t> getZoomRange() = 0;
     virtual std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) = 0;
 

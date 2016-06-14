@@ -31,6 +31,7 @@ public:
     const std::string& getURL() const { return url; }
 
 private:
+    uint16_t getTileSize() const final { return util::tileSize; }
     Range<uint8_t> getZoomRange() final;
     std::unique_ptr<Tile> createTile(const OverscaledTileID&, const UpdateParameters&) final;
 

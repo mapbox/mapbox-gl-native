@@ -108,13 +108,13 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         case SourceType::Raster: {
             style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
             if (tileSource->getTileset()) {
-                result.requiredResourceCount += tileResources(source->type, source->tileSize, *tileSource->getTileset()).size();
+                result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(), *tileSource->getTileset()).size();
             } else {
                 result.requiredResourceCount += 1;
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(tileSource->getURL()));
                 if (sourceResponse) {
-                    result.requiredResourceCount += tileResources(source->type, source->tileSize,
-                        *style::parseTileJSON(*sourceResponse->data, tileSource->getURL(), source->type, source->tileSize)).size();
+                    result.requiredResourceCount += tileResources(source->type, tileSource->getTileSize(),
+                        *style::parseTileJSON(*sourceResponse->data, tileSource->getURL(), source->type, tileSource->getTileSize())).size();
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
@@ -156,12 +156,12 @@ void OfflineDownload::activateDownload() {
 
         for (const auto& source : parser.sources) {
             SourceType type = source->type;
-            uint16_t tileSize = source->tileSize;
 
             switch (type) {
             case SourceType::Vector:
             case SourceType::Raster: {
-                style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+                const style::TileSource* tileSource = static_cast<style::TileSource*>(source.get());
+                const uint16_t tileSize = tileSource->getTileSize();
                 if (tileSource->getTileset()) {
                     ensureTiles(type, tileSize, *tileSource->getTileset());
                 } else {
