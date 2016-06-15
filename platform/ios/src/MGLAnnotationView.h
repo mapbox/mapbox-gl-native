@@ -4,6 +4,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
+    MGLAnnotationViewDragStateNone = 0,     // View is sitting on the map
+    MGLAnnotationViewDragStateStarting,     // View is beginning to drag and animation starts
+    MGLAnnotationViewDragStateDragging,     // View is being dragged
+    MGLAnnotationViewDragStateCanceling,    // View dragging was cancelled and will be returned to its starting positon.
+    MGLAnnotationViewDragStateEnding        // View was dragged, new coordinate has been set and stop animation is finishing
+};
+
 /** The MGLAnnotationView class is responsible for representing point-based annotation markers as a view. Annotation views represent an annotation object, which is an object that corresponds to the MGLAnnotation protocol. When an annotation’s coordinate point is visible on the map view, the map view delegate is asked to provide a corresponding annotation view. If an annotation view is created with a reuse identifier, the map view may recycle the view when it goes offscreen. */
 @interface MGLAnnotationView : UIView
 
@@ -47,6 +55,23 @@ NS_ASSUME_NONNULL_BEGIN
  MGLAnnotationView object, the default value of this property is YES.
  */
 @property (nonatomic, assign, getter=isScaledWithViewingDistance) BOOL scalesWithViewingDistance;
+
+/**
+ Setting this property to YES will make the view draggable. Long press followed by a pan gesture will start to move the
+ view around the map. Each update will center the annotation view. setCoordinate: is called on the associated annotation when panning ends successfully.
+ */
+@property (nonatomic, assign, getter=isDraggable) BOOL draggable;
+
+/**
+ All states are handled automatically when `draggable` is set to YES.
+ Custom animations can be achieved by overriding setDragState:animated:
+ */
+@property (nonatomic, readonly) MGLAnnotationViewDragState dragState;
+
+/**
+ Implementer may override this method to use a custom animation for the different MGLAnnotationViewDragState.
+ */
+- (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated __attribute__((objc_requires_super));
 
 /**
  Called when the view is removed from the reuse queue.

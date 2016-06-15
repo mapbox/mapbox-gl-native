@@ -6,10 +6,13 @@
 
 #include <mbgl/util/constants.hpp>
 
-@interface MGLAnnotationView ()
+@interface MGLAnnotationView () <UIGestureRecognizerDelegate>
 
 @property (nonatomic) id<MGLAnnotation> annotation;
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
+@property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
+@property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
+@property (nonatomic, weak) MGLMapView *mapView;
 
 @end
 
@@ -48,6 +51,11 @@
     center.y += _centerOffset.dy;
     
     [super setCenter:center];
+    
+    // Omit applying a new transformation while the view is being dragged.
+    if (self.dragState == MGLAnnotationViewDragStateDragging) {
+        return;
+    }
     
     if (self.flat)
     {
@@ -93,6 +101,129 @@
         CATransform3D transform = self.flat ? self.layer.transform : CATransform3DIdentity;
         self.layer.transform = CATransform3DScale(transform, pitchAdjustedScale, pitchAdjustedScale, 1);
     }
+}
+
+- (void)setDraggable:(BOOL)draggable
+{
+    _draggable = draggable;
+    if (draggable) {
+        [self enableDrag];
+    } else {
+        [self disableDrag];
+    }
+}
+
+- (void)enableDrag
+{
+    if (!_longPressRecognizer) {
+        UILongPressGestureRecognizer *recognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
+        recognizer.delegate = self;
+        [self addGestureRecognizer:recognizer];
+        _longPressRecognizer = recognizer;
+    }
+    
+    if (!_panGestureRecognizer) {
+        UIPanGestureRecognizer *recognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePan:)];
+        recognizer.delegate = self;
+        [self addGestureRecognizer:recognizer];
+        _panGestureRecognizer = recognizer;
+    }
+}
+
+- (void)disableDrag
+{
+    [self removeGestureRecognizer:_longPressRecognizer];
+    [self removeGestureRecognizer:_panGestureRecognizer];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)sender
+{
+    if (sender.state == UIGestureRecognizerStateBegan)
+    {
+        self.dragState = MGLAnnotationViewDragStateStarting;
+    }
+    else if (sender.state == UIGestureRecognizerStateChanged)
+    {
+        self.dragState = MGLAnnotationViewDragStateDragging;
+    }
+    else if (sender.state == UIGestureRecognizerStateCancelled) {
+        self.dragState = MGLAnnotationViewDragStateCanceling;
+    }
+    else if (sender.state == UIGestureRecognizerStateEnded)
+    {
+        self.dragState = MGLAnnotationViewDragStateEnding;
+    }
+}
+
+- (void)handlePan:(UIPanGestureRecognizer *)sender
+{
+    CGPoint center = [sender locationInView:sender.view.superview];
+    [self setCenter:center pitch:self.mapView.camera.pitch];
+    
+    if (sender.state == UIGestureRecognizerStateEnded) {
+        self.dragState = MGLAnnotationViewDragStateNone;
+    }
+}
+
+- (void)setDragState:(MGLAnnotationViewDragState)dragState
+{
+    [self setDragState:dragState animated:YES];
+}
+
+- (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated
+{
+    _dragState = dragState;
+    
+    switch (dragState) {
+        case MGLAnnotationViewDragStateNone:
+            break;
+        case MGLAnnotationViewDragStateStarting: {
+            if (animated)
+            {
+                [UIView animateWithDuration:.20 animations:^{
+                    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, 2, 2);
+                }];
+            }
+            break;
+        }
+        case MGLAnnotationViewDragStateDragging:
+            break;
+        case MGLAnnotationViewDragStateCanceling:
+            break;
+        case MGLAnnotationViewDragStateEnding: {
+            
+            CLLocationCoordinate2D coord = [self.mapView convertPoint:self.center toCoordinateFromView:self.mapView];
+            [self.annotation setCoordinate:coord];
+            
+            if (animated)
+            {
+                [UIView animateWithDuration:.20 animations:^{
+                    self.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1, 1);
+                } completion:^(BOOL finished) {
+                    self.dragState = MGLAnnotationViewDragStateNone;
+                }];
+            }
+            else
+            {
+                _dragState = MGLAnnotationViewDragStateNone;
+            }
+            break;
+        }
+    }
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    BOOL isDragging = self.dragState == MGLAnnotationViewDragStateDragging;
+    if ([gestureRecognizer isKindOfClass:UIPanGestureRecognizer.class] && !(isDragging)) {
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    return YES;
 }
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
