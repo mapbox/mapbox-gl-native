@@ -19,6 +19,7 @@ template <> inline Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
 template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
 template <> inline std::vector<std::string> defaultStopsValue() { return {{}}; }
 template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
+template <> inline std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
 
 template <> inline std::string defaultStopsValue() { return {}; }
 template <> inline TranslateAnchorType defaultStopsValue() { return {}; }
@@ -30,6 +31,7 @@ template <> inline TextAnchorType defaultStopsValue() { return {}; }
 template <> inline TextJustifyType defaultStopsValue() { return {}; }
 template <> inline TextTransformType defaultStopsValue() { return {}; }
 template <> inline AlignmentType defaultStopsValue() { return {}; }
+template <> inline IconTextFitType defaultStopsValue() { return {}; };
 
 template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
@@ -87,6 +89,7 @@ template class PropertyEvaluator<Color>;
 template class PropertyEvaluator<std::vector<float>>;
 template class PropertyEvaluator<std::vector<std::string>>;
 template class PropertyEvaluator<std::array<float, 2>>;
+template class PropertyEvaluator<std::array<float, 4>>;
 
 template class PropertyEvaluator<std::string>;
 template class PropertyEvaluator<TranslateAnchorType>;
@@ -98,6 +101,7 @@ template class PropertyEvaluator<TextAnchorType>;
 template class PropertyEvaluator<TextJustifyType>;
 template class PropertyEvaluator<TextTransformType>;
 template class PropertyEvaluator<AlignmentType>;
+template class PropertyEvaluator<IconTextFitType>;
 
 template <typename T>
 Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const Undefined&) const {

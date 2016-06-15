@@ -14,6 +14,8 @@ void SymbolLayoutProperties::parse(const JSValue& value) {
     iconOptional.parse("icon-optional", value);
     iconRotationAlignment.parse("icon-rotation-alignment", value);
     iconSize.parse("icon-size", value);
+    iconTextFit.parse("icon-text-fit", value);
+    iconTextFitPadding.parse("icon-text-fit-padding", value);
     iconImage.parse("icon-image", value);
     iconRotate.parse("icon-rotate", value);
     iconPadding.parse("icon-padding", value);
@@ -49,6 +51,8 @@ void SymbolLayoutProperties::recalculate(const CalculationParameters& parameters
     iconOptional.calculate(parameters);
     iconRotationAlignment.calculate(parameters);
     iconSize.calculate(parameters);
+    iconTextFit.calculate(parameters);
+    iconTextFitPadding.calculate(parameters);
     iconImage.calculate(parameters);
     iconRotate.calculate(parameters);
     iconPadding.calculate(parameters);

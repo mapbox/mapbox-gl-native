@@ -79,6 +79,14 @@ struct ValueConverter<std::array<float, 2>> {
 };
 
 template <>
+struct ValueConverter<std::array<float, 4>> {
+    mbgl::optional<mbgl::style::PropertyValue<std::array<float, 4>>> operator()(const v8::Local<v8::Value>& value) const {
+        (void)value;
+        return {};
+    }
+};
+
+template <>
 struct ValueConverter<std::vector<float>> {
     mbgl::optional<mbgl::style::PropertyValue<std::vector<float>>> operator()(const v8::Local<v8::Value>& value) const {
         (void)value;

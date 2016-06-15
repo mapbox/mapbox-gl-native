@@ -71,6 +71,25 @@ optional<std::array<float, 2>> parseConstant(const char* name, const JSValue& va
 }
 
 template <>
+optional<std::array<float, 4>> parseConstant(const char* name, const JSValue& value) {
+    if (value.IsArray() && value.Size() == 4 &&
+            value[rapidjson::SizeType(0)].IsNumber() &&
+            value[rapidjson::SizeType(1)].IsNumber() &&
+            value[rapidjson::SizeType(2)].IsNumber() &&
+            value[rapidjson::SizeType(3)].IsNumber()) {
+
+        float first = value[rapidjson::SizeType(0)].GetDouble();
+        float second = value[rapidjson::SizeType(1)].GetDouble();
+        float third = value[rapidjson::SizeType(2)].GetDouble();
+        float fourth = value[rapidjson::SizeType(3)].GetDouble();
+        return { {{ first, second, third, fourth }} };
+    } else {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be an array of four numbers", name);
+        return {};
+    }
+}
+
+template <>
 optional<std::vector<float>> parseConstant(const char* name, const JSValue& value) {
     if (!value.IsArray()) {
         Log::Warning(Event::ParseStyle, "value of '%s' must be an array of numbers", name);

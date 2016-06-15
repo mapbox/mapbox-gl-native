@@ -15,7 +15,7 @@ const float globalMinScale = 0.5f; // underscale by 1 zoom level
 
 SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
         const GeometryCoordinates& line, const SymbolLayoutProperties& layout,
-        const bool alongLine) {
+        const bool alongLine, const Shaping& shapedText) {
 
     auto image = *(shapedIcon.image);
 
@@ -24,11 +24,43 @@ SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
     auto right = left + image.pos.w / image.relativePixelRatio;
     auto top = shapedIcon.top - border;
     auto bottom = top + image.pos.h / image.relativePixelRatio;
-    Point<float> tl{left, top};
-    Point<float> tr{right, top};
-    Point<float> br{right, bottom};
-    Point<float> bl{left, bottom};
+    Point<float> tl;
+    Point<float> tr;
+    Point<float> br;
+    Point<float> bl;
 
+    if (layout.iconTextFit != IconTextFitType::None && shapedText) {
+        auto iconWidth = right - left;
+        auto iconHeight = bottom - top;
+        auto size = layout.textSize / 24.0f;
+        auto textLeft = shapedText.left * size;
+        auto textRight = shapedText.right * size;
+        auto textTop = shapedText.top * size;
+        auto textBottom = shapedText.bottom * size;
+        auto textWidth = textRight - textLeft;
+        auto textHeight = textBottom - textTop;;
+        auto padT = layout.iconTextFitPadding.value[0];
+        auto padR = layout.iconTextFitPadding.value[1];
+        auto padB = layout.iconTextFitPadding.value[2];
+        auto padL = layout.iconTextFitPadding.value[3];
+        auto offsetY = layout.iconTextFit == IconTextFitType::Width ? (textHeight - iconHeight) * 0.5 : 0;
+        auto offsetX = layout.iconTextFit == IconTextFitType::Height ? (textWidth - iconWidth) * 0.5 : 0;
+        auto width = layout.iconTextFit == IconTextFitType::Width || layout.iconTextFit == IconTextFitType::Both ? textWidth : iconWidth;
+        auto height = layout.iconTextFit == IconTextFitType::Height || layout.iconTextFit == IconTextFitType::Both ? textHeight : iconHeight;
+        left = textLeft + offsetX - padL;
+        top = textTop + offsetY - padT;
+        right = textLeft + offsetX + padR + width;
+        bottom = textTop + offsetY + padB + height;
+        tl = {left, top};
+        tr = {right, top};
+        br = {right, bottom};
+        bl = {left, bottom};
+    } else {
+        tl = {left, top};
+        tr = {right, top};
+        br = {right, bottom};
+        bl = {left, bottom};
+    }
 
     float angle = layout.iconRotate * util::DEG2RAD;
     if (alongLine) {
