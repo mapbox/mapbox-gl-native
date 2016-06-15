@@ -7,6 +7,7 @@
 #include <mbgl/shader/outlinepattern_shader.hpp>
 #include <mbgl/shader/pattern_shader.hpp>
 #include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/util/convert.hpp>
 
 namespace mbgl {
 
@@ -17,25 +18,28 @@ void Painter::renderFill(FillBucket& bucket,
                          const UnwrappedTileID& tileID,
                          const mat4& matrix) {
     const FillPaintProperties& properties = layer.impl->paint;
-    mat4 vtxMatrix =
+    mat4 vertexMatrix =
         translatedMatrix(matrix, properties.fillTranslate, tileID, properties.fillTranslateAnchor);
 
-    Color fill_color = properties.fillColor;
+    Color fillColor = properties.fillColor;
     float opacity = properties.fillOpacity;
 
-    Color stroke_color = properties.fillOutlineColor;
-    if (stroke_color.a < 0) {
-        stroke_color = fill_color;
+    Color strokeColor = properties.fillOutlineColor;
+    bool isOutlineColorDefined = strokeColor.a >= 0;
+    if (!isOutlineColorDefined) {
+        strokeColor = fillColor;
     }
 
+    auto worldSize = util::convert<GLfloat>(frame.framebufferSize);
+
     bool pattern = !properties.fillPattern.value.from.empty();
-    bool outline = properties.fillAntialias && !pattern && stroke_color != fill_color;
-    bool fringeline = properties.fillAntialias && !pattern && stroke_color == fill_color;
+    bool outline = properties.fillAntialias && !pattern && isOutlineColorDefined;
+    bool fringeline = properties.fillAntialias && !pattern && !isOutlineColorDefined;
 
     bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
     if (wireframe) {
-        fill_color = { 1.0f, 1.0f, 1.0f, 1.0f };
-        stroke_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+        fillColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        strokeColor = { 1.0f, 1.0f, 1.0f, 1.0f };
         opacity = 1.0f;
         pattern = false;
         outline = true;
@@ -47,38 +51,35 @@ void Painter::renderFill(FillBucket& bucket,
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
     config.depthMask = GL_TRUE;
+    config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
         config.program = outlineShader->getID();
-        outlineShader->u_matrix = vtxMatrix;
-        config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
+        outlineShader->u_matrix = vertexMatrix;
 
-        outlineShader->u_outline_color = stroke_color;
+        outlineShader->u_outline_color = strokeColor;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line
-        outlineShader->u_world = {{
-            static_cast<float>(frame.framebufferSize[0]),
-            static_cast<float>(frame.framebufferSize[1])
-        }};
+        outlineShader->u_world = worldSize;
         setDepthSublayer(0);
         bucket.drawVertices(*outlineShader, store);
     }
 
     if (pattern) {
-        optional<SpriteAtlasPosition> posA = spriteAtlas->getPosition(properties.fillPattern.value.from, true);
-        optional<SpriteAtlasPosition> posB = spriteAtlas->getPosition(properties.fillPattern.value.to, true);
+        optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.fillPattern.value.from, true);
+        optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.fillPattern.value.to, true);
 
         // Image fill.
-        if (pass == RenderPass::Translucent && posA && posB) {
+        if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
             config.program = patternShader->getID();
-            patternShader->u_matrix = vtxMatrix;
-            patternShader->u_pattern_tl_a = (*posA).tl;
-            patternShader->u_pattern_br_a = (*posA).br;
-            patternShader->u_pattern_tl_b = (*posB).tl;
-            patternShader->u_pattern_br_b = (*posB).br;
+            patternShader->u_matrix = vertexMatrix;
+            patternShader->u_pattern_tl_a = imagePosA->tl;
+            patternShader->u_pattern_br_a = imagePosA->br;
+            patternShader->u_pattern_tl_b = imagePosB->tl;
+            patternShader->u_pattern_br_b = imagePosB->br;
             patternShader->u_opacity = properties.fillOpacity;
             patternShader->u_image = 0;
             patternShader->u_mix = properties.fillPattern.value.t;
@@ -101,21 +102,17 @@ void Painter::renderFill(FillBucket& bucket,
             setDepthSublayer(0);
             bucket.drawElements(*patternShader, store);
 
-            if (properties.fillAntialias && stroke_color == fill_color) {
+            if (properties.fillAntialias && !isOutlineColorDefined) {
                 config.program = outlinePatternShader->getID();
-                outlinePatternShader->u_matrix = vtxMatrix;
-                config.lineWidth = 2.0f;
+                outlinePatternShader->u_matrix = vertexMatrix;
 
                 // Draw the entire line
-                outlinePatternShader->u_world = {{
-                    static_cast<float>(frame.framebufferSize[0]),
-                    static_cast<float>(frame.framebufferSize[1])
-                }};
+                outlineShader->u_world = worldSize;
 
-                outlinePatternShader->u_pattern_tl_a = (*posA).tl;
-                outlinePatternShader->u_pattern_br_a = (*posA).br;
-                outlinePatternShader->u_pattern_tl_b = (*posB).tl;
-                outlinePatternShader->u_pattern_br_b = (*posB).br;
+                outlinePatternShader->u_pattern_tl_a = imagePosA->tl;
+                outlinePatternShader->u_pattern_br_a = imagePosA->br;
+                outlinePatternShader->u_pattern_tl_b = imagePosB->tl;
+                outlinePatternShader->u_pattern_br_b = imagePosB->br;
                 outlinePatternShader->u_opacity = properties.fillOpacity;
                 outlinePatternShader->u_image = 0;
                 outlinePatternShader->u_mix = properties.fillPattern.value.t;
@@ -136,14 +133,14 @@ void Painter::renderFill(FillBucket& bucket,
         }
     } else if (!wireframe) {
         // No image fill.
-        if ((fill_color.a >= 1.0f && opacity >= 1.0f) == (pass == RenderPass::Opaque)) {
+        if ((fillColor.a >= 1.0f && opacity >= 1.0f) == (pass == RenderPass::Opaque)) {
             // Only draw the fill when it's either opaque and we're drawing opaque
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
             config.program = plainShader->getID();
-            plainShader->u_matrix = vtxMatrix;
-            plainShader->u_color = fill_color;
+            plainShader->u_matrix = vertexMatrix;
+            plainShader->u_color = fillColor;
             plainShader->u_opacity = opacity;
 
             // Draw the actual triangles into the color & stencil buffer.
@@ -156,17 +153,13 @@ void Painter::renderFill(FillBucket& bucket,
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
         config.program = outlineShader->getID();
-        outlineShader->u_matrix = vtxMatrix;
-        config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
+        outlineShader->u_matrix = vertexMatrix;
 
-        outlineShader->u_outline_color = fill_color;
+        outlineShader->u_outline_color = fillColor;
         outlineShader->u_opacity = opacity;
 
         // Draw the entire line
-        outlineShader->u_world = {{
-            static_cast<float>(frame.framebufferSize[0]),
-            static_cast<float>(frame.framebufferSize[1])
-        }};
+        outlineShader->u_world = worldSize;
 
         setDepthSublayer(2);
         bucket.drawVertices(*outlineShader, store);

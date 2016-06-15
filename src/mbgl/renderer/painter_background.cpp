@@ -33,10 +33,10 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
 
         config.program = patternShader->getID();
         patternShader->u_matrix = identityMatrix;
-        patternShader->u_pattern_tl_a = (*imagePosA).tl;
-        patternShader->u_pattern_br_a = (*imagePosA).br;
-        patternShader->u_pattern_tl_b = (*imagePosB).tl;
-        patternShader->u_pattern_br_b = (*imagePosB).br;
+        patternShader->u_pattern_tl_a = imagePosA->tl;
+        patternShader->u_pattern_br_a = imagePosA->br;
+        patternShader->u_pattern_tl_b = imagePosB->tl;
+        patternShader->u_pattern_br_b = imagePosB->br;
         patternShader->u_mix = properties.backgroundPattern.value.t;
         patternShader->u_opacity = properties.backgroundOpacity;
 
@@ -62,28 +62,26 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     config.depthMask = GL_FALSE;
     setDepthSublayer(0);
 
-    auto tileIDs = util::tileCover(state, state.getIntegerZoom());
-
-    for (auto& id : tileIDs) {
-        mat4 vtxMatrix;
-        state.matrixFor(vtxMatrix, id);
-        matrix::multiply(vtxMatrix, projMatrix, vtxMatrix);
+    for (const auto& tileID : util::tileCover(state, state.getIntegerZoom())) {
+        mat4 vertexMatrix;
+        state.matrixFor(vertexMatrix, tileID);
+        matrix::multiply(vertexMatrix, projMatrix, vertexMatrix);
 
         if (isPatterned) {
-            patternShader->u_matrix = vtxMatrix;
+            patternShader->u_matrix = vertexMatrix;
             patternShader->u_pattern_size_a = imagePosA->size;
             patternShader->u_pattern_size_b = imagePosB->size;
             patternShader->u_scale_a = properties.backgroundPattern.value.fromScale;
             patternShader->u_scale_b = properties.backgroundPattern.value.toScale;
-            patternShader->u_tile_units_to_pixels = 1.0f / id.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+            patternShader->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
 
-            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - id.canonical.z);
-            GLint pixelX = tileSizeAtNearestZoom * (id.canonical.x + id.wrap * state.zoomScale(id.canonical.z));
-            GLint pixelY = tileSizeAtNearestZoom * id.canonical.y;
+            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
+            GLint pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
+            GLint pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
             patternShader->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
             patternShader->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
         } else {
-            plainShader->u_matrix = vtxMatrix;
+            plainShader->u_matrix = vertexMatrix;
         }
 
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)tileStencilBuffer.index()));
