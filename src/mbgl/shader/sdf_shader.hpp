@@ -2,6 +2,7 @@
 
 #include <mbgl/shader/shader.hpp>
 #include <mbgl/shader/uniform.hpp>
+#include <mbgl/util/color.hpp>
 
 namespace mbgl {
 
@@ -11,7 +12,7 @@ public:
 
     UniformMatrix<4>                u_matrix        = {"u_matrix",        *this};
     Uniform<std::array<GLfloat, 2>> u_extrude_scale = {"u_extrude_scale", *this};
-    Uniform<std::array<GLfloat, 4>> u_color         = {"u_color",         *this};
+    Uniform<Color>                  u_color         = {"u_color",         *this};
     Uniform<GLfloat>                u_opacity       = {"u_opacity",       *this};
     Uniform<std::array<GLfloat, 2>> u_texsize       = {"u_texsize",       *this};
     Uniform<GLfloat>                u_buffer        = {"u_buffer",        *this};

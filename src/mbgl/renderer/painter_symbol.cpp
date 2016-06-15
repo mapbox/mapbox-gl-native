@@ -88,7 +88,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     // We're drawing in the translucent pass which is bottom-to-top, so we need
     // to draw the halo first.
-    if (haloColor[3] > 0.0f && haloWidth > 0.0f) {
+    if (haloColor.a > 0.0f && haloWidth > 0.0f) {
         sdfShader.u_gamma = (haloBlur * blurOffset / fontScale / sdfPx + gamma) * gammaScale;
         sdfShader.u_color = haloColor;
         sdfShader.u_opacity = opacity;
@@ -99,7 +99,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 
     // Then, we draw the text/icon over the halo
-    if (color[3] > 0.0f) {
+    if (color.a > 0.0f) {
         sdfShader.u_gamma = gamma * gammaScale;
         sdfShader.u_color = color;
         sdfShader.u_opacity = opacity;

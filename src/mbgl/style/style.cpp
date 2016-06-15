@@ -267,10 +267,10 @@ RenderData Style::getRenderData() const {
             if (layer.get() == layers[0].get() && paint.backgroundPattern.value.from.empty()) {
                 // This is a solid background. We can use glClear().
                 result.backgroundColor = paint.backgroundColor;
-                result.backgroundColor[0] *= paint.backgroundOpacity;
-                result.backgroundColor[1] *= paint.backgroundOpacity;
-                result.backgroundColor[2] *= paint.backgroundOpacity;
-                result.backgroundColor[3] *= paint.backgroundOpacity;
+                result.backgroundColor.r *= paint.backgroundOpacity;
+                result.backgroundColor.g *= paint.backgroundOpacity;
+                result.backgroundColor.b *= paint.backgroundOpacity;
+                result.backgroundColor.a *= paint.backgroundOpacity;
             } else {
                 // This is a textured background, or not the bottommost layer. We need to render it with a quad.
                 result.order.emplace_back(*layer);

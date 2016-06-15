@@ -146,7 +146,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         if (frame.debugOptions & MapDebugOptions::Wireframe) {
             config.clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
         } else {
-            config.clearColor = { background[0], background[1], background[2], background[3] };
+            config.clearColor = { background.r, background.g, background.b, background.a };
         }
         config.clearStencil = 0;
         config.clearDepth = 1;

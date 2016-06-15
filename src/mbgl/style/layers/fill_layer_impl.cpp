@@ -25,7 +25,7 @@ bool FillLayer::Impl::recalculate(const CalculationParameters& parameters) {
         passes |= RenderPass::Translucent;
     }
 
-    if (!paint.fillPattern.value.from.empty() || (paint.fillColor.value[3] * paint.fillOpacity) < 1.0f) {
+    if (!paint.fillPattern.value.from.empty() || (paint.fillColor.value.a * paint.fillOpacity) < 1.0f) {
         passes |= RenderPass::Translucent;
     } else {
         passes |= RenderPass::Opaque;

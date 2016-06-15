@@ -29,7 +29,7 @@ bool LineLayer::Impl::recalculate(const CalculationParameters& parameters) {
 
     bool hasTransitions = paint.recalculate(parameters);
 
-    passes = (paint.lineOpacity > 0 && paint.lineColor.value[3] > 0 && paint.lineWidth > 0)
+    passes = (paint.lineOpacity > 0 && paint.lineColor.value.a > 0 && paint.lineWidth > 0)
         ? RenderPass::Translucent : RenderPass::None;
 
     return hasTransitions;
