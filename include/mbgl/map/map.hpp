@@ -26,6 +26,7 @@ struct CameraOptions;
 struct AnimationOptions;
 
 namespace style {
+class Source;
 class Layer;
 } // namespace style
 
@@ -149,6 +150,12 @@ public:
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
 
+    // Sources
+    style::Source* getSource(const std::string& sourceID);
+    void addSource(std::unique_ptr<style::Source>);
+    void removeSource(const std::string& sourceID);
+
+    // Layers
     style::Layer* getLayer(const std::string& layerID);
     void addLayer(std::unique_ptr<style::Layer>, const optional<std::string>& beforeLayerID = {});
     void removeLayer(const std::string& layerID);

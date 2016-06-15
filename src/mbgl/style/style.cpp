@@ -111,6 +111,15 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
+void Style::removeSource(const std::string& id) {
+    auto it = std::find_if(sources.begin(), sources.end(), [&](const auto& source) {
+        return source->getID() == id;
+    });
+    if (it == sources.end())
+        throw std::runtime_error("no such source");
+    sources.erase(it);
+}
+
 std::vector<std::unique_ptr<Layer>> Style::getLayers() const {
     std::vector<std::unique_ptr<Layer>> result;
     result.reserve(layers.size());

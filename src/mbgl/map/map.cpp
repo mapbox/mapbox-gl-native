@@ -5,6 +5,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/style/style.hpp>
+#include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/observer.hpp>
 #include <mbgl/style/transition_options.hpp>
@@ -735,6 +736,18 @@ std::vector<Feature> Map::queryRenderedFeatures(const ScreenBox& box, const opti
 }
 
 #pragma mark - Style API
+
+style::Source* Map::getSource(const std::string& sourceID) {
+    return impl->style ? impl->style->getSource(sourceID) : nullptr;
+}
+
+void Map::addSource(std::unique_ptr<style::Source> source) {
+    impl->style->addSource(std::move(source));
+}
+
+void Map::removeSource(const std::string& sourceID) {
+    impl->style->removeSource(sourceID);
+}
 
 style::Layer* Map::getLayer(const std::string& layerID) {
     return impl->style ? impl->style->getLayer(layerID) : nullptr;
