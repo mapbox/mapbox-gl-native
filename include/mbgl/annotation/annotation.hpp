@@ -30,14 +30,14 @@ public:
     ShapeAnnotationGeometry geometry;
     float opacity = 1;
     float width = 1;
-    Color color = { 0, 0, 0, 1 };
+    Color color = Color::black();
 };
 
 class FillAnnotation {
 public:
     ShapeAnnotationGeometry geometry;
     float opacity = 1;
-    Color color = { 0, 0, 0, 1 };
+    Color color = Color::black();
     Color outlineColor = { 0, 0, 0, -1 };
 };
 

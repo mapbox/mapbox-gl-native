@@ -11,14 +11,26 @@ public:
     float g = 0.0f;
     float b = 0.0f;
     float a = 0.0f;
+
+    static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
+    static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };
 };
 
-inline bool operator== (const Color& colorA, const Color& colorB) {
+inline bool operator==(const Color& colorA, const Color& colorB) {
     return colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a;
 }
 
-inline bool operator!= (const Color& colorA, const Color& colorB) {
-    return !(colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a);
+inline bool operator!=(const Color& colorA, const Color& colorB) {
+    return !(colorA == colorB);
+}
+
+inline Color operator*(const Color& color, float alpha) {
+    return {
+        color.r * alpha,
+        color.g * alpha,
+        color.b * alpha,
+        color.a * alpha
+    };
 }
 
 } // namespace mbgl

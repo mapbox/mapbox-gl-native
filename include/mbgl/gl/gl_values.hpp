@@ -5,6 +5,7 @@
 #include <array>
 
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace gl {
@@ -23,7 +24,7 @@ struct ClearDepth {
 };
 
 struct ClearColor {
-    struct Type { GLfloat r, g, b, a; };
+    using Type = Color;
     static const Type Default;
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glClearColor(value.r, value.g, value.b, value.a));
@@ -34,10 +35,6 @@ struct ClearColor {
         return { floats[0], floats[1], floats[2], floats[3] };
     }
 };
-
-inline bool operator!=(const ClearColor::Type& a, const ClearColor::Type& b) {
-    return a.r != b.r || a.g != b.g || a.b != b.b || a.a != b.a;
-}
 
 struct ClearStencil {
     using Type = GLint;

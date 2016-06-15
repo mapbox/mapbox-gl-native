@@ -30,7 +30,7 @@ public:
 
 class RenderData {
 public:
-    Color backgroundColor = { 0, 0, 0, 0 };
+    Color backgroundColor;
     std::set<style::Source*> sources;
     std::vector<RenderItem> order;
 };

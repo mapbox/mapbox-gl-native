@@ -144,9 +144,9 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.depthMask = GL_TRUE;
         config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
         if (frame.debugOptions & MapDebugOptions::Wireframe) {
-            config.clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            config.clearColor = Color::black();
         } else {
-            config.clearColor = { background.r, background.g, background.b, background.a };
+            config.clearColor = background;
         }
         config.clearStencil = 0;
         config.clearDepth = 1;

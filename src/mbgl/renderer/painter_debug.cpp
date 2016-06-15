@@ -44,7 +44,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
     plainShader->u_matrix = matrix;
 
     // Draw white outline
-    plainShader->u_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+    plainShader->u_color = Color::white();
     config.lineWidth = 4.0f * frame.pixelRatio;
     tile.debugBucket->drawLines(*plainShader, store);
 
@@ -55,7 +55,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
 #endif
 
     // Draw black text.
-    plainShader->u_color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    plainShader->u_color = Color::black();
     config.lineWidth = 2.0f * frame.pixelRatio;
     tile.debugBucket->drawLines(*plainShader, store);
 
