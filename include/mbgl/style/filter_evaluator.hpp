@@ -1,17 +1,32 @@
 #pragma once
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/util/geometry.hpp>
 
 #include <type_traits>
 
 namespace mbgl {
 namespace style {
 
+/*
+   A visitor that evaluates a `Filter` for a given feature type and properties. For maximum
+   flexibility, it is templated on the PropertyAccessor type, which must be a callable type with
+   function signature `optional<Value> (const std::string&)`, returning the value for the given
+   key, if it exists.
+
+   Use via `Filter::operator()`. For example:
+
+       if (filter(feature.getType(), [&] (const std::string& key) { return feature.getValue(key); })) {
+           // matches the filter
+       } else {
+           // does not match
+       }
+*/
+template <class PropertyAccessor>
 class FilterEvaluator {
 public:
-    FilterEvaluator(const GeometryTileFeature& feature_)
-        : feature(feature_) {}
+    const FeatureType featureType;
+    const PropertyAccessor propertyAccessor;
 
     bool operator()(const NullFilter&) const {
         return true;
@@ -107,10 +122,10 @@ public:
     }
 
 private:
-    optional<Value> getValue(const std::string& key) const {
-        return key == "$type"
-            ? optional<Value>(uint64_t(feature.getType()))
-            : feature.getValue(key);
+    optional<Value> getValue(const std::string& key_) const {
+        return key_ == "$type"
+            ? optional<Value>(uint64_t(featureType))
+            : propertyAccessor(key_);
     }
 
     template <class Op>
@@ -155,9 +170,12 @@ private:
     bool equal(const Value& lhs, const Value& rhs) const {
         return compare(lhs, rhs, [] (const auto& lhs_, const auto& rhs_) { return lhs_ == rhs_; });
     }
-
-    const GeometryTileFeature& feature;
 };
+
+template <class PropertyAccessor>
+inline bool Filter::operator()(FeatureType type, PropertyAccessor accessor) const {
+    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, accessor });
+}
 
 } // namespace style
 } // namespace mbgl
