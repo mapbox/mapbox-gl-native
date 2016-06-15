@@ -65,8 +65,18 @@ struct ValueConverter<T, std::enable_if_t<std::is_enum<T>::value>> {
 template <>
 struct ValueConverter<mbgl::Color> {
     mbgl::optional<mbgl::style::PropertyValue<mbgl::Color>> operator()(const v8::Local<v8::Value>& value) const {
-        (void)value;
-        return {};
+        if (!value->IsString()) {
+            Nan::ThrowTypeError("string required");
+            return {};
+        }
+
+        mbgl::optional<mbgl::Color> result = mbgl::Color::parse(*Nan::Utf8String(value));
+        if (!result) {
+            Nan::ThrowTypeError("invalid color");
+            return {};
+        }
+
+        return { *result };
     }
 };
 
