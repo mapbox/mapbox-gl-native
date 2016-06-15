@@ -64,7 +64,19 @@ void Painter::renderFill(FillBucket& bucket,
 
         // Draw the entire line
         outlineShader->u_world = worldSize;
-        setDepthSublayer(0);
+        if (isOutlineColorDefined) {
+            // If we defined a different color for the fill outline, we are
+            // going to ignore the bits in 0x07 and just care about the global
+            // clipping mask.
+            setDepthSublayer(2); // OK
+        } else {
+            // Otherwise, we only want to drawFill the antialiased parts that are
+            // *outside* the current shape. This is important in case the fill
+            // or stroke color is translucent. If we wouldn't clip to outside
+            // the current shape, some pixels from the outline stroke overlapped
+            // the (non-antialiased) fill.
+            setDepthSublayer(0); // OK
+        }
         bucket.drawVertices(*outlineShader, store);
     }
 
