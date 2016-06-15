@@ -82,37 +82,17 @@ void Painter::renderFill(FillBucket& bucket,
             patternShader->u_opacity = properties.fillOpacity;
             patternShader->u_image = 0;
             patternShader->u_mix = properties.fillPattern.value.t;
+            patternShader->u_pattern_size_a = imagePosA->size;
+            patternShader->u_pattern_size_b = imagePosB->size;
+            patternShader->u_scale_a = properties.fillPattern.value.fromScale;
+            patternShader->u_scale_b = properties.fillPattern.value.toScale;
+            patternShader->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
 
-            std::array<int, 2> imageSizeScaledA = {{
-                (int)((*posA).size[0] * properties.fillPattern.value.fromScale),
-                (int)((*posA).size[1] * properties.fillPattern.value.fromScale)
-            }};
-            std::array<int, 2> imageSizeScaledB = {{
-                (int)((*posB).size[0] * properties.fillPattern.value.toScale),
-                (int)((*posB).size[1] * properties.fillPattern.value.toScale)
-            }};
-
-            patternShader->u_patternscale_a = {
-                { 1.0f / tileID.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
-                  1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom()) }
-            };
-            patternShader->u_patternscale_b = {
-                { 1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
-                  1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom()) }
-            };
-
-            float offsetAx = (std::fmod(util::tileSize, imageSizeScaledA[0]) * tileID.canonical.x) /
-                             (float)imageSizeScaledA[0];
-            float offsetAy = (std::fmod(util::tileSize, imageSizeScaledA[1]) * tileID.canonical.y) /
-                             (float)imageSizeScaledA[1];
-
-            float offsetBx = (std::fmod(util::tileSize, imageSizeScaledB[0]) * tileID.canonical.x) /
-                             (float)imageSizeScaledB[0];
-            float offsetBy = (std::fmod(util::tileSize, imageSizeScaledB[1]) * tileID.canonical.y) /
-                             (float)imageSizeScaledB[1];
-
-            patternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
-            patternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
+            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
+            GLint pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
+            GLint pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
+            patternShader->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
+            patternShader->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
             config.activeTexture = GL_TEXTURE0;
             spriteAtlas->bind(true, store);
@@ -139,18 +119,13 @@ void Painter::renderFill(FillBucket& bucket,
                 outlinePatternShader->u_opacity = properties.fillOpacity;
                 outlinePatternShader->u_image = 0;
                 outlinePatternShader->u_mix = properties.fillPattern.value.t;
-
-                outlinePatternShader->u_patternscale_a = {{
-                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledA[0], state.getIntegerZoom()),
-                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
-                }};
-                outlinePatternShader->u_patternscale_b = {{
-                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[0], state.getIntegerZoom()),
-                    1.0f / tileID.pixelsToTileUnits(imageSizeScaledB[1], state.getIntegerZoom())
-                }};
-
-                outlinePatternShader->u_offset_a = std::array<float, 2>{{offsetAx, offsetAy}};
-                outlinePatternShader->u_offset_b = std::array<float, 2>{{offsetBx, offsetBy}};
+                outlinePatternShader->u_pattern_size_a = imagePosA->size;
+                outlinePatternShader->u_pattern_size_b = imagePosB->size;
+                outlinePatternShader->u_scale_a = properties.fillPattern.value.fromScale;
+                outlinePatternShader->u_scale_b = properties.fillPattern.value.toScale;
+                outlinePatternShader->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+                outlinePatternShader->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
+                outlinePatternShader->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
                 config.activeTexture = GL_TEXTURE0;
                 spriteAtlas->bind(true, store);

@@ -72,6 +72,9 @@ public:
     Point<double> project(const LatLng&) const;
     LatLng unproject(const Point<double>&, double worldSize, LatLng::WrapMode = LatLng::Unwrapped) const;
 
+    double zoomScale(double zoom) const;
+    double scaleZoom(double scale) const;
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
@@ -85,8 +88,6 @@ private:
     // logical dimensions
     uint16_t width = 0, height = 0;
 
-    double zoomScale(double zoom) const;
-    double scaleZoom(double scale) const;
     double worldSize() const;
 
     mat4 coordinatePointMatrix(double z) const;
