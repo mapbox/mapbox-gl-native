@@ -29,7 +29,7 @@ template <class T, class... Params> void testClone(Params... params) {
     EXPECT_EQ("test", layer->baseImpl->clone()->getID());
 }
 
-const auto color = PropertyValue<Color> {Color(1, 0, 0, 1)};
+const auto color = PropertyValue<Color> {{ 1, 0, 0, 1 }};
 const auto opacity = PropertyValue<float> { 1.0f };
 const auto radius = PropertyValue<float> { 1.0f };
 const auto blur = PropertyValue<float> { 1.0f };

@@ -46,13 +46,12 @@ template <>
 struct Interpolator<Color> {
 public:
     Color operator()(const Color& a, const Color& b, const double t) {
-        Color color(
+        return {
             interpolate(a.r, b.r, t),
             interpolate(a.g, b.g, t),
             interpolate(a.b, b.b, t),
             interpolate(a.a, b.a, t)
-        );
-        return color;
+        };
     }
 };
 

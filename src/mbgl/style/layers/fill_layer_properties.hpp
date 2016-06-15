@@ -20,8 +20,8 @@ public:
 
     PaintProperty<bool> fillAntialias { true };
     PaintProperty<float> fillOpacity { 1 };
-    PaintProperty<Color> fillColor { Color(0, 0, 0, 1) };
-    PaintProperty<Color> fillOutlineColor { Color(0, 0, 0, -1) };
+    PaintProperty<Color> fillColor { { 0, 0, 0, 1 } };
+    PaintProperty<Color> fillOutlineColor { { 0, 0, 0, -1 } };
     PaintProperty<std::array<float, 2>> fillTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> fillTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<std::string, CrossFadedPropertyEvaluator> fillPattern { "" };

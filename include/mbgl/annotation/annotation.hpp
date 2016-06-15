@@ -30,15 +30,15 @@ public:
     ShapeAnnotationGeometry geometry;
     float opacity = 1;
     float width = 1;
-    Color color = Color(0, 0, 0, 1);
+    Color color = { 0, 0, 0, 1 };
 };
 
 class FillAnnotation {
 public:
     ShapeAnnotationGeometry geometry;
     float opacity = 1;
-    Color color = Color(0, 0, 0, 1);
-    Color outlineColor = Color(0, 0, 0, -1);
+    Color color = { 0, 0, 0, 1 };
+    Color outlineColor = { 0, 0, 0, -1 };
 };
 
 // An annotation whose type and properties are sourced from a style layer.

@@ -34,8 +34,8 @@ void Painter::renderFill(FillBucket& bucket,
 
     bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
     if (wireframe) {
-        fill_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
-        stroke_color = Color(1.0f, 1.0f, 1.0f, 1.0f);
+        fill_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+        stroke_color = { 1.0f, 1.0f, 1.0f, 1.0f };
         opacity = 1.0f;
         pattern = false;
         outline = true;

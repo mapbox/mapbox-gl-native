@@ -68,7 +68,7 @@ TEST(Map, AddLayer) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
-    layer->setBackgroundColor({Color(1, 0, 0, 1)});
+    layer->setBackgroundColor({{ 1, 0, 0, 1 }});
     map.addLayer(std::move(layer));
 
     test::checkImage("test/fixtures/map/add_layer", test::render(map));
@@ -81,7 +81,7 @@ TEST(Map, RemoveLayer) {
     map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
-    layer->setBackgroundColor({Color(1, 0, 0, 1)});
+    layer->setBackgroundColor({{ 1, 0, 0, 1 }});
     map.addLayer(std::move(layer));
     map.removeLayer("background");
 

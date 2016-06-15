@@ -49,7 +49,7 @@ TEST(Annotations, LineAnnotation) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
     LineAnnotation annotation { line };
-    annotation.color = Color(255, 0, 0, 1);
+    annotation.color = { 255, 0, 0, 1 };
     annotation.width = 5;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -62,7 +62,7 @@ TEST(Annotations, FillAnnotation) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
     FillAnnotation annotation { polygon };
-    annotation.color = Color(255, 0, 0, 1);
+    annotation.color = { 255, 0, 0, 1 };
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
     test.map.addAnnotation(annotation);
@@ -100,7 +100,7 @@ TEST(Annotations, NonImmediateAdd) {
 
     Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
     FillAnnotation annotation { polygon };
-    annotation.color = Color(255, 0, 0, 1);
+    annotation.color = { 255, 0, 0, 1 };
 
     test.map.addAnnotation(annotation);
     test.checkRendering("non_immediate_add");
@@ -154,7 +154,7 @@ TEST(Annotations, RemoveShape) {
 
     LineString<double> line = {{ { 0, 0 }, { 45, 45 } }};
     LineAnnotation annotation { line };
-    annotation.color = Color(255, 0, 0, 1);
+    annotation.color = { 255, 0, 0, 1 };
     annotation.width = 5;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
