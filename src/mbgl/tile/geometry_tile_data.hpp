@@ -17,13 +17,6 @@
 
 namespace mbgl {
 
-enum class FeatureType : uint8_t {
-    Unknown = 0,
-    Point = 1,
-    LineString = 2,
-    Polygon = 3
-};
-
 class CanonicalTileID;
 
 // Normalized vector tile coordinates.

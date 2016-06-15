@@ -5,6 +5,13 @@
 
 namespace mbgl {
 
+enum class FeatureType : uint8_t {
+    Unknown = 0,
+    Point = 1,
+    LineString = 2,
+    Polygon = 3
+};
+
 template <class T>
 using Point = mapbox::geometry::point<T>;
 
