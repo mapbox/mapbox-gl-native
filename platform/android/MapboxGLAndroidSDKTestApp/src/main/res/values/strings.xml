@@ -22,6 +22,7 @@
     <!-- InfoWindow-->
     <string name="activity_info_window">Standard InfoWindow example</string>
     <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
+    <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow Adapter</string>
 
     <!-- Camera -->
     <string name="activity_camera_animation_types">Animation Types</string>
@@ -80,6 +81,7 @@
     <string name="description_doublemap">2 maps in a view hierarchy</string>
     <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
+    <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
 
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>

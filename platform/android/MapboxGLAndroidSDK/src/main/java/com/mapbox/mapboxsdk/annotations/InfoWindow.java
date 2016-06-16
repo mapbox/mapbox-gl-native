@@ -259,9 +259,18 @@ public class InfoWindow {
         View view = mView.get();
         if (mapboxMap != null && marker != null && view != null) {
             mCoordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-            view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
+
+            if (view instanceof InfoWindowView) {
+                view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
+            } else {
+                view.setX(mCoordinates.x - (view.getMeasuredWidth() / 2) - mMarkerWidthOffset);
+            }
             view.setY(mCoordinates.y + mMarkerHeightOffset);
         }
+    }
+
+    public View getView() {
+        return mView != null ? mView.get() : null;
     }
 
     boolean isVisible() {
