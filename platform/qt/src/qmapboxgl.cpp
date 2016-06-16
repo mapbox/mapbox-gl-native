@@ -404,10 +404,10 @@ mbgl::Annotation fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnota
         linearRing.reserve(coordinates.size());
 
         for (const Coordinate &coordinate : coordinates) {
-            linearRing.emplace_back(mbgl::Point<double>(coordinate.first, coordinate.second));
+            linearRing.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
         }
 
-        polygon.emplace_back(linearRing);
+        polygon.push_back(std::move(linearRing));
     }
 
     return mbgl::StyleSourcedAnnotation { polygon, styleLayer.toStdString() };
