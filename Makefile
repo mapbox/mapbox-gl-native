@@ -242,9 +242,11 @@ run-qt-qml-app: qt-qml-app
 
 test-valgrind-qt: $(QT_MAKEFILE) node_modules
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
+	.mason/mason install valgrind latest
 	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=-*.Load
 
 run-valgrind-qt-app: qt-app
+	.mason/mason install valgrind latest
 	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/qmapboxgl --test -platform offscreen
 
 #### Linux targets #####################################################

@@ -28,8 +28,6 @@ if [ "$MASON_PLATFORM" == "osx" ]; then
         CONFIG+="    'opengl_ldflags%': ['-framework OpenGL', '-framework CoreFoundation'],"$LN
     }
 else
-    VALGRIND_VERSION=latest
-
     function print_opengl_flags {
         CONFIG+="    'opengl_cflags%': $(quote_flags $(pkg-config gl x11 --cflags)),"$LN
         CONFIG+="    'opengl_ldflags%': $(quote_flags $(pkg-config gl x11 --libs)),"$LN
