@@ -405,6 +405,25 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView addAnnotation:line];
 }
 
+- (IBAction)drawAnimatedAnnotation:(id)sender {
+    DroppedPinAnnotation *annotation = [[DroppedPinAnnotation alloc] init];
+    [self.mapView addAnnotation:annotation];
+
+    [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
+                                     target:self
+                                   selector:@selector(updateAnimatedAnnotation:)
+                                   userInfo:annotation
+                                    repeats:YES];
+}
+
+- (void)updateAnimatedAnnotation:(NSTimer *)timer {
+    DroppedPinAnnotation *annotation = timer.userInfo;
+    double angle = timer.fireDate.timeIntervalSinceReferenceDate;
+    annotation.coordinate = CLLocationCoordinate2DMake(
+        sin(angle) * 20,
+        cos(angle) * 20);
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -611,6 +630,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return _showsToolTipsOnDroppedPins;
     }
     if (menuItem.action == @selector(dropManyPins:)) {
+        return YES;
+    }
+    if (menuItem.action == @selector(drawAnimatedAnnotation:)) {
         return YES;
     }
     if (menuItem.action == @selector(removeAllAnnotations:)) {

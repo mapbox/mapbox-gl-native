@@ -506,6 +506,12 @@
                                     <action selector="drawPolygonAndPolyLineAnnotations:" target="-1" id="EhT-CB-gee"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Add Animated Annotation" id="Etf-JN-Aoc">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="drawAnimatedAnnotation:" target="-1" id="CYM-WB-s97"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Remove All Annotations" id="6rC-68-vk0">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
@@ -585,7 +591,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="109" y="131" width="350" height="84"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" id="eA4-n3-qPe">
                 <rect key="frame" x="0.0" y="0.0" width="350" height="84"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -660,7 +666,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="830" y="430" width="400" height="300"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
             <view key="contentView" id="8ha-hw-zOD">
                 <rect key="frame" x="0.0" y="0.0" width="400" height="300"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -668,11 +674,11 @@
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q8b-0e-dLv">
                         <rect key="frame" x="-1" y="20" width="402" height="281"/>
                         <clipView key="contentView" id="J9U-Yx-o2S">
-                            <rect key="frame" x="1" y="0.0" width="400" height="280"/>
+                            <rect key="frame" x="1" y="0.0" width="400" height="265"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" headerView="MAZ-Iq-hBi" id="Ato-Vu-HYT">
-                                    <rect key="frame" x="0.0" y="0.0" width="423" height="257"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="423" height="242"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
