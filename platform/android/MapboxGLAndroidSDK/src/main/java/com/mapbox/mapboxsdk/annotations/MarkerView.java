@@ -1,12 +1,16 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
@@ -26,8 +30,8 @@ public class MarkerView extends Marker {
     private float anchorU;
     private float anchorV;
 
-    private float offsetX;
-    private float offsetY;
+    private float offsetX = -1;
+    private float offsetY = -1;
 
     private float infoWindowAnchorU;
     private float infoWindowAnchorV;
@@ -42,6 +46,15 @@ public class MarkerView extends Marker {
     private Icon markerViewIcon;
 
     private boolean selected;
+
+    private LatLng targetPosition;
+    private boolean shouldAnimate;
+    private boolean isAnimationRunning;
+    private AnimatorSet set;
+
+    private long startTime;
+    private long duration;
+    private long remainingTime;
 
     /**
      * Publicly hidden default constructor
@@ -279,7 +292,7 @@ public class MarkerView extends Marker {
      *
      * @param alpha the alpha value to animate to
      */
-    public void setAlpha(@FloatRange(from=0.0, to=255.0)float alpha) {
+    public void setAlpha(@FloatRange(from = 0.0, to = 255.0) float alpha) {
         this.alpha = alpha;
         if (markerViewManager != null) {
             markerViewManager.animateAlpha(this, alpha);
@@ -337,6 +350,72 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
         markerViewManager = mapboxMap.getMarkerViewManager();
+    }
+
+    @Override
+    public void setPosition(LatLng position) {
+        setPosition(position, 0);
+    }
+
+    public void setPosition(LatLng position, long duration) {
+        if (duration <= 0) {
+            // update position instantly
+            super.setPosition(position);
+            if (markerViewManager != null) {
+                markerViewManager.update();
+            }
+        } else {
+            // animate using Android SDK animations
+            this.targetPosition = position;
+            if (markerViewManager != null) {
+                markerViewManager.animatePosition(this, duration);
+            }
+        }
+    }
+
+    boolean shouldAnimate() {
+        return shouldAnimate;
+    }
+
+    void setShouldAnimate(boolean animating) {
+        shouldAnimate = animating;
+    }
+
+    boolean isAnimating() {
+        return isAnimationRunning;
+    }
+
+    void setAnimating(boolean animationRunning) {
+        isAnimationRunning = animationRunning;
+    }
+
+    LatLng getTargetPosition() {
+        return targetPosition;
+    }
+
+    void setAnimation(AnimatorSet set) {
+        this.set = set;
+    }
+
+    AnimatorSet getAnimation() {
+        return set;
+    }
+
+    long getRemainingTime() {
+        long time = duration - (AnimationUtils.currentAnimationTimeMillis() - startTime);
+        return time > 0 ? time : 0;
+    }
+
+    void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    PointF getScreenLocation(@NonNull View convertView) {
+        return new PointF(convertView.getX() + offsetX, convertView.getY() + offsetY);
     }
 
     /**

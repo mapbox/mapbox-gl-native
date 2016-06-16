@@ -1398,8 +1398,12 @@ public class MapView extends FrameLayout {
 
             mCompassView.update(getDirection());
             mMyLocationView.update();
-            mMapboxMap.getMarkerViewManager().update();
 
+            try {
+                mMapboxMap.getMarkerViewManager().update();
+            }catch (NullPointerException e){
+
+            }
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();
             }

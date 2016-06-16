@@ -1,18 +1,17 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -42,24 +41,18 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-                LatLng brussels = new LatLng(50.900446, 4.485251);
-                LatLng washington = new LatLng(38.897108, -77.036716);
 
-                final Marker marker = mapboxMap.addMarker(new MarkerOptions().position(brussels));
-                ValueAnimator markerAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), (Object[]) new LatLng[]{brussels, washington});
-                markerAnimator.setDuration(5000);
-                markerAnimator.setRepeatCount(ValueAnimator.INFINITE);
-                markerAnimator.setRepeatMode(ValueAnimator.REVERSE);
-                markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                markerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                LatLng brussels = new LatLng(50.900446, 4.485251);
+                final MarkerView marker = mapboxMap.addMarker(new MarkerViewOptions().position(brussels));
+
+                // FIXME workaround because view is not actually added at this time
+                final LatLng utrecht = new LatLng(52.086224, 5.122309);
+                new Handler().postDelayed(new Runnable() {
                     @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        if (marker != null) {
-                            marker.setPosition((LatLng) animation.getAnimatedValue());
-                        }
+                    public void run() {
+                        marker.setPosition(utrecht, 6500l /*animation duration*/);
                     }
-                });
-                markerAnimator.start();
+                }, 1000);
             }
         });
     }
