@@ -18,7 +18,7 @@ addons_shortcuts:
   addons_qt4: &qt4
     apt:
       sources:  [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'g++-5', 'gcc-5',
+      packages: [ 'g++-5', 'gcc-5', 'libjemalloc-dev',
                   'mesa-utils', 'qt4-default' ]
   addons_qt5: &qt5
     apt:
@@ -117,14 +117,15 @@ matrix:
 
     # Qt 4 - Release
     - os: linux
-      sudo: false
+      sudo: required
+      dist: trusty
       language: cpp
       compiler: "qt4-gcc5-release"
       env: BUILDTYPE=Release _CXX=g++-5 _CC=gcc-5
       addons: *qt4
       script:
         - make qt-app
-        - make test-qt
+        - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so make test-qt-Memory.*:*.Load
 
     # Qt 5 - Release
     - os: linux
@@ -137,7 +138,7 @@ matrix:
       script:
         - make qt-app
         - make qt-qml-app
-        - make test-valgrind-qt
+        - make test-valgrind-qt--*.Load
 
 cache:
   directories:

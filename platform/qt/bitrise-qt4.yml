@@ -34,7 +34,7 @@ workflows:
             brew linkapps qt
             export BUILDTYPE=Debug
             make qt-app
-            make test-qt
+            make test-qt-*
         - is_debug: 'yes'
     - slack:
         title: Post to Slack

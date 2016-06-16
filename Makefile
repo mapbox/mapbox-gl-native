@@ -253,9 +253,11 @@ qt-app: $(QT_MAKEFILE)
 qt-qml-app: $(QT_MAKEFILE)
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) qt-qml-app
 
-test-qt: $(QT_MAKEFILE) node_modules
+test-qt-%: $(QT_MAKEFILE) node_modules
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
-	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=*
+	$(GDB) $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+test-qt: test-qt-*
 
 run-qt-app: qt-app
 	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qmapboxgl
@@ -263,10 +265,12 @@ run-qt-app: qt-app
 run-qt-qml-app: qt-qml-app
 	cd $(QT_OUTPUT_PATH)/$(BUILDTYPE) && ./qquickmapboxgl
 
-test-valgrind-qt: $(QT_MAKEFILE) node_modules
+test-valgrind-qt-%: $(QT_MAKEFILE) node_modules
 	$(QT_ENV) $(MAKE) -j$(JOBS) -C $(QT_OUTPUT_PATH) test
 	.mason/mason install valgrind latest
-	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=-*.Load
+	./scripts/valgrind.sh $(QT_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+test-valgrind-qt: test-valgrind-qt-*
 
 run-valgrind-qt-app: qt-app
 	.mason/mason install valgrind latest
