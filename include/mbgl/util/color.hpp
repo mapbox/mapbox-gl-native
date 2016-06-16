@@ -1,6 +1,8 @@
 #pragma once
 
-#include <array>
+#include <mbgl/util/optional.hpp>
+
+#include <string>
 
 namespace mbgl {
 
@@ -14,6 +16,8 @@ public:
 
     static constexpr Color black() { return { 0.0f, 0.0f, 0.0f, 1.0f }; };
     static constexpr Color white() { return { 1.0f, 1.0f, 1.0f, 1.0f }; };
+
+    static optional<Color> parse(const std::string&);
 };
 
 inline bool operator==(const Color& colorA, const Color& colorB) {

@@ -2,8 +2,6 @@
 
 #include <mbgl/platform/log.hpp>
 
-#include <csscolorparser/csscolorparser.hpp>
-
 namespace mbgl {
 namespace style {
 
@@ -44,15 +42,13 @@ optional<Color> parseConstant(const char* name, const JSValue& value) {
         return {};
     }
 
-    CSSColorParser::Color css_color = CSSColorParser::parse({ value.GetString(), value.GetStringLength() });
+    optional<Color> result = Color::parse({ value.GetString(), value.GetStringLength() });
+    if (!result) {
+        Log::Warning(Event::ParseStyle, "value of '%s' must be a valid color", name);
+        return {};
+    }
 
-    // Premultiply the color.
-    const float factor = css_color.a / 255;
-
-    return Color{ (float)css_color.r * factor,
-                  (float)css_color.g * factor,
-                  (float)css_color.b * factor,
-                  css_color.a };
+    return result;
 }
 
 template <>
