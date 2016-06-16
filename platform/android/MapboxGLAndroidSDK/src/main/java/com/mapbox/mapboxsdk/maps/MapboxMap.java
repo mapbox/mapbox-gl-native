@@ -1601,7 +1601,10 @@ public class MapboxMap {
         mMapView.invalidateCustomLayers();
     }
 
-    MapView getMapView() {
+    /**
+     * Do not use this method, used by MapBox internally
+     */
+    public MapView getMapView() {
         return mMapView;
     }
 

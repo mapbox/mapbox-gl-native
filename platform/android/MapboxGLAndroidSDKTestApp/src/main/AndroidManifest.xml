@@ -42,6 +42,14 @@
                 android:value="@string/category_infowindow" />
         </activity>
         <activity
+            android:name=".activity.infowindow.DynamicInfoWindowAdapterActivity"
+            android:description="@string/description_dynamic_info_window_adapter"
+            android:label="@string/activity_dynamic_infowindow_adapter">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_infowindow"/>
+        </activity>
+        <activity
             android:name=".activity.annotation.BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_add_bulk_markers"
