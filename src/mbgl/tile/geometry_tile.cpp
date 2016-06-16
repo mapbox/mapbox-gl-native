@@ -2,6 +2,8 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
@@ -12,15 +14,17 @@
 
 namespace mbgl {
 
+using namespace style;
+
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
-                           std::string sourceID,
-                           style::Style& style_,
+                           std::string sourceID_,
+                           Style& style_,
                            const MapMode mode_)
     : Tile(id_),
+      sourceID(std::move(sourceID_)),
       style(style_),
       worker(style_.workers),
       tileWorker(id_,
-                 sourceID,
                  *style_.spriteStore,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
@@ -28,8 +32,32 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
                  mode_) {
 }
 
+GeometryTile::~GeometryTile() {
+    cancel();
+}
+
 void GeometryTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
+}
+
+std::vector<std::unique_ptr<Layer>> GeometryTile::cloneStyleLayers() const {
+    std::vector<std::unique_ptr<Layer>> result;
+
+    for (const Layer* layer : style.getLayers()) {
+        // Avoid cloning and including irrelevant layers.
+        if (layer->is<BackgroundLayer>() ||
+            layer->is<CustomLayer>() ||
+            layer->baseImpl->source != sourceID ||
+            id.overscaledZ < std::floor(layer->baseImpl->minZoom) ||
+            id.overscaledZ >= std::ceil(layer->baseImpl->maxZoom) ||
+            layer->baseImpl->visibility == VisibilityType::None) {
+            continue;
+        }
+
+        result.push_back(layer->baseImpl->clone());
+    }
+
+    return result;
 }
 
 void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
@@ -53,7 +81,7 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
     // when tile data changed. Replacing the workdRequest will cancel a pending work
     // request in case there is one.
     workRequest.reset();
-    workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(data_), targetConfig, [this, config = targetConfig] (TileParseResult result) {
+    workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(data_), targetConfig, [this, config = targetConfig] (TileParseResult result) {
         workRequest.reset();
 
         if (result.is<TileParseResultData>()) {
@@ -80,10 +108,6 @@ void GeometryTile::setData(std::unique_ptr<GeometryTileData> data_) {
             observer->onTileError(*this, result.get<std::exception_ptr>());
         }
     });
-}
-
-GeometryTile::~GeometryTile() {
-    cancel();
 }
 
 bool GeometryTile::parsePending() {
@@ -126,7 +150,7 @@ bool GeometryTile::parsePending() {
     return true;
 }
 
-Bucket* GeometryTile::getBucket(const style::Layer& layer) {
+Bucket* GeometryTile::getBucket(const Layer& layer) {
     const auto it = buckets.find(layer.baseImpl->bucketName());
     if (it == buckets.end()) {
         return nullptr;

@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 
@@ -17,6 +18,7 @@ class FeatureIndex;
 
 namespace style {
 class Style;
+class Layer;
 } // namespace style
 
 class GeometryTile : public Tile {
@@ -46,8 +48,10 @@ public:
     void cancel() override;
 
 private:
+    std::vector<std::unique_ptr<style::Layer>> cloneStyleLayers() const;
     void redoPlacement();
 
+    const std::string sourceID;
     style::Style& style;
     Worker& worker;
     TileWorker tileWorker;

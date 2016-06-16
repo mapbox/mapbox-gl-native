@@ -120,11 +120,11 @@ void Style::removeSource(const std::string& id) {
     sources.erase(it);
 }
 
-std::vector<std::unique_ptr<Layer>> Style::getLayers() const {
-    std::vector<std::unique_ptr<Layer>> result;
+std::vector<const Layer*> Style::getLayers() const {
+    std::vector<const Layer*> result;
     result.reserve(layers.size());
     for (const auto& layer : layers) {
-        result.push_back(layer->baseImpl->clone());
+        result.push_back(layer.get());
     }
     return result;
 }

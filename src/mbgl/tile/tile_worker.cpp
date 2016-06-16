@@ -2,8 +2,6 @@
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/style/bucket_parameters.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
-#include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -13,6 +11,7 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/exception.hpp>
+
 #include <utility>
 
 namespace mbgl {
@@ -20,14 +19,12 @@ namespace mbgl {
 using namespace mbgl::style;
 
 TileWorker::TileWorker(OverscaledTileID id_,
-                       std::string sourceID_,
                        SpriteStore& spriteStore_,
                        GlyphAtlas& glyphAtlas_,
                        GlyphStore& glyphStore_,
                        const util::Atomic<bool>& obsolete_,
                        const MapMode mode_)
     : id(std::move(id_)),
-      sourceID(std::move(sourceID_)),
       spriteStore(spriteStore_),
       glyphAtlas(glyphAtlas_),
       glyphStore(glyphStore_),
@@ -134,18 +131,6 @@ void TileWorker::parseLayer(const Layer* layer) {
     // Cancel early when parsing.
     if (obsolete)
         return;
-
-    // Background and custom layers are special cases.
-    if (layer->is<BackgroundLayer>() || layer->is<CustomLayer>())
-        return;
-
-    // Skip this bucket if we are to not render this
-    if ((layer->baseImpl->source != sourceID) ||
-        (id.overscaledZ < std::floor(layer->baseImpl->minZoom)) ||
-        (id.overscaledZ >= std::ceil(layer->baseImpl->maxZoom)) ||
-        (layer->baseImpl->visibility == VisibilityType::None)) {
-        return;
-    }
 
     auto geometryLayer = tileData->getLayer(layer->baseImpl->sourceLayer);
     if (!geometryLayer) {
