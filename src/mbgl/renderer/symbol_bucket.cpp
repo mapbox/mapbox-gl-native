@@ -282,6 +282,8 @@ void SymbolBucket::addFeatures(uintptr_t tileUID,
                 }
                 if ((*image).relativePixelRatio != 1.0f) {
                     iconsNeedLinear = true;
+                } else if (layout.iconRotate != 0) {
+                    iconsNeedLinear = true;
                 }
             }
         }
