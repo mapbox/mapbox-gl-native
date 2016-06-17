@@ -39,7 +39,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
-import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import java.lang.reflect.ParameterizedType;
@@ -1539,10 +1538,8 @@ public class MapboxMap {
      *
      * @param listener The callback that's invoked when the user clicks on a marker.
      *                 To unset the callback, use null.
-     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationServices#addLocationListener(LocationListener)})}
      */
     @UiThread
-    @Deprecated
     public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mMapView.setOnMyLocationChangeListener(listener);
     }
@@ -1951,7 +1948,6 @@ public class MapboxMap {
      * Interface definition for a callback to be invoked when the the My Location view changes location.
      *
      * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
-     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationListener}
      */
     @Deprecated
     public interface OnMyLocationChangeListener {
