@@ -56,14 +56,14 @@ public:
     // the texture is only bound when the data is out of date (=dirty).
     void upload(gl::ObjectStore&);
 
-    inline dimension getWidth() const { return width; }
-    inline dimension getHeight() const { return height; }
-    inline dimension getTextureWidth() const { return pixelWidth; }
-    inline dimension getTextureHeight() const { return pixelHeight; }
-    inline float getPixelRatio() const { return pixelRatio; }
+    dimension getWidth() const { return width; }
+    dimension getHeight() const { return height; }
+    dimension getTextureWidth() const { return pixelWidth; }
+    dimension getTextureHeight() const { return pixelHeight; }
+    float getPixelRatio() const { return pixelRatio; }
 
     // Only for use in tests.
-    inline const uint32_t* getData() const { return data.get(); }
+    const uint32_t* getData() const { return data.get(); }
 
 private:
     const GLsizei width, height;
@@ -71,8 +71,8 @@ private:
     const float pixelRatio;
 
     struct Holder : private util::noncopyable {
-        inline Holder(std::shared_ptr<const SpriteImage>, Rect<dimension>);
-        inline Holder(Holder&&);
+        Holder(std::shared_ptr<const SpriteImage>, Rect<dimension>);
+        Holder(Holder&&);
         std::shared_ptr<const SpriteImage> spriteImage;
         const Rect<dimension> pos;
     };

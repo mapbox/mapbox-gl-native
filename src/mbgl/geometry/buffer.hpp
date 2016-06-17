@@ -27,11 +27,11 @@ public:
 
     // Returns the number of elements in this buffer. This is not the number of
     // bytes, but rather the number of coordinates with associated information.
-    inline GLsizei index() const {
+    GLsizei index() const {
         return static_cast<GLsizei>(pos / itemSize);
     }
 
-    inline bool empty() const {
+    bool empty() const {
         return pos == 0;
     }
 
@@ -65,7 +65,7 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    inline void upload(gl::ObjectStore& store) {
+    void upload(gl::ObjectStore& store) {
         if (!buffer) {
             bind(store);
         }
@@ -73,7 +73,7 @@ public:
 
 protected:
     // increase the buffer size by at least /required/ bytes.
-    inline void *addElement() {
+    void *addElement() {
         if (buffer) {
             throw std::runtime_error("Can't add elements after buffer was bound to GPU");
         }

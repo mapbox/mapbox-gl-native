@@ -11,27 +11,27 @@ namespace mbgl {
 namespace style {
 
 template <typename T>
-inline T defaultStopsValue();
+T defaultStopsValue();
 
-template <> inline bool defaultStopsValue() { return true; }
-template <> inline float defaultStopsValue() { return 1.0f; }
-template <> inline Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
-template <> inline std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
-template <> inline std::vector<std::string> defaultStopsValue() { return {{}}; }
-template <> inline std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
-template <> inline std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
+template <> bool defaultStopsValue() { return true; }
+template <> float defaultStopsValue() { return 1.0f; }
+template <> Color defaultStopsValue() { return { 0, 0, 0, 1 }; }
+template <> std::vector<float> defaultStopsValue() { return {{ 1, 0 }}; }
+template <> std::vector<std::string> defaultStopsValue() { return {{}}; }
+template <> std::array<float, 2> defaultStopsValue() { return {{ 0, 0 }}; }
+template <> std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; }
 
-template <> inline std::string defaultStopsValue() { return {}; }
-template <> inline TranslateAnchorType defaultStopsValue() { return {}; }
-template <> inline RotateAnchorType defaultStopsValue() { return {}; }
-template <> inline LineCapType defaultStopsValue() { return {}; }
-template <> inline LineJoinType defaultStopsValue() { return {}; }
-template <> inline SymbolPlacementType defaultStopsValue() { return {}; }
-template <> inline TextAnchorType defaultStopsValue() { return {}; }
-template <> inline TextJustifyType defaultStopsValue() { return {}; }
-template <> inline TextTransformType defaultStopsValue() { return {}; }
-template <> inline AlignmentType defaultStopsValue() { return {}; }
-template <> inline IconTextFitType defaultStopsValue() { return {}; };
+template <> std::string defaultStopsValue() { return {}; }
+template <> TranslateAnchorType defaultStopsValue() { return {}; }
+template <> RotateAnchorType defaultStopsValue() { return {}; }
+template <> LineCapType defaultStopsValue() { return {}; }
+template <> LineJoinType defaultStopsValue() { return {}; }
+template <> SymbolPlacementType defaultStopsValue() { return {}; }
+template <> TextAnchorType defaultStopsValue() { return {}; }
+template <> TextJustifyType defaultStopsValue() { return {}; }
+template <> TextTransformType defaultStopsValue() { return {}; }
+template <> AlignmentType defaultStopsValue() { return {}; }
+template <> IconTextFitType defaultStopsValue() { return {}; };
 
 template <typename T>
 T PropertyEvaluator<T>::operator()(const Function<T>& fn) const {
@@ -114,7 +114,7 @@ Faded<T> CrossFadedPropertyEvaluator<T>::operator()(const T& constant) const {
 }
 
 template <typename T>
-inline T getBiggestStopLessThan(const Function<T>& function, float z) {
+T getBiggestStopLessThan(const Function<T>& function, float z) {
     const auto& stops = function.getStops();
     for (uint32_t i = 0; i < stops.size(); i++) {
         if (stops[i].first > z) {

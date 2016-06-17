@@ -60,14 +60,14 @@ namespace gl {
 #endif
     
 struct Error : ::std::runtime_error {
-    inline Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
+    Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
     const GLenum code;
 };
 
 void checkError(const char *cmd, const char *file, int line);
 
 #if defined(DEBUG)
-#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { inline ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
+#define MBGL_CHECK_ERROR(cmd) ([&]() { struct __MBGL_C_E { ~__MBGL_C_E() { ::mbgl::gl::checkError(#cmd, __FILE__, __LINE__); } } __MBGL_C_E; return cmd; }())
 #else
 #define MBGL_CHECK_ERROR(cmd) (cmd)
 #endif

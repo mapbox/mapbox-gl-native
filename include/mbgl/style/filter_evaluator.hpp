@@ -173,7 +173,7 @@ private:
 };
 
 template <class PropertyAccessor>
-inline bool Filter::operator()(FeatureType type, PropertyAccessor accessor) const {
+bool Filter::operator()(FeatureType type, PropertyAccessor accessor) const {
     return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, accessor });
 }
 

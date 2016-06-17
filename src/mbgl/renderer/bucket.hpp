@@ -41,7 +41,7 @@ public:
 
     virtual bool needsClipping() const = 0;
 
-    inline bool needsUpload() const {
+    bool needsUpload() const {
         return !uploaded;
     }
 

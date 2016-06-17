@@ -20,7 +20,7 @@ public:
     ~VertexArrayObject();
 
     template <typename Shader, typename VertexBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset, gl::ObjectStore& store) {
+    void bind(Shader& shader, VertexBuffer &vertexBuffer, GLbyte *offset, gl::ObjectStore& store) {
         bindVertexArrayObject(store);
         if (bound_shader == 0) {
             vertexBuffer.bind(store);
@@ -34,7 +34,7 @@ public:
     }
 
     template <typename Shader, typename VertexBuffer, typename ElementsBuffer>
-    inline void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset, gl::ObjectStore& store) {
+    void bind(Shader& shader, VertexBuffer &vertexBuffer, ElementsBuffer &elementsBuffer, GLbyte *offset, gl::ObjectStore& store) {
         bindVertexArrayObject(store);
         if (bound_shader == 0) {
             vertexBuffer.bind(store);

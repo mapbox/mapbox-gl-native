@@ -20,15 +20,15 @@ public:
     static optional<Color> parse(const std::string&);
 };
 
-inline bool operator==(const Color& colorA, const Color& colorB) {
+constexpr bool operator==(const Color& colorA, const Color& colorB) {
     return colorA.r == colorB.r && colorA.g == colorB.g && colorA.b == colorB.b && colorA.a == colorB.a;
 }
 
-inline bool operator!=(const Color& colorA, const Color& colorB) {
+constexpr bool operator!=(const Color& colorA, const Color& colorB) {
     return !(colorA == colorB);
 }
 
-inline Color operator*(const Color& color, float alpha) {
+constexpr Color operator*(const Color& color, float alpha) {
     return {
         color.r * alpha,
         color.g * alpha,

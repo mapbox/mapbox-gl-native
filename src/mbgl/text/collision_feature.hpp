@@ -33,7 +33,7 @@ namespace mbgl {
     class CollisionFeature {
         public:
             // for text
-            inline explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
+            explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const Shaping &shapedText,
                     const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_)
                 : CollisionFeature(line, anchor,
@@ -41,7 +41,7 @@ namespace mbgl {
                         boxScale, padding, alongLine, indexedFeature_, false) {}
 
             // for icons
-            inline explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
+            explicit CollisionFeature(const GeometryCoordinates &line, const Anchor &anchor,
                     const PositionedIcon &shapedIcon,
                     const float boxScale, const float padding, const bool alongLine, const IndexedSubfeature& indexedFeature_)
                 : CollisionFeature(line, anchor,

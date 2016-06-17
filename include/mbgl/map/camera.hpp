@@ -67,10 +67,10 @@ struct AnimationOptions {
     std::function<void()> transitionFinishFn;
     
     /** Creates an animation with no options specified. */
-    inline AnimationOptions() {}
+    AnimationOptions() {}
     
     /** Creates an animation with the specified duration. */
-    inline AnimationOptions(Duration d)
+    AnimationOptions(Duration d)
         : duration(d) {}
 };
 

@@ -15,11 +15,11 @@
 namespace mapbox {
 namespace util {
 template <> struct nth<0, mbgl::GeometryCoordinate> {
-    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
+    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.x; };
 };
 
 template <> struct nth<1, mbgl::GeometryCoordinate> {
-    inline static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
+    static int64_t get(const mbgl::GeometryCoordinate& t) { return t.y; };
 };
 } // namespace util
 } // namespace mapbox

@@ -5,7 +5,7 @@
 #include <png.h>
 
 template<size_t max, typename... Args>
-inline static std::string sprintf(const char *msg, Args... args) {
+static std::string sprintf(const char *msg, Args... args) {
     char res[max];
     int len = snprintf(res, sizeof(res), msg, args...);
     return std::string(res, len);

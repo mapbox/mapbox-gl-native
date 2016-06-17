@@ -15,8 +15,8 @@ class SymbolLayoutProperties;
 
 class PositionedIcon {
     public:
-        inline explicit PositionedIcon() {}
-        inline explicit PositionedIcon(const SpriteAtlasElement& _image,
+        explicit PositionedIcon() {}
+        explicit PositionedIcon(const SpriteAtlasElement& _image,
                 float _top, float _bottom, float _left, float _right) :
             image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
 

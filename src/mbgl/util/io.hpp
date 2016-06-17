@@ -7,7 +7,7 @@ namespace mbgl {
 namespace util {
 
 struct IOException : std::runtime_error {
-    inline IOException(int err, const char* msg) : std::runtime_error(msg), code(err) {
+    IOException(int err, const char* msg) : std::runtime_error(msg), code(err) {
     }
     const int code = 0;
 };

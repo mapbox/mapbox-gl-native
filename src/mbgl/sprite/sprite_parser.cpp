@@ -46,7 +46,7 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
 
 namespace {
 
-inline uint16_t getUInt16(const JSValue& value, const char* name, const uint16_t def = 0) {
+uint16_t getUInt16(const JSValue& value, const char* name, const uint16_t def = 0) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsUint() && v.GetUint() <= std::numeric_limits<uint16_t>::max()) {
@@ -60,7 +60,7 @@ inline uint16_t getUInt16(const JSValue& value, const char* name, const uint16_t
     return def;
 }
 
-inline double getDouble(const JSValue& value, const char* name, const double def = 0) {
+double getDouble(const JSValue& value, const char* name, const double def = 0) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsNumber()) {
@@ -73,7 +73,7 @@ inline double getDouble(const JSValue& value, const char* name, const double def
     return def;
 }
 
-inline bool getBoolean(const JSValue& value, const char* name, const bool def = false) {
+bool getBoolean(const JSValue& value, const char* name, const bool def = false) {
     if (value.HasMember(name)) {
         auto& v = value[name];
         if (v.IsBool()) {

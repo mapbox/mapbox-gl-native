@@ -11,14 +11,14 @@ namespace mbgl {
 class Projection {
 
 public:
-    static inline double getMetersPerPixelAtLatitude(double lat, double zoom) {
+    static double getMetersPerPixelAtLatitude(double lat, double zoom) {
         const double constrainedZoom = util::clamp(zoom, util::MIN_ZOOM, util::MAX_ZOOM);
         const double mapPixelWidthAtZoom = std::pow(2.0, constrainedZoom) * util::tileSize;
         const double constrainedLatitude = util::clamp(lat, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         return std::cos(constrainedLatitude * util::DEG2RAD) * util::M2PI * util::EARTH_RADIUS_M / mapPixelWidthAtZoom;
     }
 
-    static inline ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
+    static ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
         const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         const double constrainedLongitude = util::clamp(latLng.longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
 
@@ -31,7 +31,7 @@ public:
         return ProjectedMeters(northing, easting);
     }
 
-    static inline LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
+    static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
         double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2)) * util::RAD2DEG;
         double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
 

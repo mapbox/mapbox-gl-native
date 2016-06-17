@@ -13,12 +13,12 @@ public:
 };
 
 template <class T>
-inline bool operator==(const Range<T>& a, const Range<T>& b) {
+bool operator==(const Range<T>& a, const Range<T>& b) {
     return a.min == b.min && a.max == b.max;
 }
 
 template <class T>
-inline bool operator!=(const Range<T>& a, const Range<T>& b) {
+bool operator!=(const Range<T>& a, const Range<T>& b) {
     return !(a == b);
 }
 
