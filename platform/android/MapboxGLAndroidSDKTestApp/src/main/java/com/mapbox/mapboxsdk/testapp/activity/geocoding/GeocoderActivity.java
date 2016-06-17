@@ -1,16 +1,26 @@
 package com.mapbox.mapboxsdk.testapp.activity.geocoding;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.content.Context;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,7 +29,11 @@ import com.mapbox.geocoder.GeocoderCriteria;
 import com.mapbox.geocoder.MapboxGeocoder;
 import com.mapbox.geocoder.service.models.GeocoderFeature;
 import com.mapbox.geocoder.service.models.GeocoderResponse;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -27,6 +41,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerView;
+import com.mapbox.mapboxsdk.testapp.model.annotations.PulseMarkerView;
+import com.mapbox.mapboxsdk.testapp.model.annotations.PulseMarkerViewOptions;
 
 import java.util.List;
 
@@ -63,7 +80,7 @@ public class GeocoderActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
 
         final ImageView dropPinView = new ImageView(this);
-        dropPinView.setImageResource(R.drawable.ic_droppin_24dp);
+        dropPinView.setImageResource(R.drawable.ic_add_24dp);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
         dropPinView.setLayoutParams(params);
         mapView.addView(dropPinView);
@@ -90,9 +107,72 @@ public class GeocoderActivity extends AppCompatActivity {
                         geocode(centerLatLng);
                     }
                 });
+
+                // Add MarkerView
+                final LatLng markerPosition = new LatLng(38.907298, -77.043478);
+                final MarkerView markerView = mapboxMap.addMarker(new PulseMarkerViewOptions()
+                        .anchor(0.5f, 0.5f)
+                        .position(markerPosition)
+                );
+
+                final float circleDiameterSize = getResources().getDimension(R.dimen.circle_size);
+                mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
+
+                    private Animation pulseAnimation;
+
+                    @Override
+                    public void onCameraChange(CameraPosition position) {
+                        View convertView = mapboxMap.getMarkerViewManager().getView(markerView);
+                        if (convertView != null) {
+                            View backgroundView = convertView.findViewById(R.id.background_imageview);
+                            if (pulseAnimation == null && position.target.distanceTo(markerPosition) < 0.5f * circleDiameterSize) {
+                                pulseAnimation = AnimationUtils.loadAnimation(GeocoderActivity.this, R.anim.pulse);
+                                pulseAnimation.setRepeatCount(Animation.INFINITE);
+                                pulseAnimation.setRepeatMode(Animation.RESTART);
+                                backgroundView.startAnimation(pulseAnimation);
+                            } else if (pulseAnimation != null && position.target.distanceTo(markerPosition) >= 0.6f * circleDiameterSize) {
+                                backgroundView.clearAnimation();
+                                pulseAnimation = null;
+                            }
+                        }
+                    }
+                });
+
+                mapboxMap.getMarkerViewManager().addMarkerViewAdapter(new PulseMarkerViewAdapter(GeocoderActivity.this));
             }
         });
     }
+
+
+    private static class PulseMarkerViewAdapter extends MapboxMap.MarkerViewAdapter<PulseMarkerView> {
+
+        private LayoutInflater inflater;
+
+        public PulseMarkerViewAdapter(@NonNull Context context) {
+            super(context);
+            this.inflater = LayoutInflater.from(context);
+        }
+
+        @Nullable
+        @Override
+        public View getView(@NonNull PulseMarkerView marker, @Nullable View convertView, @NonNull ViewGroup parent) {
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                viewHolder = new ViewHolder();
+                convertView = inflater.inflate(R.layout.view_pulse_marker, parent, false);
+                viewHolder.foregroundImageView = (ImageView) convertView.findViewById(R.id.foreground_imageView);
+                viewHolder.backgroundImageView = (ImageView) convertView.findViewById(R.id.background_imageview);
+                convertView.setTag(viewHolder);
+            }
+            return convertView;
+        }
+
+        private static class ViewHolder {
+            ImageView foregroundImageView;
+            ImageView backgroundImageView;
+        }
+    }
+
 
     @Override
     public void onPause() {
