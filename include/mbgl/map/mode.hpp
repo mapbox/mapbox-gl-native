@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/util/traits.hpp>
+
 #include <cstdint>
 
 namespace mbgl {
@@ -48,17 +50,16 @@ enum class MapDebugOptions : EnumType {
 #endif // GL_ES_VERSION_2_0
 };
 
-inline MapDebugOptions operator| (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
-    return MapDebugOptions(static_cast<EnumType>(lhs) | static_cast<EnumType>(rhs));
+constexpr MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {
+    return MapDebugOptions(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs));
 }
 
-inline MapDebugOptions& operator|=(MapDebugOptions& lhs, const MapDebugOptions& rhs) {
-    lhs = lhs | rhs;
-    return lhs;
+constexpr MapDebugOptions& operator|=(MapDebugOptions& lhs, MapDebugOptions rhs) {
+    return (lhs = lhs | rhs);
 }
 
-inline bool operator& (const MapDebugOptions& lhs, const MapDebugOptions& rhs) {
-    return static_cast<EnumType>(lhs) & static_cast<EnumType>(rhs);
+constexpr bool operator&(MapDebugOptions lhs, MapDebugOptions rhs) {
+    return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
 }
 
 } // namespace mbgl

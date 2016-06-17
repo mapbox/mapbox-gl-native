@@ -17,16 +17,15 @@ enum class Update : uint8_t {
     AnnotationData            = 1 << 7,
 };
 
-inline Update operator| (const Update& lhs, const Update& rhs) {
+constexpr Update operator|(Update lhs, Update rhs) {
     return Update(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs));
 }
 
-inline Update& operator|=(Update& lhs, const Update& rhs) {
-    lhs = lhs | rhs;
-    return lhs;
+constexpr Update& operator|=(Update& lhs, const Update& rhs) {
+    return (lhs = lhs | rhs);
 }
 
-inline bool operator& (const Update& lhs, const Update& rhs) {
+constexpr bool operator& (Update lhs, Update rhs) {
     return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
 }
 

@@ -57,11 +57,11 @@ public:
     LatLng(const UnwrappedTileID& id);
 };
 
-inline bool operator==(const LatLng& a, const LatLng& b) {
+constexpr bool operator==(const LatLng& a, const LatLng& b) {
     return a.latitude == b.latitude && a.longitude == b.longitude;
 }
 
-inline bool operator!=(const LatLng& a, const LatLng& b) {
+constexpr bool operator!=(const LatLng& a, const LatLng& b) {
     return !(a == b);
 }
 
@@ -78,7 +78,7 @@ public:
     }
 };
 
-inline bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
+constexpr bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
     return a.northing == b.northing && a.easting == b.easting;
 }
 
@@ -164,15 +164,15 @@ private:
     LatLngBounds(LatLng sw_, LatLng ne_)
         : sw(std::move(sw_)), ne(std::move(ne_)) {}
 
-    friend bool operator==(const LatLngBounds&, const LatLngBounds&);
-    friend bool operator!=(const LatLngBounds&, const LatLngBounds&);
+    friend constexpr bool operator==(const LatLngBounds&, const LatLngBounds&);
+    friend constexpr bool operator!=(const LatLngBounds&, const LatLngBounds&);
 };
 
-inline bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
+constexpr bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
     return a.sw == b.sw && a.ne == b.ne;
 }
 
-inline bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
+constexpr bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
     return !(a == b);
 }
 
