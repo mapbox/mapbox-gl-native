@@ -307,7 +307,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         }
     }
     
-    [NSTimer scheduledTimerWithTimeInterval:1/60
+    [NSTimer scheduledTimerWithTimeInterval:1.0/60.0
                                      target:self
                                    selector:@selector(dropOneOfManyPins:)
                                    userInfo:annotations
