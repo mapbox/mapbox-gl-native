@@ -1142,6 +1142,11 @@ public class MapboxMap {
         }
 
         if (!handledDefaultClick) {
+
+            if (marker instanceof MarkerView) {
+                mMarkerViewManager.ensureInfoWindowOffset((MarkerView) marker);
+            }
+
             if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
                 mInfoWindows.add(marker.showInfoWindow(this, mMapView));
             }
