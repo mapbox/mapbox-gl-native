@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CXX11ABI=$(scripts/check-cxx11abi.sh)
+CXX11ABI=${CXX11ABI:-$(scripts/check-cxx11abi.sh)}
 
 UNIQUE_RESOURCE_VERSION=dev
 PROTOZERO_VERSION=1.3.0
