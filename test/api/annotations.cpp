@@ -106,23 +106,7 @@ TEST(Annotations, NonImmediateAdd) {
     test.checkRendering("non_immediate_add");
 }
 
-TEST(Annotations, UpdateIcon) {
-    AnnotationTest test;
-
-    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
-    test.map.addAnnotationIcon("flipped_marker", namedMarker("default_marker.png"));
-    test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
-
-    test::render(test.map);
-
-    test.map.removeAnnotationIcon("flipped_marker");
-    test.map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
-    test.map.update(Update::Annotations);
-
-    test.checkRendering("update_icon");
-}
-
-TEST(Annotations, UpdatePoint) {
+TEST(Annotations, UpdateSymbolAnnotationGeometry) {
     AnnotationTest test;
 
     test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -132,8 +116,22 @@ TEST(Annotations, UpdatePoint) {
 
     test::render(test.map);
 
-    test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "flipped_marker" });
+    test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { -10, 0 }, "default_marker" });
     test.checkRendering("update_point");
+}
+
+TEST(Annotations, UpdateSymbolAnnotationIcon) {
+    AnnotationTest test;
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotationIcon("default_marker", namedMarker("default_marker.png"));
+    test.map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
+    AnnotationID point = test.map.addAnnotation(SymbolAnnotation { Point<double> { 0, 0 }, "default_marker" });
+
+    test::render(test.map);
+
+    test.map.updateAnnotation(point, SymbolAnnotation { Point<double> { 0, 0 }, "flipped_marker" });
+    test.checkRendering("update_icon");
 }
 
 TEST(Annotations, RemovePoint) {

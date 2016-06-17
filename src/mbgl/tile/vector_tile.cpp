@@ -69,10 +69,10 @@ private:
 };
 
 VectorTile::VectorTile(const OverscaledTileID& id_,
-                       std::string sourceID,
+                       std::string sourceID_,
                        const style::UpdateParameters& parameters,
                        const Tileset& tileset)
-    : GeometryTile(id_, sourceID, parameters.style, parameters.mode),
+    : GeometryTile(id_, sourceID_, parameters.style, parameters.mode),
       loader(*this, id_, parameters, tileset) {
 }
 

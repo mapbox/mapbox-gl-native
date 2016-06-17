@@ -4,7 +4,7 @@
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/util/geo.hpp>
+#include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <string>
@@ -14,6 +14,7 @@
 
 namespace mbgl {
 
+class LatLngBounds;
 class AnnotationTile;
 class AnnotationTileData;
 class SymbolAnnotationImpl;
@@ -29,7 +30,7 @@ public:
     ~AnnotationManager();
 
     AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);
-    void updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
+    Update updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
     void removeAnnotation(const AnnotationID&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
@@ -40,6 +41,7 @@ public:
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(style::Style&);
+    void updateData();
 
     void addTile(AnnotationTile&);
     void removeTile(AnnotationTile&);
@@ -52,6 +54,13 @@ private:
     void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
     void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
     void add(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
+
+    Update update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
+    Update update(const AnnotationID&, const LineAnnotation&, const uint8_t);
+    Update update(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    Update update(const AnnotationID&, const StyleSourcedAnnotation&, const uint8_t);
+
+    void removeAndAdd(const AnnotationID&, const Annotation&, const uint8_t);
 
     std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
 

@@ -107,10 +107,10 @@ std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile
 }
 
 GeoJSONTile::GeoJSONTile(const OverscaledTileID& overscaledTileID,
-                         std::string sourceID,
+                         std::string sourceID_,
                          const style::UpdateParameters& parameters,
                          mapbox::geojsonvt::GeoJSONVT& geojsonvt)
-    : GeometryTile(overscaledTileID, sourceID, parameters.style, parameters.mode) {
+    : GeometryTile(overscaledTileID, sourceID_, parameters.style, parameters.mode) {
     setData(convertTile(geojsonvt.getTile(id.canonical.z, id.canonical.x, id.canonical.y)));
 }
 

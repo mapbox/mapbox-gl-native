@@ -31,10 +31,9 @@ AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, cons
     return id;
 }
 
-void AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
-    removeAnnotation(id);
-    Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->add(id, annotation_, maxZoom);
+Update AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    return Annotation::visit(annotation, [&] (const auto& annotation_) {
+        return this->update(id, annotation_, maxZoom);
     });
 }
 
@@ -67,6 +66,53 @@ void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annota
 void AnnotationManager::add(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
     shapeAnnotations.emplace(id,
         std::make_unique<StyleSourcedAnnotationImpl>(id, annotation, maxZoom));
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
+    auto it = symbolAnnotations.find(id);
+    if (it == symbolAnnotations.end()) {
+        removeAndAdd(id, annotation, maxZoom);
+        return Update::AnnotationData | Update::AnnotationStyle;
+    }
+
+    Update result = Update::Nothing;
+    const SymbolAnnotation& existing = it->second->annotation;
+
+    if (existing.geometry != annotation.geometry) {
+        result |= Update::AnnotationData;
+    }
+
+    if (existing.icon != annotation.icon) {
+        result |= Update::AnnotationData | Update::AnnotationStyle;
+    }
+
+    if (result != Update::Nothing) {
+        removeAndAdd(id, annotation, maxZoom);
+    }
+
+    return result;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+Update AnnotationManager::update(const AnnotationID& id, const StyleSourcedAnnotation& annotation, const uint8_t maxZoom) {
+    removeAndAdd(id, annotation, maxZoom);
+    return Update::AnnotationData | Update::AnnotationStyle;
+}
+
+void AnnotationManager::removeAndAdd(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+    removeAnnotation(id);
+    Annotation::visit(annotation, [&] (const auto& annotation_) {
+        this->add(id, annotation_, maxZoom);
+    });
 }
 
 AnnotationIDs AnnotationManager::getPointAnnotationsInBounds(const LatLngBounds& bounds) const {
@@ -133,7 +179,9 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 
     obsoleteShapeAnnotationLayers.clear();
+}
 
+void AnnotationManager::updateData() {
     for (auto& tile : tiles) {
         tile->setData(getTileData(tile->id.canonical));
     }
