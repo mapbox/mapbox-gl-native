@@ -126,6 +126,12 @@
               '<@(webp_static_libs)',
             ],
           },
+        }, {
+          'variables': {
+            'cflags': [
+              '-DQT_IMAGE_DECODERS',
+            ],
+          },
         }],
         ['<(qt_version_major) == 4', {
           'variables': {
