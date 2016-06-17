@@ -48,16 +48,6 @@ public class MarkerView extends Marker {
 
     private boolean selected;
 
-    private LatLng targetPosition;
-    private boolean shouldAnimate;
-    private boolean isAnimationRunning;
-    private AnimatorSet set;
-
-    private long startTime;
-    private long duration;
-    private long remainingTime;
-    private AnimatorUtils.OnAnimationEndListener animationEndListener;
-
     /**
      * Publicly hidden default constructor
      */
@@ -352,82 +342,6 @@ public class MarkerView extends Marker {
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
         markerViewManager = mapboxMap.getMarkerViewManager();
-    }
-
-    @Override
-    public void setPosition(LatLng position) {
-        setPosition(position, 0);
-    }
-
-    public void setPosition(LatLng position, long duration) {
-        setPosition(position, duration, null);
-    }
-
-    public void setPosition(LatLng position, long duration, AnimatorUtils.OnAnimationEndListener animationEndListener) {
-        this.animationEndListener = animationEndListener;
-
-        if (duration <= 0) {
-            // update position instantly
-            super.setPosition(position);
-            if (markerViewManager != null) {
-                markerViewManager.update();
-            }
-        } else {
-            // animate using Android SDK animations
-            this.targetPosition = position;
-            if (markerViewManager != null) {
-                markerViewManager.animatePosition(this, duration);
-            }
-        }
-    }
-
-    boolean shouldAnimate() {
-        return shouldAnimate;
-    }
-
-    void setShouldAnimate(boolean animating) {
-        shouldAnimate = animating;
-    }
-
-    boolean isAnimating() {
-        return isAnimationRunning;
-    }
-
-    void setAnimating(boolean animationRunning) {
-        isAnimationRunning = animationRunning;
-    }
-
-    LatLng getTargetPosition() {
-        return targetPosition;
-    }
-
-    void setAnimation(AnimatorSet set) {
-        this.set = set;
-    }
-
-    AnimatorSet getAnimation() {
-        return set;
-    }
-
-    long getRemainingTime() {
-        long time = duration - (AnimationUtils.currentAnimationTimeMillis() - startTime);
-        return time > 0 ? time : 0;
-    }
-
-    void setDuration(long duration) {
-        this.duration = duration;
-    }
-
-    void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    AnimatorUtils.OnAnimationEndListener getAnimationEndListener() {
-        return animationEndListener;
-    }
-
-    PointF getScreenLocation(@NonNull View convertView) {
-        return new PointF(convertView.getX() + offsetX, convertView.getY() + offsetY);
     }
 
     /**

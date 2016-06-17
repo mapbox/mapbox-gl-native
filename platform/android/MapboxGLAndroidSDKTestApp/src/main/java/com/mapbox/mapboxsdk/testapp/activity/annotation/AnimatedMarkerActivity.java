@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -16,7 +17,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -29,8 +29,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 import java.util.Random;
 
 public class AnimatedMarkerActivity extends AppCompatActivity {
-
-    private final static String LOG_TAG = "AnimatedMarkerActivity";
 
     private MapView mMapView;
     private MapboxMap mMapboxMap;

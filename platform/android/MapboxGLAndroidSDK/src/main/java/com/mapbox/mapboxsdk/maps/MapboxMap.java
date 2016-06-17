@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  * you must obtain one from the getMapAsync() method on a MapFragment or MapView that you have
  * added to your application.
  * <p>
- * Note: Similar to a View object, a GoogleMap should only be read and modified from the main thread.
+ * Note: Similar to a View object, a MapboxMap should only be read and modified from the main thread.
  * </p>
  */
 public class MapboxMap {

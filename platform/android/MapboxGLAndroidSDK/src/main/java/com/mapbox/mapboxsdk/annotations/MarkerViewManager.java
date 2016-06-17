@@ -1,19 +1,13 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.PointF;
-import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
@@ -43,7 +37,6 @@ public class MarkerViewManager {
     private long viewMarkerBoundsUpdateTime;
     private MapboxMap.OnMarkerViewClickListener onMarkerViewClickListener;
     private ImageMarkerViewAdapter defaultMarkerViewAdapter;
-    private CountDownTimer timer;
 
     /**
      * Creates an instance of MarkerViewManager.
@@ -120,57 +113,22 @@ public class MarkerViewManager {
         for (final MarkerView marker : markerViewMap.keySet()) {
             final View convertView = markerViewMap.get(marker);
             if (convertView != null) {
-                if (marker.isAnimating() || !marker.shouldAnimate()) {
-                    if (marker.isAnimating()) {
-                        // cancel ongoing animations
-                        marker.setAnimating(false);
-                        AnimatorSet set = marker.getAnimation();
-                        List<Animator> animations = set.getChildAnimations();
-                        float x = (Float) ((ObjectAnimator) animations.get(0)).getAnimatedValue();
-                        float y = (Float) ((ObjectAnimator) animations.get(1)).getAnimatedValue();
-                        PointF pointF = new PointF(x + marker.getOffsetX(), y + marker.getOffsetY());
-                        marker.setPosition(mapboxMap.getProjection().fromScreenLocation(pointF));
-                        set.cancel();
-                    }
+                PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
+                if (marker.getOffsetX() == -1) {
+                    int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
+                    int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
+                    marker.setOffsetX(x);
+                    marker.setOffsetY(y);
+                }
 
-                    // update position on map
-                    PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                    if (marker.getOffsetX() == -1) {
-                        int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
-                        int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
-                        marker.setOffsetX(x);
-                        marker.setOffsetY(y);
-                    }
+                convertView.setX(point.x - marker.getOffsetX());
+                convertView.setY(point.y - marker.getOffsetY());
 
-                    convertView.setX(point.x - marker.getOffsetX());
-                    convertView.setY(point.y - marker.getOffsetY());
-
-                    // animate visibility
-                    if (marker.isVisible() && convertView.getVisibility() == View.GONE) {
-                        convertView.animate().cancel();
-                        convertView.setAlpha(0);
-                        AnimatorUtils.alpha(convertView, 1);
-                    }
-                } else {
-                    if (timer == null) {
-                        timer = new CountDownTimer(50, 560) {
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                animate(marker, convertView);
-                            }
-                        };
-                    } else {
-                        timer.cancel();
-                        PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-                        convertView.setX(point.x - marker.getOffsetX());
-                        convertView.setY(point.y - marker.getOffsetY());
-                    }
-                    timer.start();
+                // animate visibility
+                if (marker.isVisible() && convertView.getVisibility() == View.GONE) {
+                    convertView.animate().cancel();
+                    convertView.setAlpha(0);
+                    AnimatorUtils.alpha(convertView, 1);
                 }
             }
         }
@@ -283,23 +241,17 @@ public class MarkerViewManager {
      * @param marker the MarkerView to remove
      */
     public void removeMarkerView(MarkerView marker) {
-        boolean isAnimating = marker.isAnimating();
         final View viewHolder = markerViewMap.get(marker);
         if (viewHolder != null && marker != null) {
             for (final MapboxMap.MarkerViewAdapter<?> adapter : markerViewAdapters) {
                 if (adapter.getMarkerClass().equals(marker.getClass())) {
-                    if (!isAnimating) {
-                        if (adapter.prepareViewForReuse(marker, viewHolder)) {
-                            adapter.releaseView(viewHolder);
-                        }
+                    if (adapter.prepareViewForReuse(marker, viewHolder)) {
+                        adapter.releaseView(viewHolder);
                     }
                 }
             }
         }
-
-        if (!isAnimating) {
-            markerViewMap.remove(marker);
-        }
+        markerViewMap.remove(marker);
     }
 
     /**
@@ -373,7 +325,7 @@ public class MarkerViewManager {
         Iterator<MarkerView> iterator = markerViewMap.keySet().iterator();
         while (iterator.hasNext()) {
             MarkerView m = iterator.next();
-            if (!m.shouldAnimate() && !markers.contains(m)) {
+            if (!markers.contains(m)) {
                 // remove marker
                 convertView = markerViewMap.get(m);
                 for (MapboxMap.MarkerViewAdapter adapter : markerViewAdapters) {
@@ -442,50 +394,6 @@ public class MarkerViewManager {
                     }
                 }
             }
-        }
-    }
-
-    public void animatePosition(@NonNull MarkerView marker, long duration) {
-        marker.setDuration(duration);
-        marker.setStartTime(AnimationUtils.currentAnimationTimeMillis());
-        marker.setShouldAnimate(true);
-        animate(marker, markerViewMap.get(marker));
-    }
-
-    private void animate(final MarkerView marker, @Nullable View convertView) {
-        if (convertView != null) {
-            marker.setAnimating(true);
-            PointF screenLocation = mapboxMap.getProjection().toScreenLocation(marker.getTargetPosition());
-            PointF currentLocation = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-            convertView.setX(currentLocation.x - marker.getOffsetX());
-            convertView.setY(currentLocation.y - marker.getOffsetY());
-            ObjectAnimator animatorX = ObjectAnimator.ofFloat(convertView, "x", screenLocation.x - marker.getOffsetX());
-            ObjectAnimator animatorY = ObjectAnimator.ofFloat(convertView, "y", screenLocation.y - marker.getOffsetY());
-            AnimatorSet set = new AnimatorSet();
-            set.playTogether(animatorX, animatorY);
-            marker.setAnimation(set);
-            set.setDuration(marker.getRemainingTime());
-            set.addListener(new AnimatorListenerAdapter() {
-
-                private boolean canceled;
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    super.onAnimationCancel(animation);
-                    canceled = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    if (!canceled) {
-                        marker.setShouldAnimate(false);
-                        marker.setPosition(marker.getTargetPosition());
-                    }
-                }
-            });
-            marker.setAnimation(set);
-            set.start();
         }
     }
 
