@@ -5,7 +5,7 @@
 #include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/util/geo.hpp>
+#include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <string>
@@ -14,6 +14,7 @@
 
 namespace mbgl {
 
+class LatLngBounds;
 class PointAnnotation;
 class ShapeAnnotation;
 class AnnotationTile;
@@ -27,7 +28,7 @@ public:
 
     AnnotationIDs addPointAnnotations(const std::vector<PointAnnotation>&, const uint8_t maxZoom);
     AnnotationIDs addShapeAnnotations(const std::vector<ShapeAnnotation>&, const uint8_t maxZoom);
-    void updatePointAnnotation(const AnnotationID&, const PointAnnotation&, const uint8_t maxZoom);
+    Update updatePointAnnotation(const AnnotationID&, const PointAnnotation&, const uint8_t maxZoom);
     void removeAnnotations(const AnnotationIDs&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
@@ -38,6 +39,7 @@ public:
     SpriteAtlas& getSpriteAtlas() { return spriteAtlas; }
 
     void updateStyle(Style&);
+    void updateData();
 
     void addTileMonitor(AnnotationTileMonitor&);
     void removeTileMonitor(AnnotationTileMonitor&);

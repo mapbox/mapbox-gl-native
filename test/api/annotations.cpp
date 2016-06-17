@@ -159,7 +159,7 @@ TEST(Annotations, UpdateIcon) {
 
     map.removeAnnotationIcon("flipped_marker");
     map.addAnnotationIcon("flipped_marker", namedMarker("flipped_marker.png"));
-    map.update(Update::Annotations);
+    map.update(Update::AnnotationData | Update::AnnotationStyle);
 
     checkRendering(map, "update_icon");
 }

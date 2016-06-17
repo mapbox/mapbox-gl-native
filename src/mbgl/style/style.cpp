@@ -109,11 +109,11 @@ void Style::addSource(std::unique_ptr<Source> source) {
     sources.emplace_back(std::move(source));
 }
 
-std::vector<std::unique_ptr<StyleLayer>> Style::getLayers() const {
-    std::vector<std::unique_ptr<StyleLayer>> result;
+std::vector<const StyleLayer*> Style::getLayers() const {
+    std::vector<const StyleLayer*> result;
     result.reserve(layers.size());
     for (const auto& layer : layers) {
-        result.push_back(layer->clone());
+        result.push_back(layer.get());
     }
     return result;
 }

@@ -69,7 +69,7 @@ public:
     Source* getSource(const std::string& id) const;
     void addSource(std::unique_ptr<Source>);
 
-    std::vector<std::unique_ptr<StyleLayer>> getLayers() const;
+    std::vector<const StyleLayer*> getLayers() const;
     StyleLayer* getLayer(const std::string& id) const;
     void addLayer(std::unique_ptr<StyleLayer>,
                   optional<std::string> beforeLayerID = {});

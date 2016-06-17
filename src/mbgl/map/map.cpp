@@ -211,9 +211,13 @@ void Map::Impl::update() {
     // - Hint style sources to notify when all its tiles are loaded;
     timePoint = Clock::now();
 
-    if (style->loaded && updateFlags & Update::Annotations) {
+    if (style->loaded && updateFlags & Update::AnnotationStyle) {
         annotationManager->updateStyle(*style);
         updateFlags |= Update::Classes;
+    }
+
+    if (updateFlags & Update::AnnotationData) {
+        annotationManager->updateData();
     }
 
     if (updateFlags & Update::Classes) {
@@ -344,7 +348,7 @@ void Map::Impl::loadStyleJSON(const std::string& json, const std::string& base) 
     // force style cascade, causing all pending transitions to complete.
     style->cascade(Clock::now(), mode);
 
-    updateFlags |= Update::Classes | Update::RecalculateStyle | Update::Annotations;
+    updateFlags |= Update::Classes | Update::RecalculateStyle | Update::AnnotationStyle;
     asyncUpdate.send();
 }
 
@@ -700,7 +704,7 @@ AnnotationID Map::addPointAnnotation(const PointAnnotation& annotation) {
 
 AnnotationIDs Map::addPointAnnotations(const std::vector<PointAnnotation>& annotations) {
     auto result = impl->annotationManager->addPointAnnotations(annotations, getMaxZoom());
-    update(Update::Annotations);
+    update(Update::AnnotationStyle | Update::AnnotationData);
     return result;
 }
 
@@ -710,13 +714,12 @@ AnnotationID Map::addShapeAnnotation(const ShapeAnnotation& annotation) {
 
 AnnotationIDs Map::addShapeAnnotations(const std::vector<ShapeAnnotation>& annotations) {
     auto result = impl->annotationManager->addShapeAnnotations(annotations, getMaxZoom());
-    update(Update::Annotations);
+    update(Update::AnnotationStyle | Update::AnnotationData);
     return result;
 }
 
 void Map::updatePointAnnotation(AnnotationID annotationId, const PointAnnotation& annotation) {
-    impl->annotationManager->updatePointAnnotation(annotationId, annotation, getMaxZoom());
-    update(Update::Annotations);
+    update(impl->annotationManager->updatePointAnnotation(annotationId, annotation, getMaxZoom()));
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
@@ -725,7 +728,7 @@ void Map::removeAnnotation(AnnotationID annotation) {
 
 void Map::removeAnnotations(const AnnotationIDs& annotations) {
     impl->annotationManager->removeAnnotations(annotations);
-    update(Update::Annotations);
+    update(Update::AnnotationStyle | Update::AnnotationData);
 }
 
 AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {

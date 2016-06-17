@@ -43,7 +43,6 @@ using TileParseResult = variant<
 class TileWorker : public util::noncopyable {
 public:
     TileWorker(const OverscaledTileID&,
-               std::string sourceID,
                SpriteStore&,
                GlyphAtlas&,
                GlyphStore&,
@@ -67,7 +66,6 @@ private:
     std::unique_ptr<CollisionTile> placeLayers(PlacementConfig);
 
     const OverscaledTileID id;
-    const std::string sourceID;
 
     SpriteStore& spriteStore;
     GlyphAtlas& glyphAtlas;

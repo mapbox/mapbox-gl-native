@@ -1,6 +1,8 @@
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/style/style_layer.hpp>
+#include <mbgl/layer/background_layer.hpp>
+#include <mbgl/layer/custom_layer.hpp>
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 #include <mbgl/style/style.hpp>
@@ -13,15 +15,15 @@ namespace mbgl {
 
 VectorTileData::VectorTileData(const OverscaledTileID& id_,
                                std::unique_ptr<GeometryTileMonitor> monitor_,
-                               std::string sourceID,
+                               std::string sourceID_,
                                Style& style_,
                                const MapMode mode_,
                                const std::function<void(std::exception_ptr)>& callback)
     : TileData(id_),
+      sourceID(std::move(sourceID_)),
       style(style_),
       worker(style_.workers),
       tileWorker(id_,
-                 sourceID,
                  *style_.spriteStore,
                  *style_.glyphAtlas,
                  *style_.glyphStore,
@@ -60,7 +62,7 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
         // when tile data changed. Replacing the workdRequest will cancel a pending work
         // request in case there is one.
         workRequest.reset();
-        workRequest = worker.parseGeometryTile(tileWorker, style.getLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
+        workRequest = worker.parseGeometryTile(tileWorker, cloneStyleLayers(), std::move(tile), targetConfig, [callback, this, config = targetConfig] (TileParseResult result) {
             workRequest.reset();
 
             std::exception_ptr error;
@@ -95,6 +97,26 @@ VectorTileData::VectorTileData(const OverscaledTileID& id_,
 
 VectorTileData::~VectorTileData() {
     cancel();
+}
+
+std::vector<std::unique_ptr<StyleLayer>> VectorTileData::cloneStyleLayers() const {
+    std::vector<std::unique_ptr<StyleLayer>> result;
+
+    for (const StyleLayer* layer : style.getLayers()) {
+        // Avoid cloning and including irrelevant layers.
+        if (layer->is<BackgroundLayer>() ||
+            layer->is<CustomLayer>() ||
+            layer->source != sourceID ||
+            id.overscaledZ < std::floor(layer->minZoom) ||
+            id.overscaledZ >= std::ceil(layer->maxZoom) ||
+            layer->visibility == VisibilityType::None) {
+            continue;
+        }
+
+        result.push_back(layer->clone());
+    }
+
+    return result;
 }
 
 bool VectorTileData::parsePending(std::function<void(std::exception_ptr)> callback) {

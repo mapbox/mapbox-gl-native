@@ -8,10 +8,12 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 namespace mbgl {
 
 class Style;
+class StyleLayer;
 class AsyncRequest;
 class GeometryTileMonitor;
 class FeatureIndex;
@@ -43,6 +45,9 @@ public:
     void cancel() override;
 
 private:
+    std::vector<std::unique_ptr<StyleLayer>> cloneStyleLayers() const;
+
+    const std::string sourceID;
     Style& style;
     Worker& worker;
     TileWorker tileWorker;

@@ -49,14 +49,29 @@ AnnotationManager::addShapeAnnotations(const std::vector<ShapeAnnotation>& shape
     return annotationIDs;
 }
 
-void AnnotationManager::updatePointAnnotation(const AnnotationID& id, const PointAnnotation& point, const uint8_t) {
+Update AnnotationManager::updatePointAnnotation(const AnnotationID& id, const PointAnnotation& point, const uint8_t) {
     auto foundAnnotation = pointAnnotations.find(id);
-    if (foundAnnotation != pointAnnotations.end()) {
-        auto updatedAnnotation = std::make_shared<PointAnnotationImpl>(id, point);
-        pointTree.remove(foundAnnotation->second);
-        pointTree.insert(updatedAnnotation);
-        foundAnnotation->second = updatedAnnotation;
+    if (foundAnnotation == pointAnnotations.end()) {
+        return Update::Nothing;
     }
+
+    Update result = Update::Nothing;
+    const PointAnnotation& existing = foundAnnotation->second->point;
+
+    if (existing.position != point.position) {
+        result |= Update::AnnotationData;
+    }
+
+    if (existing.icon != point.icon) {
+        result |= Update::AnnotationData | Update::AnnotationStyle;
+    }
+
+    auto updatedAnnotation = std::make_shared<PointAnnotationImpl>(id, point);
+    pointTree.remove(foundAnnotation->second);
+    pointTree.insert(updatedAnnotation);
+    foundAnnotation->second = updatedAnnotation;
+
+    return result;
 }
 
 void AnnotationManager::removeAnnotations(const AnnotationIDs& ids) {
@@ -135,7 +150,9 @@ void AnnotationManager::updateStyle(Style& style) {
     }
 
     obsoleteShapeAnnotationLayers.clear();
+}
 
+void AnnotationManager::updateData() {
     for (auto& monitor : monitors) {
         monitor->update(getTile(monitor->tileID.canonical));
     }

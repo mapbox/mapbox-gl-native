@@ -13,7 +13,8 @@ enum class Update : uint8_t {
     RecalculateStyle          = 1 << 3,
     RenderStill               = 1 << 4,
     Repaint                   = 1 << 5,
-    Annotations               = 1 << 6,
+    AnnotationStyle           = 1 << 6,
+    AnnotationData            = 1 << 7,
 };
 
 inline Update operator| (const Update& lhs, const Update& rhs) {
