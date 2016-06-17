@@ -28,7 +28,7 @@ Response::Error::Error(Reason reason_, std::string message_)
 std::ostream& operator<<(std::ostream& os, Response::Error::Reason r) {
     switch (r) {
     case Response::Error::Reason::Success:
-        return os << "Response::Error::Reason::NotFound";
+        return os << "Response::Error::Reason::Success";
     case Response::Error::Reason::NotFound:
         return os << "Response::Error::Reason::NotFound";
     case Response::Error::Reason::Server:
