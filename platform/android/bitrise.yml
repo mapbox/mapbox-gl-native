@@ -26,6 +26,7 @@ workflows:
     - create-android-emulator@0.9.1:
         inputs:
         - name: test
+        - platform: android-20
     - start-android-emulator@1.0.2: {}
     - script:
         title: Build
