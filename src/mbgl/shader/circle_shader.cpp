@@ -3,12 +3,11 @@
 #include <mbgl/shader/circle.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::circle;
 
 CircleShader::CircleShader(gl::ObjectStore& store)
-    : Shader("circle", shaders::circle::vertex, shaders::circle::fragment, store) {
+    : Shader(::name, ::vertex, ::fragment, store) {
 }
 
 void CircleShader::bind(GLbyte* offset) {

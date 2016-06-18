@@ -3,12 +3,11 @@
 #include <mbgl/shader/line.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::line;
 
 LineShader::LineShader(gl::ObjectStore& store)
-    : Shader("line", shaders::line::vertex, shaders::line::fragment, store)
+    : Shader(::name, ::vertex, ::fragment, store)
     , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 

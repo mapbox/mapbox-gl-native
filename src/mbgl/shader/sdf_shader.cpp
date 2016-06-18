@@ -3,12 +3,11 @@
 #include <mbgl/shader/sdf.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::sdf;
 
 SDFShader::SDFShader(gl::ObjectStore& store)
-    : Shader("sdf", shaders::sdf::vertex, shaders::sdf::fragment, store)
+    : Shader(::name, ::vertex, ::fragment, store)
     , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
     , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
     , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {

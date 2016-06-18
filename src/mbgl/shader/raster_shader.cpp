@@ -3,12 +3,11 @@
 #include <mbgl/shader/raster.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::raster;
 
 RasterShader::RasterShader(gl::ObjectStore& store)
-    : Shader("raster", shaders::raster::vertex, shaders::raster::fragment, store) {
+    : Shader(::name, ::vertex, ::fragment, store) {
 }
 
 void RasterShader::bind(GLbyte* offset) {

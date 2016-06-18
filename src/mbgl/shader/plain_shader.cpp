@@ -3,12 +3,11 @@
 #include <mbgl/shader/fill.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::fill;
 
 PlainShader::PlainShader(gl::ObjectStore& store)
-    : Shader("fill", shaders::fill::vertex, shaders::fill::fragment, store) {
+    : Shader(::name, ::vertex, ::fragment, store) {
 }
 
 void PlainShader::bind(GLbyte* offset) {

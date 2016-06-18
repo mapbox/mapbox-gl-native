@@ -3,12 +3,11 @@
 #include <mbgl/shader/outline.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::outline;
 
 OutlineShader::OutlineShader(gl::ObjectStore& store)
-    : Shader("outline", shaders::outline::vertex, shaders::outline::fragment, store) {
+    : Shader(::name, ::vertex, ::fragment, store) {
 }
 
 void OutlineShader::bind(GLbyte* offset) {
