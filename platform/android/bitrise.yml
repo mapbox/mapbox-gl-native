@@ -23,6 +23,10 @@ workflows:
             else
                 envman add --key SKIPCI --value false
             fi
+    - create-android-emulator@0.9.1:
+        inputs:
+        - name: test
+    - start-android-emulator@1.0.2: {}
     - script:
         title: Build
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -35,6 +39,7 @@ workflows:
             export BUILDTYPE=Release
             make android
             make test-android
+             ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
