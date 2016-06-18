@@ -18,7 +18,7 @@ void Painter::renderRaster(RasterBucket& bucket,
     const RasterPaintProperties& properties = layer.impl->paint;
 
     if (bucket.hasData()) {
-        config.program = rasterShader->getID();
+        config.program = isWireframe() ? rasterShader->getOverdrawID() : rasterShader->getID();
         rasterShader->u_matrix = matrix;
         rasterShader->u_buffer = 0;
         rasterShader->u_opacity = properties.rasterOpacity;

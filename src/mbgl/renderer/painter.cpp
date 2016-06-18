@@ -92,7 +92,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     spriteAtlas = style.spriteAtlas.get();
     lineAtlas = style.lineAtlas.get();
 
-    RenderData renderData = style.getRenderData();
+    RenderData renderData = style.getRenderData(frame.debugOptions);
     const std::vector<RenderItem>& order = renderData.order;
     const std::set<Source*>& sources = renderData.sources;
     const Color& background = renderData.backgroundColor;
@@ -144,7 +144,12 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.depthTest = GL_FALSE;
         config.depthMask = GL_TRUE;
         config.colorMask = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
-        if (frame.debugOptions & MapDebugOptions::Wireframe) {
+
+        if (isWireframe()) {
+            config.blend = GL_TRUE;
+            config.blendFunc = { GL_CONSTANT_COLOR, GL_ONE };
+            const float overdraw = 1.0f / 8.0f;
+            config.blendColor = { overdraw, overdraw, overdraw, 0.0f };
             config.clearColor = Color::black();
         } else {
             config.clearColor = background;
@@ -243,7 +248,9 @@ void Painter::renderPass(RenderPass pass_,
         if (!layer.baseImpl->hasRenderPass(pass))
             continue;
 
-        if (pass == RenderPass::Translucent) {
+        if (isWireframe()) {
+            config.blend = GL_TRUE;
+        } else if (pass == RenderPass::Translucent) {
             config.blendFunc.reset();
             config.blend = GL_TRUE;
         } else {

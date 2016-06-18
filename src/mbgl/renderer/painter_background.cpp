@@ -21,9 +21,6 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
-    bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
-    isPatterned &= !wireframe;
-
     if (isPatterned) {
         imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from, true);
         imagePosB = spriteAtlas->getPosition(properties.backgroundPattern.value.to, true);
@@ -31,7 +28,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = patternShader->getID();
+        config.program = isWireframe() ? patternShader->getOverdrawID() : patternShader->getID();
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = imagePosA->tl;
         patternShader->u_pattern_br_a = imagePosA->br;
@@ -44,15 +41,10 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         backgroundPatternArray.bind(*patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
 
     } else {
-        if (wireframe) {
-            plainShader->u_color = Color::black();
-            plainShader->u_opacity = 1.0f;
-        } else {
-            plainShader->u_color = properties.backgroundColor;
-            plainShader->u_opacity = properties.backgroundOpacity;
-        }
+        plainShader->u_color = properties.backgroundColor;
+        plainShader->u_opacity = properties.backgroundOpacity;
 
-        config.program = plainShader->getID();
+        config.program = isWireframe() ? plainShader->getOverdrawID() : plainShader->getID();
         backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
     }
 

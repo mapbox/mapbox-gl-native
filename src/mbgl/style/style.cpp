@@ -258,7 +258,7 @@ bool Style::isLoaded() const {
     return true;
 }
 
-RenderData Style::getRenderData() const {
+RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
     RenderData result;
 
     for (const auto& source : sources) {
@@ -272,6 +272,11 @@ RenderData Style::getRenderData() const {
             continue;
 
         if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
+            if (debugOptions & MapDebugOptions::Wireframe) {
+                // We want to skip glClear optimization in wireframe mode.
+                result.order.emplace_back(*layer);
+                continue;
+            }
             const BackgroundPaintProperties& paint = background->impl->paint;
             if (layer.get() == layers[0].get() && paint.backgroundPattern.value.from.empty()) {
                 // This is a solid background. We can use glClear().

@@ -27,7 +27,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 
-    config.program = circleShader->getID();
+    config.program = isWireframe() ? circleShader->getOverdrawID() : circleShader->getID();
 
     circleShader->u_matrix = vtxMatrix;
     circleShader->u_extrude_scale = extrudeScale;

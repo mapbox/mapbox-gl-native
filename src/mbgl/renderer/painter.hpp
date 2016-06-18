@@ -156,6 +156,8 @@ private:
 
     void setDepthSublayer(int n);
 
+    bool isWireframe() const { return frame.debugOptions & MapDebugOptions::Wireframe; }
+
     mat4 projMatrix;
     mat4 nativeMatrix;
 

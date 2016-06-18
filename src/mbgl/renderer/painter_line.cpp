@@ -33,17 +33,10 @@ void Painter::renderLine(LineBucket& bucket,
     // Retina devices need a smaller distance to avoid aliasing.
     float antialiasing = 1.0 / frame.pixelRatio;
 
-    bool wireframe = frame.debugOptions & MapDebugOptions::Wireframe;
-
     float blur = properties.lineBlur + antialiasing;
 
-    Color color = Color::white();
-    float opacity = 1.0f;
-    if (!wireframe) {
-        color = properties.lineColor;
-        opacity = properties.lineOpacity;
-    }
-
+    const Color color = properties.lineColor;
+    const float opacity = properties.lineOpacity;
     const float ratio = 1.0 / tileID.pixelsToTileUnits(1.0, state.getZoom());
 
     mat2 antialiasingMatrix;
@@ -64,7 +57,7 @@ void Painter::renderLine(LineBucket& bucket,
 
     if (!properties.lineDasharray.value.from.empty()) {
 
-        config.program = linesdfShader->getID();
+        config.program = isWireframe() ? linesdfShader->getOverdrawID() : linesdfShader->getID();
 
         linesdfShader->u_matrix = vtxMatrix;
         linesdfShader->u_linewidth = properties.lineWidth / 2;
@@ -109,7 +102,7 @@ void Painter::renderLine(LineBucket& bucket,
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = linepatternShader->getID();
+        config.program = isWireframe() ? linepatternShader->getOverdrawID() : linepatternShader->getID();
 
         linepatternShader->u_matrix = vtxMatrix;
         linepatternShader->u_linewidth = properties.lineWidth / 2;
@@ -145,7 +138,7 @@ void Painter::renderLine(LineBucket& bucket,
         bucket.drawLinePatterns(*linepatternShader, store);
 
     } else {
-        config.program = lineShader->getID();
+        config.program = isWireframe() ? lineShader->getOverdrawID() : lineShader->getID();
 
         lineShader->u_matrix = vtxMatrix;
         lineShader->u_linewidth = properties.lineWidth / 2;

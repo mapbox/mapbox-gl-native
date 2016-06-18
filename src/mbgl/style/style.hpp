@@ -74,7 +74,7 @@ public:
     void setClasses(const std::vector<std::string>&, const TransitionOptions& = {});
     std::vector<std::string> getClasses() const;
 
-    RenderData getRenderData() const;
+    RenderData getRenderData(MapDebugOptions) const;
 
     std::vector<Feature> queryRenderedFeatures(const QueryParameters&) const;
 
