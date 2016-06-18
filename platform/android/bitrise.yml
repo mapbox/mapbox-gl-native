@@ -39,6 +39,7 @@ workflows:
             export BUILDTYPE=Release
             make android
             make test-android
+            cd platform/android/
              ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
     - slack:
         title: Post to Slack
