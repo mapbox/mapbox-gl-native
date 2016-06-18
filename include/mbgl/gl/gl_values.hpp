@@ -210,6 +210,10 @@ struct BlendFunc {
     }
 };
 
+constexpr bool operator!=(const BlendFunc::Type& a, const BlendFunc::Type& b) {
+    return a.sfactor != b.sfactor || a.dfactor != b.dfactor;
+}
+
 struct Program {
     using Type = GLuint;
     static const Type Default;
