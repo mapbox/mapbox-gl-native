@@ -3,12 +3,11 @@
 #include <mbgl/shader/collisionbox.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::collisionbox;
 
 CollisionBoxShader::CollisionBoxShader(gl::ObjectStore& store)
-    : Shader("collisionbox", shaders::collisionbox::vertex, shaders::collisionbox::fragment, store)
+    : Shader(::name, ::vertex, ::fragment, store)
     , a_extrude(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_extrude")))
     , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }

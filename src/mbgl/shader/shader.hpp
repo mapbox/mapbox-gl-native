@@ -8,10 +8,8 @@ namespace mbgl {
 
 class Shader : private util::noncopyable {
 public:
-    Shader(const GLchar *name, const GLchar *vertex, const GLchar *fragment, gl::ObjectStore&);
-
     ~Shader();
-    const GLchar *name;
+    const char* name;
 
     GLuint getID() const {
         return program.get();
@@ -20,6 +18,7 @@ public:
     virtual void bind(GLbyte *offset) = 0;
 
 protected:
+    Shader(const char* name_, const char* vertex, const char* fragment, gl::ObjectStore&);
     GLint a_pos = -1;
 
 private:

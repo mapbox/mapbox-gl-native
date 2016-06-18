@@ -50,6 +50,11 @@ namespace mbgl {{
 namespace shaders {{
 namespace {name} {{
 
+#ifndef MBGL_SHADER_NAME_{NAME}
+#define MBGL_SHADER_NAME_{NAME}
+constexpr const char* name = "{name}";
+#endif // MBGL_SHADER_NAME_{NAME}
+
 #ifdef GL_ES_VERSION_2_0
 constexpr const char* {type} = R"MBGL_SHADER(precision highp float;\n{data})MBGL_SHADER";
 #else
