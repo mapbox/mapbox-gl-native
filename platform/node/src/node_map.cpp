@@ -285,6 +285,11 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::Collision;
             }
         }
+        if (Nan::Has(debug, Nan::New("overdraw").ToLocalChecked()).FromJust()) {
+            if (Nan::Get(debug, Nan::New("overdraw").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                options.debugOptions = mbgl::MapDebugOptions::Overdraw;
+            }
+        }
     }
 
     return options;

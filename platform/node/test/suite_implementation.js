@@ -36,7 +36,8 @@ module.exports = function (style, options, callback) {
     options.pitch = style.pitch;
     options.debug = {
         tileBorders: options.debug,
-        collision: options.collisionDebug
+        collision: options.collisionDebug,
+        overdraw: options.showOverdrawInspector,
     };
 
     map.load(style);
