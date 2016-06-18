@@ -214,6 +214,19 @@ constexpr bool operator!=(const BlendFunc::Type& a, const BlendFunc::Type& b) {
     return a.sfactor != b.sfactor || a.dfactor != b.dfactor;
 }
 
+struct BlendColor {
+    using Type = Color;
+    static const Type Default;
+    inline static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glBlendColor(value.r, value.g, value.b, value.a));
+    }
+    inline static Type Get() {
+        GLfloat floats[4];
+        MBGL_CHECK_ERROR(glGetFloatv(GL_BLEND_COLOR, floats));
+        return { floats[0], floats[1], floats[2], floats[3] };
+    }
+};
+
 struct Program {
     using Type = GLuint;
     static const Type Default;

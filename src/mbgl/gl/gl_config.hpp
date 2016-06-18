@@ -56,6 +56,7 @@ public:
         depthFunc.reset();
         blend.reset();
         blendFunc.reset();
+        blendColor.reset();
         colorMask.reset();
         clearDepth.reset();
         clearColor.reset();
@@ -80,6 +81,7 @@ public:
         depthFunc.setDirty();
         blend.setDirty();
         blendFunc.setDirty();
+        blendColor.setDirty();
         colorMask.setDirty();
         clearDepth.setDirty();
         clearColor.setDirty();
@@ -103,6 +105,7 @@ public:
     Value<DepthFunc> depthFunc;
     Value<Blend> blend;
     Value<BlendFunc> blendFunc;
+    Value<BlendColor> blendColor;
     Value<ColorMask> colorMask;
     Value<ClearDepth> clearDepth;
     Value<ClearColor> clearColor;
