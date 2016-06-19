@@ -231,8 +231,17 @@ QT_ENV = $(shell MASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) ./platform/qt/
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$(QT_ENV) ./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
 
+GYP_FLAVOR = make
+ifneq ($(HOST_PLATFORM),$(BUILD_PLATFORM))
+  ifeq ($(BUILD_PLATFORM), linux)
+    GYP_FLAVOR = make-linux
+  else ifeq ($(BUILD_PLATFORM), macos)
+    GYP_FLAVOR = make-mac
+  endif
+endif
+
 $(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
-	$(QT_ENV) $(GYP) -f make -I $(QT_OUTPUT_PATH)/config.gypi \
+	$(QT_ENV) $(GYP) -f $(GYP_FLAVOR) -I $(QT_OUTPUT_PATH)/config.gypi \
 	  --generator-output=$(QT_OUTPUT_PATH) $<
 
 qt-lib: $(QT_MAKEFILE)
