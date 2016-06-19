@@ -269,6 +269,14 @@
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
         </activity>
+        <activity
+            android:name=".activity.annotation.MarkerViewScaleActivity"
+            android:description="@string/description_view_marker_scale"
+            android:label="@string/activity_view_marker_scale">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
 
         <activity android:name=".activity.navigation.LocationPickerActivity"
                   android:description="@string/description_location_picker"
