@@ -2,12 +2,26 @@ export BUILDTYPE ?= Debug
 
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = macos
+  HOST_PLATFORM_VERSION = $(shell uname -m)
   export JOBS ?= $(shell sysctl -n hw.ncpu)
 else ifeq ($(shell uname -s), Linux)
   HOST_PLATFORM = linux
+  HOST_PLATFORM_VERSION = $(shell uname -m)
   export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 else
   $(error Cannot determine host platform)
+endif
+
+ifeq ($(MASON_PLATFORM),)
+  BUILD_PLATFORM = $(HOST_PLATFORM)
+else
+  BUILD_PLATFORM = $(MASON_PLATFORM)
+endif
+
+ifeq ($(MASON_PLATFORM_VERSION),)
+  BUILD_PLATFORM_VERSION = $(HOST_PLATFORM_VERSION)
+else
+  BUILD_PLATFORM_VERSION = $(MASON_PLATFORM_VERSION)
 endif
 
 ifeq ($(V), 1)
@@ -16,7 +30,7 @@ else
   export XCPRETTY ?= | xcpretty
 endif
 
-default: test-$(HOST_PLATFORM)
+default: test-$(BUILD_PLATFORM)
 
 ifneq (,$(wildcard .git/.))
 .mason/mason:
@@ -183,10 +197,10 @@ apackage:
 #### Node targets #####################################################
 
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
-NODE_OUTPUT_PATH = build/node-$(HOST_PLATFORM)-$(shell uname -m)
+NODE_OUTPUT_PATH = build/node-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 
-$(NODE_OUTPUT_PATH)/config.gypi: platform/$(HOST_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
+$(NODE_OUTPUT_PATH)/config.gypi: platform/$(BUILD_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
+	./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
 
 node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
 	$(NODE_PRE_GYP) configure --clang -- -I$< \
@@ -208,14 +222,14 @@ test-node: node
 
 #### Qt targets #####################################################
 
-QT_OUTPUT_PATH = build/qt-$(HOST_PLATFORM)-$(shell uname -m)
+QT_OUTPUT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 QT_MAKEFILE = $(QT_OUTPUT_PATH)/Makefile
 
 # Cross compilation support
-QT_ENV = $(shell MASON_PLATFORM_VERSION=$(shell uname -m) ./platform/qt/scripts/toolchain.sh)
+QT_ENV = $(shell MASON_PLATFORM_VERSION=$(BUILD_PLATFORM_VERSION) ./platform/qt/scripts/toolchain.sh)
 
 $(QT_OUTPUT_PATH)/config.gypi: platform/qt/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	$(QT_ENV) ./configure $< $@ $(HOST_PLATFORM) $(shell uname -m)
+	$(QT_ENV) ./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
 
 $(QT_MAKEFILE): platform/qt/platform.gyp $(QT_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	$(QT_ENV) $(GYP) -f make -I $(QT_OUTPUT_PATH)/config.gypi \
@@ -251,11 +265,11 @@ run-valgrind-qt-app: qt-app
 
 #### Linux targets #####################################################
 
-LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)
+LINUX_OUTPUT_PATH = build/linux-$(BUILD_PLATFORM_VERSION)
 LINUX_MAKEFILE = $(LINUX_OUTPUT_PATH)/Makefile
 
 $(LINUX_OUTPUT_PATH)/config.gypi: platform/linux/scripts/configure.sh $(CONFIG_DEPENDENCIES)
-	./configure $< $@ linux $(shell uname -m)
+	./configure $< $@ linux $(BUILD_PLATFORM_VERSION)
 
 $(LINUX_MAKEFILE): platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 	$(GYP) -f make -I $(LINUX_OUTPUT_PATH)/config.gypi \
@@ -291,7 +305,7 @@ check: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
-compdb: node_modules compdb-$(HOST_PLATFORM)
+compdb: node_modules compdb-$(BUILD_PLATFORM)
 
 compdb-linux: platform/linux/platform.gyp $(LINUX_OUTPUT_PATH)/config.gypi
 	$(GYP) -f ninja -I $(LINUX_OUTPUT_PATH)/config.gypi \
@@ -305,7 +319,7 @@ compdb-macos: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
 	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) \
 		-t compdb cc cc_s cxx objc objcxx > $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/compile_commands.json
 
-tidy: compdb tidy-$(HOST_PLATFORM)
+tidy: compdb tidy-$(BUILD_PLATFORM)
 
 tidy-linux:
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
