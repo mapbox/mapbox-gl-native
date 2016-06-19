@@ -133,6 +133,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         MBGL_DEBUG_GROUP("upload");
 
         tileStencilBuffer.upload(store);
+        rasterBoundsBuffer.upload(store);
         tileBorderBuffer.upload(store);
         spriteAtlas->upload(store);
         lineAtlas->upload(store);
