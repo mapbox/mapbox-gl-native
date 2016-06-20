@@ -952,6 +952,15 @@ IB_DESIGNABLE
 - (void)removeAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations;
 
 /**
+ Returns an `MGLAnnotationView` if the given annotation is currently associated
+ with a view, otherwise nil.
+ 
+ @param annotation The annotation associated with the view. 
+    Annotation must conform to the `MGLAnnotation` protocol.
+ */
+- (nullable MGLAnnotationView *)viewForAnnotation:(id <MGLAnnotation>)annotation;
+
+/**
  Returns a reusable annotation image object associated with its identifier.
  
  For performance reasons, you should generally reuse `MGLAnnotationImage`
