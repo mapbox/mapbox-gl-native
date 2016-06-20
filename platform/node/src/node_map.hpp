@@ -1,5 +1,7 @@
 #pragma once
 
+#include "node_style.hpp"
+
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/platform/default/headless_view.hpp>
@@ -9,8 +11,6 @@
 #pragma GCC diagnostic ignored "-Wshadow"
 #include <nan.h>
 #pragma GCC diagnostic pop
-
-#include <queue>
 
 namespace node_mbgl {
 
@@ -28,9 +28,12 @@ public:
     static NAN_METHOD(Render);
     static NAN_METHOD(Release);
     static NAN_METHOD(AddClass);
+    static NAN_METHOD(SetLayoutProperty);
     static NAN_METHOD(SetPaintProperty);
     static NAN_METHOD(DumpDebugLogs);
     static NAN_METHOD(QueryRenderedFeatures);
+
+    static void setProperty(const Nan::FunctionCallbackInfo<v8::Value>&, const PropertySetters&);
 
     void startRender(RenderOptions options);
     void renderFinished();

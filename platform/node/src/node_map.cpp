@@ -56,6 +56,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "release", Release);
 
     Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
+    Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
 
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
@@ -481,7 +482,7 @@ NAN_METHOD(NodeMap::AddClass) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::SetPaintProperty) {
+void NodeMap::setProperty(const Nan::FunctionCallbackInfo<v8::Value>& info, const PropertySetters& setters) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -502,8 +503,6 @@ NAN_METHOD(NodeMap::SetPaintProperty) {
         return Nan::ThrowTypeError("Second argument must be a string");
     }
 
-    static const PropertySetters setters = makePaintPropertySetters();
-
     auto it = setters.find(*Nan::Utf8String(info[1]));
     if (it == setters.end()) {
         return Nan::ThrowTypeError("property not found");
@@ -515,6 +514,16 @@ NAN_METHOD(NodeMap::SetPaintProperty) {
 
     nodeMap->map->update(mbgl::Update::RecalculateStyle);
     info.GetReturnValue().SetUndefined();
+}
+
+NAN_METHOD(NodeMap::SetLayoutProperty) {
+    static const PropertySetters setters = makeLayoutPropertySetters();
+    setProperty(info, setters);
+}
+
+NAN_METHOD(NodeMap::SetPaintProperty) {
+    static const PropertySetters setters = makePaintPropertySetters();
+    setProperty(info, setters);
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {

@@ -9,7 +9,7 @@
 
 namespace node_mbgl {
 
-PropertySetters makeLayoutPropertySetters() {
+inline PropertySetters makeLayoutPropertySetters() {
     using namespace mbgl::style;
     PropertySetters result;
 
@@ -60,7 +60,7 @@ PropertySetters makeLayoutPropertySetters() {
     return result;
 }
 
-PropertySetters makePaintPropertySetters() {
+inline PropertySetters makePaintPropertySetters() {
     using namespace mbgl::style;
     PropertySetters result;
 
