@@ -21,9 +21,9 @@
     <string name="activity_view_marker_scale">Scaling in the View Marker API</string>
 
     <!-- InfoWindow-->
-    <string name="activity_info_window">Standard InfoWindow example</string>
-    <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
-    <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow Adapter</string>
+    <string name="activity_info_window">Standard InfoWindow</string>
+    <string name="activity_infowindow_adapter">Custom InfoWindow</string>
+    <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow</string>
 
     <!-- Camera -->
     <string name="activity_camera_animation_types">Animation Types</string>
