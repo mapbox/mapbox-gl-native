@@ -231,7 +231,7 @@ final class NativeMapView {
     }
 
     public void setLatLng(LatLng latLng, long duration) {
-        nativeSetLatLng(mNativeMapViewPtr, latLng, duration);
+        nativeSetLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude(), duration);
     }
 
     public LatLng getLatLng() {
@@ -344,7 +344,7 @@ final class NativeMapView {
     }
 
     public long addMarker(Marker marker) {
-        Marker[] markers = { marker };
+        Marker[] markers = {marker};
         return nativeAddMarkers(mNativeMapViewPtr, markers)[0];
     }
 
@@ -353,7 +353,7 @@ final class NativeMapView {
     }
 
     public long addPolyline(Polyline polyline) {
-        Polyline[] polylines = { polyline };
+        Polyline[] polylines = {polyline};
         return nativeAddPolylines(mNativeMapViewPtr, polylines)[0];
     }
 
@@ -362,7 +362,7 @@ final class NativeMapView {
     }
 
     public long addPolygon(Polygon polygon) {
-        Polygon[] polygons = { polygon };
+        Polygon[] polygons = {polygon};
         return nativeAddPolygons(mNativeMapViewPtr, polygons)[0];
     }
 
@@ -377,7 +377,7 @@ final class NativeMapView {
     }
 
     public void removeAnnotation(long id) {
-        long[] ids = { id };
+        long[] ids = {id};
         removeAnnotations(ids);
     }
 
@@ -426,15 +426,15 @@ final class NativeMapView {
     }
 
     public ProjectedMeters projectedMetersForLatLng(LatLng latLng) {
-        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng);
+        return nativeProjectedMetersForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForProjectedMeters(ProjectedMeters projectedMeters) {
-        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters);
+        return nativeLatLngForProjectedMeters(mNativeMapViewPtr, projectedMeters.getNorthing(), projectedMeters.getEasting());
     }
 
     public PointF pixelForLatLng(LatLng latLng) {
-        return nativePixelForLatLng(mNativeMapViewPtr, latLng);
+        return nativePixelForLatLng(mNativeMapViewPtr, latLng.getLatitude(), latLng.getLongitude());
     }
 
     public LatLng latLngForPixel(PointF pixel) {
@@ -446,15 +446,15 @@ final class NativeMapView {
     }
 
     public void jumpTo(double angle, LatLng center, double pitch, double zoom) {
-        nativeJumpTo(mNativeMapViewPtr, angle, center, pitch, zoom);
+        nativeJumpTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), pitch, zoom);
     }
 
     public void easeTo(double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator) {
-        nativeEaseTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom, easingInterpolator);
+        nativeEaseTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom, easingInterpolator);
     }
 
     public void flyTo(double angle, LatLng center, long duration, double pitch, double zoom) {
-        nativeFlyTo(mNativeMapViewPtr, angle, center, duration, pitch, zoom);
+        nativeFlyTo(mNativeMapViewPtr, angle, center.getLatitude(), center.getLongitude(), duration, pitch, zoom);
     }
 
     public void addCustomLayer(CustomLayer customLayer, String before) {
@@ -542,7 +542,7 @@ final class NativeMapView {
     private native void nativeMoveBy(long nativeMapViewPtr, double dx,
                                      double dy, long duration);
 
-    private native void nativeSetLatLng(long nativeMapViewPtr, LatLng latLng,
+    private native void nativeSetLatLng(long nativeMapViewPtr, double latitude, double longitude,
                                         long duration);
 
     private native LatLng nativeGetLatLng(long nativeMapViewPtr);
@@ -623,21 +623,21 @@ final class NativeMapView {
 
     private native double nativeGetMetersPerPixelAtLatitude(long nativeMapViewPtr, double lat, double zoom);
 
-    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, LatLng latLng);
+    private native ProjectedMeters nativeProjectedMetersForLatLng(long nativeMapViewPtr, double latitude, double longitude);
 
-    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, ProjectedMeters projectedMeters);
+    private native LatLng nativeLatLngForProjectedMeters(long nativeMapViewPtr, double northing, double easting);
 
-    private native PointF nativePixelForLatLng(long nativeMapViewPtr, LatLng latLng);
+    private native PointF nativePixelForLatLng(long nativeMapViewPtr, double lat, double lon);
 
     private native LatLng nativeLatLngForPixel(long nativeMapViewPtr, PointF pixel);
 
     private native double nativeGetTopOffsetPixelsForAnnotationSymbol(long nativeMapViewPtr, String symbolName);
+    
+    private native void nativeJumpTo(long nativeMapViewPtr, double angle, double latitude, double longitude, double pitch, double zoom);
 
-    private native void nativeJumpTo(long nativeMapViewPtr, double angle, LatLng center, double pitch, double zoom);
+    private native void nativeEaseTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom, boolean easingInterpolator);
 
-    private native void nativeEaseTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator);
-
-    private native void nativeFlyTo(long nativeMapViewPtr, double angle, LatLng center, long duration, double pitch, double zoom);
+    private native void nativeFlyTo(long nativeMapViewPtr, double angle, double latitude, double longitude, long duration, double pitch, double zoom);
 
     private native void nativeAddCustomLayer(long nativeMapViewPtr, CustomLayer customLayer, String before);
 
