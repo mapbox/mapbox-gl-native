@@ -21,9 +21,8 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
         diagnose collision and label placement issues. */
     MGLMapDebugCollisionBoxesMask = 1 << 4,
     
-    /** Line widths, backgrounds, and fill colors are ignored to create a
-        wireframe effect. */
-    MGLMapDebugWireframesMask = 1 << 5,
+    /** Overdraw inspector. */
+    MGLMapDebugOverdrawsMask = 1 << 5,
     
     /** The stencil buffer is shown instead of the color buffer. */
     MGLMapDebugStencilBufferMask = 1 << 6,

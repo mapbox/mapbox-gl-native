@@ -46,7 +46,7 @@ void Painter::renderFill(FillBucket& bucket,
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        config.program = isWireframe() ? outlineShader->getOverdrawID() : outlineShader->getID();
+        config.program = isOverdraw() ? outlineShader->getOverdrawID() : outlineShader->getID();
         outlineShader->u_matrix = vertexMatrix;
 
         outlineShader->u_outline_color = strokeColor;
@@ -76,7 +76,7 @@ void Painter::renderFill(FillBucket& bucket,
 
         // Image fill.
         if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
-            config.program = isWireframe() ? patternShader->getOverdrawID() : patternShader->getID();
+            config.program = isOverdraw() ? patternShader->getOverdrawID() : patternShader->getID();
             patternShader->u_matrix = vertexMatrix;
             patternShader->u_pattern_tl_a = imagePosA->tl;
             patternShader->u_pattern_br_a = imagePosA->br;
@@ -105,7 +105,7 @@ void Painter::renderFill(FillBucket& bucket,
             bucket.drawElements(*patternShader, store);
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
-                config.program = isWireframe() ? outlinePatternShader->getOverdrawID() : outlinePatternShader->getID();
+                config.program = isOverdraw() ? outlinePatternShader->getOverdrawID() : outlinePatternShader->getID();
                 outlinePatternShader->u_matrix = vertexMatrix;
 
                 // Draw the entire line
@@ -140,7 +140,7 @@ void Painter::renderFill(FillBucket& bucket,
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            config.program = isWireframe() ? plainShader->getOverdrawID() : plainShader->getID();
+            config.program = isOverdraw() ? plainShader->getOverdrawID() : plainShader->getID();
             plainShader->u_matrix = vertexMatrix;
             plainShader->u_color = fillColor;
             plainShader->u_opacity = opacity;
@@ -154,7 +154,7 @@ void Painter::renderFill(FillBucket& bucket,
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        config.program = isWireframe() ? outlineShader->getOverdrawID() : outlineShader->getID();
+        config.program = isOverdraw() ? outlineShader->getOverdrawID() : outlineShader->getID();
         outlineShader->u_matrix = vertexMatrix;
 
         outlineShader->u_outline_color = fillColor;

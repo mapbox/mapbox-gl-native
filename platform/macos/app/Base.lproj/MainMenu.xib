@@ -461,10 +461,10 @@
                                     <action selector="toggleCollisionBoxes:" target="-1" id="EYa-7n-iWZ"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Show Wireframes" id="hSX-Be-8xC">
+                            <menuItem title="Show Overdraws" id="hSX-Be-8xC">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleWireframes:" target="-1" id="usj-ug-upt"/>
+                                    <action selector="toggleOverdraws:" target="-1" id="usj-ug-upt"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="2EG-Hp-4FA"/>

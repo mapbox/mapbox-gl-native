@@ -33,7 +33,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 - Removed unused SVG files from the SDK’s resource bundle. ([#4641](https://github.com/mapbox/mapbox-gl-native/pull/4641))
 - Deprecated `-[MGLMapView emptyMemoryCache]`. ([#4725](https://github.com/mapbox/mapbox-gl-native/pull/4725))
 - Added `MGLCoordinateInCoordinateBounds()`, a function that tests whether or not a coordinate is in a given bounds. ([#5053](https://github.com/mapbox/mapbox-gl-native/pull/5053))
-- Added a new option to `MGLMapDebugMaskOptions`, `MGLMapDebugWireframesMask`, that shows wireframes instead of the usual rendered output. ([#4359](https://github.com/mapbox/mapbox-gl-native/pull/4359))
+- Added a new option to `MGLMapDebugMaskOptions`, `MGLMapDebugOverdrawsMask`, that shows wireframes for overdraw inspection instead of the usual rendered output. ([#4359](https://github.com/mapbox/mapbox-gl-native/pull/4359))
 
 ## 3.2.3
 

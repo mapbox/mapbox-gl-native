@@ -272,8 +272,8 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
             continue;
 
         if (const BackgroundLayer* background = layer->as<BackgroundLayer>()) {
-            if (debugOptions & MapDebugOptions::Wireframe) {
-                // We want to skip glClear optimization in wireframe mode.
+            if (debugOptions & MapDebugOptions::Overdraw) {
+                // We want to skip glClear optimization in overdraw mode.
                 result.order.emplace_back(*layer);
                 continue;
             }

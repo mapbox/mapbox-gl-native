@@ -28,7 +28,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = isWireframe() ? patternShader->getOverdrawID() : patternShader->getID();
+        config.program = isOverdraw() ? patternShader->getOverdrawID() : patternShader->getID();
         patternShader->u_matrix = identityMatrix;
         patternShader->u_pattern_tl_a = imagePosA->tl;
         patternShader->u_pattern_br_a = imagePosA->br;
@@ -44,7 +44,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         plainShader->u_color = properties.backgroundColor;
         plainShader->u_opacity = properties.backgroundOpacity;
 
-        config.program = isWireframe() ? plainShader->getOverdrawID() : plainShader->getID();
+        config.program = isOverdraw() ? plainShader->getOverdrawID() : plainShader->getID();
         backgroundArray.bind(*plainShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
     }
 

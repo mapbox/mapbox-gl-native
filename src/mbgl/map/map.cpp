@@ -787,14 +787,14 @@ void Map::cycleDebugOptions() {
 #ifndef GL_ES_VERSION_2_0
     if (impl->debugOptions & MapDebugOptions::StencilClip)
         impl->debugOptions = MapDebugOptions::NoDebug;
-    else if (impl->debugOptions & MapDebugOptions::Wireframe)
+    else if (impl->debugOptions & MapDebugOptions::Overdraw)
         impl->debugOptions = MapDebugOptions::StencilClip;
 #else
-    if (impl->debugOptions & MapDebugOptions::Wireframe)
+    if (impl->debugOptions & MapDebugOptions::Overdraw)
         impl->debugOptions = MapDebugOptions::NoDebug;
 #endif // GL_ES_VERSION_2_0
     else if (impl->debugOptions & MapDebugOptions::Collision)
-        impl->debugOptions = MapDebugOptions::Wireframe;
+        impl->debugOptions = MapDebugOptions::Overdraw;
     else if (impl->debugOptions & MapDebugOptions::Timestamps)
         impl->debugOptions = impl->debugOptions | MapDebugOptions::Collision;
     else if (impl->debugOptions & MapDebugOptions::ParseStatus)

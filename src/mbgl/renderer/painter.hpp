@@ -156,7 +156,7 @@ private:
 
     void setDepthSublayer(int n);
 
-    bool isWireframe() const { return frame.debugOptions & MapDebugOptions::Wireframe; }
+    bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
 
     mat4 projMatrix;
     mat4 nativeMatrix;

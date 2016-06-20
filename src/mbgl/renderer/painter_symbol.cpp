@@ -58,7 +58,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         exScale = {{ exScale[0] * scale, exScale[1] * scale }};
     }
 
-    config.program = isWireframe() ? sdfShader.getOverdrawID() : sdfShader.getID();
+    config.program = isOverdraw() ? sdfShader.getOverdrawID() : sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_extrude_scale = exScale;
     sdfShader.u_texsize = texsize;
@@ -199,7 +199,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                 exScale = {{ exScale[0] * scale, exScale[1] * scale }};
             }
 
-            config.program = isWireframe() ? iconShader->getOverdrawID() : iconShader->getID();
+            config.program = isOverdraw() ? iconShader->getOverdrawID() : iconShader->getID();
             iconShader->u_matrix = vtxMatrix;
             iconShader->u_extrude_scale = exScale;
             iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};

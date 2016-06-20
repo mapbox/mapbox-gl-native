@@ -2398,8 +2398,8 @@ public:
     if (options & mbgl::MapDebugOptions::Collision) {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
-    if (options & mbgl::MapDebugOptions::Wireframe) {
-        mask |= MGLMapDebugWireframesMask;
+    if (options & mbgl::MapDebugOptions::Overdraw) {
+        mask |= MGLMapDebugOverdrawsMask;
     }
     if (options & mbgl::MapDebugOptions::StencilClip) {
         mask |= MGLMapDebugStencilBufferMask;
@@ -2421,8 +2421,8 @@ public:
     if (debugMask & MGLMapDebugCollisionBoxesMask) {
         options |= mbgl::MapDebugOptions::Collision;
     }
-    if (debugMask & MGLMapDebugWireframesMask) {
-        options |= mbgl::MapDebugOptions::Wireframe;
+    if (debugMask & MGLMapDebugOverdrawsMask) {
+        options |= mbgl::MapDebugOptions::Overdraw;
     }
     if (debugMask & MGLMapDebugStencilBufferMask) {
         options |= mbgl::MapDebugOptions::StencilClip;

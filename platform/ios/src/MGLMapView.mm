@@ -1829,9 +1829,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         mask |= MGLMapDebugCollisionBoxesMask;
     }
-    if (options & mbgl::MapDebugOptions::Wireframe)
+    if (options & mbgl::MapDebugOptions::Overdraw)
     {
-        mask |= MGLMapDebugWireframesMask;
+        mask |= MGLMapDebugOverdrawsMask;
     }
     return mask;
 }
@@ -1855,9 +1855,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         options |= mbgl::MapDebugOptions::Collision;
     }
-    if (debugMask & MGLMapDebugWireframesMask)
+    if (debugMask & MGLMapDebugOverdrawsMask)
     {
-        options |= mbgl::MapDebugOptions::Wireframe;
+        options |= mbgl::MapDebugOptions::Overdraw;
     }
     _mbglMap->setDebug(options);
 }

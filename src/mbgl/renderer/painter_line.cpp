@@ -57,7 +57,7 @@ void Painter::renderLine(LineBucket& bucket,
 
     if (!properties.lineDasharray.value.from.empty()) {
 
-        config.program = isWireframe() ? linesdfShader->getOverdrawID() : linesdfShader->getID();
+        config.program = isOverdraw() ? linesdfShader->getOverdrawID() : linesdfShader->getID();
 
         linesdfShader->u_matrix = vtxMatrix;
         linesdfShader->u_linewidth = properties.lineWidth / 2;
@@ -102,7 +102,7 @@ void Painter::renderLine(LineBucket& bucket,
         if (!imagePosA || !imagePosB)
             return;
 
-        config.program = isWireframe() ? linepatternShader->getOverdrawID() : linepatternShader->getID();
+        config.program = isOverdraw() ? linepatternShader->getOverdrawID() : linepatternShader->getID();
 
         linepatternShader->u_matrix = vtxMatrix;
         linepatternShader->u_linewidth = properties.lineWidth / 2;
@@ -138,7 +138,7 @@ void Painter::renderLine(LineBucket& bucket,
         bucket.drawLinePatterns(*linepatternShader, store);
 
     } else {
-        config.program = isWireframe() ? lineShader->getOverdrawID() : lineShader->getID();
+        config.program = isOverdraw() ? lineShader->getOverdrawID() : lineShader->getID();
 
         lineShader->u_matrix = vtxMatrix;
         lineShader->u_linewidth = properties.lineWidth / 2;

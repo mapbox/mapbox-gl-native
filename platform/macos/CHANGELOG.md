@@ -1,6 +1,7 @@
 # Changelog for Mapbox macOS SDK
 
 ## master
+* Refactor wireframe mode to match GL JS overdraw implementation. ([#5403](https://github.com/mapbox/mapbox-gl-native/pull/5403)).
 
 ## 0.2.0
 
