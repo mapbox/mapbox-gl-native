@@ -3,16 +3,11 @@
 #include <mbgl/shader/pattern.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-#include <cstdio>
-
 using namespace mbgl;
+using namespace shaders::pattern;
 
 PatternShader::PatternShader(gl::ObjectStore& store)
-    : Shader(
-        "pattern",
-        shaders::pattern::vertex, shaders::pattern::fragment,
-        store
-    ) {
+    : Shader(::name, ::vertex, ::fragment, store) {
 }
 
 void PatternShader::bind(GLbyte *offset) {
