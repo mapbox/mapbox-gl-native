@@ -318,7 +318,7 @@ endif
 test-%: test
 	$(GDB) $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)/test --gtest_catch_exceptions=0 --gtest_filter=$*
 
-check: test
+coverage: test
 	scripts/collect-coverage.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
 # Generates a compilation database with ninja for use in clang tooling
@@ -338,15 +338,29 @@ compdb-macos: platform/macos/platform.gyp $(MACOS_OUTPUT_PATH)/config.gypi
 
 tidy: compdb tidy-$(BUILD_PLATFORM)
 
-tidy-linux:
+clang-tools-linux:
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
 	deps/ninja/ninja-linux -C $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) headers
-	scripts/clang-tidy.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
 
-tidy-macos:
+tidy-linux: clang-tools-linux
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE)
+
+clang-tools-macos:
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
+	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
 	deps/ninja/ninja-macos -C $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) headers
-	scripts/clang-tidy.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+
+tidy-macos: clang-tools-macos
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE)
+
+check: compdb check-$(BUILD_PLATFORM)
+
+check-linux: clang-tools-linux
+	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH)/$(BUILDTYPE) --diff
+
+check-macos: clang-tools-macos
+	scripts/clang-tools.sh $(MACOS_OUTPUT_PATH)/$(BUILDTYPE) --diff
 
 #### Miscellaneous targets #####################################################
 
