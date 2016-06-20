@@ -1,14 +1,8 @@
 #include <mbgl/util/image.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/iostreams/stream.hpp>
-#pragma GCC diagnostic pop
-
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/device/array.hpp>
+#include <istream>
+#include <sstream>
+#include <array>
 
 extern "C"
 {
@@ -17,27 +11,24 @@ extern "C"
 
 namespace mbgl {
 
-using source_type = boost::iostreams::array_source;
-using input_stream = boost::iostreams::stream<source_type>;
-
 const static unsigned BUF_SIZE = 4096;
 
 struct jpeg_stream_wrapper {
     jpeg_source_mgr manager;
-    input_stream * stream;
-    JOCTET buffer[BUF_SIZE];
+    std::istream* stream;
+    std::array<JOCTET, BUF_SIZE> buffer;
 };
 
 static void init_source(j_decompress_ptr cinfo) {
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
-    wrap->stream->seekg(0,std::ios_base::beg);
+    wrap->stream->seekg(0);
 }
 
 static boolean fill_input_buffer(j_decompress_ptr cinfo) {
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
-    wrap->stream->read(reinterpret_cast<char*>(&wrap->buffer[0]),BUF_SIZE);
+    wrap->stream->read(reinterpret_cast<char*>(&wrap->buffer[0]), BUF_SIZE);
     std::streamsize size = wrap->stream->gcount();
-    wrap->manager.next_input_byte = wrap->buffer;
+    wrap->manager.next_input_byte = wrap->buffer.data();
     wrap->manager.bytes_in_buffer = BUF_SIZE;
     return (size > 0) ? TRUE : FALSE;
 }
@@ -62,7 +53,7 @@ static void skip(j_decompress_ptr cinfo, long count) {
 
 static void term(j_decompress_ptr) {}
 
-static void attach_stream(j_decompress_ptr cinfo, input_stream* in) {
+static void attach_stream(j_decompress_ptr cinfo, std::istream* in) {
     if (cinfo->src == nullptr) {
         cinfo->src = (struct jpeg_source_mgr *)
             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
@@ -98,8 +89,8 @@ struct jpeg_info_guard {
 };
 
 PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
-    source_type source(reinterpret_cast<const char*>(data), size);
-    input_stream stream(source);
+    std::istringstream source(std::string(reinterpret_cast<const char*>(data), size));
+    std::istream stream(source.rdbuf());
 
     jpeg_decompress_struct cinfo;
     jpeg_info_guard iguard(&cinfo);

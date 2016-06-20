@@ -2,15 +2,8 @@
 #include <mbgl/util/premultiply.hpp>
 #include <mbgl/platform/log.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/iostreams/stream.hpp>
-#pragma GCC diagnostic pop
-
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/device/array.hpp>
+#include <istream>
+#include <sstream>
 
 extern "C"
 {
@@ -18,9 +11,6 @@ extern "C"
 }
 
 namespace mbgl {
-
-using source_type = boost::iostreams::array_source;
-using input_stream = boost::iostreams::stream<source_type>;
 
 static void user_error_fn(png_structp, png_const_charp error_msg) {
     throw std::runtime_error(std::string("failed to read invalid png: '") + error_msg + "'");
@@ -31,7 +21,7 @@ static void user_warning_fn(png_structp, png_const_charp warning_msg) {
 }
 
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length) {
-    input_stream * fin = reinterpret_cast<input_stream*>(png_get_io_ptr(png_ptr));
+    std::istream* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
     std::streamsize read_count = fin->gcount();
     if (read_count < 0 || static_cast<png_size_t>(read_count) != length)
@@ -54,8 +44,8 @@ struct png_struct_guard {
 };
 
 PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
-    source_type source(reinterpret_cast<const char*>(data), size);
-    input_stream stream(source);
+    std::istringstream source(std::string(reinterpret_cast<const char*>(data), size));
+    std::istream stream(source.rdbuf());
 
     png_byte header[8] = { 0 };
     stream.read(reinterpret_cast<char*>(header), 8);
