@@ -2,6 +2,19 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 4.1.0-beta.3
+
+* New samples:
+  * [Location picker](https://github.com/mapbox/mapbox-gl-native/pull/5391)
+  * [Animate and rotate multiple markers](https://github.com/mapbox/mapbox-gl-native/issues/5299)
+  * [Scaling marker activity](https://github.com/mapbox/mapbox-gl-native/issues/5409)
+* Marker improvements:
+  * [Expose MarkerView alpha](https://github.com/mapbox/mapbox-gl-native/pull/5329)
+  * [Icon should be optional for MarkerView](https://github.com/mapbox/mapbox-gl-native/pull/5328)
+  * [Expose an API to enable selection/deselection of markers on a map tap](https://github.com/mapbox/mapbox-gl-native/pull/5312)
+  * [Bring selected MarkerView to the front](https://github.com/mapbox/mapbox-gl-native/pull/5294)
+* [Make gesture focal point configurable](https://github.com/mapbox/mapbox-gl-native/pull/5332)
+
 ## 4.1.0-beta.2
 
 * Dynamically Update InfoWindow ([#5237](https://github.com/mapbox/mapbox-gl-native/issues/5237))
