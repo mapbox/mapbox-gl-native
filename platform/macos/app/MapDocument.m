@@ -276,8 +276,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     self.mapView.debugMask ^= MGLMapDebugCollisionBoxesMask;
 }
 
-- (IBAction)toggleOverdraws:(id)sender {
-    self.mapView.debugMask ^= MGLMapDebugOverdrawsMask;
+- (IBAction)toggleOverdrawVisualization:(id)sender {
+    self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
 }
 
 - (IBAction)showColorBuffer:(id)sender {
@@ -604,9 +604,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         menuItem.title = isShown ? @"Hide Collision Boxes" : @"Show Collision Boxes";
         return YES;
     }
-    if (menuItem.action == @selector(toggleOverdraws:)) {
-        BOOL isShown = self.mapView.debugMask & MGLMapDebugOverdrawsMask;
-        menuItem.title = isShown ? @"Hide Overdraws" : @"Show Overdraws";
+    if (menuItem.action == @selector(toggleOverdrawVisualization:)) {
+        BOOL isShown = self.mapView.debugMask & MGLMapDebugOverdrawVisualizationMask;
+        menuItem.title = isShown ? @"Hide Overdraw Visualization" : @"Show Overdraw Visualization";
         return YES;
     }
     if (menuItem.action == @selector(showColorBuffer:)) {
