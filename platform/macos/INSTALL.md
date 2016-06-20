@@ -55,4 +55,12 @@ class ViewController: NSViewController {
 }
 ```
 
+```applescript
+-- AppDelegate.applescript
+script AppDelegate
+    property parent : class "NSObject"
+    property theMapView : missing value
+end script
+```
+
 Run `make xdocument` to generate complete API documentation. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/api/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox macOS SDK with few differences, mostly around unimplemented features like user location tracking.
