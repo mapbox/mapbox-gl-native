@@ -199,11 +199,15 @@ apackage:
 NODE_PRE_GYP = $(shell npm bin)/node-pre-gyp
 NODE_OUTPUT_PATH = build/node-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)
 
+ifeq ($(BUILDTYPE), Debug)
+	NODE_DEBUG = "--debug"
+endif
+
 $(NODE_OUTPUT_PATH)/config.gypi: platform/$(BUILD_PLATFORM)/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	./configure $< $@ $(BUILD_PLATFORM) $(BUILD_PLATFORM_VERSION)
 
 node: $(NODE_OUTPUT_PATH)/config.gypi node_modules $(GYP_DEPENDENCIES)
-	$(NODE_PRE_GYP) configure --clang -- -I$< \
+	$(NODE_PRE_GYP) configure --clang $(NODE_DEBUG) -- -I$< \
 	  -Dcoverage= -Dlibuv_cflags= -Dlibuv_ldflags= -Dlibuv_static_libs=
 	$(NODE_PRE_GYP) build --clang
 
