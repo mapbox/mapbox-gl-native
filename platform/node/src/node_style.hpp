@@ -46,4 +46,22 @@ PropertySetter makePropertySetter(void (L::*setter)(mbgl::style::PropertyValue<V
     };
 }
 
+inline bool setVisibility(mbgl::style::Layer& layer, const v8::Local<v8::Value>& value) {
+    if (value->IsNull() || value->IsUndefined()) {
+        layer.setVisibility(mbgl::style::VisibilityType::Visible);
+        return true;
+    }
+
+    if (!value->IsString()) {
+        Nan::ThrowTypeError("visibility value must be \"visible\" or \"none\"");
+        return false;
+    }
+
+    layer.setVisibility(std::string(*Nan::Utf8String(value)) == "none"
+        ? mbgl::style::VisibilityType::None
+        : mbgl::style::VisibilityType::Visible);
+
+   return true;
+}
+
 }

@@ -13,6 +13,8 @@ inline PropertySetters makeLayoutPropertySetters() {
     using namespace mbgl::style;
     PropertySetters result;
 
+    result["visibility"] = &setVisibility;
+
 
     result["line-cap"] = makePropertySetter(&LineLayer::setLineCap);
     result["line-join"] = makePropertySetter(&LineLayer::setLineJoin);
