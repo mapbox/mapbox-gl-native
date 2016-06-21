@@ -84,7 +84,7 @@ void ShapeAnnotationImpl::updateTile(const CanonicalTileID& tileID, AnnotationTi
     static const double baseTolerance = 4;
 
     if (!shapeTiler) {
-        const uint64_t maxAmountOfTiles = 1 << maxZoom;
+        const uint64_t maxAmountOfTiles = 1 << (maxZoom + 1);
         const double tolerance = baseTolerance / (maxAmountOfTiles * util::EXTENT);
 
         geojsonvt::ProjectedRings rings;
