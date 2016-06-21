@@ -2984,6 +2984,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return annotationView;
 }
 
+- (nullable MGLAnnotationView *)viewForAnnotation:(id<MGLAnnotation>)annotation
+{
+    MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+    if (annotationTag == MGLAnnotationTagNotFound) return nil;
+    
+    MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+    return annotationContext.annotationView;
+}
+
 - (double)alphaForShapeAnnotation:(MGLShape *)annotation
 {
     if (_delegateHasAlphasForShapeAnnotations)
