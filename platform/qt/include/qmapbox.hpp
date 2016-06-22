@@ -11,8 +11,7 @@
 namespace QMapbox {
 
 typedef QPair<double, double> Coordinate;
-typedef QList<Coordinate> Coordinates;
-typedef QList<Coordinates> CoordinateSegments;
+typedef QList<Coordinate> LineString;
 
 typedef QPair<Coordinate, double> CoordinateZoom;
 
@@ -22,7 +21,7 @@ typedef QList<AnnotationID> AnnotationIDs;
 typedef QPair<Coordinate, QString> PointAnnotation;
 
 // FIXME: We need to add support for custom style properties
-typedef QPair<CoordinateSegments, QString> ShapeAnnotation;
+typedef QPair<LineString, QString> ShapeAnnotation;
 
 enum NetworkMode {
     Online, // Default

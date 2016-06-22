@@ -77,24 +77,17 @@ QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 // Convertion helper functions.
 
 auto fromQMapboxGLShapeAnnotation(const ShapeAnnotation &shapeAnnotation) {
-    const CoordinateSegments &segments = shapeAnnotation.first;
+    const LineString &lineString = shapeAnnotation.first;
     const QString &styleLayer = shapeAnnotation.second;
 
-    mbgl::Polygon<double> polygon;
-    polygon.reserve(segments.size());
+    mbgl::LineString<double> mbglLineString;
+    mbglLineString.reserve(lineString.size());
 
-    for (const Coordinates &coordinates : segments) {
-        mbgl::LinearRing<double> linearRing;
-        linearRing.reserve(coordinates.size());
-
-        for (const Coordinate &coordinate : coordinates) {
-            linearRing.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
-        }
-
-        polygon.push_back(std::move(linearRing));
+    for (const Coordinate &coordinate : lineString) {
+        mbglLineString.emplace_back(mbgl::Point<double> { coordinate.first, coordinate.second });
     }
 
-    return mbgl::StyleSourcedAnnotation { std::move(polygon), styleLayer.toStdString() };
+    return mbgl::StyleSourcedAnnotation { std::move(mbglLineString), styleLayer.toStdString() };
 }
 
 auto fromQMapboxTransitionOptions(const QMapbox::TransitionOptions &options) {
