@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
 #include <mbgl/util/rapidjson.hpp>
