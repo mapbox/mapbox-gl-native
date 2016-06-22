@@ -7,6 +7,7 @@
 #pragma GCC diagnostic pop
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/feature.hpp>
 
 namespace mbgl {
 namespace style {
@@ -66,6 +67,24 @@ inline optional<std::string> toString(v8::Local<v8::Value> value) {
         return {};
     }
     return std::string(*Nan::Utf8String(value));
+}
+
+inline optional<Value> toValue(v8::Local<v8::Value> value) {
+    if (value->IsFalse()) {
+        return { false };
+    } else if (value->IsTrue()) {
+        return { true };
+    } else if (value->IsString()) {
+        return { std::string(*Nan::Utf8String(value)) };
+    } else if (value->IsUint32()) {
+        return { value->Uint32Value() };
+    } else if (value->IsInt32()) {
+        return { value->Int32Value() };
+    } else if (value->IsNumber()) {
+        return { value->NumberValue() };
+    } else {
+        return {};
+    }
 }
 
 } // namespace conversion

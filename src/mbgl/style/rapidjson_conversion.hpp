@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/rapidjson.hpp>
+#include <mbgl/util/feature.hpp>
 
 namespace mbgl {
 namespace style {
@@ -48,6 +49,28 @@ inline optional<std::string> toString(const JSValue& value) {
         return {};
     }
     return {{ value.GetString(), value.GetStringLength() }};
+}
+
+inline optional<Value> toValue(const JSValue& value) {
+    switch (value.GetType()) {
+        case rapidjson::kNullType:
+        case rapidjson::kFalseType:
+            return { false };
+
+        case rapidjson::kTrueType:
+            return { true };
+
+        case rapidjson::kStringType:
+            return { std::string { value.GetString(), value.GetStringLength() } };
+
+        case rapidjson::kNumberType:
+            if (value.IsUint64()) return { value.GetUint64() };
+            if (value.IsInt64()) return { value.GetInt64() };
+            return { value.GetDouble() };
+
+        default:
+            return {};
+    }
 }
 
 } // namespace conversion

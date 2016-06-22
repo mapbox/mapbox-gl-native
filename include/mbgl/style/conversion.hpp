@@ -2,7 +2,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/filter.hpp>
 
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/optional.hpp>
@@ -27,6 +27,12 @@ namespace conversion {
    This is used concretely for conversions from RapidJSON types in mbgl core, and from v8 types in
    the node bindings.
 
+   It also defines a convertion from `V` to `Filter`, representing a JSON object conforming to a Style
+   Specification filter object:
+
+       template <class V>
+       Result<Filter> convertFilter(const V& value);
+
    The requirements are that the following are legal expressions for a value `v` of type `const V&`:
 
       * `isArray(v)` -- returns a boolean indicating whether `v` represents a JSON array
@@ -41,6 +47,9 @@ namespace conversion {
       * `toBool(v)` -- returns `optional<bool>`, absence indicating `v` is not a JSON boolean
       * `toNumber(v)` -- returns `optional<float>`, absence indicating `v` is not a JSON number
       * `toString(v)` -- returns `optional<std::string>`, absence indicating `v` is not a JSON string
+      * `toValue(v)` -- returns `optional<mbgl::Value>`, a variant type, for generic conversion,
+        absence indicating `v` is not a boolean, number, or string. Numbers should be converted to
+        unsigned integer, signed integer, or floating point, in descending preference.
 
    If for any reason the conversion fails, the result of `convertPropertyValue` will be the `Error` variant,
    which includes explanatory text.
@@ -256,6 +265,127 @@ Result<PropertyValue<T>> convertPropertyValue(const V& value) {
     }
 
     return Function<T>(stops, *base);
+}
+
+Result<Value> normalizeFilterValue(const std::string& key, const optional<Value>&);
+
+template <class V>
+Result<Filter> convertFilter(const V& value);
+
+template <class FilterType, class V>
+Result<Filter> parseUnaryFilter(const V& value) {
+    if (arrayLength(value) < 2) {
+        return Error { "filter expression must have 2 elements" };
+    }
+
+    optional<std::string> key = toString(arrayMember(value, 1));
+    if (!key) {
+        return Error { "filter expression key must be a string" };
+    }
+
+    return FilterType { *key };
+}
+
+template <class FilterType, class V>
+Result<Filter> parseBinaryFilter(const V& value) {
+    if (arrayLength(value) < 3) {
+        return Error { "filter expression must have 3 elements" };
+    }
+
+    optional<std::string> key = toString(arrayMember(value, 1));
+    if (!key) {
+        return Error { "filter expression key must be a string" };
+    }
+
+    Result<Value> filterValue = normalizeFilterValue(*key, toValue(arrayMember(value, 2)));
+    if (filterValue.is<Error>()) {
+        return filterValue.get<Error>();
+    }
+
+    return FilterType { *key, filterValue.get<Value>() };
+}
+
+template <class FilterType, class V>
+Result<Filter> parseSetFilter(const V& value) {
+    if (arrayLength(value) < 2) {
+        return Error { "filter expression must at least 2 elements" };
+    }
+
+    optional<std::string> key = toString(arrayMember(value, 1));
+    if (!key) {
+        return Error { "filter expression key must be a string" };
+    }
+
+    std::vector<Value> values;
+    for (std::size_t i = 2; i < arrayLength(value); ++i) {
+        Result<Value> filterValue = normalizeFilterValue(*key, toValue(arrayMember(value, i)));
+        if (filterValue.is<Error>()) {
+            return filterValue.get<Error>();
+        }
+        values.push_back(filterValue.get<Value>());
+    }
+
+    return FilterType { *key, std::move(values) };
+}
+
+template <class FilterType, class V>
+Result<Filter> parseCompoundFilter(const V& value) {
+    std::vector<Filter> filters;
+    for (std::size_t i = 1; i < arrayLength(value); ++i) {
+        Result<Filter> element = convertFilter(arrayMember(value, i));
+        if (element.is<Error>()) {
+            return element;
+        }
+        filters.push_back(element.get<Filter>());
+    }
+
+    return FilterType { std::move(filters) };
+}
+
+template <class V>
+Result<Filter> convertFilter(const V& value) {
+    if (!isArray(value)) {
+        return Error { "filter expression must be an array" };
+    }
+
+    if (arrayLength(value) < 1) {
+        return Error { "filter expression must have at least 1 element" };
+    }
+
+    optional<std::string> op = toString(arrayMember(value, 0));
+    if (!op) {
+        return Error { "filter operator must be a string" };
+    }
+
+    if (*op == "==") {
+        return parseBinaryFilter<EqualsFilter>(value);
+    } else if (*op == "!=") {
+        return parseBinaryFilter<NotEqualsFilter>(value);
+    } else if (*op == ">") {
+        return parseBinaryFilter<GreaterThanFilter>(value);
+    } else if (*op == ">=") {
+        return parseBinaryFilter<GreaterThanEqualsFilter>(value);
+    } else if (*op == "<") {
+        return parseBinaryFilter<LessThanFilter>(value);
+    } else if (*op == "<=") {
+        return parseBinaryFilter<LessThanEqualsFilter>(value);
+    } else if (*op == "in") {
+        return parseSetFilter<InFilter>(value);
+    } else if (*op == "!in") {
+        return parseSetFilter<NotInFilter>(value);
+    } else if (*op == "all") {
+        return parseCompoundFilter<AllFilter>(value);
+    } else if (*op == "any") {
+        return parseCompoundFilter<AnyFilter>(value);
+    } else if (*op == "none") {
+        return parseCompoundFilter<NoneFilter>(value);
+    } else if (*op == "has") {
+        return parseUnaryFilter<HasFilter>(value);
+    } else if (*op == "!has") {
+       return parseUnaryFilter<NotHasFilter>(value);
+    }
+
+    return Error { "filter operator must be one of \"==\", \"!=\", \">\", \">=\", \"<\", \"<=\", \"in\", \"!in\", \"all\", \"any\", \"none\", \"has\", or \"!has\"" };
 }
 
 } // namespace conversion

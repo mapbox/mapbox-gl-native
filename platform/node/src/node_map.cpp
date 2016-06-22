@@ -58,6 +58,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
     Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
+    Nan::SetPrototypeMethod(tpl, "setFilter", SetFilter);
 
     Nan::SetPrototypeMethod(tpl, "dumpDebugLogs", DumpDebugLogs);
     Nan::SetPrototypeMethod(tpl, "queryRenderedFeatures", QueryRenderedFeatures);
@@ -524,6 +525,42 @@ NAN_METHOD(NodeMap::SetLayoutProperty) {
 NAN_METHOD(NodeMap::SetPaintProperty) {
     static const PropertySetters setters = makePaintPropertySetters();
     setProperty(info, setters);
+}
+
+NAN_METHOD(NodeMap::SetFilter) {
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() < 2) {
+        return Nan::ThrowTypeError("Two arguments required");
+    }
+
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    mbgl::style::Layer* layer = nodeMap->map->getLayer(*Nan::Utf8String(info[0]));
+    if (!layer) {
+        return Nan::ThrowTypeError("layer not found");
+    }
+
+    mbgl::style::Filter filter;
+
+    if (!info[1]->IsNull() && !info[1]->IsUndefined()) {
+        mbgl::style::conversion::Result<mbgl::style::Filter> converted
+            = mbgl::style::conversion::convertFilter(info[1]);
+        if (converted.is<mbgl::style::conversion::Error>()) {
+            Nan::ThrowTypeError(converted.get<mbgl::style::conversion::Error>().message);
+            return;
+        }
+        filter = std::move(converted.get<mbgl::style::Filter>());
+    }
+
+    if (!setFilter(*layer, filter)) {
+        return;
+    }
+
+    info.GetReturnValue().SetUndefined();
 }
 
 NAN_METHOD(NodeMap::DumpDebugLogs) {

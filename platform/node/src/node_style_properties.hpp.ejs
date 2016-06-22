@@ -34,4 +34,20 @@ inline PropertySetters makePaintPropertySetters() {
     return result;
 }
 
+inline bool setFilter(mbgl::style::Layer& layer, const mbgl::style::Filter& filter) {
+    using namespace mbgl::style;
+
+<% for (const layer of locals.layers) { -%>
+<% if (layer.type !== 'raster' && layer.type !== 'background' && layer.type !== 'custom') { -%>
+    if (layer.is<<%- camelize(layer.type) %>Layer>()) {
+        layer.as<<%- camelize(layer.type) %>Layer>()->setFilter(filter);
+        return true;
+    }
+<% } -%>
+<% } -%>
+
+    Nan::ThrowTypeError("layer doesn't support filters");
+    return false;
+}
+
 }

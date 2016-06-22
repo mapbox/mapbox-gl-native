@@ -30,6 +30,7 @@ public:
     static NAN_METHOD(AddClass);
     static NAN_METHOD(SetLayoutProperty);
     static NAN_METHOD(SetPaintProperty);
+    static NAN_METHOD(SetFilter);
     static NAN_METHOD(DumpDebugLogs);
     static NAN_METHOD(QueryRenderedFeatures);
 

@@ -122,4 +122,28 @@ inline PropertySetters makePaintPropertySetters() {
     return result;
 }
 
+inline bool setFilter(mbgl::style::Layer& layer, const mbgl::style::Filter& filter) {
+    using namespace mbgl::style;
+
+    if (layer.is<FillLayer>()) {
+        layer.as<FillLayer>()->setFilter(filter);
+        return true;
+    }
+    if (layer.is<LineLayer>()) {
+        layer.as<LineLayer>()->setFilter(filter);
+        return true;
+    }
+    if (layer.is<SymbolLayer>()) {
+        layer.as<SymbolLayer>()->setFilter(filter);
+        return true;
+    }
+    if (layer.is<CircleLayer>()) {
+        layer.as<CircleLayer>()->setFilter(filter);
+        return true;
+    }
+
+    Nan::ThrowTypeError("layer doesn't support filters");
+    return false;
+}
+
 }

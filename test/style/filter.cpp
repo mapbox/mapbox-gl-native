@@ -2,7 +2,8 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/parser.hpp>
+#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion.hpp>
 
 #include <rapidjson/document.h>
 
@@ -16,7 +17,7 @@ typedef std::multimap<std::string, mbgl::Value> Properties;
 Filter parse(const char * expression) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
     doc.Parse<0>(expression);
-    return parseFilter(doc);
+    return conversion::convertFilter(doc).get<Filter>();
 }
 
 bool evaluate(const Filter& filter, const Properties& properties, FeatureType type = FeatureType::Unknown) {

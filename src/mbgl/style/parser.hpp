@@ -2,7 +2,6 @@
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/filter.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
@@ -15,8 +14,6 @@
 
 namespace mbgl {
 namespace style {
-
-Filter parseFilter(const JSValue&);
 
 class Parser {
 public:
