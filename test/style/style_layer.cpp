@@ -55,12 +55,12 @@ const auto duration = PropertyValue<float> { 1.0f };
 
 TEST(Layer, Clone) {
     testClone<BackgroundLayer>("background");
-    testClone<CircleLayer>("circle");
+    testClone<CircleLayer>("circle", "source");
     testClone<CustomLayer>("custom", [](void*){}, [](void*, const CustomLayerRenderParameters&){}, [](void*){}, nullptr),
-    testClone<FillLayer>("fill");
-    testClone<LineLayer>("line");
-    testClone<RasterLayer>("raster");
-    testClone<SymbolLayer>("symbol");
+    testClone<FillLayer>("fill", "source");
+    testClone<LineLayer>("line", "source");
+    testClone<RasterLayer>("raster", "source");
+    testClone<SymbolLayer>("symbol", "source");
 }
 
 TEST(Layer, BackgroundProperties) {
@@ -80,7 +80,7 @@ TEST(Layer, BackgroundProperties) {
 }
 
 TEST(Layer, CircleProperties) {
-    auto layer = std::make_unique<CircleLayer>("circle");
+    auto layer = std::make_unique<CircleLayer>("circle", "source");
     EXPECT_TRUE(layer->is<CircleLayer>());
 
     // Paint properties
@@ -105,7 +105,7 @@ TEST(Layer, CircleProperties) {
 }
 
 TEST(Layer, FillProperties) {
-    auto layer = std::make_unique<FillLayer>("fill");
+    auto layer = std::make_unique<FillLayer>("fill", "source");
     EXPECT_TRUE(layer->is<FillLayer>());
 
     // Paint properties
@@ -133,7 +133,7 @@ TEST(Layer, FillProperties) {
 }
 
 TEST(Layer, LineProperties) {
-    auto layer = std::make_unique<LineLayer>("line");
+    auto layer = std::make_unique<LineLayer>("line", "source");
     EXPECT_TRUE(layer->is<LineLayer>());
 
     // Layout properties
@@ -184,7 +184,7 @@ TEST(Layer, LineProperties) {
 }
 
 TEST(Layer, RasterProperties) {
-    auto layer = std::make_unique<RasterLayer>("raster");
+    auto layer = std::make_unique<RasterLayer>("raster", "source");
     EXPECT_TRUE(layer->is<RasterLayer>());
 
     // Paint properties

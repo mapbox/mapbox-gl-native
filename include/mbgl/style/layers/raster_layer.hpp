@@ -13,12 +13,10 @@ namespace style {
 
 class RasterLayer : public Layer {
 public:
-    RasterLayer(const std::string& layerID);
+    RasterLayer(const std::string& layerID, const std::string& sourceID);
     ~RasterLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID);
     const std::string& getSourceID() const;
 
     // Paint properties

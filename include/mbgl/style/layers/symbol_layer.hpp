@@ -15,14 +15,13 @@ namespace style {
 
 class SymbolLayer : public Layer {
 public:
-    SymbolLayer(const std::string& layerID);
+    SymbolLayer(const std::string& layerID, const std::string& sourceID);
     ~SymbolLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;

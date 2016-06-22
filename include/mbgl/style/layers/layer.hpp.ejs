@@ -22,24 +22,23 @@ namespace style {
 
 class <%- camelize(type) %>Layer : public Layer {
 public:
+<% if (type === 'background') { -%>
     <%- camelize(type) %>Layer(const std::string& layerID);
+<% } else { -%>
+    <%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID);
+<% } -%>
     ~<%- camelize(type) %>Layer() final;
 
-<% if (type === 'raster') { -%>
+<% if (type !== 'background') { -%>
     // Source
-
-    void setSource(const std::string& sourceID);
     const std::string& getSourceID() const;
-
-<% } else if (type !== 'background') { -%>
-    // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
-    const std::string& getSourceID() const;
+<% if (type !== 'raster') { -%>
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;
+<% } -%>
 
 <% } -%>
 <% if (layoutProperties.length) { -%>

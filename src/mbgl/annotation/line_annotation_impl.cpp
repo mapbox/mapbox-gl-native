@@ -16,8 +16,8 @@ void LineAnnotationImpl::updateStyle(Style& style) const {
     if (style.getLayer(layerID))
         return;
 
-    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>(layerID);
-    layer->setSource(AnnotationManager::SourceID, layerID);
+    std::unique_ptr<LineLayer> layer = std::make_unique<LineLayer>(layerID, AnnotationManager::SourceID);
+    layer->setSourceLayer(layerID);
     layer->setLineJoin(LineJoinType::Round);
     layer->setLineOpacity(annotation.opacity);
     layer->setLineWidth(annotation.width);

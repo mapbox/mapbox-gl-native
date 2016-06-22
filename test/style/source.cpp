@@ -276,8 +276,8 @@ TEST(Source, VectorTileCorrupt) {
     };
 
     // Need to have at least one layer that uses the source.
-    auto layer = std::make_unique<LineLayer>("id");
-    layer->setSource("source", "water");
+    auto layer = std::make_unique<LineLayer>("id", "source");
+    layer->setSourceLayer("water");
     test.style.addLayer(std::move(layer));
 
     Tileset tileset;

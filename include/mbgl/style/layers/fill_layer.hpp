@@ -13,14 +13,13 @@ namespace style {
 
 class FillLayer : public Layer {
 public:
-    FillLayer(const std::string& layerID);
+    FillLayer(const std::string& layerID, const std::string& sourceID);
     ~FillLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;

@@ -15,14 +15,13 @@ namespace style {
 
 class LineLayer : public Layer {
 public:
-    LineLayer(const std::string& layerID);
+    LineLayer(const std::string& layerID, const std::string& sourceID);
     ~LineLayer() final;
 
     // Source
-
-    void setSource(const std::string& sourceID, const std::string& sourceLayer);
     const std::string& getSourceID() const;
     const std::string& getSourceLayer() const;
+    void setSourceLayer(const std::string& sourceLayer);
 
     void setFilter(const Filter&);
     const Filter& getFilter() const;

@@ -16,9 +16,8 @@ void FillAnnotationImpl::updateStyle(Style& style) const {
     if (style.getLayer(layerID))
         return;
 
-    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>(layerID);
-    layer->setSource(AnnotationManager::SourceID, layerID);
-
+    std::unique_ptr<FillLayer> layer = std::make_unique<FillLayer>(layerID, AnnotationManager::SourceID);
+    layer->setSourceLayer(layerID);
     layer->setFillOpacity(annotation.opacity);
     layer->setFillColor(annotation.color);
     layer->setFillOutlineColor(annotation.outlineColor);

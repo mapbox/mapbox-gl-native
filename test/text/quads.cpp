@@ -4,14 +4,13 @@
 #include <mbgl/text/quads.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer_properties.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
 
 TEST(getIconQuads, normal) {
-    auto layer = std::make_unique<SymbolLayer>("symbol");
+    SymbolLayoutProperties layout;
     Anchor anchor(2.0, 3.0, 0.0, 0.5f, 0);
     SpriteAtlasElement image = {
         Rect<uint16_t>( 0, 0, 15, 11 ),
@@ -22,7 +21,7 @@ TEST(getIconQuads, normal) {
     GeometryCoordinates line;
     Shaping shapedText;
 
-    SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+    SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
     
     ASSERT_EQ(quads.size(), 1u);
     ASSERT_EQ(quads[0].anchorPoint.x, 2);
@@ -58,8 +57,8 @@ TEST(getIconQuads, style) {
 
     // none
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads.size(), 1u);
         ASSERT_EQ(quads[0].anchorPoint.x, 0);
@@ -79,10 +78,10 @@ TEST(getIconQuads, style) {
 
     // width
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(24.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(24.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -60);
         ASSERT_EQ(quads[0].tl.y, 0);
@@ -96,10 +95,10 @@ TEST(getIconQuads, style) {
 
     // width x textSize
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -113,14 +112,14 @@ TEST(getIconQuads, style) {
 
     // width x textSize + padding
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
-        layer->impl->layout.iconTextFitPadding.value[0] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[1] = 10.0f;
-        layer->impl->layout.iconTextFitPadding.value[2] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Width);
+        layout.iconTextFitPadding.value[0] = 5.0f;
+        layout.iconTextFitPadding.value[1] = 10.0f;
+        layout.iconTextFitPadding.value[2] = 5.0f;
+        layout.iconTextFitPadding.value[3] = 10.0f;
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -40);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -134,10 +133,10 @@ TEST(getIconQuads, style) {
 
     // height
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(24.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(24.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -151,10 +150,10 @@ TEST(getIconQuads, style) {
 
     // height x textSize
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -20);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -168,14 +167,14 @@ TEST(getIconQuads, style) {
 
     // height x textSize + padding
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
-        layer->impl->layout.iconTextFitPadding.value[0] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[1] = 10.0f;
-        layer->impl->layout.iconTextFitPadding.value[2] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Height);
+        layout.iconTextFitPadding.value[0] = 5.0f;
+        layout.iconTextFitPadding.value[1] = 10.0f;
+        layout.iconTextFitPadding.value[2] = 5.0f;
+        layout.iconTextFitPadding.value[3] = 10.0f;
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -189,10 +188,10 @@ TEST(getIconQuads, style) {
 
     // both
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(24.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(24.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -60);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -206,10 +205,10 @@ TEST(getIconQuads, style) {
 
     // both x textSize
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -30);
         ASSERT_EQ(quads[0].tl.y, -5);
@@ -223,14 +222,14 @@ TEST(getIconQuads, style) {
 
     // both x textSize + padding
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        layer->impl->layout.iconTextFitPadding.value[0] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[1] = 10.0f;
-        layer->impl->layout.iconTextFitPadding.value[2] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[3] = 10.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
+        layout.iconTextFitPadding.value[0] = 5.0f;
+        layout.iconTextFitPadding.value[1] = 10.0f;
+        layout.iconTextFitPadding.value[2] = 5.0f;
+        layout.iconTextFitPadding.value[3] = 10.0f;
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -40);
         ASSERT_EQ(quads[0].tl.y, -10);
@@ -244,14 +243,14 @@ TEST(getIconQuads, style) {
 
     // both x textSize + padding t/r/b/l
     {
-        auto layer = std::make_unique<SymbolLayer>("symbol");
-        layer->impl->layout.textSize = LayoutProperty<float>(12.0f);
-        layer->impl->layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
-        layer->impl->layout.iconTextFitPadding.value[0] = 0.0f;
-        layer->impl->layout.iconTextFitPadding.value[1] = 5.0f;
-        layer->impl->layout.iconTextFitPadding.value[2] = 10.0f;
-        layer->impl->layout.iconTextFitPadding.value[3] = 15.0f;
-        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layer->impl->layout, false, shapedText);
+        SymbolLayoutProperties layout;
+        layout.textSize = LayoutProperty<float>(12.0f);
+        layout.iconTextFit = LayoutProperty<IconTextFitType>(IconTextFitType::Both);
+        layout.iconTextFitPadding.value[0] = 0.0f;
+        layout.iconTextFitPadding.value[1] = 5.0f;
+        layout.iconTextFitPadding.value[2] = 10.0f;
+        layout.iconTextFitPadding.value[3] = 15.0f;
+        SymbolQuads quads = getIconQuads(anchor, shapedIcon, line, layout, false, shapedText);
 
         ASSERT_EQ(quads[0].tl.x, -45);
         ASSERT_EQ(quads[0].tl.y, -5);

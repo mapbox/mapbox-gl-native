@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-LineLayer::LineLayer(const std::string& layerID)
+LineLayer::LineLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Line, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 LineLayer::LineLayer(const Impl& other)
@@ -25,13 +26,12 @@ std::unique_ptr<Layer> LineLayer::Impl::clone() const {
 
 // Source
 
-void LineLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
-}
-
 const std::string& LineLayer::getSourceID() const {
     return impl->source;
+}
+
+void LineLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& LineLayer::getSourceLayer() const {

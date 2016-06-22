@@ -11,11 +11,20 @@
 namespace mbgl {
 namespace style {
 
+<% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
     : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
 }
+<% } else { -%>
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID)
+    : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>())
+    , impl(static_cast<Impl*>(baseImpl.get())) {
+    impl->id = layerID;
+    impl->source = sourceID;
+}
+<% } -%>
 
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const Impl& other)
     : Layer(Type::<%- camelize(type) %>, std::make_unique<Impl>(other))
@@ -28,26 +37,16 @@ std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::clone() const {
     return std::make_unique<<%- camelize(type) %>Layer>(*this);
 }
 
-<% if (type === 'raster') { -%>
+<% if (type !== 'background') { -%>
 // Source
-
-void <%- camelize(type) %>Layer::setSource(const std::string& sourceID) {
-    impl->source = sourceID;
-}
 
 const std::string& <%- camelize(type) %>Layer::getSourceID() const {
     return impl->source;
 }
-<% } else if (type !== 'background') { -%>
-// Source
 
-void <%- camelize(type) %>Layer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
+<% if (type !== 'raster') { -%>
+void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
     impl->sourceLayer = sourceLayer;
-}
-
-const std::string& <%- camelize(type) %>Layer::getSourceID() const {
-    return impl->source;
 }
 
 const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
@@ -63,6 +62,7 @@ void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
 const Filter& <%- camelize(type) %>Layer::getFilter() const {
     return impl->filter;
 }
+<% } -%>
 <% } -%>
 
 // Layout properties

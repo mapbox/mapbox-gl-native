@@ -219,7 +219,7 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
             return;
         }
 
-        layer = reference->copy(id, ref);
+        layer = reference->baseImpl->copy(id, ref, reference->baseImpl->source);
         layer->baseImpl->parsePaints(value);
     } else {
         // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
@@ -235,17 +235,31 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         }
 
         std::string type { typeVal.GetString(), typeVal.GetStringLength() };
+        std::string source;
+
+        if (value.HasMember("source")) {
+            const JSValue& value_source = value["source"];
+            if (value_source.IsString()) {
+                source = { value_source.GetString(), value_source.GetStringLength() };
+                auto source_it = sourcesMap.find(source);
+                if (source_it == sourcesMap.end()) {
+                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source.c_str(), id.c_str());
+                }
+            } else {
+                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", id.c_str());
+            }
+        }
 
         if (type == "fill") {
-            layer = std::make_unique<FillLayer>(id);
+            layer = std::make_unique<FillLayer>(id, source);
         } else if (type == "line") {
-            layer = std::make_unique<LineLayer>(id);
+            layer = std::make_unique<LineLayer>(id, source);
         } else if (type == "circle") {
-            layer = std::make_unique<CircleLayer>(id);
+            layer = std::make_unique<CircleLayer>(id, source);
         } else if (type == "symbol") {
-            layer = std::make_unique<SymbolLayer>(id);
+            layer = std::make_unique<SymbolLayer>(id, source);
         } else if (type == "raster") {
-            layer = std::make_unique<RasterLayer>(id);
+            layer = std::make_unique<RasterLayer>(id, source);
         } else if (type == "background") {
             layer = std::make_unique<BackgroundLayer>(id);
         } else {
@@ -254,19 +268,6 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         }
 
         Layer::Impl* impl = layer->baseImpl.get();
-
-        if (value.HasMember("source")) {
-            const JSValue& value_source = value["source"];
-            if (value_source.IsString()) {
-                impl->source = { value_source.GetString(), value_source.GetStringLength() };
-                auto source_it = sourcesMap.find(impl->source);
-                if (source_it == sourcesMap.end()) {
-                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", impl->source.c_str(), impl->id.c_str());
-                }
-            } else {
-                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", impl->id.c_str());
-            }
-        }
 
         if (value.HasMember("source-layer")) {
             const JSValue& value_source_layer = value["source-layer"];

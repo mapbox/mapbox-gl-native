@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-SymbolLayer::SymbolLayer(const std::string& layerID)
+SymbolLayer::SymbolLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Symbol, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 SymbolLayer::SymbolLayer(const Impl& other)
@@ -25,13 +26,12 @@ std::unique_ptr<Layer> SymbolLayer::Impl::clone() const {
 
 // Source
 
-void SymbolLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
-}
-
 const std::string& SymbolLayer::getSourceID() const {
     return impl->source;
+}
+
+void SymbolLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& SymbolLayer::getSourceLayer() const {

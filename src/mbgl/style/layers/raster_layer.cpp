@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-RasterLayer::RasterLayer(const std::string& layerID)
+RasterLayer::RasterLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Raster, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 RasterLayer::RasterLayer(const Impl& other)
@@ -25,13 +26,10 @@ std::unique_ptr<Layer> RasterLayer::Impl::clone() const {
 
 // Source
 
-void RasterLayer::setSource(const std::string& sourceID) {
-    impl->source = sourceID;
-}
-
 const std::string& RasterLayer::getSourceID() const {
     return impl->source;
 }
+
 
 // Layout properties
 

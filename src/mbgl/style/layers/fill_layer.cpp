@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-FillLayer::FillLayer(const std::string& layerID)
+FillLayer::FillLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Fill, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 FillLayer::FillLayer(const Impl& other)
@@ -25,13 +26,12 @@ std::unique_ptr<Layer> FillLayer::Impl::clone() const {
 
 // Source
 
-void FillLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
-}
-
 const std::string& FillLayer::getSourceID() const {
     return impl->source;
+}
+
+void FillLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& FillLayer::getSourceLayer() const {

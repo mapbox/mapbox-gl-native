@@ -6,10 +6,11 @@
 namespace mbgl {
 namespace style {
 
-CircleLayer::CircleLayer(const std::string& layerID)
+CircleLayer::CircleLayer(const std::string& layerID, const std::string& sourceID)
     : Layer(Type::Circle, std::make_unique<Impl>())
     , impl(static_cast<Impl*>(baseImpl.get())) {
     impl->id = layerID;
+    impl->source = sourceID;
 }
 
 CircleLayer::CircleLayer(const Impl& other)
@@ -25,13 +26,12 @@ std::unique_ptr<Layer> CircleLayer::Impl::clone() const {
 
 // Source
 
-void CircleLayer::setSource(const std::string& sourceID, const std::string& sourceLayer) {
-    impl->source = sourceID;
-    impl->sourceLayer = sourceLayer;
-}
-
 const std::string& CircleLayer::getSourceID() const {
     return impl->source;
+}
+
+void CircleLayer::setSourceLayer(const std::string& sourceLayer) {
+    impl->sourceLayer = sourceLayer;
 }
 
 const std::string& CircleLayer::getSourceLayer() const {
