@@ -4,6 +4,7 @@
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <rapidjson/document.h>
@@ -17,7 +18,7 @@ typedef std::multimap<std::string, Value> Properties;
 style::Filter parse(const char* expression) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
     doc.Parse<0>(expression);
-    return style::conversion::convertFilter(doc).get<style::Filter>();
+    return *style::conversion::convert<style::Filter>(doc);
 }
 
 static void Parse_Filter(benchmark::State& state) {

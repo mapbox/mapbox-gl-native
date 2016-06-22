@@ -11,6 +11,7 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/filter.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -277,11 +278,11 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         }
 
         if (value.HasMember("filter")) {
-            conversion::Result<Filter> filter = conversion::convertFilter(value["filter"]);
-            if (filter.is<Filter>()) {
-                impl->filter = filter.get<Filter>();
+            conversion::Result<Filter> filter = conversion::convert<Filter>(value["filter"]);
+            if (filter) {
+                impl->filter = *filter;
             } else {
-                Log::Warning(Event::ParseStyle, filter.get<conversion::Error>().message);
+                Log::Warning(Event::ParseStyle, filter.error().message);
             }
         }
 
