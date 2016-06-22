@@ -11,7 +11,7 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/filter.hpp>
+#include <mbgl/style/conversion/layer.hpp>
 
 #include <mbgl/platform/log.hpp>
 
@@ -219,120 +219,16 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
             return;
         }
 
-        layer = reference->baseImpl->copy(id, ref, reference->baseImpl->source);
-        layer->baseImpl->parsePaints(value);
+        layer = reference->baseImpl->cloneRef(id);
+        conversion::setPaintProperties(*layer, value);
     } else {
-        // Otherwise, parse the source/source-layer/filter/render keys to form the bucket.
-        if (!value.HasMember("type")) {
-            Log::Warning(Event::ParseStyle, "layer '%s' is missing a type", id.c_str());
+        conversion::Result<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value);
+        if (!converted) {
+            Log::Warning(Event::ParseStyle, converted.error().message);
             return;
         }
-
-        const JSValue& typeVal = value["type"];
-        if (!typeVal.IsString()) {
-            Log::Warning(Event::ParseStyle, "layer '%s' has an invalid type", id.c_str());
-            return;
-        }
-
-        std::string type { typeVal.GetString(), typeVal.GetStringLength() };
-        std::string source;
-
-        if (value.HasMember("source")) {
-            const JSValue& value_source = value["source"];
-            if (value_source.IsString()) {
-                source = { value_source.GetString(), value_source.GetStringLength() };
-                auto source_it = sourcesMap.find(source);
-                if (source_it == sourcesMap.end()) {
-                    Log::Warning(Event::ParseStyle, "can't find source '%s' required for layer '%s'", source.c_str(), id.c_str());
-                }
-            } else {
-                Log::Warning(Event::ParseStyle, "source of layer '%s' must be a string", id.c_str());
-            }
-        }
-
-        if (type == "fill") {
-            layer = std::make_unique<FillLayer>(id, source);
-        } else if (type == "line") {
-            layer = std::make_unique<LineLayer>(id, source);
-        } else if (type == "circle") {
-            layer = std::make_unique<CircleLayer>(id, source);
-        } else if (type == "symbol") {
-            layer = std::make_unique<SymbolLayer>(id, source);
-        } else if (type == "raster") {
-            layer = std::make_unique<RasterLayer>(id, source);
-        } else if (type == "background") {
-            layer = std::make_unique<BackgroundLayer>(id);
-        } else {
-            Log::Warning(Event::ParseStyle, "unknown type '%s' for layer '%s'", type.c_str(), id.c_str());
-            return;
-        }
-
-        Layer::Impl* impl = layer->baseImpl.get();
-
-        if (value.HasMember("source-layer")) {
-            const JSValue& value_source_layer = value["source-layer"];
-            if (value_source_layer.IsString()) {
-                impl->sourceLayer = { value_source_layer.GetString(), value_source_layer.GetStringLength() };
-            } else {
-                Log::Warning(Event::ParseStyle, "source-layer of layer '%s' must be a string", impl->id.c_str());
-            }
-        }
-
-        if (value.HasMember("filter")) {
-            conversion::Result<Filter> filter = conversion::convert<Filter>(value["filter"]);
-            if (filter) {
-                impl->filter = *filter;
-            } else {
-                Log::Warning(Event::ParseStyle, filter.error().message);
-            }
-        }
-
-        if (value.HasMember("minzoom")) {
-            const JSValue& min_zoom = value["minzoom"];
-            if (min_zoom.IsNumber()) {
-                impl->minZoom = min_zoom.GetDouble();
-            } else {
-                Log::Warning(Event::ParseStyle, "minzoom of layer %s must be numeric", impl->id.c_str());
-            }
-        }
-
-        if (value.HasMember("maxzoom")) {
-            const JSValue& max_zoom = value["maxzoom"];
-            if (max_zoom.IsNumber()) {
-                impl->maxZoom = max_zoom.GetDouble();
-            } else {
-                Log::Warning(Event::ParseStyle, "maxzoom of layer %s must be numeric", impl->id.c_str());
-            }
-        }
-
-        if (value.HasMember("layout")) {
-            parseVisibility(*layer, value["layout"]);
-            impl->parseLayout(value["layout"]);
-        }
-
-        impl->parsePaints(value);
+        layer = std::move(*converted);
     }
-}
-
-void Parser::parseVisibility(Layer& layer, const JSValue& value) {
-    Layer::Impl& impl = *layer.baseImpl;
-
-    if (!value.HasMember("visibility")) {
-        return;
-    }
-
-    if (!value["visibility"].IsString()) {
-        Log::Warning(Event::ParseStyle, "value of 'visibility' must be a string");
-        return;
-    }
-
-    const auto enumValue = Enum<VisibilityType>::toEnum({ value["visibility"].GetString(), value["visibility"].GetStringLength() });
-    if (!enumValue) {
-        Log::Warning(Event::ParseStyle, "value of 'visibility' must be a valid enumeration value");
-        return;
-    }
-
-    impl.visibility = *enumValue;
 }
 
 std::vector<FontStack> Parser::fontStacks() const {

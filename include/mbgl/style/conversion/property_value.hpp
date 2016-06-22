@@ -13,7 +13,9 @@ template <class T>
 struct Converter<PropertyValue<T>> {
     template <class V>
     Result<PropertyValue<T>> operator()(const V& value) const {
-        if (isObject(value)) {
+        if (isUndefined(value)) {
+            return {};
+        } else if (isObject(value)) {
             Result<Function<T>> function = convert<Function<T>>(value);
             if (!function) {
                 return function.error();

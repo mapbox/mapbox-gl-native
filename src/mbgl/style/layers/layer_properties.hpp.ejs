@@ -10,7 +10,6 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 namespace style {
@@ -21,7 +20,6 @@ class CalculationParameters;
 <% if (layoutProperties.length) { -%>
 class <%- camelize(type) %>LayoutProperties {
 public:
-    void parse(const JSValue&);
     void recalculate(const CalculationParameters&);
 
 <% for (const property of layoutProperties) { -%>
@@ -32,7 +30,6 @@ public:
 <% } -%>
 class <%- camelize(type) %>PaintProperties {
 public:
-    void parse(const JSValue&);
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 

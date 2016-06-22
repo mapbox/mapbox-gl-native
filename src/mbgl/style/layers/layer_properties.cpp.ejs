@@ -11,12 +11,6 @@ namespace mbgl {
 namespace style {
 
 <% if (layoutProperties.length) { -%>
-void <%- camelize(type) %>LayoutProperties::parse(const JSValue& value) {
-<% for (const property of layoutProperties) { -%>
-    <%- camelizeWithLeadingLowercase(property.name) %>.parse(<%- JSON.stringify(property.name) %>, value);
-<% } -%>
-}
-
 void <%- camelize(type) %>LayoutProperties::recalculate(const CalculationParameters& parameters) {
 <% for (const property of layoutProperties) { -%>
     <%- camelizeWithLeadingLowercase(property.name) %>.calculate(parameters);
@@ -24,12 +18,6 @@ void <%- camelize(type) %>LayoutProperties::recalculate(const CalculationParamet
 }
 
 <% } -%>
-void <%- camelize(type) %>PaintProperties::parse(const JSValue& value) {
-<% for (const property of paintProperties) { -%>
-    <%- camelizeWithLeadingLowercase(property.name) %>.parse(<%- JSON.stringify(property.name) %>, value);
-<% } -%>
-}
-
 void <%- camelize(type) %>PaintProperties::cascade(const CascadeParameters& parameters) {
 <% for (const property of paintProperties) { -%>
     <%- camelizeWithLeadingLowercase(property.name) %>.cascade(parameters);

@@ -5,7 +5,6 @@
 #include <mbgl/style/filter.hpp>
 #include <mbgl/renderer/render_pass.hpp>
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <memory>
@@ -46,8 +45,8 @@ public:
     // Create an identical copy of this layer.
     virtual std::unique_ptr<Layer> clone() const = 0;
 
-    virtual void parseLayout(const JSValue& value) = 0;
-    virtual void parsePaints(const JSValue& value) = 0;
+    // Create a layer, copying all properties except id, ref, and paint properties from this layer.
+    virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
 
     // If the layer has a ref, the ref. Otherwise, the id.
     const std::string& bucketName() const;

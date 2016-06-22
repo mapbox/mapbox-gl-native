@@ -34,7 +34,6 @@ private:
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<Layer>&);
-    void parseVisibility(Layer&, const JSValue& value);
 
     std::unordered_map<std::string, const Source*> sourcesMap;
     std::unordered_map<std::string, std::pair<const JSValue&, std::unique_ptr<Layer>>> layersMap;

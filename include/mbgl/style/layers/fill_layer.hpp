@@ -27,25 +27,25 @@ public:
     // Paint properties
 
     PropertyValue<bool> getFillAntialias() const;
-    void setFillAntialias(PropertyValue<bool>);
+    void setFillAntialias(PropertyValue<bool>, const optional<std::string>& klass = {});
 
     PropertyValue<float> getFillOpacity() const;
-    void setFillOpacity(PropertyValue<float>);
+    void setFillOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getFillColor() const;
-    void setFillColor(PropertyValue<Color>);
+    void setFillColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<Color> getFillOutlineColor() const;
-    void setFillOutlineColor(PropertyValue<Color>);
+    void setFillOutlineColor(PropertyValue<Color>, const optional<std::string>& klass = {});
 
     PropertyValue<std::array<float, 2>> getFillTranslate() const;
-    void setFillTranslate(PropertyValue<std::array<float, 2>>);
+    void setFillTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
 
     PropertyValue<TranslateAnchorType> getFillTranslateAnchor() const;
-    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setFillTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
     PropertyValue<std::string> getFillPattern() const;
-    void setFillPattern(PropertyValue<std::string>);
+    void setFillPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
 
     // Private implementation
 

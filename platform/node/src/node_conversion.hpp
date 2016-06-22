@@ -8,10 +8,16 @@
 
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/style/conversion.hpp>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
+
+inline bool isUndefined(v8::Local<v8::Value> value) {
+    Nan::HandleScope scope;
+    return value->IsUndefined() || value->IsNull();
+}
 
 inline bool isArray(v8::Local<v8::Value> value) {
     Nan::HandleScope scope;
@@ -35,14 +41,29 @@ inline bool isObject(v8::Local<v8::Value> value) {
 
 inline optional<v8::Local<v8::Value>> objectMember(v8::Local<v8::Value> value, const char * name) {
     Nan::EscapableHandleScope scope;
-    if (!Nan::Has(value.As<v8::Array>(), Nan::New(name).ToLocalChecked()).FromJust()) {
+    if (!Nan::Has(value->ToObject(), Nan::New(name).ToLocalChecked()).FromJust()) {
         return {};
     }
-    Nan::MaybeLocal<v8::Value> result = Nan::Get(value.As<v8::Array>(), Nan::New(name).ToLocalChecked());
+    Nan::MaybeLocal<v8::Value> result = Nan::Get(value->ToObject(), Nan::New(name).ToLocalChecked());
     if (result.IsEmpty()) {
         return {};
     }
     return scope.Escape(result.ToLocalChecked());
+}
+
+template <class Fn>
+optional<Error> eachMember(v8::Local<v8::Value> value, Fn&& fn) {
+    Nan::HandleScope scope;
+    v8::Local<v8::Array> names = value->ToObject()->GetOwnPropertyNames();
+    for (uint32_t i = 0; i < names->Length(); ++i) {
+        v8::Local<v8::Value> k = Nan::Get(names, i).ToLocalChecked();
+        v8::Local<v8::Value> v = Nan::Get(value->ToObject(), k).ToLocalChecked();
+        optional<Error> result = fn(*Nan::Utf8String(k), v);
+        if (result) {
+            return result;
+        }
+    }
+    return {};
 }
 
 inline optional<bool> toBool(v8::Local<v8::Value> value) {

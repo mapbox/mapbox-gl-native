@@ -141,6 +141,8 @@ Layer* Style::getLayer(const std::string& id) const {
 }
 
 void Style::addLayer(std::unique_ptr<Layer> layer, optional<std::string> before) {
+    // TODO: verify source
+
     if (SymbolLayer* symbolLayer = layer->as<SymbolLayer>()) {
         if (!symbolLayer->impl->spriteAtlas) {
             symbolLayer->impl->spriteAtlas = spriteAtlas.get();

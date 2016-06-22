@@ -12,7 +12,7 @@
     "type": "line",
     "source": "mapbox",
     "paint": {
-      "line-translate": null
+      "line-translate": "no"
     }
   }]
 }

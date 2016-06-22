@@ -8,10 +8,6 @@
 namespace mbgl {
 namespace style {
 
-void FillLayer::Impl::parsePaints(const JSValue& layer) {
-    paint.parse(layer);
-}
-
 void FillLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }

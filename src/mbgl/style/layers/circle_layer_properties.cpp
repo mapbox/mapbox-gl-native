@@ -5,15 +5,6 @@
 namespace mbgl {
 namespace style {
 
-void CirclePaintProperties::parse(const JSValue& value) {
-    circleRadius.parse("circle-radius", value);
-    circleColor.parse("circle-color", value);
-    circleBlur.parse("circle-blur", value);
-    circleOpacity.parse("circle-opacity", value);
-    circleTranslate.parse("circle-translate", value);
-    circleTranslateAnchor.parse("circle-translate-anchor", value);
-}
-
 void CirclePaintProperties::cascade(const CascadeParameters& parameters) {
     circleRadius.cascade(parameters);
     circleColor.cascade(parameters);

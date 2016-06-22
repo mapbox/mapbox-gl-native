@@ -4,10 +4,6 @@
 namespace mbgl {
 namespace style {
 
-void BackgroundLayer::Impl::parsePaints(const JSValue& layer) {
-    paint.parse(layer);
-}
-
 void BackgroundLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }

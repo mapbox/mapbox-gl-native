@@ -5,7 +5,6 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 namespace style {
@@ -15,7 +14,6 @@ class CalculationParameters;
 
 class SymbolLayoutProperties {
 public:
-    void parse(const JSValue&);
     void recalculate(const CalculationParameters&);
 
     LayoutProperty<SymbolPlacementType> symbolPlacement { SymbolPlacementType::Point };
@@ -56,7 +54,6 @@ public:
 
 class SymbolPaintProperties {
 public:
-    void parse(const JSValue&);
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 

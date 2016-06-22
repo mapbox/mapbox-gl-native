@@ -2,10 +2,15 @@
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/style/conversion.hpp>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
+
+inline bool isUndefined(const JSValue& value) {
+    return value.IsNull();
+}
 
 inline bool isArray(const JSValue& value) {
     return value.IsArray();
@@ -28,6 +33,17 @@ inline const JSValue* objectMember(const JSValue& value, const char * name) {
         return nullptr;
     }
     return &value[name];
+}
+
+template <class Fn>
+optional<Error> eachMember(const JSValue& value, Fn&& fn) {
+    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
+        optional<Error> result = fn({it->name.GetString(), it->name.GetStringLength()}, it->value);
+        if (result) {
+            return result;
+        }
+    }
+    return {};
 }
 
 inline optional<bool> toBool(const JSValue& value) {

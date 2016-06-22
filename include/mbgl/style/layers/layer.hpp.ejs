@@ -54,7 +54,7 @@ public:
 
 <% for (const property of paintProperties) { -%>
     PropertyValue<<%- propertyType(property) %>> get<%- camelize(property.name) %>() const;
-    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>);
+    void set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>>, const optional<std::string>& klass = {});
 
 <% } -%>
     // Private implementation

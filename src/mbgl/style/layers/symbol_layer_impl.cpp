@@ -5,14 +5,6 @@
 namespace mbgl {
 namespace style {
 
-void SymbolLayer::Impl::parseLayout(const JSValue& value) {
-    layout.parse(value);
-}
-
-void SymbolLayer::Impl::parsePaints(const JSValue& layer) {
-    paint.parse(layer);
-}
-
 void SymbolLayer::Impl::cascade(const CascadeParameters& parameters) {
     paint.cascade(parameters);
 }

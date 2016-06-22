@@ -1,7 +1,7 @@
 {
     "default": {
         "log": [
-            [1, "WARNING", "ParseStyle", "line-width: function stops must be an array"]
+            [1, "WARNING", "ParseStyle", "function stops must be an array"]
         ]
     }
 }

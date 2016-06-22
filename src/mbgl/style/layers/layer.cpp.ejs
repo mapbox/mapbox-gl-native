@@ -37,6 +37,14 @@ std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::clone() const {
     return std::make_unique<<%- camelize(type) %>Layer>(*this);
 }
 
+std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::cloneRef(const std::string& id_) const {
+    auto result = std::make_unique<<%- camelize(type) %>Layer>(*this);
+    result->impl->id = id_;
+    result->impl->ref = this->id;
+    result->impl->paint = <%- camelize(type) %>PaintProperties();
+    return std::move(result);
+}
+
 <% if (type !== 'background') { -%>
 // Source
 
@@ -83,8 +91,8 @@ PropertyValue<<%- propertyType(property) %>> <%- camelize(type) %>Layer::get<%- 
     return impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.get();
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value) {
-    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value);
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(PropertyValue<<%- propertyType(property) %>> value, const optional<std::string>& klass) {
+    impl->paint.<%- camelizeWithLeadingLowercase(property.name) %>.set(value, klass);
 }
 <% } -%>
 

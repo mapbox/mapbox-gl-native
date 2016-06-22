@@ -3,7 +3,6 @@
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/property_parsing.hpp>
 #include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 #include <utility>
 
@@ -23,12 +22,6 @@ public:
 
     void set(const PropertyValue<T>& value_) {
         currentValue = value_;
-    }
-
-    void parse(const char * name, const JSValue& layout) {
-        if (layout.HasMember(name)) {
-            currentValue = parseProperty<T>(name, layout[name]);
-        }
     }
 
     void calculate(const CalculationParameters& parameters) {

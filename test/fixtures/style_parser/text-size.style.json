@@ -14,7 +14,7 @@
     "source-layer": "country_label",
     "filter": ["==", "$type", "Point"],
     "layout": {
-      "text-size": null
+      "text-size": "no"
     }
   }]
 }
