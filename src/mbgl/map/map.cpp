@@ -234,7 +234,6 @@ void Map::Impl::update() {
                                        transform.getState(),
                                        style->workers,
                                        fileSource,
-                                       *texturePool,
                                        style->shouldReparsePartialTiles,
                                        mode,
                                        *annotationManager,
