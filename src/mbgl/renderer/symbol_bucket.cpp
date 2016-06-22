@@ -601,39 +601,39 @@ void SymbolBucket::swapRenderData() {
     }
 }
 
-void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& text = renderData->text;
     for (auto &group : text.groups) {
         assert(group);
-        group->array[0].bind(shader, text.vertices, text.triangles, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, text.vertices, text.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * text.vertices.itemSize;
         elements_index += group->elements_length * text.triangles.itemSize;
     }
 }
 
-void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
-        group->array[0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        group->array[overdraw ? 1 : 0].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
         elements_index += group->elements_length * icon.triangles.itemSize;
     }
 }
 
-void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store) {
+void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, bool overdraw) {
     GLbyte *vertex_index = BUFFER_OFFSET_0;
     GLbyte *elements_index = BUFFER_OFFSET_0;
     auto& icon = renderData->icon;
     for (auto &group : icon.groups) {
         assert(group);
-        group->array[1].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
+        group->array[overdraw ? 3 : 2].bind(shader, icon.vertices, icon.triangles, vertex_index, store);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT, elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
         elements_index += group->elements_length * icon.triangles.itemSize;

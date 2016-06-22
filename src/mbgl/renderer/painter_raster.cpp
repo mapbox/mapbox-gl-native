@@ -18,26 +18,28 @@ void Painter::renderRaster(RasterBucket& bucket,
     const RasterPaintProperties& properties = layer.impl->paint;
 
     if (bucket.hasData()) {
-        config.program = isOverdraw() ? rasterShader->getOverdrawID() : rasterShader->getID();
-        rasterShader->u_matrix = matrix;
-        rasterShader->u_buffer = 0;
-        rasterShader->u_opacity = properties.rasterOpacity;
-        rasterShader->u_brightness_low = properties.rasterBrightnessMin;
-        rasterShader->u_brightness_high = properties.rasterBrightnessMax;
-        rasterShader->u_saturation_factor = saturationFactor(properties.rasterSaturation);
-        rasterShader->u_contrast_factor = contrastFactor(properties.rasterContrast);
-        rasterShader->u_spin_weights = spinWeights(properties.rasterHueRotate);
+        const auto& shaderRaster = isOverdraw() ? rasterOverdrawShader : rasterShader;
+        auto& vaoRaster = isOverdraw() ? coveringRasterOverdrawArray : coveringRasterArray;
+        config.program = shaderRaster->getID();
+        shaderRaster->u_matrix = matrix;
+        shaderRaster->u_buffer = 0;
+        shaderRaster->u_opacity = properties.rasterOpacity;
+        shaderRaster->u_brightness_low = properties.rasterBrightnessMin;
+        shaderRaster->u_brightness_high = properties.rasterBrightnessMax;
+        shaderRaster->u_saturation_factor = saturationFactor(properties.rasterSaturation);
+        shaderRaster->u_contrast_factor = contrastFactor(properties.rasterContrast);
+        shaderRaster->u_spin_weights = spinWeights(properties.rasterHueRotate);
 
         config.stencilTest = GL_FALSE;
 
-        rasterShader->u_image = 0;
+        shaderRaster->u_image = 0;
         config.activeTexture = GL_TEXTURE0;
 
         config.depthFunc.reset();
         config.depthTest = GL_TRUE;
         config.depthMask = GL_FALSE;
         setDepthSublayer(0);
-        bucket.drawRaster(*rasterShader, tileStencilBuffer, coveringRasterArray, store);
+        bucket.drawRaster(*shaderRaster, tileStencilBuffer, vaoRaster, store);
     }
 }
 

@@ -7,7 +7,7 @@ namespace mbgl {
 
 class IconShader : public Shader {
 public:
-    IconShader(gl::ObjectStore&);
+    IconShader(gl::ObjectStore&, bool overdraw = false);
 
     void bind(GLbyte *offset) final;
 
@@ -19,11 +19,6 @@ public:
     Uniform<GLint>                  u_rotate_with_map = {"u_rotate_with_map", *this};
     Uniform<GLint>                  u_texture       = {"u_texture",       *this};
     Uniform<GLint>                  u_fadetexture   = {"u_fadetexture",   *this};
-
-protected:
-    GLint a_offset = -1;
-    GLint a_data1 = -1;
-    GLint a_data2 = -1;
 };
 
 } // namespace mbgl

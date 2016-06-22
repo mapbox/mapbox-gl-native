@@ -18,7 +18,7 @@ class LineSDFShader;
 class LinepatternShader;
 
 class LineBucket : public Bucket {
-    using TriangleGroup = ElementGroup<3>;
+    using TriangleGroup = ElementGroup<6>;
 
 public:
     LineBucket(uint32_t overscaling);
@@ -32,9 +32,9 @@ public:
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::ObjectStore&);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&);
+    void drawLines(LineShader&, gl::ObjectStore&, bool overdraw);
+    void drawLineSDF(LineSDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&, bool overdraw);
 
 private:
     struct TriangleElement {

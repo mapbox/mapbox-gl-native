@@ -43,17 +43,24 @@ void Painter::renderFill(FillBucket& bucket,
     config.depthMask = GL_TRUE;
     config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
+    const bool overdraw = isOverdraw();
+    const auto& shaderOutline = overdraw ? outlineOverdrawShader : outlineShader;
+    const auto& shaderPattern = overdraw ? patternOverdrawShader : patternShader;
+    const auto& shaderOutlinePattern = overdraw ? outlinePatternOverdrawShader : outlinePatternShader;
+    const auto& shaderPlain = overdraw ? plainOverdrawShader : plainShader;
+
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
     if (outline && pass == RenderPass::Translucent) {
-        config.program = isOverdraw() ? outlineShader->getOverdrawID() : outlineShader->getID();
-        outlineShader->u_matrix = vertexMatrix;
 
-        outlineShader->u_outline_color = strokeColor;
-        outlineShader->u_opacity = opacity;
+        config.program = shaderOutline->getID();
+        shaderOutline->u_matrix = vertexMatrix;
+
+        shaderOutline->u_outline_color = strokeColor;
+        shaderOutline->u_opacity = opacity;
 
         // Draw the entire line
-        outlineShader->u_world = worldSize;
+        shaderOutline->u_world = worldSize;
         if (isOutlineColorDefined) {
             // If we defined a different color for the fill outline, we are
             // going to ignore the bits in 0x07 and just care about the global
@@ -67,7 +74,7 @@ void Painter::renderFill(FillBucket& bucket,
             // the (non-antialiased) fill.
             setDepthSublayer(0); // OK
         }
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawVertices(*shaderOutline, store, overdraw);
     }
 
     if (pattern) {
@@ -76,61 +83,61 @@ void Painter::renderFill(FillBucket& bucket,
 
         // Image fill.
         if (pass == RenderPass::Translucent && imagePosA && imagePosB) {
-            config.program = isOverdraw() ? patternShader->getOverdrawID() : patternShader->getID();
-            patternShader->u_matrix = vertexMatrix;
-            patternShader->u_pattern_tl_a = imagePosA->tl;
-            patternShader->u_pattern_br_a = imagePosA->br;
-            patternShader->u_pattern_tl_b = imagePosB->tl;
-            patternShader->u_pattern_br_b = imagePosB->br;
-            patternShader->u_opacity = properties.fillOpacity;
-            patternShader->u_image = 0;
-            patternShader->u_mix = properties.fillPattern.value.t;
-            patternShader->u_pattern_size_a = imagePosA->size;
-            patternShader->u_pattern_size_b = imagePosB->size;
-            patternShader->u_scale_a = properties.fillPattern.value.fromScale;
-            patternShader->u_scale_b = properties.fillPattern.value.toScale;
-            patternShader->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+            config.program = shaderPattern->getID();
+            shaderPattern->u_matrix = vertexMatrix;
+            shaderPattern->u_pattern_tl_a = imagePosA->tl;
+            shaderPattern->u_pattern_br_a = imagePosA->br;
+            shaderPattern->u_pattern_tl_b = imagePosB->tl;
+            shaderPattern->u_pattern_br_b = imagePosB->br;
+            shaderPattern->u_opacity = properties.fillOpacity;
+            shaderPattern->u_image = 0;
+            shaderPattern->u_mix = properties.fillPattern.value.t;
+            shaderPattern->u_pattern_size_a = imagePosA->size;
+            shaderPattern->u_pattern_size_b = imagePosB->size;
+            shaderPattern->u_scale_a = properties.fillPattern.value.fromScale;
+            shaderPattern->u_scale_b = properties.fillPattern.value.toScale;
+            shaderPattern->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
 
             GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
             GLint pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
             GLint pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
-            patternShader->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
-            patternShader->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
+            shaderPattern->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
+            shaderPattern->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
             config.activeTexture = GL_TEXTURE0;
             spriteAtlas->bind(true, store);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(*patternShader, store);
+            bucket.drawElements(*shaderPattern, store, overdraw);
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
-                config.program = isOverdraw() ? outlinePatternShader->getOverdrawID() : outlinePatternShader->getID();
-                outlinePatternShader->u_matrix = vertexMatrix;
+                config.program = shaderOutlinePattern->getID();
+                shaderOutlinePattern->u_matrix = vertexMatrix;
 
                 // Draw the entire line
-                outlineShader->u_world = worldSize;
+                shaderOutline->u_world = worldSize;
 
-                outlinePatternShader->u_pattern_tl_a = imagePosA->tl;
-                outlinePatternShader->u_pattern_br_a = imagePosA->br;
-                outlinePatternShader->u_pattern_tl_b = imagePosB->tl;
-                outlinePatternShader->u_pattern_br_b = imagePosB->br;
-                outlinePatternShader->u_opacity = properties.fillOpacity;
-                outlinePatternShader->u_image = 0;
-                outlinePatternShader->u_mix = properties.fillPattern.value.t;
-                outlinePatternShader->u_pattern_size_a = imagePosA->size;
-                outlinePatternShader->u_pattern_size_b = imagePosB->size;
-                outlinePatternShader->u_scale_a = properties.fillPattern.value.fromScale;
-                outlinePatternShader->u_scale_b = properties.fillPattern.value.toScale;
-                outlinePatternShader->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
-                outlinePatternShader->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
-                outlinePatternShader->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
+                shaderOutlinePattern->u_pattern_tl_a = imagePosA->tl;
+                shaderOutlinePattern->u_pattern_br_a = imagePosA->br;
+                shaderOutlinePattern->u_pattern_tl_b = imagePosB->tl;
+                shaderOutlinePattern->u_pattern_br_b = imagePosB->br;
+                shaderOutlinePattern->u_opacity = properties.fillOpacity;
+                shaderOutlinePattern->u_image = 0;
+                shaderOutlinePattern->u_mix = properties.fillPattern.value.t;
+                shaderOutlinePattern->u_pattern_size_a = imagePosA->size;
+                shaderOutlinePattern->u_pattern_size_b = imagePosB->size;
+                shaderOutlinePattern->u_scale_a = properties.fillPattern.value.fromScale;
+                shaderOutlinePattern->u_scale_b = properties.fillPattern.value.toScale;
+                shaderOutlinePattern->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+                shaderOutlinePattern->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
+                shaderOutlinePattern->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
                 config.activeTexture = GL_TEXTURE0;
                 spriteAtlas->bind(true, store);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(*outlinePatternShader, store);
+                bucket.drawVertices(*shaderOutlinePattern, store, overdraw);
             }
         }
     } else {
@@ -140,31 +147,31 @@ void Painter::renderFill(FillBucket& bucket,
             // fragments or when it's translucent and we're drawing translucent
             // fragments
             // Draw filling rectangle.
-            config.program = isOverdraw() ? plainShader->getOverdrawID() : plainShader->getID();
-            plainShader->u_matrix = vertexMatrix;
-            plainShader->u_color = fillColor;
-            plainShader->u_opacity = opacity;
+            config.program = shaderPlain->getID();
+            shaderPlain->u_matrix = vertexMatrix;
+            shaderPlain->u_color = fillColor;
+            shaderPlain->u_opacity = opacity;
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(*plainShader, store);
+            bucket.drawElements(*shaderPlain, store, overdraw);
         }
     }
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // below, we have to draw the outline first (!)
     if (fringeline && pass == RenderPass::Translucent) {
-        config.program = isOverdraw() ? outlineShader->getOverdrawID() : outlineShader->getID();
-        outlineShader->u_matrix = vertexMatrix;
+        config.program = shaderOutline->getID();
+        shaderOutline->u_matrix = vertexMatrix;
 
-        outlineShader->u_outline_color = fillColor;
-        outlineShader->u_opacity = opacity;
+        shaderOutline->u_outline_color = fillColor;
+        shaderOutline->u_opacity = opacity;
 
         // Draw the entire line
-        outlineShader->u_world = worldSize;
+        shaderOutline->u_world = worldSize;
 
         setDepthSublayer(2);
-        bucket.drawVertices(*outlineShader, store);
+        bucket.drawVertices(*shaderOutline, store, overdraw);
     }
 }
 

@@ -16,26 +16,24 @@ public:
         return program.get();
     }
 
-    GLuint getOverdrawID() const {
-        return programOverdraw ? *programOverdraw : 0;
-    }
-
     virtual void bind(GLbyte *offset) = 0;
 
 protected:
-    Shader(const char* name_, const char* vertex, const char* fragment, gl::ObjectStore&);
-    GLint a_pos = -1;
+    Shader(const char* name_, const char* vertex, const char* fragment, gl::ObjectStore&, bool overdraw = false);
+
+    static constexpr GLint     a_pos = 0;
+    static constexpr GLint a_extrude = 1;
+    static constexpr GLint  a_offset = 2;
+    static constexpr GLint    a_data = 3;
+    static constexpr GLint   a_data1 = 4;
+    static constexpr GLint   a_data2 = 5;
 
 private:
     bool compileShader(gl::UniqueShader&, const GLchar *source);
-    void linkProgram(gl::UniqueProgram&);
 
     gl::UniqueProgram program;
     gl::UniqueShader vertexShader;
     gl::UniqueShader fragmentShader;
-
-    mbgl::optional<gl::UniqueProgram> programOverdraw;
-    mbgl::optional<gl::UniqueShader> overdrawShader;
 };
 
 } // namespace mbgl

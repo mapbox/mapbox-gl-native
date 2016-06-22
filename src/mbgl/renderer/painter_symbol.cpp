@@ -21,7 +21,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
+                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, bool),
 
                         // Layout
                         AlignmentType rotationAlignment,
@@ -58,7 +58,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         exScale = {{ exScale[0] * scale, exScale[1] * scale }};
     }
 
-    config.program = isOverdraw() ? sdfShader.getOverdrawID() : sdfShader.getID();
+    config.program = sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
     sdfShader.u_extrude_scale = exScale;
     sdfShader.u_texsize = texsize;
@@ -95,7 +95,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
 
         setDepthSublayer(0);
-        (bucket.*drawSDF)(sdfShader, store);
+        (bucket.*drawSDF)(sdfShader, store, isOverdraw());
     }
 
     // Then, we draw the text/icon over the halo
@@ -106,7 +106,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
 
         setDepthSublayer(1);
-        (bucket.*drawSDF)(sdfShader, store);
+        (bucket.*drawSDF)(sdfShader, store, isOverdraw());
     }
 }
 
@@ -170,7 +170,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                       matrix,
                       1.0f,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
-                      *sdfIconShader,
+                      isOverdraw() ? *sdfIconOverdrawShader : *sdfIconShader,
                       &SymbolBucket::drawIcons,
                       layout.iconRotationAlignment,
                       // icon-pitch-alignment is not yet implemented
@@ -199,24 +199,27 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                 exScale = {{ exScale[0] * scale, exScale[1] * scale }};
             }
 
-            config.program = isOverdraw() ? iconShader->getOverdrawID() : iconShader->getID();
-            iconShader->u_matrix = vtxMatrix;
-            iconShader->u_extrude_scale = exScale;
-            iconShader->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
-            iconShader->u_rotate_with_map = alignedWithMap;
-            iconShader->u_texture = 0;
+            const bool overdraw = isOverdraw();
+            const auto& shaderIcon = overdraw ? iconOverdrawShader : iconShader;
+
+            config.program = shaderIcon->getID();
+            shaderIcon->u_matrix = vtxMatrix;
+            shaderIcon->u_extrude_scale = exScale;
+            shaderIcon->u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
+            shaderIcon->u_rotate_with_map = alignedWithMap;
+            shaderIcon->u_texture = 0;
 
             // adjust min/max zooms for variable font sies
             float zoomAdjust = std::log(fontSize / layout.iconSize) / std::log(2);
-            iconShader->u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
-            iconShader->u_opacity = paint.iconOpacity;
+            shaderIcon->u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
+            shaderIcon->u_opacity = paint.iconOpacity;
 
             config.activeTexture = GL_TEXTURE1;
             frameHistory.bind(store);
-            iconShader->u_fadetexture = 1;
+            shaderIcon->u_fadetexture = 1;
 
             setDepthSublayer(0);
-            bucket.drawIcons(*iconShader, store);
+            bucket.drawIcons(*shaderIcon, store, overdraw);
         }
     }
 
@@ -236,7 +239,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                   matrix,
                   24.0f,
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
-                  *sdfGlyphShader,
+                  isOverdraw() ? *sdfGlyphOverdrawShader : *sdfGlyphShader,
                   &SymbolBucket::drawGlyphs,
                   layout.textRotationAlignment,
                   layout.textPitchAlignment,

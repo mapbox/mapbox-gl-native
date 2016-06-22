@@ -53,8 +53,6 @@ class CircleShader;
 class PatternShader;
 class IconShader;
 class RasterShader;
-class SDFGlyphShader;
-class SDFIconShader;
 class CollisionBoxShader;
 
 struct ClipID;
@@ -137,7 +135,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, bool),
 
                    // Layout
                    style::AlignmentType rotationAlignment,
@@ -208,10 +206,23 @@ private:
     std::unique_ptr<PatternShader> patternShader;
     std::unique_ptr<IconShader> iconShader;
     std::unique_ptr<RasterShader> rasterShader;
-    std::unique_ptr<SDFGlyphShader> sdfGlyphShader;
-    std::unique_ptr<SDFIconShader> sdfIconShader;
+    std::unique_ptr<SDFShader> sdfGlyphShader;
+    std::unique_ptr<SDFShader> sdfIconShader;
     std::unique_ptr<CollisionBoxShader> collisionBoxShader;
     std::unique_ptr<CircleShader> circleShader;
+
+    std::unique_ptr<PlainShader> plainOverdrawShader;
+    std::unique_ptr<OutlineShader> outlineOverdrawShader;
+    std::unique_ptr<OutlinePatternShader> outlinePatternOverdrawShader;
+    std::unique_ptr<LineShader> lineOverdrawShader;
+    std::unique_ptr<LineSDFShader> linesdfOverdrawShader;
+    std::unique_ptr<LinepatternShader> linepatternOverdrawShader;
+    std::unique_ptr<PatternShader> patternOverdrawShader;
+    std::unique_ptr<IconShader> iconOverdrawShader;
+    std::unique_ptr<RasterShader> rasterOverdrawShader;
+    std::unique_ptr<SDFShader> sdfGlyphOverdrawShader;
+    std::unique_ptr<SDFShader> sdfIconOverdrawShader;
+    std::unique_ptr<CircleShader> circleOverdrawShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer = {
@@ -241,6 +252,8 @@ private:
     };
 
     VertexArrayObject tileBorderArray;
+
+    VertexArrayObject coveringRasterOverdrawArray;
 };
 
 } // namespace mbgl

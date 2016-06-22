@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-OutlinePatternShader::OutlinePatternShader(gl::ObjectStore& store)
+OutlinePatternShader::OutlinePatternShader(gl::ObjectStore& store, bool overdraw)
     : Shader(shaders::outlinepattern::name,
              shaders::outlinepattern::vertex,
              shaders::outlinepattern::fragment,
-             store) {
+             store, overdraw) {
 }
 
 void OutlinePatternShader::bind(GLbyte *offset) {

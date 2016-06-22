@@ -8,7 +8,7 @@ namespace mbgl {
 
 class LineSDFShader : public Shader {
 public:
-    LineSDFShader(gl::ObjectStore&);
+    LineSDFShader(gl::ObjectStore&, bool overdraw = false);
 
     void bind(GLbyte *offset) final;
 
@@ -30,9 +30,6 @@ public:
     Uniform<GLfloat>                 u_extra     = {"u_extra",     *this};
     Uniform<GLfloat>                 u_offset    = {"u_offset",    *this};
     UniformMatrix<2>                 u_antialiasingmatrix = {"u_antialiasingmatrix", *this};
-
-private:
-    GLint a_data = -1;
 };
 
 

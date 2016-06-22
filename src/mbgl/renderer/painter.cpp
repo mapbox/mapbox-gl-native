@@ -64,10 +64,24 @@ Painter::Painter(const TransformState& state_,
     patternShader = std::make_unique<PatternShader>(store);
     iconShader = std::make_unique<IconShader>(store);
     rasterShader = std::make_unique<RasterShader>(store);
-    sdfGlyphShader = std::make_unique<SDFGlyphShader>(store);
-    sdfIconShader = std::make_unique<SDFIconShader>(store);
+    sdfGlyphShader = std::make_unique<SDFShader>(store);
+    sdfIconShader = std::make_unique<SDFShader>(store);
     collisionBoxShader = std::make_unique<CollisionBoxShader>(store);
     circleShader = std::make_unique<CircleShader>(store);
+
+    bool overdraw = true;
+    plainOverdrawShader = std::make_unique<PlainShader>(store, overdraw);
+    outlineOverdrawShader = std::make_unique<OutlineShader>(store, overdraw);
+    outlinePatternOverdrawShader = std::make_unique<OutlinePatternShader>(store, overdraw);
+    lineOverdrawShader = std::make_unique<LineShader>(store, overdraw);
+    linesdfOverdrawShader = std::make_unique<LineSDFShader>(store, overdraw);
+    linepatternOverdrawShader = std::make_unique<LinepatternShader>(store, overdraw);
+    patternOverdrawShader = std::make_unique<PatternShader>(store, overdraw);
+    iconOverdrawShader = std::make_unique<IconShader>(store, overdraw);
+    rasterOverdrawShader = std::make_unique<RasterShader>(store, overdraw);
+    sdfGlyphOverdrawShader = std::make_unique<SDFShader>(store, overdraw);
+    sdfIconOverdrawShader = std::make_unique<SDFShader>(store, overdraw);
+    circleOverdrawShader = std::make_unique<CircleShader>(store, overdraw);
 
     // Reset GL values
     config.reset();

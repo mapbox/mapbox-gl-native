@@ -27,17 +27,19 @@ void Painter::renderCircle(CircleBucket& bucket,
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 
-    config.program = isOverdraw() ? circleShader->getOverdrawID() : circleShader->getID();
+    const auto& shader = isOverdraw() ? circleOverdrawShader : circleShader;
 
-    circleShader->u_matrix = vtxMatrix;
-    circleShader->u_extrude_scale = extrudeScale;
-    circleShader->u_devicepixelratio = frame.pixelRatio;
-    circleShader->u_color = properties.circleColor;
-    circleShader->u_radius = properties.circleRadius;
-    circleShader->u_blur = properties.circleBlur;
-    circleShader->u_opacity = properties.circleOpacity;
+    config.program = shader->getID();
 
-    bucket.drawCircles(*circleShader, store);
+    shader->u_matrix = vtxMatrix;
+    shader->u_extrude_scale = extrudeScale;
+    shader->u_devicepixelratio = frame.pixelRatio;
+    shader->u_color = properties.circleColor;
+    shader->u_radius = properties.circleRadius;
+    shader->u_blur = properties.circleBlur;
+    shader->u_opacity = properties.circleOpacity;
+
+    bucket.drawCircles(*shader, store);
 }
 
 } // namespace mbgl

@@ -27,18 +27,18 @@ public:
 
     void addGeometry(const GeometryCollection&);
 
-    void drawElements(PlainShader&, gl::ObjectStore&);
-    void drawElements(PatternShader&, gl::ObjectStore&);
-    void drawVertices(OutlineShader&, gl::ObjectStore&);
-    void drawVertices(OutlinePatternShader&, gl::ObjectStore&);
+    void drawElements(PlainShader&, gl::ObjectStore&, bool overdraw);
+    void drawElements(PatternShader&, gl::ObjectStore&, bool overdraw);
+    void drawVertices(OutlineShader&, gl::ObjectStore&, bool overdraw);
+    void drawVertices(OutlinePatternShader&, gl::ObjectStore&, bool overdraw);
 
 private:
     FillVertexBuffer vertexBuffer;
     TriangleElementsBuffer triangleElementsBuffer;
     LineElementsBuffer lineElementsBuffer;
 
-    typedef ElementGroup<2> TriangleGroup;
-    typedef ElementGroup<2> LineGroup;
+    typedef ElementGroup<4> TriangleGroup;
+    typedef ElementGroup<4> LineGroup;
 
     std::vector<std::unique_ptr<TriangleGroup>> triangleGroups;
     std::vector<std::unique_ptr<LineGroup>> lineGroups;

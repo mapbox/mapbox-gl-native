@@ -5,8 +5,11 @@
 
 namespace mbgl {
 
-PatternShader::PatternShader(gl::ObjectStore& store)
-    : Shader(shaders::pattern::name, shaders::pattern::vertex, shaders::pattern::fragment, store) {
+PatternShader::PatternShader(gl::ObjectStore& store, bool overdraw)
+    : Shader(shaders::pattern::name,
+             shaders::pattern::vertex,
+             shaders::pattern::fragment,
+             store, overdraw) {
 }
 
 void PatternShader::bind(GLbyte *offset) {

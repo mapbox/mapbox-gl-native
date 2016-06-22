@@ -7,7 +7,7 @@ namespace mbgl {
 
 class OutlinePatternShader : public Shader {
 public:
-    OutlinePatternShader(gl::ObjectStore&);
+    OutlinePatternShader(gl::ObjectStore&, bool overdraw = false);
 
     void bind(GLbyte *offset) final;
 

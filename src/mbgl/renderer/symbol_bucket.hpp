@@ -61,8 +61,8 @@ class SymbolInstance {
 };
 
 class SymbolBucket : public Bucket {
-    typedef ElementGroup<1> TextElementGroup;
-    typedef ElementGroup<2> IconElementGroup;
+    typedef ElementGroup<2> TextElementGroup;
+    typedef ElementGroup<4> IconElementGroup;
     typedef ElementGroup<1> CollisionBoxElementGroup;
 
 public:
@@ -82,9 +82,9 @@ public:
                      GlyphAtlas&,
                      GlyphStore&);
 
-    void drawGlyphs(SDFShader&, gl::ObjectStore&);
-    void drawIcons(SDFShader&, gl::ObjectStore&);
-    void drawIcons(IconShader&, gl::ObjectStore&);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawIcons(SDFShader&, gl::ObjectStore&, bool overdraw);
+    void drawIcons(IconShader&, gl::ObjectStore&, bool overdraw);
     void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
 
     void parseFeatures(const GeometryTileLayer&, const style::Filter&);
