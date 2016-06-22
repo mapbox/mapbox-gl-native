@@ -2,22 +2,21 @@
 
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/ptr.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
-
-#include <mutex>
+#include <mbgl/util/atomic.hpp>
 
 namespace mbgl {
 
-class Raster : public std::enable_shared_from_this<Raster> {
-
+class Raster {
 public:
+    enum class MipMap : bool { No = false, Yes = true };
+    enum class Scaling : bool { Nearest = false, Linear = true };
+
     // load image data
-    void load(PremultipliedImage);
+    void load(PremultipliedImage, uint32_t mipmapLevel = 0);
 
     // bind current texture
-    void bind(bool linear, gl::ObjectStore&);
+    void bind(gl::ObjectStore&, Scaling = Scaling::Nearest, MipMap = MipMap::No);
 
     // uploads the texture if it hasn't been uploaded yet.
     void upload(gl::ObjectStore&);
@@ -25,28 +24,19 @@ public:
     // loaded status
     bool isLoaded() const;
 
-public:
-    // loaded image dimensions
-    GLsizei width = 0;
-    GLsizei height = 0;
+private:
+    // raw pixels have been loaded
+    util::Atomic<bool> loaded { false };
+
+    // filters
+    Scaling filter = Scaling::Nearest;
+    MipMap mipmap = MipMap::No;
+
+    // the raw pixels
+    std::vector<PremultipliedImage> images;
 
     // GL buffer object handle.
     mbgl::optional<gl::UniqueTexture> texture;
-
-    // texture opacity
-    double opacity = 0;
-
-private:
-    mutable std::mutex mtx;
-
-    // raw pixels have been loaded
-    bool loaded = false;
-
-    // min/mag filter
-    GLint filter = 0;
-
-    // the raw pixels
-    PremultipliedImage img;
 };
 
 } // namespace mbgl

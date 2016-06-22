@@ -31,9 +31,9 @@ void RasterBucket::drawRaster(RasterShader& shader,
                               gl::Config& config,
                               gl::ObjectStore& store) {
     config.activeTexture = GL_TEXTURE0;
-    raster.bind(true, store);
+    raster.bind(store, Raster::Scaling::Linear);
     config.activeTexture = GL_TEXTURE1;
-    raster.bind(true, store);
+    raster.bind(store, Raster::Scaling::Linear);
     array.bind(shader, vertices, BUFFER_OFFSET_0, store);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)vertices.index()));
 }
