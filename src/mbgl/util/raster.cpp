@@ -9,10 +9,6 @@
 
 using namespace mbgl;
 
-Raster::Raster(gl::TexturePool& texturePool_)
-    : texturePool(texturePool_)
-{}
-
 bool Raster::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
     return loaded;
@@ -30,14 +26,14 @@ void Raster::load(PremultipliedImage image) {
 }
 
 
-void Raster::bind(bool linear, gl::ObjectStore& store) {
+void Raster::bind(bool linear, gl::TexturePool& texturePool, gl::ObjectStore& store) {
     if (!width || !height) {
         Log::Error(Event::OpenGL, "trying to bind texture without dimension");
         return;
     }
 
     if (img.data && !texture) {
-        upload(store);
+        upload(texturePool, store);
     } else if (texture) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
@@ -50,7 +46,7 @@ void Raster::bind(bool linear, gl::ObjectStore& store) {
     }
 }
 
-void Raster::upload(gl::ObjectStore& store) {
+void Raster::upload(gl::TexturePool& texturePool, gl::ObjectStore& store) {
     if (img.data && !texture) {
         texture = texturePool.acquireTexture(store);
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));

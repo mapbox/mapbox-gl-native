@@ -15,7 +15,6 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
                        const style::UpdateParameters& parameters,
                        const Tileset& tileset)
     : Tile(id_),
-      texturePool(parameters.texturePool),
       worker(parameters.worker),
       loader(*this, id_, parameters, tileset) {
 }
@@ -42,7 +41,7 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
     }
 
     workRequest.reset();
-    workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(texturePool), data, [this] (RasterTileParseResult result) {
+    workRequest = worker.parseRasterTile(std::make_unique<RasterBucket>(), data, [this] (RasterTileParseResult result) {
         workRequest.reset();
 
         availableData = DataAvailability::All;

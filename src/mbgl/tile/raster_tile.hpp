@@ -35,7 +35,6 @@ public:
     Bucket* getBucket(const style::Layer&) override;
 
 private:
-    gl::TexturePool& texturePool;
     Worker& worker;
 
     TileLoader<RasterTile> loader;

@@ -7,13 +7,9 @@ namespace mbgl {
 
 using namespace style;
 
-RasterBucket::RasterBucket(gl::TexturePool& texturePool)
-: raster(texturePool) {
-}
-
-void RasterBucket::upload(gl::ObjectStore& store) {
+void RasterBucket::upload(gl::TexturePool& texturePool, gl::ObjectStore& store) {
     if (hasData()) {
-        raster.upload(store);
+        raster.upload(texturePool, store);
         uploaded = true;
     }
 }
@@ -29,8 +25,12 @@ void RasterBucket::setImage(PremultipliedImage image) {
     raster.load(std::move(image));
 }
 
-void RasterBucket::drawRaster(RasterShader& shader, StaticVertexBuffer &vertices, VertexArrayObject &array, gl::ObjectStore& store) {
-    raster.bind(true, store);
+void RasterBucket::drawRaster(RasterShader& shader,
+                              StaticVertexBuffer& vertices,
+                              VertexArrayObject& array,
+                              gl::TexturePool& texturePool,
+                              gl::ObjectStore& store) {
+    raster.bind(true, texturePool, store);
     array.bind(shader, vertices, BUFFER_OFFSET_0, store);
     MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.index()));
 }

@@ -255,7 +255,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), store);
+        painter = std::make_unique<Painter>(transform.getState(), *texturePool, store);
     }
 
     FrameData frameData { view.getFramebufferSize(),
