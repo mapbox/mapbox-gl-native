@@ -83,9 +83,9 @@ public:
 template <class T, class Enable = void>
 struct Converter;
 
-template <class T, class V>
-Result<T> convert(const V& value) {
-    return Converter<T>()(value);
+template <class T, class V, class...Args>
+Result<T> convert(const V& value, Args&&...args) {
+    return Converter<T>()(value, std::forward<Args>(args)...);
 }
 
 } // namespace conversion

@@ -2,14 +2,7 @@
 
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/source_impl.hpp>
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/variant.hpp>
-
-namespace mapbox {
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-} // namespace mapbox
 
 namespace mbgl {
 
@@ -19,14 +12,11 @@ namespace style {
 
 class GeoJSONSource::Impl : public Source::Impl {
 public:
-    using GeoJSON = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
-
-    static std::unique_ptr<GeoJSONSource> parse(const std::string& id, const JSValue&);
-    static GeoJSON parseGeoJSON(const JSValue&);
-
-    Impl(std::string id, Source&,
-         variant<std::string, GeoJSON> urlOrGeoJSON);
+    Impl(std::string id, Source&);
     ~Impl() final;
+
+    void setURL(std::string);
+    void setGeoJSON(GeoJSON&&);
 
     void load(FileSource&) final;
 

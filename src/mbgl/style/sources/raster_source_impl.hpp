@@ -8,8 +8,6 @@ namespace style {
 
 class RasterSource::Impl : public TileSourceImpl {
 public:
-    static std::unique_ptr<RasterSource> parse(std::string id, const JSValue&);
-
     Impl(std::string id, Source&, variant<std::string, Tileset>, uint16_t tileSize);
 
 private:

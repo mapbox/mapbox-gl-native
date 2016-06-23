@@ -4,7 +4,6 @@
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 namespace mbgl {
 
@@ -18,8 +17,6 @@ namespace style {
 */
 class TileSourceImpl : public Source::Impl {
 public:
-    // A tile source can either specify a URL to TileJSON, or inline TileJSON.
-    static optional<variant<std::string, Tileset>> parseURLOrTileset(const JSValue&);
     static Tileset parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType, uint16_t tileSize);
 
     TileSourceImpl(SourceType, std::string id, Source&,

@@ -1,23 +1,13 @@
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/sources/raster_source_impl.hpp>
-#include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/style/sources/geojson_source_impl.hpp>
 #include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/line_layer.hpp>
-#include <mbgl/style/layers/circle_layer.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/layers/raster_layer.hpp>
-#include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 
 #include <mbgl/platform/log.hpp>
 
-#include <mbgl/tile/geometry_tile_data.hpp>
-#include <mbgl/util/enum.hpp>
-#include <mbgl/util/tileset.hpp>
+#include <mapbox/geojsonvt.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -75,54 +65,18 @@ void Parser::parseSources(const JSValue& value) {
         return;
     }
 
-    JSValue::ConstMemberIterator itr = value.MemberBegin();
-    for (; itr != value.MemberEnd(); ++itr) {
-        const JSValue& nameVal = itr->name;
-        const JSValue& sourceVal = itr->value;
+    for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
+        std::string id = *conversion::toString(it->name);
 
-        if (!sourceVal.HasMember("type")) {
-            Log::Warning(Event::ParseStyle, "source must have a type");
+        conversion::Result<std::unique_ptr<Source>> source
+            = conversion::convert<std::unique_ptr<Source>>(it->value, id);
+        if (!source) {
+            Log::Warning(Event::ParseStyle, source.error().message);
             continue;
         }
 
-        const JSValue& typeVal = sourceVal["type"];
-        if (!typeVal.IsString()) {
-            Log::Warning(Event::ParseStyle, "source type must be a string");
-            continue;
-        }
-
-        const auto type = Enum<SourceType>::toEnum({ typeVal.GetString(), typeVal.GetStringLength() });
-        if (!type) {
-            Log::Warning(Event::ParseStyle, "source type must have one of the enum values");
-            continue;
-        }
-
-        const std::string id { nameVal.GetString(), nameVal.GetStringLength() };
-        std::unique_ptr<Source> source;
-
-        switch (*type) {
-        case SourceType::Raster: {
-            source = RasterSource::Impl::parse(id, sourceVal);
-            break;
-        }
-
-        case SourceType::Vector:
-            source = VectorSource::Impl::parse(id, sourceVal);
-            break;
-
-        case SourceType::GeoJSON:
-            source = GeoJSONSource::Impl::parse(id, sourceVal);
-            break;
-
-        default:
-            Log::Error(Event::ParseStyle, "source type '%s' is not supported", typeVal.GetString());
-            continue;
-        }
-
-        if (source) {
-            sourcesMap.emplace(id, source.get());
-            sources.emplace_back(std::move(source));
-        }
+        sourcesMap.emplace(id, (*source).get());
+        sources.emplace_back(std::move(*source));
     }
 }
 

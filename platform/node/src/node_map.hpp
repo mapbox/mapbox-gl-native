@@ -26,6 +26,7 @@ public:
     static NAN_METHOD(Render);
     static NAN_METHOD(Release);
     static NAN_METHOD(AddClass);
+    static NAN_METHOD(AddSource);
     static NAN_METHOD(AddLayer);
     static NAN_METHOD(SetLayoutProperty);
     static NAN_METHOD(SetPaintProperty);

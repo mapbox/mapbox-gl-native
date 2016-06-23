@@ -2,9 +2,11 @@
 #include "node_request.hpp"
 #include "node_feature.hpp"
 #include "node_conversion.hpp"
+#include "node_geojson.hpp"
 
 #include <mbgl/platform/default/headless_display.hpp>
 #include <mbgl/util/exception.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 
@@ -56,6 +58,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "release", Release);
 
     Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
+    Nan::SetPrototypeMethod(tpl, "addSource", AddSource);
     Nan::SetPrototypeMethod(tpl, "addLayer", AddLayer);
     Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
@@ -482,6 +485,30 @@ NAN_METHOD(NodeMap::AddClass) {
     }
 
     info.GetReturnValue().SetUndefined();
+}
+
+NAN_METHOD(NodeMap::AddSource) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() != 2) {
+        return Nan::ThrowTypeError("Two argument required");
+    }
+
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(info[1], *Nan::Utf8String(info[0]));
+    if (!source) {
+        Nan::ThrowTypeError(source.error().message);
+        return;
+    }
+
+    nodeMap->map->addSource(std::move(*source));
 }
 
 NAN_METHOD(NodeMap::AddLayer) {

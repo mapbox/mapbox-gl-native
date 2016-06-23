@@ -4,14 +4,6 @@
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<VectorSource> VectorSource::Impl::parse(std::string id, const JSValue& value) {
-    optional<variant<std::string, Tileset>> urlOrTileset = TileSourceImpl::parseURLOrTileset(value);
-    if (!urlOrTileset) {
-        return nullptr;
-    }
-    return std::make_unique<VectorSource>(std::move(id), std::move(*urlOrTileset));
-}
-
 VectorSource::Impl::Impl(std::string id_, Source& base_, variant<std::string, Tileset> urlOrTileset_)
     : TileSourceImpl(SourceType::Vector, std::move(id_), base_, std::move(urlOrTileset_), util::tileSize) {
 }

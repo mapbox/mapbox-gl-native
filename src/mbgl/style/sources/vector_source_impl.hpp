@@ -8,8 +8,6 @@ namespace style {
 
 class VectorSource::Impl : public TileSourceImpl {
 public:
-    static std::unique_ptr<VectorSource> parse(std::string id, const JSValue&);
-
     Impl(std::string id, Source&, variant<std::string, Tileset>);
 
 private:

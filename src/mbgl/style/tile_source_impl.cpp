@@ -1,10 +1,10 @@
 #include <mbgl/style/tile_source_impl.hpp>
 #include <mbgl/style/source_observer.hpp>
-#include <mbgl/style/parser.hpp>
+#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/platform/log.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -13,73 +13,6 @@
 
 namespace mbgl {
 namespace style {
-
-namespace {
-
-void parseTileJSONMember(const JSValue& value, std::vector<std::string>& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsArray()) {
-        return;
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        if (!property[i].IsString()) {
-            return;
-        }
-    }
-
-    for (rapidjson::SizeType i = 0; i < property.Size(); i++) {
-        target.emplace_back(std::string(property[i].GetString(), property[i].GetStringLength()));
-    }
-}
-
-void parseTileJSONMember(const JSValue& value, std::string& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsString()) {
-        return;
-    }
-
-    target = { property.GetString(), property.GetStringLength() };
-}
-
-void parseTileJSONMember(const JSValue& value, uint8_t& target, const char* name) {
-    if (!value.HasMember(name)) {
-        return;
-    }
-
-    const JSValue& property = value[name];
-    if (!property.IsUint()) {
-        return;
-    }
-
-    unsigned int uint = property.GetUint();
-    if (uint > std::numeric_limits<uint8_t>::max()) {
-        return;
-    }
-
-    target = uint;
-}
-
-Tileset parseTileJSON(const JSValue& value) {
-    Tileset result;
-
-    parseTileJSONMember(value, result.tiles, "tiles");
-    parseTileJSONMember(value, result.zoomRange.min, "minzoom");
-    parseTileJSONMember(value, result.zoomRange.max, "maxzoom");
-    parseTileJSONMember(value, result.attribution, "attribution");
-
-    return result;
-}
-
-} // end namespace
 
 Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
@@ -91,30 +24,19 @@ Tileset TileSourceImpl::parseTileJSON(const std::string& json, const std::string
         throw std::runtime_error(message.str());
     }
 
-    Tileset result = mbgl::style::parseTileJSON(document);
+    conversion::Result<Tileset> result = conversion::convert<Tileset>(document);
+    if (!result) {
+        throw std::runtime_error(result.error().message);
+    }
 
     // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
     if (util::mapbox::isMapboxURL(sourceURL)) {
-        for (auto& url : result.tiles) {
+        for (auto& url : (*result).tiles) {
             url = util::mapbox::canonicalizeTileURL(url, type, tileSize);
         }
     }
 
-    return result;
-}
-
-optional<variant<std::string, Tileset>> TileSourceImpl::parseURLOrTileset(const JSValue& value) {
-    if (!value.HasMember("url")) {
-        return { mbgl::style::parseTileJSON(value) };
-    }
-
-    const JSValue& urlVal = value["url"];
-    if (!urlVal.IsString()) {
-        Log::Error(Event::ParseStyle, "source url must be a string");
-        return {};
-    }
-
-    return { std::string(urlVal.GetString(), urlVal.GetStringLength()) };
+    return *result;
 }
 
 TileSourceImpl::TileSourceImpl(SourceType type_, std::string id_, Source& base_,

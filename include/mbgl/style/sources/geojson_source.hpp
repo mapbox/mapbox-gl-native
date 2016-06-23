@@ -1,26 +1,22 @@
 #pragma once
 
 #include <mbgl/style/source.hpp>
+#include <mbgl/util/geojson.hpp>
 
 namespace mbgl {
 namespace style {
 
 class GeoJSONSource : public Source {
 public:
-    // Future public API:
-    // void setData(FeatureCollection&&);
-    // void setJSON(const std::string& json);
-    // void loadData(const std::string& url);
+    GeoJSONSource(const std::string& id);
 
+    void setURL(const std::string& url);
+    void setGeoJSON(GeoJSON&&);
 
     // Private implementation
 
     class Impl;
-
-    template <class Fn>
-    GeoJSONSource(Fn&& fn)
-        : Source(SourceType::GeoJSON, fn(*this)) {
-    }
+    Impl* const impl;
 };
 
 } // namespace style
