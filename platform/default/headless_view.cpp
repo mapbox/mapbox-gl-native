@@ -51,6 +51,8 @@ void HeadlessView::resize(const uint16_t width, const uint16_t height) {
 }
 
 std::shared_ptr<const PremultipliedImage> HeadlessView::readStillImage() {
+    MBGL_VERIFY_THREAD(tid);
+
     assert(active);
     assert(dimensions[0] <= dimensionsLimits[0]);
     assert(dimensions[1] <= dimensionsLimits[1]);

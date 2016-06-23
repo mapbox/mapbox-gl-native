@@ -3,6 +3,7 @@
 #include <mbgl/map/change.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <array>
 #include <functional>
@@ -58,6 +59,8 @@ public:
     virtual void notifyMapChange(MapChange change);
 
 protected:
+    MBGL_STORE_THREAD(tid);
+
     mbgl::Map *map = nullptr;
 };
 } // namespace mbgl
