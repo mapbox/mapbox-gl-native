@@ -1,10 +1,15 @@
 package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +38,7 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     private MapboxMap mMapboxMap;
     private Spinner mLocationSpinner, mBearingSpinner;
     private Location mLocation;
+    private static final int PERMISSIONS_LOCATION = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +63,9 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                 mMapboxMap = mapboxMap;
 
                 // disable dismissal when a gesture occurs
-                mMapboxMap.getTrackingSettings().setDismissLocationTrackingOnGesture(false);
-                mMapboxMap.getTrackingSettings().setDismissBearingTrackingOnGesture(false);
+                TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
+                trackingSettings.setDismissLocationTrackingOnGesture(false);
+                trackingSettings.setDismissBearingTrackingOnGesture(false);
 
                 mapboxMap.setOnMyLocationChangeListener(MyLocationTrackingModeActivity.this);
 
@@ -96,13 +103,46 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
                     }
                 });
 
-
-                mLocation = LocationServices.getLocationServices(MyLocationTrackingModeActivity.this).getLastLocation();
-                if(mLocation!=null){
-                    setInitialPosition(new LatLng(mLocation));
-                }
+                toggleGps(!mapboxMap.isMyLocationEnabled());
             }
         });
+    }
+
+    @UiThread
+    public void toggleGps(boolean enableGps) {
+        if (enableGps) {
+            if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                    (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+            } else {
+                enableLocation(true);
+            }
+        } else {
+            enableLocation(false);
+        }
+    }
+
+    private void enableLocation(boolean enabled) {
+        if (enabled) {
+            mMapboxMap.setMyLocationEnabled(true);
+            Location location = mMapboxMap.getMyLocation();
+            if (location != null) {
+                setInitialPosition(new LatLng(location));
+            }
+        } else {
+            mMapboxMap.setMyLocationEnabled(false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableLocation(true);
+                }
+            }
+        }
     }
 
     private void setInitialPosition(LatLng latLng){
