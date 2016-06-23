@@ -178,7 +178,11 @@ build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config
 android-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
 
-android-$1: android-lib-$1
+test-android-$1: node_modules android-lib-$1
+	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 test 
+
+android-lib-$1: build/android-$1/Makefile
+	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 apackage: android-lib-$1
@@ -188,11 +192,19 @@ $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 
 android: android-arm-v7
 
-test-android:
-	cd platform/android && ./gradlew testReleaseUnitTest --continue
+test-android: test-android-arm-v7
+#TODO Decide where to place the class files and other tmp outputs 
+	javac -sourcepath test/src -d build -source 1.7 -target 1.7 test/src/Main.java
+	cd build && dx --dex --output=test.jar Main.class
+	adb push build/test.jar /data/local/tmp/
+	adb shell "LD_LIBRARY_PATH=/data/local/tmp dalvikvm -cp /data/local/tmp/test.jar Main"	
+	#cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
+
+#test-android-arm-v7: node_modules android-lib-arm-v7
+#	$$(shell $(ANDROID_ENV) arm-v7) $(MAKE) -j$(JOBS) -C build/android-arm-v7 test
 
 #### Node targets #####################################################
 

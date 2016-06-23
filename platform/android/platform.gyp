@@ -6,6 +6,7 @@
   },
   'includes': [
     '../../mbgl.gypi',
+    '../../test/test.gypi',
   ],
   'targets': [
     {
@@ -114,6 +115,7 @@
       'dependencies': [
         'platform-lib',
         'example-custom-layer-lib',
+	'test',
       ],
 
       'variables': {
@@ -145,6 +147,40 @@
           'outputs': [ '<(DEPTH)/platform/android//MapboxGLAndroidSDKTestApp/src/main/jniLibs/$(JNIDIR)/libexample-custom-layer.so' ],
           'action': [ '$(STRIP)', '<@(_inputs)', '-o', '<@(_outputs)' ]
         }
+      ],
+    },
+    {
+      'target_name': 'test',
+      'product_name': 'test-jni-lib',
+      'type': 'shared_library',
+      'hard_dependency': 1,
+
+      'dependencies': [
+        'test-lib',
+        'platform-lib',
+      ],
+
+      'cflags_cc': [
+        '<@(jni.hpp_cflags)',
+      ],
+
+      'link_settings': {
+        'libraries': [
+          '-llog',
+          '-landroid',
+          '-lEGL',
+          '-lGLESv2',
+          '-lstdc++',
+          '-latomic',
+        ],
+      },
+
+      'sources': [
+        '../../test/src/main.jni.cpp',
+      ],
+
+      'include_dirs': [
+        '../../include',
       ],
     },
   ],

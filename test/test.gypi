@@ -18,73 +18,10 @@
       ],
 
       'sources': [
-        'util/async_task.cpp',
-        'util/geo.cpp',
-        'util/image.cpp',
-        'util/mapbox.cpp',
-        'util/memory.cpp',
-        'util/merge_lines.cpp',
-        'util/run_loop.cpp',
-        'util/number_conversions.cpp',
-        'util/text_conversions.cpp',
-        'util/thread.cpp',
-        'util/thread_local.cpp',
-        'util/tile_cover.cpp',
-        'util/timer.cpp',
-        'util/token.cpp',
-        'util/work_queue.cpp',
-        'util/projection.cpp',
-
         'algorithm/covered_by_children.cpp',
         'algorithm/generate_clip_ids.cpp',
         'algorithm/mock.hpp',
         'algorithm/update_renderables.cpp',
-
-        'api/annotations.cpp',
-        'api/api_misuse.cpp',
-        'api/repeated_render.cpp',
-        'api/render_missing.cpp',
-        'api/set_style.cpp',
-        'api/custom_layer.cpp',
-
-        'geometry/binpack.cpp',
-
-        'gl/object.cpp',
-
-        'map/map.cpp',
-        'map/transform.cpp',
-
-        'math/minmax.cpp',
-        'math/clamp.cpp',
-
-        'text/quads.cpp',
-
-        'tile/geometry_tile_data.cpp',
-        'tile/tile_id.cpp',
-
-        'storage/offline.cpp',
-        'storage/offline_database.cpp',
-        'storage/offline_download.cpp',
-        'storage/asset_file_source.cpp',
-        'storage/default_file_source.cpp',
-        'storage/http_file_source.cpp',
-        'storage/online_file_source.cpp',
-        'storage/headers.cpp',
-        'storage/resource.cpp',
-
-        'style/glyph_store.cpp',
-        'style/source.cpp',
-        'style/style.cpp',
-        'style/style_layer.cpp',
-        'style/tile_source.cpp',
-        'style/filter.cpp',
-        'style/functions.cpp',
-        'style/style_parser.cpp',
-
-        'sprite/sprite_atlas.cpp',
-        'sprite/sprite_image.cpp',
-        'sprite/sprite_parser.cpp',
-        'sprite/sprite_store.cpp',
 
         'src/mbgl/test/stub_file_source.hpp',
         'src/mbgl/test/stub_file_source.cpp',
@@ -105,11 +42,11 @@
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
-          '<@(earcut_cflags)',
+          '<@(earcut_cflags)'
         ],
         'ldflags': [
-          '<@(gtest_ldflags)',
-          '<@(sqlite_ldflags)',
+          '-landroid',
+	  '<@(sqlite_ldflags)',
         ],
         'libraries': [
           '<@(gtest_static_libs)',
