@@ -118,8 +118,7 @@ public class MarkerViewManager {
                 if (marker.getOffsetX() == -1) {
                     int x = (int) (marker.getAnchorU() * convertView.getMeasuredWidth());
                     int y = (int) (marker.getAnchorV() * convertView.getMeasuredHeight());
-                    marker.setOffsetX(x);
-                    marker.setOffsetY(y);
+                    marker.setOffset(x, y);
                 }
 
                 convertView.setX(point.x - marker.getOffsetX());
@@ -247,6 +246,8 @@ public class MarkerViewManager {
             for (final MapboxMap.MarkerViewAdapter<?> adapter : markerViewAdapters) {
                 if (adapter.getMarkerClass().equals(marker.getClass())) {
                     if (adapter.prepareViewForReuse(marker, viewHolder)) {
+                        // reset offset for reuse
+                        marker.setOffset(-1, -1);
                         adapter.releaseView(viewHolder);
                     }
                 }
@@ -417,11 +418,9 @@ public class MarkerViewManager {
 
             // update position on map
             if (marker.getOffsetX() == -1) {
-            PointF point = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
                 int x = (int) (marker.getAnchorU() * view.getMeasuredWidth());
                 int y = (int) (marker.getAnchorV() * view.getMeasuredHeight());
-                marker.setOffsetX(x);
-                marker.setOffsetY(y);
+                marker.setOffset(x, y);
             }
 
             // InfoWindow offset

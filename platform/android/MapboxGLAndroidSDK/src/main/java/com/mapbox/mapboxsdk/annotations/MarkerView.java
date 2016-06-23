@@ -86,6 +86,7 @@ public class MarkerView extends Marker {
     public void setAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
+        setOffset(-1, -1);
     }
 
     /**
@@ -107,26 +108,16 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Internal method to set the horizontal calculated offset.
+     * Internal method to set the calculated offset.
      * <p>
      * These are calculated based on the View bounds and the provided anchor.
      * </p>
      *
      * @param x the x-value of the offset
-     */
-    void setOffsetX(float x) {
-        offsetX = x;
-    }
-
-    /**
-     * Internal method to set the vertical calculated offset.
-     * <p>
-     * These are calculated based on the View bounds and the provided anchor.
-     * </p>
-     *
      * @param y the y-value of the offset
      */
-    void setOffsetY(float y) {
+    void setOffset(float x, float y) {
+        offsetX = x;
         offsetY = y;
     }
 
