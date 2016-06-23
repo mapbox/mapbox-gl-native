@@ -32,6 +32,8 @@ sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' platform/io
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
+cp platform/ios/screenshot.png "${OUTPUT}"
+
 jazzy \
     --config platform/ios/jazzy.yml \
     --sdk iphonesimulator \
