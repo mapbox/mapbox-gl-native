@@ -4,6 +4,12 @@
 #include <cassert>
 #include <cstring>
 
+namespace {
+
+std::array<uint16_t, 2> dimensionsLimits = {{ 4096, 4096 }};
+
+}
+
 namespace mbgl {
 
 HeadlessView::HeadlessView(float pixelRatio_, uint16_t width, uint16_t height)
@@ -32,25 +38,38 @@ HeadlessView::~HeadlessView() {
 }
 
 void HeadlessView::resize(const uint16_t width, const uint16_t height) {
-    if(dimensions[0] == width &&
-       dimensions[1] == height) {
+    if (dimensions[0] == width && dimensions[1] == height) {
         return;
     }
+
+    if (width > dimensionsLimits[0] || height > dimensionsLimits[1]) {
+        return;
+    }
+
     dimensions = {{ width, height }};
     needsResize = true;
 }
 
 std::shared_ptr<const PremultipliedImage> HeadlessView::readStillImage() {
     assert(active);
+    assert(dimensions[0] <= dimensionsLimits[0]);
+    assert(dimensions[1] <= dimensionsLimits[1]);
+
+    static auto image = std::make_shared<PremultipliedImage>(
+        dimensionsLimits[0] * pixelRatio, dimensionsLimits[1] * pixelRatio);
+
+    static auto tmp = std::make_unique<uint8_t[]>(image->stride());
 
     const unsigned int w = dimensions[0] * pixelRatio;
     const unsigned int h = dimensions[1] * pixelRatio;
 
-    auto image = std::make_shared<PremultipliedImage>(w, h);
     MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image->data.get()));
 
+    image->height = h;
+    image->width = w;
+
     const auto stride = image->stride();
-    auto tmp = std::make_unique<uint8_t[]>(stride);
+
     uint8_t* rgba = image->data.get();
     for (int i = 0, j = h - 1; i < j; i++, j--) {
         std::memcpy(tmp.get(), rgba + i * stride, stride);
