@@ -27,7 +27,7 @@ TEST(AssetFileSource, Load) {
     AssetFileSource fs(getFileSourceRoot());
 
     // iOS seems to run out of file descriptors...
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE || __ANDROID__
     unsigned numThreads = 30;
 #else
     unsigned numThreads = 50;

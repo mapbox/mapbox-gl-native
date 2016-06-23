@@ -1703,9 +1703,12 @@ void updateOfflineRegionMetadata(JNIEnv *env, jni::jobject* offlineRegion_, jni:
 
 // Offline calls end
 
-}
+} // anonymous
 
-extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+namespace mbgl {
+namespace android {
+
+void registerNatives(JavaVM *vm) {
     theJVM = vm;
 
     jni::JNIEnv& env = jni::GetEnv(*vm, jni::jni_version_1_6);
@@ -1988,6 +1991,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     char release[PROP_VALUE_MAX] = "";
     __system_property_get("ro.build.version.release", release);
     androidRelease = std::string(release);
-
-    return JNI_VERSION_1_6;
 }
+    
+} // android
+} // mbgl

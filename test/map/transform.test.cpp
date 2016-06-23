@@ -109,7 +109,13 @@ TEST(Transform, IntegerZoom) {
     auto checkIntegerZoom = [&transform](uint8_t zoomInt, double zoom) {
         double scale = transform.getState().zoomScale(zoom);
         transform.setScale(scale);
+#if __ANDROID__
+        // Android uses log(x) / M_LN2 instead of log2(x) because the latter
+        // is _broken in ARMv5 - that approach being less precise than log2(x).
+        ASSERT_NEAR(transform.getScale(), scale, 0.0001);
+#else
         ASSERT_DOUBLE_EQ(transform.getScale(), scale);
+#endif
         ASSERT_NEAR(transform.getZoom(), zoom, 0.0001);
         ASSERT_EQ(transform.getState().getIntegerZoom(), zoomInt);
         ASSERT_NEAR(transform.getState().getZoomFraction(), zoom - zoomInt, 0.0001);

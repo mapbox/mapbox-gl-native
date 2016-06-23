@@ -467,8 +467,9 @@ test-node: node
 
 #### Android targets ###########################################################
 
-ANDROID_ENV = platform/android/scripts/toolchain.sh
-ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+MBGL_ANDROID_ENV = platform/android/scripts/toolchain.sh
+MBGL_ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 
 .PHONY: android-style-code
 android-style-code:
@@ -481,7 +482,7 @@ build/android-$1/$(BUILDTYPE): $(BUILD_DEPS)
 	mkdir -p build/android-$1/$(BUILDTYPE)
 
 build/android-$1/$(BUILDTYPE)/toolchain.cmake: platform/android/scripts/toolchain.sh build/android-$1/$(BUILDTYPE)
-	$(ANDROID_ENV) $1 > build/android-$1/$(BUILDTYPE)/toolchain.cmake
+	$(MBGL_ANDROID_ENV) $1 > build/android-$1/$(BUILDTYPE)/toolchain.cmake
 
 build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.cmake platform/android/config.cmake
 	cd build/android-$1/$(BUILDTYPE) && cmake ../../.. -G Ninja \
@@ -489,6 +490,10 @@ build/android-$1/$(BUILDTYPE)/Makefile: build/android-$1/$(BUILDTYPE)/toolchain.
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DMBGL_PLATFORM=android
+
+.PHONY: android-test-lib-$1
+android-test-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C build/android-$1/$(BUILDTYPE) mbgl-test-stripped
 
 .PHONY: android-lib-$1
 android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
@@ -498,6 +503,37 @@ android-lib-$1: build/android-$1/$(BUILDTYPE)/Makefile
 android-$1: android-lib-$1
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
+run-android-core-test-$1: android-lib-$1 android-test-lib-$1
+	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
+	cd platform/android && ./gradlew assembleDebug
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1/$(BUILDTYPE)
+	
+	#Compile Test runner
+	find platform/android/src/test -name "*.java" > build/android-$1/$(BUILDTYPE)/java-sources.txt
+	javac -sourcepath platform/android/src/test -d build/android-$1/$(BUILDTYPE) -source 1.7 -target 1.7 @build/android-$1/$(BUILDTYPE)/java-sources.txt
+	#Combine and dex
+	cd build/android-$1/$(BUILDTYPE) && $(ANDROID_HOME)/build-tools/25.0.0/dx --dex --output=test.jar *.class classes.dex
+
+	#Ensure clean state on the device
+	adb shell "rm -Rf $(MBGL_ANDROID_LOCAL_WORK_DIR) && mkdir -p $(MBGL_ANDROID_LOCAL_WORK_DIR)/test"
+
+	# Generate zipped asset files
+	cd test/fixtures/api && zip -r assets.zip assets && cd -
+	cd test/fixtures/storage && zip -r assets.zip assets && cd -
+
+	#Push all needed files to the device
+	adb push build/android-$1/$(BUILDTYPE)/test.jar $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push test/fixtures $(MBGL_ANDROID_LOCAL_WORK_DIR)/test > /dev/null 2>&1
+	adb push build/android-$1/$(BUILDTYPE)/stripped/libmapbox-gl.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+	adb push build/android-$1/$(BUILDTYPE)/stripped/libmbgl-test.so $(MBGL_ANDROID_LOCAL_WORK_DIR) > /dev/null 2>&1
+
+	#Kick off the tests
+	adb shell "export LD_LIBRARY_PATH=/system/lib:$(MBGL_ANDROID_LOCAL_WORK_DIR) && cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(MBGL_ANDROID_LOCAL_WORK_DIR)/test.jar Main"
+
+	#Gather the results
+	adb shell "cd $(MBGL_ANDROID_LOCAL_WORK_DIR) && tar -cvzf results.tgz test/fixtures/*  > /dev/null 2>&1"
+	adb pull $(MBGL_ANDROID_LOCAL_WORK_DIR)/results.tgz build/android-$1/$(BUILDTYPE)/ > /dev/null 2>&1
+
 .PHONY: run-android-$1
 run-android-$1: android-$1
 	cd platform/android  && ./gradlew :MapboxGLAndroidSDKTestApp:installDebug && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity	
@@ -505,7 +541,7 @@ run-android-$1: android-$1
 apackage: android-lib-$1
 endef
 
-$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
+$(foreach abi,$(MBGL_ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 
 .PHONY: android
 android: android-arm-v7
