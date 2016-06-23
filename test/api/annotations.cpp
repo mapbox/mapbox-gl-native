@@ -29,7 +29,7 @@ public:
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
-                         test::render(map), 0.0002, 0.1);
+                         *test::render(map), 0.0002, 0.1);
     }
 };
 

@@ -86,13 +86,13 @@ Server::~Server() {
     }
 }
 
-PremultipliedImage render(Map& map) {
-    PremultipliedImage result;
-    map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
-        result = std::move(image);
+std::shared_ptr<const PremultipliedImage> render(Map& map) {
+    std::shared_ptr<const PremultipliedImage> result;
+    map.renderStill([&result](std::exception_ptr, std::shared_ptr<const PremultipliedImage> image) {
+        result = image;
     });
 
-    while (!result.size()) {
+    while (!result) {
         util::RunLoop::Get()->runOnce();
     }
 

@@ -10,8 +10,8 @@ void View::initialize(Map *map_) {
     map = map_;
 }
 
-PremultipliedImage View::readStillImage() {
-    return {};
+std::shared_ptr<const PremultipliedImage> View::readStillImage() {
+    return nullptr;
 }
 
 void View::notifyMapChange(MapChange) {

@@ -90,5 +90,5 @@ TEST(CustomLayer, Basic) {
             delete reinterpret_cast<TestLayer*>(context);
         }, new TestLayer()));
 
-    test::checkImage("test/fixtures/custom_layer/basic", test::render(map));
+    test::checkImage("test/fixtures/custom_layer/basic", *test::render(map));
 }

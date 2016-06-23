@@ -33,37 +33,37 @@ TEST(API, RepeatedRender) {
 
     {
         map.setStyleJSON(style);
-        PremultipliedImage result;
-        map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
-            result = std::move(image);
+        std::shared_ptr<const PremultipliedImage> result;
+        map.renderStill([&result](std::exception_ptr, std::shared_ptr<const PremultipliedImage> image) {
+            result = image;
         });
 
-        while (!result.size()) {
+        while (!result) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256u, result.width);
-        ASSERT_EQ(512u, result.height);
+        ASSERT_EQ(256u, result->width);
+        ASSERT_EQ(512u, result->height);
 #if !TEST_READ_ONLY
-        util::write_file("test/fixtures/api/1.png", encodePNG(result));
+        util::write_file("test/fixtures/api/1.png", encodePNG(*result));
 #endif
     }
 
     {
         map.setStyleJSON(style);
-        PremultipliedImage result;
-        map.renderStill([&result](std::exception_ptr, PremultipliedImage&& image) {
-            result = std::move(image);
+        std::shared_ptr<const PremultipliedImage> result;
+        map.renderStill([&result](std::exception_ptr, std::shared_ptr<const PremultipliedImage> image) {
+            result = image;
         });
 
-        while (!result.size()) {
+        while (!result) {
             loop.runOnce();
         }
 
-        ASSERT_EQ(256u, result.width);
-        ASSERT_EQ(512u, result.height);
+        ASSERT_EQ(256u, result->width);
+        ASSERT_EQ(512u, result->height);
 #if !TEST_READ_ONLY
-        util::write_file("test/fixtures/api/2.png", encodePNG(result));
+        util::write_file("test/fixtures/api/2.png", encodePNG(*result));
 #endif
     }
 

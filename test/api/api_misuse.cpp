@@ -50,7 +50,7 @@ TEST(API, RenderWithoutStyle) {
     Map map(view, fileSource, MapMode::Still);
 
     std::exception_ptr error;
-    map.renderStill([&](std::exception_ptr error_, PremultipliedImage&&) {
+    map.renderStill([&](std::exception_ptr error_, std::shared_ptr<const PremultipliedImage>) {
         error = error_;
         loop.stop();
     });
