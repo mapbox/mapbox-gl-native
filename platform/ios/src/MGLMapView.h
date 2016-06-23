@@ -43,9 +43,10 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
     /** Edges of glyphs and symbols are shown as faint, green lines to help
         diagnose collision and label placement issues. */
     MGLMapDebugCollisionBoxesMask = 1 << 4,
-    /** Line widths, backgrounds, and fill colors are ignored to create a
-        wireframe effect. */
-    MGLMapDebugWireframesMask = 1 << 5,
+    /** Each drawing operation is replaced by a translucent fill. Overlapping
+        drawing operations appear more prominent to help diagnose overdrawing.
+     */
+    MGLMapDebugOverdrawVisualizationMask = 1 << 5,
 };
 
 /**

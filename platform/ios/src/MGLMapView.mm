@@ -1831,7 +1831,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     }
     if (options & mbgl::MapDebugOptions::Wireframe)
     {
-        mask |= MGLMapDebugWireframesMask;
+        mask |= MGLMapDebugOverdrawVisualizationMask;
     }
     return mask;
 }
@@ -1855,7 +1855,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     {
         options |= mbgl::MapDebugOptions::Collision;
     }
-    if (debugMask & MGLMapDebugWireframesMask)
+    if (debugMask & MGLMapDebugOverdrawVisualizationMask)
     {
         options |= mbgl::MapDebugOptions::Wireframe;
     }

@@ -181,9 +181,9 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         ((debugMask & MGLMapDebugCollisionBoxesMask)
          ? @"Hide Collision Boxes"
          : @"Show Collision Boxes"),
-        ((debugMask & MGLMapDebugWireframesMask)
-         ? @"Hide Wireframes"
-         : @"Show Wireframes"),
+        ((debugMask & MGLMapDebugOverdrawVisualizationMask)
+         ? @"Hide Overdraw Visualization"
+         : @"Show Overdraw Visualization"),
         @"Add 100 Points",
         @"Add 1,000 Points",
         @"Add 10,000 Points",
@@ -226,7 +226,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 5)
     {
-        self.mapView.debugMask ^= MGLMapDebugWireframesMask;
+        self.mapView.debugMask ^= MGLMapDebugOverdrawVisualizationMask;
     }
     else if (buttonIndex == actionSheet.firstOtherButtonIndex + 6)
     {

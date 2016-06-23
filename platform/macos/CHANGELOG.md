@@ -1,6 +1,9 @@
 # Changelog for Mapbox macOS SDK
 
 ## master
+* Replaced the wireframe debug mask with an overdraw visualization debug mask to match Mapbox GL JS’s overdraw inspector. ([#5403](https://github.com/mapbox/mapbox-gl-native/pull/5403))
+
+## 0.2.0
 
 * Renamed the SDK to the Mapbox macOS SDK.
 * Fixed an issue in which Mapbox.framework was nested inside another folder named Mapbox.framework. ([#4998](https://github.com/mapbox/mapbox-gl-native/pull/4998))
