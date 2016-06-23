@@ -332,6 +332,12 @@ public class MarkerView extends Marker {
     @Override
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
+
+        if(isFlat()) {
+            // initial tilt value if MapboxMap is started with a tilt attribute
+            tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+        }
+
         markerViewManager = mapboxMap.getMarkerViewManager();
     }
 

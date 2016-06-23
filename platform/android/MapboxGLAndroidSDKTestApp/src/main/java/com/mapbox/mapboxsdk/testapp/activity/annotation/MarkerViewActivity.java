@@ -163,8 +163,6 @@ public class MarkerViewActivity extends AppCompatActivity {
                         .icon(IconFactory.getInstance(mMapView.getContext())
                                 .fromResource(R.drawable.ic_arsenal))
                 );
-
-                mMapboxMap.getUiSettings().setFocalPoint(new PointF(mMapView.getMeasuredWidth() / 2, mMapView.getMeasuredHeight() / 4));
             }
         });
     }
