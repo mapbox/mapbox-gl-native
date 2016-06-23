@@ -359,7 +359,7 @@ public class MarkerViewManager {
                             adaptedView.setAlpha(marker.getAlpha());
 
                             // visible
-                            adaptedView.setVisibility(marker.isVisible() ? View.VISIBLE : View.GONE);
+                            adaptedView.setVisibility(View.GONE);
 
                             if (mapboxMap.getSelectedMarkers().contains(marker)) {
                                 // if a marker to be shown was selected
@@ -386,6 +386,7 @@ public class MarkerViewManager {
 
                             markerViewMap.put(marker, adaptedView);
                             if (convertView == null) {
+                                adaptedView.setVisibility(View.GONE);
                                 mapView.getMarkerViewContainer().addView(adaptedView);
                             }
                         }
