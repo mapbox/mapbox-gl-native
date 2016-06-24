@@ -4542,7 +4542,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 
                 CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 [annotationView setCenter:center pitch:self.camera.pitch];
-                
+                annotationView.mapView = self;
                 annotationContext.annotationView = annotationView;
             }
         }

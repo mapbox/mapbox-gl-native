@@ -411,6 +411,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
     {
+        /*
         CGPoint point = [longPress locationInView:longPress.view];
         NSArray *features = [self.mapView visibleFeaturesAtPoint:point];
         NSString *title;
@@ -427,6 +428,7 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
         // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
         [self.mapView selectAnnotation:pin animated:YES];
+        */
     }
 }
 
@@ -590,6 +592,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         // uncomment to flatten the annotation view against the map when the map is tilted
         // this currently causes severe performance issues when more than 2k annotations are visible
         // annotationView.flat = YES;
+        
+        // uncomment to make the annotation view draggable
+        // also note that having two long press gesture recognizers on overlapping views (`self.view` & `annotationView`) will cause weird behaviour
+        // comment out the pin dropping functionality in the handleLongPress: method in this class to make draggable annotation views play nice
+        annotationView.draggable = YES;
+
        
         // uncomment to force annotation view to maintain a constant size when the map is tilted
         // by default, annotation views will shrink and grow as the move towards and away from the
@@ -601,6 +609,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         annotationView.centerColor = [UIColor orangeColor];
     }
     return annotationView;
+}
+
+- (void)mapView:(MGLMapView *)mapView didDragAnnotationView:(nonnull MGLAnnotationView *)annotationView toCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    MGLPointAnnotation *annotation = (MGLPointAnnotation *)annotationView.annotation;
+    annotation.coordinate = coordinate;
 }
 
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
