@@ -51,7 +51,8 @@ public:
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;
-    mbgl::PremultipliedImage image;
+    std::shared_ptr<const mbgl::PremultipliedImage> image =
+        std::make_shared<const mbgl::PremultipliedImage>(0,0);
     std::unique_ptr<Nan::Callback> callback;
 
     // Async for delivering the notifications of render completion.

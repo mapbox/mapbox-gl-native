@@ -340,7 +340,7 @@ NAN_METHOD(NodeMap::Render) {
     auto options = ParseOptions(info[0]->ToObject());
 
     assert(!nodeMap->callback);
-    assert(!nodeMap->image.data);
+    assert(!nodeMap->image->size());
     nodeMap->callback = std::make_unique<Nan::Callback>(info[1].As<v8::Function>());
 
     try {
@@ -361,13 +361,13 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     map->setPitch(options.pitch);
     map->setDebug(options.debugOptions);
 
-    map->renderStill([this](const std::exception_ptr eptr, mbgl::PremultipliedImage&& result) {
+    map->renderStill([this](const std::exception_ptr eptr, std::shared_ptr<const mbgl::PremultipliedImage> result) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
         } else {
-            assert(!image.data);
-            image = std::move(result);
+            assert(!image->size());
+            image.swap(result);
             uv_async_send(async);
         }
     });
@@ -392,13 +392,13 @@ void NodeMap::renderFinished() {
     Unref();
 
     // Move the callback and image out of the way so that the callback can start a new render call.
-    auto cb = std::move(callback);
-    auto img = std::move(image);
-    assert(cb);
+    auto cb = callback.release();
+    auto img = std::make_shared<const mbgl::PremultipliedImage>(0,0);
+    img.swap(image);
 
     // These have to be empty to be prepared for the next render call.
     assert(!callback);
-    assert(!image.data);
+    assert(!image->size());
 
     if (error) {
         std::string errorMessage;
@@ -418,16 +418,11 @@ void NodeMap::renderFinished() {
         assert(!error);
 
         cb->Call(1, argv);
-    } else if (img.data) {
+    } else if (img->size()) {
         v8::Local<v8::Object> pixels = Nan::NewBuffer(
-            reinterpret_cast<char *>(img.data.get()), img.size(),
-            // Retain the data until the buffer is deleted.
-            [](char *, void * hint) {
-                delete [] reinterpret_cast<uint8_t*>(hint);
-            },
-            img.data.get()
+            reinterpret_cast<char *>(img->data.get()), img->size()
         ).ToLocalChecked();
-        img.data.release();
+        img.reset();
 
         v8::Local<v8::Value> argv[] = {
             Nan::Null(),
