@@ -1350,10 +1350,6 @@ public class MapView extends FrameLayout {
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
 
         private Surface mSurface;
-        private View mViewHolder;
-
-        private static final int VIEW_MARKERS_POOL_SIZE = 20;
-
 
         // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
