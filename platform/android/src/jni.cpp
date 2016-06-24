@@ -721,10 +721,12 @@ Geometry toGeometry(JNIEnv *env, jni::jobject* jlist) {
         reinterpret_cast<jni::jarray<jni::jobject>*>(jni::CallMethod<jni::jobject*>(*env, jlist, *listToArrayId));
     NullCheck(*env, jarray);
 
-    Geometry geometry;
-    geometry.reserve(jni::GetArrayLength(*env, *jarray));
+    std::size_t size = jni::GetArrayLength(*env, *jarray);
 
-    for (std::size_t i = 0; i < geometry.size(); i++) {
+    Geometry geometry;
+    geometry.reserve(size);
+
+    for (std::size_t i = 0; i < size; i++) {
         jni::jobject* latLng = reinterpret_cast<jni::jobject*>(jni::GetObjectArrayElement(*env, *jarray, i));
         NullCheck(*env, latLng);
 
