@@ -226,6 +226,8 @@ TEST(OfflineDownload, Activate) {
             EXPECT_EQ(status.requiredResourceCount, computedStatus.requiredResourceCount);
             EXPECT_EQ(status.completedResourceCount, computedStatus.completedResourceCount);
             EXPECT_EQ(status.completedResourceSize, computedStatus.completedResourceSize);
+            EXPECT_EQ(status.completedTileCount, computedStatus.completedTileCount);
+            EXPECT_EQ(status.completedTileSize, computedStatus.completedTileSize);
             EXPECT_TRUE(status.requiredResourceCountIsPrecise);
 
             test.loop.stop();
