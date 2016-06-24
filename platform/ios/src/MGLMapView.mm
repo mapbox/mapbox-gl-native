@@ -2934,6 +2934,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [self updateAnnotationContainerViewWithAnnotationViews:newAnnotationViews];
     
     [self didChangeValueForKey:@"annotations"];
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:didAddAnnotationViews:)])
+    {
+        [self.delegate mapView:self didAddAnnotationViews:newAnnotationViews];
+    }
+    
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 

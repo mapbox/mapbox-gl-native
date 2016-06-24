@@ -131,15 +131,6 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Managing the Display of Annotations
 
 /**
- Returns a view object to use for the marker for the specified point annotation object.
- 
- @param mapView The map view that requested the annotation view.
- @param annotation The object representing the annotation that is about to be displayed.
- @return The view object to display for the specified annotation or `nil` if you want to display the default marker image.
- */
-- (nullable MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation;
-
-/**
  Returns an image object to use for the marker for the specified point annotation object.
  
  @param mapView The map view that requested the annotation image.
@@ -279,7 +270,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation;
 
-
 /**
  Tells the delegate that one of its annotation views was selected.
  
@@ -299,6 +289,27 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotationView The annotation view that was deselected.
  */
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotationView:(MGLAnnotationView *)annotationView;
+
+#pragma mark Managing annotation views
+
+/**
+ Returns a view object to use for the marker for the specified point annotation object.
+ 
+ @param mapView The map view that requested the annotation view.
+ @param annotation The object representing the annotation that is about to be displayed.
+ @return The view object to display for the specified annotation or `nil` if you want to display the default marker image.
+ */
+- (nullable MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id <MGLAnnotation>)annotation;
+
+/**
+ Tells the delegate that new annotation views have been added and positioned on the map.
+ 
+ You can use this method to animate the adding of the annotation views.
+ 
+ @param mapView The map view containing the annotation views.
+ @param annotationViews The annotation views that was added.
+ */
+- (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NS_ARRAY_OF(MGLAnnotationView *) *)annotationViews;
 
 /**
  Tells the delegate that one if its annotation views was dragged to a new coordinate.
