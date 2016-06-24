@@ -88,6 +88,10 @@ const CLLocationDirection MGLToleranceForSnappingToNorth = 7;
 /// Reuse identifier and file name of the default point annotation image.
 static NSString * const MGLDefaultStyleMarkerSymbolName = @"default_marker";
 
+/// Reuse identifier and file name of the invisible point annotation image used
+/// by annotations that are visually backed by MGLAnnotationView objects
+static NSString * const MGLInvisibleStyleMarkerSymbolName = @"invisible_marker";
+
 /// Prefix that denotes a sprite installed by MGLMapView, to avoid collisions
 /// with style-defined sprites.
 NSString *const MGLAnnotationSpritePrefix = @"com.mapbox.sprites.";
@@ -2861,6 +2865,14 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                     annotationView.annotation = annotation;
                     annotationView.center = [self convertCoordinate:annotation.coordinate toPointToView:self];
                     [newAnnotationViews addObject:annotationView];
+                  
+                    MGLAnnotationImage *annotationImage = self.invisibleAnnotationImage;
+                    symbolName = annotationImage.styleIconIdentifier;
+                    annotationImagesForAnnotation[annotationValue] = annotationImage;
+                    if ( ! self.annotationImagesByIdentifier[annotationImage.reuseIdentifier])
+                    {
+                        [self installAnnotationImage:annotationImage];
+                    }
                 }
             }
             
@@ -2897,22 +2909,21 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
             MGLAnnotationTag annotationTag = _mbglMap->addAnnotation(mbgl::SymbolAnnotation {
                 MGLPointFromLocationCoordinate2D(annotation.coordinate),
-                symbolName.UTF8String ?: ""
+                symbolName.UTF8String
             });
 
             MGLAnnotationContext context;
             context.annotation = annotation;
             MGLAnnotationImage *annotationImage = annotationImagesForAnnotation[annotationValue];
+            context.imageReuseIdentifier = annotationImage.reuseIdentifier;
 
-            if (annotationImage) {
-                context.imageReuseIdentifier = annotationImage.reuseIdentifier;
-            }
             if (annotationView) {
                 context.annotationView = annotationView;
                 context.viewReuseIdentifier = annotationView.reuseIdentifier;
             }
             
             _annotationContextsByAnnotationTag[annotationTag] = context;
+
             if ([annotation isKindOfClass:[NSObject class]]) {
                 NSAssert(![annotation isKindOfClass:[MGLMultiPoint class]], @"Point annotation should not be MGLMultiPoint.");
                 [(NSObject *)annotation addObserver:self forKeyPath:@"coordinate" options:0 context:(void *)(NSUInteger)annotationTag];
@@ -2959,6 +2970,23 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     MGLAnnotationImage *annotationImage = [MGLAnnotationImage annotationImageWithImage:image
                                                                        reuseIdentifier:MGLDefaultStyleMarkerSymbolName];
     annotationImage.styleIconIdentifier = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+    return annotationImage;
+}
+
+- (MGLAnnotationImage *)invisibleAnnotationImage
+{
+    MGLAnnotationImage *annotationImage = [self dequeueReusableAnnotationImageWithIdentifier:MGLInvisibleStyleMarkerSymbolName];
+    
+    if (!annotationImage)
+    {
+        UIGraphicsBeginImageContext(CGSizeMake(1, 1));
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        annotationImage = [MGLAnnotationImage annotationImageWithImage:image
+                                                                           reuseIdentifier:MGLInvisibleStyleMarkerSymbolName];
+        annotationImage.styleIconIdentifier = [MGLAnnotationSpritePrefix stringByAppendingString:annotationImage.reuseIdentifier];
+    }
+    
     return annotationImage;
 }
 
