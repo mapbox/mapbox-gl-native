@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Camera;
@@ -93,6 +92,8 @@ public class MyLocationView extends View {
     private Matrix matrix;
     private Camera camera;
     private PointF screenLocation;
+
+    private float direction;
     private float tilt;
 
     @MyLocationTracking.Mode
@@ -262,7 +263,7 @@ public class MyLocationView extends View {
 
         // apply tilt to camera
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate(tilt, 0, direction);
 
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
@@ -301,6 +302,15 @@ public class MyLocationView extends View {
 
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
         this.tilt = (float) tilt;
+    }
+
+    public void setBearing(double bearing) {
+        this.direction = (float) bearing;
+    }
+
+    public void updateCameraPosition(@FloatRange(from = 0, to = 60.0f) double tilt, double bearing) {
+        this.tilt = (float) tilt;
+        this.direction = (float) bearing;
     }
 
     void updateOnNextFrame() {
@@ -350,8 +360,8 @@ public class MyLocationView extends View {
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state){
-        if (state instanceof Bundle){
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             tilt = bundle.getFloat("tilt");
             state = bundle.getParcelable("superState");

@@ -1178,9 +1178,10 @@ public class MapView extends FrameLayout {
         }
         mNativeMapView.cancelTransitions();
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
+        mMyLocationView.updateCameraPosition(pitch, bearing);
     }
 
-    void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
+    void easeTo(final double bearing, LatLng center, long duration, final double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mDestroyed) {
             return;
         }
@@ -1193,6 +1194,8 @@ public class MapView extends FrameLayout {
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
+
+                        mMyLocationView.updateCameraPosition(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1204,7 +1207,7 @@ public class MapView extends FrameLayout {
         mNativeMapView.easeTo(bearing, center, duration, pitch, zoom, easingInterpolator);
     }
 
-    void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
+    void flyTo(final double bearing, LatLng center, long duration, final double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mDestroyed) {
             return;
         }
@@ -1217,6 +1220,8 @@ public class MapView extends FrameLayout {
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
+
+                        mMyLocationView.updateCameraPosition(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1410,6 +1415,7 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing, centerX, centerY);
+        mMyLocationView.setBearing(bearing);
     }
 
     void setBearing(float bearing) {
@@ -1417,6 +1423,7 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing);
+        mMyLocationView.setBearing(bearing);
     }
 
     void setBearing(float bearing, long duration) {
@@ -1424,6 +1431,7 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing, duration);
+        mMyLocationView.setBearing(bearing);
     }
 
     //
