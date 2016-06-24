@@ -635,6 +635,7 @@ public class MapView extends FrameLayout {
         }
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
+        mMyLocationView.setBearing(0);
     }
 
     //
@@ -720,7 +721,7 @@ public class MapView extends FrameLayout {
         }
 
         // work around to invalidate camera position
-        postDelayed(new ZoomInvalidator(mMapboxMap), MapboxConstants.ANIMATION_DURATION);
+        postDelayed(new ZoomInvalidator(mMapboxMap, mMyLocationView), MapboxConstants.ANIMATION_DURATION);
     }
 
     //
@@ -1178,7 +1179,7 @@ public class MapView extends FrameLayout {
         }
         mNativeMapView.cancelTransitions();
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
-        mMyLocationView.updateCameraPosition(pitch, bearing);
+        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
     }
 
     void easeTo(final double bearing, LatLng center, long duration, final double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
@@ -1195,7 +1196,7 @@ public class MapView extends FrameLayout {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
 
-                        mMyLocationView.updateCameraPosition(pitch, bearing);
+                        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1221,7 +1222,7 @@ public class MapView extends FrameLayout {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
 
-                        mMyLocationView.updateCameraPosition(pitch, bearing);
+                        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1363,7 +1364,7 @@ public class MapView extends FrameLayout {
                 return;
             }
 
-            mCompassView.update(getBearing());
+            mCompassView.update(mMapboxMap.getCameraPosition().bearing);
             mMyLocationView.update();
 
             try {
@@ -1375,15 +1376,6 @@ public class MapView extends FrameLayout {
                 infoWindow.update();
             }
         }
-    }
-
-    // Used by UserLocationView
-    void update() {
-        if (mDestroyed) {
-            return;
-        }
-
-        mNativeMapView.update();
     }
 
     CameraPosition invalidateCameraPosition() {
@@ -1813,6 +1805,10 @@ public class MapView extends FrameLayout {
             mBeginTime = 0;
             mScaleFactor = 1.0f;
             mZoomStarted = false;
+
+            if (mMyLocationView.isEnabled()) {
+                mMyLocationView.invalidateZoom();
+            }
         }
 
         // Called each time a finger moves
@@ -1850,7 +1846,7 @@ public class MapView extends FrameLayout {
 
             // Scale the map
             if (mFocalPoint != null) {
-                // arround user provided focal point
+                // around user provided focal point
                 mNativeMapView.scaleBy(detector.getScaleFactor(), mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
             } else if (mQuickZoom) {
                 // around center map
@@ -2713,15 +2709,20 @@ public class MapView extends FrameLayout {
     private static class ZoomInvalidator implements Runnable {
 
         private MapboxMap mapboxMap;
+        private MyLocationView myLocationView;
 
-        public ZoomInvalidator(MapboxMap mapboxMap) {
+        public ZoomInvalidator(MapboxMap mapboxMap, MyLocationView myLocationView) {
             this.mapboxMap = mapboxMap;
+            this.myLocationView = myLocationView;
         }
 
         @Override
         public void run() {
             // invalidate camera position
             mapboxMap.getCameraPosition();
+            if(myLocationView.isEnabled()) {
+                myLocationView.invalidateZoom();
+            }
         }
     }
 
