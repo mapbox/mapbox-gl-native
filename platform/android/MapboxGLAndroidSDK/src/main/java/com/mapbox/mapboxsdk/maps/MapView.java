@@ -629,46 +629,13 @@ public class MapView extends FrameLayout {
     // Direction
     //
 
-    double getDirection() {
-        if (mDestroyed) {
-            return 0;
-        }
-
-        double direction = -mNativeMapView.getBearing();
-
-        while (direction > 360) {
-            direction -= 360;
-        }
-        while (direction < 0) {
-            direction += 360;
-        }
-
-        return direction;
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
-        if (mDestroyed) {
-            return;
-        }
-        setDirection(direction, false);
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
-        if (mDestroyed) {
-            return;
-        }
-        long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
-        mNativeMapView.cancelTransitions();
-        // Out of range directions are normalised in setBearing
-        mNativeMapView.setBearing(-direction, duration);
-    }
-
     void resetNorth() {
         if (mDestroyed) {
             return;
         }
         mNativeMapView.cancelTransitions();
         mNativeMapView.resetNorth();
+        mMyLocationView.setBearing(0);
     }
 
     //
@@ -754,7 +721,7 @@ public class MapView extends FrameLayout {
         }
 
         // work around to invalidate camera position
-        postDelayed(new ZoomInvalidator(mMapboxMap), MapboxConstants.ANIMATION_DURATION);
+        postDelayed(new ZoomInvalidator(mMapboxMap, mMyLocationView), MapboxConstants.ANIMATION_DURATION);
     }
 
     //
@@ -1212,9 +1179,10 @@ public class MapView extends FrameLayout {
         }
         mNativeMapView.cancelTransitions();
         mNativeMapView.jumpTo(bearing, center, pitch, zoom);
+        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
     }
 
-    void easeTo(double bearing, LatLng center, long duration, double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
+    void easeTo(final double bearing, LatLng center, long duration, final double pitch, double zoom, boolean easingInterpolator, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mDestroyed) {
             return;
         }
@@ -1227,6 +1195,8 @@ public class MapView extends FrameLayout {
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
+
+                        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1238,7 +1208,7 @@ public class MapView extends FrameLayout {
         mNativeMapView.easeTo(bearing, center, duration, pitch, zoom, easingInterpolator);
     }
 
-    void flyTo(double bearing, LatLng center, long duration, double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
+    void flyTo(final double bearing, LatLng center, long duration, final double pitch, double zoom, @Nullable final MapboxMap.CancelableCallback cancelableCallback) {
         if (mDestroyed) {
             return;
         }
@@ -1251,6 +1221,8 @@ public class MapView extends FrameLayout {
                 public void onMapChanged(@MapChange int change) {
                     if (change == REGION_DID_CHANGE_ANIMATED) {
                         cancelableCallback.onFinish();
+
+                        mMyLocationView.setCameraPositionAttributes(pitch, bearing);
 
                         // Clean up after self
                         removeOnMapChangedListener(this);
@@ -1350,10 +1322,6 @@ public class MapView extends FrameLayout {
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
 
         private Surface mSurface;
-        private View mViewHolder;
-
-        private static final int VIEW_MARKERS_POOL_SIZE = 20;
-
 
         // Called when the native surface texture has been created
         // Must do all EGL/GL ES initialization here
@@ -1396,27 +1364,18 @@ public class MapView extends FrameLayout {
                 return;
             }
 
-            mCompassView.update(getDirection());
+            mCompassView.update(mMapboxMap.getCameraPosition().bearing);
             mMyLocationView.update();
 
             try {
                 mMapboxMap.getMarkerViewManager().update();
-            }catch (NullPointerException e){
+            } catch (NullPointerException e) {
 
             }
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();
             }
         }
-    }
-
-    // Used by UserLocationView
-    void update() {
-        if (mDestroyed) {
-            return;
-        }
-
-        mNativeMapView.update();
     }
 
     CameraPosition invalidateCameraPosition() {
@@ -1430,7 +1389,25 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return 0;
         }
-        return mNativeMapView.getBearing();
+
+        double bearing = -mNativeMapView.getBearing();
+
+        while (bearing > 360) {
+            bearing -= 360;
+        }
+        while (bearing < 0) {
+            bearing += 360;
+        }
+
+        return bearing;
+    }
+
+    void setBearing(double bearing, float centerX, float centerY) {
+        if (mDestroyed) {
+            return;
+        }
+        mNativeMapView.setBearing(bearing, centerX, centerY);
+        mMyLocationView.setBearing(bearing);
     }
 
     void setBearing(float bearing) {
@@ -1438,6 +1415,7 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing);
+        mMyLocationView.setBearing(bearing);
     }
 
     void setBearing(float bearing, long duration) {
@@ -1445,6 +1423,7 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing, duration);
+        mMyLocationView.setBearing(bearing);
     }
 
     //
@@ -1826,6 +1805,10 @@ public class MapView extends FrameLayout {
             mBeginTime = 0;
             mScaleFactor = 1.0f;
             mZoomStarted = false;
+
+            if (mMyLocationView.isEnabled()) {
+                mMyLocationView.invalidateZoom();
+            }
         }
 
         // Called each time a finger moves
@@ -1863,7 +1846,7 @@ public class MapView extends FrameLayout {
 
             // Scale the map
             if (mFocalPoint != null) {
-                // arround user provided focal point
+                // around user provided focal point
                 mNativeMapView.scaleBy(detector.getScaleFactor(), mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
             } else if (mQuickZoom) {
                 // around center map
@@ -1944,10 +1927,10 @@ public class MapView extends FrameLayout {
             // Rotate the map
             if (mFocalPoint != null) {
                 // User provided focal point
-                mNativeMapView.setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+                setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
             } else {
                 // around gesture
-                mNativeMapView.setBearing(bearing,
+                setBearing(bearing,
                         detector.getFocusX() / mScreenDensity,
                         detector.getFocusY() / mScreenDensity);
             }
@@ -2726,15 +2709,20 @@ public class MapView extends FrameLayout {
     private static class ZoomInvalidator implements Runnable {
 
         private MapboxMap mapboxMap;
+        private MyLocationView myLocationView;
 
-        public ZoomInvalidator(MapboxMap mapboxMap) {
+        public ZoomInvalidator(MapboxMap mapboxMap, MyLocationView myLocationView) {
             this.mapboxMap = mapboxMap;
+            this.myLocationView = myLocationView;
         }
 
         @Override
         public void run() {
             // invalidate camera position
             mapboxMap.getCameraPosition();
+            if(myLocationView.isEnabled()) {
+                myLocationView.invalidateZoom();
+            }
         }
     }
 

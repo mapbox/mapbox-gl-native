@@ -215,7 +215,7 @@ public class TrackingSettings {
     private void validateGesturesForBearingTrackingMode() {
         int myBearingTrackingMode = getMyBearingTrackingMode();
         if (!dismissBearingTrackingOnGesture) {
-            if (myBearingTrackingMode == MyBearingTracking.NONE) {
+            if (myBearingTrackingMode == MyBearingTracking.NONE || myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
                 uiSettings.setRotateGesturesEnabled(true);
             } else {
                 uiSettings.setRotateGesturesEnabled(false);

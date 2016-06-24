@@ -1629,7 +1629,7 @@ public class MapboxMap {
      * Triggers an invalidation of the map view.
      */
     public void invalidate() {
-        mMapView.update();
+        mMapView.invalidate();
     }
 
     /**

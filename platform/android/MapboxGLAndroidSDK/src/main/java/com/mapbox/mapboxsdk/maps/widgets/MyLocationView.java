@@ -1,6 +1,6 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.ObjectAnimator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Camera;
@@ -56,6 +56,8 @@ public class MyLocationView extends View {
     private LatLng interpolatedLocation;
     private LatLng previousLocation;
     private long locationUpdateTimestamp;
+    private float metersPerPixelAtLatitude;
+    private static final long MAX_ANIMATION_TIME = 5000;
 
     private float gpsDirection;
     private float previousDirection;
@@ -93,6 +95,8 @@ public class MyLocationView extends View {
     private Matrix matrix;
     private Camera camera;
     private PointF screenLocation;
+
+    private float direction;
     private float tilt;
 
     @MyLocationTracking.Mode
@@ -251,9 +255,7 @@ public class MyLocationView extends View {
         }
 
         final PointF pointF = screenLocation;
-
-        float metersPerPixel = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
-        float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixel / 2;
+        float accuracyPixels = (Float) accuracyAnimator.getAnimatedValue() / metersPerPixelAtLatitude / 2;
         float maxRadius = getWidth() / 2;
         accuracyPixels = accuracyPixels <= maxRadius ? accuracyPixels : maxRadius;
 
@@ -262,14 +264,14 @@ public class MyLocationView extends View {
 
         // apply tilt to camera
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate(tilt, 0, direction);
 
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
 
-        //
+        // apply rotation
         if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
-            matrix.postRotate((Float) directionAnimator.getAnimatedValue());
+            matrix.preRotate((Float) directionAnimator.getAnimatedValue());
         }
 
         // put matrix at location of MyLocationView
@@ -303,8 +305,21 @@ public class MyLocationView extends View {
         this.tilt = (float) tilt;
     }
 
-    void updateOnNextFrame() {
-        mapboxMap.invalidate();
+    public void setBearing(double bearing) {
+        this.direction = (float) bearing;
+    }
+
+    public void setCameraPositionAttributes(@FloatRange(from = 0, to = 60.0f) double tilt, double bearing) {
+        this.tilt = (float) tilt;
+        this.direction = (float) bearing;
+        invalidateZoom();
+    }
+
+    public void invalidateZoom() {
+        if (location != null) {
+            metersPerPixelAtLatitude = (float) projection.getMetersPerPixelAtLatitude(location.getLatitude());
+            invalidate();
+        }
     }
 
     public void onPause() {
@@ -350,8 +365,8 @@ public class MyLocationView extends View {
     }
 
     @Override
-    public void onRestoreInstanceState(Parcelable state){
-        if (state instanceof Bundle){
+    public void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             tilt = bundle.getFloat("tilt");
             state = bundle.getParcelable("superState");
@@ -451,7 +466,7 @@ public class MyLocationView extends View {
         previousDirection = newDir;
 
         directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
-        directionAnimator.setDuration(375);
+        directionAnimator.setDuration(575);
         directionAnimator.addUpdateListener(invalidateSelfOnUpdateListener);
         directionAnimator.start();
     }
@@ -506,7 +521,7 @@ public class MyLocationView extends View {
         private float[] mI = new float[16];
 
         // Controls the sensor updateLatLng rate in milliseconds
-        private static final int UPDATE_RATE_MS = 500;
+        private static final int UPDATE_RATE_MS = 1000;
 
         // Compass data
         private long mCompassUpdateNextTimestamp = 0;
@@ -569,7 +584,7 @@ public class MyLocationView extends View {
         }
     }
 
-    private class MarkerCoordinateAnimatorListener implements ValueAnimator.AnimatorUpdateListener {
+    private class MarkerCoordinateAnimatorListener extends AnimatorListenerAdapter implements ValueAnimator.AnimatorUpdateListener {
 
         private MyLocationBehavior behavior;
         private double fromLat;
@@ -591,7 +606,7 @@ public class MyLocationView extends View {
             double latitude = fromLat + (toLat - fromLat) * frac;
             double longitude = fromLng + (toLng - fromLng) * frac;
             behavior.updateLatLng(latitude, longitude);
-            updateOnNextFrame();
+            update();
         }
     }
 
@@ -732,7 +747,10 @@ public class MyLocationView extends View {
             }
 
             locationChangeAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
-            locationChangeAnimator.setDuration((long) (locationUpdateDuration * 1.2));
+
+
+            long duration = (long) (locationUpdateDuration * 1.5);
+            locationChangeAnimator.setDuration(duration > MAX_ANIMATION_TIME ? MAX_ANIMATION_TIME : duration);
             locationChangeAnimator.addUpdateListener(new MarkerCoordinateAnimatorListener(this,
                     previousLocation, interpolatedLocation
             ));
