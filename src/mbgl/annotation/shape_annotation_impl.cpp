@@ -73,7 +73,8 @@ private:
             converted.push_back(convertPoint(p));
         }
 
-        if (type == geojsonvt::ProjectedFeatureType::Polygon && points.front() != points.back()) {
+        assert(points.size() > 0);
+        if (type == geojsonvt::ProjectedFeatureType::Polygon && points.size() > 0 && points.front() != points.back()) {
             converted.push_back(converted.front());
         }
 
