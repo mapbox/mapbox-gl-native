@@ -51,9 +51,8 @@ namespace mbgl {
 using namespace style;
 
 Painter::Painter(const TransformState& state_,
-                 gl::TexturePool& texturePool_,
                  gl::ObjectStore& store_)
-    : state(state_), texturePool(texturePool_), store(store_) {
+    : state(state_), store(store_) {
     gl::debugging::enable();
 
     plainShader = std::make_unique<PlainShader>(store);
@@ -129,7 +128,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(texturePool, store);
+                item.bucket->upload(store);
             }
         }
     }

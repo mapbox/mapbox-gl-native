@@ -22,7 +22,11 @@ void BufferDeleter::operator()(GLuint id) const {
 
 void TextureDeleter::operator()(GLuint id) const {
     assert(store);
-    store->abandonedTextures.push_back(id);
+    if (store->pooledTextures.size() >= TextureMax) {
+        store->abandonedTextures.push_back(id);
+    } else {
+        store->pooledTextures.push_back(id);
+    }
 }
 
 void VAODeleter::operator()(GLuint id) const {
@@ -30,19 +34,19 @@ void VAODeleter::operator()(GLuint id) const {
     store->abandonedVAOs.push_back(id);
 }
 
-void TexturePoolDeleter::operator()(ObjectPool ids) const {
-    assert(store);
-    for (const auto& id : ids) {
-        store->abandonedTextures.push_back(id);
-    }
-}
-
 ObjectStore::~ObjectStore() {
+    assert(pooledTextures.empty());
     assert(abandonedPrograms.empty());
     assert(abandonedShaders.empty());
     assert(abandonedBuffers.empty());
     assert(abandonedTextures.empty());
     assert(abandonedVAOs.empty());
+}
+
+void ObjectStore::reset() {
+    std::copy(pooledTextures.begin(), pooledTextures.end(), std::back_inserter(abandonedTextures));
+    pooledTextures.resize(0);
+    performCleanup();
 }
 
 void ObjectStore::performCleanup() {

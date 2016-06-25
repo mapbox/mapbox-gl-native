@@ -73,7 +73,7 @@ SymbolBucket::~SymbolBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void SymbolBucket::upload(gl::TexturePool&, gl::ObjectStore& store) {
+void SymbolBucket::upload(gl::ObjectStore& store) {
     if (hasTextData()) {
         renderData->text.vertices.upload(store);
         renderData->text.triangles.upload(store);

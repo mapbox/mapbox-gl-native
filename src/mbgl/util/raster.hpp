@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mbgl/gl/gl.hpp>
-#include <mbgl/gl/texture_pool.hpp>
+#include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/chrono.hpp>
@@ -18,10 +17,10 @@ public:
     void load(PremultipliedImage);
 
     // bind current texture
-    void bind(bool linear, gl::TexturePool&, gl::ObjectStore&);
+    void bind(bool linear, gl::ObjectStore&);
 
     // uploads the texture if it hasn't been uploaded yet.
-    void upload(gl::TexturePool&, gl::ObjectStore&);
+    void upload(gl::ObjectStore&);
 
     // loaded status
     bool isLoaded() const;
@@ -32,7 +31,7 @@ public:
     GLsizei height = 0;
 
     // GL buffer object handle.
-    mbgl::optional<gl::PooledTexture> texture;
+    mbgl::optional<gl::UniqueTexture> texture;
 
     // texture opacity
     double opacity = 0;
