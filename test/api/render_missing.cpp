@@ -41,7 +41,7 @@ TEST(API, TEST_REQUIRES_SERVER(RenderMissingTile)) {
 
     // This host does not respond (== connection error).
     map.setStyleJSON(style);
-    map.renderStill([&](std::exception_ptr err, PremultipliedImage&&) {
+    map.renderStill([&](std::exception_ptr err, std::shared_ptr<const PremultipliedImage>) {
         ASSERT_TRUE(err.operator bool());
         try {
             std::rethrow_exception(err);

@@ -41,7 +41,7 @@ public:
 
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
-    using StillImageCallback = std::function<void (std::exception_ptr, PremultipliedImage&&)>;
+    using StillImageCallback = std::function<void (std::exception_ptr, std::shared_ptr<const PremultipliedImage>)>;
     void renderStill(StillImageCallback callback);
 
     // Main render function.

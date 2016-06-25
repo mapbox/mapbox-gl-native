@@ -46,7 +46,7 @@ TEST(Map, Offline) {
     map.setStyleURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
-                     test::render(map),
+                     *test::render(map),
                      0.0015,
                      0.1);
 
@@ -71,7 +71,7 @@ TEST(Map, AddLayer) {
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
     map.addLayer(std::move(layer));
 
-    test::checkImage("test/fixtures/map/add_layer", test::render(map));
+    test::checkImage("test/fixtures/map/add_layer", *test::render(map));
 }
 
 TEST(Map, RemoveLayer) {
@@ -85,5 +85,5 @@ TEST(Map, RemoveLayer) {
     map.addLayer(std::move(layer));
     map.removeLayer("background");
 
-    test::checkImage("test/fixtures/map/remove_layer", test::render(map));
+    test::checkImage("test/fixtures/map/remove_layer", *test::render(map));
 }

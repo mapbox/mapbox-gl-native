@@ -3,6 +3,7 @@
 #include <mbgl/map/change.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <array>
 #include <functional>
@@ -52,12 +53,14 @@ public:
 
     // Reads the pixel data from the current framebuffer. If your View implementation
     // doesn't support reading from the framebuffer, return a null pointer.
-    virtual PremultipliedImage readStillImage();
+    virtual std::shared_ptr<const PremultipliedImage> readStillImage();
 
     // Notifies a watcher of map x/y/scale/rotation changes.
     virtual void notifyMapChange(MapChange change);
 
 protected:
+    MBGL_STORE_THREAD(tid);
+
     mbgl::Map *map = nullptr;
 };
 } // namespace mbgl

@@ -66,7 +66,7 @@ private:
     int fd = -1;
 };
 
-PremultipliedImage render(Map&);
+std::shared_ptr<const PremultipliedImage> render(Map&);
 
 void checkImage(const std::string& base,
                 const PremultipliedImage& actual,

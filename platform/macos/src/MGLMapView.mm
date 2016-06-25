@@ -724,7 +724,7 @@ public:
 
         if (_isPrinting) {
             _isPrinting = NO;
-            std::string png = encodePNG(_mbglView->readStillImage());
+            std::string png = encodePNG(*_mbglView->readStillImage());
             NSData *data = [[NSData alloc] initWithBytes:png.data() length:png.size()];
             NSImage *image = [[NSImage alloc] initWithData:data];
             [self performSelector:@selector(printWithImage:) withObject:image afterDelay:0];
@@ -2468,17 +2468,17 @@ public:
         [NSOpenGLContext clearCurrentContext];
     }
 
-    mbgl::PremultipliedImage readStillImage() override {
+    std::shared_ptr<mbgl::PremultipliedImage> readStillImage() override {
         auto size = getFramebufferSize();
         const unsigned int w = size[0];
         const unsigned int h = size[1];
         
-        mbgl::PremultipliedImage image { w, h };
+        auto image = std::make_shared<mbgl::PremultipliedImage>(w, h);
         MBGL_CHECK_ERROR(glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.data.get()));
         
-        const size_t stride = image.stride();
+        const size_t stride = image->stride();
         auto tmp = std::make_unique<uint8_t[]>(stride);
-        uint8_t *rgba = image.data.get();
+        uint8_t *rgba = image->data.get();
         for (int i = 0, j = h - 1; i < j; i++, j--) {
             std::memcpy(tmp.get(), rgba + i * stride, stride);
             std::memcpy(rgba + i * stride, rgba + j * stride, stride);
