@@ -269,7 +269,7 @@ public class MyLocationView extends View {
 
         //
         if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
-            matrix.postRotate((Float) directionAnimator.getAnimatedValue());
+            matrix.preRotate((Float) directionAnimator.getAnimatedValue());
         }
 
         // put matrix at location of MyLocationView
