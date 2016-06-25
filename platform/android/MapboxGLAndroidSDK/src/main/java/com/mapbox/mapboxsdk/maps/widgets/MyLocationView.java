@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Camera;
@@ -28,7 +27,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -301,10 +299,6 @@ public class MyLocationView extends View {
 
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
         this.tilt = (float) tilt;
-    }
-
-    void updateOnNextFrame() {
-        mapboxMap.invalidate();
     }
 
     public void onPause() {
@@ -591,7 +585,7 @@ public class MyLocationView extends View {
             double latitude = fromLat + (toLat - fromLat) * frac;
             double longitude = fromLng + (toLng - fromLng) * frac;
             behavior.updateLatLng(latitude, longitude);
-            updateOnNextFrame();
+            update();
         }
     }
 
