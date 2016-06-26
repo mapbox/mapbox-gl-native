@@ -1136,13 +1136,13 @@ public class MapView extends FrameLayout {
         for (int i = 0; i < ids.length; i++) {
             idsList.add(ids[i]);
         }
-
+        
         List<MarkerView> annotations = new ArrayList<>(ids.length);
         List<Annotation> annotationList = mMapboxMap.getAnnotations();
         int count = annotationList.size();
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
+            if (annotation instanceof MarkerView) {
                 annotations.add((MarkerView) annotation);
             }
         }
@@ -1395,15 +1395,10 @@ public class MapView extends FrameLayout {
             if (mDestroyed) {
                 return;
             }
-
             mCompassView.update(getDirection());
             mMyLocationView.update();
+            mMapboxMap.getMarkerViewManager().update();
 
-            try {
-                mMapboxMap.getMarkerViewManager().update();
-            }catch (NullPointerException e){
-
-            }
             for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
                 infoWindow.update();
             }
