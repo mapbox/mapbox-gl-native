@@ -192,6 +192,7 @@
           '<@(protozero_cflags)',
           '<@(boost_cflags)',
           '<@(geometry_cflags)',
+          '<@(geojson_cflags)',
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(variant_cflags)',
@@ -207,7 +208,7 @@
           '<@(opengl_ldflags)',
         ],
         'libraries': [
-          '<@(geojsonvt_static_libs)',
+          '<@(geojson_static_libs)',
         ],
       },
 

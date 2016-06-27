@@ -14,6 +14,7 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
+#include <iostream>
 
 namespace mbgl {
 
@@ -72,5 +73,77 @@ Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 // Fix up possibly-non-V2-compliant polygon geometry using angus clipper.
 // The result is guaranteed to have correctly wound, strictly simple rings.
 GeometryCollection fixupPolygons(const GeometryCollection&);
+
+struct ToGeometryCollection {
+    GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
+        GeometryCollection collection;
+        GeometryCoordinates coordinates;
+        coordinates.emplace_back(geom.x, geom.y);
+        collection.push_back(coordinates);
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::multi_point<int16_t>& geom) const {
+        GeometryCollection collection;
+        GeometryCoordinates coordinates;
+        coordinates.reserve(geom.size());
+        for (auto& point : geom) {
+            coordinates.emplace_back(point.x, point.y);
+        }
+        collection.push_back(coordinates);
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::line_string<int16_t>& geom) const {
+        GeometryCollection collection;
+        GeometryCoordinates coordinates;
+        coordinates.reserve(geom.size());
+        for (auto& point : geom) {
+            coordinates.emplace_back(point.x, point.y);
+        }
+        collection.push_back(coordinates);
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::multi_line_string<int16_t>& geom) const {
+        GeometryCollection collection;
+        for (auto& ring : geom) {
+            GeometryCoordinates coordinates;
+            coordinates.reserve(ring.size());
+            for (auto& point : ring) {
+                coordinates.emplace_back(point.x, point.y);
+            }
+            collection.push_back(coordinates);
+        }
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::polygon<int16_t>& geom) const {
+        GeometryCollection collection;
+        for (auto& ring : geom) {
+            GeometryCoordinates coordinates;
+            coordinates.reserve(ring.size());
+            for (auto& point : ring) {
+                coordinates.emplace_back(point.x, point.y);
+            }
+            collection.push_back(coordinates);
+        }
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::multi_polygon<int16_t>& geom) const {
+        GeometryCollection collection;
+        for (auto& polygon : geom) {
+            for (auto& ring : polygon) {
+                GeometryCoordinates coordinates;
+                coordinates.reserve(ring.size());
+                for (auto& point : ring) {
+                    coordinates.emplace_back(point.x, point.y);
+                }
+                collection.push_back(coordinates);
+            }
+        }
+        return collection;
+    }
+    GeometryCollection operator()(const mapbox::geometry::geometry_collection<int16_t>&) const {
+        GeometryCollection collection;
+        return collection;
+    }
+};
 
 } // namespace mbgl

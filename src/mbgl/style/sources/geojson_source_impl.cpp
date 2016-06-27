@@ -6,6 +6,8 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
+#include <mapbox/geojson.hpp>
+#include <mapbox/geojson/rapidjson.hpp>
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
 
@@ -18,6 +20,24 @@ using namespace mapbox::geojsonvt;
 namespace mbgl {
 namespace style {
 namespace conversion {
+
+struct ToFeatureCollection {
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature_collection value) const {
+        return value;
+    }
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature value) const {
+        mapbox::geojson::feature_collection features;
+        features.emplace_back(value);
+        return features;
+    }
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::geometry value) const {
+        mapbox::geojson::feature_collection features;
+        mapbox::geojson::feature feature = { value };
+        features.emplace_back(feature);
+        return features;
+    }
+};
+
 template <>
 Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     Options options;
@@ -25,7 +45,10 @@ Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     options.extent = util::EXTENT;
 
     try {
-        return GeoJSON { std::make_unique<GeoJSONVT>(Convert::convert(value, 0), options) };
+        ToFeatureCollection toFeatureCollection;
+        const auto geojson = mapbox::geojson::convert(value);
+        const auto features = apply_visitor(toFeatureCollection, geojson);
+        return GeoJSON { std::make_unique<GeoJSONVT>(features, options) };
     } catch (const std::exception& ex) {
         return Error { ex.what() };
     }
@@ -82,7 +105,8 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message);
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
-                urlOrGeoJSON = GeoJSON { std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>()) };
+                mapbox::geojson::feature_collection features;
+                urlOrGeoJSON = GeoJSON { std::make_unique<GeoJSONVT>(features) };
             } else {
                 urlOrGeoJSON = std::move(*geoJSON);
             }
