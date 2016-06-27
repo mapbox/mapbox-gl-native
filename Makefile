@@ -175,10 +175,7 @@ build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config
 	$$(shell $(ANDROID_ENV) $1) $(GYP) -f make-android -I build/android-$1/config.gypi \
 	  --generator-output=build/android-$1 $$<
 
-android-lib-$1: build/android-$1/Makefile
-	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
-
-test-android-$1: node_modules android-lib-$1
+android-test-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 test 
 
 android-lib-$1: build/android-$1/Makefile
@@ -192,19 +189,25 @@ $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 
 android: android-arm-v7
 
-test-android: test-android-arm-v7
-#TODO Decide where to place the class files and other tmp outputs 
+test-android: android-test-lib-arm-v7
+        #TODO Decide where to place the class files and other tmp outputs 
+	#Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
+	cd platform/android && ./gradlew assembleDebug
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build
+	#Compile Test runner
 	javac -sourcepath test/src -d build -source 1.7 -target 1.7 test/src/Main.java
-	cd build && dx --dex --output=test.jar Main.class
+	#Combine and dex
+	cd build && dx --dex --output=test.jar Main.class classes.dex	
+	#Push all needed files to the device
 	adb push build/test.jar /data/local/tmp/
-	adb shell "LD_LIBRARY_PATH=/data/local/tmp dalvikvm -cp /data/local/tmp/test.jar Main"	
-	#cd platform/android && ./gradlew testReleaseUnitTest --continue
+	adb push build/android-arm-v7/Debug/lib.target/libmapbox-gl.so /data/local/tmp/
+	adb push build/android-arm-v7/Debug/lib.target/libtest-jni-lib.so /data/local/tmp/
+	adb shell "LD_LIBRARY_PATH=/data/local/tmp dalvikvm32 -cp /data/local/tmp/test.jar Main"	
+	#TODO - Renable platform tests cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
 
-#test-android-arm-v7: node_modules android-lib-arm-v7
-#	$$(shell $(ANDROID_ENV) arm-v7) $(MAKE) -j$(JOBS) -C build/android-arm-v7 test
 
 #### Node targets #####################################################
 

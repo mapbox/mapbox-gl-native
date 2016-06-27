@@ -80,25 +80,6 @@
           'include',
         ],
 
-        # Force the linker to include all the objects from the lib-test archive. Otherwise they'd
-        # be discarded because there are no undefined symbols to pull them in, and the resulting
-        # executable would run zero tests.
-
-        'conditions': [
-          ['OS == "mac"', {
-            'xcode_settings': {
-              'OTHER_LDFLAGS': [
-                '-Wl,-force_load,<(PRODUCT_DIR)/libtest-lib.a',
-              ],
-            }
-          }, {
-            'link_settings': {
-              'ldflags': [
-                '-Wl,-whole-archive <(PRODUCT_DIR)/libtest-lib.a -Wl,-no-whole-archive',
-              ],
-            },
-          }],
-        ],
       },
     },
   ]

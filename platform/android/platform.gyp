@@ -161,8 +161,19 @@
       ],
 
       'cflags_cc': [
+        '<@(boost_cflags)',
+        '<@(rapidjson_cflags)',
+        '<@(nunicode_cflags)',
+        '<@(sqlite_cflags)',
         '<@(jni.hpp_cflags)',
+        '<@(libzip_cflags)',
+        '<@(libpng_cflags)',
+        '<@(libjpeg-turbo_cflags)',
       ],
+
+#      'cflags_cc': [
+#        '<@(jni.hpp_cflags)',
+#      ],
 
       'link_settings': {
         'libraries': [
