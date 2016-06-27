@@ -1,6 +1,7 @@
 #import "MGLAPIClient.h"
 #import "NSBundle+MGLAdditions.h"
 #import "MGLAccountManager.h"
+#import "NSData+GZIP.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 static NSString * const MGLAPIClientBaseURL = @"https://events.mapbox.com";
@@ -9,6 +10,7 @@ static NSString * const MGLAPIClientEventsPath = @"events/v2";
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
 static NSString * const MGLAPIClientHeaderFieldContentTypeKey = @"Content-Type";
 static NSString * const MGLAPIClientHeaderFieldContentTypeValue = @"application/json";
+static NSString * const MGLAPIClientHeaderFieldContentEncodingKey = @"Content-Encoding";
 static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 
 @interface MGLAPIClient ()
@@ -82,8 +84,22 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     [request setValue:self.userAgent forHTTPHeaderField:MGLAPIClientHeaderFieldUserAgentKey];
     [request setValue:MGLAPIClientHeaderFieldContentTypeValue forHTTPHeaderField:MGLAPIClientHeaderFieldContentTypeKey];
     [request setHTTPMethod:MGLAPIClientHTTPMethodPost];
+    
     NSData *jsonData = [self serializedDataForEvents:events];
-    [request setHTTPBody:jsonData];
+    
+    // Compressing less than 2 events can have a negative impact on the size.
+    if (events.count > 1) {
+        NSData *gzipData = [jsonData gzippedData];
+        [request setValue:@"gzip" forHTTPHeaderField:MGLAPIClientHeaderFieldContentEncodingKey];
+        [request setHTTPBody:gzipData];
+    }
+    
+    // Set JSON data if events.count were less than 2 or something went wrong with compressing HTTP body data.
+    if (!request.HTTPBody) {
+        [request setValue:nil forHTTPHeaderField:MGLAPIClientHeaderFieldContentEncodingKey];
+        [request setHTTPBody:jsonData];
+    }
+    
     return [request copy];
 }
 

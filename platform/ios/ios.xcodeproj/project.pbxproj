@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		353D23961D0B0DFE002BE09D /* MGLAnnotationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */; };
+		357886511D21237F00404011 /* NSData+GZIP.h in Headers */ = {isa = PBXBuildFile; fileRef = 3578864F1D21237F00404011 /* NSData+GZIP.h */; };
+		357886541D21237F00404011 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 357886501D21237F00404011 /* NSData+GZIP.m */; };
+		357886551D21237F00404011 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 357886501D21237F00404011 /* NSData+GZIP.m */; };
 		4018B1C71CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		4018B1C91CDC288A00F666AF /* MGLAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */; };
@@ -327,6 +330,8 @@
 
 /* Begin PBXFileReference section */
 		353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationViewTests.m; sourceTree = "<group>"; };
+		3578864F1D21237F00404011 /* NSData+GZIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+GZIP.h"; sourceTree = "<group>"; };
+		357886501D21237F00404011 /* NSData+GZIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+GZIP.m"; sourceTree = "<group>"; };
 		4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView_Private.h; sourceTree = "<group>"; };
 		4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAnnotationView.mm; sourceTree = "<group>"; };
 		4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView.h; sourceTree = "<group>"; };
@@ -934,6 +939,8 @@
 			children = (
 				DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */,
 				DA8848431CBAFB9800AB86E3 /* MGLAPIClient.m */,
+				3578864F1D21237F00404011 /* NSData+GZIP.h */,
+				357886501D21237F00404011 /* NSData+GZIP.m */,
 				DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */,
 				DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */,
 				DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */,
@@ -949,6 +956,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				357886511D21237F00404011 /* NSData+GZIP.h in Headers */,
 				DA88483A1CBAFB8500AB86E3 /* MGLAnnotationImage.h in Headers */,
 				DA35A2BB1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
 				DA8848861CBB033F00AB86E3 /* Fabric+FABKits.h in Headers */,
@@ -1380,6 +1388,7 @@
 				DA8848281CBAFA6200AB86E3 /* MGLShape.m in Sources */,
 				DA35A2B31CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
+				357886541D21237F00404011 /* NSData+GZIP.m in Sources */,
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
@@ -1421,6 +1430,7 @@
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
 				DA35A2B41CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
+				357886551D21237F00404011 /* NSData+GZIP.m in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */,
