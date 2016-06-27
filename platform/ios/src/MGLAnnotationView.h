@@ -4,6 +4,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol MGLAnnotation;
+
+typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
+    MGLAnnotationViewDragStateNone = 0,     // View is sitting on the map.
+    MGLAnnotationViewDragStateStarting,     // View is beginning to drag.
+    MGLAnnotationViewDragStateDragging,     // View is being dragged.
+    MGLAnnotationViewDragStateCanceling,    // View dragging was cancelled and will be returned to its starting positon.
+    MGLAnnotationViewDragStateEnding        // View was dragged.
+};
+
 /** The MGLAnnotationView class is responsible for representing point-based annotation markers as a view. Annotation views represent an annotation object, which is an object that corresponds to the MGLAnnotation protocol. When an annotation’s coordinate point is visible on the map view, the map view delegate is asked to provide a corresponding annotation view. If an annotation view is created with a reuse identifier, the map view may recycle the view when it goes offscreen. */
 @interface MGLAnnotationView : UIView
 
@@ -14,6 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
  @return The initialized annotation view object.
  */
 - (instancetype)initWithReuseIdentifier:(nullable NSString *)reuseIdentifier;
+
+/**
+ This property will be set to the associated annotation when the view is visible.
+ 
+ When the view is queued and waiting to be reused, the value will be set to nil.
+ */
+@property (nonatomic, readonly, nullable) id <MGLAnnotation> annotation;
 
 /**
  The string that identifies that this annotation view is reusable. (read-only)
@@ -39,6 +56,45 @@ NS_ASSUME_NONNULL_BEGIN
  Setting this property to YES will force the annotation view to tilt according to the associated map view.
  */
 @property (nonatomic, assign, getter=isFlat) BOOL flat;
+
+/**
+ Defaults to NO and becomes YES when the view is tapped on.
+ 
+ Selecting another view will first deselect the currently selected view.
+ This property should not be changed directly.
+ */
+@property (nonatomic, assign, getter=isSelected) BOOL selected;
+
+/**
+ Subclasses may override this method in order to customize appearance.
+ This method should not be called directly.
+ */
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated;
+
+/*
+ This property defaults to YES. Setting it to NO will cause the annotation view to ignore all touch events.
+ Subclasses may use this property to customize the appearance.
+ */
+@property (nonatomic, assign, getter=isEnabled) BOOL enabled;
+
+/**
+ Setting this property to YES will make the view draggable. Long-press followed by a pan gesture will start to move the
+ view around the map. `-mapView:didDragAnnotationView:toCoordinate:` will be called when a view is dropped.
+ */
+@property (nonatomic, assign, getter=isDraggable) BOOL draggable;
+
+/**
+ All states are handled automatically when `draggable` is set to YES.
+ Custom animations can be achieved by overriding setDragState:animated:
+ */
+@property (nonatomic, readonly) MGLAnnotationViewDragState dragState;
+
+/**
+ Called when the `dragState` changes.
+ 
+ Implementer may override this method in order to customize animations in subclasses.
+ */
+- (void)setDragState:(MGLAnnotationViewDragState)dragState animated:(BOOL)animated NS_REQUIRES_SUPER;
 
 /**
  Setting this property to YES will cause the annotation view to shrink as it approaches the horizon and grow as it moves away from the

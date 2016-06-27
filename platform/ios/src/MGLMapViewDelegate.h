@@ -279,6 +279,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation;
 
+
+/**
+ Tells the delegate that one of its annotation views was selected.
+ 
+ You can use this method to track changes in the selection state of annotation views.
+ 
+ @param mapView The map view containing the annotation.
+ @param annotationView The annotation view that was selected.
+ */
+- (void)mapView:(MGLMapView *)mapView didSelectAnnotationView:(MGLAnnotationView *)annotationView;
+
+/**
+ Tells the delegate that one of its annotation views was deselected.
+ 
+ You can use this method to track changes in the selection state of annotation views.
+ 
+ @param mapView The map view containing the annotation.
+ @param annotationView The annotation view that was deselected.
+ */
+- (void)mapView:(MGLMapView *)mapView didDeselectAnnotationView:(MGLAnnotationView *)annotationView;
+
+/**
+ Tells the delegate that one if its annotation views was dragged to a new coordinate.
+ 
+ In order to make the new location persistent, you have to update the `coordinate` property of the associated annotation.
+ 
+ @param mapView The map view containing the annotation view.
+ @param annotationView The annotation view that was dragged.
+ @param coordinate The coordinate that the annotation view was dropped on.
+ 
+ */
+- (void)mapView:(MGLMapView *)mapView didDragAnnotationView:(MGLAnnotationView *)annotationView toCoordinate:(CLLocationCoordinate2D)coordinate;
+
 @end
 
 NS_ASSUME_NONNULL_END

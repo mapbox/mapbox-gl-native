@@ -147,10 +147,16 @@ const NSTimeInterval MGLFlushInterval = 180;
 #if TARGET_OS_SIMULATOR
     return NO;
 #else
+    BOOL isLowPowerModeEnabled = NO;
+    if ([NSProcessInfo instancesRespondToSelector:@selector(isLowPowerModeEnabled)]) {
+        isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
+    }
     return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
-            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0);
+            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0 &&
+            !isLowPowerModeEnabled);
 #endif
 }
+
 
 - (BOOL)debugLoggingEnabled {
     return (self.canEnableDebugLogging &&
@@ -203,6 +209,11 @@ const NSTimeInterval MGLFlushInterval = 180;
        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseOrResumeMetricsCollectionIfRequired) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseOrResumeMetricsCollectionIfRequired) name:UIApplicationWillEnterForegroundNotification object:nil];
+
+        // Watch for Low Power Mode change events
+        if (&NSProcessInfoPowerStateDidChangeNotification != NULL) {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pauseOrResumeMetricsCollectionIfRequired) name:NSProcessInfoPowerStateDidChangeNotification object:nil];
+        }
     }
     return self;
 }
@@ -253,12 +264,11 @@ const NSTimeInterval MGLFlushInterval = 180;
         return;
     }
     
-    // Toggle pause based on current pause state and current settings state
-    // Practically, a pause only occurs because of a change to an NSUserDefaultsDidChangeNotification
-    BOOL enabledInSettings = [[self class] isEnabled];
-    if (self.paused && enabledInSettings) {
+    // Toggle pause based on current pause state, user opt-out state, and low-power state.
+    BOOL enabled = [[self class] isEnabled];
+    if (self.paused && enabled) {
         [self resumeMetricsCollection];
-    } else if (!self.paused && !enabledInSettings) {
+    } else if (!self.paused && !enabled) {
         [self pauseMetricsCollection];
     }
 }
@@ -281,7 +291,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     if (!self.paused || ![[self class] isEnabled]) {
         return;
     }
-    
+
     self.paused = NO;
     self.data = [[MGLMapboxEventsData alloc] init];
     
