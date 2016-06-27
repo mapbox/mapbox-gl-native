@@ -437,7 +437,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
     }
 }
 
-void LineBucket::upload(gl::TexturePool&, gl::ObjectStore& store) {
+void LineBucket::upload(gl::ObjectStore& store) {
     vertexBuffer.upload(store);
     triangleElementsBuffer.upload(store);
 

@@ -16,7 +16,6 @@
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/gl/texture_pool.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/exception.hpp>
@@ -63,7 +62,6 @@ public:
     util::AsyncTask asyncUpdate;
 
     std::unique_ptr<AnnotationManager> annotationManager;
-    std::unique_ptr<gl::TexturePool> texturePool;
     std::unique_ptr<Painter> painter;
     std::unique_ptr<Style> style;
 
@@ -99,8 +97,7 @@ Map::Impl::Impl(View& view_,
       contextMode(contextMode_),
       pixelRatio(view.getPixelRatio()),
       asyncUpdate([this] { update(); }),
-      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)),
-      texturePool(std::make_unique<gl::TexturePool>()) {
+      annotationManager(std::make_unique<AnnotationManager>(pixelRatio)) {
 }
 
 Map::~Map() {
@@ -109,13 +106,11 @@ Map::~Map() {
     impl->styleRequest = nullptr;
 
     // Explicit resets currently necessary because these abandon resources that need to be
-    // cleaned up by store.performCleanup();
+    // cleaned up by store.reset();
     impl->style.reset();
     impl->painter.reset();
-    impl->texturePool.reset();
     impl->annotationManager.reset();
-
-    impl->store.performCleanup();
+    impl->store.reset();
 
     impl->view.deactivate();
 }
@@ -254,7 +249,7 @@ void Map::Impl::update() {
 
 void Map::Impl::render() {
     if (!painter) {
-        painter = std::make_unique<Painter>(transform.getState(), *texturePool, store);
+        painter = std::make_unique<Painter>(transform.getState(), store);
     }
 
     FrameData frameData { view.getFramebufferSize(),
