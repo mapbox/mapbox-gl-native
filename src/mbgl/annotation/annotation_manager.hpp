@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/sprite/sprite_store.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -34,6 +35,7 @@ public:
     void removeAnnotation(const AnnotationID&);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&) const;
+    AnnotationIDs getShapeAnnotationsInBounds(const LatLngBounds&) const;
 
     void addIcon(const std::string& name, std::shared_ptr<const SpriteImage>);
     void removeIcon(const std::string& name);
@@ -67,10 +69,12 @@ private:
     AnnotationID nextID = 0;
 
     using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
+    using ShapeAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const ShapeAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
     using SymbolAnnotationMap = std::unordered_map<AnnotationID, std::shared_ptr<SymbolAnnotationImpl>>;
-    using ShapeAnnotationMap = std::unordered_map<AnnotationID, std::unique_ptr<ShapeAnnotationImpl>>;
+    using ShapeAnnotationMap = std::unordered_map<AnnotationID, std::shared_ptr<ShapeAnnotationImpl>>;
 
     SymbolAnnotationTree symbolTree;
+    ShapeAnnotationTree shapeTree;
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
     std::vector<std::string> obsoleteShapeAnnotationLayers;

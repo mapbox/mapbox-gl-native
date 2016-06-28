@@ -3,6 +3,8 @@
 #include <mapbox/geojsonvt.hpp>
 
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/annotation/annotation_impl.hpp>
+#include <mbgl/util/geo.hpp>
 
 #include <string>
 #include <memory>
@@ -33,3 +35,22 @@ public:
 };
 
 } // namespace mbgl
+
+// Tell Boost Geometry how to access a std::shared_ptr<mbgl::ShapeAnnotationImpl> object.
+namespace boost {
+namespace geometry {
+namespace index {
+
+template <>
+struct indexable<std::shared_ptr<const mbgl::ShapeAnnotationImpl>> {
+    using result_type = mbgl::LatLngBounds;
+    mbgl::LatLngBounds operator()(const std::shared_ptr<const mbgl::ShapeAnnotationImpl>& v) const {
+        return mbgl::ShapeAnnotationGeometry::visit(v->geometry(), [&] (const auto& geometry) {
+            return mbgl::boundsForGeometry(geometry);
+        });
+    }
+};
+
+} // end namespace index
+} // end namespace geometry
+} // end namespace boost

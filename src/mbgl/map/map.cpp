@@ -704,6 +704,10 @@ AnnotationIDs Map::getPointAnnotationsInBounds(const LatLngBounds& bounds) {
     return impl->annotationManager->getPointAnnotationsInBounds(bounds);
 }
 
+AnnotationIDs Map::getShapeAnnotationsInBounds(const LatLngBounds& bounds) {
+    return impl->annotationManager->getShapeAnnotationsInBounds(bounds);
+}
+
 #pragma mark - Feature query api
 
 std::vector<Feature> Map::queryRenderedFeatures(const ScreenCoordinate& point, const optional<std::vector<std::string>>& layerIDs) {
