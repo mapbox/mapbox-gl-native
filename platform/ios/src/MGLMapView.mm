@@ -1288,7 +1288,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             velocity = 0;
         }
 
-        NSTimeInterval duration = velocity > 0 ? 1 : 0.25;
+        NSTimeInterval duration = (velocity > 0 ? 1 : 0.25) * self.decelerationRate;
 
         CGFloat scale = self.scale * pinch.scale;
         CGFloat newScale = scale;
@@ -1306,12 +1306,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             velocity = 0;
         }
 
-        if (velocity)
+        if (velocity && duration)
         {
             _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
         }
 
-        [self notifyGestureDidEndWithDrift:velocity];
+        [self notifyGestureDidEndWithDrift:velocity && duration];
 
         [self unrotateIfNeededForGesture];
     }
@@ -1360,21 +1360,20 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
         CGFloat velocity = rotate.velocity;
-
-        if (fabs(velocity) > 3)
+        CGFloat decelerationRate = self.decelerationRate;
+        if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
-            NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
-            CGFloat newRadians = radians + velocity * duration * 0.1;
+            CGFloat newRadians = radians + velocity * decelerationRate * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
+            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(decelerationRate));
 
             [self notifyGestureDidEndWithDrift:YES];
 
             __weak MGLMapView *weakSelf = self;
 
-            [self animateWithDelay:duration animations:^
+            [self animateWithDelay:decelerationRate animations:^
              {
                  [weakSelf unrotateIfNeededForGesture];
              }];
