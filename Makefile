@@ -202,7 +202,7 @@ test-android: android-test-lib-arm-v7
 	adb push build/test.jar /data/local/tmp/
 	adb push build/android-arm-v7/Debug/lib.target/libmapbox-gl.so /data/local/tmp/
 	adb push build/android-arm-v7/Debug/lib.target/libtest-jni-lib.so /data/local/tmp/
-	adb shell "LD_LIBRARY_PATH=/data/local/tmp dalvikvm32 -cp /data/local/tmp/test.jar Main"	
+	adb shell "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/system/lib:/data/local/tmp dalvikvm32 -cp /data/local/tmp/test.jar Main"	
 	#TODO - Renable platform tests cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:

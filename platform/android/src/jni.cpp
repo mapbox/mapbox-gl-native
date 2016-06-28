@@ -1540,7 +1540,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     static mbgl::util::RunLoop mainRunLoop;
 
-    //XXX Need to figure out why this breaks everything mbgl::android::RegisterNativeHTTPRequest(env);
+    mbgl::android::RegisterNativeHTTPRequest(env);
 
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");
     latLngClass = jni::NewGlobalRef(env, latLngClass).release();
