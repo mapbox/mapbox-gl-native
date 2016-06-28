@@ -53,7 +53,7 @@ void parseGlyphPBF(mbgl::GlyphSet& glyphSet, const std::string& data) {
                 }
             }
 
-            glyphSet.insert(glyph.id, glyph);
+            glyphSet.insert(glyph.id, std::move(glyph));
         }
     }
 }
