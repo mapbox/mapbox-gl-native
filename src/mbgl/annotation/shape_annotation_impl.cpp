@@ -90,8 +90,8 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     static const double baseTolerance = 4;
 
     if (!shapeTiler) {
-        const uint64_t maxAmountOfTiles = 1 << maxZoom;
-        const double tolerance = baseTolerance / (maxAmountOfTiles * util::EXTENT);
+        const uint64_t maxAmountOfTileFeatures = (1ull << maxZoom) * util::EXTENT;
+        const double tolerance = baseTolerance / maxAmountOfTileFeatures;
 
         std::vector<geojsonvt::ProjectedFeature> features = {
             ShapeAnnotationGeometry::visit(geometry(), ToGeoJSONVT(tolerance))

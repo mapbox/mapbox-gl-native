@@ -18,7 +18,7 @@ constexpr float tileSize = 512;
  * In practice, all features are converted to this extent before being added.
  *
  * Positions are stored as signed 16bit integers.
- * One bit is lost for signedness to support featuers extending past the left edge of the tile.
+ * One bit is lost for signedness to support features extending past the left edge of the tile.
  * One bit is lost because the line vertex buffer packs 1 bit of other data into the int.
  * One bit is lost to support features extending past the extent on the right edge of the tile.
  * This leaves us with 2^13 = 8192

@@ -16,13 +16,13 @@ TransformState::TransformState(ConstrainMode constrainMode_, ViewportMode viewpo
 #pragma mark - Matrix
 
 void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) const {
-    const uint64_t tileScale = 1ull << tileID.canonical.z;
+    const uint32_t tileScale = 1u << tileID.canonical.z;
     const double s = worldSize() / tileScale;
 
     matrix::identity(matrix);
     matrix::translate(matrix, matrix,
-                      static_cast<int64_t>(tileID.canonical.x + tileID.wrap * tileScale) * s,
-                      static_cast<int64_t>(tileID.canonical.y) * s, 0);
+                      int64_t(tileID.canonical.x + tileID.wrap * tileScale) * s,
+                      int64_t(tileID.canonical.y) * s, 0);
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
