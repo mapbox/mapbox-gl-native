@@ -187,7 +187,7 @@
 {
     CGPoint center = [sender locationInView:sender.view.superview];
     [self setCenter:center pitch:self.mapView.camera.pitch];
-    
+
     if (sender.state == UIGestureRecognizerStateEnded) {
         self.dragState = MGLAnnotationViewDragStateNone;
     }
@@ -206,9 +206,10 @@
     
     if (dragState == MGLAnnotationViewDragStateStarting)
     {
+        [self.mapView.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
         [self.superview bringSubviewToFront:self];
     }
-    
+
     if (dragState == MGLAnnotationViewDragStateEnding)
     {
         if ([self.mapView.delegate respondsToSelector:@selector(mapView:didDragAnnotationView:toCoordinate:)])
@@ -231,7 +232,7 @@
     {
         return NO;
     }
-    
+
     return YES;
 }
 

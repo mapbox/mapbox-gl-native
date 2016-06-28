@@ -5,6 +5,9 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
 @interface MGLMapView (Internal)
 
+/// Currently shown popover representing the selected annotation.
+@property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
+
 /** Triggers another render pass even when it is not necessary. */
 - (void)setNeedsGLDisplay;
 
