@@ -1954,7 +1954,6 @@ public class MapboxMap {
      *
      * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
      */
-    @Deprecated
     public interface OnMyLocationChangeListener {
         /**
          * Called when the location of the My Location view has changed
