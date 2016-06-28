@@ -3004,6 +3004,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (annotationView)
     {
         annotationView.annotation = annotation;
+        annotationView.mapView = self;
         CGRect bounds = UIEdgeInsetsInsetRect({ CGPointZero, annotationView.frame.size }, annotationView.alignmentRectInsets);
         
         _largestAnnotationViewSize = CGSizeMake(MAX(_largestAnnotationViewSize.width, CGRectGetWidth(bounds)),
