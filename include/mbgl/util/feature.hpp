@@ -7,13 +7,9 @@
 namespace mbgl {
 
 using Value = mapbox::geometry::value;
-
-class Feature : public mapbox::geometry::feature<double> {
-public:
-    Feature(geometry_type&& geometry_)
-        : mapbox::geometry::feature<double> { std::move(geometry_) } {}
-
-    optional<uint64_t> id;
-};
+using NullValue = mapbox::geometry::null_value_t;
+using PropertyMap = mapbox::geometry::property_map;
+using FeatureIdentifier = mapbox::geometry::identifier;
+using Feature = mapbox::geometry::feature<double>;
 
 } // namespace mbgl

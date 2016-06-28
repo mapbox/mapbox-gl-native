@@ -24,12 +24,12 @@ public:
     FeatureType getType() const override { return type; }
     optional<Value> getValue(const std::string&) const override;
     std::unordered_map<std::string,Value> getProperties() const override;
-    optional<uint64_t> getID() const override;
+    optional<FeatureIdentifier> getID() const override;
     GeometryCollection getGeometries() const override;
 
 private:
     const VectorTileLayer& layer;
-    optional<uint64_t> id;
+    optional<FeatureIdentifier> id;
     FeatureType type = FeatureType::Unknown;
     packed_iter_type tags_iter;
     packed_iter_type geometry_iter;
@@ -120,7 +120,7 @@ VectorTileFeature::VectorTileFeature(protozero::pbf_reader feature_pbf, const Ve
     while (feature_pbf.next()) {
         switch (feature_pbf.tag()) {
         case 1: // id
-            id = feature_pbf.get_uint64();
+            id = { feature_pbf.get_uint64() };
             break;
         case 2: // tags
             tags_iter = feature_pbf.get_packed_uint32();
@@ -185,7 +185,7 @@ std::unordered_map<std::string,Value> VectorTileFeature::getProperties() const {
     return properties;
 }
 
-optional<uint64_t> VectorTileFeature::getID() const {
+optional<FeatureIdentifier> VectorTileFeature::getID() const {
     return id;
 }
 

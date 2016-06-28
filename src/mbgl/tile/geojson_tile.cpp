@@ -11,16 +11,16 @@ namespace mbgl {
 
 class GeoJSONTileFeature : public GeometryTileFeature {
 public:
-    GeoJSONTileFeature(FeatureType, GeometryCollection&&, Feature::property_map&&);
+    GeoJSONTileFeature(FeatureType, GeometryCollection&&, PropertyMap&&);
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
-    Feature::property_map getProperties() const override { return properties; }
+    PropertyMap getProperties() const override { return properties; }
     GeometryCollection getGeometries() const override;
 
 private:
     const FeatureType type;
     const GeometryCollection geometries;
-    const Feature::property_map properties;
+    const PropertyMap properties;
 };
 
 class GeoJSONTileLayer : public GeometryTileLayer {
@@ -94,7 +94,7 @@ std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile
                 geometry = fixupPolygons(geometry);
             }
 
-            Feature::property_map properties{ feature.tags.begin(), feature.tags.end() };
+            PropertyMap properties{ feature.tags.begin(), feature.tags.end() };
 
             features.emplace_back(std::make_shared<GeoJSONTileFeature>(
                 featureType, std::move(geometry), std::move(properties)));
@@ -118,7 +118,7 @@ void GeoJSONTile::setNecessity(Necessity) {}
 
 GeoJSONTileFeature::GeoJSONTileFeature(FeatureType type_,
                                        GeometryCollection&& geometries_,
-                                       Feature::property_map&& properties_)
+                                       PropertyMap&& properties_)
     : type(type_), geometries(std::move(geometries_)), properties(std::move(properties_)) {
 }
 

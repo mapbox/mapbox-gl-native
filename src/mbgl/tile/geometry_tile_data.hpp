@@ -41,8 +41,8 @@ public:
     virtual ~GeometryTileFeature() = default;
     virtual FeatureType getType() const = 0;
     virtual optional<Value> getValue(const std::string& key) const = 0;
-    virtual Feature::property_map getProperties() const { return Feature::property_map(); }
-    virtual optional<uint64_t> getID() const { return {}; }
+    virtual PropertyMap getProperties() const { return PropertyMap(); }
+    virtual optional<FeatureIdentifier> getID() const { return {}; }
     virtual GeometryCollection getGeometries() const = 0;
 };
 

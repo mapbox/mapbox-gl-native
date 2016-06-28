@@ -9,11 +9,7 @@
 
 #include <rapidjson/document.h>
 
-#include <map>
-
 using namespace mbgl;
-
-typedef std::multimap<std::string, Value> Properties;
 
 style::Filter parse(const char* expression) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
@@ -29,7 +25,7 @@ static void Parse_Filter(benchmark::State& state) {
 
 static void Parse_EvaluateFilter(benchmark::State& state) {
     const style::Filter filter = parse(R"FILTER(["==", "foo", "bar"])FILTER");
-    const Properties properties = { { "foo", std::string("bar") } };
+    const PropertyMap properties = { { "foo", std::string("bar") } };
 
     while (state.KeepRunning()) {
         filter(FeatureType::Unknown, [&] (const std::string& key) -> optional<Value> {

@@ -8,12 +8,8 @@
 
 #include <rapidjson/document.h>
 
-#include <map>
-
 using namespace mbgl;
 using namespace mbgl::style;
-
-typedef std::multimap<std::string, mbgl::Value> Properties;
 
 Filter parse(const char * expression) {
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
@@ -21,7 +17,7 @@ Filter parse(const char * expression) {
     return *conversion::convert<Filter>(doc);
 }
 
-bool evaluate(const Filter& filter, const Properties& properties, FeatureType type = FeatureType::Unknown) {
+bool evaluate(const Filter& filter, const PropertyMap& properties, FeatureType type = FeatureType::Unknown) {
     return filter(type, [&] (const std::string& key) -> optional<Value> {
         auto it = properties.find(key);
         if (it == properties.end())
@@ -47,6 +43,7 @@ TEST(Filter, EqualsNumber) {
     ASSERT_FALSE(evaluate(f, {{ "foo", std::string("0") }}));
     ASSERT_FALSE(evaluate(f, {{ "foo", false }}));
     ASSERT_FALSE(evaluate(f, {{ "foo", true }}));
+    ASSERT_FALSE(evaluate(f, {{ "foo", nullptr }}));
     ASSERT_FALSE(evaluate(f, {{}}));
 }
 
