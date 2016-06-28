@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithCoordinates:(CLLocationCoordinate2D *)coords count:(NSUInteger)count;
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds;
+- (BOOL)isWithinDistance:(CGFloat)distance ofPoint:(CGPoint)point transform:(CGPoint (^)(CLLocationCoordinate2D))transform;
 
 /** Constructs a shape annotation object, asking the delegate for style values. */
 - (mbgl::Annotation)annotationObjectWithDelegate:(id <MGLMultiPointDelegate>)delegate;

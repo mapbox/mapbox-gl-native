@@ -103,6 +103,52 @@ mbgl::Color MGLColorObjectFromCGColorRef(CGColorRef cgColor) {
     return MGLLatLngBoundsFromCoordinateBounds(_bounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
 }
 
+- (BOOL)isWithinDistance:(CGFloat)distance ofPoint:(CGPoint)point transform:(CGPoint (^)(CLLocationCoordinate2D))transform
+{
+    BOOL isWithinDistance = NO;
+
+    for (NSInteger i = 0; i < self.pointCount; i++) {
+        NSInteger j = (i != self.pointCount - 1) ? i + 1 : 0;
+        CGPoint endpoint1 = transform(self.coordinates[i]);
+        CGPoint endpoint2 = transform(self.coordinates[j]);
+
+        CGFloat length = point.x - endpoint1.x;
+        CGFloat height = point.y - endpoint1.y;
+        CGFloat xDifference = endpoint2.x - endpoint1.x;
+        CGFloat yDifference = endpoint2.y - endpoint1.y;
+
+        CGFloat dotProduct = length * xDifference + height * yDifference;
+        CGFloat lineLengthSquared = xDifference * xDifference + yDifference * yDifference;
+        CGFloat offset = dotProduct / lineLengthSquared;
+
+        CGFloat xOffset, yOffset;
+        if (offset <= 0.0) {
+            xOffset = endpoint1.x;
+            yOffset = endpoint1.y;
+        }
+        else if (offset >= 1.0) {
+            xOffset = endpoint2.x;
+            yOffset = endpoint2.y;
+        }
+        else {
+            xOffset = endpoint1.x + offset * xDifference;
+            yOffset = endpoint1.y + offset * yDifference;
+        }
+        
+        CGFloat xDistance = point.x - xOffset;
+        CGFloat yDistance = point.y - yOffset;
+        
+        CGFloat distanceFromPoint = sqrt(xDistance * xDistance + yDistance * yDistance);
+        
+        if (distanceFromPoint <= distance) {
+            isWithinDistance = YES;
+            break;
+        }
+    }
+
+    return isWithinDistance;
+}
+
 - (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate {
     NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
     return mbgl::SymbolAnnotation({mbgl::Point<double>()});
