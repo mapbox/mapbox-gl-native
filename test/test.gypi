@@ -135,7 +135,6 @@
             ['exclude', 'api/.*(hpp|cpp)$'],
             ['exclude', 'gl/object.cpp'],
             ['exclude', 'map/.*(hpp|cpp)$'],
-            ['exclude', 'tile/.*(hpp|cpp)$'],
             ['exclude', 'storage/.*(hpp|cpp)$'],
             ['exclude', 'style/.*(hpp|cpp)$'],
             ['exclude', 'sprite/.*(hpp|cpp)$'],
