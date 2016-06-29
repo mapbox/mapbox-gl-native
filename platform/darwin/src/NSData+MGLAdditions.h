@@ -4,7 +4,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSData (MGLAdditions)
 
-- (NSData *)mgl_compress;
+- (NSData *)mgl_compressedData;
+
+- (NSData *)mgl_decompressedData;
 
 @end
 

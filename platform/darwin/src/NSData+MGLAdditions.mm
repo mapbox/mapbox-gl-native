@@ -4,15 +4,22 @@
 
 @implementation NSData (MGLAdditions)
 
-- (NSData *)mgl_compress
+- (NSData *)mgl_compressedData
 {
-    NSString *string = [[NSString alloc] initWithData:self encoding:NSUTF8StringEncoding];
+    std::string string(static_cast<const char*>(self.bytes), self.length);
+    std::string compressed_string = mbgl::util::compress(string);
     
-    std::string compressedString = mbgl::util::compress(std::string([string UTF8String]));
+    return [NSData dataWithBytes:(void *) compressed_string.c_str() length:compressed_string.length()];
+}
 
-    NSString *convertedString = [NSString stringWithCString:compressedString.c_str() encoding:[NSString defaultCStringEncoding]];
+- (NSData *)mgl_decompressedData
+{
+    std::string string(static_cast<const char*>(self.bytes), self.length);
+    std::string decompressed_string = mbgl::util::decompress(string);
     
-    return [convertedString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString *decompressedString = @(decompressed_string.c_str());
+    
+    return [decompressedString dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 @end
