@@ -133,7 +133,6 @@
           'sources/': [
             ['exclude', 'util/.*(hpp|cpp)$'],
             ['exclude', 'api/.*(hpp|cpp)$'],
-            ['exclude', 'geometry/.*(hpp|cpp)$'],
             ['exclude', 'gl/object.cpp'],
             ['exclude', 'map/.*(hpp|cpp)$'],
             ['exclude', 'tile/.*(hpp|cpp)$'],
