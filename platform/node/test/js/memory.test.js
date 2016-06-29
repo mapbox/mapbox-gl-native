@@ -29,23 +29,23 @@ var tile_vector   = readFixture('vector.tile');
 
 test('Memory', function(t) {
     var options = {
-        request: function(req, callback) {
+        request: function(req) {
             if (req.url == null) {
                 t.fail('invalid file request');
             } else if (req.url.indexOf('sprite') > -1 && req.url.endsWith('json')) {
-                callback(null, { data: sprite_json });
+                req.respond(null, { data: sprite_json });
             } else if (req.url.indexOf('sprite') > -1 && req.url.endsWith('png')) {
-                callback(null, { data: sprite_png });
+                req.respond(null, { data: sprite_png });
             } else if (req.url.indexOf('fonts') > -1 && req.url.endsWith('pbf')) {
-                callback(null, { data: glyph });
+                req.respond(null, { data: glyph });
             } else if (req.url.endsWith('mapbox.satellite')) {
-                callback(null, { data: source_raster });
+                req.respond(null, { data: source_raster });
             } else if (req.url.indexOf('satellite') > -1 && req.url.endsWith('webp')) {
-                callback(null, { data: tile_raster });
+                req.respond(null, { data: tile_raster });
             } else if (req.url.endsWith('mapbox.mapbox-streets-v7')) {
-                callback(null, { data: source_vector });
+                req.respond(null, { data: source_vector });
             } else if (req.url.indexOf('streets') > -1 && req.url.endsWith('pbf')) {
-                callback(null, { data: tile_vector });
+                req.respond(null, { data: tile_vector });
             } else {
                 t.fail('unhandled file request: ' + req.url);
             }

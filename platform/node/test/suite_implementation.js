@@ -10,14 +10,14 @@ mbgl.on('message', function(msg) {
 module.exports = function (style, options, callback) {
     var map = new mbgl.Map({
         ratio: options.pixelRatio,
-        request: function(req, callback) {
+        request: function(req) {
             request(req.url, {encoding: null}, function (err, response, body) {
                 if (err) {
-                    callback(err);
+                    req.respond(err);
                 } else if (response.statusCode != 200) {
-                    callback(new Error(response.statusMessage));
+                    req.respond(new Error(response.statusMessage));
                 } else {
-                    callback(null, {data: body});
+                    req.respond(null, {data: body});
                 }
             });
         }

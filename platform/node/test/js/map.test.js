@@ -171,9 +171,9 @@ test('Map', function(t) {
 
     t.test('.render', function(t) {
         var options = {
-            request: function(req, callback) {
+            request: function(req) {
                 fs.readFile(path.join(__dirname, '..', req.url), function(err, data) {
-                    callback(err, { data: data });
+                    req.respond(err, { data: data });
                 });
             },
             ratio: 1
@@ -223,10 +223,10 @@ test('Map', function(t) {
         t.test('returns an error delayed', function(t) {
             var delay = 0;
             var map = new mbgl.Map({
-                request: function(req, callback) {
+                request: function(req) {
                     delay += 100;
                     setTimeout(function() {
-                        callback(new Error('not found'));
+                        req.respond(new Error('not found'));
                     }, delay);
                 },
                 ratio: 1
@@ -317,9 +317,9 @@ test('Map', function(t) {
     t.test('request callback', function (t) {
         t.test('returning an error', function(t) {
             var map = new mbgl.Map({
-                request: function(req, callback) {
+                request: function(req) {
                     setImmediate(function () {
-                        callback(new Error('request error'));
+                        req.respond(new Error('request error'));
                     });
                 },
             });
@@ -334,8 +334,8 @@ test('Map', function(t) {
 
         t.test('returning no content for a tile', function(t) {
             var map = new mbgl.Map({
-                request: function(req, callback) {
-                    callback();
+                request: function(req) {
+                    req.respond();
                 },
             });
             map.load(style);
