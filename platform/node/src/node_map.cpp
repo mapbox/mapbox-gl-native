@@ -742,10 +742,9 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
 
     auto requestHandle = NodeRequest::Create(resource, callback_)->ToObject();
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(requestHandle);
-    auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
 
-    v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
-    Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
+    v8::Local<v8::Value> argv[] = { requestHandle };
+    Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 1, argv);
 
     return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
 }
