@@ -133,6 +133,8 @@
           'sources/': [
             ['exclude', 'util/.*(hpp|cpp)$'],
             ['include', 'util/run_loop.cpp'],
+            ['include', 'util/async_task.cpp'],
+            ['include', 'util/timer.cpp'],
             ['exclude', 'api/.*(hpp|cpp)$'],
             ['exclude', 'gl/object.cpp'],
             ['exclude', 'map/.*(hpp|cpp)$'],
