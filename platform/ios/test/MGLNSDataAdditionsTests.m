@@ -29,16 +29,23 @@
 {
     NSMutableArray *array = [NSMutableArray array];
     for (NSUInteger i=0;i<count;i++) {
-        [array addObject:@{@"lat": @(@([self randomFloatBetween:-90 and:90]).integerValue),
-                           @"lng": @(@([self randomFloatBetween:-180 and:180]).integerValue),
-                           @"timestamp": @(@([[NSDate date] timeIntervalSince1970]).integerValue)}];
+        
+        NSTimeInterval ts = [[NSDate date] timeIntervalSince1970];
+        [array addObject:@{@"lat": @([self safeValueBetween:-90 and:90]),
+                           @"lng": @([self safeValueBetween:-190 and:190]),
+                           @"timestamp": @((floor(ts) * 100) / 100)}];
     }
     return array;
 }
 
-- (float)randomFloatBetween:(float)lowerBound and:(float)upperBound {
-    float diff = upperBound - lowerBound;
-    return (((float) (arc4random() % ((unsigned)RAND_MAX + 1)) / RAND_MAX) * diff) + lowerBound;
+- (double)safeValueBetween:(double)lowerBound and:(double)upperBound
+{
+    return floor([self randomBetween:lowerBound and:upperBound] * 100 ) / 100;
+}
+
+- (double)randomBetween:(double)lowerBound and:(double)upperBound
+{
+    return lowerBound * drand48() + upperBound * drand48();
 }
 
 @end
