@@ -43,11 +43,11 @@ static const char* releasedMessage() {
     return "Map resources have already been released";
 }
 
-NAN_MODULE_INIT(NodeMap::Init) {
+void NodeMap::Init(v8::Local<v8::Object> target) {
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
 
-    tpl->InstanceTemplate()->SetInternalFieldCount(2);
     tpl->SetClassName(Nan::New("Map").ToLocalChecked());
+    tpl->InstanceTemplate()->SetInternalFieldCount(2);
 
     Nan::SetPrototypeMethod(tpl, "load", Load);
     Nan::SetPrototypeMethod(tpl, "loaded", Loaded);

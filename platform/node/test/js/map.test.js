@@ -1,13 +1,15 @@
 'use strict';
 
 var test = require('tape');
-var mbgl = require('../../../../lib/mapbox-gl-native');
+var mbgl = require('../../index');
 var fs = require('fs');
 var path = require('path');
 var style = require('../fixtures/style.json');
 
 test('Map', function(t) {
-    t.test('must be constructed with new', function(t) {
+    // This test is skipped because of the req.respond shim in index.js
+    // which will always call new mbgl.Map()
+    t.skip('must be constructed with new', function(t) {
         t.throws(function() {
             mbgl.Map();
         }, /Use the new operator to create new Map objects/);
@@ -83,6 +85,42 @@ test('Map', function(t) {
             var map = new mbgl.Map(options);
             map.release();
         });
+
+        t.end();
+    });
+
+    t.test('instanceof mbgl.Map', function(t) {
+        var options = {
+            request: function() {},
+            ratio: 1
+        };
+
+        var map = new mbgl.Map(options);
+
+        t.ok(map instanceof mbgl.Map);
+        t.equal(map.__proto__, mbgl.Map.prototype);
+
+        var keys = Object.keys(mbgl.Map.prototype);
+
+        t.deepEqual(keys, [
+            'load',
+            'loaded',
+            'render',
+            'release',
+            'addClass',
+            'addSource',
+            'addLayer',
+            'removeLayer',
+            'setLayoutProperty',
+            'setPaintProperty',
+            'setFilter',
+            'dumpDebugLogs',
+            'queryRenderedFeatures'
+        ]);
+
+        for (var key in keys) {
+            t.equal(map[key], mbgl.Map.prototype[key]);
+        }
 
         t.end();
     });

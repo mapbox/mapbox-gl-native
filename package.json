@@ -6,7 +6,7 @@
     "mapbox",
     "gl"
   ],
-  "main": "lib/mapbox-gl-native.node",
+  "main": "platform/node/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/mapbox/mapbox-gl-native.git"
