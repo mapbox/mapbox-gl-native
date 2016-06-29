@@ -42,11 +42,11 @@
           '<@(geojsonvt_cflags)',
           '<@(rapidjson_cflags)',
           '<@(pixelmatch_cflags)',
-          '<@(earcut_cflags)'
+          '<@(earcut_cflags)',
         ],
         'ldflags': [
-          '-landroid',
-	  '<@(sqlite_ldflags)',
+          '<@(gtest_ldflags)',
+          '<@(sqlite_ldflags)',
         ],
         'libraries': [
           '<@(gtest_static_libs)',
@@ -71,6 +71,11 @@
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
             'libraries': [ '<@(libraries)', '<@(ldflags)' ],
+          }],
+          
+          #Android doesn't support -pthread
+          ['target_platform == "android"', {
+            'libraries!': ['<@(gtest_ldflags)']
           }]
         ],
       },
@@ -79,7 +84,34 @@
         'include_dirs': [
           'include',
         ],
+        
+        # Force the linker to include all the objects from the lib-test archive. Otherwise they'd
+        # be discarded because there are no undefined symbols to pull them in, and the resulting
+        # executable would run zero tests.
+        #
+        # Don't do this for android as linking this in a shared library leads to linker
+        # errors: "previous definition here"
 
+
+        'conditions': [
+          ['OS == "mac"', {
+            'xcode_settings': {
+              'OTHER_LDFLAGS': [
+                '-Wl,-force_load,<(PRODUCT_DIR)/libtest-lib.a',
+              ],
+            }
+          }, {
+            'conditions': [
+              ['target_platform != "android"', {
+                'link_settings': {
+                  'ldflags': [
+                    '-Wl,-whole-archive <(PRODUCT_DIR)/libtest-lib.a -Wl,-no-whole-archive',
+                  ],
+                },
+              }]
+            ],
+          }],
+        ]
       },
     },
   ]
