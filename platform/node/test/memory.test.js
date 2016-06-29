@@ -1,7 +1,7 @@
 'use strict';
 
 var fs = require('fs');
-var mbgl = require('../../../lib/mapbox-gl-native');
+var mbgl = require('../index');
 var path = require('path');
 var test = require('tape');
 

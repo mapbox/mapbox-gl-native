@@ -1,6 +1,6 @@
 'use strict';
 
-var mbgl = require('../../../lib/mapbox-gl-native');
+var mbgl = require('../index');
 var request = require('request');
 
 mbgl.on('message', function(msg) {
