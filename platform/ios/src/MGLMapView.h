@@ -21,6 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLCalloutView;
 @protocol MGLFeature;
 
+/** The default deceleration rate for a map view. */
+extern const CGFloat MGLMapViewDecelerationRateNormal;
+
+/** A fast deceleration rate for a map view. */
+extern const CGFloat MGLMapViewDecelerationRateFast;
+
+/** Disables decleration in a map view. */
+extern const CGFloat MGLMapViewDecelerationRateImmediate;
+
 /** The vertical alignment of an annotation within a map view. */
 typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     /** Aligns the annotation vertically in the center of the map view. */
@@ -403,6 +412,17 @@ IB_DESIGNABLE
  The default value of this property is `YES`.
  */
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
+
+/**
+ A floating-point value that determines the rate of deceleration after the user
+ lifts their finger.
+
+ Your application can use the `MGLMapViewDecelerationRateNormal` and
+ `MGLMapViewDecelerationRateFast` constants as reference points for reasonable
+ deceleration rates. `MGLMapViewDecelerationRateImmediate` can be used to
+ disable deceleration entirely.
+ */
+@property(nonatomic) CGFloat decelerationRate;
 
 #pragma mark Manipulating the Viewpoint
 
