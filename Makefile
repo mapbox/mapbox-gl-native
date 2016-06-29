@@ -166,6 +166,7 @@ idocument:
 
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
+ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 
 define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
@@ -197,12 +198,18 @@ test-android: android-test-lib-arm-v7
 	#Compile Test runner
 	javac -sourcepath test/src -d build -source 1.7 -target 1.7 test/src/Main.java
 	#Combine and dex
-	cd build && dx --dex --output=test.jar Main.class classes.dex	
+	cd build && dx --dex --output=test.jar Main.class classes.dex
+
+	#Ensure clean state on the device
+	adb shell "rm -Rf $(ANDROID_LOCAL_WORK_DIR)"
+	adb shell "mkdir -p $(ANDROID_LOCAL_WORK_DIR)/test"
+
 	#Push all needed files to the device
-	adb push build/test.jar /data/local/tmp/
-	adb push build/android-arm-v7/Debug/lib.target/libmapbox-gl.so /data/local/tmp/
-	adb push build/android-arm-v7/Debug/lib.target/libtest-jni-lib.so /data/local/tmp/
-	adb shell "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/system/lib:/data/local/tmp dalvikvm32 -cp /data/local/tmp/test.jar Main"	
+	adb push build/test.jar $(ANDROID_LOCAL_WORK_DIR)
+	adb push test/fixtures $(ANDROID_LOCAL_WORK_DIR)/test
+	adb push build/android-arm-v7/Debug/lib.target/libmapbox-gl.so $(ANDROID_LOCAL_WORK_DIR)
+	adb push build/android-arm-v7/Debug/lib.target/libtest-jni-lib.so $(ANDROID_LOCAL_WORK_DIR)
+	adb shell "export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:/system/lib:$(ANDROID_LOCAL_WORK_DIR) && cd $(ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(ANDROID_LOCAL_WORK_DIR)/test.jar Main"	
 	#TODO - Renable platform tests cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:
