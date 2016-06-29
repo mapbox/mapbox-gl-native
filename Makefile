@@ -190,7 +190,7 @@ $(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
 android: android-arm-v7
 
 test-android: android-test-lib-arm-v7
-        #TODO Decide where to place the class files and other tmp outputs 
+	#TODO Decide where to place the class files and other tmp outputs 
 	#Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	cd platform/android && ./gradlew assembleDebug
 	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build

@@ -172,10 +172,6 @@
         '<@(libjpeg-turbo_cflags)',
       ],
 
-#      'cflags_cc': [
-#        '<@(jni.hpp_cflags)',
-#      ],
-
       'link_settings': {
         'libraries': [
           '-llog',
