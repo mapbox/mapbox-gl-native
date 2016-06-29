@@ -84,9 +84,12 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     
     _annotationView = annotationView;
     
-    [_expectation fulfill];
-    
     return annotationView;
+}
+
+- (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NSArray<MGLAnnotationView *> *)annotationViews
+{
+    [_expectation fulfill];
 }
 
 @end
