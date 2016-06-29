@@ -1768,16 +1768,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if (annotation == [self annotationWithTag:annotationTag])
         {
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
-            
-            MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
+
             NSString *symbolName;
-            if (!annotationContext.annotationView)
-            {
-                MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-                symbolName = annotationImage.styleIconIdentifier;
-            }
-            
-            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String ?: "" });
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            symbolName = annotationImage.styleIconIdentifier;
+
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String});
             if (annotationTag == _selectedAnnotationTag)
             {
                 [self deselectAnnotation:annotation animated:YES];
