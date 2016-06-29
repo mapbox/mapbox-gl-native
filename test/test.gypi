@@ -132,6 +132,7 @@
           'sources!': ['util/async_task.cpp'], # Doesn't compile??
           'sources/': [
             ['exclude', 'util/.*(hpp|cpp)$'],
+            ['include', 'util/run_loop.cpp'],
             ['exclude', 'api/.*(hpp|cpp)$'],
             ['exclude', 'gl/object.cpp'],
             ['exclude', 'map/.*(hpp|cpp)$'],
