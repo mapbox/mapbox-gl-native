@@ -337,6 +337,7 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions) const {
 }
 
 std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& parameters) const {
+    std::vector<Feature> result;
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
 
     for (const auto& source : sources) {
@@ -344,7 +345,9 @@ std::vector<Feature> Style::queryRenderedFeatures(const QueryParameters& paramet
         std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
     }
 
-    std::vector<Feature> result;
+    if (resultsByLayer.empty()) {
+        return result;
+    }
 
     // Combine all results based on the style layer order.
     for (const auto& layer : layers) {
