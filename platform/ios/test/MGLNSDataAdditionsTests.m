@@ -22,19 +22,20 @@
     
     NSArray *decompressedArray = [NSJSONSerialization JSONObjectWithData:decompressedData options:0 error:nil];
     
-    XCTAssertTrue([originalArray isEqualToArray:decompressedArray], @"originalDict and decompressedDict should be equal");
+    XCTAssertTrue([originalArray isEqualToArray:decompressedArray], @"originalArray and decompressedArray should be equal");
 }
 
 - (NSArray *)mockDataWithCount:(NSUInteger)count
 {
     NSMutableArray *array = [NSMutableArray array];
-    for (NSUInteger i=0;i<count;i++) {
-        
-        NSTimeInterval ts = [[NSDate date] timeIntervalSince1970];
+    
+    for (NSUInteger i=0;i<count;i++)
+    {
         [array addObject:@{@"lat": @([self safeValueBetween:-90 and:90]),
-                           @"lng": @([self safeValueBetween:-190 and:190]),
-                           @"timestamp": @((floor(ts) * 100) / 100)}];
+                           @"lng": @([self safeValueBetween:-180 and:180]),
+                           @"timestamp": @((floor([NSDate date].timeIntervalSince1970) * 100) / 100)}];
     }
+    
     return array;
 }
 
