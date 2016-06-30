@@ -49,7 +49,7 @@ public:
     virtual void swapRenderData() {}
 
 protected:
-    util::Atomic<bool> uploaded = { false };
+    util::Atomic<bool> uploaded { false };
 };
 
 } // namespace mbgl
