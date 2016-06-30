@@ -1,5 +1,6 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/premultiply.hpp>
+#include <mbgl/util/char_array_buffer.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <istream>
@@ -44,8 +45,8 @@ struct png_struct_guard {
 };
 
 PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
-    std::istringstream source(std::string(reinterpret_cast<const char*>(data), size));
-    std::istream stream(source.rdbuf());
+    util::CharArrayBuffer dataBuffer { reinterpret_cast<const char*>(data), size };
+    std::istream stream(&dataBuffer);
 
     png_byte header[8] = { 0 };
     stream.read(reinterpret_cast<char*>(header), 8);

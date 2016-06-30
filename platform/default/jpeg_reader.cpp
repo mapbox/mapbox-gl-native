@@ -1,4 +1,5 @@
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/char_array_buffer.hpp>
 
 #include <istream>
 #include <sstream>
@@ -21,7 +22,7 @@ struct jpeg_stream_wrapper {
 
 static void init_source(j_decompress_ptr cinfo) {
     jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
-    wrap->stream->seekg(0);
+    wrap->stream->seekg(0, std::ios_base::beg);
 }
 
 static boolean fill_input_buffer(j_decompress_ptr cinfo) {
@@ -89,8 +90,8 @@ struct jpeg_info_guard {
 };
 
 PremultipliedImage decodeJPEG(const uint8_t* data, size_t size) {
-    std::istringstream source(std::string(reinterpret_cast<const char*>(data), size));
-    std::istream stream(source.rdbuf());
+    util::CharArrayBuffer dataBuffer { reinterpret_cast<const char*>(data), size };
+    std::istream stream(&dataBuffer);
 
     jpeg_decompress_struct cinfo;
     jpeg_info_guard iguard(&cinfo);
