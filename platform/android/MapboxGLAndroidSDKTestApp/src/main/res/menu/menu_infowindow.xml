@@ -8,6 +8,12 @@
             android:id="@+id/action_toggle_concurrent_infowindow"
             app:showAsAction="never"
             android:checkable="true"/>
+        <item
+            android:title="@string/menuitem_title_deselect_markers_on_tap"
+            android:id="@+id/action_toggle_deselect_markers_on_tap"
+            app:showAsAction="never"
+            android:checkable="true"
+            android:checked="true"/>
     </group>
 
 </menu>

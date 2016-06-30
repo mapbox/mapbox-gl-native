@@ -39,6 +39,22 @@ public abstract class BaseMarkerOptions<U extends Marker, T extends BaseMarkerOp
         return getThis();
     }
 
+    public T setIcon(Icon icon) {
+        return icon(icon);
+    }
+
+    public T setPosition(LatLng position) {
+        return position(position);
+    }
+
+    public T setSnippet(String snippet) {
+        return snippet(snippet);
+    }
+
+    public T setTitle(String title) {
+        return title(title);
+    }
+
     public abstract T getThis();
 
     public abstract U getMarker();

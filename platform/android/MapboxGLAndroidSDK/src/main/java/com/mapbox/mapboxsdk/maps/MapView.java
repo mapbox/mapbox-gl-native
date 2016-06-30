@@ -48,6 +48,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -124,6 +125,7 @@ public class MapView extends FrameLayout {
     private NativeMapView mNativeMapView;
     private boolean mHasSurface = false;
 
+    private ViewGroup mMarkerViewContainer;
     private CompassView mCompassView;
     private ImageView mLogoView;
     private ImageView mAttributionsView;
@@ -150,6 +152,8 @@ public class MapView extends FrameLayout {
     private int mContentPaddingTop;
     private int mContentPaddingRight;
     private int mContentPaddingBottom;
+
+    private PointF mFocalPoint;
 
     private StyleInitializer mStyleInitializer;
 
@@ -224,6 +228,8 @@ public class MapView extends FrameLayout {
 
         // Connectivity
         onConnectivityChanged(isConnected());
+
+        mMarkerViewContainer = (ViewGroup) view.findViewById(R.id.markerViewContainer);
 
         mMyLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
         mMyLocationView.setMapboxMap(mMapboxMap);
@@ -561,6 +567,18 @@ public class MapView extends FrameLayout {
             // user has failed to supply a style url
             setStyleUrl(mStyleInitializer.getStyle());
         }
+    }
+
+    void setFocalPoint(PointF focalPoint) {
+        if (focalPoint == null) {
+            // resetting focal point,
+            UiSettings uiSettings = mMapboxMap.getUiSettings();
+            // need to validate if we need to reset focal point with user provided one
+            if (uiSettings.getFocalPoint() != null) {
+                focalPoint = uiSettings.getFocalPoint();
+            }
+        }
+        mFocalPoint = focalPoint;
     }
 
     /**
@@ -1119,18 +1137,25 @@ public class MapView extends FrameLayout {
         for (int i = 0; i < ids.length; i++) {
             idsList.add(ids[i]);
         }
-
+        
         List<MarkerView> annotations = new ArrayList<>(ids.length);
         List<Annotation> annotationList = mMapboxMap.getAnnotations();
         int count = annotationList.size();
         for (int i = 0; i < count; i++) {
             Annotation annotation = annotationList.get(i);
-            if (annotation instanceof MarkerView && idsList.contains(annotation.getId())) {
+            if (annotation instanceof MarkerView) {
                 annotations.add((MarkerView) annotation);
             }
         }
 
         return new ArrayList<>(annotations);
+    }
+
+    /**
+     * @return the ViewGroup containing the marker views
+     */
+    public ViewGroup getMarkerViewContainer() {
+        return mMarkerViewContainer;
     }
 
 
@@ -1371,7 +1396,6 @@ public class MapView extends FrameLayout {
             if (mDestroyed) {
                 return;
             }
-
             mCompassView.update(getDirection());
             mMyLocationView.update();
             mMapboxMap.getMarkerViewManager().update();
@@ -1538,8 +1562,12 @@ public class MapView extends FrameLayout {
                         || mShoveGestureDetector.isInProgress();
 
                 if (mTwoTap && isTap && !inProgress) {
-                    PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
-                    zoom(false, focalPoint.x, focalPoint.y);
+                    if (mFocalPoint != null) {
+                        zoom(false, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+                    } else {
+                        PointF focalPoint = TwoFingerGestureDetector.determineFocalPoint(event);
+                        zoom(false, focalPoint.x, focalPoint.y);
+                    }
                     mTwoTap = false;
                     return true;
                 }
@@ -1598,12 +1626,12 @@ public class MapView extends FrameLayout {
                     }
 
                     // Single finger double tap
-                    if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
+                    if (mFocalPoint != null) {
+                        // User provided focal point
+                        zoom(true, mFocalPoint.x, mFocalPoint.y);
+                    } else {
                         // Zoom in on gesture
                         zoom(true, e.getX(), e.getY());
-                    } else {
-                        // Zoom in on user location view
-                        zoom(true, mMyLocationView.getCenterX(), mMyLocationView.getCenterY());
                     }
                     break;
             }
@@ -1678,8 +1706,10 @@ public class MapView extends FrameLayout {
                     }
                 }
             } else {
-                // deselect any selected marker
-                mMapboxMap.deselectMarkers();
+                if (mMapboxMap.getUiSettings().isDeselectMarkersOnTap()) {
+                    // deselect any selected marker
+                    mMapboxMap.deselectMarkers();
+                }
 
                 // notify app of map click
                 MapboxMap.OnMapClickListener listener = mMapboxMap.getOnMapClickListener();
@@ -1835,23 +1865,18 @@ public class MapView extends FrameLayout {
             // Gesture is a quickzoom if there aren't two fingers
             mQuickZoom = !mTwoTap;
 
-            TrackingSettings trackingSettings = mMapboxMap.getTrackingSettings();
-
             // Scale the map
-            if (uiSettings.isScrollGesturesEnabled() && !mQuickZoom && trackingSettings.isLocationTrackingDisabled()) {
+            if (mFocalPoint != null) {
+                // arround user provided focal point
+                mNativeMapView.scaleBy(detector.getScaleFactor(), mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+            } else if (mQuickZoom) {
+                // around center map
+                mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
+            } else {
                 // around gesture
                 mNativeMapView.scaleBy(detector.getScaleFactor(), detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
-            } else {
-                if (trackingSettings.isLocationTrackingDisabled()) {
-                    // around center map
-                    mNativeMapView.scaleBy(detector.getScaleFactor(), (getWidth() / 2) / mScreenDensity, (getHeight() / 2) / mScreenDensity);
-                } else {
-                    // around user location view
-                    float x = mMyLocationView.getX() + mMyLocationView.getWidth() / 2;
-                    float y = mMyLocationView.getY() + mMyLocationView.getHeight() / 2;
-                    mNativeMapView.scaleBy(detector.getScaleFactor(), x / mScreenDensity, y / mScreenDensity);
-                }
             }
+
             return true;
         }
     }
@@ -1925,16 +1950,14 @@ public class MapView extends FrameLayout {
             bearing += detector.getRotationDegreesDelta();
 
             // Rotate the map
-            if (mMapboxMap.getTrackingSettings().isLocationTrackingDisabled()) {
+            if (mFocalPoint != null) {
+                // User provided focal point
+                mNativeMapView.setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+            } else {
                 // around gesture
                 mNativeMapView.setBearing(bearing,
                         detector.getFocusX() / mScreenDensity,
                         detector.getFocusY() / mScreenDensity);
-            } else {
-                // around center userlocation
-                float x = mMyLocationView.getX() + mMyLocationView.getWidth() / 2;
-                float y = mMyLocationView.getY() + mMyLocationView.getHeight() / 2;
-                mNativeMapView.setBearing(bearing, x / mScreenDensity, y / mScreenDensity);
             }
             return true;
         }
@@ -2429,6 +2452,13 @@ public class MapView extends FrameLayout {
             mMapboxMap.setMyLocationEnabled(true);
         }
         mMyLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
+
+        if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+            setFocalPoint(new PointF(mMyLocationView.getCenterX(), mMyLocationView.getCenterY()));
+        } else {
+            setFocalPoint(null);
+        }
+
         MapboxMap.OnMyLocationTrackingModeChangeListener listener = mMapboxMap.getOnMyLocationTrackingModeChangeListener();
         if (listener != null) {
             listener.onMyLocationTrackingModeChange(myLocationTrackingMode);

@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
@@ -38,7 +39,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
-import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import java.lang.reflect.ParameterizedType;
@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  * you must obtain one from the getMapAsync() method on a MapFragment or MapView that you have
  * added to your application.
  * <p>
- * Note: Similar to a View object, a GoogleMap should only be read and modified from the main thread.
+ * Note: Similar to a View object, a MapboxMap should only be read and modified from the main thread.
  * </p>
  */
 public class MapboxMap {
@@ -1142,6 +1142,11 @@ public class MapboxMap {
         }
 
         if (!handledDefaultClick) {
+
+            if (marker instanceof MarkerView) {
+                mMarkerViewManager.ensureInfoWindowOffset((MarkerView) marker);
+            }
+
             if (isInfoWindowValidForMarker(marker) || getInfoWindowAdapter() != null) {
                 mInfoWindows.add(marker.showInfoWindow(this, mMapView));
             }
@@ -1208,7 +1213,12 @@ public class MapboxMap {
 
     private MarkerView prepareViewMarker(BaseMarkerViewOptions markerViewOptions) {
         MarkerView marker = markerViewOptions.getMarker();
-        marker.setIcon(markerViewOptions.getIcon());
+
+        Icon icon = markerViewOptions.getIcon();
+        if (icon == null) {
+            icon = IconFactory.getInstance(mMapView.getContext()).defaultMarkerView();
+        }
+        marker.setIcon(icon);
         return marker;
     }
 
@@ -1533,10 +1543,8 @@ public class MapboxMap {
      *
      * @param listener The callback that's invoked when the user clicks on a marker.
      *                 To unset the callback, use null.
-     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationServices#addLocationListener(LocationListener)})}
      */
     @UiThread
-    @Deprecated
     public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener listener) {
         mMapView.setOnMyLocationChangeListener(listener);
     }
@@ -1945,9 +1953,7 @@ public class MapboxMap {
      * Interface definition for a callback to be invoked when the the My Location view changes location.
      *
      * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
-     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.location.LocationListener}
      */
-    @Deprecated
     public interface OnMyLocationChangeListener {
         /**
          * Called when the location of the My Location view has changed

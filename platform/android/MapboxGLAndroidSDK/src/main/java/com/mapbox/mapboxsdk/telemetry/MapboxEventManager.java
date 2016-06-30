@@ -313,6 +313,16 @@ public class MapboxEventManager {
      * @param location Location event
      */
     public void addLocationEvent(Location location) {
+
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(location.getLatitude()) ||  Double.isNaN(location.getLongitude()) ||  Double.isNaN(location.getAltitude())) {
+            return;
+        }
+
+        if (Double.isInfinite(location.getLatitude()) ||  Double.isInfinite(location.getLongitude()) ||  Double.isInfinite(location.getAltitude())) {
+            return;
+        }
+
         // Add Location even to queue
         Hashtable<String, Object> event = new Hashtable<>();
         event.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_LOCATION);

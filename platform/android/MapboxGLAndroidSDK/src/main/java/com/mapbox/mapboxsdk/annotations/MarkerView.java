@@ -1,13 +1,18 @@
 package com.mapbox.mapboxsdk.annotations;
 
+import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * MarkerView is an annotation that shows an View at a geographical location.
@@ -26,8 +31,8 @@ public class MarkerView extends Marker {
     private float anchorU;
     private float anchorV;
 
-    private float offsetX;
-    private float offsetY;
+    private float offsetX = -1;
+    private float offsetY = -1;
 
     private float infoWindowAnchorU;
     private float infoWindowAnchorV;
@@ -81,6 +86,7 @@ public class MarkerView extends Marker {
     public void setAnchor(@FloatRange(from = 0.0, to = 1.0) float u, @FloatRange(from = 0.0, to = 1.0) float v) {
         this.anchorU = u;
         this.anchorV = v;
+        setOffset(-1, -1);
     }
 
     /**
@@ -102,26 +108,16 @@ public class MarkerView extends Marker {
     }
 
     /**
-     * Internal method to set the horizontal calculated offset.
+     * Internal method to set the calculated offset.
      * <p>
      * These are calculated based on the View bounds and the provided anchor.
      * </p>
      *
      * @param x the x-value of the offset
-     */
-    void setOffsetX(float x) {
-        offsetX = x;
-    }
-
-    /**
-     * Internal method to set the vertical calculated offset.
-     * <p>
-     * These are calculated based on the View bounds and the provided anchor.
-     * </p>
-     *
      * @param y the y-value of the offset
      */
-    void setOffsetY(float y) {
+    void setOffset(float x, float y) {
+        offsetX = x;
         offsetY = y;
     }
 
@@ -279,7 +275,7 @@ public class MarkerView extends Marker {
      *
      * @param alpha the alpha value to animate to
      */
-    public void setAlpha(@FloatRange(from=0.0, to=255.0)float alpha) {
+    public void setAlpha(@FloatRange(from = 0.0, to = 255.0) float alpha) {
         this.alpha = alpha;
         if (markerViewManager != null) {
             markerViewManager.animateAlpha(this, alpha);
@@ -336,6 +332,12 @@ public class MarkerView extends Marker {
     @Override
     public void setMapboxMap(MapboxMap mapboxMap) {
         super.setMapboxMap(mapboxMap);
+
+        if(isFlat()) {
+            // initial tilt value if MapboxMap is started with a tilt attribute
+            tiltValue = (float) mapboxMap.getCameraPosition().tilt;
+        }
+
         markerViewManager = mapboxMap.getMarkerViewManager();
     }
 

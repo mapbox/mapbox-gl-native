@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -9,7 +10,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -61,10 +66,16 @@ public class FeatureOverviewActivity extends AppCompatActivity {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 if (!sectionAdapter.isSectionHeaderPosition(position)) {
-                    Intent intent = new Intent();
                     int realPosition = sectionAdapter.getConvertedPosition(position);
-                    intent.setComponent(new ComponentName(getPackageName(), features.get(realPosition).getName()));
-                    startActivity(intent);
+                    Feature feature = features.get(realPosition);
+                    if (feature.getCategory().equals(getString(R.string.category_userlocation))) {
+                        if ((ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
+                                (ContextCompat.checkSelfPermission(FeatureOverviewActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                            ActivityCompat.requestPermissions(FeatureOverviewActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, realPosition);
+                            return;
+                        }
+                    }
+                    startFeature(feature);
                 }
             }
         });
@@ -102,6 +113,22 @@ public class FeatureOverviewActivity extends AppCompatActivity {
         sectionAdapter = new FeatureSectionAdapter(this, R.layout.section_main_layout, R.id.section_text, new FeatureAdapter(features));
         sectionAdapter.setSections(sections.toArray(dummy));
         recyclerView.setAdapter(sectionAdapter);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startFeature(features.get(requestCode));
+        }else{
+            Snackbar.make(findViewById(android.R.id.content),"Can't open without the location permission.",Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private void startFeature(Feature feature) {
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName(getPackageName(), feature.getName()));
+        startActivity(intent);
     }
 
     @Override

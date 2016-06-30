@@ -117,6 +117,11 @@ public class Marker extends Annotation {
         refreshInfoWindowContent();
     }
 
+    @Nullable
+    public InfoWindow getInfoWindow() {
+        return infoWindow;
+    }
+
     /**
      * Update only for default Marker's InfoWindow content for Title and Snippet
      */

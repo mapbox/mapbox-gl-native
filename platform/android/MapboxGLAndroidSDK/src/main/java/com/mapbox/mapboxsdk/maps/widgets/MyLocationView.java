@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Camera;
@@ -28,7 +27,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -66,6 +64,14 @@ public class MyLocationView extends View {
     private ValueAnimator locationChangeAnimator;
     private ValueAnimator accuracyAnimator;
     private ValueAnimator directionAnimator;
+
+    private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
+            new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    invalidate();
+                }
+            };
 
     private Drawable foregroundDrawable;
     private Drawable foregroundBearingDrawable;
@@ -260,8 +266,8 @@ public class MyLocationView extends View {
         camera.getMatrix(matrix);
 
         //
-        if (myBearingTrackingMode != MyBearingTracking.NONE) {
-            matrix.postRotate((Float) directionAnimator.getAnimatedValue());
+        if (myBearingTrackingMode != MyBearingTracking.NONE && directionAnimator != null) {
+            matrix.preRotate((Float) directionAnimator.getAnimatedValue());
         }
 
         // put matrix at location of MyLocationView
@@ -293,10 +299,6 @@ public class MyLocationView extends View {
 
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
         this.tilt = (float) tilt;
-    }
-
-    void updateOnNextFrame() {
-        mapboxMap.invalidate();
     }
 
     public void onPause() {
@@ -444,6 +446,7 @@ public class MyLocationView extends View {
 
         directionAnimator = ValueAnimator.ofFloat(oldDir, newDir);
         directionAnimator.setDuration(375);
+        directionAnimator.addUpdateListener(invalidateSelfOnUpdateListener);
         directionAnimator.start();
     }
 
@@ -526,24 +529,19 @@ public class MyLocationView extends View {
                 return;
             }
 
-            long currentTime = SystemClock.elapsedRealtime();
-            if (currentTime < mCompassUpdateNextTimestamp) {
-                return;
-            }
-
             int type = event.sensor.getType();
-            float[] data;
             if (type == Sensor.TYPE_ACCELEROMETER) {
-                data = mGData;
+                System.arraycopy(event.values, 0, mGData, 0, 3);
             } else if (type == Sensor.TYPE_MAGNETIC_FIELD) {
-                data = mMData;
+                System.arraycopy(event.values, 0, mMData, 0, 3);
             } else {
                 // we should not be here.
                 return;
             }
 
-            for (int i = 0; i < 3; i++) {
-                data[i] = event.values[i];
+            long currentTime = SystemClock.elapsedRealtime();
+            if (currentTime < mCompassUpdateNextTimestamp) {
+                return;
             }
 
             SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
@@ -587,7 +585,7 @@ public class MyLocationView extends View {
             double latitude = fromLat + (toLat - fromLat) * frac;
             double longitude = fromLng + (toLng - fromLng) * frac;
             behavior.updateLatLng(latitude, longitude);
-            updateOnNextFrame();
+            update();
         }
     }
 

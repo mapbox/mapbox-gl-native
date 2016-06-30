@@ -33,6 +33,7 @@ public final class IconFactory {
     private Context mContext;
     private static IconFactory sInstance;
     private Icon mDefaultMarker;
+    private Icon mDefaultMarkerView;
     private BitmapFactory.Options mOptions;
 
     private int mNextId = 0;
@@ -119,6 +120,13 @@ public final class IconFactory {
             mDefaultMarker = fromResource(R.drawable.default_marker);
         }
         return mDefaultMarker;
+    }
+
+    public Icon defaultMarkerView() {
+        if (mDefaultMarkerView == null) {
+            mDefaultMarkerView = fromResource(R.drawable.default_markerview);
+        }
+        return mDefaultMarkerView;
     }
 
     private Icon fromInputStream(@NonNull InputStream is) {

@@ -18,10 +18,12 @@
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
+    <string name="activity_view_marker_scale">Scaling in the View Marker API</string>
 
     <!-- InfoWindow-->
-    <string name="activity_info_window">Standard InfoWindow example</string>
-    <string name="activity_infowindow_adapter">Custom InfoWindow Adapter</string>
+    <string name="activity_info_window">Standard InfoWindow</string>
+    <string name="activity_infowindow_adapter">Custom InfoWindow</string>
+    <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow</string>
 
     <!-- Camera -->
     <string name="activity_camera_animation_types">Animation Types</string>
@@ -33,6 +35,9 @@
     <!-- API -->
     <string name="activity_directions">Directions</string>
     <string name="activity_geocoder">Geocoder</string>
+
+    <!-- Navigation -->
+    <string name="activity_location_picker">Location Picker</string>
 
     <!-- Other -->
     <string name="activity_double_map">Double Map Activity</string>
@@ -80,8 +85,12 @@
     <string name="description_doublemap">2 maps in a view hierarchy</string>
     <string name="description_back_to_map">Restart map view after temporarily leaving to another activity</string>
     <string name="description_view_marker">Use an Android SDK View as marker</string>
+    <string name="description_view_marker_scale">Scale a View Marker</string>
+    <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
+    <string name="description_location_picker">Use a fixed Marker to select your location</string>
 
-    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>r
+    <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
+    <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
     <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
     <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on gesture</string>
     <string name="menuitem_title_reset">Reset</string>
@@ -98,6 +107,7 @@
     <string name="category_maplayout">Map Layout</string>
     <string name="category_offline">Offline</string>
     <string name="category_userlocation">User Location</string>
+    <string name="category_navigation">Navigation</string>
 
     <string name="action_visible_bounds_explanation">Center map around 2 markers</string>
     <string name="action_remove_polylines">Remove polylines</string>
@@ -158,5 +168,7 @@
     <string name="dynamic_marker_chelsea_snippet">Stamford Bridge</string>
     <string name="dynamic_marker_arsenal_title">Arsenal</string>
     <string name="dynamic_marker_arsenal_snippet">Emirates Stadium</string>
+
+    <string name="navigation_select_location_button_text">Select Location!</string>
 
 </resources>

@@ -5,6 +5,7 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -55,7 +56,8 @@ public class MarkerViewActivity extends AppCompatActivity {
             new LatLng(38.909698, -77.029642),
             new LatLng(38.907227, -77.036530),
             new LatLng(38.905607, -77.031916),
-            new LatLng(38.889441, -77.050134)
+            new LatLng(38.889441, -77.050134),
+            new LatLng(38.888000, -77.050000) //Slight overlap to show re-ordering on selection
     };
 
     @Override
@@ -90,6 +92,7 @@ public class MarkerViewActivity extends AppCompatActivity {
                     mMapboxMap.addMarker(new MarkerViewOptions()
                             .position(LAT_LNGS[i])
                             .title(String.valueOf(i))
+                            .alpha(0.5f)
                             .icon(usFlag)
                     );
                 }

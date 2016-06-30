@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.annotations;
 import android.content.res.Resources;
 import android.graphics.PointF;
 import android.support.annotation.LayoutRes;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -222,9 +223,22 @@ public class InfoWindow {
         }
         mMapboxMap = new WeakReference<>(mapboxMap);
         String title = overlayItem.getTitle();
-        ((TextView) view.findViewById(R.id.infowindow_title)).setText(title);
+        TextView titleTextView = ((TextView) view.findViewById(R.id.infowindow_title));
+        if (!TextUtils.isEmpty(title)) {
+            titleTextView.setText(title);
+            titleTextView.setVisibility(View.VISIBLE);
+        } else {
+            titleTextView.setVisibility(View.GONE);
+        }
+
         String snippet = overlayItem.getSnippet();
-        ((TextView) view.findViewById(R.id.infowindow_description)).setText(snippet);
+        TextView snippetTextView = ((TextView) view.findViewById(R.id.infowindow_description));
+        if (!TextUtils.isEmpty(snippet)) {
+            snippetTextView.setText(snippet);
+            snippetTextView.setVisibility(View.VISIBLE);
+        } else {
+            snippetTextView.setVisibility(View.GONE);
+        }
     }
 
     InfoWindow setBoundMarker(Marker boundMarker) {
@@ -245,9 +259,18 @@ public class InfoWindow {
         View view = mView.get();
         if (mapboxMap != null && marker != null && view != null) {
             mCoordinates = mapboxMap.getProjection().toScreenLocation(marker.getPosition());
-            view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
+
+            if (view instanceof InfoWindowView) {
+                view.setX(mCoordinates.x + mViewWidthOffset - mMarkerWidthOffset);
+            } else {
+                view.setX(mCoordinates.x - (view.getMeasuredWidth() / 2) - mMarkerWidthOffset);
+            }
             view.setY(mCoordinates.y + mMarkerHeightOffset);
         }
+    }
+
+    public View getView() {
+        return mView != null ? mView.get() : null;
     }
 
     boolean isVisible() {

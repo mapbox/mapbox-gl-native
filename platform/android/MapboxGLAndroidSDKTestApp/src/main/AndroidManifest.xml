@@ -42,6 +42,14 @@
                 android:value="@string/category_infowindow" />
         </activity>
         <activity
+            android:name=".activity.infowindow.DynamicInfoWindowAdapterActivity"
+            android:description="@string/description_dynamic_info_window_adapter"
+            android:label="@string/activity_dynamic_infowindow_adapter">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_infowindow"/>
+        </activity>
+        <activity
             android:name=".activity.annotation.BulkMarkerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_add_bulk_markers"
@@ -260,6 +268,22 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
+        </activity>
+        <activity
+            android:name=".activity.annotation.MarkerViewScaleActivity"
+            android:description="@string/description_view_marker_scale"
+            android:label="@string/activity_view_marker_scale">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_annotation" />
+        </activity>
+
+        <activity android:name=".activity.navigation.LocationPickerActivity"
+                  android:description="@string/description_location_picker"
+                  android:label="@string/activity_location_picker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_navigation" />
         </activity>
 
         <!-- Configuration Settings -->
