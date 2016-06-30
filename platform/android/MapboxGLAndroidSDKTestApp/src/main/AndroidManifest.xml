@@ -12,7 +12,7 @@
         android:name=".MapboxApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@drawable/icon_burned"
+        android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
