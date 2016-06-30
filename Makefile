@@ -183,34 +183,39 @@ android-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
-apackage: android-lib-$1
-endef
-
-$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
-
-android: android-arm-v7
-
-test-android: android-test-lib-arm-v7
-	#TODO Decide where to place the class files and other tmp outputs 
-	#Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
+test-android-core-$1: android-test-lib-$1
+	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	cd platform/android && ./gradlew assembleDebug
-	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build
+	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1
+	
 	#Compile Test runner
-	javac -sourcepath test/src -d build -source 1.7 -target 1.7 test/src/Main.java
+	javac -sourcepath test/src -d build/android-$1 -source 1.7 -target 1.7 test/src/Main.java
 	#Combine and dex
-	cd build && dx --dex --output=test.jar Main.class classes.dex
+	cd build/android-$1 && dx --dex --output=test.jar *.class classes.dex
 
 	#Ensure clean state on the device
 	adb shell "rm -Rf $(ANDROID_LOCAL_WORK_DIR)"
 	adb shell "mkdir -p $(ANDROID_LOCAL_WORK_DIR)/test"
 
 	#Push all needed files to the device
-	adb push build/test.jar $(ANDROID_LOCAL_WORK_DIR)
+	adb push build/android-$1/test.jar $(ANDROID_LOCAL_WORK_DIR)
 	adb push test/fixtures $(ANDROID_LOCAL_WORK_DIR)/test
-	adb push build/android-arm-v7/Debug/lib.target/libmapbox-gl.so $(ANDROID_LOCAL_WORK_DIR)
-	adb push build/android-arm-v7/Debug/lib.target/libtest-jni-lib.so $(ANDROID_LOCAL_WORK_DIR)
+	adb push build/android-$1/$(BUILDTYPE)/lib.target/libmapbox-gl.so $(ANDROID_LOCAL_WORK_DIR)
+	adb push build/android-$1/$(BUILDTYPE)/lib.target/libtest-jni-lib.so $(ANDROID_LOCAL_WORK_DIR)
+
+	#Kick off the tests
 	adb shell "export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:/system/lib:$(ANDROID_LOCAL_WORK_DIR) && cd $(ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(ANDROID_LOCAL_WORK_DIR)/test.jar Main"	
-	#TODO - Renable platform tests cd platform/android && ./gradlew testReleaseUnitTest --continue
+
+apackage: android-lib-$1i
+
+endef
+
+$(foreach abi,$(ANDROID_ABIS),$(eval $(call ANDROID_RULES,$(abi))))
+
+android: android-arm-v7
+
+test-android: test-android-core-arm-v7
+	cd platform/android && ./gradlew testReleaseUnitTest --continue
 
 apackage:
 	cd platform/android && ./gradlew --parallel-threads=$(JOBS) assemble$(BUILDTYPE)
