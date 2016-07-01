@@ -90,7 +90,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     // Compressing less than 3 events can have a negative impact on the size.
     if (events.count > 2) {
         NSData *compressedData = [jsonData mgl_compressedData];
-        [request setValue:@"gzip" forHTTPHeaderField:MGLAPIClientHeaderFieldContentEncodingKey];
+        [request setValue:@"deflate" forHTTPHeaderField:MGLAPIClientHeaderFieldContentEncodingKey];
         [request setHTTPBody:compressedData];
     }
     
