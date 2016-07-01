@@ -36,8 +36,14 @@ int looperCallbackDefault(int fd, int, void* data) {
     int buffer[1];
     while (read(fd, buffer, sizeof(buffer)) > 0) {}
 
-    auto runLoop = reinterpret_cast<RunLoop*>(data);
+    auto runLoopImpl = reinterpret_cast<RunLoop::Impl*>(data);
+    auto runLoop = runLoopImpl->runLoop;
+
     runLoop->runOnce();
+
+    if (!runLoopImpl->running) {
+        ALooper_wake(runLoopImpl->loop);
+    }
 
     return 1;
 }
@@ -47,7 +53,7 @@ int looperCallbackDefault(int fd, int, void* data) {
 namespace mbgl {
 namespace util {
 
-RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
+RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     using namespace mbgl::android;
     detach = attach_jni_thread(theJVM, &env, "");
 
@@ -73,7 +79,7 @@ RunLoop::Impl::Impl(RunLoop* runLoop, RunLoop::Type type) {
         break;
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
-            ALOOPER_EVENT_INPUT, looperCallbackDefault, runLoop);
+            ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
         break;
     }
 

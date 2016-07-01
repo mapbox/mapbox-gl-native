@@ -38,6 +38,10 @@ public:
 
     Milliseconds processRunnables();
 
+    ALooper* loop = nullptr;
+    RunLoop* runLoop = nullptr;
+    util::Atomic<bool> running;
+
 private:
     friend RunLoop;
 
@@ -45,9 +49,6 @@ private:
 
     JNIEnv *env = nullptr;
     bool detach = false;
-
-    ALooper* loop = nullptr;
-    util::Atomic<bool> running;
 
     std::recursive_mutex mtx;
     std::list<Runnable*> runnables;
