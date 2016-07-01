@@ -259,6 +259,14 @@
           },
         }],
 
+        ['headless_lib == "egl"', {
+          'sources': [
+            'platform/default/headless_display.cpp',
+            'platform/default/headless_view.cpp',
+            'platform/android/src/headless_view_egl.cpp',
+          ],
+        }],
+
         ['loop_lib == "darwin"', {
           'sources': [
             'platform/darwin/src/async_task.cpp',

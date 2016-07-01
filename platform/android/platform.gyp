@@ -1,7 +1,7 @@
 {
   'variables': {
     'loop_lib': 'android',
-    'headless_lib': 'none',
+    'headless_lib': 'egl',
     'coverage': 0,
   },
   'includes': [
