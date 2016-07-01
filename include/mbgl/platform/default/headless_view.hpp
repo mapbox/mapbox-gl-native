@@ -10,6 +10,9 @@ class QGLWidget;
 #else
 #define MBGL_USE_CGL 1
 #endif
+#elif __ANDROID__
+#include <EGL/egl.h>
+#define MBGL_USE_EGL 1
 #else
 #define GL_GLEXT_PROTOTYPES
 #define MBGL_USE_GLX 1
@@ -87,6 +90,13 @@ private:
     GLXFBConfig *fbConfigs = nullptr;
     GLXContext glContext = nullptr;
     GLXPbuffer glxPbuffer = 0;
+#endif
+
+#if MBGL_USE_EGL
+    EGLDisplay glDisplay = EGL_NO_DISPLAY;
+    EGLConfig glConfig = nullptr;	
+    EGLSurface glSurface = EGL_NO_SURFACE;
+    EGLContext glContext = EGL_NO_CONTEXT;
 #endif
 
     std::function<void(MapChange)> mapChangeCallback;
