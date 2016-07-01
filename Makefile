@@ -167,6 +167,7 @@ idocument:
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
+ANDROID_DX := $(shell command -v dx 2> /dev/null)
 
 define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
@@ -184,6 +185,9 @@ android-lib-$1: build/android-$1/Makefile
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 test-android-core-$1: android-test-lib-$1
+	ifndef ANDROID_DX
+		$$(error "dx not found. Install android build tools (sdk) and make sure it's on the path")
+	
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
 	cd platform/android && ./gradlew assembleDebug
 	unzip -o platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk classes.dex -d build/android-$1
