@@ -98,7 +98,7 @@ private:
             const size_t index);
     bool anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor);
     std::map<std::u32string, std::vector<Anchor>> compareText;
-    
+
     void addToDebugBuffers(CollisionTile &collisionTile);
 
     void swapRenderData() override;

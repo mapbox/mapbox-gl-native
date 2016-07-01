@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
 GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, bool tx, bool ty, int8_t dir, int32_t linesofar) {
     GLsizei idx = index();
@@ -34,3 +34,5 @@ GLsizei LineVertexBuffer::add(vertex_type x, vertex_type y, float ex, float ey, 
 
     return idx;
 }
+
+} // namespace mbgl

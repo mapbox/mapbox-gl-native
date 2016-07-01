@@ -16,7 +16,7 @@
 
 namespace mbgl {
 
-using namespace mbgl::style;
+using namespace style;
 
 TileWorker::TileWorker(OverscaledTileID id_,
                        SpriteStore& spriteStore_,

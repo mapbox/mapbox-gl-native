@@ -5,7 +5,7 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
 
 void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencils) {
@@ -38,3 +38,5 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLES, 0, (GLsizei)tileStencilBuffer.index()));
     }
 }
+
+} // namespace mbgl

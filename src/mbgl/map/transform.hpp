@@ -28,7 +28,7 @@ public:
     // Camera
     /** Returns the current camera options. */
     CameraOptions getCameraOptions(optional<EdgeInsets>) const;
-    
+
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
     /** Asynchronously transitions all specified camera options linearly along
@@ -40,7 +40,7 @@ public:
     void flyTo(const CameraOptions&, const AnimationOptions& = {});
 
     // Position
-    
+
     /** Pans the map by the given amount.
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
@@ -157,7 +157,7 @@ public:
     bool isRotating() const { return state.isRotating(); }
     bool isScaling() const { return state.isScaling(); }
     bool isPanning() const { return state.isPanning(); }
-    
+
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;

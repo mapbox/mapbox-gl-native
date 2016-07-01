@@ -24,7 +24,7 @@
 
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
 void matrix::identity(mat2& out) {
     out[0] = 1.0f;
@@ -50,3 +50,5 @@ void matrix::scale(mat2& out, const mat2& a, double v0, double v1) {
     out[2] = a2 * v1;
     out[3] = a3 * v1;
 }
+
+} // namespace mbgl

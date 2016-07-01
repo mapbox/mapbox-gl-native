@@ -191,12 +191,12 @@ public:
     double left = 0;    ///< Number of pixels inset from the left edge.
     double bottom = 0;  ///< Number of pixels inset from the bottom edge.
     double right = 0;   ///< Number of pixels inset from the right edge.
-    
+
     EdgeInsets() {}
-    
+
     EdgeInsets(const double t, const double l, const double b, const double r)
         : top(t), left(l), bottom(b), right(r) {}
-    
+
     explicit operator bool() const {
         return !(std::isnan(top) || std::isnan(left) || std::isnan(bottom) || std::isnan(right))
             && (top || left || bottom || right);
@@ -214,7 +214,7 @@ public:
             top + o.top, left + o.left, bottom + o.bottom, right + o.right,
         };
     }
-    
+
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
 };
 

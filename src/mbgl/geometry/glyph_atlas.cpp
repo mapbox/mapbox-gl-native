@@ -9,7 +9,7 @@
 #include <algorithm>
 
 
-using namespace mbgl;
+namespace mbgl {
 
 GlyphAtlas::GlyphAtlas(uint16_t width_, uint16_t height_)
     : width(width_),
@@ -197,3 +197,5 @@ void GlyphAtlas::bind(gl::ObjectStore& store) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
     }
 }
+
+} // namespace mbgl

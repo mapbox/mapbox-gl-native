@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstring>
 
-using namespace mbgl;
+namespace mbgl {
 
 void DebugFontBuffer::addText(const char *text, double left, double baseline, double scale) {
     uint16_t *coords = nullptr;
@@ -40,3 +40,5 @@ void DebugFontBuffer::addText(const char *text, double left, double baseline, do
         left += glyph.width * scale;
     }
 }
+
+} // namespace mbgl

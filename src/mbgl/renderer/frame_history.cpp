@@ -1,7 +1,7 @@
 #include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/math/minmax.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
 FrameHistory::FrameHistory() {
     changeOpacities.fill(0);
@@ -110,3 +110,5 @@ void FrameHistory::bind(gl::ObjectStore& store) {
     }
 
 }
+
+} // namespace mbgl

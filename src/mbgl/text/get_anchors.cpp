@@ -80,25 +80,25 @@ Anchors getAnchors(const GeometryCoordinates &line, float spacing,
     const float angleWindowSize = (textLeft - textRight) != 0.0f ?
         3.0f / 5.0f * glyphSize * boxScale :
         0;
-    
+
     const float labelLength = fmax(textRight - textLeft, iconRight - iconLeft);
-    
+
     // Is the line continued from outside the tile boundary?
     const bool continuedLine = (line[0].x == 0 || line[0].x == util::EXTENT || line[0].y == 0 || line[0].y == util::EXTENT);
-    
+
     // Is the label long, relative to the spacing?
     // If so, adjust the spacing so there is always a minimum space of `spacing / 4` between label edges.
     if (spacing - labelLength * boxScale  < spacing / 4) {
         spacing = labelLength * boxScale + spacing / 4;
     }
-    
+
     // Offset the first anchor by:
     // Either half the label length plus a fixed extra offset if the line is not continued
     // Or half the spacing if the line is continued.
 
     // For non-continued lines, add a bit of fixed extra offset to avoid collisions at T intersections.
     const float fixedExtraOffset = glyphSize * 2;
-    
+
     const float offset = !continuedLine ?
     std::fmod((labelLength / 2 + fixedExtraOffset) * boxScale * overscaling, spacing) :
     std::fmod(spacing / 2 * overscaling, spacing);

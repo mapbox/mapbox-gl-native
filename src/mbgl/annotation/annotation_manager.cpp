@@ -200,7 +200,7 @@ void AnnotationManager::addIcon(const std::string& name, std::shared_ptr<const S
     spriteStore.setSprite(name, sprite);
     spriteAtlas.updateDirty();
 }
-    
+
 void AnnotationManager::removeIcon(const std::string& name) {
     spriteStore.removeSprite(name);
     spriteAtlas.updateDirty();

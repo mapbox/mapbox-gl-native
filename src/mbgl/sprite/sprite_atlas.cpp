@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 
-using namespace mbgl;
+namespace mbgl {
 
 SpriteAtlas::SpriteAtlas(dimension width_, dimension height_, float pixelRatio_, SpriteStore& store_)
     : width(width_),
@@ -253,3 +253,5 @@ SpriteAtlas::Holder::Holder(std::shared_ptr<const SpriteImage> spriteImage_, Rec
 
 SpriteAtlas::Holder::Holder(Holder&& h) : spriteImage(std::move(h.spriteImage)), pos(h.pos) {
 }
+
+} // namespace mbgl

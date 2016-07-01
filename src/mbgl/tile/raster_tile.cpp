@@ -9,7 +9,7 @@
 #include <mbgl/util/worker.hpp>
 #include <mbgl/util/work_request.hpp>
 
-using namespace mbgl;
+namespace mbgl {
 
 RasterTile::RasterTile(const OverscaledTileID& id_,
                        const style::UpdateParameters& parameters,
@@ -67,3 +67,5 @@ void RasterTile::setNecessity(Necessity necessity) {
 void RasterTile::cancel() {
     workRequest.reset();
 }
+
+} // namespace mbgl

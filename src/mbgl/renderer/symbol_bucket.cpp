@@ -370,7 +370,7 @@ void SymbolBucket::addFeature(const GeometryCollection &lines,
         }
     }
 }
-    
+
 bool SymbolBucket::anchorIsTooClose(const std::u32string &text, const float repeatDistance, Anchor &anchor) {
     if (compareText.find(text) == compareText.end()) {
         compareText.emplace(text, Anchors());

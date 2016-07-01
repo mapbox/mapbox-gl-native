@@ -7,7 +7,7 @@
 #include <cassert>
 #include <cstring>
 
-using namespace mbgl;
+namespace mbgl {
 
 bool Raster::isLoaded() const {
     std::lock_guard<std::mutex> lock(mtx);
@@ -59,3 +59,5 @@ void Raster::upload(gl::ObjectStore& store) {
         img.data.reset();
     }
 }
+
+} // namespace mbgl

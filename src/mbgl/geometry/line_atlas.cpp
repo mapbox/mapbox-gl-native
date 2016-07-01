@@ -9,7 +9,7 @@
 #include <sstream>
 #include <cmath>
 
-using namespace mbgl;
+namespace mbgl {
 
 LineAtlas::LineAtlas(GLsizei w, GLsizei h)
     : width(w),
@@ -171,3 +171,5 @@ void LineAtlas::bind(gl::ObjectStore& store) {
         dirty = false;
     }
 }
+
+} // namespace mbgl

@@ -98,7 +98,7 @@ void Painter::renderLine(LineBucket& bucket,
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
         optional<SpriteAtlasPosition> imagePosB = spriteAtlas->getPosition(properties.linePattern.value.to, true);
-        
+
         if (!imagePosA || !imagePosB)
             return;
 

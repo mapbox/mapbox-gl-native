@@ -3,14 +3,15 @@
 #include <mbgl/shader/pattern.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-using namespace mbgl;
-using namespace shaders::pattern;
+namespace mbgl {
 
 PatternShader::PatternShader(gl::ObjectStore& store)
-    : Shader(::name, ::vertex, ::fragment, store) {
+    : Shader(shaders::pattern::name, shaders::pattern::vertex, shaders::pattern::fragment, store) {
 }
 
 void PatternShader::bind(GLbyte *offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset));
 }
+
+} // namespace mbgl

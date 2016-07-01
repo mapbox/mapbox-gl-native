@@ -3,12 +3,14 @@
 #include <mbgl/shader/linesdfpattern.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-using namespace mbgl;
-using namespace shaders::linesdfpattern;
+namespace mbgl {
 
 LineSDFShader::LineSDFShader(gl::ObjectStore& store)
-    : Shader(::name, ::vertex, ::fragment, store)
-    , a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
+    : Shader(shaders::linesdfpattern::name,
+             shaders::linesdfpattern::vertex,
+             shaders::linesdfpattern::fragment,
+             store),
+      a_data(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data"))) {
 }
 
 void LineSDFShader::bind(GLbyte* offset) {
@@ -18,3 +20,5 @@ void LineSDFShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_data));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_data, 4, GL_UNSIGNED_BYTE, false, 8, offset + 4));
 }
+
+} // namespace mbgl

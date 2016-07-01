@@ -3,14 +3,18 @@
 #include <mbgl/shader/outlinepattern.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-using namespace mbgl;
-using namespace shaders::outlinepattern;
+namespace mbgl {
 
 OutlinePatternShader::OutlinePatternShader(gl::ObjectStore& store)
-    : Shader(::name, ::vertex, ::fragment, store) {
+    : Shader(shaders::outlinepattern::name,
+             shaders::outlinepattern::vertex,
+             shaders::outlinepattern::fragment,
+             store) {
 }
 
 void OutlinePatternShader::bind(GLbyte *offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 0, offset));
 }
+
+} // namespace mbgl

@@ -3,14 +3,13 @@
 #include <mbgl/shader/sdf.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-using namespace mbgl;
-using namespace shaders::sdf;
+namespace mbgl {
 
 SDFShader::SDFShader(gl::ObjectStore& store)
-    : Shader(::name, ::vertex, ::fragment, store)
-    , a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset")))
-    , a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1")))
-    , a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {
+    : Shader(shaders::sdf::name, shaders::sdf::vertex, shaders::sdf::fragment, store),
+      a_offset(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_offset"))),
+      a_data1(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data1"))),
+      a_data2(MBGL_CHECK_ERROR(glGetAttribLocation(getID(), "a_data2"))) {
 }
 
 void SDFGlyphShader::bind(GLbyte* offset) {
@@ -44,3 +43,5 @@ void SDFIconShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_data2));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_data2, 4, GL_UNSIGNED_BYTE, false, stride, offset + 12));
 }
+
+} // namespace mbgl

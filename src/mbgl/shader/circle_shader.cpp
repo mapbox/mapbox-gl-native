@@ -3,14 +3,15 @@
 #include <mbgl/shader/circle.fragment.hpp>
 #include <mbgl/gl/gl.hpp>
 
-using namespace mbgl;
-using namespace shaders::circle;
+namespace mbgl {
 
 CircleShader::CircleShader(gl::ObjectStore& store)
-    : Shader(::name, ::vertex, ::fragment, store) {
+    : Shader(shaders::circle::name, shaders::circle::vertex, shaders::circle::fragment, store) {
 }
 
 void CircleShader::bind(GLbyte* offset) {
     MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
     MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_SHORT, false, 4, offset));
 }
+
+} // namespace mbgl

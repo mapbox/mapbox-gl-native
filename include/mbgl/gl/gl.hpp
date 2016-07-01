@@ -45,9 +45,9 @@ namespace gl {
                                 GLsizei length,
                                 const GLchar *message,
                                 const void *userParam);
-    
+
     template <class... Args> void mbx_trapExtension(const char *name, Args... args);
-    
+
     void mbx_trapExtension(const char *);
     void mbx_trapExtension(const char *, GLint, const char *);
     void mbx_trapExtension(const char *, GLsizei, GLuint *);
@@ -58,7 +58,7 @@ namespace gl {
     void mbx_trapExtension(const char *, GLuint, GLuint, GLuint, GLuint, GLint, const char *, const void*);
     void mbx_trapExtension(const char *name, GLuint array);
 #endif
-    
+
 struct Error : ::std::runtime_error {
     Error(GLenum err, const std::string &msg) : ::std::runtime_error(msg), code(err) {};
     const GLenum code;

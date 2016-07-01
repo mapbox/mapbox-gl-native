@@ -7,7 +7,8 @@
 #include <iostream>
 #include <atomic>
 
-using namespace mbgl::util;
+namespace mbgl {
+namespace util {
 
 stopwatch::stopwatch(Event event_)
     : event(event_), start(Clock::now()) {}
@@ -33,4 +34,8 @@ stopwatch::~stopwatch() {
         report(name);
     }
 }
+
+} // namespace util
+} // namespace mbgl
+
 #endif
