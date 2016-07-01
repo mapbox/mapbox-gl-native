@@ -20,10 +20,10 @@ cd $1
 
 function check_tidy() {
     echo "Running clang-tidy on $0..."
-    if [ -n $1 ] && [ $1 == "--fix" ]; then
-        OUTPUT=$(${CLANG_TIDY} -p=$PWD -fix -fix-errors $0 2>/dev/null)
+    if [[ -n $1 ]] && [[ $1 == "--fix" ]]; then
+        OUTPUT=$(${CLANG_TIDY} -p=$PWD -fix -fix-errors ${0} 2>/dev/null)
     else
-        OUTPUT=$(${CLANG_TIDY} -p=$PWD $0 2>/dev/null)
+        OUTPUT=$(${CLANG_TIDY} -p=$PWD ${0} 2>/dev/null)
     fi
     if [[ -n $OUTPUT ]]; then
         echo "Caught clang-tidy warning/error:"
