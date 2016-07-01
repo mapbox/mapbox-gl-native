@@ -128,7 +128,7 @@
         }],
 
         #Exclude tests that don't run on android yet
-        ['target_platform == "android"', {
+        ['loop_lib == "android"', {
           'sources!': ['util/async_task.cpp'], # Doesn't compile??
           'sources/': [
             ['exclude', 'util/.*(hpp|cpp)$'],
@@ -155,7 +155,7 @@
           }],
           
           #Android doesn't support -pthread
-          ['target_platform == "android"', {
+          ['loop_lib == "android"', {
             'libraries!': ['<@(gtest_ldflags)']
           }]
         ],
@@ -183,7 +183,7 @@
             }
           }, {
             'conditions': [
-              ['target_platform != "android"', {
+              ['loop_lib != "android"', {
                 'link_settings': {
                   'ldflags': [
                     '-Wl,-whole-archive <(PRODUCT_DIR)/libtest-lib.a -Wl,-no-whole-archive',
