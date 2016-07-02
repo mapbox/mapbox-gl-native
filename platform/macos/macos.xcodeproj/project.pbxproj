@@ -1039,7 +1039,7 @@
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;
@@ -1078,7 +1078,7 @@
 				OTHER_LDFLAGS = (
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;

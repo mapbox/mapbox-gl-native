@@ -1739,7 +1739,7 @@
 					"$(sqlite_ldflags)",
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
 				PRODUCT_NAME = Mapbox;
@@ -1779,7 +1779,7 @@
 					"$(sqlite_ldflags)",
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
 				PRODUCT_NAME = Mapbox;
@@ -1833,7 +1833,7 @@
 					"$(sqlite_ldflags)",
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_NAME = Mapbox;
 				PUBLIC_HEADERS_FOLDER_PATH = Headers;
@@ -1863,7 +1863,7 @@
 					"$(sqlite_ldflags)",
 					"$(zlib_ldflags)",
 					"$(opengl_ldflags)",
-					"$(geojsonvt_static_libs)",
+					"$(geojson_static_libs)",
 				);
 				PRODUCT_NAME = Mapbox;
 				PUBLIC_HEADERS_FOLDER_PATH = Headers;
