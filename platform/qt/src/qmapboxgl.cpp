@@ -12,6 +12,10 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -21,6 +25,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/tileset.hpp>
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
@@ -250,6 +255,64 @@ auto fromQMapboxRasterLayer(const QMapbox::Layer &layer) {
 
 auto fromQMapboxBackgroundLayer(const QMapbox::Layer &layer) {
     return std::make_unique<mbgl::style::BackgroundLayer>(layer.layerID.toStdString());
+}
+
+auto fromQMapboxSourceUrlOrTileset(const QMapbox::SourceUrlOrTileset& urlOrTileset) {
+    mbgl::variant<std::string, mbgl::Tileset> mbglUrlOrTileset;
+    if (urlOrTileset.canConvert<QString>()) {
+        mbglUrlOrTileset = urlOrTileset.toString().toStdString();
+    } else {
+        QMapbox::Tileset tileset = urlOrTileset.value<QMapbox::Tileset>();
+        std::vector<std::string> mbglTiles;
+        for (const auto& tile : tileset.tiles) {
+            mbglTiles.emplace_back(tile.toStdString());
+        }
+
+        mbgl::Tileset mbglTileset;
+        mbglTileset.tiles = mbglTiles;
+
+        if (tileset.minzoom.isValid() || tileset.maxzoom.isValid()) {
+            if (tileset.minzoom.isValid()) {
+                mbglTileset.zoomRange.min = tileset.minzoom.value<uint8_t>();
+            }
+            if (tileset.maxzoom.isValid()) {
+                mbglTileset.zoomRange.max = tileset.maxzoom.value<uint8_t>();
+            }
+        }
+
+        if (tileset.attribution.isValid()) {
+            mbglTileset.attribution = tileset.attribution.toString().toStdString();
+        }
+
+        mbglUrlOrTileset = mbglTileset;
+    }
+
+    return mbglUrlOrTileset;
+}
+
+auto fromQMapboxRasterSource(const QMapbox::Source &source) {
+    return std::make_unique<mbgl::style::RasterSource>(
+            source.sourceID.toStdString(),
+            fromQMapboxSourceUrlOrTileset(source.urlOrTileset),
+            source.tileSize.value<uint16_t>());
+}
+
+auto fromQMapboxVectorSource(const QMapbox::Source &source) {
+    return std::make_unique<mbgl::style::VectorSource>(
+            source.sourceID.toStdString(),
+            fromQMapboxSourceUrlOrTileset(source.urlOrTileset));
+}
+
+auto fromQMapboxGeoJSONSource(const QMapbox::Source &source) {
+    auto mbglSource = std::make_unique<mbgl::style::GeoJSONSource>(source.sourceID.toStdString());
+
+    if (source.urlOrTileset.canConvert<QString>()) {
+        mbglSource->setURL(source.urlOrTileset.toString().toStdString());
+    } else {
+        // FIXME Support inline GeoJSON (use rapidjson?).
+    }
+
+    return mbglSource;
 }
 
 } // anonymous namespace
@@ -786,6 +849,27 @@ void QMapboxGL::addLayer(const QMapbox::Layer &layer) {
 
 void QMapboxGL::removeLayer(const QString &layerID) {
     d_ptr->mapObj->removeLayer(layerID.toStdString());
+}
+
+void QMapboxGL::addSource(const QMapbox::Source &source) {
+    std::unique_ptr<mbgl::style::Source> mbglSource;
+    switch (source.type) {
+    case RasterSource:
+        mbglSource = fromQMapboxRasterSource(source);
+        break;
+    case VectorSource:
+        mbglSource = fromQMapboxVectorSource(source);
+        break;
+    case GeoJSONSource:
+        mbglSource = fromQMapboxGeoJSONSource(source);
+        break;
+    }
+
+    d_ptr->mapObj->addSource(std::move(mbglSource));
+}
+
+void QMapboxGL::removeSource(const QString &sourceID) {
+    d_ptr->mapObj->removeSource(sourceID.toStdString());
 }
 
 void QMapboxGL::render()

@@ -206,6 +206,8 @@ public:
     void setFilter(const QString &layerID, const QMapbox::Filter &filter);
     void addLayer(const QMapbox::Layer &layer);
     void removeLayer(const QString &layerID);
+    void addSource(const QMapbox::Source &source);
+    void removeSource(const QString &sourceID);
 
 public slots:
     void render();

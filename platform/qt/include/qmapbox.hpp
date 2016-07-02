@@ -5,6 +5,7 @@
 #include <QPair>
 #include <QVariant>
 #include <QString>
+#include <QStringList>
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
@@ -146,6 +147,29 @@ struct Q_DECL_EXPORT Layer {
     QVariant maxZoom; // float
 };
 
+// Tileset, QString (URL)
+typedef QVariant SourceUrlOrTileset;
+
+enum SourceType {
+    RasterSource,
+    VectorSource,
+    GeoJSONSource,
+};
+
+struct Q_DECL_EXPORT Source {
+    SourceType type;
+    QString sourceID;
+    SourceUrlOrTileset urlOrTileset;
+    QVariant tileSize; // uint16_t
+};
+
+struct Q_DECL_EXPORT Tileset {
+    QStringList tiles;
+    QVariant minzoom; // float
+    QVariant maxzoom; // flaot
+    QVariant attribution; // QString
+};
+
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
@@ -157,5 +181,7 @@ Q_DECLARE_METATYPE(QMapbox::BinaryFilterForm);
 Q_DECLARE_METATYPE(QMapbox::SetFilterForm);
 Q_DECLARE_METATYPE(QMapbox::CompoundFilterForm);
 Q_DECLARE_METATYPE(QMapbox::UnaryFilterForm);
+
+Q_DECLARE_METATYPE(QMapbox::Tileset);
 
 #endif // QMAPBOX_H
