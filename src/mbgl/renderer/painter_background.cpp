@@ -21,8 +21,11 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     optional<SpriteAtlasPosition> imagePosA;
     optional<SpriteAtlasPosition> imagePosB;
 
-    const auto& shaderPattern = isOverdraw() ? patternOverdrawShader : patternShader;
-    const auto& shaderPlain = isOverdraw() ? plainOverdrawShader : plainShader;
+    const bool overdraw = isOverdraw();
+    const auto& shaderPattern = overdraw ? patternOverdrawShader : patternShader;
+    const auto& shaderPlain = overdraw ? plainOverdrawShader : plainShader;
+    auto& arrayBackgroundPattern = overdraw ? backgroundPatternOverdrawArray : backgroundPatternArray;
+    auto& arrayBackground = overdraw ? backgroundOverdrawArray : backgroundArray;
 
     if (isPatterned) {
         imagePosA = spriteAtlas->getPosition(properties.backgroundPattern.value.from, true);
@@ -41,14 +44,14 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         shaderPattern->u_opacity = properties.backgroundOpacity;
 
         spriteAtlas->bind(true, store);
-        backgroundPatternArray.bind(*shaderPattern, tileStencilBuffer, BUFFER_OFFSET(0), store);
+        arrayBackgroundPattern.bind(*shaderPattern, tileStencilBuffer, BUFFER_OFFSET(0), store);
 
     } else {
         config.program = shaderPlain->getID();
         shaderPlain->u_color = properties.backgroundColor;
         shaderPlain->u_opacity = properties.backgroundOpacity;
 
-        backgroundArray.bind(*shaderPlain, tileStencilBuffer, BUFFER_OFFSET(0), store);
+        arrayBackground.bind(*shaderPlain, tileStencilBuffer, BUFFER_OFFSET(0), store);
     }
 
     config.stencilTest = GL_FALSE;

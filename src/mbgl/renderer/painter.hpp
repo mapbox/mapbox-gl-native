@@ -242,6 +242,11 @@ private:
     VertexArrayObject backgroundPatternArray;
     VertexArrayObject backgroundArray;
 
+    VertexArrayObject coveringPlaingOverdrawArray;
+    VertexArrayObject coveringRasterOverdrawArray;
+    VertexArrayObject backgroundPatternOverdrawArray;
+    VertexArrayObject backgroundOverdrawArray;
+
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer = {
         { 0, 0 },
@@ -252,8 +257,6 @@ private:
     };
 
     VertexArrayObject tileBorderArray;
-
-    VertexArrayObject coveringRasterOverdrawArray;
 };
 
 } // namespace mbgl
