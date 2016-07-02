@@ -208,6 +208,7 @@ public:
     void removeLayer(const QString &layerID);
     void addSource(const QMapbox::Source &source);
     void removeSource(const QString &sourceID);
+    void setPaintProperty(const QString &layerID, QMapbox::PaintPropertyType, const QMapbox::PropertyValue &, const QString &klass = QString());
 
 public slots:
     void render();

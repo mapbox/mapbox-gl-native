@@ -1,0 +1,46 @@
+#pragma once
+
+// This file is generated. Edit make_property_setters.hpp.ejs, then run `make style-code`.
+
+#include "property_setter.hpp"
+
+<% for (const layer of locals.layers) { -%>
+#include <mbgl/style/layers/<%- layer.type %>_layer.hpp>
+<% } -%>
+
+#include <QMapbox>
+
+#include <map>
+
+namespace mbgl {
+namespace style {
+namespace conversion {
+
+auto makeQtLayoutPropertySetters() {
+    std::map<QMapbox::LayoutPropertyType, QtLayoutPropertySetter> result;
+
+    result[QMapbox::Visibility] = &setQtVisibility;
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.layoutProperties) { -%>
+    result[QMapbox::<%- camelize(property.name) %>] = makeQtPropertySetter(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+<% } -%>
+<% } -%>
+
+    return result;
+}
+
+auto makeQtPaintPropertySetters() {
+    std::map<QMapbox::PaintPropertyType, QtPaintPropertySetter> result;
+
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.paintProperties) { -%>
+    result[QMapbox::<%- camelize(property.name) %>] = makeQtPropertySetter(&<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>);
+<% } -%>
+<% } -%>
+
+    return result;
+}
+
+} // namespace conversion
+} // namespace style
+} // namespace mbgl

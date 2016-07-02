@@ -170,6 +170,83 @@ struct Q_DECL_EXPORT Tileset {
     QVariant attribution; // QString
 };
 
+// Undefined, T, Function<T>
+// T can be QColor, Enum (QString), QString, bool, float,
+// PropertyValueNumbers, PropertyValueStrings
+typedef QVariant PropertyValue;
+
+typedef QList<float> PropertyValueNumbers;
+typedef QStringList PropertyValueStrings;
+
+typedef QPair<float, PropertyValue> PropertyValueFunctionStop;
+typedef QList<PropertyValueFunctionStop> PropertyValueFunctionStops;
+
+struct Q_DECL_EXPORT PropertyValueFunction {
+    float base;
+    PropertyValueFunctionStops stops;
+};
+
+enum PaintPropertyType {
+    // Background
+    BackgroundColor,
+    BackgroundPattern,
+    BackgroundOpacity,
+
+    // Circle
+    CircleRadius,
+    CircleColor,
+    CircleBlur,
+    CircleOpacity,
+    CircleTranslate,
+    CircleTranslateAnchor,
+
+    // Fill
+    FillAntialias,
+    FillOpacity,
+    FillColor,
+    FillOutlineColor,
+    FillTranslate,
+    FillTranslateAnchor,
+    FillPattern,
+
+    // Line
+    LineOpacity,
+    LineColor,
+    LineTranslate,
+    LineTranslateAnchor,
+    LineWidth,
+    LineGapWidth,
+    LineOffset,
+    LineBlur,
+    LineDasharray,
+    LinePattern,
+
+    // Raster
+    RasterOpacity,
+    RasterHueRotate,
+    RasterBrightnessMin,
+    RasterBrightnessMax,
+    RasterSaturation,
+    RasterContrast,
+    RasterFadeDuration,
+
+    // Symbol
+    IconOpacity,
+    IconColor,
+    IconHaloColor,
+    IconHaloWidth,
+    IconHaloBlur,
+    IconTranslate,
+    IconTranslateAnchor,
+    TextOpacity,
+    TextColor,
+    TextHaloColor,
+    TextHaloWidth,
+    TextHaloBlur,
+    TextTranslate,
+    TextTranslateAnchor,
+};
+
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
@@ -183,5 +260,11 @@ Q_DECLARE_METATYPE(QMapbox::CompoundFilterForm);
 Q_DECLARE_METATYPE(QMapbox::UnaryFilterForm);
 
 Q_DECLARE_METATYPE(QMapbox::Tileset);
+
+Q_DECLARE_METATYPE(QMapbox::PropertyValueNumbers);
+Q_DECLARE_METATYPE(QMapbox::PropertyValueStrings);
+Q_DECLARE_METATYPE(QMapbox::PropertyValueFunctionStop);
+Q_DECLARE_METATYPE(QMapbox::PropertyValueFunctionStops);
+Q_DECLARE_METATYPE(QMapbox::PropertyValueFunction);
 
 #endif // QMAPBOX_H

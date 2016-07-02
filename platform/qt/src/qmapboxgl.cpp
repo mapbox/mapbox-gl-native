@@ -1,4 +1,5 @@
 #include "qmapboxgl_p.hpp"
+#include "make_property_setters.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -870,6 +871,23 @@ void QMapboxGL::addSource(const QMapbox::Source &source) {
 
 void QMapboxGL::removeSource(const QString &sourceID) {
     d_ptr->mapObj->removeSource(sourceID.toStdString());
+}
+
+void QMapboxGL::setPaintProperty(const QString &layerID, QMapbox::PaintPropertyType type, const QMapbox::PropertyValue &value, const QString &klass) {
+    mbgl::style::Layer *layer = d_ptr->mapObj->getLayer(layerID.toStdString());
+    if (!layer) {
+        return;
+    }
+
+    static const auto setters = mbgl::style::conversion::makeQtPaintPropertySetters();
+    auto it = setters.find(type);
+    if (it == setters.end()) {
+        return;
+    }
+
+    it->second(*layer, value, klass.toStdString());
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
 }
 
 void QMapboxGL::render()

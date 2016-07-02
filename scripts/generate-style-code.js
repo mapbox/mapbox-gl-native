@@ -113,3 +113,6 @@ for (const layer of layers) {
 
 const propertySettersHpp = ejs.compile(fs.readFileSync('include/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
 fs.writeFileSync('include/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
+
+const qtPropertySettersHpp = ejs.compile(fs.readFileSync('platform/qt/src/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
+fs.writeFileSync('platform/qt/src/make_property_setters.hpp', qtPropertySettersHpp({layers: layers}));
