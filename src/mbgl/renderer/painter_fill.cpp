@@ -115,9 +115,6 @@ void Painter::renderFill(FillBucket& bucket,
                 config.program = shaderOutlinePattern->getID();
                 shaderOutlinePattern->u_matrix = vertexMatrix;
 
-                // Draw the entire line
-                shaderOutline->u_world = worldSize;
-
                 shaderOutlinePattern->u_pattern_tl_a = imagePosA->tl;
                 shaderOutlinePattern->u_pattern_br_a = imagePosA->br;
                 shaderOutlinePattern->u_pattern_tl_b = imagePosB->tl;
@@ -132,6 +129,9 @@ void Painter::renderFill(FillBucket& bucket,
                 shaderOutlinePattern->u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
                 shaderOutlinePattern->u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
                 shaderOutlinePattern->u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
+
+                // Draw the entire line
+                shaderOutlinePattern->u_world = worldSize;
 
                 config.activeTexture = GL_TEXTURE0;
                 spriteAtlas->bind(true, store);
