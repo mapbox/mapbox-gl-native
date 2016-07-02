@@ -34,6 +34,7 @@ custom_categories:
       - MGLAnnotationImage
       - MGLAnnotationVerticalAlignment
       - MGLAnnotationView
+      - MGLAnnotationViewDragState
       - MGLCalloutView
       - MGLCalloutViewDelegate
       - MGLMultiPoint
