@@ -156,7 +156,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  The default value of this property is `YES`. Set this property to `NO` if the
  view’s legibility is important.
  */
-@property (nonatomic, assign, getter=isScaledWithViewingDistance) BOOL scalesWithViewingDistance;
+@property (nonatomic, assign) BOOL scalesWithViewingDistance;
 
 #pragma mark Managing the Selection State
 
