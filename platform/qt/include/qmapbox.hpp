@@ -127,10 +127,30 @@ struct Q_DECL_EXPORT UnaryFilterForm {
     QString key;
 };
 
+enum LayerType {
+    FillLayer,
+    LineLayer,
+    CircleLayer,
+    SymbolLayer,
+    RasterLayer,
+    BackgroundLayer,
+};
+
+struct Q_DECL_EXPORT Layer {
+    LayerType type;
+    QString layerID;
+    QVariant sourceID; // QString
+    QVariant sourceLayer; // QString
+    QVariant filter; // Filter
+    QVariant minZoom; // float
+    QVariant maxZoom; // float
+};
+
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
 
+Q_DECLARE_METATYPE(QMapbox::Filter);
 Q_DECLARE_METATYPE(QMapbox::FilterValueList);
 Q_DECLARE_METATYPE(QMapbox::FilterValueMap);
 Q_DECLARE_METATYPE(QMapbox::BinaryFilterForm);

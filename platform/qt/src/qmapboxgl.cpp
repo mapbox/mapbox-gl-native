@@ -231,6 +231,27 @@ mbgl::style::Filter fromQMapboxFilter(const QMapbox::Filter &filter)
     return {};
 }
 
+template <typename LayerType>
+std::unique_ptr<LayerType> fromQMapboxVectorLayer(const QMapbox::Layer &layer) {
+    auto mbglLayer = std::make_unique<LayerType>(layer.layerID.toStdString(), layer.sourceID.toString().toStdString());
+    if (layer.sourceLayer.isValid()) {
+        mbglLayer->setSourceLayer(layer.sourceLayer.toString().toStdString());
+    }
+    if (layer.filter.isValid()) {
+        mbglLayer->setFilter(fromQMapboxFilter(layer.filter.value<QMapbox::Filter>()));
+    }
+    return mbglLayer;
+}
+
+auto fromQMapboxRasterLayer(const QMapbox::Layer &layer) {
+    return std::make_unique<mbgl::style::RasterLayer>(layer.layerID.toStdString(),
+                                                      layer.sourceID.toString().toStdString());
+}
+
+auto fromQMapboxBackgroundLayer(const QMapbox::Layer &layer) {
+    return std::make_unique<mbgl::style::BackgroundLayer>(layer.layerID.toStdString());
+}
+
 } // anonymous namespace
 
 QMapboxGLSettings::QMapboxGLSettings()
@@ -713,11 +734,6 @@ void QMapboxGL::addCustomLayer(const QString &id,
             before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
-void QMapboxGL::removeCustomLayer(const QString& id)
-{
-    d_ptr->mapObj->removeLayer(id.toStdString());
-}
-
 void QMapboxGL::setFilter(const QString &layerID, const QMapbox::Filter &filter) {
     mbgl::style::Layer *layer = d_ptr->mapObj->getLayer(layerID.toStdString());
     if (!layer) return;
@@ -732,6 +748,44 @@ void QMapboxGL::setFilter(const QString &layerID, const QMapbox::Filter &filter)
     } else if (layer->is<mbgl::style::CircleLayer>()) {
         layer->as<mbgl::style::CircleLayer>()->setFilter(mbglFilter);
     }
+}
+
+void QMapboxGL::addLayer(const QMapbox::Layer &layer) {
+    std::unique_ptr<mbgl::style::Layer> mbglLayer;
+    switch (layer.type) {
+    case FillLayer:
+        mbglLayer = fromQMapboxVectorLayer<mbgl::style::FillLayer>(layer);
+        break;
+    case LineLayer:
+        mbglLayer = fromQMapboxVectorLayer<mbgl::style::LineLayer>(layer);
+        break;
+    case CircleLayer:
+        mbglLayer = fromQMapboxVectorLayer<mbgl::style::CircleLayer>(layer);
+        break;
+    case SymbolLayer:
+        mbglLayer = fromQMapboxVectorLayer<mbgl::style::SymbolLayer>(layer);
+        break;
+    case RasterLayer:
+        mbglLayer = fromQMapboxRasterLayer(layer);
+        break;
+    case BackgroundLayer:
+        mbglLayer = fromQMapboxBackgroundLayer(layer);
+        break;
+    }
+
+    if (layer.minZoom.isValid()) {
+        mbglLayer->setMinZoom(layer.minZoom.toFloat());
+    }
+
+    if (layer.maxZoom.isValid()) {
+        mbglLayer->setMaxZoom(layer.maxZoom.toFloat());
+    }
+
+    d_ptr->mapObj->addLayer(std::move(mbglLayer));
+}
+
+void QMapboxGL::removeLayer(const QString &layerID) {
+    d_ptr->mapObj->removeLayer(layerID.toStdString());
 }
 
 void QMapboxGL::render()

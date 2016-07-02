@@ -202,9 +202,10 @@ public:
         QMapbox::CustomLayerDeinitializeFunction,
         void* context,
         char* before = NULL);
-    void removeCustomLayer(const QString& id);
 
     void setFilter(const QString &layerID, const QMapbox::Filter &filter);
+    void addLayer(const QMapbox::Layer &layer);
+    void removeLayer(const QString &layerID);
 
 public slots:
     void render();
