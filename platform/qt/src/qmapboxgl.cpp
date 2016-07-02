@@ -890,6 +890,23 @@ void QMapboxGL::setPaintProperty(const QString &layerID, QMapbox::PaintPropertyT
     d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
 }
 
+void QMapboxGL::setLayoutProperty(const QString &layerID, QMapbox::LayoutPropertyType type, const QMapbox::PropertyValue &value) {
+    mbgl::style::Layer *layer = d_ptr->mapObj->getLayer(layerID.toStdString());
+    if (!layer) {
+        return;
+    }
+
+    static const auto setters = mbgl::style::conversion::makeQtLayoutPropertySetters();
+    auto it = setters.find(type);
+    if (it == setters.end()) {
+        return;
+    }
+
+    it->second(*layer, value);
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
+}
+
 void QMapboxGL::render()
 {
     d_ptr->dirty = false;

@@ -247,6 +247,52 @@ enum PaintPropertyType {
     TextTranslateAnchor,
 };
 
+enum LayoutPropertyType {
+    Visibility,
+
+    // Line
+    LineCap,
+    LineJoin,
+    LineMiterLimit,
+    LineRoundLimit,
+
+    // Symbol
+    SymbolPlacement,
+    SymbolSpacing,
+    SymbolAvoidEdges,
+    IconAllowOverlap,
+    IconIgnorePlacement,
+    IconOptional,
+    IconRotationAlignment,
+    IconSize,
+    IconTextFit,
+    IconTextFitPadding,
+    IconImage,
+    IconRotate,
+    IconPadding,
+    IconKeepUpright,
+    IconOffset,
+    TextPitchAlignment,
+    TextRotationAlignment,
+    TextField,
+    TextFont,
+    TextSize,
+    TextMaxWidth,
+    TextLineHeight,
+    TextLetterSpacing,
+    TextJustify,
+    TextAnchor,
+    TextMaxAngle,
+    TextRotate,
+    TextPadding,
+    TextKeepUpright,
+    TextTransform,
+    TextOffset,
+    TextAllowOverlap,
+    TextIgnorePlacement,
+    TextOptional,
+};
+
 } // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
