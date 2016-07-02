@@ -42,6 +42,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
 
     config.program = plainShader->getID();
     plainShader->u_matrix = matrix;
+    plainShader->u_opacity = 1.0f;
 
     // Draw white outline
     plainShader->u_color = Color::white();
@@ -75,6 +76,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
 
     config.program = plainShader->getID();
     plainShader->u_matrix = matrix;
+    plainShader->u_opacity = 1.0f;
 
     // draw tile outline
     tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET_0, store);
