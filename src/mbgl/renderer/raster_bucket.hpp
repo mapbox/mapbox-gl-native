@@ -2,11 +2,12 @@
 
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/util/raster.hpp>
+#include <mbgl/gl/gl_config.hpp>
 
 namespace mbgl {
 
 class RasterShader;
-class StaticVertexBuffer;
+class StaticRasterVertexBuffer;
 class VertexArrayObject;
 
 class RasterBucket : public Bucket {
@@ -18,7 +19,7 @@ public:
 
     void setImage(PremultipliedImage);
 
-    void drawRaster(RasterShader&, StaticVertexBuffer&, VertexArrayObject&, gl::ObjectStore&);
+    void drawRaster(RasterShader&, StaticRasterVertexBuffer&, VertexArrayObject&, gl::Config&, gl::ObjectStore&);
 
     Raster raster;
 };

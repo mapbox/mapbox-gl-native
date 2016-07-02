@@ -50,6 +50,7 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data, "a_data"));
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data1, "a_data1"));
     MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_data2, "a_data2"));
+    MBGL_CHECK_ERROR(glBindAttribLocation(program.get(), a_texture_pos, "a_texture_pos"));
 
     // Link program
     GLint status;

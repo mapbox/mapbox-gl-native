@@ -21,12 +21,13 @@ public:
 protected:
     Shader(const char* name_, const char* vertex, const char* fragment, gl::ObjectStore&, bool overdraw = false);
 
-    static constexpr GLint     a_pos = 0;
-    static constexpr GLint a_extrude = 1;
-    static constexpr GLint  a_offset = 2;
-    static constexpr GLint    a_data = 3;
-    static constexpr GLint   a_data1 = 4;
-    static constexpr GLint   a_data2 = 5;
+    static constexpr GLint         a_pos = 0;
+    static constexpr GLint     a_extrude = 1;
+    static constexpr GLint      a_offset = 2;
+    static constexpr GLint        a_data = 3;
+    static constexpr GLint       a_data1 = 4;
+    static constexpr GLint       a_data2 = 5;
+    static constexpr GLint a_texture_pos = 6;
 
 private:
     bool compileShader(gl::UniqueShader&, const GLchar *source);
