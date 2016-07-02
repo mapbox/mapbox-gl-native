@@ -64,8 +64,78 @@ typedef void (*CustomLayerDeinitializeFunction)(void* context);
 
 Q_DECL_EXPORT void initializeGLExtensions();
 
-}
+// Runtime Style API
+
+enum FilterValueType {
+    NullFilterValueType,
+    BooleanFilterValueType,
+    UnsignedIntegerFilterValueType,
+    SignedIntegerFilterValueType,
+    DoubleFilterValueType,
+    StringFilterValueType,
+    ListFilterValueType,
+    MapFilterValueType,
+};
+
+enum FilterType {
+    EqualsFilterType,
+    NotEqualsFilterType,
+    GreaterThanFilterType,
+    GreaterThanEqualsFilterType,
+    LessThanFilterType,
+    LessThanEqualsFilterType,
+    InFilterType,
+    NotInFilterType,
+    AllFilterType,
+    AnyFilterType,
+    NoneFilterType,
+    HasFilterType,
+    NotHasFilterType,
+};
+
+struct Q_DECL_EXPORT FilterValue {
+    QVariant value;
+    FilterValueType type;
+};
+
+typedef QList<FilterValue> FilterValueList;
+typedef QMap<QString, FilterValue> FilterValueMap;
+
+// BinaryFilterForm, SetFilterForm, CompoundFilterForm, UnaryFilterForm
+typedef QVariant FilterForm;
+
+struct Q_DECL_EXPORT Filter {
+    FilterType type;
+    FilterForm form;
+};
+
+struct Q_DECL_EXPORT BinaryFilterForm {
+    QString key;
+    FilterValue value;
+};
+
+struct Q_DECL_EXPORT SetFilterForm {
+    QString key;
+    FilterValueList values;
+};
+
+struct Q_DECL_EXPORT CompoundFilterForm {
+    QList<Filter> filters;
+};
+
+struct Q_DECL_EXPORT UnaryFilterForm {
+    QString key;
+};
+
+} // namespace QMapbox
 
 Q_DECLARE_METATYPE(QMapbox::Coordinate);
+
+Q_DECLARE_METATYPE(QMapbox::FilterValueList);
+Q_DECLARE_METATYPE(QMapbox::FilterValueMap);
+Q_DECLARE_METATYPE(QMapbox::BinaryFilterForm);
+Q_DECLARE_METATYPE(QMapbox::SetFilterForm);
+Q_DECLARE_METATYPE(QMapbox::CompoundFilterForm);
+Q_DECLARE_METATYPE(QMapbox::UnaryFilterForm);
 
 #endif // QMAPBOX_H

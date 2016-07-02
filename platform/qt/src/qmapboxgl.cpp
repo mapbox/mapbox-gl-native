@@ -4,14 +4,23 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/layer.hpp>
+#include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/style/layers/fill_layer.hpp>
+#include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/util/feature.hpp>
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
@@ -28,6 +37,9 @@
 #include <QThreadStorage>
 
 #include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
 
 using namespace QMapbox;
 
@@ -109,7 +121,117 @@ auto fromQStringList(const QStringList &list)
     return strings;
 }
 
+mbgl::Value fromQMapboxFilterValueList(const QMapbox::FilterValue &value);
+mbgl::Value fromQMapboxFilterValueMap(const QMapbox::FilterValue &value);
+
+mbgl::Value fromQMapboxFilterValue(const QMapbox::FilterValue &value) {
+    switch (value.type) {
+    case NullFilterValueType:
+        return {};
+    case BooleanFilterValueType:
+        return value.value.toBool();
+    case UnsignedIntegerFilterValueType:
+        return value.value.value<uint64_t>();
+    case SignedIntegerFilterValueType:
+        return value.value.value<int64_t>();
+    case DoubleFilterValueType:
+        return value.value.toDouble();
+    case StringFilterValueType:
+        return value.value.toString().toStdString();
+    case ListFilterValueType:
+        return fromQMapboxFilterValueList(value);
+    case MapFilterValueType:
+        return fromQMapboxFilterValueMap(value);
+    }
+    return {};
 }
+
+mbgl::Value fromQMapboxFilterValueList(const QMapbox::FilterValue &value) {
+    const auto list = value.value.value<QMapbox::FilterValueList>();
+    std::vector<mbgl::Value> values;
+    for (const auto& listValue : list) {
+        values.emplace_back(fromQMapboxFilterValue(listValue));
+    }
+    return values;
+}
+
+mbgl::Value fromQMapboxFilterValueMap(const QMapbox::FilterValue &value) {
+    const auto map = value.value.value<QMapbox::FilterValueMap>();
+    std::unordered_map<std::string, mbgl::Value> values;
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        values.emplace(std::make_pair(it.key().toStdString(), fromQMapboxFilterValue(it.value())));
+    }
+    return values;
+}
+
+template <typename FilterType>
+mbgl::style::Filter fromQMapboxBinaryFilterForm(const QMapbox::Filter &filter) {
+    const auto form = filter.form.value<QMapbox::BinaryFilterForm>();
+    return FilterType { form.key.toStdString(), fromQMapboxFilterValue(form.value) };
+}
+
+template <typename FilterType>
+mbgl::style::Filter fromQMapboxSetFilterForm(const QMapbox::Filter &filter) {
+    const auto form = filter.form.value<QMapbox::SetFilterForm>();
+    std::vector<mbgl::Value> values;
+    for (const auto& listValue : form.values) {
+        values.emplace_back(fromQMapboxFilterValue(listValue));
+    }
+    return FilterType { form.key.toStdString(), values };
+}
+
+mbgl::style::Filter fromQMapboxFilter(const QMapbox::Filter &filter);
+
+template <typename FilterType>
+mbgl::style::Filter fromQMapboxCompoundFilterForm(const QMapbox::Filter &filter) {
+    const auto form = filter.form.value<QMapbox::CompoundFilterForm>();
+    std::vector<mbgl::style::Filter> filters;
+    for (const auto& compoundFilter : form.filters) {
+        filters.emplace_back(fromQMapboxFilter(compoundFilter));
+    }
+    return FilterType { filters };
+}
+
+template <typename FilterType>
+mbgl::style::Filter fromQMapboxUnaryFilterForm(const QMapbox::Filter &filter) {
+    const auto form = filter.form.value<QMapbox::UnaryFilterForm>();
+    return FilterType { form.key.toStdString() };
+}
+
+mbgl::style::Filter fromQMapboxFilter(const QMapbox::Filter &filter)
+{
+    switch (filter.type) {
+    case EqualsFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::EqualsFilter>(filter);
+    case NotEqualsFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::NotEqualsFilter>(filter);
+    case GreaterThanFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::GreaterThanFilter>(filter);
+    case GreaterThanEqualsFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::GreaterThanEqualsFilter>(filter);
+    case LessThanFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::LessThanFilter>(filter);
+    case LessThanEqualsFilterType:
+        return fromQMapboxBinaryFilterForm<mbgl::style::LessThanEqualsFilter>(filter);
+    case InFilterType:
+        return fromQMapboxSetFilterForm<mbgl::style::InFilter>(filter);
+    case NotInFilterType:
+        return fromQMapboxSetFilterForm<mbgl::style::NotInFilter>(filter);
+    case AllFilterType:
+        return fromQMapboxCompoundFilterForm<mbgl::style::AllFilter>(filter);
+    case AnyFilterType:
+        return fromQMapboxCompoundFilterForm<mbgl::style::AnyFilter>(filter);
+    case NoneFilterType:
+        return fromQMapboxCompoundFilterForm<mbgl::style::NoneFilter>(filter);
+    case HasFilterType:
+        return fromQMapboxUnaryFilterForm<mbgl::style::HasFilter>(filter);
+    case NotHasFilterType:
+        return fromQMapboxUnaryFilterForm<mbgl::style::NotHasFilter>(filter);
+    }
+    return {};
+}
+
+} // anonymous namespace
 
 QMapboxGLSettings::QMapboxGLSettings()
     : m_mapMode(QMapboxGLSettings::ContinuousMap)
@@ -594,6 +716,22 @@ void QMapboxGL::addCustomLayer(const QString &id,
 void QMapboxGL::removeCustomLayer(const QString& id)
 {
     d_ptr->mapObj->removeLayer(id.toStdString());
+}
+
+void QMapboxGL::setFilter(const QString &layerID, const QMapbox::Filter &filter) {
+    mbgl::style::Layer *layer = d_ptr->mapObj->getLayer(layerID.toStdString());
+    if (!layer) return;
+
+    mbgl::style::Filter mbglFilter(fromQMapboxFilter(filter));
+    if (layer->is<mbgl::style::FillLayer>()) {
+        layer->as<mbgl::style::FillLayer>()->setFilter(mbglFilter);
+    } else if (layer->is<mbgl::style::LineLayer>()) {
+        layer->as<mbgl::style::LineLayer>()->setFilter(mbglFilter);
+    } else if (layer->is<mbgl::style::SymbolLayer>()) {
+        layer->as<mbgl::style::SymbolLayer>()->setFilter(mbglFilter);
+    } else if (layer->is<mbgl::style::CircleLayer>()) {
+        layer->as<mbgl::style::CircleLayer>()->setFilter(mbglFilter);
+    }
 }
 
 void QMapboxGL::render()

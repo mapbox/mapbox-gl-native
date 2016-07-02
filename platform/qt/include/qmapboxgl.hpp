@@ -204,6 +204,8 @@ public:
         char* before = NULL);
     void removeCustomLayer(const QString& id);
 
+    void setFilter(const QString &layerID, const QMapbox::Filter &filter);
+
 public slots:
     void render();
     void connectionEstablished();
