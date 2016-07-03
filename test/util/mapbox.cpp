@@ -13,8 +13,8 @@ TEST(Mapbox, SourceURL) {
         "https://api.mapbox.com/v4/user.map.json?access_token=key&secure",
         mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"));
     EXPECT_EQ(
-        "https://api.mapbox.com/v4/user.map.json?access_token=token&secure",
-        mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "token"));
+        "http://path",
+        mbgl::util::mapbox::normalizeSourceURL("http://path", "key");
     EXPECT_THROW(
         std::runtime_error,
         mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", ""));
