@@ -101,7 +101,7 @@
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
         
-        CATransform3D transform = self.layer.transform;
+        CATransform3D transform = CATransform3DIdentity;
         self.layer.transform = CATransform3DScale(transform, pitchAdjustedScale, pitchAdjustedScale, 1);
     }
 }
