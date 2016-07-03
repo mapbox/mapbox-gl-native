@@ -589,10 +589,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
         annotationView.frame = CGRectMake(0, 0, 10, 10);
         annotationView.centerColor = [UIColor whiteColor];
        
-        // uncomment to flatten the annotation view against the map when the map is tilted
-        // this currently causes severe performance issues when more than 2k annotations are visible
-        // annotationView.flat = YES;
-        
         // uncomment to make the annotation view draggable
         // also note that having two long press gesture recognizers on overlapping views (`self.view` & `annotationView`) will cause weird behaviour
         // comment out the pin dropping functionality in the handleLongPress: method in this class to make draggable annotation views play nice

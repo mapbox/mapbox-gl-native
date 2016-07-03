@@ -71,21 +71,10 @@
         return;
     }
     
-    if (self.flat)
-    {
-        [self updatePitch:pitch];
-    }
-  
     if (self.scalesWithViewingDistance)
     {
         [self updateScaleForPitch:pitch];
     }
-}
-
-- (void)updatePitch:(CGFloat)pitch
-{
-    CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(pitch), 1.0, 0, 0);
-    self.layer.transform = t;
 }
 
 - (void)updateScaleForPitch:(CGFloat)pitch
@@ -112,7 +101,7 @@
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
         
-        CATransform3D transform = self.flat ? self.layer.transform : CATransform3DIdentity;
+        CATransform3D transform = self.layer.transform;
         self.layer.transform = CATransform3DScale(transform, pitchAdjustedScale, pitchAdjustedScale, 1);
     }
 }

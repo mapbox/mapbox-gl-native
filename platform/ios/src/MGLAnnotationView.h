@@ -127,21 +127,6 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
 @property (nonatomic) CGVector centerOffset;
 
 /**
- A Boolean value indicating whether the view lies flat against the map as it
- tilts.
- 
- If this option is unset, the annotation view remains unchanged as the map’s
- pitch increases, so that the view appears to stand upright on the tilted map.
- If this option is set, the annotation view tilts as the map’s pitch increases,
- so that the view appears to lie flat against the tilted map.
- 
- For example, you would set this option if the annotation view depicts an arrow
- that should always point due south. You would unset this option if the arrow
- should always point down towards the ground.
- */
-@property (nonatomic, assign, getter=isFlat) BOOL flat;
-
-/**
  A Boolean value that determines whether the annotation view grows and shrinks
  as the distance between the viewpoint and the annotation view changes on a
  tilted map.
