@@ -83,6 +83,7 @@ private:
 
 #if MBGL_USE_EGL
     EGLDisplay glDisplay = EGL_NO_DISPLAY;
+    EGLConfig glConfig = nullptr;	
     EGLSurface glSurface = EGL_NO_SURFACE;
     EGLContext glContext = EGL_NO_CONTEXT;
 #endif
