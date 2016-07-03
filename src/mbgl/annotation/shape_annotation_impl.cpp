@@ -43,7 +43,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
 
     ToGeometryCollection toGeometryCollection;
     ToFeatureType toFeatureType;
-    for (auto& shapeFeature : shapeTile.features) {
+    for (const auto& shapeFeature : shapeTile.features) {
         FeatureType featureType = apply_visitor(toFeatureType, shapeFeature.geometry);
         GeometryCollection renderGeometry = apply_visitor(toGeometryCollection, shapeFeature.geometry);
 

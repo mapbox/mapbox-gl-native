@@ -76,38 +76,31 @@ GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
-        GeometryCollection collection;
-        GeometryCoordinates coordinates;
-        coordinates.emplace_back(geom.x, geom.y);
-        collection.push_back(coordinates);
-        return collection;
+        return GeometryCollection { { geom } };
     }
     GeometryCollection operator()(const mapbox::geometry::multi_point<int16_t>& geom) const {
-        GeometryCollection collection;
         GeometryCoordinates coordinates;
         coordinates.reserve(geom.size());
-        for (auto& point : geom) {
+        for (const auto& point : geom) {
             coordinates.emplace_back(point.x, point.y);
         }
-        collection.push_back(coordinates);
-        return collection;
+        return GeometryCollection { coordinates };
     }
     GeometryCollection operator()(const mapbox::geometry::line_string<int16_t>& geom) const {
-        GeometryCollection collection;
         GeometryCoordinates coordinates;
         coordinates.reserve(geom.size());
-        for (auto& point : geom) {
+        for (const auto& point : geom) {
             coordinates.emplace_back(point.x, point.y);
         }
-        collection.push_back(coordinates);
-        return collection;
+        return GeometryCollection { coordinates };
     }
     GeometryCollection operator()(const mapbox::geometry::multi_line_string<int16_t>& geom) const {
         GeometryCollection collection;
-        for (auto& ring : geom) {
+        collection.reserve(geom.size());
+        for (const auto& ring : geom) {
             GeometryCoordinates coordinates;
             coordinates.reserve(ring.size());
-            for (auto& point : ring) {
+            for (const auto& point : ring) {
                 coordinates.emplace_back(point.x, point.y);
             }
             collection.push_back(coordinates);
@@ -116,10 +109,11 @@ struct ToGeometryCollection {
     }
     GeometryCollection operator()(const mapbox::geometry::polygon<int16_t>& geom) const {
         GeometryCollection collection;
-        for (auto& ring : geom) {
+        collection.reserve(geom.size());
+        for (const auto& ring : geom) {
             GeometryCoordinates coordinates;
             coordinates.reserve(ring.size());
-            for (auto& point : ring) {
+            for (const auto& point : ring) {
                 coordinates.emplace_back(point.x, point.y);
             }
             collection.push_back(coordinates);
