@@ -312,7 +312,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
  * @param {Array<number>} [options.center=[0,0]] longitude, latitude center
  * of the map
  * @param {number} [options.bearing=0] rotation
- * @param {Array<string>} [options.classes=[]] GL Style Classes
+ * @param {Array<string>} [options.classes=[]] style classes
  * @param {Function} callback
  * @returns {undefined} calls callback
  * @throws {Error} if stylesheet is not loaded or if map is already rendering
