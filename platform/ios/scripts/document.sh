@@ -27,7 +27,7 @@ README=/tmp/mbgl/README.md
 cp platform/ios/docs/doc-README.md "${README}"
 # http://stackoverflow.com/a/4858011/4585461
 echo "## Changes in version ${RELEASE_VERSION}" >> "${README}"
-sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' platform/ios/CHANGELOG.md >> "${README}"
+sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^## /q' -e 'p' -e 'ba' -e '}' platform/ios/CHANGELOG.md >> "${README}"
 
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
