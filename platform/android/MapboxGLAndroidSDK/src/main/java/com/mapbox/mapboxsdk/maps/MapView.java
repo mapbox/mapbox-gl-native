@@ -14,10 +14,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -45,7 +43,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.Surface;
-import android.view.TextureView;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -196,9 +195,8 @@ public class MapView extends FrameLayout {
         }
 
         // Reference the TextureView
-        TextureView textureView = (TextureView) view.findViewById(R.id.textureView);
-        textureView.setSurfaceTextureListener(new SurfaceTextureListener());
-
+        SurfaceView surfaceView = (SurfaceView) view.findViewById(R.id.surfaceView);
+        
         // Check if we are in Android Studio UI editor to avoid error in layout preview
         if (isInEditMode()) {
             return;
@@ -212,6 +210,8 @@ public class MapView extends FrameLayout {
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
+
+        surfaceView.getHolder().addCallback(new SurfaceCallback());
 
         // Touch gesture detectors
         mGestureDetector = new GestureDetectorCompat(context, new GestureListener());
@@ -456,7 +456,16 @@ public class MapView extends FrameLayout {
                     }
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
+
+                    mCompassView.update(getDirection());
+                    mMyLocationView.update();
+                    mMapboxMap.getMarkerViewManager().update();
+
+                    for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
+                        infoWindow.update();
+                    }
                 }
+
             }
         });
 
@@ -1347,62 +1356,32 @@ public class MapView extends FrameLayout {
         return mNativeMapView.getScale();
     }
 
-    // This class handles TextureView callbacks
-    private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
+    private class SurfaceCallback implements SurfaceHolder.Callback {
 
         private Surface mSurface;
-        private View mViewHolder;
 
-        private static final int VIEW_MARKERS_POOL_SIZE = 20;
-
-
-        // Called when the native surface texture has been created
-        // Must do all EGL/GL ES initialization here
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            mNativeMapView.createSurface(mSurface = new Surface(surface));
-            mNativeMapView.resizeFramebuffer(width, height);
+        public void surfaceCreated(SurfaceHolder holder) {
+            mNativeMapView.createSurface(mSurface = holder.getSurface());
             mHasSurface = true;
         }
 
-        // Called when the native surface texture has been destroyed
-        // Must do all EGL/GL ES destruction here
         @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            if (mDestroyed) {
+                return;
+            }
+            mNativeMapView.resizeFramebuffer(width, height);
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
             mHasSurface = false;
 
             if (mNativeMapView != null) {
                 mNativeMapView.destroySurface();
             }
             mSurface.release();
-            return true;
-        }
-
-        // Called when the format or size of the native surface texture has been changed
-        // Must handle window resizing here.
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            if (mDestroyed) {
-                return;
-            }
-
-            mNativeMapView.resizeFramebuffer(width, height);
-        }
-
-        // Called when the SurfaceTexure frame is drawn to screen
-        // Must sync with UI here
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-            if (mDestroyed) {
-                return;
-            }
-            mCompassView.update(getDirection());
-            mMyLocationView.update();
-            mMapboxMap.getMarkerViewManager().update();
-
-            for (InfoWindow infoWindow : mMapboxMap.getInfoWindows()) {
-                infoWindow.update();
-            }
         }
     }
 
@@ -2620,18 +2599,19 @@ public class MapView extends FrameLayout {
 
     @UiThread
     void snapshot(@NonNull final MapboxMap.SnapshotReadyCallback callback, @Nullable final Bitmap bitmap) {
-        TextureView textureView = (TextureView) findViewById(R.id.textureView);
-        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
-
-        setDrawingCacheEnabled(true);
-        Bitmap content = Bitmap.createBitmap(getDrawingCache());
-        setDrawingCacheEnabled(false);
-
-        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
-        canvas.drawBitmap(content, new Matrix(), null);
-        callback.onSnapshotReady(output);
+//        TextureView textureView = (TextureView) findViewById(R.id.textureView);
+//        final boolean canUseBitmap = bitmap != null && textureView.getWidth() == bitmap.getWidth() && textureView.getHeight() == bitmap.getHeight();
+//
+//        setDrawingCacheEnabled(true);
+//        Bitmap content = Bitmap.createBitmap(getDrawingCache());
+//        setDrawingCacheEnabled(false);
+//
+//        Bitmap output = Bitmap.createBitmap(content.getWidth(), content.getHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas canvas = new Canvas(output);
+//        canvas.drawBitmap(canUseBitmap ? textureView.getBitmap(bitmap) : textureView.getBitmap(), 0, 0, null);
+//        canvas.drawBitmap(content, new Matrix(), null);
+//        callback.onSnapshotReady(output);
+        throw new RuntimeException("TextureView code needs to be migrated to SurfaceView");
     }
 
     //
