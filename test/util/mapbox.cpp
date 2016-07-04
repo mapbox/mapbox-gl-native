@@ -14,10 +14,10 @@ TEST(Mapbox, SourceURL) {
         mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", "key"));
     EXPECT_EQ(
         "http://path",
-        mbgl::util::mapbox::normalizeSourceURL("http://path", "key");
+        mbgl::util::mapbox::normalizeSourceURL("http://path", "key"));
     EXPECT_THROW(
-        std::runtime_error,
-        mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", ""));
+        mbgl::util::mapbox::normalizeSourceURL("mapbox://user.map", ""),
+        std::runtime_error);
 }
 
 TEST(Mapbox, GlyphsURL) {
