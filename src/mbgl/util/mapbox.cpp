@@ -20,13 +20,14 @@ bool isMapboxURL(const std::string& url) {
 std::vector<std::string> getMapboxURLPathname(const std::string& url) {
     std::vector<std::string> pathname;
     std::size_t startIndex = protocol.length();
-    while (startIndex < url.length()) {
+    std::size_t end = url.find_first_of("?#");
+    if (end == std::string::npos) {
+        end = url.length();
+    }
+    while (startIndex < end) {
         std::size_t endIndex = url.find("/", startIndex);
         if (endIndex == std::string::npos) {
-            endIndex = url.find_first_of("?#");
-        }
-        if (endIndex == std::string::npos) {
-            endIndex = url.length();
+            endIndex = end;
         }
         pathname.push_back(url.substr(startIndex, endIndex - startIndex));
         startIndex = endIndex + 1;
