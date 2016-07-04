@@ -16,7 +16,7 @@ class AsyncTask::Impl : public QObject {
     Q_OBJECT
 
 public:
-    Impl(std::function<void()>&& fn);
+    Impl(std::function<void()> &&);
 
     void maySend();
 
@@ -34,5 +34,5 @@ private:
 };
 
 
-}
-}
+} // namespace util
+} // namespace mbgl

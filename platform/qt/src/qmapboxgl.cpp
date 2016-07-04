@@ -609,7 +609,6 @@ void QMapboxGL::connectionEstablished()
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings)
     : QObject(q)
-    , size(0, 0)
     , q_ptr(q)
     , fileSourceObj(std::make_unique<mbgl::DefaultFileSource>(
         settings.cacheDatabasePath().toStdString(),
