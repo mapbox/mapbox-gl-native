@@ -1,3 +1,5 @@
+#pragma once
+
 // This file is generated. Edit make_property_setters.hpp.ejs, then run `make style-code`.
 
 #include <mbgl/style/conversion/property_setter.hpp>
