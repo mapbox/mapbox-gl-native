@@ -123,10 +123,16 @@ void RunLoop::Impl::addRunnable(Runnable* runnable) {
 void RunLoop::Impl::removeRunnable(Runnable* runnable) {
     std::lock_guard<std::recursive_mutex> lock(mtx);
 
-    if (runnable->iter != runnables.end()) {
-        runnables.erase(runnable->iter);
-        runnable->iter = runnables.end();
+    if (runnable->iter == runnables.end()) {
+        return;
     }
+
+    if (nextRunnable == runnable->iter) {
+        ++nextRunnable;
+    }
+
+    runnables.erase(runnable->iter);
+    runnable->iter = runnables.end();
 }
 
 void RunLoop::Impl::initRunnable(Runnable* runnable) {
@@ -141,8 +147,8 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     // O(N) but in the render thread where we get tons
     // of messages, the size of the list is usually 1~2.
-    for (auto iter = runnables.begin(); iter != runnables.end();) {
-        Runnable* runnable = *(iter++);
+    for (nextRunnable = runnables.begin(); nextRunnable != runnables.end();) {
+        Runnable* runnable = *(nextRunnable++);
 
         auto const dueTime = runnable->dueTime();
         if (dueTime <= now) {
