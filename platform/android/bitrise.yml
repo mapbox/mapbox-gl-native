@@ -36,10 +36,15 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-            sudo apt-get install -y pkg-config nodejs
+            apt-get install -y pkg-config python-pip python-dev build-essential nodejs
+            pip install awscli
+
+            aws s3 cp s3://mapbox/android/ci-access-token/developer-config.xml platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+
             export BUILDTYPE=Release
             make android
             make test-android
+
             cd platform/android/
              ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
     - slack:
