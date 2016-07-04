@@ -29,7 +29,6 @@ public:
     }
 
     void stop() {
-        task = nullptr;
         loop->removeRunnable(this);
     }
 
@@ -47,8 +46,8 @@ public:
     }
 
     void runTask() override {
-        task();
         reschedule();
+        task();
     }
 
 private:
