@@ -249,7 +249,7 @@ private:
     VertexArrayObject backgroundPatternArray;
     VertexArrayObject backgroundArray;
 
-    VertexArrayObject coveringPlaingOverdrawArray;
+    VertexArrayObject coveringPlainOverdrawArray;
     VertexArrayObject coveringRasterOverdrawArray;
     VertexArrayObject backgroundPatternOverdrawArray;
     VertexArrayObject backgroundOverdrawArray;

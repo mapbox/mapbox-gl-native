@@ -13,7 +13,7 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
 
     const bool overdraw = isOverdraw();
     const auto& shaderPlain = overdraw ? plainOverdrawShader : plainShader;
-    auto& arrayCoveringPlain = overdraw ? coveringPlaingOverdrawArray : coveringPlainArray;
+    auto& arrayCoveringPlain = overdraw ? coveringPlainOverdrawArray : coveringPlainArray;
 
     mat4 matrix;
     const GLuint mask = 0b11111111;
