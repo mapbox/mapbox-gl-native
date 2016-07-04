@@ -3,6 +3,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 
+#include <cassert>
 #include <functional>
 
 namespace mbgl {
@@ -11,6 +12,7 @@ namespace util {
 class Timer::Impl : public RunLoop::Impl::Runnable {
 public:
     Impl() {
+        assert(!loop->isDefaultLoop);
         loop->initRunnable(this);
     }
 
@@ -35,7 +37,7 @@ public:
     void reschedule() {
         if (repeat != Duration::zero()) {
             due = Clock::now() + repeat;
-            loop->addRunnable(this);
+            loop->wake();
         } else {
             stop();
         }

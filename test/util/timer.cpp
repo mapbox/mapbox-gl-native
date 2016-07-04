@@ -10,7 +10,7 @@
 using namespace mbgl::util;
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
 
@@ -34,7 +34,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Basic)) {
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
 
@@ -60,7 +60,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Repeat)) {
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     Timer timer1;
     Timer timer2;
@@ -96,7 +96,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(Stop)) {
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     auto timer1 = std::make_unique<Timer>();
     Timer timer2;
@@ -132,7 +132,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(DestroyShouldStop)) {
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
 
@@ -166,7 +166,7 @@ TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(StartOverrides)) {
 }
 
 TEST(Timer, TEST_REQUIRES_ACCURATE_TIMING(CanStopNonStartedTimer)) {
-    RunLoop loop;
+    RunLoop loop(RunLoop::Type::New);
 
     Timer timer;
     timer.stop();

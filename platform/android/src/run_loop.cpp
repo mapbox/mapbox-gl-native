@@ -80,6 +80,8 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
             ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
+        running = true;
+        isDefaultLoop = true;
         break;
     }
 
