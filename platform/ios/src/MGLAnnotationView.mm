@@ -212,13 +212,21 @@
         [self.mapView.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
         [self.superview bringSubviewToFront:self];
     }
-
-    if (dragState == MGLAnnotationViewDragStateEnding)
+    else if (dragState == MGLAnnotationViewDragStateCanceling)
     {
-        if ([self.mapView.delegate respondsToSelector:@selector(mapView:didDragAnnotationView:toCoordinate:)])
+        self.panGestureRecognizer.enabled = NO;
+        self.longPressRecognizer.enabled = NO;
+        self.center = [self.mapView convertCoordinate:self.annotation.coordinate toPointToView:self.mapView];
+        self.panGestureRecognizer.enabled = YES;
+        self.longPressRecognizer.enabled = YES;
+        self.dragState = MGLAnnotationViewDragStateNone;
+    }
+    else if (dragState == MGLAnnotationViewDragStateEnding)
+    {
+        if ([self.annotation respondsToSelector:@selector(setCoordinate:)])
         {
             CLLocationCoordinate2D coordinate = [self.mapView convertPoint:self.center toCoordinateFromView:self.mapView];
-            [self.mapView.delegate mapView:self.mapView didDragAnnotationView:self toCoordinate:coordinate];
+            [(NSObject *)self.annotation setValue:[NSValue valueWithMGLCoordinate:coordinate] forKey:@"coordinate"];
         }
     }
 }

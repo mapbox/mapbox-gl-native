@@ -202,9 +202,6 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  attempting to stop an operation that has already been initiated; doing so can
  lead to undefined behavior. Once begun, the drag operation should always
  continue to completion.
- 
- `-mapView:didDragAnnotationView:toCoordinate:` is called when a view is
- dropped.
  */
 @property (nonatomic, assign, getter=isDraggable) BOOL draggable;
 

@@ -284,27 +284,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NS_ARRAY_OF(MGLAnnotationView *) *)annotationViews;
 
-#pragma mark Dragging Annotation Views
-
-/**
- Tells the delegate that the user has dragged the given annotation view to a new
- location.
- 
- This method is called as soon as the user finishes dragging and drops the
- annotation view at a new location.
- 
- To permanently move the corresponding annotation to the new geographic
- coordinate, set the annotation’s `coordinate` property to the given coordinate.
- Otherwise, the annotation view will return to the original location
- corresponding to that property’s value.
- 
- @param mapView The map view containing the annotation view.
- @param annotationView The annotation view that was dragged.
- @param coordinate The geographic coordinate corresponding to the location to
-    which the user has dragged the annotation view.
- */
-- (void)mapView:(MGLMapView *)mapView didDragAnnotationView:(MGLAnnotationView *)annotationView toCoordinate:(CLLocationCoordinate2D)coordinate;
-
 #pragma mark Selecting Annotations
 
 /**
