@@ -114,10 +114,10 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
-    // The extrusion scale.
-    const float flippedY = state.getViewportMode() == ViewportMode::FlippedY;
-    extrudeScale = {{ 2.0f / state.getWidth() * state.getAltitude(),
-                      (flippedY ? 2.0f : -2.0f) / state.getHeight() * state.getAltitude() }};
+    pixelsToGLUnits = {{ 2.0f  / state.getWidth(), -2.0f / state.getHeight() }};
+    if (state.getViewportMode() == ViewportMode::FlippedY) {
+        pixelsToGLUnits[1] *= -1;
+    }
 
     // The native matrix is a 1:1 matrix that paints the coordinates at the
     // same screen position as the vertex specifies.

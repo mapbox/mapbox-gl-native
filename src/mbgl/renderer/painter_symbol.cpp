@@ -44,23 +44,26 @@ void Painter::renderSDF(SymbolBucket &bucket,
     float fontSize = paintSize;
     float fontScale = fontSize / sdfFontSize;
 
-    float scale = fontScale;
-    std::array<float, 2> exScale = extrudeScale;
     bool rotateWithMap = rotationAlignment == AlignmentType::Map;
     bool pitchWithMap = pitchAlignment == AlignmentType::Map;
-    float gammaScale = 1.0f;
+
+    std::array<float, 2> extrudeScale;
+    float gammaScale;
 
     if (pitchWithMap) {
-        scale *= tileID.pixelsToTileUnits(1, state.getZoom());
-        exScale.fill(scale);
-        gammaScale /= std::cos(state.getPitch());
+        gammaScale = 1.0 / std::cos(state.getPitch());
+        extrudeScale.fill(tileID.pixelsToTileUnits(1, state.getZoom()) * fontScale);
     } else {
-        exScale = {{ exScale[0] * scale, exScale[1] * scale }};
+        gammaScale = 1.0;
+        extrudeScale = {{
+            pixelsToGLUnits[0] * fontScale * state.getAltitude(),
+            pixelsToGLUnits[1] * fontScale * state.getAltitude()
+        }};
     }
 
     config.program = sdfShader.getID();
     sdfShader.u_matrix = vtxMatrix;
-    sdfShader.u_extrude_scale = exScale;
+    sdfShader.u_extrude_scale = extrudeScale;
     sdfShader.u_texsize = texsize;
     sdfShader.u_rotate_with_map = rotateWithMap;
     sdfShader.u_pitch_with_map = pitchWithMap;
@@ -189,14 +192,16 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             mat4 vtxMatrix =
                 translatedMatrix(matrix, paint.iconTranslate, tileID, paint.iconTranslateAnchor);
 
-            float scale = fontScale;
-            std::array<float, 2> exScale = extrudeScale;
+            std::array<float, 2> extrudeScale;
+
             const bool alignedWithMap = layout.iconRotationAlignment == AlignmentType::Map;
             if (alignedWithMap) {
-                scale *= tileID.pixelsToTileUnits(1, state.getZoom());
-                exScale.fill(scale);
+                extrudeScale.fill(tileID.pixelsToTileUnits(1, state.getZoom()) * fontScale);
             } else {
-                exScale = {{ exScale[0] * scale, exScale[1] * scale }};
+                extrudeScale = {{
+                    pixelsToGLUnits[0] * fontScale * state.getAltitude(),
+                    pixelsToGLUnits[1] * fontScale * state.getAltitude()
+                }};
             }
 
             const bool overdraw = isOverdraw();
@@ -204,7 +209,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
 
             config.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
-            iconShader.u_extrude_scale = exScale;
+            iconShader.u_extrude_scale = extrudeScale;
             iconShader.u_texsize = {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }};
             iconShader.u_rotate_with_map = alignedWithMap;
             iconShader.u_texture = 0;

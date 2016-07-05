@@ -159,7 +159,7 @@ private:
     mat4 projMatrix;
     mat4 nativeMatrix;
 
-    std::array<float, 2> extrudeScale;
+    std::array<float, 2> pixelsToGLUnits;
 
     // used to composite images and flips the geometry upside down
     const mat4 flipMatrix = []{
