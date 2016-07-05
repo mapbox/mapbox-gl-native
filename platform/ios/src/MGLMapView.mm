@@ -3864,7 +3864,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 - (nullable MGLUserLocation *)userLocation
 {
-    return self.userLocationAnnotationView.annotation;
+    return self.userLocationAnnotationView.userLocation;
 }
 
 - (BOOL)isUserLocationVisible

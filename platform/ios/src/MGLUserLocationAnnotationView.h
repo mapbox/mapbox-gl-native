@@ -2,6 +2,7 @@
 #import <CoreLocation/CoreLocation.h>
 
 #import "MGLTypes.h"
+#import "MGLAnnotationView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -9,10 +10,10 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLUserLocation;
 
 /** View representing an `MGLUserLocation` on screen. */
-@interface MGLUserLocationAnnotationView : UIView
+@interface MGLUserLocationAnnotationView : MGLAnnotationView
 
 @property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic) MGLUserLocation *annotation;
+@property (nonatomic, readonly, nullable) MGLUserLocation *userLocation;
 @property (nonatomic, readonly, nullable) CALayer *haloLayer;
 @property (nonatomic, readonly) CALayer *hitTestLayer;
 
