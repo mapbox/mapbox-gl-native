@@ -54,7 +54,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
     if (self = [super initWithFrame:CGRectMake(0, 0, frameSize, frameSize)])
     {
-        self.annotation = [[MGLUserLocation alloc] initWithMapView:mapView];
+        _userLocation = [[MGLUserLocation alloc] initWithMapView:mapView];
         _mapView = mapView;
         [self setupLayers];
         self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable | UIAccessibilityTraitUpdatesFrequently;
@@ -78,14 +78,14 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (NSString *)accessibilityLabel
 {
-    return self.annotation.title;
+    return self.userLocation.title;
 }
 
 - (NSString *)accessibilityValue
 {
-    if (self.annotation.subtitle)
+    if (self.userLocation.subtitle)
     {
-        return self.annotation.subtitle;
+        return self.userLocation.subtitle;
     }
     
     // Each arcminute of longitude is at most about 1 nmi, too small for low zoom levels.
@@ -149,7 +149,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (void)setupLayers
 {
-    if (CLLocationCoordinate2DIsValid(self.annotation.coordinate))
+    if (CLLocationCoordinate2DIsValid(self.userLocation.coordinate))
     {
         (_mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? [self drawPuck] : [self drawDot];
         [self updatePitch];
@@ -260,9 +260,9 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
         [self.layer addSublayer:_puckArrow];
     }
-    if (self.annotation.location.course >= 0)
+    if (self.userLocation.location.course >= 0)
     {
-        _puckArrow.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.annotation.location.course));
+        _puckArrow.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.location.course));
     }
 
     if ( ! _puckModeActivated)
@@ -310,7 +310,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         
         // heading indicator (tinted, semi-circle)
         //
-        if ( ! _headingIndicatorLayer && self.annotation.heading.headingAccuracy)
+        if ( ! _headingIndicatorLayer && self.userLocation.heading.headingAccuracy)
         {
             CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
             
@@ -330,7 +330,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         
         // heading indicator accuracy mask (fan-shaped)
         //
-        if ( ! _headingIndicatorMaskLayer && self.annotation.heading.headingAccuracy)
+        if ( ! _headingIndicatorMaskLayer && self.userLocation.heading.headingAccuracy)
         {
             _headingIndicatorMaskLayer = [CAShapeLayer layer];
             _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
@@ -339,20 +339,20 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
             // apply the mask to the halo-radius-sized gradient layer
             _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
             
-            _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+            _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
             
         }
-        else if (_oldHeadingAccuracy != self.annotation.heading.headingAccuracy)
+        else if (_oldHeadingAccuracy != self.userLocation.heading.headingAccuracy)
         {
             // recalculate the clipping mask based on updated accuracy
             _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
             
-            _oldHeadingAccuracy = self.annotation.heading.headingAccuracy;
+            _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
         }
         
-        if (self.annotation.heading.trueHeading >= 0)
+        if (self.userLocation.heading.trueHeading >= 0)
         {
-            _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.annotation.heading.trueHeading));
+            _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.heading.trueHeading));
         }
     }
     else
@@ -366,7 +366,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
     // update accuracy ring (if zoom or horizontal accuracy have changed)
     //
-    if (_accuracyRingLayer && (_oldZoom != self.mapView.zoomLevel || _oldHorizontalAccuracy != self.annotation.location.horizontalAccuracy))
+    if (_accuracyRingLayer && (_oldZoom != self.mapView.zoomLevel || _oldHorizontalAccuracy != self.userLocation.location.horizontalAccuracy))
     {
         CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
         
@@ -393,13 +393,13 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         }
 
         // store accuracy and zoom so we're not redrawing unchanged location updates
-        _oldHorizontalAccuracy = self.annotation.location.horizontalAccuracy;
+        _oldHorizontalAccuracy = self.userLocation.location.horizontalAccuracy;
         _oldZoom = self.mapView.zoomLevel;
     }
 
     // accuracy ring (circular, tinted, mostly-transparent)
     //
-    if ( ! _accuracyRingLayer && self.annotation.location.horizontalAccuracy)
+    if ( ! _accuracyRingLayer && self.userLocation.location.horizontalAccuracy)
     {
         CGFloat accuracyRingSize = [self calculateAccuracyRingSize];
         _accuracyRingLayer = [self circleLayerWithSize:accuracyRingSize];
@@ -526,8 +526,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (CGFloat)calculateAccuracyRingSize
 {
-    CGFloat latRadians = self.annotation.coordinate.latitude * M_PI / 180.0f;
-    CGFloat pixelRadius = self.annotation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPointAtLatitude:self.annotation.coordinate.latitude];
+    CGFloat latRadians = self.userLocation.coordinate.latitude * M_PI / 180.0f;
+    CGFloat pixelRadius = self.userLocation.location.horizontalAccuracy / cos(latRadians) / [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude];
 
     return pixelRadius * 2;
 }
@@ -567,7 +567,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (UIBezierPath *)headingIndicatorClippingMask
 {
-    CGFloat accuracy = self.annotation.heading.headingAccuracy;
+    CGFloat accuracy = self.userLocation.heading.headingAccuracy;
 
     // size the mask using exagerated accuracy, but keep within a good display range
     CGFloat clippingDegrees = 90 - (accuracy * 1.5);
