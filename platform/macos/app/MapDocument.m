@@ -180,7 +180,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)chooseCustomStyle:(id)sender {
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = @"Apply custom style";
-    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox GL style specification, such as a style designed in Mapbox Studio:";
+    alert.informativeText = @"Enter the URL to a JSON file that conforms to the Mapbox Style Specification, such as a style designed in Mapbox Studio:";
     NSTextField *textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
     [textField sizeToFit];
     NSRect textFieldFrame = textField.frame;

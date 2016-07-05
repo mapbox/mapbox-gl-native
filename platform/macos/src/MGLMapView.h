@@ -49,7 +49,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
  The map view loads scalable vector tiles that conform to the
  <a href="https://github.com/mapbox/vector-tile-spec">Mapbox Vector Tile Specification</a>.
  It styles them with a style that conforms to the
- <a href="https://www.mapbox.com/mapbox-gl-style-spec/">Mapbox GL style specification</a>.
+ <a href="https://www.mapbox.com/mapbox-gl-style-spec/">Mapbox Style Specification</a>.
  Such styles can be designed in
  <a href="https://www.mapbox.com/studio/">Mapbox Studio</a> and hosted on
  mapbox.com.
