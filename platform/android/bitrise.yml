@@ -27,7 +27,6 @@ workflows:
         inputs:
         - name: test
         - platform: android-23
-    - start-android-emulator@1.0.2: {}
     - script:
         title: Build
         run_if: '{{enveq "SKIPCI" "false"}}'
@@ -44,9 +43,15 @@ workflows:
             export BUILDTYPE=Release
             make android
             make test-android
-
+    - start-android-emulator@1.0.2: {}
+    - script:
+        title: Run integragion tests
+        run_if: '{{enveq "SKIPCI" "false"}}'
+        inputs:
+        - content: |-
+            #!/bin/bash
             cd platform/android/
-             ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
+            ./gradlew -Pandroid.testInstrumentationRunnerArguments.class=com.mapbox.mapboxsdk.testapp.espresso.LatLngBoundsActivityTest connectedAndroidTest
     - slack:
         title: Post to Slack
         run_if: '{{enveq "SKIPCI" "false"}}'
