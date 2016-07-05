@@ -4,9 +4,13 @@
 #include <TargetConditionals.h>
 #endif
 
+#if TARGET_OS_IOS
 #define TEST_READ_ONLY 1
 #define TEST_HAS_SERVER 0
-
+#else
+#define TEST_READ_ONLY 0
+#define TEST_HAS_SERVER 1
+#endif
 
 #if TARGET_OS_SIMULATOR
 #define TEST_IS_SIMULATOR 1
@@ -38,7 +42,6 @@
 #include <cstdint>
 
 #include <gtest/gtest.h>
-
 #define SCOPED_TEST(name) \
     static class name { \
         bool completed = false; \
@@ -46,6 +49,15 @@
         void finish() { EXPECT_FALSE(completed) << #name " was already completed."; completed = true; } \
         ~name() { if (!completed) ADD_FAILURE() << #name " didn't complete."; } \
     } name;
+
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wformat"
+#include "httplib.h"
+#pragma GCC diagnostic pop
+
+#include <memory>
+#include <future>
 
 namespace mbgl {
 
@@ -55,11 +67,13 @@ namespace test {
 
 class Server {
 public:
-    Server(const char* executable);
-    ~Server();
-
+	Server();
+	~Server();
+	void start();
 private:
-    int fd = -1;
+	std::unique_ptr<httplib::Server> svr;
+	std::future<void> f_;
+	bool up_;
 };
 
 PremultipliedImage render(Map&);

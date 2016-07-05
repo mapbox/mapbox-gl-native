@@ -14,76 +14,104 @@
 
 #include <unistd.h>
 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wformat"
+#include "httplib.h"
+#pragma GCC diagnostic pop
+
+#include <memory>
+
 namespace mbgl {
 namespace test {
 
-Server::Server(const char* executable) {
-    int input[2];
-    int output[2];
+std::string dumpHeaders(const httplib::MultiMap& headers) {
+	std::string s;
+	char buf[BUFSIZ];
 
-    if (pipe(input)) {
-        throw std::runtime_error("Cannot create server input pipe");
-    }
-    if (pipe(output)) {
-        throw std::runtime_error("Cannot create server output pipe");
-    }
+	for (auto it = headers.begin(); it != headers.end(); ++it) {
+		const auto& x = *it;
+		snprintf(buf, sizeof(buf), "%s: %s\n", x.first.c_str(), x.second.c_str());
+		s += buf;
+	}
 
-    // Store the parent => child pipe so that we can close it in the destructor.
-    fd = input[1];
+	return s;
+}
 
-    pid_t pid = fork();
-    if (pid < 0) {
-        Log::Error(Event::Setup, "Cannot create server process");
-        exit(1);
-    } else if (pid == 0) {
-        // This is the child process.
+Server::Server() {
+	svr = std::make_unique<httplib::Server>();
 
-        // Connect the parent => child pipe to stdin.
-        while ((dup2(input[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
-        close(input[0]);
-        close(input[1]);
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wunused-parameter"	
+	
+	svr->get("/test", [](const auto& req, auto& res) {
+		std::cout << "test\n";
+		if(req.has_param("modified")) {
+			//res.setHeader('Last-Modified', (new Date(req.query.modified * 1000)).toUTCString());
+			std::cout << "Modified "  << req.params.find("modified")->second;	
+		}
+		if (req.has_param("expires")) {
+        		//res.setHeader('Expires', (new Date(req.query.expires * 1000)).toUTCString());
+	    		std::cout << "Exipres "  << req.params.find("expires")->second; 
+		}
+	        if (req.has_param("etag")) {
+	    		std::cout << "etag "  << req.params.find("etag")->second; 
+			res.set_header("ETag", req.params.find("etag")->second.c_str());
+		}
+		if (req.has_param("cachecontrol")) {
+	    		std::cout << "cachecontrol "  << req.params.find("cachecontrol")->second; 
+			res.set_header("Cache-Control", req.params.find("cachecontrol")->second.c_str());
+		}
+		res.set_content("Hello World!", "text/plain");
+	});
 
-        // Move the child => parent side of the pipe to stdout.
-        while ((dup2(output[1], STDOUT_FILENO) == -1) && (errno == EINTR)) {}
-        close(output[1]);
-        close(output[0]);
+	svr->get("/stale", [] (const auto& req, auto& res) {
+		std::cout << "stale " << req.url << "\n";
+		//TODO: Don't respond
+	});	
 
-        // Launch the actual server process.
-        int ret = execl(executable, executable, nullptr);
+	int cacheCounter = 0;
+	svr->get("/cache", [&cacheCounter](const auto& req, auto& res) {
+		std::cout << "cache\n";
+		res.set_header("Cache-Control", "max-age=30");
+		res.set_content("Response " + std::to_string(++cacheCounter), "text/plain");	
+	});
 
-        // This call should not return. In case execl failed, we exit anyway.
-        if (ret < 0) {
-            Log::Error(Event::Setup, "Failed to start server: %s", strerror(errno));
-        }
-        exit(0);
-    } else {
-        // This is the parent process.
-
-        // Close the unneeded sides of the pipes.
-        close(output[1]);
-        close(input[0]);
-
-        // Wait until the server process sends at least 2 bytes or closes the handle.
-        char buffer[2];
-        ssize_t bytes, total = 0;
-        while (total < 2 && (bytes = read(output[0], buffer + total, 2 - total)) != 0) {
-            total += bytes;
-        }
-
-        // Close child => parent pipe.
-        close(output[0]);
-
-        // Check signature
-        if (total != 2 || strncmp(buffer, "OK", 2) != 0) {
-            throw std::runtime_error("Failed to start server: Invalid signature");
-        }
-    }
+	svr->get("/revalidate-same", [](const auto& req, auto& res) {
+		std::cout << "revalidate same\n";
+		std::cout << dumpHeaders(req.headers) << "\n\n";
+		if (req.has_header("if-non-match") && req.headers.find("if-none-match")->second == "snowfall") {
+			// Second request can be cached for 30 seconds.
+			res.set_header("Cache-Control", "max-age=30"); 
+			res.status = 304;
+		} else {
+			// First request must always be revalidated.
+			res.set_header("ETag", "snowfall"); 
+			res.set_header("Cache-Control", "must-revalidate");
+			res.status = 200;
+			res.set_content("Response", "text/plain");
+		}
+	});
+#pragma GCC diagnostic pop
 }
 
 Server::~Server() {
-    if (fd > 0) {
-        close(fd);
-    }
+	svr->stop();
+}
+
+void Server::start() {
+	std::cout << "Starting server on port 3000\n";
+	//svr->listen("localhost", 3000);
+	//std::cout << "Stopped!!\n";
+	f_ = std::async([&](){
+		up_ = true;
+		svr->listen("localhost", 3000);
+	});
+
+	while (!up_) {
+		usleep(1000);
+	}
+	std::cout << "Server should be up\n";
 }
 
 PremultipliedImage render(Map& map) {
