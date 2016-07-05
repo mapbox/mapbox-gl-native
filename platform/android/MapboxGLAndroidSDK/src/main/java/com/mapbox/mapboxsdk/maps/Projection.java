@@ -31,7 +31,7 @@ public class Projection {
      * @param latitude The latitude for which to return the value.
      * @return The distance measured in meters.
      */
-    public double getMetersPerPixelAtLatitude(@FloatRange(from = -180, to = 180) double latitude) {
+    public double getMetersPerPixelAtLatitude(@FloatRange(from = -90, to = 90) double latitude) {
         return mMapView.getMetersPerPixelAtLatitude(latitude);
     }
 
