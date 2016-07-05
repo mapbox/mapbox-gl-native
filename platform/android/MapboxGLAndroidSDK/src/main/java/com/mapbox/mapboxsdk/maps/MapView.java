@@ -155,7 +155,7 @@ public class MapView extends FrameLayout {
 
     private PointF mFocalPoint;
 
-    private StyleInitializer mStyleInitializer;
+    private String mStyleUrl;
 
     private List<OnMapReadyCallback> mOnMapReadyCallbackList;
 
@@ -189,7 +189,6 @@ public class MapView extends FrameLayout {
         mOnMapChangedListener = new CopyOnWriteArrayList<>();
         mMapboxMap = new MapboxMap(this);
         mIcons = new ArrayList<>();
-        mStyleInitializer = new StyleInitializer(context);
         View view = LayoutInflater.from(context).inflate(R.layout.mapview_internal, this);
 
         if (!isInEditMode()) {
@@ -262,21 +261,22 @@ public class MapView extends FrameLayout {
             mMyLocationView.setTilt(position.tilt);
         }
 
-        String accessToken = null;
+        // access token
+        String accessToken;
         if (MapboxAccountManager.getInstance() != null) {
             accessToken = MapboxAccountManager.getInstance().getAccessToken();
         } else {
             accessToken = options.getAccessToken();
         }
 
-        String style = options.getStyle();
         if (!TextUtils.isEmpty(accessToken)) {
             mMapboxMap.setAccessToken(accessToken);
-            if (style != null) {
-                setStyleUrl(style);
-            }
-        } else {
-            mStyleInitializer.setStyle(style, true);
+        }
+
+        // style url
+        String style = options.getStyle();
+        if (!TextUtils.isEmpty(style)) {
+            mMapboxMap.setStyleUrl(style);
         }
 
         // MyLocationView
@@ -481,7 +481,7 @@ public class MapView extends FrameLayout {
         outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
         outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, mMapboxMap.getCameraPosition());
         outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, mMapboxMap.isDebugActive());
-        outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleInitializer.getStyle());
+        outState.putString(MapboxConstants.STATE_STYLE_URL, mStyleUrl);
         outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, mMapboxMap.isMyLocationEnabled());
 
         // TrackingSettings
@@ -563,9 +563,9 @@ public class MapView extends FrameLayout {
         mNativeMapView.update();
         mMyLocationView.onResume();
 
-        if (mStyleInitializer.isDefaultStyle()) {
+        if (mStyleUrl == null) {
             // user has failed to supply a style url
-            setStyleUrl(mStyleInitializer.getStyle());
+            setStyleUrl(Style.MAPBOX_STREETS);
         }
     }
 
@@ -819,7 +819,7 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return;
         }
-        mStyleInitializer.setStyle(url);
+        mStyleUrl = url;
         mNativeMapView.setStyleUrl(url);
     }
 
@@ -853,7 +853,7 @@ public class MapView extends FrameLayout {
     @UiThread
     @NonNull
     public String getStyleUrl() {
-        return mStyleInitializer.getStyle();
+        return mStyleUrl;
     }
 
     //
@@ -1137,7 +1137,7 @@ public class MapView extends FrameLayout {
         for (int i = 0; i < ids.length; i++) {
             idsList.add(ids[i]);
         }
-        
+
         List<MarkerView> annotations = new ArrayList<>(ids.length);
         List<Annotation> annotationList = mMapboxMap.getAnnotations();
         int count = annotationList.size();
@@ -2746,41 +2746,6 @@ public class MapView extends FrameLayout {
         public void run() {
             // invalidate camera position
             mapboxMap.getCameraPosition();
-        }
-    }
-
-    /**
-     * Class responsible for managing state of Style loading.
-     */
-    static class StyleInitializer {
-
-        private String mStyle;
-        private boolean mDefaultStyle;
-
-        StyleInitializer(@NonNull Context context) {
-            mStyle = Style.MAPBOX_STREETS;
-            mDefaultStyle = true;
-        }
-
-        void setStyle(@NonNull String style) {
-            setStyle(style, false);
-        }
-
-        void setStyle(@NonNull String style, boolean defaultStyle) {
-            if (style == null) {
-                // don't override default style
-                return;
-            }
-            mStyle = style;
-            mDefaultStyle = defaultStyle;
-        }
-
-        public String getStyle() {
-            return mStyle;
-        }
-
-        boolean isDefaultStyle() {
-            return mDefaultStyle;
         }
     }
 
