@@ -90,6 +90,8 @@
         'src/mbgl/test/stub_file_source.cpp',
         'src/mbgl/test/util.hpp',
         'src/mbgl/test/util.cpp',
+        'src/mbgl/test/server.hpp',
+        'src/mbgl/test/server.cpp',
         'src/mbgl/test/fixture_log_observer.hpp',
         'src/mbgl/test/fixture_log_observer.cpp',
         'src/mbgl/test/test.cpp'
