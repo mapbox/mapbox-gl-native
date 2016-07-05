@@ -65,6 +65,10 @@ void Painter::setClipping(const ClipID& clip) {
 }
 
 void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
+    if (frame.framebufferSize != frame_.framebufferSize) {
+        config.viewport.setDefaultValue(
+            { { 0, 0, frame_.framebufferSize[0], frame_.framebufferSize[1] } });
+    }
     frame = frame_;
 
     PaintParameters parameters {
@@ -121,6 +125,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     // tiles whatsoever.
     {
         MBGL_DEBUG_GROUP("clear");
+        config.bindFramebuffer.reset();
+        config.viewport.reset();
         config.stencilFunc.reset();
         config.stencilTest = GL_TRUE;
         config.stencilMask = 0xFF;
@@ -271,6 +277,8 @@ void Painter::renderPass(PaintParameters& parameters,
             setDepthSublayer(0);
             layer.as<CustomLayer>()->impl->render(state);
             config.setDirty();
+            config.bindFramebuffer.reset();
+            config.viewport.reset();
         } else {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - " + util::toString(item.tile->id));
             if (item.bucket->needsClipping()) {

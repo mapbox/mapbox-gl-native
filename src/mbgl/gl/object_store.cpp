@@ -34,6 +34,11 @@ void VAODeleter::operator()(GLuint id) const {
     store->abandonedVAOs.push_back(id);
 }
 
+void FBODeleter::operator()(GLuint id) const {
+    assert(store);
+    store->abandonedFBOs.push_back(id);
+}
+
 ObjectStore::~ObjectStore() {
     assert(pooledTextures.empty());
     assert(abandonedPrograms.empty());
@@ -41,6 +46,7 @@ ObjectStore::~ObjectStore() {
     assert(abandonedBuffers.empty());
     assert(abandonedTextures.empty());
     assert(abandonedVAOs.empty());
+    assert(abandonedFBOs.empty());
 }
 
 void ObjectStore::reset() {
@@ -73,6 +79,11 @@ void ObjectStore::performCleanup() {
     if (!abandonedVAOs.empty()) {
         MBGL_CHECK_ERROR(gl::DeleteVertexArrays(int(abandonedVAOs.size()), abandonedVAOs.data()));
         abandonedVAOs.clear();
+    }
+
+    if (!abandonedFBOs.empty()) {
+        MBGL_CHECK_ERROR(glDeleteFramebuffers(int(abandonedFBOs.size()), abandonedFBOs.data()));
+        abandonedFBOs.clear();
     }
 }
 

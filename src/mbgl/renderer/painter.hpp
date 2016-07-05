@@ -63,7 +63,7 @@ class BackgroundLayer;
 } // namespace style
 
 struct FrameData {
-    std::array<uint16_t, 2> framebufferSize;
+    std::array<uint16_t, 2> framebufferSize = {{ 0, 0 }};
     TimePoint timePoint;
     float pixelRatio;
     MapMode mapMode;

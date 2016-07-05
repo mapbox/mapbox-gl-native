@@ -9,6 +9,20 @@
 namespace mbgl {
 namespace gl {
 
+
+template <typename T, typename = void>
+struct DefaultValue {
+    static typename T::Type Get() {
+        return T::Get();
+    }
+};
+template <typename T>
+struct DefaultValue<T, decltype((void)T::Default, void())> {
+    static typename T::Type Get() {
+        return T::Default;
+    }
+};
+
 template <typename T>
 class Value {
 public:
@@ -25,7 +39,7 @@ public:
     }
 
     void reset() {
-        *this = T::Default;
+        *this = defaultValue;
     }
 
     void setDirty() {
@@ -40,8 +54,13 @@ public:
         return dirty;
     }
 
+    void setDefaultValue(const typename T::Type& value) {
+        defaultValue = value;
+    }
+
 private:
-    typename T::Type current = T::Default;
+    typename T::Type defaultValue = DefaultValue<T>::Get();
+    typename T::Type current = defaultValue;
     bool dirty = false;
 };
 
@@ -66,6 +85,8 @@ public:
         program.reset();
         lineWidth.reset();
         activeTexture.reset();
+        bindFramebuffer.reset();
+        viewport.reset();
 #ifndef GL_ES_VERSION_2_0
         pixelZoom.reset();
         rasterPos.reset();
@@ -91,6 +112,8 @@ public:
         program.setDirty();
         lineWidth.setDirty();
         activeTexture.setDirty();
+        bindFramebuffer.setDirty();
+        viewport.setDirty();
 #ifndef GL_ES_VERSION_2_0
         pixelZoom.setDirty();
         rasterPos.setDirty();
@@ -115,6 +138,8 @@ public:
     Value<Program> program;
     Value<LineWidth> lineWidth;
     Value<ActiveTexture> activeTexture;
+    Value<BindFramebuffer> bindFramebuffer;
+    Value<Viewport> viewport;
 #ifndef GL_ES_VERSION_2_0
     Value<PixelZoom> pixelZoom;
     Value<RasterPos> rasterPos;

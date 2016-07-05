@@ -271,6 +271,31 @@ struct ActiveTexture {
     }
 };
 
+struct BindFramebuffer {
+    using Type = GLint;
+    static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, value));
+    }
+    static Type Get() {
+        Type activeFBO;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &activeFBO));
+        return activeFBO;
+    }
+};
+
+struct Viewport {
+    using Type = std::array<GLint, 4>;
+    static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glViewport(value[0], value[1], value[2], value[3]));
+    }
+    static Type Get() {
+        Type pos;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_VIEWPORT, pos.data()));
+        return pos;
+    }
+};
+
+
 #ifndef GL_ES_VERSION_2_0
 
 struct PixelZoom {
