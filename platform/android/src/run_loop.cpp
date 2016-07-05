@@ -211,8 +211,10 @@ void RunLoop::runOnce() {
 }
 
 void RunLoop::stop() {
-    impl->running = false;
-    impl->wake();
+    invoke([&] {
+        impl->running = false;
+        impl->wake();
+    });
 }
 
 void RunLoop::addWatch(int, Event, std::function<void(int, Event)>&&) {
