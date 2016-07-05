@@ -307,6 +307,7 @@ void Map::setStyleURL(const std::string& url) {
         } else if (res.notModified || res.noContent) {
             return;
         } else {
+            impl->loading = true;
             impl->loadStyleJSON(*res.data);
         }
     });
