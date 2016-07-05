@@ -13,10 +13,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
+
 import java.util.Arrays;
 
 /**
@@ -176,17 +178,17 @@ public class MapboxMapOptions implements Parcelable {
             mapboxMapOptions.myLocationBackgroundTintColor(typedArray.getColor(R.styleable.MapView_my_location_background_tint, Color.TRANSPARENT));
 
             Drawable foregroundDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_foreground);
-            if(foregroundDrawable==null){
-                foregroundDrawable = ContextCompat.getDrawable(context,R.drawable.ic_mylocationview_normal);
+            if (foregroundDrawable == null) {
+                foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_mylocationview_normal);
             }
 
             Drawable foregroundBearingDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_foreground_bearing);
-            if(foregroundBearingDrawable==null){
-                foregroundBearingDrawable = ContextCompat.getDrawable(context,R.drawable.ic_mylocationview_bearing);
+            if (foregroundBearingDrawable == null) {
+                foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.ic_mylocationview_bearing);
             }
 
             Drawable backgroundDrawable = typedArray.getDrawable(R.styleable.MapView_my_location_background);
-            if(backgroundDrawable==null){
+            if (backgroundDrawable == null) {
                 backgroundDrawable = ContextCompat.getDrawable(context, R.drawable.ic_mylocationview_background);
             }
 
@@ -452,20 +454,25 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
+     * Set the foreground drawables of the MyLocationView.
      *
-     * @param myLocationForegroundDrawable
-     * @param myLocationBearingDrawable
+     * @param myLocationForegroundDrawable the drawable to show as foreground without bearing
+     * @param myLocationBearingDrawable    the drawable to show as foreground when bearing is disabled
      * @return This
      */
-    public MapboxMapOptions myLocationForegroundDrawables(Drawable myLocationForegroundDrawable, Drawable myLocationBearingDrawable ) {
+    public MapboxMapOptions myLocationForegroundDrawables(Drawable myLocationForegroundDrawable, Drawable myLocationBearingDrawable) {
         this.myLocationForegroundDrawable = myLocationForegroundDrawable;
         this.myLocationForegroundBearingDrawable = myLocationBearingDrawable;
         return this;
     }
 
     /**
+     * Set the foreground drawable of the MyLocationView.
+     * <p>
+     * The same drawable will be used for both bearing as non bearing modes.
+     * </p>
      *
-     * @param myLocationForegroundDrawable
+     * @param myLocationForegroundDrawable the drawable to show as foreground
      * @return This
      */
     public MapboxMapOptions myLocationForegroundDrawable(Drawable myLocationForegroundDrawable) {
@@ -474,7 +481,12 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param myLocationBackgroundDrawable
+     * Set the background drawable of MyLocationView.
+     * <p>
+     * Padding can be added to provide an offset to the background.
+     * </p>
+     *
+     * @param myLocationBackgroundDrawable the drawable to show as background
      * @return This
      */
     public MapboxMapOptions myLocationBackgroundDrawable(Drawable myLocationBackgroundDrawable) {
@@ -483,7 +495,12 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param myLocationForegroundTintColor
+     * Set the foreground tint color of MyLocationView.
+     * <p>
+     * The color will tint both the foreground and the bearing foreground drawable.
+     * </p>
+     *
+     * @param myLocationForegroundTintColor the color to tint the foreground drawable
      * @return This
      */
     public MapboxMapOptions myLocationForegroundTintColor(@ColorInt int myLocationForegroundTintColor) {
@@ -492,7 +509,9 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param myLocationBackgroundTintColor
+     * Set the background tint color of MyLocationView.
+     *
+     * @param myLocationBackgroundTintColor the color to tint the background
      * @return This
      */
     public MapboxMapOptions myLocationBackgroundTintColor(@ColorInt int myLocationBackgroundTintColor) {
@@ -501,7 +520,9 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param myLocationBackgroundPadding
+     * Set the MyLocationView padding.
+     *
+     * @param myLocationBackgroundPadding the color to tint the background
      * @return This
      */
     public MapboxMapOptions myLocationBackgroundPadding(int[] myLocationBackgroundPadding) {
@@ -510,7 +531,9 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param myLocationAccuracyTintColor
+     * Set the MyLocationView accuracy circle tint color.
+     *
+     * @param myLocationAccuracyTintColor the color to tint the accuracy circle
      * @return This
      */
     public MapboxMapOptions myLocationAccuracyTint(@ColorInt int myLocationAccuracyTintColor) {
@@ -519,7 +542,9 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @param alpha
+     * Set the MyLocationView accuracy alpha value.
+     *
+     * @param alpha the alpha value
      * @return This
      */
     public MapboxMapOptions myLocationAccuracyAlpha(@IntRange(from = 0, to = 255) int alpha) {
@@ -702,6 +727,11 @@ public class MapboxMapOptions implements Parcelable {
         return attributionMargins;
     }
 
+    /**
+     * Get the current configured tint color for attribution for a map view.
+     *
+     * @return the tint color
+     */
     @ColorInt
     public int getAttributionTintColor() {
         return attributionTintColor;
@@ -717,56 +747,72 @@ public class MapboxMapOptions implements Parcelable {
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView foreground drawable.
+     *
+     * @return the drawable used as foreground
      */
     public Drawable getMyLocationForegroundDrawable() {
         return myLocationForegroundDrawable;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView foreground bearing drawable.
+     *
+     * @return the drawable used as foreground when bearing is enabled
      */
     public Drawable getMyLocationForegroundBearingDrawable() {
         return myLocationForegroundBearingDrawable;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView background drawable.
+     *
+     * @return the drawable used as background
      */
     public Drawable getMyLocationBackgroundDrawable() {
         return myLocationBackgroundDrawable;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView foreground tint color.
+     *
+     * @return the tint color
      */
     public int getMyLocationForegroundTintColor() {
         return myLocationForegroundTintColor;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView background tint color.
+     *
+     * @return the tint color
      */
     public int getMyLocationBackgroundTintColor() {
         return myLocationBackgroundTintColor;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView background padding.
+     *
+     * @return an array describing the padding in a LTRB manner
      */
     public int[] getMyLocationBackgroundPadding() {
         return myLocationBackgroundPadding;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView accuracy circle color tint value.
+     *
+     * @return the tint color
      */
     public int getMyLocationAccuracyTintColor() {
         return myLocationAccuracyTintColor;
     }
 
     /**
-     * @return
+     * Get the current configured MyLocationView accuracy circle alpha value.
+     *
+     * @return the alpha value
      */
     public int getMyLocationAccuracyAlpha() {
         return myLocationAccuracyAlpha;
