@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-SDFShader::SDFShader(gl::ObjectStore& store, bool overdraw)
+SDFShader::SDFShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::sdf::name,
              shaders::sdf::vertex,
              shaders::sdf::fragment,
-             store, overdraw) {
+             store, defines) {
 }
 
 void SDFShader::bind(GLbyte* offset) {

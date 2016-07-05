@@ -8,7 +8,7 @@ namespace mbgl {
 
 class CircleShader : public Shader {
 public:
-    CircleShader(gl::ObjectStore&, bool overdraw = false);
+    CircleShader(gl::ObjectStore&, Defines defines = None);
 
     void bind(GLbyte *offset) final;
 

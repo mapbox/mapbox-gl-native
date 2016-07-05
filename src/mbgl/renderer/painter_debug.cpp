@@ -40,25 +40,26 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
             tile.expires, frame.debugOptions);
     }
 
-    config.program = plainShader->getID();
-    plainShader->u_matrix = matrix;
-    plainShader->u_opacity = 1.0f;
+    auto& plainShader = *shader.plain;
+    config.program = plainShader.getID();
+    plainShader.u_matrix = matrix;
+    plainShader.u_opacity = 1.0f;
 
     // Draw white outline
-    plainShader->u_color = Color::white();
+    plainShader.u_color = Color::white();
     config.lineWidth = 4.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(*plainShader, store);
+    tile.debugBucket->drawLines(plainShader, store);
 
 #ifndef GL_ES_VERSION_2_0
     // Draw line "end caps"
     MBGL_CHECK_ERROR(glPointSize(2));
-    tile.debugBucket->drawPoints(*plainShader, store);
+    tile.debugBucket->drawPoints(plainShader, store);
 #endif
 
     // Draw black text.
-    plainShader->u_color = Color::black();
+    plainShader.u_color = Color::black();
     config.lineWidth = 2.0f * frame.pixelRatio;
-    tile.debugBucket->drawLines(*plainShader, store);
+    tile.debugBucket->drawLines(plainShader, store);
 
     config.depthFunc.reset();
     config.depthTest = GL_TRUE;
@@ -74,13 +75,14 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
 
-    config.program = plainShader->getID();
-    plainShader->u_matrix = matrix;
-    plainShader->u_opacity = 1.0f;
+    auto& plainShader = *shader.plain;
+    config.program = plainShader.getID();
+    plainShader.u_matrix = matrix;
+    plainShader.u_opacity = 1.0f;
 
     // draw tile outline
-    tileBorderArray.bind(*plainShader, tileBorderBuffer, BUFFER_OFFSET_0, store);
-    plainShader->u_color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    tileBorderArray.bind(plainShader, tileBorderBuffer, BUFFER_OFFSET_0, store);
+    plainShader.u_color = { 1.0f, 0.0f, 0.0f, 1.0f };
     config.lineWidth = 4.0f * frame.pixelRatio;
     MBGL_CHECK_ERROR(glDrawArrays(GL_LINE_STRIP, 0, (GLsizei)tileBorderBuffer.index()));
 }

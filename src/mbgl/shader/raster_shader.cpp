@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-RasterShader::RasterShader(gl::ObjectStore& store, bool overdraw)
+RasterShader::RasterShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::raster::name,
              shaders::raster::vertex,
              shaders::raster::fragment,
-             store, overdraw) {
+             store, defines) {
 }
 
 void RasterShader::bind(GLbyte* offset) {

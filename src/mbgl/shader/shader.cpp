@@ -15,7 +15,7 @@
 
 namespace mbgl {
 
-Shader::Shader(const char* name_, const char* vertexSource, const char* fragmentSource, gl::ObjectStore& store, bool overdraw)
+Shader::Shader(const char* name_, const char* vertexSource, const char* fragmentSource, gl::ObjectStore& store, Defines defines)
     : name(name_)
     , program(store.createProgram())
     , vertexShader(store.createShader(GL_VERTEX_SHADER))
@@ -29,7 +29,7 @@ Shader::Shader(const char* name_, const char* vertexSource, const char* fragment
     }
 
     std::string fragment(fragmentSource);
-    if (overdraw) {
+    if (defines & Defines::Overdraw) {
         assert(fragment.find("#ifdef OVERDRAW_INSPECTOR") != std::string::npos);
         fragment.replace(fragment.find_first_of('\n'), 1, "\n#define OVERDRAW_INSPECTOR\n");
     }

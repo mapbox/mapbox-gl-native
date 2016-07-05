@@ -5,11 +5,11 @@
 
 namespace mbgl {
 
-IconShader::IconShader(gl::ObjectStore& store, bool overdraw)
+IconShader::IconShader(gl::ObjectStore& store, Defines defines)
     : Shader(shaders::icon::name,
              shaders::icon::vertex,
              shaders::icon::fragment,
-             store, overdraw) {
+             store, defines) {
 }
 
 void IconShader::bind(GLbyte* offset) {

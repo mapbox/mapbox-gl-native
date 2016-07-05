@@ -197,32 +197,36 @@ private:
 
     FrameHistory frameHistory;
 
-    std::unique_ptr<PlainShader> plainShader;
-    std::unique_ptr<OutlineShader> outlineShader;
-    std::unique_ptr<OutlinePatternShader> outlinePatternShader;
-    std::unique_ptr<LineShader> lineShader;
-    std::unique_ptr<LineSDFShader> linesdfShader;
-    std::unique_ptr<LinepatternShader> linepatternShader;
-    std::unique_ptr<PatternShader> patternShader;
-    std::unique_ptr<IconShader> iconShader;
-    std::unique_ptr<RasterShader> rasterShader;
-    std::unique_ptr<SDFShader> sdfGlyphShader;
-    std::unique_ptr<SDFShader> sdfIconShader;
-    std::unique_ptr<CollisionBoxShader> collisionBoxShader;
-    std::unique_ptr<CircleShader> circleShader;
+    struct {
+        std::unique_ptr<PlainShader> plain;
+        std::unique_ptr<OutlineShader> outline;
+        std::unique_ptr<OutlinePatternShader> outlinePattern;
+        std::unique_ptr<LineShader> line;
+        std::unique_ptr<LineSDFShader> linesdf;
+        std::unique_ptr<LinepatternShader> linepattern;
+        std::unique_ptr<PatternShader> pattern;
+        std::unique_ptr<IconShader> icon;
+        std::unique_ptr<RasterShader> raster;
+        std::unique_ptr<SDFShader> sdfGlyph;
+        std::unique_ptr<SDFShader> sdfIcon;
+        std::unique_ptr<CollisionBoxShader> collisionBox;
+        std::unique_ptr<CircleShader> circle;
+    } shader;
 
-    std::unique_ptr<PlainShader> plainOverdrawShader;
-    std::unique_ptr<OutlineShader> outlineOverdrawShader;
-    std::unique_ptr<OutlinePatternShader> outlinePatternOverdrawShader;
-    std::unique_ptr<LineShader> lineOverdrawShader;
-    std::unique_ptr<LineSDFShader> linesdfOverdrawShader;
-    std::unique_ptr<LinepatternShader> linepatternOverdrawShader;
-    std::unique_ptr<PatternShader> patternOverdrawShader;
-    std::unique_ptr<IconShader> iconOverdrawShader;
-    std::unique_ptr<RasterShader> rasterOverdrawShader;
-    std::unique_ptr<SDFShader> sdfGlyphOverdrawShader;
-    std::unique_ptr<SDFShader> sdfIconOverdrawShader;
-    std::unique_ptr<CircleShader> circleOverdrawShader;
+    struct {
+        std::unique_ptr<PlainShader> plain;
+        std::unique_ptr<OutlineShader> outline;
+        std::unique_ptr<OutlinePatternShader> outlinePattern;
+        std::unique_ptr<LineShader> line;
+        std::unique_ptr<LineSDFShader> linesdf;
+        std::unique_ptr<LinepatternShader> linepattern;
+        std::unique_ptr<PatternShader> pattern;
+        std::unique_ptr<IconShader> icon;
+        std::unique_ptr<RasterShader> raster;
+        std::unique_ptr<SDFShader> sdfGlyph;
+        std::unique_ptr<SDFShader> sdfIcon;
+        std::unique_ptr<CircleShader> circle;
+    } overdrawShader;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer {
