@@ -76,7 +76,7 @@ GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
-        return GeometryCollection { { geom } };
+        return { { geom } };
     }
     GeometryCollection operator()(const mapbox::geometry::multi_point<int16_t>& geom) const {
         GeometryCoordinates coordinates;
@@ -84,7 +84,7 @@ struct ToGeometryCollection {
         for (const auto& point : geom) {
             coordinates.emplace_back(point.x, point.y);
         }
-        return GeometryCollection { coordinates };
+        return { coordinates };
     }
     GeometryCollection operator()(const mapbox::geometry::line_string<int16_t>& geom) const {
         GeometryCoordinates coordinates;
@@ -92,7 +92,7 @@ struct ToGeometryCollection {
         for (const auto& point : geom) {
             coordinates.emplace_back(point.x, point.y);
         }
-        return GeometryCollection { coordinates };
+        return { coordinates };
     }
     GeometryCollection operator()(const mapbox::geometry::multi_line_string<int16_t>& geom) const {
         GeometryCollection collection;

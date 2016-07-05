@@ -26,10 +26,10 @@ struct ToFeatureCollection {
         return value;
     }
     mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature value) const {
-        return mapbox::geojson::feature_collection { value };
+        return { value };
     }
     mapbox::geojson::feature_collection operator()(const mapbox::geojson::geometry value) const {
-        return mapbox::geojson::feature_collection { { value } };
+        return { { value } };
     }
 };
 
