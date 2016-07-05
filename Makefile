@@ -204,7 +204,7 @@ test-android-core-$1: android-test-lib-$1
 	adb push build/android-$1/$(BUILDTYPE)/lib.target/libtest-jni-lib.so $(ANDROID_LOCAL_WORK_DIR)
 
 	#Kick off the tests
-	adb shell "export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:/system/lib:$(ANDROID_LOCAL_WORK_DIR) && cd $(ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(ANDROID_LOCAL_WORK_DIR)/test.jar Main"	
+	adb shell "export LD_LIBRARY_PATH=/system/lib:$(ANDROID_LOCAL_WORK_DIR) && cd $(ANDROID_LOCAL_WORK_DIR) && dalvikvm32 -cp $(ANDROID_LOCAL_WORK_DIR)/test.jar Main"	
 
 apackage: android-lib-$1i
 
