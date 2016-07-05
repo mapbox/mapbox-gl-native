@@ -59,6 +59,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
+/**
+ Asks the delegate whether the map view should be allowed to change from the
+ existing camera to the new camera in response to a user gesture.
+ 
+ This method is called as soon as the user gesture is recognized. It is not
+ called in response to a programmatic camera change, such as by setting the
+ `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
+ 
+ @param mapView The map view that the user is manipulating.
+ @param oldCamera The camera representing the viewpoint at the moment the
+    gesture is recognized. If this method returns `NO`, the map view’s camera
+    continues to be this camera.
+ @param newCamera The expected camera after the gesture completes. If this
+    method returns `YES`, this camera becomes the map view’s camera.
+ @return A Boolean value indicating whether the map view should stay at
+    `oldCamera` or change to `newCamera`.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
+
 #pragma mark Loading the Map
 
 /**
