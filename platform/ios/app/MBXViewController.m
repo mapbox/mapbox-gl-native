@@ -605,12 +605,6 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
     return annotationView;
 }
 
-- (void)mapView:(MGLMapView *)mapView didDragAnnotationView:(nonnull MGLAnnotationView *)annotationView toCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    MGLPointAnnotation *annotation = (MGLPointAnnotation *)annotationView.annotation;
-    annotation.coordinate = coordinate;
-}
-
 - (BOOL)mapView:(__unused MGLMapView *)mapView annotationCanShowCallout:(__unused id <MGLAnnotation>)annotation
 {
     return YES;
