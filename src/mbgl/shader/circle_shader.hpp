@@ -19,6 +19,7 @@ public:
     Uniform<GLfloat>                 u_radius           = {"u_radius",           *this};
     Uniform<GLfloat>                 u_blur             = {"u_blur",             *this};
     Uniform<GLfloat>                 u_opacity          = {"u_opacity",          *this};
+    Uniform<GLint>                   u_scale_with_map   = {"u_scale_with_map",   *this};
 };
 
 } // namespace mbgl

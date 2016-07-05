@@ -32,10 +32,18 @@ void Painter::renderCircle(CircleBucket& bucket,
     config.program = circleShader.getID();
 
     circleShader.u_matrix = vtxMatrix;
-    circleShader->u_extrude_scale = {{
-        pixelsToGLUnits[0] * state.getAltitude(),
-        pixelsToGLUnits[1] * state.getAltitude()
-    }};
+
+    if (properties.circlePitchScale == CirclePitchScaleType::Map) {
+        circleShader.u_extrude_scale = {{
+            pixelsToGLUnits[0] * state.getAltitude(),
+            pixelsToGLUnits[1] * state.getAltitude()
+        }};
+        circleShader.u_scale_with_map = true;
+    } else {
+        circleShader.u_extrude_scale = pixelsToGLUnits;
+        circleShader.u_scale_with_map = false;
+    }
+
     circleShader.u_devicepixelratio = frame.pixelRatio;
     circleShader.u_color = properties.circleColor;
     circleShader.u_radius = properties.circleRadius;

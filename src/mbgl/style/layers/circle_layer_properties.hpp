@@ -23,6 +23,7 @@ public:
     PaintProperty<float> circleOpacity { 1 };
     PaintProperty<std::array<float, 2>> circleTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> circleTranslateAnchor { TranslateAnchorType::Map };
+    PaintProperty<CirclePitchScaleType> circlePitchScale { CirclePitchScaleType::Map };
 };
 
 } // namespace style

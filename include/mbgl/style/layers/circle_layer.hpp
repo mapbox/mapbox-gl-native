@@ -44,6 +44,9 @@ public:
     PropertyValue<TranslateAnchorType> getCircleTranslateAnchor() const;
     void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
 
+    PropertyValue<CirclePitchScaleType> getCirclePitchScale() const;
+    void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
+
     // Private implementation
 
     class Impl;

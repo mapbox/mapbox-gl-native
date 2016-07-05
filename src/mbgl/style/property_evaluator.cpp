@@ -24,6 +24,7 @@ template <> std::array<float, 4> defaultStopsValue() { return {{ 0, 0, 0, 0 }}; 
 template <> std::string defaultStopsValue() { return {}; }
 template <> TranslateAnchorType defaultStopsValue() { return {}; }
 template <> RotateAnchorType defaultStopsValue() { return {}; }
+template <> CirclePitchScaleType defaultStopsValue() { return {}; }
 template <> LineCapType defaultStopsValue() { return {}; }
 template <> LineJoinType defaultStopsValue() { return {}; }
 template <> SymbolPlacementType defaultStopsValue() { return {}; }
@@ -94,6 +95,7 @@ template class PropertyEvaluator<std::array<float, 4>>;
 template class PropertyEvaluator<std::string>;
 template class PropertyEvaluator<TranslateAnchorType>;
 template class PropertyEvaluator<RotateAnchorType>;
+template class PropertyEvaluator<CirclePitchScaleType>;
 template class PropertyEvaluator<LineCapType>;
 template class PropertyEvaluator<LineJoinType>;
 template class PropertyEvaluator<SymbolPlacementType>;

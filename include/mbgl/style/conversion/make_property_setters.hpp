@@ -112,6 +112,7 @@ auto makePaintPropertySetters() {
     result["circle-opacity"] = makePropertySetter<V>(&CircleLayer::setCircleOpacity);
     result["circle-translate"] = makePropertySetter<V>(&CircleLayer::setCircleTranslate);
     result["circle-translate-anchor"] = makePropertySetter<V>(&CircleLayer::setCircleTranslateAnchor);
+    result["circle-pitch-scale"] = makePropertySetter<V>(&CircleLayer::setCirclePitchScale);
 
     result["raster-opacity"] = makePropertySetter<V>(&RasterLayer::setRasterOpacity);
     result["raster-hue-rotate"] = makePropertySetter<V>(&RasterLayer::setRasterHueRotate);
