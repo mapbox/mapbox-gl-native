@@ -38,7 +38,7 @@ std::string dumpHeaders(const httplib::MultiMap& headers) {
 	return s;
 }
 
-Server::Server() {
+Server::Server(bool) {
 	svr = std::make_unique<httplib::Server>();
 
 #pragma GCC diagnostic push 
@@ -70,9 +70,8 @@ Server::Server() {
 		//TODO: Don't respond
 	});	
 
-	int cacheCounter = 0;
-	svr->get("/cache", [&cacheCounter](const auto& req, auto& res) {
-		std::cout << "cache\n";
+	svr->get("/cache", [](const auto& req, auto& res) {
+	    static int cacheCounter;
 		res.set_header("Cache-Control", "max-age=30");
 		res.set_content("Response " + std::to_string(++cacheCounter), "text/plain");	
 	});
@@ -103,7 +102,7 @@ void Server::start() {
 	std::cout << "Starting server on port 3000\n";
 	//svr->listen("localhost", 3000);
 	//std::cout << "Stopped!!\n";
-	f_ = std::async([&](){
+	f_ = std::async(std::launch::async, [&](){
 		up_ = true;
 		svr->listen("localhost", 3000);
 	});

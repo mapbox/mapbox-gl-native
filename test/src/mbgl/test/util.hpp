@@ -67,13 +67,13 @@ namespace test {
 
 class Server {
 public:
-	Server();
+	Server(bool);
 	~Server();
 	void start();
 private:
 	std::unique_ptr<httplib::Server> svr;
 	std::future<void> f_;
-	bool up_;
+	bool up_ = false;
 };
 
 PremultipliedImage render(Map&);
