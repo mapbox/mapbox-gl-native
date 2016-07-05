@@ -223,6 +223,7 @@ public class MapboxMapOptions implements Parcelable {
      *
      * @param accessToken Token to be used to access the service
      * @return This
+     * @deprecated As of release 4.1.0, replaced by {@link com.mapbox.mapboxsdk.MapboxAccountManager#start(Context, String)}
      */
     @Deprecated
     public MapboxMapOptions accessToken(String accessToken) {
