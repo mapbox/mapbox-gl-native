@@ -21,6 +21,7 @@
     #elif TARGET_OS_MAC
         #include <OpenGL/OpenGL.h>
         #include <OpenGL/gl.h>
+        #include <OpenGL/glext.h>
     #else
         #error Unsupported Apple platform
     #endif
