@@ -2,12 +2,14 @@
 
 #include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <android/looper.h>
 
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -53,6 +55,24 @@ int looperCallbackDefault(int fd, int, void* data) {
 namespace mbgl {
 namespace util {
 
+// This is needed only for the RunLoop living on the main thread because of
+// how we implement timers. We sleep on `ALooper_pollAll` until the next
+// timeout, but on the main thread `ALooper_pollAll` is called by the activity
+// automatically, thus we cannot set the timeout. Instead we wake the loop
+// with an external file descriptor event coming from this thread.
+class Alarm {
+public:
+    Alarm(RunLoop::Impl* loop_) : loop(loop_) {}
+
+    void set(const Milliseconds& timeout) {
+        alarm.start(timeout, mbgl::Duration::zero(), [this]() { loop->wake(); });
+    }
+
+private:
+    Timer alarm;
+    RunLoop::Impl* loop;
+};
+
 RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     using namespace mbgl::android;
     detach = attach_jni_thread(theJVM, &env, "");
@@ -80,6 +100,8 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
             ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
+        alarm = std::make_unique<Thread<Alarm>>(ThreadContext{"Alarm"}, this);
+        running = true;
         break;
     }
 
@@ -89,6 +111,8 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
 }
 
 RunLoop::Impl::~Impl() {
+    alarm.reset();
+
     if (ALooper_removeFd(loop, fds[PIPE_OUT]) != 1) {
         throw std::runtime_error("Failed to remove file descriptor from Looper.");
     }
@@ -160,9 +184,14 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     if (runnables.empty() || nextDue == TimePoint::max()) {
         return Milliseconds(-1);
-    } else {
-        return std::chrono::duration_cast<Milliseconds>(nextDue - now);
     }
+
+    auto timeout = std::chrono::duration_cast<Milliseconds>(nextDue - now);
+    if (alarm) {
+        alarm->invoke(&Alarm::set, timeout);
+    }
+
+    return timeout;
 }
 
 RunLoop* RunLoop::Get() {
