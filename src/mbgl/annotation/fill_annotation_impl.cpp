@@ -9,7 +9,7 @@ using namespace style;
 
 FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation({ ensureClosed(annotation_.geometry), annotation_.opacity, annotation_.color, annotation_.outlineColor }) {
+      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.color, annotation_.outlineColor }) {
 }
 
 void FillAnnotationImpl::updateStyle(Style& style) const {
@@ -27,11 +27,6 @@ void FillAnnotationImpl::updateStyle(Style& style) const {
 
 const ShapeAnnotationGeometry& FillAnnotationImpl::geometry() const {
     return annotation.geometry;
-}
-
-const ShapeAnnotationGeometry ensureClosed(const ShapeAnnotationGeometry& shapegeom) {
-    ToClosed toClosed;
-    return { apply_visitor(toClosed, shapegeom) };
 }
 
 } // namespace mbgl
