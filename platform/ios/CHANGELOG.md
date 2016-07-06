@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 * Fixed an issue preventing MGLMapView from changing its viewport when a single annotation was passed into `-[MGLMapView showAnnotations:animated:]`. ([#5693](https://github.com/mapbox/mapbox-gl-native/pull/5693))
 * If you subclass MGLAnnotationView, your implementation of `-setSelected:animated:` is now called with the correct value in the `animated` parameter, making it possible to animate a deselection. ([#5677](https://github.com/mapbox/mapbox-gl-native/pull/5677))
 * The compass, Mapbox logo, and attribution button now accommodate the containing map view’s content insets. If your interface elements partially overlap the map view but do not affect the top and bottom layout guides, set the `automaticallyAdjustsScrollViewInsets` property to `NO` and set the `contentInset` property to a suitable value. ([#5671](https://github.com/mapbox/mapbox-gl-native/pull/5671))
+* Added a property to MGLOfflineStorage, `countOfBytesCompleted`, that indicates the disk space occupied by all cached and offline resources. ([#5585](https://github.com/mapbox/mapbox-gl-native/pull/5585))
 
 ## 3.3.0
 
