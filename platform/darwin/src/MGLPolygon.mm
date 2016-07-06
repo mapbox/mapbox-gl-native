@@ -51,6 +51,26 @@
     return annotation;
 }
 
+- (BOOL)containsPoint:(CGPoint)point transform:(CGPoint (^)(CLLocationCoordinate2D))transform {
+    BOOL isInside = NO;
+    NSInteger j = self.pointCount - 1;
+    for (NSInteger i = 0; i < self.pointCount; i++) {
+        CGPoint vertex1 = transform(self.coordinates[i]);
+        CGPoint vertex2 = transform(self.coordinates[j]);
+        BOOL verticesCrossPoint = (vertex1.y > point.y != vertex2.y > point.y);
+        BOOL intersectionPointIsOnRay = (vertex1.x + (point.y - vertex1.y) / (vertex2.y - vertex1.y) * (vertex2.x - vertex1.x)) < point.x;
+        if (verticesCrossPoint && intersectionPointIsOnRay) {
+            isInside = !isInside;
+        }
+        j = i;
+    }
+    return isInside;
+}
+
+- (BOOL)isWithinDistance:(CGFloat)distance ofPoint:(CGPoint)point transform:(CGPoint (^)(CLLocationCoordinate2D))transform {
+    return [self containsPoint:point transform:transform] || [super isWithinDistance:distance ofPoint:point transform:transform];
+}
+
 @end
 
 @interface MGLMultiPolygon ()
@@ -85,6 +105,15 @@
 
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLLatLngBoundsFromCoordinateBounds(_overlayBounds).intersects(MGLLatLngBoundsFromCoordinateBounds(overlayBounds));
+}
+
+- (BOOL)isWithinDistance:(CGFloat)distance ofPoint:(CGPoint)point transform:(CGPoint (^)(CLLocationCoordinate2D))transform {
+    for (MGLPolygon *polygon in _polygons) {
+        if ([polygon isWithinDistance:distance ofPoint:point transform:transform]) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 @end

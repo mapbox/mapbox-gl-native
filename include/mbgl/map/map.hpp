@@ -149,6 +149,7 @@ public:
     void removeAnnotation(AnnotationID);
 
     AnnotationIDs getPointAnnotationsInBounds(const LatLngBounds&);
+    AnnotationIDs getShapeAnnotationsInBounds(const LatLngBounds&);
 
     // Sources
     style::Source* getSource(const std::string& sourceID);

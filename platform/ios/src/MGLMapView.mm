@@ -3238,6 +3238,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         CGRect hitRect = CGRectInset({ point, CGSizeZero },
                                      -MGLAnnotationImagePaddingForHitTest,
                                      -MGLAnnotationImagePaddingForHitTest);
+
+        CGPoint (^transform)(CLLocationCoordinate2D) = ^CGPoint (CLLocationCoordinate2D coordinate) {
+            return [self convertCoordinate:coordinate toPointToView:self];
+        };
         
         // Filter out any annotation whose image or view is unselectable or for which
         // hit testing fails.
@@ -3248,7 +3252,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             NSAssert(annotation, @"Unknown annotation found nearby tap");
             
             MGLAnnotationContext annotationContext = _annotationContextsByAnnotationTag[annotationTag];
-            CGRect annotationRect;
             
             MGLAnnotationView *annotationView = annotationContext.annotationView;
             if (annotationView)
@@ -3257,10 +3260,16 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 {
                     return true;
                 }
-                
+
                 CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
                 CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -CGRectGetWidth(annotationView.frame) / 2, -CGRectGetHeight(annotationView.frame) / 2);
-                annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
+                CGRect annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
+                return !!!CGRectIntersectsRect(annotationRect, hitRect);
+            }
+            else if ([annotation isKindOfClass:[MGLMultiPoint class]])
+            {
+                MGLMultiPoint *multiPoint = (MGLMultiPoint *)annotationContext.annotation;
+                return !(multiPoint.enabled && [multiPoint isWithinDistance:MGLAnnotationImagePaddingForHitTest ofPoint:point transform:transform]);
             }
             else
             {
@@ -3272,13 +3281,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                 
                 MGLAnnotationImage *fallbackAnnotationImage = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName];
                 UIImage *fallbackImage = fallbackAnnotationImage.image;
-                
-                annotationRect = [self frameOfImage:annotationImage.image ?: fallbackImage centeredAtCoordinate:annotation.coordinate];
+
+                // Filter out the annotation if the fattened finger didn’t land
+                // within the image’s alignment rect.
+                CGRect annotationRect = [self frameOfImage:annotationImage.image ?: fallbackImage centeredAtCoordinate:annotation.coordinate];
+                return !!!CGRectIntersectsRect(annotationRect, hitRect);
             }
-            
-            // Filter out the annotation if the fattened finger didn’t land
-            // within the image’s alignment rect.
-            return !!!CGRectIntersectsRect(annotationRect, hitRect);
         });
         
         nearbyAnnotations.resize(std::distance(nearbyAnnotations.begin(), end));
@@ -3359,7 +3367,10 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(CGRect)rect
 {
     mbgl::LatLngBounds queryBounds = [self convertRect:rect toLatLngBoundsFromView:self];
-    return _mbglMap->getPointAnnotationsInBounds(queryBounds);
+    std::vector<MGLAnnotationTag> annotations = _mbglMap->getPointAnnotationsInBounds(queryBounds);
+    std::vector<MGLAnnotationTag> shapeAnnotations = _mbglMap->getShapeAnnotationsInBounds(queryBounds);
+    annotations.insert(annotations.end(), shapeAnnotations.begin(), shapeAnnotations.end());
+    return annotations;
 }
 
 - (id <MGLAnnotation>)selectedAnnotation
@@ -3410,8 +3421,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     if ( ! annotation) return;
-
-    if ([annotation isKindOfClass:[MGLMultiPoint class]]) return;
 
     if (annotation == self.selectedAnnotation) return;
 
@@ -4555,9 +4564,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                       -_largestAnnotationViewSize.height / 2.0 - MGLAnnotationUpdateViewportOutset.width);
         
         MGLAnnotationContext &annotationContext = pair.second;
-        MGLAnnotationView *annotationView = annotationContext.annotationView;
-       
-        if (!annotationView)
+
+        if ([annotationContext.annotation isKindOfClass:[MGLMultiPoint class]])
+        {
+            continue;
+        }
+
+        if (!annotationContext.annotationView)
         {
             MGLAnnotationView *annotationView = [self annotationViewForAnnotation:annotationContext.annotation];
             if (annotationView)
@@ -4568,14 +4581,15 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                     [self.glView addSubview:annotationView];
                 }
                 
-                CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-                [annotationView setCenter:center pitch:self.camera.pitch];
                 annotationView.mapView = self;
                 annotationContext.annotationView = annotationView;
             }
+            else {
+                continue;
+            }
         }
         
-        bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationView.frame);
+        bool annotationViewIsVisible = CGRectContainsRect(viewPort, annotationContext.annotationView.frame);
         if (!annotationViewIsVisible)
         {
             [self enqueueAnnotationViewForAnnotationContext:annotationContext];
@@ -4583,7 +4597,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         else
         {
             CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-            [annotationView setCenter:center pitch:self.camera.pitch];
+            [annotationContext.annotationView setCenter:center pitch:self.camera.pitch];
         }
     }
 }

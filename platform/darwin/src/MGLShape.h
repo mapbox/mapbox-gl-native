@@ -26,6 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSString *subtitle;
 
+/**
+ A Boolean value indicating whether the annotation is enabled.
+
+ The default value of this property is `YES`. If the value of this property is `NO`, the annotation cannot be selected.
+ */
+@property (nonatomic, getter=isEnabled) BOOL enabled;
+
 #if !TARGET_OS_IPHONE
 
 /**
