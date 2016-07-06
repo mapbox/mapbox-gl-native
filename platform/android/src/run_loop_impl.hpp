@@ -41,7 +41,6 @@ public:
     ALooper* loop = nullptr;
     RunLoop* runLoop = nullptr;
     util::Atomic<bool> running;
-    bool isDefaultLoop = false;
 
 private:
     friend RunLoop;
