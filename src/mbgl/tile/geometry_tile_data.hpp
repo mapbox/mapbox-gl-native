@@ -82,7 +82,7 @@ struct ToGeometryCollection {
         GeometryCoordinates coordinates;
         coordinates.reserve(geom.size());
         for (const auto& point : geom) {
-            coordinates.emplace_back(point.x, point.y);
+            coordinates.emplace_back(point);
         }
         return { coordinates };
     }
@@ -90,7 +90,7 @@ struct ToGeometryCollection {
         GeometryCoordinates coordinates;
         coordinates.reserve(geom.size());
         for (const auto& point : geom) {
-            coordinates.emplace_back(point.x, point.y);
+            coordinates.emplace_back(point);
         }
         return { coordinates };
     }
@@ -101,9 +101,9 @@ struct ToGeometryCollection {
             GeometryCoordinates coordinates;
             coordinates.reserve(ring.size());
             for (const auto& point : ring) {
-                coordinates.emplace_back(point.x, point.y);
+                coordinates.emplace_back(point);
             }
-            collection.push_back(coordinates);
+            collection.push_back(std::move(coordinates));
         }
         return collection;
     }
@@ -114,9 +114,9 @@ struct ToGeometryCollection {
             GeometryCoordinates coordinates;
             coordinates.reserve(ring.size());
             for (const auto& point : ring) {
-                coordinates.emplace_back(point.x, point.y);
+                coordinates.emplace_back(point);
             }
-            collection.push_back(coordinates);
+            collection.push_back(std::move(coordinates));
         }
         return collection;
     }
@@ -127,9 +127,9 @@ struct ToGeometryCollection {
                 GeometryCoordinates coordinates;
                 coordinates.reserve(ring.size());
                 for (auto& point : ring) {
-                    coordinates.emplace_back(point.x, point.y);
+                    coordinates.emplace_back(point);
                 }
-                collection.push_back(coordinates);
+                collection.push_back(std::move(coordinates));
             }
         }
         return collection;

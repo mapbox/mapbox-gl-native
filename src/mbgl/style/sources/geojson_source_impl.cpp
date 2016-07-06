@@ -22,13 +22,13 @@ namespace style {
 namespace conversion {
 
 struct ToFeatureCollection {
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature_collection value) const {
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature_collection& value) const {
         return value;
     }
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature value) const {
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature& value) const {
         return { value };
     }
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::geometry value) const {
+    mapbox::geojson::feature_collection operator()(const mapbox::geojson::geometry& value) const {
         return { { value } };
     }
 };

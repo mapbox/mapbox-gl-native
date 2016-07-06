@@ -49,7 +49,7 @@ private:
 std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile) {
     std::shared_ptr<GeoJSONTileLayer> layer;
 
-    if (tile.features.size()) {
+    if (!tile.features.empty()) {
         std::vector<std::shared_ptr<const GeoJSONTileFeature>> features;
         GeometryCoordinates line;
 
