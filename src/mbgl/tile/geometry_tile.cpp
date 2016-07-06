@@ -28,6 +28,8 @@ static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
 
 static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
     GeometryCoordinates result;
+    result.reserve(path.size() + 1);
+    
     result.reserve(path.size());
     for (const auto& p : path) {
         using Coordinate = GeometryCoordinates::coordinate_type;
@@ -37,6 +39,12 @@ static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
         assert(p.y <= std::numeric_limits<Coordinate>::max());
         result.emplace_back(Coordinate(p.x), Coordinate(p.y));
     }
+    
+    // Clipper does not repeat initial point, but our geometry model requires it.
+    if (!result.empty()) {
+        result.push_back(result.front());
+    }
+    
     return result;
 }
 
