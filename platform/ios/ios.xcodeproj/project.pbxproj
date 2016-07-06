@@ -1713,6 +1713,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1753,6 +1754,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1815,6 +1817,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
 				HEADER_SEARCH_PATHS = (
 					../default,
 					../../include,
@@ -1845,6 +1848,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DAC07C961CBB2CD6000CB309 /* mbgl.xcconfig */;
 			buildSettings = {
+				BITCODE_GENERATION_MODE = bitcode;
 				HEADER_SEARCH_PATHS = (
 					../default,
 					../../include,

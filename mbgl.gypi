@@ -199,6 +199,7 @@
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags_cc)' ],
             'OTHER_CFLAGS': [ '<@(cflags)' ],
+            'BITCODE_GENERATION_MODE': 'bitcode',
           },
         }, {
           'cflags_cc': [ '<@(cflags_cc)' ],
