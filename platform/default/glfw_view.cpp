@@ -272,8 +272,7 @@ void GLFWView::addRandomPointAnnotations(int count) {
 void GLFWView::addRandomShapeAnnotations(int count) {
     for (int i = 0; i < count; i++) {
         mbgl::Polygon<double> triangle;
-        const auto first = makeRandomPoint();
-        triangle.push_back({ first, makeRandomPoint(), makeRandomPoint(), first });
+        triangle.push_back({ makeRandomPoint(), makeRandomPoint(), makeRandomPoint() });
         annotationIDs.push_back(map->addAnnotation(mbgl::FillAnnotation { triangle, .1 }));
     }
 }
