@@ -178,11 +178,25 @@ if [[ "${GCC_GENERATE_DEBUGGING_SYMBOLS}" == false ]]; then
     fi
 fi
 
+function create_local_podspec {
+    step "Creating local podspec"
+    POD_SOURCE_PATH='    :path => ".",'
+    POD_FRAMEWORKS="  m.vendored_frameworks = '"${NAME}".framework'"
+    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
+    POD_LOCALSPEC=${OUTPUT}/$1/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
+    sed "s/.*:http.*/${POD_SOURCE_PATH}/" platform/ios/${NAME}-iOS-SDK${POD_SUFFIX}.podspec > ${POD_LOCALSPEC}
+    sed -i.bak "s/.*vendored_frameworks.*/${POD_FRAMEWORKS}/" ${POD_LOCALSPEC}
+    rm -rf ${POD_LOCALSPEC}.bak
+    cp -pv LICENSE.md ${OUTPUT}/$1/
+}
+
 if [[ ${BUILD_STATIC} == true ]]; then
     stat "${OUTPUT}/static/${NAME}.framework"
+    create_local_podspec "static"
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     stat "${OUTPUT}/dynamic/${NAME}.framework"
+    create_local_podspec "dynamic"
 fi
 
 if [[ ${BUILD_STATIC} == true ]]; then
