@@ -249,7 +249,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     alert.informativeText = @"\
 • To scroll, swipe with two fingers on a trackpad, or drag the cursor, or press the arrow keys.\n\
 • To zoom in, pinch two fingers apart on a trackpad, or double-click, or hold down Shift while dragging the cursor down, or hold down Option while pressing the up key.\n\
-• To zoom out, pinch two fingers together on a trackpad, or double-tap on a mouse, or hold down Shift while dragging the cursor up, or hold down Option while pressing the down key.\n\
+• To zoom out, pinch two fingers together on a trackpad, or double-tap with two fingers on a trackpad, or double-tap on a mouse, or hold down Shift while dragging the cursor up, or hold down Option while pressing the down key.\n\
 • To rotate, move two fingers opposite each other in a circle on a trackpad, or hold down Option while dragging the cursor left and right, or hold down Option while pressing the left and right arrow keys.\n\
 • To tilt, hold down Option while dragging the cursor up and down.\n\
 • To drop a pin, click and hold.\
