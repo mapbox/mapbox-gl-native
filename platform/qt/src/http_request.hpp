@@ -15,13 +15,13 @@ class Response;
 class HTTPRequest : public AsyncRequest
 {
 public:
-    HTTPRequest(HTTPFileSource::Impl*, const Resource&, FileSource::Callback);
+    HTTPRequest(HTTPFileSource::Impl *, const Resource&, FileSource::Callback);
     virtual ~HTTPRequest();
 
     QUrl requestUrl() const;
     QNetworkRequest networkRequest() const;
 
-    void handleNetworkReply(QNetworkReply *reply);
+    void handleNetworkReply(QNetworkReply *);
 
 private:
     HTTPFileSource::Impl* m_context;

@@ -202,7 +202,14 @@ public:
         QMapbox::CustomLayerDeinitializeFunction,
         void* context,
         char* before = NULL);
-    void removeCustomLayer(const QString& id);
+
+    void setFilter(const QString &layerID, const QMapbox::Filter &filter);
+    void addLayer(const QMapbox::Layer &layer);
+    void removeLayer(const QString &layerID);
+    void addSource(const QMapbox::Source &source);
+    void removeSource(const QString &sourceID);
+    void setPaintProperty(const QString &layerID, QMapbox::PaintPropertyType, const QMapbox::PropertyValue &, const QString &klass = QString());
+    void setLayoutProperty(const QString &layerID, QMapbox::LayoutPropertyType, const QMapbox::PropertyValue &);
 
 public slots:
     void render();

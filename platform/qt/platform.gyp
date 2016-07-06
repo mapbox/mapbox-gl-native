@@ -69,6 +69,8 @@
         'src/run_loop_impl.hpp',
         'src/timer.cpp',
         'src/timer_impl.hpp',
+        'src/property_setter.hpp',
+        'src/make_property_setters.hpp',
       ],
 
       'variables': {
