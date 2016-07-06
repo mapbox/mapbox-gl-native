@@ -192,7 +192,6 @@ function create_local_podspec {
 
 if [[ ${BUILD_STATIC} == true ]]; then
     stat "${OUTPUT}/static/${NAME}.framework"
-    create_local_podspec "static"
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     stat "${OUTPUT}/dynamic/${NAME}.framework"
