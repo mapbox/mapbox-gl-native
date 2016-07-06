@@ -275,6 +275,19 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     _mbglFileSource->setOfflineMapboxTileCountLimit(maximumCount);
 }
 
+#pragma mark -
+
+- (unsigned long long)countOfBytesCompleted {
+    NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
+    NSString *cachePath = cacheURL.path;
+    if (!cachePath) {
+        return 0;
+    }
+    
+    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachePath error:NULL];
+    return attributes.fileSize;
+}
+
 #pragma mark MGLOfflinePackDelegate methods
 
 - (void)offlinePack:(MGLOfflinePack *)pack progressDidChange:(__unused MGLOfflinePackProgress)progress {
