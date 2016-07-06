@@ -9,7 +9,7 @@ using namespace style;
 
 LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(std::move(annotation_)) {
+      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
 }
 
 void LineAnnotationImpl::updateStyle(Style& style) const {

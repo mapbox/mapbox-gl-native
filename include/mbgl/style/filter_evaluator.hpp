@@ -151,13 +151,24 @@ private:
             return false;
         }
 
+        bool operator()(const NullValue&,
+                        const NullValue&) const {
+            // Should be unreachable; null is not currently allowed by the style specification.
+            assert(false);
+            return false;
+        }
+
         bool operator()(const std::vector<Value>&,
                         const std::vector<Value>&) const {
+            // Should be unreachable; nested values are not currently allowed by the style specification.
+            assert(false);
             return false;
         }
 
         bool operator()(const std::unordered_map<std::string, Value>&,
                         const std::unordered_map<std::string, Value>&) const {
+            // Should be unreachable; nested values are not currently allowed by the style specification.
+            assert(false);
             return false;
         }
     };

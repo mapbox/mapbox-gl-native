@@ -6,6 +6,8 @@
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/rapidjson.hpp>
 
+#include <mapbox/geojson.hpp>
+#include <mapbox/geojson/rapidjson.hpp>
 #include <mapbox/geojsonvt.hpp>
 #include <mapbox/geojsonvt/convert.hpp>
 
@@ -18,6 +20,7 @@ using namespace mapbox::geojsonvt;
 namespace mbgl {
 namespace style {
 namespace conversion {
+
 template <>
 Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     Options options;
@@ -25,7 +28,8 @@ Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     options.extent = util::EXTENT;
 
     try {
-        return GeoJSON { std::make_unique<GeoJSONVT>(Convert::convert(value, 0), options) };
+        const auto geojson = mapbox::geojson::convert(value);
+        return GeoJSON { std::make_unique<GeoJSONVT>(geojson, options) };
     } catch (const std::exception& ex) {
         return Error { ex.what() };
     }
@@ -82,7 +86,8 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message);
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
-                urlOrGeoJSON = GeoJSON { std::make_unique<GeoJSONVT>(std::vector<ProjectedFeature>()) };
+                mapbox::geojson::feature_collection features;
+                urlOrGeoJSON = GeoJSON { std::make_unique<GeoJSONVT>(features) };
             } else {
                 urlOrGeoJSON = std::move(*geoJSON);
             }

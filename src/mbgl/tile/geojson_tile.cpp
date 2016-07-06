@@ -11,16 +11,16 @@ namespace mbgl {
 
 class GeoJSONTileFeature : public GeometryTileFeature {
 public:
-    GeoJSONTileFeature(FeatureType, GeometryCollection&&, Feature::property_map&&);
+    GeoJSONTileFeature(FeatureType, GeometryCollection&&, PropertyMap&&);
     FeatureType getType() const override;
     optional<Value> getValue(const std::string&) const override;
-    Feature::property_map getProperties() const override { return properties; }
+    PropertyMap getProperties() const override { return properties; }
     GeometryCollection getGeometries() const override;
 
 private:
     const FeatureType type;
     const GeometryCollection geometries;
-    const Feature::property_map properties;
+    const PropertyMap properties;
 };
 
 class GeoJSONTileLayer : public GeometryTileLayer {
@@ -49,52 +49,28 @@ private:
 std::unique_ptr<GeoJSONTileData> convertTile(const mapbox::geojsonvt::Tile& tile) {
     std::shared_ptr<GeoJSONTileLayer> layer;
 
-    if (tile) {
+    if (!tile.features.empty()) {
         std::vector<std::shared_ptr<const GeoJSONTileFeature>> features;
         GeometryCoordinates line;
 
+        ToFeatureType toFeatureType;
+        ToGeometryCollection toGeometryCollection;
+
         for (auto& feature : tile.features) {
-            const FeatureType featureType =
-                (feature.type == mapbox::geojsonvt::TileFeatureType::Point
-                     ? FeatureType::Point
-                     : (feature.type == mapbox::geojsonvt::TileFeatureType::LineString
-                            ? FeatureType::LineString
-                            : (feature.type == mapbox::geojsonvt::TileFeatureType::Polygon
-                                   ? FeatureType::Polygon
-                                   : FeatureType::Unknown)));
+            const FeatureType featureType = apply_visitor(toFeatureType, feature.geometry);
+
             if (featureType == FeatureType::Unknown) {
                 continue;
             }
 
-            GeometryCollection geometry;
-
-            // Flatten the geometry; GeoJSONVT distinguishes between a Points array and Rings array
-            // (Points = GeoJSON types Point, MultiPoint, LineString)
-            // (Rings = GeoJSON types MultiLineString, Polygon, MultiPolygon)
-            // However, in Mapbox GL, we use one structure for both types, and just have one outer
-            // element for Points.
-            if (feature.tileGeometry.is<mapbox::geojsonvt::TilePoints>()) {
-                line.clear();
-                for (auto& point : feature.tileGeometry.get<mapbox::geojsonvt::TilePoints>()) {
-                    line.emplace_back(point.x, point.y);
-                }
-                geometry.emplace_back(std::move(line));
-            } else if (feature.tileGeometry.is<mapbox::geojsonvt::TileRings>()) {
-                for (auto& ring : feature.tileGeometry.get<mapbox::geojsonvt::TileRings>()) {
-                    line.clear();
-                    for (auto& point : ring) {
-                        line.emplace_back(point.x, point.y);
-                    }
-                    geometry.emplace_back(std::move(line));
-                }
-            }
+            GeometryCollection geometry = apply_visitor(toGeometryCollection, feature.geometry);
 
             // https://github.com/mapbox/geojson-vt-cpp/issues/44
             if (featureType == FeatureType::Polygon) {
                 geometry = fixupPolygons(geometry);
             }
 
-            Feature::property_map properties{ feature.tags.begin(), feature.tags.end() };
+            PropertyMap properties = feature.properties;
 
             features.emplace_back(std::make_shared<GeoJSONTileFeature>(
                 featureType, std::move(geometry), std::move(properties)));
@@ -118,7 +94,7 @@ void GeoJSONTile::setNecessity(Necessity) {}
 
 GeoJSONTileFeature::GeoJSONTileFeature(FeatureType type_,
                                        GeometryCollection&& geometries_,
-                                       Feature::property_map&& properties_)
+                                       PropertyMap&& properties_)
     : type(type_), geometries(std::move(geometries_)), properties(std::move(properties_)) {
 }
 

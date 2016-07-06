@@ -9,7 +9,7 @@ using namespace style;
 
 FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotation_, uint8_t maxZoom_)
     : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation(std::move(annotation_)) {
+      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.color, annotation_.outlineColor }) {
 }
 
 void FillAnnotationImpl::updateStyle(Style& style) const {
