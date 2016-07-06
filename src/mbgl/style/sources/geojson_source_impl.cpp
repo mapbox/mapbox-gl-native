@@ -21,18 +21,6 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-struct ToFeatureCollection {
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature_collection& value) const {
-        return value;
-    }
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::feature& value) const {
-        return { value };
-    }
-    mapbox::geojson::feature_collection operator()(const mapbox::geojson::geometry& value) const {
-        return { { value } };
-    }
-};
-
 template <>
 Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     Options options;
@@ -40,10 +28,8 @@ Result<GeoJSON> convertGeoJSON(const JSValue& value) {
     options.extent = util::EXTENT;
 
     try {
-        ToFeatureCollection toFeatureCollection;
         const auto geojson = mapbox::geojson::convert(value);
-        const auto features = apply_visitor(toFeatureCollection, geojson);
-        return GeoJSON { std::make_unique<GeoJSONVT>(features, options) };
+        return GeoJSON { std::make_unique<GeoJSONVT>(geojson, options) };
     } catch (const std::exception& ex) {
         return Error { ex.what() };
     }
