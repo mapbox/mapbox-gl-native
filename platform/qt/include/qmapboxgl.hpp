@@ -175,6 +175,7 @@ public:
     void removeAnnotation(QMapbox::AnnotationID);
 
     void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
+    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
 
     bool isRotating() const;
     bool isScaling() const;

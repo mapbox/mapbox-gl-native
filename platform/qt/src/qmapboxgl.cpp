@@ -469,6 +469,29 @@ void QMapboxGL::setLayoutProperty(const QString& layer_, const QString& property
     d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
 }
 
+void QMapboxGL::setPaintProperty(const QString& layer_, const QString& property, const QVariant& value, const QString& klass_)
+{
+    using namespace mbgl::style;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    mbgl::optional<std::string> klass;
+    if (!klass_.isEmpty()) {
+        klass = klass_.toStdString();
+    }
+
+    if (conversion::setPaintProperty(*layer, property.toStdString(), value, klass)) {
+        qWarning() << "Error setting paint property:" << layer_ << "-" << property;
+        return;
+    }
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
+}
+
 bool QMapboxGL::isRotating() const
 {
     return d_ptr->mapObj->isRotating();
