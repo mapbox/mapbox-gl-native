@@ -73,7 +73,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     }
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
     if (useSubdirectory) {
-        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@"mapbox"];
+        cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
     }
     [[NSFileManager defaultManager] createDirectoryAtURL:cacheDirectoryURL
                              withIntermediateDirectories:YES
