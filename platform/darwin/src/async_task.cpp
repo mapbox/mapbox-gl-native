@@ -25,7 +25,7 @@ public:
             perform
         };
         source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context);
-        CFRunLoopAddSource(loop, source, kCFRunLoopDefaultMode);
+        CFRunLoopAddSource(loop, source, kCFRunLoopCommonModes);
     }
 
     ~Impl() {

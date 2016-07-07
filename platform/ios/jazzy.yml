@@ -21,6 +21,9 @@ custom_categories:
       - MGLMapCamera
       - MGLMapDebugMaskOptions
       - MGLMapView
+      - MGLMapViewDecelerationRateFast
+      - MGLMapViewDecelerationRateImmediate
+      - MGLMapViewDecelerationRateNormal
       - MGLMapViewDelegate
       - MGLStyle
       - MGLStyleDefaultVersion
@@ -31,6 +34,7 @@ custom_categories:
       - MGLAnnotationImage
       - MGLAnnotationVerticalAlignment
       - MGLAnnotationView
+      - MGLAnnotationViewDragState
       - MGLCalloutView
       - MGLCalloutViewDelegate
       - MGLMultiPoint
@@ -81,6 +85,7 @@ custom_categories:
       - MGLCoordinateBoundsMake
       - MGLCoordinateBoundsOffset
       - MGLCoordinateFormatter
+      - MGLCoordinateInCoordinateBounds
       - MGLCoordinateSpan
       - MGLCoordinateSpanEqualToCoordinateSpan
       - MGLCoordinateSpanMake

@@ -54,42 +54,46 @@
     [self didChangeValueForKey:@"selected"];
 }
 
-- (void)setCenter:(CGPoint)center
+- (CGPoint)center
 {
-    [self setCenter:center pitch:0];
+    CGPoint center = super.center;
+    center.x -= _centerOffset.dx;
+    center.y -= _centerOffset.dy;
+    return center;
 }
 
-- (void)setCenter:(CGPoint)center pitch:(CGFloat)pitch
+- (void)setCenter:(CGPoint)center
 {
     center.x += _centerOffset.dx;
     center.y += _centerOffset.dy;
     
-    [super setCenter:center];
-    
+    super.center = center;
+    [self updateTransform];
+}
+
+- (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
+{
+    if (_scalesWithViewingDistance != scalesWithViewingDistance)
+    {
+        _scalesWithViewingDistance = scalesWithViewingDistance;
+        [self updateTransform];
+    }
+}
+
+- (void)updateTransform
+{
     // Omit applying a new transformation while the view is being dragged.
-    if (self.dragState == MGLAnnotationViewDragStateDragging) {
+    if (self.dragState == MGLAnnotationViewDragStateDragging)
+    {
         return;
     }
     
-    if (self.flat)
+    self.layer.transform = CATransform3DIdentity;
+    if ( ! self.scalesWithViewingDistance)
     {
-        [self updatePitch:pitch];
+        return;
     }
-  
-    if (self.scalesWithViewingDistance)
-    {
-        [self updateScaleForPitch:pitch];
-    }
-}
-
-- (void)updatePitch:(CGFloat)pitch
-{
-    CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(pitch), 1.0, 0, 0);
-    self.layer.transform = t;
-}
-
-- (void)updateScaleForPitch:(CGFloat)pitch
-{
+    
     CGFloat superviewHeight = CGRectGetHeight(self.superview.frame);
     if (superviewHeight > 0.0) {
         // Find the maximum amount of scale reduction to apply as the view's center moves from the top
@@ -104,7 +108,7 @@
         // as the map view will allow). The map view's maximum pitch is defined in `mbgl::util::PITCH_MAX`.
         // Since it is possible for the map view to report a pitch less than 0 due to the nature of
         // how the gesture information is captured, the value is guarded with MAX.
-        CGFloat pitchIntensity = MAX(pitch, 0) / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
+        CGFloat pitchIntensity = MAX(self.mapView.camera.pitch, 0) / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
        
         // The pitch adjusted scale is the inverse proportion of the maximum possible scale reduction
         // multiplied by the pitch intensity. For example, if the maximum scale reduction is 75% and the
@@ -112,7 +116,7 @@
         // reduction is then normalized for a scale of 1.0.
         CGFloat pitchAdjustedScale = 1.0 - maxScaleReduction * pitchIntensity;
         
-        CATransform3D transform = self.flat ? self.layer.transform : CATransform3DIdentity;
+        CATransform3D transform = CATransform3DIdentity;
         self.layer.transform = CATransform3DScale(transform, pitchAdjustedScale, pitchAdjustedScale, 1);
     }
 }
@@ -185,9 +189,8 @@
 
 - (void)handlePan:(UIPanGestureRecognizer *)sender
 {
-    CGPoint center = [sender locationInView:sender.view.superview];
-    [self setCenter:center pitch:self.mapView.camera.pitch];
-    
+    self.center = [sender locationInView:sender.view.superview];
+
     if (sender.state == UIGestureRecognizerStateEnded) {
         self.dragState = MGLAnnotationViewDragStateNone;
     }
@@ -206,19 +209,24 @@
     
     if (dragState == MGLAnnotationViewDragStateStarting)
     {
+        [self.mapView.calloutViewForSelectedAnnotation dismissCalloutAnimated:animated];
         [self.superview bringSubviewToFront:self];
     }
-    
-    if (dragState == MGLAnnotationViewDragStateEnding)
+    else if (dragState == MGLAnnotationViewDragStateCanceling)
     {
-        if ([self.mapView.delegate respondsToSelector:@selector(mapView:didDragAnnotationView:toCoordinate:)])
+        self.panGestureRecognizer.enabled = NO;
+        self.longPressRecognizer.enabled = NO;
+        self.center = [self.mapView convertCoordinate:self.annotation.coordinate toPointToView:self.mapView];
+        self.panGestureRecognizer.enabled = YES;
+        self.longPressRecognizer.enabled = YES;
+        self.dragState = MGLAnnotationViewDragStateNone;
+    }
+    else if (dragState == MGLAnnotationViewDragStateEnding)
+    {
+        if ([self.annotation respondsToSelector:@selector(setCoordinate:)])
         {
-            CGPoint offsetAdjustedCenter = self.center;
-            offsetAdjustedCenter.x -= self.centerOffset.dx;
-            offsetAdjustedCenter.y -= self.centerOffset.dy;
-            
-            CLLocationCoordinate2D coordinate = [self.mapView convertPoint:offsetAdjustedCenter toCoordinateFromView:self.mapView];
-            [self.mapView.delegate mapView:self.mapView didDragAnnotationView:self toCoordinate:coordinate];
+            CLLocationCoordinate2D coordinate = [self.mapView convertPoint:self.center toCoordinateFromView:self.mapView];
+            [(NSObject *)self.annotation setValue:[NSValue valueWithMGLCoordinate:coordinate] forKey:@"coordinate"];
         }
     }
 }
@@ -231,19 +239,19 @@
     {
         return NO;
     }
-    
+
     return YES;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
-    return YES;
+    return otherGestureRecognizer == _longPressRecognizer || otherGestureRecognizer == _panGestureRecognizer;
 }
 
 - (id<CAAction>)actionForLayer:(CALayer *)layer forKey:(NSString *)event
 {
     // Allow mbgl to drive animation of this view’s bounds.
-    if ([event isEqualToString:@"bounds"])
+    if ([event isEqualToString:@"bounds"] || [event isEqualToString:@"position"])
     {
         return [NSNull null];
     }
