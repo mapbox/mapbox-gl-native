@@ -21,9 +21,7 @@ public:
     }
 
     void reset() {
-        dirty = true;
-        current = T::Default;
-        T::Set(current);
+        *this = T::Default;
     }
 
     void setDirty() {

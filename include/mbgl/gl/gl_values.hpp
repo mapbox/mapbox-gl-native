@@ -140,6 +140,10 @@ struct StencilOp {
     }
 };
 
+constexpr bool operator!=(const StencilOp::Type& a, const StencilOp::Type& b) {
+    return a.sfail != b.sfail || a.dpfail != b.dpfail || a.dppass != b.dppass;
+}
+
 struct DepthRange {
     struct Type { GLfloat near, far; };
     static const Type Default;

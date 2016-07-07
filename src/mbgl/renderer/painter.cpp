@@ -83,6 +83,7 @@ Painter::Painter(const TransformState& state_,
     overdrawShader.circle = std::make_unique<CircleShader>(store, Shader::Overdraw);
 
     // Reset GL values
+    config.setDirty();
     config.reset();
 }
 
