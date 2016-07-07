@@ -39,7 +39,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 ### Offline maps
 
 - `MGLOfflinePackProgress` now indicates how many tiles have been downloaded and how much space they take up. ([#4874](https://github.com/mapbox/mapbox-gl-native/pull/4874))
-- Fixed an issue (speculatively) where the tile cache could be included in iCloud backups. ([#5124](https://github.com/mapbox/mapbox-gl-native/pull/5124))
+- Fixed an issue where the tile cache could be included in iCloud backups on the first launch. ([#5124](https://github.com/mapbox/mapbox-gl-native/pull/5124), [#5601](https://github.com/mapbox/mapbox-gl-native/pull/5601))
 - Suppressed “Unable to make space for entry” console spew. ([#4708](https://github.com/mapbox/mapbox-gl-native/pull/4708))
 - Deprecated `-[MGLMapView emptyMemoryCache]`. ([#4725](https://github.com/mapbox/mapbox-gl-native/pull/4725))
 
