@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11129.15" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11163.2" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11129.15"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11163.2"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -128,14 +128,12 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="aJh-i4-bef"/>
-                            <menuItem title="Page Setup…" id="qIS-W8-SiK">
-                                <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                            <menuItem title="Page Setup…" keyEquivalent="P" id="qIS-W8-SiK">
                                 <connections>
                                     <action selector="runPageLayout:" target="-1" id="Din-rz-gC5"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Print…" id="aTl-1u-JFS">
-                                <modifierMask key="keyEquivalentModifierMask" control="YES"/>
+                            <menuItem title="Print…" keyEquivalent="p" id="aTl-1u-JFS">
                                 <connections>
                                     <action selector="print:" target="-1" id="qaZ-4w-aoO"/>
                                 </connections>
@@ -477,8 +475,8 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="dYw-bb-tr1"/>
-                            <menuItem title="Show Tooltips on Dropped Pins" keyEquivalent="t" id="uir-Rx-zmw">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Show Tooltips on Dropped Pins" id="uir-Rx-zmw">
+                                <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleShowsToolTipsOnDroppedPins:" target="-1" id="1YC-Co-QQ6"/>
                                 </connections>
@@ -490,7 +488,8 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="Sl5-nE-kHd"/>
-                            <menuItem title="Blanket Map With Pins" keyEquivalent="p" id="LMZ-oe-Ngh">
+                            <menuItem title="Blanket Map With Pins" keyEquivalent="." id="LMZ-oe-Ngh">
+                                <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
                                 <connections>
                                     <action selector="dropManyPins:" target="-1" id="Rtv-8N-3Z8"/>
                                 </connections>
@@ -506,8 +505,10 @@
                                     <action selector="drawAnimatedAnnotation:" target="-1" id="CYM-WB-s97"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove All Annotations" keyEquivalent="q" id="6rC-68-vk0">
-                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                            <menuItem title="Remove All Annotations" id="6rC-68-vk0">
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                                 <connections>
                                     <action selector="removeAllAnnotations:" target="-1" id="6v3-0E-LsR"/>
                                 </connections>
@@ -809,7 +810,6 @@
                                     </connections>
                                 </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="QLr-6P-Ogs">
                             <rect key="frame" x="1" y="264" width="400" height="16"/>
