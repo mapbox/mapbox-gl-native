@@ -118,7 +118,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
 
     int counter = 0;
 
-    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=1" };
+    const Resource resource { Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age%3D1" };
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);

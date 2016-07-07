@@ -143,7 +143,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
     util::RunLoop loop;
     HTTPFileSource fs;
 
-    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" }, [&](Response res) {
+    auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age%3D120" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);

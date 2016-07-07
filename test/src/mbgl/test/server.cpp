@@ -1,7 +1,10 @@
 #include <mbgl/test/server.hpp>
 #include <mbgl/platform/log.hpp>
 #include <iostream>
+#include <string>
+#include <thread>
 #include <future>
+#include <mbgl/util/chrono.hpp>
 
 #pragma GCC diagnostic push 
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -23,19 +26,6 @@ std::string timestampToISO(const time_t rawtime){
     return std::string(buffer);
 }
 
-std::string dumpHeaders(const httplib::MultiMap& headers) {
-    std::string s;
-    char buf[BUFSIZ];
-
-    for (auto it = headers.begin(); it != headers.end(); ++it) {
-        const auto& x = *it;
-        snprintf(buf, sizeof(buf), "|%s|: |%s|\n", x.first.c_str(), x.second.c_str());
-        s += buf;
-    }
-
-    return s;
-}
-
 Server::Server(bool) {
     svr = std::make_unique<httplib::Server>();
 
@@ -43,16 +33,8 @@ Server::Server(bool) {
 #pragma GCC diagnostic ignored "-Wunused-parameter" 
     
     svr->get("/test", [](const auto& req, auto& res) {
-        //XXX Remove
-        std::cout << "test " << req.url << "\n";
-        for (auto it = req.params.begin(); it != req.params.end(); ++it) { 
-            const auto& x = *it;  
-            std::cout << "Param: " << x.first << " - " << x.second << " / " << req.has_param(x.first.c_str()) << "\n";
-        } 
-
         if(req.has_param("modified")) {
             res.set_header("Last-Modified", timestampToISO(std::stoi(req.params.at("modified"))).c_str());
-            std::cout << "Modified "  << timestampToISO(std::stoi(req.params.at("modified")));   
         }
         if (req.has_param("expires")) {
             res.set_header("Expires", timestampToISO(std::stoi(req.params.at("expires"))).c_str());
@@ -67,8 +49,7 @@ Server::Server(bool) {
     });
 
     svr->get("/stale", [] (const auto& req, auto& res) {
-        std::cout << "stale " << req.url << "\n";
-        //TODO: Don't respond
+        //Don't respond
     }); 
 
     svr->get("/cache", [](const auto& req, auto& res) {
@@ -90,6 +71,88 @@ Server::Server(bool) {
             res.set_content("Response", "text/plain");
         }
     });
+
+    svr->get("/clockskew", [](const auto& req, auto& res) {
+        static int expiresCounter = 0;
+        char dateString[25];
+        sprintf(dateString, "Feb 01 2010 10:0%d:00", ++expiresCounter); 
+        res.set_header("Expires", dateString);
+        res.status = 200;
+        res.set_content("Response", "text/plain");
+    });
+    
+    svr->get("/revalidate-modified", [](const auto& req, auto& res) { 
+        Timestamp jan1 = util::parseTimestamp("Jan 01 2015");
+            
+        if (req.has_header("If-Modified-Since")) {
+            Timestamp modified_since = util::parseTimestamp(req.headers.find("If-Modified-Since")->second.c_str());
+            if (modified_since >= jan1) {
+                res.set_header("Cache-Control", "max-age=30");
+                res.status = 304;
+                return;
+            } 
+        }
+            
+        // First request must always be revalidated.
+        res.set_header("Last-Modified", timestampToISO(std::chrono::system_clock::to_time_t(jan1)).c_str());
+        res.set_header("Cache-Control", "must-revalidate");
+        res.status = 200;
+        res.set_content("Response", "text/plain");
+    });
+
+
+    svr->get("/revalidate-etag", [](const auto& req, auto& res) { 
+        static int revalidateEtagCounter = 1;
+        res.set_header("ETag", std::string("response-").append(std::to_string(revalidateEtagCounter)).c_str());
+        res.set_header("Cache-Control", "must-revalidate");
+
+        res.status = 200;
+        res.set_content(std::string("Response ").append(std::to_string(revalidateEtagCounter)), "text/plain");
+        revalidateEtagCounter++;
+    });
+
+
+    svr->get("/empty-data", [](const auto& req, auto& res) { 
+        res.status = 200;
+    });
+
+    svr->get("/no-content", [](const auto& req, auto& res) { 
+        res.status = 204;
+    });
+
+    svr->get("/not-found", [](const auto& req, auto& res) { 
+        res.status = 404;
+        res.set_content("Not Found", "text/plain");
+    });
+
+    svr->get("/permanent-error", [](const auto& req, auto& res) { 
+        res.status = 500;
+        res.set_content("Server Error", "text/plain");
+    });
+
+    svr->get("/temporary-error", [](const auto& req, auto& res) { 
+        static int temporaryErrorCounter = 0;
+        if (temporaryErrorCounter == 0) {
+            res.status = 500;
+        } else {
+            res.status = 200;
+            res.set_content("Hello World!", "text/plain");
+        }
+
+        temporaryErrorCounter++;
+    });
+
+    svr->get("/delayed", [](const auto& req, auto& res) { 
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        res.status = 200;
+        res.set_content("Response", "text/plain");
+    });
+    
+    svr->get(R"(/load/(\d+))", [](const auto& req, auto& res) {
+        std::string number = req.matches.str(1); 
+        res.set_content(std::string("Request ").append(number), "text/plain");       
+    });
+
 #pragma GCC diagnostic pop
 }
 
