@@ -33,7 +33,7 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 
 - The user dot now moves smoothly between user location updates while user location tracking is disabled. ([#1582](https://github.com/mapbox/mapbox-gl-native/pull/1582))
 - Fixed an issue preventing KVO change notifications from being generated on MGLMapView’s `userTrackingMode` key path when `-setUserTrackingMode:animated:` is called. ([#4724](https://github.com/mapbox/mapbox-gl-native/pull/4724))
-- Fixed a crash setting MGLMapView’s `userLocationVerticalAlignment` property before a user location update has occurred. ([#5274](https://github.com/mapbox/mapbox-gl-native/issues/5274))
+- Fixed a crash setting MGLMapView’s `userLocationVerticalAlignment` property before a user location update has occurred. ([#5278](https://github.com/mapbox/mapbox-gl-native/pull/5278))
 - Mapbox Telemetry is automatically disabled while the host application is running in the iOS Simulator. ([#4726](https://github.com/mapbox/mapbox-gl-native/pull/4726))
 
 ### Offline maps
