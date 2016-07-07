@@ -1,8 +1,8 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import <Mapbox/Mapbox.h>
 
 #import "MGLTypes.h"
-#import "MGLAnnotationView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,10 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak) MGLMapView *mapView;
 @property (nonatomic, readonly, nullable) MGLUserLocation *userLocation;
-@property (nonatomic, readonly, nullable) CALayer *haloLayer;
 
-- (instancetype)initInMapView:(MGLMapView *)mapView NS_DESIGNATED_INITIALIZER;
-- (void)setupLayers;
+- (instancetype)initInMapView:(MGLMapView *)mapView userLocation:(MGLUserLocation *)userLocation;
+
+- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation;
 
 @end
 
