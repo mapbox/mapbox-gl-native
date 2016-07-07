@@ -121,8 +121,8 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
         // Move the offline file cache from v3.2.x path to a subdirectory that
         // can be reliably excluded from backups.
         if (![[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
-            NSURL *subdirectorylessCachePath = [[self class] cacheURLIncludingSubdirectory:NO];
-            [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCachePath.path toPath:cachePath error:NULL];
+            NSURL *subdirectorylessCacheURL = [[self class] cacheURLIncludingSubdirectory:NO];
+            [[NSFileManager defaultManager] moveItemAtPath:subdirectorylessCacheURL.path toPath:cachePath error:NULL];
         }
 
         _mbglFileSource = new mbgl::DefaultFileSource(cachePath.UTF8String, [NSBundle mainBundle].resourceURL.path.UTF8String);
