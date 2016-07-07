@@ -4,6 +4,7 @@
 #import "MBXCustomCalloutView.h"
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
+#import "MBXUserLocationAnnotationView.h"
 #import "MGLFillStyleLayer.h"
 
 #import <Mapbox/Mapbox.h>
@@ -699,6 +700,12 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
+    if (annotation == mapView.userLocation)
+    {
+        MBXUserLocationAnnotationView *annotationView = [[MBXUserLocationAnnotationView alloc] initInMapView:mapView userLocation:mapView.userLocation];
+        annotationView.frame = CGRectMake(0, 0, annotationView.intrinsicContentSize.width, annotationView.intrinsicContentSize.height);
+        return annotationView;
+    }
     // Use GL backed pins for dropped pin annotations
     if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
     {
