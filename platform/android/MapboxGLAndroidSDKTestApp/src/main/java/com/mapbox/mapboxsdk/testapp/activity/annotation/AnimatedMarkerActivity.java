@@ -143,6 +143,12 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
         final ValueAnimator markerAnimator = ObjectAnimator.ofObject(marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
         markerAnimator.setDuration((long) (10 * marker.getPosition().distanceTo(to)));
         markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        markerAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mMapboxMap.getMarkerViewManager().update();
+            }
+        });
 
         // Start
         markerAnimator.start();
