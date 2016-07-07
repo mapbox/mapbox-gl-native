@@ -6,6 +6,8 @@
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -22,6 +24,7 @@
 #include <QCoreApplication>
 #endif
 
+#include <QDebug>
 #include <QImage>
 #include <QMapboxGL>
 #include <QMargins>
@@ -446,6 +449,24 @@ AnnotationID QMapboxGL::addShapeAnnotation(const ShapeAnnotation &shapeAnnotatio
 void QMapboxGL::removeAnnotation(AnnotationID annotationID)
 {
     d_ptr->mapObj->removeAnnotation(annotationID);
+}
+
+void QMapboxGL::setLayoutProperty(const QString& layer_, const QString& property, const QVariant& value)
+{
+    using namespace mbgl::style;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    if (conversion::setLayoutProperty(*layer, property.toStdString(), value)) {
+        qWarning() << "Error setting layout property:" << layer_ << "-" << property;
+        return;
+    }
+
+    d_ptr->mapObj->update(mbgl::Update::RecalculateStyle);
 }
 
 bool QMapboxGL::isRotating() const
