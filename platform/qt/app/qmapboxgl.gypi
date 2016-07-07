@@ -17,6 +17,7 @@
         'main.cpp',
         'mapwindow.cpp',
         'mapwindow.hpp',
+        'source.qrc',
       ],
 
       'include_dirs': [
@@ -30,6 +31,8 @@
           '<@(qt_gui_cflags)',
           '<@(qt_opengl_cflags)',
           '-fPIC',
+          # Qt4 generates code with unused variables.
+          '-Wno-unused-variable',
         ],
         'ldflags': [
           '<@(opengl_ldflags)',
