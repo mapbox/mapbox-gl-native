@@ -106,6 +106,7 @@
     // Unit tests don't use the main bundle; use com.mapbox.ios.sdk instead.
     NSString *bundleIdentifier = [NSBundle bundleForClass:[MGLMapView class]].bundleIdentifier;
     cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    cacheDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:@".mapbox"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:cacheDirectoryURL.path], @"Cache directory should exist.");
 
     NSURL *cacheURL = [cacheDirectoryURL URLByAppendingPathComponent:@"cache.db"];
