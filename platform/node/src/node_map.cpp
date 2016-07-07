@@ -598,7 +598,7 @@ NAN_METHOD(NodeMap::SetPaintProperty) {
         return Nan::ThrowTypeError(error->message);
     }
 
-    nodeMap->map->update(mbgl::Update::RecalculateStyle);
+    nodeMap->map->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
     info.GetReturnValue().SetUndefined();
 }
 
