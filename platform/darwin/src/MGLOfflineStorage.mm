@@ -41,21 +41,14 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 }
 
 /**
- Returns the file URL to the offline cache.
+ Returns the file URL to the offline cache, with the option to omit the private
+ subdirectory for legacy (v3.2.0 - v3.2.3) migration purposes.
 
  The cache is located in a directory specific to the application, so that packs
  downloaded by other applications don’t count toward this application’s limits.
 
  The cache is located at:
- ~/Library/Application Support/tld.app.bundle.id/mapbox/cache.db
- */
-+ (NSURL *)cacheURL {
-    return [[self class] cacheURLIncludingSubdirectory:YES];
-}
-
-/**
- Returns the file URL to the offline cache, with the option to omit the "mapbox"
- subdirectory for legacy (v3.2.0 - v3.2.3) migration purposes.
+ ~/Library/Application Support/tld.app.bundle.id/.mapbox/cache.db
 
  The subdirectory-less cache was located at:
  ~/Library/Application Support/tld.app.bundle.id/cache.db
@@ -115,7 +108,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
 
 - (instancetype)init {
     if (self = [super init]) {
-        NSURL *cacheURL = [[self class] cacheURL];
+        NSURL *cacheURL = [[self class] cacheURLIncludingSubdirectory:YES];
         NSString *cachePath = cacheURL.path ?: @"";
 
         // Move the offline cache from v3.2.0-beta.1 to a location that can also
