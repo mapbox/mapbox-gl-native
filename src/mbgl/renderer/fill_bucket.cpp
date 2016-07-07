@@ -95,7 +95,7 @@ void FillBucket::addGeometry(const GeometryCollection& geometry) {
     }
 }
 
-void FillBucket::upload(gl::ObjectStore& store) {
+void FillBucket::upload(gl::ObjectStore& store, gl::Config&) {
     vertexBuffer.upload(store);
     triangleElementsBuffer.upload(store);
     lineElementsBuffer.upload(store);

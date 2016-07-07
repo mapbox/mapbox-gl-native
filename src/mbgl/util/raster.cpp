@@ -1,5 +1,6 @@
 #include <mbgl/platform/platform.hpp>
 #include <mbgl/gl/gl.hpp>
+#include <mbgl/gl/gl_config.hpp>
 #include <mbgl/platform/log.hpp>
 
 #include <mbgl/util/raster.hpp>
@@ -24,7 +25,11 @@ void Raster::load(PremultipliedImage image, uint32_t mipmapLevel) {
     loaded = true;
 }
 
-void Raster::bind(gl::ObjectStore& store, Scaling newFilter, MipMap newMipMap) {
+void Raster::bind(gl::ObjectStore& store,
+                  gl::Config& config,
+                  uint32_t unit,
+                  Scaling newFilter,
+                  MipMap newMipMap) {
     bool updateFilter = false;
 
     if (!texture) {
@@ -32,17 +37,21 @@ void Raster::bind(gl::ObjectStore& store, Scaling newFilter, MipMap newMipMap) {
             Log::Error(Event::OpenGL, "trying to bind texture without images");
             return;
         } else {
-            upload(store);
+            upload(store, config, unit);
             updateFilter = true;
         }
     } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+        if (config.texture[unit] != *texture) {
+            config.activeTexture = unit;
+            config.texture[unit] = *texture;
+        }
         updateFilter = (filter != newFilter || mipmap != newMipMap);
     }
 
     if (updateFilter) {
         filter = newFilter;
         mipmap = newMipMap;
+        config.activeTexture = unit;
         MBGL_CHECK_ERROR(glTexParameteri(
             GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
             filter == Scaling::Linear
@@ -53,10 +62,11 @@ void Raster::bind(gl::ObjectStore& store, Scaling newFilter, MipMap newMipMap) {
     }
 }
 
-void Raster::upload(gl::ObjectStore& store) {
+void Raster::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
     if (!images.empty() && !texture) {
         texture = store.createTexture();
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+        config.activeTexture = unit;
+        config.texture[unit] = *texture;
 #ifndef GL_ES_VERSION_2_0
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, images.size()));
 #endif

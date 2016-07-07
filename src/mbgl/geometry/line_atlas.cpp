@@ -1,6 +1,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/gl_config.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/platform/platform.hpp>
 
@@ -20,7 +21,7 @@ LineAtlas::LineAtlas(GLsizei w, GLsizei h)
 
 LineAtlas::~LineAtlas() = default;
 
-LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, bool round, gl::ObjectStore& store) {
+LinePatternPos LineAtlas::getDashPosition(const std::vector<float>& dasharray, bool round) {
     size_t key = round ? std::numeric_limits<size_t>::min() : std::numeric_limits<size_t>::max();
     for (const float part : dasharray) {
         boost::hash_combine<float>(key, part);
@@ -29,7 +30,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     // Note: We're not handling hash collisions here.
     const auto it = positions.find(key);
     if (it == positions.end()) {
-        auto inserted = positions.emplace(key, addDash(dasharray, round, store));
+        auto inserted = positions.emplace(key, addDash(dasharray, round));
         assert(inserted.second);
         return inserted.first->second;
     } else {
@@ -37,8 +38,7 @@ LinePatternPos LineAtlas::getDashPosition(const std::vector<float> &dasharray, b
     }
 }
 
-LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool round, gl::ObjectStore& store) {
-
+LinePatternPos LineAtlas::addDash(const std::vector<float>& dasharray, bool round) {
     int n = round ? 7 : 0;
     int dashheight = 2 * n + 1;
     const uint8_t offset = 128;
@@ -115,32 +115,34 @@ LinePatternPos LineAtlas::addDash(const std::vector<float> &dasharray, bool roun
     nextRow += dashheight;
 
     dirty = true;
-    bind(store);
 
     return position;
 }
 
-void LineAtlas::upload(gl::ObjectStore& store) {
+void LineAtlas::upload(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
     if (dirty) {
-        bind(store);
+        bind(store, config, unit);
     }
 }
 
-void LineAtlas::bind(gl::ObjectStore& store) {
+void LineAtlas::bind(gl::ObjectStore& store, gl::Config& config, uint32_t unit) {
     bool first = false;
     if (!texture) {
         texture = store.createTexture();
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+        config.activeTexture = unit;
+        config.texture[unit] = *texture;
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
         MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         first = true;
-    } else {
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, *texture));
+    } else if (config.texture[unit] != *texture) {
+        config.activeTexture = unit;
+        config.texture[unit] = *texture;
     }
 
     if (dirty) {
+        config.activeTexture = unit;
         if (first) {
             MBGL_CHECK_ERROR(glTexImage2D(
                 GL_TEXTURE_2D, // GLenum target

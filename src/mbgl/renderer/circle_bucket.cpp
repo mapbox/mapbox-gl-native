@@ -16,7 +16,7 @@ CircleBucket::~CircleBucket() {
     // Do not remove. header file only contains forward definitions to unique pointers.
 }
 
-void CircleBucket::upload(gl::ObjectStore& store) {
+void CircleBucket::upload(gl::ObjectStore& store, gl::Config&) {
     vertexBuffer_.upload(store);
     elementsBuffer_.upload(store);
     uploaded = true;

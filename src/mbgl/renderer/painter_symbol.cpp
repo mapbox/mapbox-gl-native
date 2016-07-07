@@ -77,8 +77,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
 
     sdfShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
 
-    config.activeTexture = GL_TEXTURE1;
-    frameHistory.bind(store);
+    frameHistory.bind(store, config, 1);
     sdfShader.u_fadetexture = 1;
 
     // The default gamma value has to be adjust for the current pixelratio so that we're not
@@ -164,8 +163,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         SpriteAtlas* activeSpriteAtlas = layer.impl->spriteAtlas;
         const bool iconScaled = fontScale != 1 || frame.pixelRatio != activeSpriteAtlas->getPixelRatio() || bucket.iconsNeedLinear;
         const bool iconTransformed = layout.iconRotationAlignment == AlignmentType::Map || angleOffset != 0 || state.getPitch() != 0;
-        config.activeTexture = GL_TEXTURE0;
-        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store);
+        activeSpriteAtlas->bind(sdf || state.isChanging() || iconScaled || iconTransformed, store, config, 0);
 
         if (sdf) {
             renderSDF(bucket,
@@ -219,8 +217,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             iconShader.u_zoom = (state.getZoom() - zoomAdjust) * 10; // current zoom level
             iconShader.u_opacity = paint.iconOpacity;
 
-            config.activeTexture = GL_TEXTURE1;
-            frameHistory.bind(store);
+            frameHistory.bind(store, config, 1);
             iconShader.u_fadetexture = 1;
 
             setDepthSublayer(0);
@@ -236,8 +233,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             config.depthTest = GL_FALSE;
         }
 
-        config.activeTexture = GL_TEXTURE0;
-        glyphAtlas->bind(store);
+        glyphAtlas->bind(store, config, 0);
 
         renderSDF(bucket,
                   tileID,
@@ -276,8 +272,6 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         bucket.drawCollisionBoxes(collisionBoxShader, store);
 
     }
-
-    config.activeTexture = GL_TEXTURE0;
 }
 
 } // namespace mbgl

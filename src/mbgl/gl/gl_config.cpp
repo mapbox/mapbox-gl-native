@@ -20,7 +20,8 @@ const ClearColor::Type ClearColor::Default = { 0, 0, 0, 0 };
 const ClearStencil::Type ClearStencil::Default = 0;
 const Program::Type Program::Default = 0;
 const LineWidth::Type LineWidth::Default = 1;
-const ActiveTexture::Type ActiveTexture::Default = GL_TEXTURE0;
+const ActiveTexture::Type ActiveTexture::Default = 0;
+const BindTexture::Type BindTexture::Default = 0;
 
 #ifndef GL_ES_VERSION_2_0
 const PixelZoom::Type PixelZoom::Default = { 1, 1 };

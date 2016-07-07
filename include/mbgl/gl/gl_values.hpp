@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <tuple>
 #include <array>
+#include <cassert>
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/util/color.hpp>
@@ -258,15 +259,15 @@ struct LineWidth {
 };
 
 struct ActiveTexture {
-    using Type = GLint;
+    using Type = uint8_t;
     static const Type Default;
     static void Set(const Type& value) {
-        MBGL_CHECK_ERROR(glActiveTexture(value));
+        MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0 + value));
     }
     static Type Get() {
-        Type activeTexture;
+        GLint activeTexture;
         MBGL_CHECK_ERROR(glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture));
-        return activeTexture;
+        return activeTexture - GL_TEXTURE0;
     }
 };
 
@@ -304,6 +305,19 @@ struct RasterPos {
 };
 
 #endif // GL_ES_VERSION_2_0
+
+struct BindTexture {
+    using Type = GLuint;
+    static const Type Default;
+    static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, value));
+    }
+    static Type Get() {
+        GLint texture;
+        MBGL_CHECK_ERROR(glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture));
+        return texture;
+    }
+};
 
 } // namespace gl
 } // namespace mbgl

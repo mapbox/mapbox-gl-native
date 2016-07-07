@@ -135,15 +135,15 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         tileStencilBuffer.upload(store);
         rasterBoundsBuffer.upload(store);
         tileBorderBuffer.upload(store);
-        spriteAtlas->upload(store);
-        lineAtlas->upload(store);
-        glyphAtlas->upload(store);
-        frameHistory.upload(store);
-        annotationSpriteAtlas.upload(store);
+        spriteAtlas->upload(store, config, 0);
+        lineAtlas->upload(store, config, 0);
+        glyphAtlas->upload(store, config, 0);
+        frameHistory.upload(store, config, 0);
+        annotationSpriteAtlas.upload(store, config, 0);
 
         for (const auto& item : order) {
             if (item.bucket && item.bucket->needsUpload()) {
-                item.bucket->upload(store);
+                item.bucket->upload(store, config);
             }
         }
     }
@@ -232,7 +232,11 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("cleanup");
 
-        MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+        config.activeTexture = 1;
+        config.texture[1] = 0;
+        config.activeTexture = 0;
+        config.texture[0] = 0;
+
         MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
     }
 

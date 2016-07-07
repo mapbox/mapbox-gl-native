@@ -72,8 +72,8 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader.u_color = color;
         linesdfShader.u_opacity = opacity;
 
-        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round, store);
-        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round, store);
+        LinePatternPos posA = lineAtlas->getDashPosition(properties.lineDasharray.value.from, layout.lineCap == LineCapType::Round);
+        LinePatternPos posB = lineAtlas->getDashPosition(properties.lineDasharray.value.to, layout.lineCap == LineCapType::Round);
 
         const float widthA = posA.width * properties.lineDasharray.value.fromScale * layer.impl->dashLineWidth;
         const float widthB = posB.width * properties.lineDasharray.value.toScale * layer.impl->dashLineWidth;
@@ -94,8 +94,7 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linesdfShader.u_image = 0;
-        config.activeTexture = GL_TEXTURE0;
-        lineAtlas->bind(store);
+        lineAtlas->bind(store, config, 0);
 
         bucket.drawLineSDF(linesdfShader, store, overdraw);
 
@@ -136,8 +135,7 @@ void Painter::renderLine(LineBucket& bucket,
         linepatternShader.u_antialiasingmatrix = antialiasingMatrix;
 
         linepatternShader.u_image = 0;
-        config.activeTexture = GL_TEXTURE0;
-        spriteAtlas->bind(true, store);
+        spriteAtlas->bind(true, store, config, 0);
 
         bucket.drawLinePatterns(linepatternShader, store, overdraw);
 

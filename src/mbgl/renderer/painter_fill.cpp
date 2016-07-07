@@ -103,8 +103,7 @@ void Painter::renderFill(FillBucket& bucket,
             patternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
             patternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
-            config.activeTexture = GL_TEXTURE0;
-            spriteAtlas->bind(true, store);
+            spriteAtlas->bind(true, store, config, 0);
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
@@ -132,8 +131,7 @@ void Painter::renderFill(FillBucket& bucket,
                 // Draw the entire line
                 outlinePatternShader.u_world = worldSize;
 
-                config.activeTexture = GL_TEXTURE0;
-                spriteAtlas->bind(true, store);
+                spriteAtlas->bind(true, store, config, 0);
 
                 setDepthSublayer(2);
                 bucket.drawVertices(outlinePatternShader, store, overdraw);

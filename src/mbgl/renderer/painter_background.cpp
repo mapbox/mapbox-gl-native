@@ -43,7 +43,7 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
         patternShader.u_mix = properties.backgroundPattern.value.t;
         patternShader.u_opacity = properties.backgroundOpacity;
 
-        spriteAtlas->bind(true, store);
+        spriteAtlas->bind(true, store, config, 0);
         arrayBackgroundPattern.bind(patternShader, tileStencilBuffer, BUFFER_OFFSET(0), store);
 
     } else {

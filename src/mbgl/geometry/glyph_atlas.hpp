@@ -15,6 +15,10 @@
 
 namespace mbgl {
 
+namespace gl {
+class Config;
+} // namespace gl
+
 class GlyphAtlas : public util::noncopyable {
 public:
     GlyphAtlas(uint16_t width, uint16_t height);
@@ -28,11 +32,11 @@ public:
     void removeGlyphs(uintptr_t tileUID);
 
     // Binds the atlas texture to the GPU, and uploads data if it is out of date.
-    void bind(gl::ObjectStore&);
+    void bind(gl::ObjectStore&, gl::Config&, uint32_t unit);
 
     // Uploads the texture to the GPU to be available when we need it. This is a lazy operation;
     // the texture is only bound when the data is out of date (=dirty).
-    void upload(gl::ObjectStore&);
+    void upload(gl::ObjectStore&, gl::Config&, uint32_t unit);
 
     const GLsizei width;
     const GLsizei height;
