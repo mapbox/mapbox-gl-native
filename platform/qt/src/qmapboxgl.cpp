@@ -637,7 +637,21 @@ void QMapboxGL::addCustomLayer(const QString &id,
             before ? mbgl::optional<std::string>(before) : mbgl::optional<std::string>());
 }
 
-void QMapboxGL::removeCustomLayer(const QString& id)
+void QMapboxGL::addLayer(const QVariant& value)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(value);
+    if (!layer) {
+        qWarning() << "Unable to add layer:" << layer.error().message;
+        return;
+    }
+
+    d_ptr->mapObj->addLayer(std::move(*layer));
+}
+
+void QMapboxGL::removeLayer(const QString& id)
 {
     d_ptr->mapObj->removeLayer(id.toStdString());
 }
