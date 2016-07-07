@@ -1,5 +1,7 @@
 #include "qmapboxgl_p.hpp"
 
+#include "qt_conversion.hpp"
+
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/map/camera.hpp>
