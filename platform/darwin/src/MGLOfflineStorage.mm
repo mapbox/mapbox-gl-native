@@ -100,6 +100,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = @"MaximumCount";
     NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
     // ~/Library/Caches/tld.app.bundle.id/offline.db
+    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
     NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                             inDomain:NSUserDomainMask
                                                                    appropriateForURL:nil
