@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/symbol_bucket.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
@@ -110,7 +111,8 @@ void Painter::renderSDF(SymbolBucket &bucket,
     }
 }
 
-void Painter::renderSymbol(SymbolBucket& bucket,
+void Painter::renderSymbol(PaintParameters& parameters,
+                           SymbolBucket& bucket,
                            const SymbolLayer& layer,
                            const UnwrappedTileID& tileID,
                            const mat4& matrix) {
@@ -169,7 +171,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                       matrix,
                       1.0f,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
-                      isOverdraw() ? overdrawShaders->sdfIcon : shaders->sdfIcon,
+                      parameters.shaders.sdfIcon,
                       &SymbolBucket::drawIcons,
                       layout.iconRotationAlignment,
                       // icon-pitch-alignment is not yet implemented
@@ -200,8 +202,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                 }};
             }
 
-            const bool overdraw = isOverdraw();
-            auto& iconShader = overdraw ? overdrawShaders->icon : shaders->icon;
+            auto& iconShader = parameters.shaders.icon;
 
             config.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
@@ -219,7 +220,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             iconShader.u_fadetexture = 1;
 
             setDepthSublayer(0);
-            bucket.drawIcons(iconShader, store, overdraw);
+            bucket.drawIcons(iconShader, store, isOverdraw());
         }
     }
 
@@ -238,7 +239,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                   matrix,
                   24.0f,
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
-                  isOverdraw() ? overdrawShaders->sdfGlyph : shaders->sdfGlyph,
+                  parameters.shaders.sdfGlyph,
                   &SymbolBucket::drawGlyphs,
                   layout.textRotationAlignment,
                   layout.textPitchAlignment,

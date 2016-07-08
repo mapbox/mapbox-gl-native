@@ -49,6 +49,11 @@ public:
     SDFShader sdfIcon;
     CollisionBoxShader collisionBox;
     CircleShader circle;
+
+    VertexArrayObject coveringPlainArray;
+    VertexArrayObject coveringRasterArray;
+    VertexArrayObject backgroundPatternArray;
+    VertexArrayObject backgroundArray;
 };
 
 } // namespace mbgl

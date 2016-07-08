@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
@@ -11,7 +12,8 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderLine(LineBucket& bucket,
+void Painter::renderLine(PaintParameters& parameters,
+                         LineBucket& bucket,
                          const LineLayer& layer,
                          const UnwrappedTileID& tileID,
                          const mat4& matrix) {
@@ -53,10 +55,9 @@ void Painter::renderLine(LineBucket& bucket,
 
     setDepthSublayer(0);
 
-    const bool overdraw = isOverdraw();
-    auto& linesdfShader = overdraw ? overdrawShaders->linesdf : shaders->linesdf;
-    auto& linepatternShader = overdraw ? overdrawShaders->linepattern : shaders->linepattern;
-    auto& lineShader = overdraw ? overdrawShaders->line : shaders->line;
+    auto& linesdfShader = parameters.shaders.linesdf;
+    auto& linepatternShader = parameters.shaders.linepattern;
+    auto& lineShader = parameters.shaders.line;
 
     if (!properties.lineDasharray.value.from.empty()) {
         config.program = linesdfShader.getID();
@@ -94,7 +95,7 @@ void Painter::renderLine(LineBucket& bucket,
         linesdfShader.u_image = 0;
         lineAtlas->bind(store, config, 0);
 
-        bucket.drawLineSDF(linesdfShader, store, overdraw);
+        bucket.drawLineSDF(linesdfShader, store, isOverdraw());
 
     } else if (!properties.linePattern.value.from.empty()) {
         optional<SpriteAtlasPosition> imagePosA = spriteAtlas->getPosition(properties.linePattern.value.from, true);
@@ -135,7 +136,7 @@ void Painter::renderLine(LineBucket& bucket,
         linepatternShader.u_image = 0;
         spriteAtlas->bind(true, store, config, 0);
 
-        bucket.drawLinePatterns(linepatternShader, store, overdraw);
+        bucket.drawLinePatterns(linepatternShader, store, isOverdraw());
 
     } else {
         config.program = lineShader.getID();
@@ -153,7 +154,7 @@ void Painter::renderLine(LineBucket& bucket,
         lineShader.u_color = color;
         lineShader.u_opacity = opacity;
 
-        bucket.drawLines(lineShader, store, overdraw);
+        bucket.drawLines(lineShader, store, isOverdraw());
     }
 }
 

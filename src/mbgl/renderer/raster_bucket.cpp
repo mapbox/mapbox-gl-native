@@ -15,10 +15,11 @@ void RasterBucket::upload(gl::ObjectStore& store, gl::Config& config) {
 }
 
 void RasterBucket::render(Painter& painter,
+                          PaintParameters& parameters,
                           const Layer& layer,
                           const UnwrappedTileID& tileID,
                           const mat4& matrix) {
-    painter.renderRaster(*this, *layer.as<RasterLayer>(), tileID, matrix);
+    painter.renderRaster(parameters, *this, *layer.as<RasterLayer>(), tileID, matrix);
 }
 
 void RasterBucket::setImage(PremultipliedImage image) {

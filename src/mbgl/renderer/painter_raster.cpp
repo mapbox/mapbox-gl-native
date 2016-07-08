@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -9,7 +10,8 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderRaster(RasterBucket& bucket,
+void Painter::renderRaster(PaintParameters& parameters,
+                           RasterBucket& bucket,
                            const RasterLayer& layer,
                            const UnwrappedTileID&,
                            const mat4& matrix) {
@@ -18,9 +20,8 @@ void Painter::renderRaster(RasterBucket& bucket,
     const RasterPaintProperties& properties = layer.impl->paint;
 
     if (bucket.hasData()) {
-        const bool overdraw = isOverdraw();
-        auto& rasterShader = overdraw ? overdrawShaders->raster : shaders->raster;
-        auto& rasterVAO = overdraw ? coveringRasterOverdrawArray : coveringRasterArray;
+        auto& rasterShader = parameters.shaders.raster;
+        auto& rasterVAO = parameters.shaders.coveringRasterArray;
 
         config.program = rasterShader.getID();
         rasterShader.u_matrix = matrix;

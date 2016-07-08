@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
@@ -10,7 +11,8 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderFill(FillBucket& bucket,
+void Painter::renderFill(PaintParameters& parameters,
+                         FillBucket& bucket,
                          const FillLayer& layer,
                          const UnwrappedTileID& tileID,
                          const mat4& matrix) {
@@ -40,11 +42,10 @@ void Painter::renderFill(FillBucket& bucket,
     config.depthMask = GL_TRUE;
     config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
-    const bool overdraw = isOverdraw();
-    auto& outlineShader = overdraw ? overdrawShaders->outline : shaders->outline;
-    auto& patternShader = overdraw ? overdrawShaders->pattern : shaders->pattern;
-    auto& outlinePatternShader = overdraw ? overdrawShaders->outlinePattern : shaders->outlinePattern;
-    auto& plainShader = overdraw ? overdrawShaders->plain : shaders->plain;
+    auto& outlineShader = parameters.shaders.outline;
+    auto& patternShader = parameters.shaders.pattern;
+    auto& outlinePatternShader = parameters.shaders.outlinePattern;
+    auto& plainShader = parameters.shaders.plain;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)
@@ -70,7 +71,7 @@ void Painter::renderFill(FillBucket& bucket,
             // the (non-antialiased) fill.
             setDepthSublayer(0); // OK
         }
-        bucket.drawVertices(outlineShader, store, overdraw);
+        bucket.drawVertices(outlineShader, store, isOverdraw());
     }
 
     if (pattern) {
@@ -104,7 +105,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(0);
-            bucket.drawElements(patternShader, store, overdraw);
+            bucket.drawElements(patternShader, store, isOverdraw());
 
             if (properties.fillAntialias && !isOutlineColorDefined) {
                 config.program = outlinePatternShader.getID();
@@ -131,7 +132,7 @@ void Painter::renderFill(FillBucket& bucket,
                 spriteAtlas->bind(true, store, config, 0);
 
                 setDepthSublayer(2);
-                bucket.drawVertices(outlinePatternShader, store, overdraw);
+                bucket.drawVertices(outlinePatternShader, store, isOverdraw());
             }
         }
     } else {
@@ -148,7 +149,7 @@ void Painter::renderFill(FillBucket& bucket,
 
             // Draw the actual triangles into the color & stencil buffer.
             setDepthSublayer(1);
-            bucket.drawElements(plainShader, store, overdraw);
+            bucket.drawElements(plainShader, store, isOverdraw());
         }
     }
 
@@ -165,7 +166,7 @@ void Painter::renderFill(FillBucket& bucket,
         outlineShader.u_world = worldSize;
 
         setDepthSublayer(2);
-        bucket.drawVertices(outlineShader, store, overdraw);
+        bucket.drawVertices(outlineShader, store, isOverdraw());
     }
 }
 

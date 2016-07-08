@@ -43,6 +43,7 @@ class RasterBucket;
 
 class Shaders;
 class SDFShader;
+class PaintParameters;
 
 struct ClipID;
 
@@ -88,18 +89,18 @@ public:
     void renderClipMasks();
 
     void renderDebugText(Tile&, const mat4&);
-    void renderFill(FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
-    void renderLine(LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
-    void renderCircle(CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);
-    void renderSymbol(SymbolBucket&, const style::SymbolLayer&, const UnwrappedTileID&, const mat4&);
-    void renderRaster(RasterBucket&, const style::RasterLayer&, const UnwrappedTileID&, const mat4&);
-    void renderBackground(const style::BackgroundLayer&);
+    void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
+    void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
+    void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);
+    void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const UnwrappedTileID&, const mat4&);
+    void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const UnwrappedTileID&, const mat4&);
+    void renderBackground(PaintParameters&, const style::BackgroundLayer&);
 
     float saturationFactor(float saturation);
     float contrastFactor(float contrast);
     std::array<float, 3> spinWeights(float spin_value);
 
-    void drawClippingMasks(const std::map<UnwrappedTileID, ClipID>&);
+    void drawClippingMasks(PaintParameters&, const std::map<UnwrappedTileID, ClipID>&);
 
     bool needsAnimation() const;
 
@@ -112,7 +113,8 @@ private:
     std::vector<RenderItem> determineRenderOrder(const style::Style&);
 
     template <class Iterator>
-    void renderPass(RenderPass,
+    void renderPass(PaintParameters&,
+                    RenderPass,
                     Iterator it, Iterator end,
                     GLsizei i, int8_t increment);
 
@@ -208,16 +210,6 @@ private:
         {{ 0, util::EXTENT, 0, 32767 }},
         {{ util::EXTENT, util::EXTENT, 32767, 32767 }},
     };
-
-    VertexArrayObject coveringPlainArray;
-    VertexArrayObject coveringRasterArray;
-    VertexArrayObject backgroundPatternArray;
-    VertexArrayObject backgroundArray;
-
-    VertexArrayObject coveringPlainOverdrawArray;
-    VertexArrayObject coveringRasterOverdrawArray;
-    VertexArrayObject backgroundPatternOverdrawArray;
-    VertexArrayObject backgroundOverdrawArray;
 
     // Set up the tile boundary lines we're using to draw the tile outlines.
     StaticVertexBuffer tileBorderBuffer {

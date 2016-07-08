@@ -13,7 +13,7 @@ class VertexArrayObject;
 class RasterBucket : public Bucket {
 public:
     void upload(gl::ObjectStore&, gl::Config&) override;
-    void render(Painter&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
     bool hasData() const override;
     bool needsClipping() const override;
 

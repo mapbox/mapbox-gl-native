@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 
 #include <mbgl/style/source.hpp>
@@ -66,6 +67,10 @@ void Painter::setClipping(const ClipID& clip) {
 
 void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& annotationSpriteAtlas) {
     frame = frame_;
+
+    PaintParameters parameters {
+        isOverdraw() ? *overdrawShaders : *shaders
+    };
 
     glyphAtlas = style.glyphAtlas.get();
     spriteAtlas = style.spriteAtlas.get();
@@ -150,7 +155,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
             source->baseImpl->startRender(generator, projMatrix, state);
         }
 
-        drawClippingMasks(generator.getStencils());
+        drawClippingMasks(parameters, generator.getStencils());
     }
 
     if (frame.debugOptions & MapDebugOptions::StencilClip) {
@@ -166,13 +171,15 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
     // Render everything top-to-bottom by using reverse iterators. Render opaque objects first.
-    renderPass(RenderPass::Opaque,
+    renderPass(parameters,
+               RenderPass::Opaque,
                order.rbegin(), order.rend(),
                0, 1);
 
     // - TRANSLUCENT PASS --------------------------------------------------------------------------
     // Make a second pass, rendering translucent objects. This time, we render bottom-to-top.
-    renderPass(RenderPass::Translucent,
+    renderPass(parameters,
+               RenderPass::Translucent,
                order.begin(), order.end(),
                static_cast<GLsizei>(order.size()) - 1, -1);
 
@@ -211,7 +218,8 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
 }
 
 template <class Iterator>
-void Painter::renderPass(RenderPass pass_,
+void Painter::renderPass(PaintParameters& parameters,
+                         RenderPass pass_,
                          Iterator it, Iterator end,
                          GLsizei i, int8_t increment) {
     pass = pass_;
@@ -246,7 +254,7 @@ void Painter::renderPass(RenderPass pass_,
 
         if (layer.is<BackgroundLayer>()) {
             MBGL_DEBUG_GROUP("background");
-            renderBackground(*layer.as<BackgroundLayer>());
+            renderBackground(parameters, *layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
             VertexArrayObject::Unbind();
@@ -257,7 +265,7 @@ void Painter::renderPass(RenderPass pass_,
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }
-            item.bucket->render(*this, layer, item.tile->id, item.tile->matrix);
+            item.bucket->render(*this, parameters, layer, item.tile->id, item.tile->matrix);
         }
     }
 

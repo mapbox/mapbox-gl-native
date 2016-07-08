@@ -1,4 +1,5 @@
 #include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/circle_bucket.hpp>
 
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -10,7 +11,8 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderCircle(CircleBucket& bucket,
+void Painter::renderCircle(PaintParameters& parameters,
+                           CircleBucket& bucket,
                            const CircleLayer& layer,
                            const UnwrappedTileID& tileID,
                            const mat4& matrix) {
@@ -27,7 +29,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 
-    auto& circleShader = isOverdraw() ? overdrawShaders->circle : shaders->circle;
+    auto& circleShader = parameters.shaders.circle;
 
     config.program = circleShader.getID();
 
