@@ -4746,18 +4746,25 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
 
 + (UIImage *)resourceImageNamed:(NSString *)imageName
 {
-    NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
-    NSBundle *bundle = [NSBundle mgl_frameworkBundle];
-    NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
-                                      ofType:extension
-                                 inDirectory:bundle.mgl_resourcesDirectory];
-    if ( ! path)
-    {
-        [NSException raise:@"Resource not found" format:
-         @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
-    }
-    
-    return [UIImage imageWithContentsOfFile:path];
+	NSString *extension = imageName.pathExtension.length ? imageName.pathExtension : @"png";
+	NSBundle *bundle = [NSBundle mgl_frameworkBundle];
+	NSString *path = [bundle pathForResource:imageName.stringByDeletingPathExtension
+									  ofType:extension
+								 inDirectory:bundle.mgl_resourcesDirectory];
+	if (!path)
+	{
+		bundle = [NSBundle mainBundle];
+		path = [bundle pathForResource:imageName.stringByDeletingPathExtension
+								ofType:extension];
+	}
+	
+	if ( ! path)
+	{
+		[NSException raise:@"Resource not found" format:
+		 @"The resource named “%@” could not be found in the Mapbox framework bundle.", imageName];
+	}
+	
+	return [UIImage imageWithContentsOfFile:path];
 }
 
 - (BOOL)isFullyLoaded
