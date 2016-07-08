@@ -1,5 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -13,8 +14,7 @@ using namespace style;
 void Painter::renderRaster(PaintParameters& parameters,
                            RasterBucket& bucket,
                            const RasterLayer& layer,
-                           const UnwrappedTileID&,
-                           const mat4& matrix) {
+                           const RenderTile& tile) {
     if (pass != RenderPass::Translucent) return;
 
     const RasterPaintProperties& properties = layer.impl->paint;
@@ -24,7 +24,7 @@ void Painter::renderRaster(PaintParameters& parameters,
         auto& rasterVAO = parameters.shaders.coveringRasterArray;
 
         config.program = rasterShader.getID();
-        rasterShader.u_matrix = matrix;
+        rasterShader.u_matrix = tile.matrix;
         rasterShader.u_buffer_scale = 1.0f;
         rasterShader.u_opacity0 = properties.rasterOpacity;
         rasterShader.u_opacity1 = 0;

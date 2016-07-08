@@ -70,7 +70,7 @@ public:
     ~SymbolBucket() override;
 
     void upload(gl::ObjectStore&, gl::Config&) override;
-    void render(Painter&, PaintParameters&, const style::Layer&, const UnwrappedTileID&, const mat4&) override;
+    void render(Painter&, PaintParameters&, const style::Layer&, const RenderTile&) override;
     bool hasData() const override;
     bool hasTextData() const;
     bool hasIconData() const;

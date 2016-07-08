@@ -1,6 +1,7 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/fill_bucket.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
@@ -14,11 +15,10 @@ using namespace style;
 void Painter::renderFill(PaintParameters& parameters,
                          FillBucket& bucket,
                          const FillLayer& layer,
-                         const UnwrappedTileID& tileID,
-                         const mat4& matrix) {
+                         const RenderTile& tile) {
     const FillPaintProperties& properties = layer.impl->paint;
     mat4 vertexMatrix =
-        translatedMatrix(matrix, properties.fillTranslate, tileID, properties.fillTranslateAnchor);
+        translatedMatrix(tile.matrix, properties.fillTranslate, tile.id, properties.fillTranslateAnchor);
 
     Color fillColor = properties.fillColor;
     float opacity = properties.fillOpacity;
@@ -93,11 +93,11 @@ void Painter::renderFill(PaintParameters& parameters,
             patternShader.u_pattern_size_b = imagePosB->size;
             patternShader.u_scale_a = properties.fillPattern.value.fromScale;
             patternShader.u_scale_b = properties.fillPattern.value.toScale;
-            patternShader.u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+            patternShader.u_tile_units_to_pixels = 1.0f / tile.id.pixelsToTileUnits(1.0f, state.getIntegerZoom());
 
-            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tileID.canonical.z);
-            GLint pixelX = tileSizeAtNearestZoom * (tileID.canonical.x + tileID.wrap * state.zoomScale(tileID.canonical.z));
-            GLint pixelY = tileSizeAtNearestZoom * tileID.canonical.y;
+            GLint tileSizeAtNearestZoom = util::tileSize * state.zoomScale(state.getIntegerZoom() - tile.id.canonical.z);
+            GLint pixelX = tileSizeAtNearestZoom * (tile.id.canonical.x + tile.id.wrap * state.zoomScale(tile.id.canonical.z));
+            GLint pixelY = tileSizeAtNearestZoom * tile.id.canonical.y;
             patternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
             patternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 
@@ -122,7 +122,7 @@ void Painter::renderFill(PaintParameters& parameters,
                 outlinePatternShader.u_pattern_size_b = imagePosB->size;
                 outlinePatternShader.u_scale_a = properties.fillPattern.value.fromScale;
                 outlinePatternShader.u_scale_b = properties.fillPattern.value.toScale;
-                outlinePatternShader.u_tile_units_to_pixels = 1.0f / tileID.pixelsToTileUnits(1.0f, state.getIntegerZoom());
+                outlinePatternShader.u_tile_units_to_pixels = 1.0f / tile.id.pixelsToTileUnits(1.0f, state.getIntegerZoom());
                 outlinePatternShader.u_pixel_coord_upper = {{ float(pixelX >> 16), float(pixelY >> 16) }};
                 outlinePatternShader.u_pixel_coord_lower = {{ float(pixelX & 0xFFFF), float(pixelY & 0xFFFF) }};
 

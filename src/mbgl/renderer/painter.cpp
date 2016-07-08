@@ -265,7 +265,7 @@ void Painter::renderPass(PaintParameters& parameters,
             if (item.bucket->needsClipping()) {
                 setClipping(item.tile->clip);
             }
-            item.bucket->render(*this, parameters, layer, item.tile->id, item.tile->matrix);
+            item.bucket->render(*this, parameters, layer, *item.tile);
         }
     }
 

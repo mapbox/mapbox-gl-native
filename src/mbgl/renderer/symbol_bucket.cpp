@@ -89,9 +89,8 @@ void SymbolBucket::upload(gl::ObjectStore& store, gl::Config&) {
 void SymbolBucket::render(Painter& painter,
                           PaintParameters& parameters,
                           const Layer& layer,
-                          const UnwrappedTileID& tileID,
-                          const mat4& matrix) {
-    painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tileID, matrix);
+                          const RenderTile& tile) {
+    painter.renderSymbol(parameters, *this, *layer.as<SymbolLayer>(), tile);
 }
 
 bool SymbolBucket::hasData() const { return hasTextData() || hasIconData() || !symbolInstances.empty(); }

@@ -89,11 +89,11 @@ public:
     void renderClipMasks();
 
     void renderDebugText(Tile&, const mat4&);
-    void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const UnwrappedTileID&, const mat4&);
-    void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const UnwrappedTileID&, const mat4&);
-    void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const UnwrappedTileID&, const mat4&);
-    void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const UnwrappedTileID&, const mat4&);
-    void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const UnwrappedTileID&, const mat4&);
+    void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
+    void renderLine(PaintParameters&, LineBucket&, const style::LineLayer&, const RenderTile&);
+    void renderCircle(PaintParameters&, CircleBucket&, const style::CircleLayer&, const RenderTile&);
+    void renderSymbol(PaintParameters&, SymbolBucket&, const style::SymbolLayer&, const RenderTile&);
+    void renderRaster(PaintParameters&, RasterBucket&, const style::RasterLayer&, const RenderTile&);
     void renderBackground(PaintParameters&, const style::BackgroundLayer&);
 
     float saturationFactor(float saturation);
@@ -120,9 +120,8 @@ private:
 
     void setClipping(const ClipID&);
 
-    void renderSDF(SymbolBucket &bucket,
-                   const UnwrappedTileID &tileID,
-                   const mat4 &matrixSymbol,
+    void renderSDF(SymbolBucket&,
+                   const RenderTile&,
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,

@@ -25,9 +25,8 @@ void CircleBucket::upload(gl::ObjectStore& store, gl::Config&) {
 void CircleBucket::render(Painter& painter,
                         PaintParameters& parameters, 
                         const Layer& layer,
-                        const UnwrappedTileID& tileID,
-                        const mat4& matrix) {
-    painter.renderCircle(parameters, *this, *layer.as<CircleLayer>(), tileID, matrix);
+                        const RenderTile& tile) {
+    painter.renderCircle(parameters, *this, *layer.as<CircleLayer>(), tile);
 }
 
 bool CircleBucket::hasData() const {
