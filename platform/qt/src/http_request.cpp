@@ -39,7 +39,8 @@ QNetworkRequest HTTPRequest::networkRequest() const
     req.setRawHeader("User-Agent", "MapboxGL/1.0 [Qt]");
 
     if (m_resource.priorEtag) {
-        req.setRawHeader("If-None-Match", QByteArray(m_resource.priorEtag->data(), m_resource.priorEtag->size()));
+        const auto etag = m_resource.priorEtag;
+        req.setRawHeader("If-None-Match", QByteArray(etag->data(), etag->size()));
     } else if (m_resource.priorModified) {
         req.setRawHeader("If-Modified-Since", util::rfc1123(*m_resource.priorModified).c_str());
     }
