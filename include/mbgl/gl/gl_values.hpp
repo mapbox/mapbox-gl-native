@@ -13,7 +13,7 @@ namespace gl {
 
 struct ClearDepth {
     using Type = GLfloat;
-    static const Type Default;
+    static const constexpr Type Default = 1;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glClearDepth(value));
     }
@@ -26,7 +26,7 @@ struct ClearDepth {
 
 struct ClearColor {
     using Type = Color;
-    static const Type Default;
+    static const constexpr Type Default = { 0, 0, 0, 0 };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glClearColor(value.r, value.g, value.b, value.a));
     }
@@ -39,7 +39,7 @@ struct ClearColor {
 
 struct ClearStencil {
     using Type = GLint;
-    static const Type Default;
+    static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glClearStencil(value));
     }
@@ -52,7 +52,7 @@ struct ClearStencil {
 
 struct StencilMask {
     using Type = GLuint;
-    static const Type Default;
+    static const constexpr Type Default = ~0u;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilMask(value));
     }
@@ -65,7 +65,7 @@ struct StencilMask {
 
 struct DepthMask {
     using Type = GLboolean;
-    static const Type Default;
+    static const constexpr Type Default = GL_TRUE;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glDepthMask(value));
     }
@@ -78,7 +78,7 @@ struct DepthMask {
 
 struct ColorMask {
     struct Type { bool r, g, b, a; };
-    static const Type Default;
+    static const constexpr Type Default = { GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glColorMask(value.r, value.g, value.b, value.a));
     }
@@ -96,7 +96,7 @@ constexpr bool operator!=(const ColorMask::Type& a, const ColorMask::Type& b) {
 
 struct StencilFunc {
     struct Type { GLenum func; GLint ref; GLuint mask; };
-    static const Type Default;
+    static const constexpr Type Default = { GL_ALWAYS, 0, ~0u };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilFunc(value.func, value.ref, value.mask));
     }
@@ -115,7 +115,7 @@ constexpr bool operator!=(const StencilFunc::Type& a, const StencilFunc::Type& b
 
 struct StencilTest {
     using Type = bool;
-    static const Type Default;
+    static const constexpr Type Default = GL_FALSE;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(value ? glEnable(GL_STENCIL_TEST) : glDisable(GL_STENCIL_TEST));
     }
@@ -128,7 +128,7 @@ struct StencilTest {
 
 struct StencilOp {
     struct Type { GLenum sfail, dpfail, dppass; };
-    static const Type Default;
+    static const constexpr Type Default = { GL_KEEP, GL_KEEP, GL_REPLACE };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glStencilOp(value.sfail, value.dpfail, value.dppass));
     }
@@ -147,7 +147,7 @@ constexpr bool operator!=(const StencilOp::Type& a, const StencilOp::Type& b) {
 
 struct DepthRange {
     struct Type { GLfloat near, far; };
-    static const Type Default;
+    static const constexpr Type Default = { 0, 1 };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glDepthRange(value.near, value.far));
     }
@@ -164,7 +164,7 @@ constexpr bool operator!=(const DepthRange::Type& a, const DepthRange::Type& b) 
 
 struct DepthTest {
     using Type = bool;
-    static const Type Default;
+    static const constexpr Type Default = GL_FALSE;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(value ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST));
     }
@@ -177,7 +177,7 @@ struct DepthTest {
 
 struct DepthFunc {
     using Type = GLenum;
-    static const Type Default;
+    static const constexpr Type Default = GL_LEQUAL;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glDepthFunc(value));
     }
@@ -190,7 +190,7 @@ struct DepthFunc {
 
 struct Blend {
     using Type = bool;
-    static const Type Default;
+    static const constexpr Type Default = GL_TRUE;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(value ? glEnable(GL_BLEND) : glDisable(GL_BLEND));
     }
@@ -203,7 +203,7 @@ struct Blend {
 
 struct BlendFunc {
     struct Type { GLenum sfactor, dfactor; };
-    static const Type Default;
+    static const constexpr Type Default = { GL_ONE, GL_ONE_MINUS_SRC_ALPHA };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBlendFunc(value.sfactor, value.dfactor));
     }
@@ -221,7 +221,7 @@ constexpr bool operator!=(const BlendFunc::Type& a, const BlendFunc::Type& b) {
 
 struct BlendColor {
     using Type = Color;
-    static const Type Default;
+    static const constexpr Type Default = { 0, 0, 0, 0 };
     inline static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBlendColor(value.r, value.g, value.b, value.a));
     }
@@ -234,7 +234,7 @@ struct BlendColor {
 
 struct Program {
     using Type = GLuint;
-    static const Type Default;
+    static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glUseProgram(value));
     }
@@ -247,7 +247,7 @@ struct Program {
 
 struct LineWidth {
     using Type = GLfloat;
-    static const Type Default;
+    static const constexpr Type Default = 1;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glLineWidth(value));
     }
@@ -260,7 +260,7 @@ struct LineWidth {
 
 struct ActiveTexture {
     using Type = uint8_t;
-    static const Type Default;
+    static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0 + value));
     }
@@ -275,7 +275,7 @@ struct ActiveTexture {
 
 struct PixelZoom {
     struct Type { GLfloat xfactor; GLfloat yfactor; };
-    static const Type Default;
+    static const constexpr Type Default = { 1, 1 };
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glPixelZoom(value.xfactor, value.yfactor));
     }
@@ -293,7 +293,7 @@ constexpr bool operator!=(const PixelZoom::Type& a, const PixelZoom::Type& b) {
 
 struct RasterPos {
     using Type = std::array<GLdouble, 4>;
-    static const Type Default;
+    static const constexpr Type Default = {{ 0, 0, 0, 0 }};
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glRasterPos4d(value[0], value[1], value[2], value[3]));
     }
@@ -308,7 +308,7 @@ struct RasterPos {
 
 struct BindTexture {
     using Type = GLuint;
-    static const Type Default;
+    static const constexpr Type Default = 0;
     static void Set(const Type& value) {
         MBGL_CHECK_ERROR(glBindTexture(GL_TEXTURE_2D, value));
     }
