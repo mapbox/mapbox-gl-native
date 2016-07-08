@@ -1,6 +1,7 @@
 #include "qmapboxgl_p.hpp"
 
 #include "qt_conversion.hpp"
+#include "qt_geojson.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -8,6 +9,7 @@
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/layer.hpp>
+#include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
@@ -617,6 +619,25 @@ QMargins QMapboxGL::margins() const
         d_ptr->margins.right,
         d_ptr->margins.bottom
     );
+}
+
+void QMapboxGL::addSource(const QString& sourceID, const QVariant& value)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(value, sourceID.toStdString());
+    if (!source) {
+        qWarning() << "Unable to add source:" << source.error().message;
+        return;
+    }
+
+    d_ptr->mapObj->addSource(std::move(*source));
+}
+
+void QMapboxGL::removeSource(const QString& sourceID)
+{
+    d_ptr->mapObj->removeSource(sourceID.toStdString());
 }
 
 void QMapboxGL::addCustomLayer(const QString &id,
