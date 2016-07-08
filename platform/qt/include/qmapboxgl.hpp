@@ -207,6 +207,8 @@ public:
         char* before = NULL);
     void removeCustomLayer(const QString& id);
 
+    void setFilter(const QString &layer, const QVariant &filter);
+
 public slots:
     void render();
     void connectionEstablished();

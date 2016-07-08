@@ -642,6 +642,46 @@ void QMapboxGL::removeCustomLayer(const QString& id)
     d_ptr->mapObj->removeLayer(id.toStdString());
 }
 
+void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
+{
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    Layer* layer = d_ptr->mapObj->getLayer(layer_.toStdString());
+    if (!layer) {
+        qWarning() << "Layer not found:" << layer_;
+        return;
+    }
+
+    Filter filter;
+
+    Result<Filter> converted = convert<Filter>(filter_);
+    if (!converted) {
+        qWarning() << "Error parsing filter:" << converted.error().message;
+        return;
+    }
+    filter = std::move(*converted);
+
+    if (layer->is<FillLayer>()) {
+        layer->as<FillLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<LineLayer>()) {
+        layer->as<LineLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<SymbolLayer>()) {
+        layer->as<SymbolLayer>()->setFilter(filter);
+        return;
+    }
+    if (layer->is<CircleLayer>()) {
+        layer->as<CircleLayer>()->setFilter(filter);
+        return;
+    }
+
+    qWarning() << "Layer doesn't support filters";
+}
+
 void QMapboxGL::render()
 {
     d_ptr->dirty = false;
