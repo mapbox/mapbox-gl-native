@@ -167,6 +167,9 @@ idocument:
 ANDROID_ENV = platform/android/scripts/toolchain.sh
 ANDROID_ABIS = arm-v5 arm-v7 arm-v8 x86 x86-64 mips
 
+style-code-android:
+	node platform/android/scripts/generate-style-code.js
+
 define ANDROID_RULES
 build/android-$1/config.gypi: platform/android/scripts/configure.sh $(CONFIG_DEPENDENCIES)
 	$$(shell $(ANDROID_ENV) $1) ./configure $$< $$@ android $1
@@ -178,7 +181,7 @@ build/android-$1/Makefile: platform/android/platform.gyp build/android-$1/config
 android-lib-$1: build/android-$1/Makefile
 	$$(shell $(ANDROID_ENV) $1) $(MAKE) -j$(JOBS) -C build/android-$1 all
 
-android-$1: android-lib-$1
+android-$1: android-lib-$1 style-code-android
 	cd platform/android && ./gradlew --parallel --max-workers=$(JOBS) assemble$(BUILDTYPE)
 
 apackage: android-lib-$1

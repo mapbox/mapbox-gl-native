@@ -9,11 +9,15 @@
 #include <sys/system_properties.h>
 
 #include "jni.hpp"
+#include "java_types.hpp"
 #include "native_map_view.hpp"
+#include "style/layers/layers.hpp"
+#include "style/sources/sources.hpp"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/annotation/annotation.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/sprite/sprite_image.hpp>
 #include <mbgl/platform/event.hpp>
@@ -1085,6 +1089,81 @@ void nativeRemoveCustomLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
 }
 
+jni::jobject* nativeGetLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* layerId) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetLayer");
+
+    assert(env);
+    assert(nativeMapViewPtr != 0);
+
+    //Get the native map peer
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+
+    //Find the layer
+    mbgl::style::Layer* coreLayer = nativeMapView->getMap().getLayer(std_string_from_jstring(env, layerId));
+    if (!coreLayer) {
+       mbgl::Log::Debug(mbgl::Event::JNI, "No layer found");
+       return jni::Object<Layer>();
+    }
+
+    //Create and return the layer's native peer
+    return createJavaLayerPeer(*env, nativeMapView->getMap(), *coreLayer);
+}
+
+void nativeAddLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jlong nativeLayerPtr, jni::jstring* before) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddLayer");
+    assert(nativeMapViewPtr != 0);
+    assert(nativeLayerPtr != 0);
+
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    Layer *layer = reinterpret_cast<Layer *>(nativeLayerPtr);
+
+    nativeMapView->getMap().addLayer(
+        layer->releaseCoreLayer(),
+        before ? mbgl::optional<std::string>(std_string_from_jstring(env, before)) : mbgl::optional<std::string>()
+    );
+}
+
+void nativeRemoveLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveLayer");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    try {
+        nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchLayerException"), error.what());
+    }
+}
+
+void nativeAddSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id, jni::jobject* jsource) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeAddSource");
+    assert(nativeMapViewPtr != 0);
+    assert(id != nullptr);
+    assert(jsource != nullptr);
+
+    //Convert
+    mbgl::optional<std::unique_ptr<mbgl::style::Source>> source = convertToNativeSource(
+        *env,
+        jni::Object<jni::jobject>(jsource), jni::String(id)
+    );
+
+    //Add to map view
+    if (source) {
+        NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+        nativeMapView->getMap().addSource(std::move(*source));
+    }
+}
+
+void nativeRemoveSource(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jni::jstring* id) {
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeRemoveSource");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    try {
+        nativeMapView->getMap().removeSource(std_string_from_jstring(env, id));
+    } catch (const std::runtime_error& error) {
+        jni::ThrowNew(*env, jni::FindClass(*env, "com/mapbox/mapboxsdk/style/layers/NoSuchSourceException"), error.what());
+    }
+}
+
 // Offline calls begin
 
 jlong createDefaultFileSource(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* assetRoot_, jlong maximumCacheSize) {
@@ -1545,6 +1624,9 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     mbgl::android::RegisterNativeHTTPRequest(env);
 
+    java::registerNatives(env);
+    registerNativeLayers(env);
+
     latLngClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/geometry/LatLng");
     latLngClass = jni::NewGlobalRef(env, latLngClass).release();
     latLngConstructorId = &jni::GetMethodID(env, *latLngClass, "<init>", "(DD)V");
@@ -1699,6 +1781,11 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeFlyTo, "(JDDDJDD)V"),
         MAKE_NATIVE_METHOD(nativeAddCustomLayer, "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveCustomLayer, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeGetLayer, "(JLjava/lang/String;)Lcom/mapbox/mapboxsdk/style/layers/Layer;"),
+        MAKE_NATIVE_METHOD(nativeAddLayer, "(JJLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveLayer, "(JLjava/lang/String;)V"),
+        MAKE_NATIVE_METHOD(nativeAddSource, "(JLjava/lang/String;Lcom/mapbox/mapboxsdk/style/sources/Source;)V"),
+        MAKE_NATIVE_METHOD(nativeRemoveSource, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V")
     );
 
