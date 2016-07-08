@@ -1,6 +1,6 @@
 #include <mbgl/renderer/painter.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/clip_id.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
@@ -12,7 +12,7 @@ void Painter::drawClippingMasks(const std::map<UnwrappedTileID, ClipID>& stencil
     MBGL_DEBUG_GROUP("clipping masks");
 
     const bool overdraw = isOverdraw();
-    auto& plainShader = overdraw ? *overdrawShader.plain : *shader.plain;
+    auto& plainShader = overdraw ? overdrawShaders->plain : shaders->plain;
     auto& arrayCoveringPlain = overdraw ? coveringPlainOverdrawArray : coveringPlainArray;
 
     mat4 matrix;

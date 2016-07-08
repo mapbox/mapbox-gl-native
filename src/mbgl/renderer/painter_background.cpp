@@ -2,8 +2,7 @@
 
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/tile_cover.hpp>
@@ -22,8 +21,8 @@ void Painter::renderBackground(const BackgroundLayer& layer) {
     optional<SpriteAtlasPosition> imagePosB;
 
     const bool overdraw = isOverdraw();
-    auto& patternShader = overdraw ? *overdrawShader.pattern : *shader.pattern;
-    auto& plainShader = overdraw ? *overdrawShader.plain : *shader.plain;
+    auto& patternShader = overdraw ? overdrawShaders->pattern : shaders->pattern;
+    auto& plainShader = overdraw ? overdrawShaders->plain : shaders->plain;
     auto& arrayBackgroundPattern = overdraw ? backgroundPatternOverdrawArray : backgroundPatternArray;
     auto& arrayBackground = overdraw ? backgroundOverdrawArray : backgroundArray;
 

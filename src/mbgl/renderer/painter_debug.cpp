@@ -2,7 +2,7 @@
 #include <mbgl/renderer/debug_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/tile.hpp>
-#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/gl/debugging.hpp>
 #include <mbgl/gl/gl.hpp>
@@ -40,7 +40,7 @@ void Painter::renderDebugText(Tile& tile, const mat4 &matrix) {
             tile.expires, frame.debugOptions);
     }
 
-    auto& plainShader = *shader.plain;
+    auto& plainShader = shaders->plain;
     config.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;
@@ -75,7 +75,7 @@ void Painter::renderDebugFrame(const mat4 &matrix) {
     config.stencilOp.reset();
     config.stencilTest = GL_TRUE;
 
-    auto& plainShader = *shader.plain;
+    auto& plainShader = shaders->plain;
     config.program = plainShader.getID();
     plainShader.u_matrix = matrix;
     plainShader.u_opacity = 1.0f;

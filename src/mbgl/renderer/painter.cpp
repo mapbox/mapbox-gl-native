@@ -18,18 +18,7 @@
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/plain_shader.hpp>
-#include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/shader/outlinepattern_shader.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/raster_shader.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/collision_box_shader.hpp>
-#include <mbgl/shader/circle_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -55,32 +44,8 @@ Painter::Painter(const TransformState& state_,
     : state(state_), store(store_) {
     gl::debugging::enable();
 
-    shader.plain = std::make_unique<PlainShader>(store);
-    shader.outline = std::make_unique<OutlineShader>(store);
-    shader.outlinePattern = std::make_unique<OutlinePatternShader>(store);
-    shader.line = std::make_unique<LineShader>(store);
-    shader.linesdf = std::make_unique<LineSDFShader>(store);
-    shader.linepattern = std::make_unique<LinepatternShader>(store);
-    shader.pattern = std::make_unique<PatternShader>(store);
-    shader.icon = std::make_unique<IconShader>(store);
-    shader.raster = std::make_unique<RasterShader>(store);
-    shader.sdfGlyph = std::make_unique<SDFShader>(store);
-    shader.sdfIcon = std::make_unique<SDFShader>(store);
-    shader.collisionBox = std::make_unique<CollisionBoxShader>(store);
-    shader.circle = std::make_unique<CircleShader>(store);
-
-    overdrawShader.plain = std::make_unique<PlainShader>(store, Shader::Overdraw);
-    overdrawShader.outline = std::make_unique<OutlineShader>(store, Shader::Overdraw);
-    overdrawShader.outlinePattern = std::make_unique<OutlinePatternShader>(store, Shader::Overdraw);
-    overdrawShader.line = std::make_unique<LineShader>(store, Shader::Overdraw);
-    overdrawShader.linesdf = std::make_unique<LineSDFShader>(store, Shader::Overdraw);
-    overdrawShader.linepattern = std::make_unique<LinepatternShader>(store, Shader::Overdraw);
-    overdrawShader.pattern = std::make_unique<PatternShader>(store, Shader::Overdraw);
-    overdrawShader.icon = std::make_unique<IconShader>(store, Shader::Overdraw);
-    overdrawShader.raster = std::make_unique<RasterShader>(store, Shader::Overdraw);
-    overdrawShader.sdfGlyph = std::make_unique<SDFShader>(store, Shader::Overdraw);
-    overdrawShader.sdfIcon = std::make_unique<SDFShader>(store, Shader::Overdraw);
-    overdrawShader.circle = std::make_unique<CircleShader>(store, Shader::Overdraw);
+    shaders = std::make_unique<Shaders>(store);
+    overdrawShaders = std::make_unique<Shaders>(store, Shader::Overdraw);
 
     // Reset GL values
     config.setDirty();

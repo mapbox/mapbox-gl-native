@@ -4,9 +4,7 @@
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
 #include <mbgl/geometry/glyph_atlas.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/shader/sdf_shader.hpp>
-#include <mbgl/shader/icon_shader.hpp>
-#include <mbgl/shader/collision_box_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/math.hpp>
 
 #include <cmath>
@@ -171,7 +169,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                       matrix,
                       1.0f,
                       {{ float(activeSpriteAtlas->getWidth()) / 4.0f, float(activeSpriteAtlas->getHeight()) / 4.0f }},
-                      isOverdraw() ? *overdrawShader.sdfIcon : *shader.sdfIcon,
+                      isOverdraw() ? overdrawShaders->sdfIcon : shaders->sdfIcon,
                       &SymbolBucket::drawIcons,
                       layout.iconRotationAlignment,
                       // icon-pitch-alignment is not yet implemented
@@ -203,7 +201,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
             }
 
             const bool overdraw = isOverdraw();
-            auto& iconShader = overdraw ? *overdrawShader.icon : *shader.icon;
+            auto& iconShader = overdraw ? overdrawShaders->icon : shaders->icon;
 
             config.program = iconShader.getID();
             iconShader.u_matrix = vtxMatrix;
@@ -240,7 +238,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
                   matrix,
                   24.0f,
                   {{ float(glyphAtlas->width) / 4, float(glyphAtlas->height) / 4 }},
-                  isOverdraw() ? *overdrawShader.sdfGlyph : *shader.sdfGlyph,
+                  isOverdraw() ? overdrawShaders->sdfGlyph : shaders->sdfGlyph,
                   &SymbolBucket::drawGlyphs,
                   layout.textRotationAlignment,
                   layout.textPitchAlignment,
@@ -259,7 +257,7 @@ void Painter::renderSymbol(SymbolBucket& bucket,
         config.stencilOp.reset();
         config.stencilTest = GL_TRUE;
 
-        auto& collisionBoxShader = *shader.collisionBox;
+        auto& collisionBoxShader = shaders->collisionBox;
         config.program = collisionBoxShader.getID();
         collisionBoxShader.u_matrix = matrix;
         // TODO: This was the overscaled z instead of the canonical z.

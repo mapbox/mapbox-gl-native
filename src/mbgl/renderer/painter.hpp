@@ -41,19 +41,8 @@ class CircleBucket;
 class SymbolBucket;
 class RasterBucket;
 
+class Shaders;
 class SDFShader;
-class PlainShader;
-class OutlineShader;
-class OutlinePatternShader;
-class LineShader;
-class LinejoinShader;
-class LineSDFShader;
-class LinepatternShader;
-class CircleShader;
-class PatternShader;
-class IconShader;
-class RasterShader;
-class CollisionBoxShader;
 
 struct ClipID;
 
@@ -197,36 +186,8 @@ private:
 
     FrameHistory frameHistory;
 
-    struct {
-        std::unique_ptr<PlainShader> plain;
-        std::unique_ptr<OutlineShader> outline;
-        std::unique_ptr<OutlinePatternShader> outlinePattern;
-        std::unique_ptr<LineShader> line;
-        std::unique_ptr<LineSDFShader> linesdf;
-        std::unique_ptr<LinepatternShader> linepattern;
-        std::unique_ptr<PatternShader> pattern;
-        std::unique_ptr<IconShader> icon;
-        std::unique_ptr<RasterShader> raster;
-        std::unique_ptr<SDFShader> sdfGlyph;
-        std::unique_ptr<SDFShader> sdfIcon;
-        std::unique_ptr<CollisionBoxShader> collisionBox;
-        std::unique_ptr<CircleShader> circle;
-    } shader;
-
-    struct {
-        std::unique_ptr<PlainShader> plain;
-        std::unique_ptr<OutlineShader> outline;
-        std::unique_ptr<OutlinePatternShader> outlinePattern;
-        std::unique_ptr<LineShader> line;
-        std::unique_ptr<LineSDFShader> linesdf;
-        std::unique_ptr<LinepatternShader> linepattern;
-        std::unique_ptr<PatternShader> pattern;
-        std::unique_ptr<IconShader> icon;
-        std::unique_ptr<RasterShader> raster;
-        std::unique_ptr<SDFShader> sdfGlyph;
-        std::unique_ptr<SDFShader> sdfIcon;
-        std::unique_ptr<CircleShader> circle;
-    } overdrawShader;
+    std::unique_ptr<Shaders> shaders;
+    std::unique_ptr<Shaders> overdrawShaders;
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer {

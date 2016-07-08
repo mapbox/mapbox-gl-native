@@ -3,7 +3,7 @@
 #include <mbgl/renderer/raster_bucket.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/raster_layer_impl.hpp>
-#include <mbgl/shader/raster_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 
 namespace mbgl {
 
@@ -19,7 +19,7 @@ void Painter::renderRaster(RasterBucket& bucket,
 
     if (bucket.hasData()) {
         const bool overdraw = isOverdraw();
-        auto& rasterShader = overdraw ? *overdrawShader.raster : *shader.raster;
+        auto& rasterShader = overdraw ? overdrawShaders->raster : shaders->raster;
         auto& rasterVAO = overdraw ? coveringRasterOverdrawArray : coveringRasterArray;
 
         config.program = rasterShader.getID();

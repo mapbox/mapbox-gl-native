@@ -2,9 +2,7 @@
 #include <mbgl/renderer/line_bucket.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/shader/line_shader.hpp>
-#include <mbgl/shader/linesdf_shader.hpp>
-#include <mbgl/shader/linepattern_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/geometry/line_atlas.hpp>
 #include <mbgl/util/mat2.hpp>
@@ -56,9 +54,9 @@ void Painter::renderLine(LineBucket& bucket,
     setDepthSublayer(0);
 
     const bool overdraw = isOverdraw();
-    auto& linesdfShader = overdraw ? *overdrawShader.linesdf : *shader.linesdf;
-    auto& linepatternShader = overdraw ? *overdrawShader.linepattern : *shader.linepattern;
-    auto& lineShader = overdraw ? *overdrawShader.line : *shader.line;
+    auto& linesdfShader = overdraw ? overdrawShaders->linesdf : shaders->linesdf;
+    auto& linepatternShader = overdraw ? overdrawShaders->linepattern : shaders->linepattern;
+    auto& lineShader = overdraw ? overdrawShaders->line : shaders->line;
 
     if (!properties.lineDasharray.value.from.empty()) {
         config.program = linesdfShader.getID();

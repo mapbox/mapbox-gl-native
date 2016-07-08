@@ -3,10 +3,7 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_layer_impl.hpp>
 #include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/shader/outline_shader.hpp>
-#include <mbgl/shader/outlinepattern_shader.hpp>
-#include <mbgl/shader/pattern_shader.hpp>
-#include <mbgl/shader/plain_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 #include <mbgl/util/convert.hpp>
 
 namespace mbgl {
@@ -44,10 +41,10 @@ void Painter::renderFill(FillBucket& bucket,
     config.lineWidth = 2.0f; // This is always fixed and does not depend on the pixelRatio!
 
     const bool overdraw = isOverdraw();
-    auto& outlineShader = overdraw ? *overdrawShader.outline : *shader.outline;
-    auto& patternShader = overdraw ? *overdrawShader.pattern : *shader.pattern;
-    auto& outlinePatternShader = overdraw ? *overdrawShader.outlinePattern : *shader.outlinePattern;
-    auto& plainShader = overdraw ? *overdrawShader.plain : *shader.plain;
+    auto& outlineShader = overdraw ? overdrawShaders->outline : shaders->outline;
+    auto& patternShader = overdraw ? overdrawShaders->pattern : shaders->pattern;
+    auto& outlinePatternShader = overdraw ? overdrawShaders->outlinePattern : shaders->outlinePattern;
+    auto& plainShader = overdraw ? overdrawShaders->plain : shaders->plain;
 
     // Because we're drawing top-to-bottom, and we update the stencil mask
     // befrom, we have to draw the outline first (!)

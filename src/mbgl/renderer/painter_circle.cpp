@@ -4,7 +4,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 
-#include <mbgl/shader/circle_shader.hpp>
+#include <mbgl/shader/shaders.hpp>
 
 namespace mbgl {
 
@@ -27,7 +27,7 @@ void Painter::renderCircle(CircleBucket& bucket,
     mat4 vtxMatrix = translatedMatrix(matrix, properties.circleTranslate, tileID,
                                       properties.circleTranslateAnchor);
 
-    auto& circleShader = isOverdraw() ? *overdrawShader.circle : *shader.circle;
+    auto& circleShader = isOverdraw() ? overdrawShaders->circle : shaders->circle;
 
     config.program = circleShader.getID();
 
