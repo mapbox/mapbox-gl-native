@@ -2,10 +2,16 @@
 
 #import "MGLUserLocation.h"
 #import "MGLUserLocation_Private.h"
+#import "MGLAnnotationView_Private.h"
 #import "MGLAnnotation.h"
 #import "MGLMapView.h"
 #import "MGLCoordinateFormatter.h"
 #import "NSBundle+MGLAdditions.h"
+
+@interface MGLUserLocationAnnotationView()
+@property (nonatomic, weak, nullable) MGLMapView *mapView;
+@property (nonatomic, weak, nullable) MGLUserLocation *userLocation;
+@end
 
 @implementation MGLUserLocationAnnotationView {
     MGLCoordinateFormatter *_accessibilityCoordinateFormatter;
@@ -13,33 +19,20 @@
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
-    NSAssert(NO, @"No containing map view specified. Call -initInMapView: instead.");
-    return self = [self init];
-}
-
-- (instancetype)initInMapView:(MGLMapView *)mapView userLocation:(MGLUserLocation *)userLocation
-{
-    self = [super initWithFrame:CGRectZero];
+    self = [super initWithFrame:frame];
     if (self == nil) return nil;
-    _mapView = mapView;
-    _userLocation = userLocation;
+    
     self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable | UIAccessibilityTraitUpdatesFrequently;
     
     _accessibilityCoordinateFormatter = [[MGLCoordinateFormatter alloc] init];
     _accessibilityCoordinateFormatter.unitStyle = NSFormattingUnitStyleLong;
+    
     return self;
-}
-
-- (instancetype)initWithCoder:(NSCoder *)decoder
-{
-    MGLMapView *mapView = [decoder valueForKey:@"mapView"];
-    MGLUserLocation *userLocation = [decoder valueForKey:@"userLocation"];
-    return [self initInMapView:mapView userLocation:userLocation];
 }
 
 - (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
 {
-    // Left blank intentionally. Subclasses may override this in order to customize UI based new new bearing, speed etc.
+    // Left blank intentionally. Subclasses may override this in order to customize UI based on course, speed etc.
 }
 
 - (BOOL)isAccessibilityElement

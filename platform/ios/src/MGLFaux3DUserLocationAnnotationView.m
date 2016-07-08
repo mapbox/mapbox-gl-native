@@ -36,21 +36,12 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     double _oldPitch;
 }
 
-- (instancetype)initInMapView:(MGLMapView *)mapView userLocation:(MGLUserLocation *)userLocation
-{
-    self = [super initInMapView:mapView userLocation:userLocation];
-    if (self == nil) return nil;
-    
-    CGFloat frameSize = (mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
-    
-    self.frame = CGRectMake(0, 0, frameSize, frameSize);
-    
-    return self;
-}
-
 - (void)didUpdateUserLocation:(MGLUserLocation *)userLocation
 {
     [self setupLayers];
+    
+    CGFloat frameSize = (self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithCourse) ? MGLUserLocationAnnotationPuckSize : MGLUserLocationAnnotationDotSize;
+    self.frame = CGRectMake(0, 0, frameSize, frameSize);
     
     self.haloLayer.hidden = ! CLLocationCoordinate2DIsValid(userLocation.coordinate) || userLocation.location.horizontalAccuracy > 10;
 }
