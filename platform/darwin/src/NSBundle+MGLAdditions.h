@@ -17,15 +17,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 #undef NSLocalizedString
 #define NSLocalizedString(key, comment) \
-    [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:@"" table:nil]
+    [[NSBundle mainBundle] localizedStringForKey:(key) value:@"" table:nil]
 
 #undef NSLocalizedStringFromTable
 #define NSLocalizedStringFromTable(key, tbl, comment) \
-    [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:@"" table:(tbl)]
+    [[NSBundle mainBundle] localizedStringForKey:(key) value:@"" table:(tbl)]
 
 #undef NSLocalizedStringWithDefaultValue
 #define NSLocalizedStringWithDefaultValue(key, tbl, bundle, val, comment) \
-    [[NSBundle mgl_frameworkBundle] localizedStringForKey:(key) value:(val) table:(tbl)]
+    [[NSBundle mainBundle] localizedStringForKey:(key) value:(val) table:(tbl)]
 
 @interface NSBundle (MGLAdditions)
 
