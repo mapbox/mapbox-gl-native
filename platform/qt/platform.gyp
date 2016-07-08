@@ -74,6 +74,8 @@
       'variables': {
         'cflags': [
           '<@(boost_cflags)',
+          '<@(geojson_cflags)',
+          '<@(libjpeg-turbo_cflags)',
           '<@(nunicode_cflags)',
           '<@(opengl_cflags)',
           '<@(qt_core_cflags)',
@@ -93,6 +95,8 @@
           '<@(zlib_ldflags)',
         ],
         'libraries': [
+          '<@(geojson_static_libs)',
+          '<@(libjpeg-turbo_static_libs)',
           '<@(nunicode_static_libs)',
           '<@(sqlite_static_libs)',
           '<@(zlib_static_libs)',

@@ -28,7 +28,7 @@ inline QVariant arrayMember(const QVariant& value, std::size_t i) {
 }
 
 inline bool isObject(const QVariant& value) {
-    return value.canConvert(QVariant::Map);
+    return value.canConvert(QVariant::Map) || value.type() == QVariant::ByteArray;
 }
 
 inline optional<QVariant> objectMember(const QVariant& value, const char* key) {
