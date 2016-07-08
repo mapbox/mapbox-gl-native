@@ -50,8 +50,9 @@ void Painter::renderLine(PaintParameters& parameters,
     float x = state.getHeight() / 2.0f * std::tan(state.getPitch());
     float extra = (topedgelength + x) / topedgelength - 1.0f;
 
-    mat4 vtxMatrix =
-        translatedMatrix(tile.matrix, properties.lineTranslate, tile.id, properties.lineTranslateAnchor);
+    mat4 vtxMatrix = tile.translatedMatrix(properties.lineTranslate,
+                                           properties.lineTranslateAnchor,
+                                           state);
 
     setDepthSublayer(0);
 

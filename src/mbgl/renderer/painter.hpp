@@ -105,11 +105,6 @@ public:
     bool needsAnimation() const;
 
 private:
-    mat4 translatedMatrix(const mat4& matrix,
-                          const std::array<float, 2>& translation,
-                          const UnwrappedTileID& id,
-                          style::TranslateAnchorType anchor);
-
     std::vector<RenderItem> determineRenderOrder(const style::Style&);
 
     template <class Iterator>

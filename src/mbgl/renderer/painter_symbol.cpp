@@ -15,7 +15,7 @@ namespace mbgl {
 
 using namespace style;
 
-void Painter::renderSDF(SymbolBucket &bucket,
+void Painter::renderSDF(SymbolBucket& bucket,
                         const RenderTile& tile,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
@@ -37,7 +37,7 @@ void Painter::renderSDF(SymbolBucket &bucket,
                         TranslateAnchorType translateAnchor,
                         float paintSize)
 {
-    mat4 vtxMatrix = translatedMatrix(tile.matrix, translate, tile.id, translateAnchor);
+    mat4 vtxMatrix = tile.translatedMatrix(translate, translateAnchor, state);
 
     // If layerStyle.size > bucket.info.fontSize then labels may collide
     float fontSize = paintSize;
@@ -185,8 +185,9 @@ void Painter::renderSymbol(PaintParameters& parameters,
                       paint.iconTranslateAnchor,
                       layer.impl->iconSize);
         } else {
-            mat4 vtxMatrix =
-                translatedMatrix(tile.matrix, paint.iconTranslate, tile.id, paint.iconTranslateAnchor);
+            mat4 vtxMatrix = tile.translatedMatrix(paint.iconTranslate,
+                                                   paint.iconTranslateAnchor,
+                                                   state);
 
             std::array<float, 2> extrudeScale;
 

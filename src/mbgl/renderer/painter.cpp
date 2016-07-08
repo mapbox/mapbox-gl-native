@@ -274,32 +274,6 @@ void Painter::renderPass(PaintParameters& parameters,
     }
 }
 
-mat4 Painter::translatedMatrix(const mat4& matrix,
-                               const std::array<float, 2>& translation,
-                               const UnwrappedTileID& id,
-                               TranslateAnchorType anchor) {
-    if (translation[0] == 0 && translation[1] == 0) {
-        return matrix;
-    } else {
-        mat4 vtxMatrix;
-        if (anchor == TranslateAnchorType::Viewport) {
-            const double sin_a = std::sin(-state.getAngle());
-            const double cos_a = std::cos(-state.getAngle());
-            matrix::translate(vtxMatrix, matrix,
-                    id.pixelsToTileUnits(translation[0] * cos_a - translation[1] * sin_a, state.getZoom()),
-                    id.pixelsToTileUnits(translation[0] * sin_a + translation[1] * cos_a, state.getZoom()),
-                    0);
-        } else {
-            matrix::translate(vtxMatrix, matrix,
-                    id.pixelsToTileUnits(translation[0], state.getZoom()),
-                    id.pixelsToTileUnits(translation[1], state.getZoom()),
-                    0);
-        }
-
-        return vtxMatrix;
-    }
-}
-
 void Painter::setDepthSublayer(int n) {
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;

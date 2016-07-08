@@ -26,14 +26,13 @@ void Painter::renderCircle(PaintParameters& parameters,
     setDepthSublayer(0);
 
     const CirclePaintProperties& properties = layer.impl->paint;
-    mat4 vtxMatrix = translatedMatrix(tile.matrix, properties.circleTranslate, tile.id,
-                                      properties.circleTranslateAnchor);
-
     auto& circleShader = parameters.shaders.circle;
 
     config.program = circleShader.getID();
 
-    circleShader.u_matrix = vtxMatrix;
+    circleShader.u_matrix = tile.translatedMatrix(properties.circleTranslate,
+                                                  properties.circleTranslateAnchor,
+                                                  state);
 
     if (properties.circlePitchScale == CirclePitchScaleType::Map) {
         circleShader.u_extrude_scale = {{

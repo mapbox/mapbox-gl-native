@@ -17,8 +17,9 @@ void Painter::renderFill(PaintParameters& parameters,
                          const FillLayer& layer,
                          const RenderTile& tile) {
     const FillPaintProperties& properties = layer.impl->paint;
-    mat4 vertexMatrix =
-        translatedMatrix(tile.matrix, properties.fillTranslate, tile.id, properties.fillTranslateAnchor);
+    mat4 vertexMatrix = tile.translatedMatrix(properties.fillTranslate,
+                                              properties.fillTranslateAnchor,
+                                              state);
 
     Color fillColor = properties.fillColor;
     float opacity = properties.fillOpacity;
