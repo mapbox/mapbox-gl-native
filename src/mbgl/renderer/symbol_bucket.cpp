@@ -19,14 +19,14 @@ SymbolBucket::SymbolBucket(const MapMode mode_,
       iconsNeedLinear(iconsNeedLinear_) {
 }
 
-void SymbolBucket::upload(gl::ObjectStore& store, gl::Config&) {
+void SymbolBucket::upload(gl::ObjectStore& store, gl::Config& config) {
     if (hasTextData()) {
-        text.vertices.upload(store);
-        text.triangles.upload(store);
+        text.vertices.upload(store, config);
+        text.triangles.upload(store, config);
     }
     if (hasIconData()) {
-        icon.vertices.upload(store);
-        icon.triangles.upload(store);
+        icon.vertices.upload(store, config);
+        icon.triangles.upload(store, config);
     }
 
     uploaded = true;
@@ -60,13 +60,16 @@ bool SymbolBucket::needsClipping() const {
     return mode == MapMode::Still;
 }
 
-void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : text.groups) {
+void SymbolBucket::drawGlyphs(SDFShader& shader,
+                              gl::ObjectStore& store,
+                              gl::Config& config,
+                              PaintMode paintMode) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : text.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, text.vertices, text.triangles, vertex_index, store);
+            shader, text.vertices, text.triangles, vertex_index, store, config);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * text.vertices.itemSize;
@@ -74,13 +77,16 @@ void SymbolBucket::drawGlyphs(SDFShader& shader, gl::ObjectStore& store, PaintMo
     }
 }
 
-void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : icon.groups) {
+void SymbolBucket::drawIcons(SDFShader& shader,
+                             gl::ObjectStore& store,
+                             gl::Config& config,
+                             PaintMode paintMode) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : icon.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 1 : 0].bind(
-            shader, icon.vertices, icon.triangles, vertex_index, store);
+            shader, icon.vertices, icon.triangles, vertex_index, store, config);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
@@ -88,13 +94,16 @@ void SymbolBucket::drawIcons(SDFShader& shader, gl::ObjectStore& store, PaintMod
     }
 }
 
-void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, PaintMode paintMode) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    GLbyte *elements_index = BUFFER_OFFSET_0;
-    for (auto &group : icon.groups) {
+void SymbolBucket::drawIcons(IconShader& shader,
+                             gl::ObjectStore& store,
+                             gl::Config& config,
+                             PaintMode paintMode) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    GLbyte* elements_index = BUFFER_OFFSET_0;
+    for (auto& group : icon.groups) {
         assert(group);
         group->array[paintMode == PaintMode::Overdraw ? 3 : 2].bind(
-            shader, icon.vertices, icon.triangles, vertex_index, store);
+            shader, icon.vertices, icon.triangles, vertex_index, store, config);
         MBGL_CHECK_ERROR(glDrawElements(GL_TRIANGLES, group->elements_length * 3, GL_UNSIGNED_SHORT,
                                         elements_index));
         vertex_index += group->vertex_length * icon.vertices.itemSize;
@@ -102,10 +111,12 @@ void SymbolBucket::drawIcons(IconShader& shader, gl::ObjectStore& store, PaintMo
     }
 }
 
-void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader, gl::ObjectStore& store) {
-    GLbyte *vertex_index = BUFFER_OFFSET_0;
-    for (auto &group : collisionBox.groups) {
-        group->array[0].bind(shader, collisionBox.vertices, vertex_index, store);
+void SymbolBucket::drawCollisionBoxes(CollisionBoxShader& shader,
+                                      gl::ObjectStore& store,
+                                      gl::Config& config) {
+    GLbyte* vertex_index = BUFFER_OFFSET_0;
+    for (auto& group : collisionBox.groups) {
+        group->array[0].bind(shader, collisionBox.vertices, vertex_index, store, config);
         MBGL_CHECK_ERROR(glDrawArrays(GL_LINES, 0, group->vertex_length));
     }
 }

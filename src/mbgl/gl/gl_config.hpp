@@ -70,6 +70,9 @@ public:
         pixelZoom.reset();
         rasterPos.reset();
 #endif // GL_ES_VERSION_2_0
+        vertexBuffer.reset();
+        elementBuffer.reset();
+        vertexArrayObject.reset();
     }
 
     void setDirty() {
@@ -95,6 +98,9 @@ public:
         pixelZoom.setDirty();
         rasterPos.setDirty();
 #endif // GL_ES_VERSION_2_0
+        vertexBuffer.setDirty();
+        elementBuffer.setDirty();
+        vertexArrayObject.setDirty();
     }
 
     Value<StencilFunc> stencilFunc;
@@ -120,6 +126,9 @@ public:
     Value<RasterPos> rasterPos;
 #endif // GL_ES_VERSION_2_0
     std::array<Value<BindTexture>, 2> texture;
+    Value<BindBuffer<GL_ARRAY_BUFFER>> vertexBuffer;
+    Value<BindBuffer<GL_ELEMENT_ARRAY_BUFFER>> elementBuffer;
+    Value<BindVAO> vertexArrayObject;
 };
 
 } // namespace gl

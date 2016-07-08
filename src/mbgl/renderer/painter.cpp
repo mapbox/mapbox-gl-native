@@ -100,9 +100,9 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     {
         MBGL_DEBUG_GROUP("upload");
 
-        tileStencilBuffer.upload(store);
-        rasterBoundsBuffer.upload(store);
-        tileBorderBuffer.upload(store);
+        tileStencilBuffer.upload(store, config);
+        rasterBoundsBuffer.upload(store, config);
+        tileBorderBuffer.upload(store, config);
         spriteAtlas->upload(store, config, 0);
         lineAtlas->upload(store, config, 0);
         glyphAtlas->upload(store, config, 0);
@@ -215,7 +215,7 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         config.activeTexture = 0;
         config.texture[0] = 0;
 
-        MBGL_CHECK_ERROR(VertexArrayObject::Unbind());
+        config.vertexArrayObject = 0;
     }
 
     if (frame.contextMode == GLContextMode::Shared) {
@@ -263,7 +263,7 @@ void Painter::renderPass(PaintParameters& parameters,
             renderBackground(parameters, *layer.as<BackgroundLayer>());
         } else if (layer.is<CustomLayer>()) {
             MBGL_DEBUG_GROUP(layer.baseImpl->id + " - custom");
-            VertexArrayObject::Unbind();
+            config.vertexArrayObject = 0;
             config.depthFunc.reset();
             config.depthTest = GL_TRUE;
             config.depthMask = GL_FALSE;

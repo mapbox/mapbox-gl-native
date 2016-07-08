@@ -25,7 +25,7 @@ public:
     bool needsClipping() const override;
     void addGeometry(const GeometryCollection&);
 
-    void drawCircles(CircleShader&, gl::ObjectStore&);
+    void drawCircles(CircleShader&, gl::ObjectStore&, gl::Config&);
 
 private:
     CircleVertexBuffer vertexBuffer_;

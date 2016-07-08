@@ -12,6 +12,7 @@ class PlainShader;
 
 namespace gl {
 class ObjectStore;
+class Config;
 } // namespace gl
 
 class DebugBucket : private util::noncopyable {
@@ -23,8 +24,8 @@ public:
                 optional<Timestamp> expires,
                 MapDebugOptions);
 
-    void drawLines(PlainShader&, gl::ObjectStore&);
-    void drawPoints(PlainShader&, gl::ObjectStore&);
+    void drawLines(PlainShader&, gl::ObjectStore&, gl::Config&);
+    void drawPoints(PlainShader&, gl::ObjectStore&, gl::Config&);
 
     const bool renderable;
     const bool complete;

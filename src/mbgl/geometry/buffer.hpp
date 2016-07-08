@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
+#include <mbgl/gl/gl_config.hpp>
 #include <mbgl/platform/log.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
@@ -15,11 +16,14 @@ namespace mbgl {
 
 template <
     GLsizei item_size,
-    GLenum bufferType = GL_ARRAY_BUFFER,
+    GLenum target = GL_ARRAY_BUFFER,
     GLsizei defaultLength = 8192,
     bool retainAfterUpload = false
 >
 class Buffer : private util::noncopyable {
+    static_assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER,
+                  "target must be one of GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER");
+
 public:
     ~Buffer() {
         cleanup();
@@ -36,17 +40,24 @@ public:
     }
 
     // Transfers this buffer to the GPU and binds the buffer to the GL context.
-    void bind(gl::ObjectStore& store) {
-        if (buffer) {
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
-        } else {
+    void bind(gl::ObjectStore& store, gl::Config& config) {
+        const bool initialized { buffer };
+        if (!initialized) {
             buffer = store.createBuffer();
-            MBGL_CHECK_ERROR(glBindBuffer(bufferType, *buffer));
+        }
+
+        if (target == GL_ARRAY_BUFFER) {
+            config.vertexBuffer = *buffer;
+        } else {
+            config.elementBuffer = *buffer;
+        }
+
+        if (!initialized) {
             if (array == nullptr) {
                 Log::Debug(Event::OpenGL, "Buffer doesn't contain elements");
                 pos = 0;
             }
-            MBGL_CHECK_ERROR(glBufferData(bufferType, pos, array, GL_STATIC_DRAW));
+            MBGL_CHECK_ERROR(glBufferData(target, pos, array, GL_STATIC_DRAW));
             if (!retainAfterUpload) {
                 cleanup();
             }
@@ -65,9 +76,9 @@ public:
     }
 
     // Uploads the buffer to the GPU to be available when we need it.
-    void upload(gl::ObjectStore& store) {
+    void upload(gl::ObjectStore& store, gl::Config& config) {
         if (!buffer) {
-            bind(store);
+            bind(store, config);
         }
     }
 

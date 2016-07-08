@@ -32,9 +32,9 @@ public:
     void addGeometry(const GeometryCollection&);
     void addGeometry(const GeometryCoordinates& line);
 
-    void drawLines(LineShader&, gl::ObjectStore&, PaintMode);
-    void drawLineSDF(LineSDFShader&, gl::ObjectStore&, PaintMode);
-    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&, PaintMode);
+    void drawLines(LineShader&, gl::ObjectStore&, gl::Config&, PaintMode);
+    void drawLineSDF(LineSDFShader&, gl::ObjectStore&, gl::Config&, PaintMode);
+    void drawLinePatterns(LinepatternShader&, gl::ObjectStore&, gl::Config&, PaintMode);
 
 private:
     struct TriangleElement {

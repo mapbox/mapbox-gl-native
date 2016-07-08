@@ -125,7 +125,7 @@ private:
                    float scaleDivisor,
                    std::array<float, 2> texsize,
                    SDFShader& sdfShader,
-                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
+                   void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode),
 
                    // Layout
                    style::AlignmentType rotationAlignment,

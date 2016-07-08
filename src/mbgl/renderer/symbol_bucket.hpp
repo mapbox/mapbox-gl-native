@@ -33,10 +33,10 @@ public:
     bool hasCollisionBoxData() const;
     bool needsClipping() const override;
 
-    void drawGlyphs(SDFShader&, gl::ObjectStore&, PaintMode);
-    void drawIcons(SDFShader&, gl::ObjectStore&, PaintMode);
-    void drawIcons(IconShader&, gl::ObjectStore&, PaintMode);
-    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&);
+    void drawGlyphs(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode);
+    void drawIcons(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode);
+    void drawIcons(IconShader&, gl::ObjectStore&, gl::Config&, PaintMode);
+    void drawCollisionBoxes(CollisionBoxShader&, gl::ObjectStore&, gl::Config&);
 
     const MapMode mode;
     const style::SymbolLayoutProperties layout;

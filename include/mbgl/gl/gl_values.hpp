@@ -319,5 +319,37 @@ struct BindTexture {
     }
 };
 
+template <GLenum target>
+struct BindBuffer {
+    static_assert(target == GL_ARRAY_BUFFER || target == GL_ELEMENT_ARRAY_BUFFER,
+                  "target must be one of GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER");
+    using Type = GLuint;
+    static const constexpr Type Default = 0;
+    static void Set(const Type& value) {
+        MBGL_CHECK_ERROR(glBindBuffer(target, value));
+    }
+    static Type Get() {
+        GLint binding;
+        MBGL_CHECK_ERROR(glGetIntegerv(target == GL_ARRAY_BUFFER ? GL_ARRAY_BUFFER_BINDING
+                                                                 : GL_ELEMENT_ARRAY_BUFFER_BINDING,
+                                       &binding));
+        return binding;
+    }
+};
+
+template <GLenum target>
+const typename BindBuffer<target>::Type BindBuffer<target>::Default;
+
+struct BindVAO {
+    using Type = GLuint;
+    static const constexpr Type Default = 0;
+    static void Set(const Type& value) {
+        if (gl::BindVertexArray) {
+            MBGL_CHECK_ERROR(gl::BindVertexArray(value));
+        }
+    }
+};
+
+
 } // namespace gl
 } // namespace mbgl

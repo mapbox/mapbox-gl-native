@@ -20,7 +20,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
                         float sdfFontSize,
                         std::array<float, 2> texsize,
                         SDFShader& sdfShader,
-                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, PaintMode),
+                        void (SymbolBucket::*drawSDF)(SDFShader&, gl::ObjectStore&, gl::Config&, PaintMode),
 
                         // Layout
                         AlignmentType rotationAlignment,
@@ -94,7 +94,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = haloColor;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (haloOffset - haloWidth / fontScale) / sdfPx;
-        (bucket.*drawSDF)(sdfShader, store, paintMode());
+        (bucket.*drawSDF)(sdfShader, store, config, paintMode());
     }
 
     // Then, we draw the text/icon over the halo
@@ -103,7 +103,7 @@ void Painter::renderSDF(SymbolBucket& bucket,
         sdfShader.u_color = color;
         sdfShader.u_opacity = opacity;
         sdfShader.u_buffer = (256.0f - 64.0f) / 256.0f;
-        (bucket.*drawSDF)(sdfShader, store, paintMode());
+        (bucket.*drawSDF)(sdfShader, store, config, paintMode());
     }
 }
 
@@ -216,7 +216,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
             frameHistory.bind(store, config, 1);
             iconShader.u_fadetexture = 1;
 
-            bucket.drawIcons(iconShader, store, paintMode());
+            bucket.drawIcons(iconShader, store, config, paintMode());
         }
     }
 
@@ -262,8 +262,7 @@ void Painter::renderSymbol(PaintParameters& parameters,
         collisionBoxShader.u_maxzoom = (tile.id.canonical.z + 1) * 10;
         config.lineWidth = 1.0f;
 
-        bucket.drawCollisionBoxes(collisionBoxShader, store);
-
+        bucket.drawCollisionBoxes(collisionBoxShader, store, config);
     }
 }
 
