@@ -90,7 +90,7 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         if (bytes.isEmpty()) {
             response.data = std::make_shared<std::string>();
         } else {
-            response.data = std::make_shared<std::string>(bytes.data(), bytes.size());
+            response.data = std::make_shared<std::string>(bytes.constData(), bytes.size());
         }
         break;
     }
