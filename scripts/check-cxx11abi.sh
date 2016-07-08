@@ -13,7 +13,7 @@ fi
 LIBSTDCPP=$(ldd $(dirname $0)/check-cxx11abi.dat |grep libstdc++ |cut -d' ' -f3)
 
 if [ $(readelf -Ws $LIBSTDCPP |c++filt |grep -c ::__cxx11::) -gt 0 ]; then
-    echo "-cxx11abi"
-else
     echo ""
+else
+    echo "-cxx03abi"
 fi
