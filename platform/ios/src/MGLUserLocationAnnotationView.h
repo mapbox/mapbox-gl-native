@@ -12,12 +12,19 @@ NS_ASSUME_NONNULL_BEGIN
 /** View representing an `MGLUserLocation` on screen. */
 @interface MGLUserLocationAnnotationView : MGLAnnotationView
 
-@property (nonatomic, weak) MGLMapView *mapView;
-@property (nonatomic, readonly, nullable) MGLUserLocation *userLocation;
-
-- (instancetype)initInMapView:(MGLMapView *)mapView userLocation:(MGLUserLocation *)userLocation;
-
-- (void)didUpdateUserLocation:(MGLUserLocation *)userLocation;
+/**
+ Returns the associated map view.
+ 
+ The value of this property is nil during initialization.
+ */
+@property (nonatomic, readonly, weak, nullable) MGLMapView *mapView;
+ 
+/**
+ Returns the annotation object indicating the user's current location.
+ 
+ The value of this property is nil during initialization and while user tracking is inactive.
+ */
+@property (nonatomic, readonly, weak, nullable) MGLUserLocation *userLocation;
 
 @end
 

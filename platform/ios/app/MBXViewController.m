@@ -702,9 +702,10 @@ static NSString * const MBXViewControllerAnnotationViewReuseIdentifer = @"MBXVie
 {
     if (annotation == mapView.userLocation)
     {
-        MBXUserLocationAnnotationView *annotationView = [[MBXUserLocationAnnotationView alloc] initInMapView:mapView userLocation:mapView.userLocation];
-        annotationView.frame = CGRectMake(0, 0, annotationView.intrinsicContentSize.width, annotationView.intrinsicContentSize.height);
-        return annotationView;
+        //MBXUserLocationAnnotationView *annotationView = [[MBXUserLocationAnnotationView alloc] initWithFrame:CGRectZero];
+        //annotationView.frame = CGRectMake(0, 0, annotationView.intrinsicContentSize.width, annotationView.intrinsicContentSize.height);
+        //return annotationView;
+        return nil;
     }
     // Use GL backed pins for dropped pin annotations
     if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
