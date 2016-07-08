@@ -142,17 +142,8 @@ private:
     bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
 
     mat4 projMatrix;
-    mat4 nativeMatrix;
 
     std::array<float, 2> pixelsToGLUnits;
-
-    // used to composite images and flips the geometry upside down
-    const mat4 flipMatrix = []{
-        mat4 flip;
-        matrix::ortho(flip, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
-        matrix::translate(flip, flip, 0, -util::EXTENT, 0);
-        return flip;
-    }();
 
     const mat4 identityMatrix = []{
         mat4 identity;

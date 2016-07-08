@@ -89,11 +89,6 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
         pixelsToGLUnits[1] *= -1;
     }
 
-    // The native matrix is a 1:1 matrix that paints the coordinates at the
-    // same screen position as the vertex specifies.
-    matrix::identity(nativeMatrix);
-    matrix::multiply(nativeMatrix, projMatrix, nativeMatrix);
-
     frameHistory.record(frame.timePoint, state.getZoom(),
         frame.mapMode == MapMode::Continuous ? util::DEFAULT_FADE_DURATION : Milliseconds(0));
 
