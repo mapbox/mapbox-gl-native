@@ -51,6 +51,10 @@
 class MBGLView;
 class MGLAnnotationContext;
 
+const CGFloat MGLMapViewDecelerationRateNormal = UIScrollViewDecelerationRateNormal;
+const CGFloat MGLMapViewDecelerationRateFast = UIScrollViewDecelerationRateFast;
+const CGFloat MGLMapViewDecelerationRateImmediate = 0.0;
+
 /// Indicates the manner in which the map view is tracking the user location.
 typedef NS_ENUM(NSUInteger, MGLUserTrackingState) {
     /// The map view is not yet tracking the user location.
@@ -500,6 +504,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [self addGestureRecognizer:_twoFingerDrag];
     _pitchEnabled = YES;
 
+    _decelerationRate = MGLMapViewDecelerationRateNormal;
+
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
     {
         _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
@@ -579,8 +585,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
     [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
     
+    CGFloat weight = &UIFontWeightUltraLight ? UIFontWeightUltraLight : -0.8;
     NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COMPASS_NORTH", nil, nil, @"N", @"Compass abbreviation for north") attributes:@{
-        NSFontAttributeName: [UIFont systemFontOfSize:9 weight:UIFontWeightUltraLight],
+        NSFontAttributeName: [UIFont systemFontOfSize:9 weight:weight],
         NSForegroundColorAttributeName: [UIColor whiteColor],
     }];
     CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
@@ -1201,18 +1208,17 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
         CGPoint velocity = [pan velocityInView:pan.view];
-        if (sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
+        if (self.decelerationRate == MGLMapViewDecelerationRateImmediate || sqrtf(velocity.x * velocity.x + velocity.y * velocity.y) < 100)
         {
             // Not enough velocity to overcome friction
             velocity = CGPointZero;
         }
 
-        NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
         BOOL drift = ! CGPointEqualToPoint(velocity, CGPointZero);
         if (drift)
         {
-            CGPoint offset = CGPointMake(velocity.x * duration / 4, velocity.y * duration / 4);
-            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSeconds(duration));
+            CGPoint offset = CGPointMake(velocity.x * self.decelerationRate / 4, velocity.y * self.decelerationRate / 4);
+            _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationInSeconds(self.decelerationRate));
         }
 
         [self notifyGestureDidEndWithDrift:drift];
@@ -1282,7 +1288,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             velocity = 0;
         }
 
-        NSTimeInterval duration = velocity > 0 ? 1 : 0.25;
+        NSTimeInterval duration = (velocity > 0 ? 1 : 0.25) * self.decelerationRate;
 
         CGFloat scale = self.scale * pinch.scale;
         CGFloat newScale = scale;
@@ -1300,12 +1306,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             velocity = 0;
         }
 
-        if (velocity)
+        if (velocity && duration)
         {
             _mbglMap->setScale(newScale, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
         }
 
-        [self notifyGestureDidEndWithDrift:velocity];
+        [self notifyGestureDidEndWithDrift:velocity && duration];
 
         [self unrotateIfNeededForGesture];
     }
@@ -1354,21 +1360,20 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
         CGFloat velocity = rotate.velocity;
-
-        if (fabs(velocity) > 3)
+        CGFloat decelerationRate = self.decelerationRate;
+        if (decelerationRate != MGLMapViewDecelerationRateImmediate && fabs(velocity) > 3)
         {
             CGFloat radians = self.angle + rotate.rotation;
-            NSTimeInterval duration = UIScrollViewDecelerationRateNormal;
-            CGFloat newRadians = radians + velocity * duration * 0.1;
+            CGFloat newRadians = radians + velocity * decelerationRate * 0.1;
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
-            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(duration));
+            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationInSeconds(decelerationRate));
 
             [self notifyGestureDidEndWithDrift:YES];
 
             __weak MGLMapView *weakSelf = self;
 
-            [self animateWithDelay:duration animations:^
+            [self animateWithDelay:decelerationRate animations:^
              {
                  [weakSelf unrotateIfNeededForGesture];
              }];
@@ -1767,16 +1772,19 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         if (annotation == [self annotationWithTag:annotationTag])
         {
             const mbgl::Point<double> point = MGLPointFromLocationCoordinate2D(annotation.coordinate);
-            
+
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
-            NSString *symbolName;
-            if (!annotationContext.annotationView)
+            if (annotationContext.annotationView)
             {
-                MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
-                symbolName = annotationImage.styleIconIdentifier;
+                // Redundantly move the associated annotation view outside the scope of the animation-less transaction block in -updateAnnotationViews.
+                annotationContext.annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
             }
             
-            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String ?: "" });
+            MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
+            NSString *symbolName = annotationImage.styleIconIdentifier;
+
+            // Update the annotation’s backing geometry to match the annotation model object. Any associated annotation view is also moved by side effect. However, -updateAnnotationViews disables the view’s animation actions, because it can’t distinguish between moves due to the viewport changing and moves due to the annotation’s coordinate changing.
+            _mbglMap->updateAnnotation(annotationTag, mbgl::SymbolAnnotation { point, symbolName.UTF8String });
             if (annotationTag == _selectedAnnotationTag)
             {
                 [self deselectAnnotation:annotation animated:YES];
@@ -2934,6 +2942,12 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     [self updateAnnotationContainerViewWithAnnotationViews:newAnnotationViews];
     
     [self didChangeValueForKey:@"annotations"];
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:didAddAnnotationViews:)])
+    {
+        [self.delegate mapView:self didAddAnnotationViews:newAnnotationViews];
+    }
+    
     UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
@@ -2997,6 +3011,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     if (annotationView)
     {
         annotationView.annotation = annotation;
+        annotationView.mapView = self;
         CGRect bounds = UIEdgeInsetsInsetRect({ CGPointZero, annotationView.frame.size }, annotationView.alignmentRectInsets);
         
         _largestAnnotationViewSize = CGSizeMake(MAX(_largestAnnotationViewSize.width, CGRectGetWidth(bounds)),
@@ -4548,6 +4563,9 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         return;
     }
     
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    
     for (auto &pair : _annotationContextsByAnnotationTag)
     {
         CGRect viewPort = CGRectInset(self.bounds,
@@ -4568,8 +4586,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                     [self.glView addSubview:annotationView];
                 }
                 
-                CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-                [annotationView setCenter:center pitch:self.camera.pitch];
+                annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
                 annotationView.mapView = self;
                 annotationContext.annotationView = annotationView;
             }
@@ -4582,10 +4599,11 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         }
         else
         {
-            CGPoint center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
-            [annotationView setCenter:center pitch:self.camera.pitch];
+            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
         }
     }
+    
+    [CATransaction commit];
 }
 
 - (void)enqueueAnnotationViewForAnnotationContext:(MGLAnnotationContext &)annotationContext

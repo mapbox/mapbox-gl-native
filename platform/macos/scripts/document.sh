@@ -32,6 +32,8 @@ sed -n -e '/^## /{' -e ':a' -e 'n' -e '/^##/q' -e 'p' -e 'ba' -e '}' platform/ma
 rm -rf ${OUTPUT}
 mkdir -p ${OUTPUT}
 
+cp platform/macos/screenshot.png "${OUTPUT}"
+
 jazzy \
     --config platform/macos/jazzy.yml \
     --sdk macosx \
@@ -39,6 +41,7 @@ jazzy \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
     --module-version ${SHORT_VERSION} \
     --readme ${README} \
+    --theme platform/darwin/docs/theme \
     --output ${OUTPUT}
 # https://github.com/realm/jazzy/issues/411
 find ${OUTPUT} -name *.html -exec \
