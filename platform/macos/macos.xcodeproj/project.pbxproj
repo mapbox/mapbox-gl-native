@@ -20,6 +20,7 @@
 		DA35A2C21CCA9F4A00E826B2 /* MGLClockDirectionFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2C11CCA9F4A00E826B2 /* MGLClockDirectionFormatterTests.m */; };
 		DA35A2CF1CCAAED300E826B2 /* NSValue+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA35A2CD1CCAAED300E826B2 /* NSValue+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA35A2D01CCAAED300E826B2 /* NSValue+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA35A2CE1CCAAED300E826B2 /* NSValue+MGLAdditions.m */; };
+		DA5589771D320C41006B7F64 /* wms.json in Resources */ = {isa = PBXBuildFile; fileRef = DA5589761D320C41006B7F64 /* wms.json */; };
 		DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E961CC2E3400062CAFB /* AppDelegate.m */; };
 		DA839E9A1CC2E3400062CAFB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E991CC2E3400062CAFB /* main.m */; };
 		DA839E9D1CC2E3400062CAFB /* MapDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = DA839E9C1CC2E3400062CAFB /* MapDocument.m */; };
@@ -159,6 +160,7 @@
 		DA35A2C11CCA9F4A00E826B2 /* MGLClockDirectionFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLClockDirectionFormatterTests.m; path = ../../darwin/test/MGLClockDirectionFormatterTests.m; sourceTree = "<group>"; };
 		DA35A2CD1CCAAED300E826B2 /* NSValue+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLAdditions.h"; sourceTree = "<group>"; };
 		DA35A2CE1CCAAED300E826B2 /* NSValue+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+MGLAdditions.m"; sourceTree = "<group>"; };
+		DA5589761D320C41006B7F64 /* wms.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = wms.json; sourceTree = "<group>"; };
 		DA839E921CC2E3400062CAFB /* Mapbox GL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mapbox GL.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA839E951CC2E3400062CAFB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DA839E961CC2E3400062CAFB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -334,6 +336,7 @@
 				DAE6C2EC1CC3050F00DB3429 /* TimeIntervalTransformer.m */,
 				DA839EA11CC2E3400062CAFB /* Assets.xcassets */,
 				DA839EA31CC2E3400062CAFB /* MainMenu.xib */,
+				DA5589761D320C41006B7F64 /* wms.json */,
 				DAE6C2E11CC304F900DB3429 /* Credits.rtf */,
 				DA839EA61CC2E3400062CAFB /* Info.plist */,
 				DA839E981CC2E3400062CAFB /* Supporting Files */,
@@ -721,6 +724,7 @@
 				DA839EA21CC2E3400062CAFB /* Assets.xcassets in Resources */,
 				DA839EA01CC2E3400062CAFB /* MapDocument.xib in Resources */,
 				DA839EA51CC2E3400062CAFB /* MainMenu.xib in Resources */,
+				DA5589771D320C41006B7F64 /* wms.json in Resources */,
 				DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
