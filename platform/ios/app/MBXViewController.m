@@ -1720,6 +1720,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
 
+        // uncomment to flatten the annotation view against the map when the map is tilted
+        // this currently causes severe performance issues when more than 2k annotations are visible
+        // annotationView.flat = YES;
+        
         // Uncomment to force annotation view to maintain a constant size when
         // the map is tilted. By default, annotation views will shrink and grow
         // as they move towards and away from the horizon. Relatedly, annotations
