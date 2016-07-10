@@ -29,13 +29,25 @@ npm run test-suite
 ## Rendering a map tile
 
 ```js
+var fs = require('fs');
+var path = require('path');
 var mbgl = require('mapbox-gl-native');
 var sharp = require('sharp');
-var map = new mbgl.Map({ request: function() {} });
+
+var options = {
+  request: function(req, callback) {
+    fs.readFile(path.join(__dirname, 'test', req.url), function(err, data) {
+      callback(err, { data: data });
+    });
+  },
+  ratio: 1
+};
+
+var map = new mbgl.Map(options);
 
 map.load(require('./test/fixtures/style.json'));
 
-map.render({}, function(err, buffer) {
+map.render({zoom: 0}, function(err, buffer) {
     if (err) throw err;
 
     map.release();
