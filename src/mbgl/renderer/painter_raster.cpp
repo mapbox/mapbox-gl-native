@@ -26,7 +26,7 @@ void Painter::renderRaster(RasterBucket& bucket,
         rasterShader.u_matrix = matrix;
         rasterShader.u_buffer_scale = 1.0f;
         rasterShader.u_opacity0 = properties.rasterOpacity;
-        rasterShader.u_opacity1 = 1.0f - properties.rasterOpacity;
+        rasterShader.u_opacity1 = 0;
 
         rasterShader.u_brightness_low = properties.rasterBrightnessMin;
         rasterShader.u_brightness_high = properties.rasterBrightnessMax;
