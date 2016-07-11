@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
@@ -73,6 +74,10 @@ public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerV
 
     @Override
     public MarkerView getMarker() {
+        if (position == null) {
+            throw new InvalidMarkerPositionException();
+        }
+        
         marker.setPosition(position);
         marker.setSnippet(snippet);
         marker.setTitle(title);
