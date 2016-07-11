@@ -91,6 +91,9 @@ public class MyLocationView extends View {
     private Matrix matrix;
     private Camera camera;
     private PointF screenLocation;
+
+    // camera vars
+    private float bearing;
     private float tilt;
 
     @MyLocationTracking.Mode
@@ -260,7 +263,7 @@ public class MyLocationView extends View {
 
         // apply tilt to camera
         camera.save();
-        camera.rotate(tilt, 0, 0);
+        camera.rotate(tilt, 0, bearing);
 
         // map camera matrix on our matrix
         camera.getMatrix(matrix);
@@ -299,6 +302,15 @@ public class MyLocationView extends View {
 
     public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
         this.tilt = (float) tilt;
+    }
+
+    public void setBearing(double bearing) {
+        this.bearing = (float) bearing;
+    }
+
+    public void setCameraPosition(CameraPosition position) {
+        setTilt(position.tilt);
+        setBearing(position.bearing);
     }
 
     public void onPause() {
@@ -404,7 +416,7 @@ public class MyLocationView extends View {
             compassListener.onPause();
             if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
                 // always face north
-                gpsDirection = 0;
+                gpsDirection = bearing;
                 setCompass(gpsDirection);
             }
         }
@@ -546,7 +558,7 @@ public class MyLocationView extends View {
 
             SensorManager.getRotationMatrix(mR, mI, mGData, mMData);
             SensorManager.getOrientation(mR, mOrientation);
-            setCompass((int) (mOrientation[0] * 180.0f / Math.PI));
+            setCompass(mCurrentDegree = (int) (mOrientation[0] * 180.0f / Math.PI));
             mCompassUpdateNextTimestamp = currentTime + UPDATE_RATE_MS;
         }
 
@@ -662,7 +674,7 @@ public class MyLocationView extends View {
                 if (location.hasBearing()) {
                     builder.bearing(location.getBearing());
                 }
-                gpsDirection = 0;
+                gpsDirection = location.getBearing();
                 setCompass(gpsDirection);
             } else if (myBearingTrackingMode == MyBearingTracking.COMPASS) {
                 if (!compassListener.isPaused()) {
@@ -703,8 +715,8 @@ public class MyLocationView extends View {
             latLng = new LatLng(location);
 
             // update LatLng direction
-            if (location.hasBearing()) {
-                gpsDirection = clamp(location.getBearing() - (float) mapboxMap.getCameraPosition().bearing);
+            if (myBearingTrackingMode == MyBearingTracking.GPS && location.hasBearing()) {
+                gpsDirection = location.getBearing();
                 setCompass(gpsDirection);
             }
 
@@ -734,17 +746,6 @@ public class MyLocationView extends View {
 
             // use interpolated location as current location
             latLng = interpolatedLocation;
-        }
-
-        private float clamp(float direction) {
-            float diff = previousDirection - direction;
-            if (diff > 180.0f) {
-                direction += 360.0f;
-            } else if (diff < -180.0f) {
-                direction -= 360.f;
-            }
-            previousDirection = direction;
-            return direction;
         }
 
         @Override

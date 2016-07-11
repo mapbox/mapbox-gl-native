@@ -21,8 +21,8 @@ public class MapboxMapUtils {
      * @param mapView
      * @param direction
      */
-    public static void setDirection(MapView mapView, double direction) {
-        mapView.setDirection(direction);
+    public static void setDirection(MapView mapView, float direction) {
+        mapView.setBearing(direction);
     }
 
 }
