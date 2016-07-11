@@ -618,6 +618,8 @@
 				40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */,
 				DA1DC9661CB6C6B7006E619F /* MBXCustomCalloutView.h */,
 				DA1DC9671CB6C6B7006E619F /* MBXCustomCalloutView.m */,
+				354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */,
+				354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */,
 				DA1DC9681CB6C6B7006E619F /* MBXOfflinePacksTableViewController.h */,
 				DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */,
 				DA1DC9531CB6C1C2006E619F /* MBXViewController.h */,
@@ -631,8 +633,6 @@
 				DA1DC95E1CB6C1C2006E619F /* Info.plist */,
 				DA1DC99C1CB6E076006E619F /* Default-568h@2x.png */,
 				DA1DC94D1CB6C1C2006E619F /* Supporting Files */,
-				354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */,
-				354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */,
 			);
 			name = "Demo App";
 			path = app;
