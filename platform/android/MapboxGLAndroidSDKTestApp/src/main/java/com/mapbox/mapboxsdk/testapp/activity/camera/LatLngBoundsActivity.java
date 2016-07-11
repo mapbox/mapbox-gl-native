@@ -20,6 +20,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LatLngBoundsActivity extends AppCompatActivity {
 
     private static final LatLng LOS_ANGELES = new LatLng(34.053940, -118.242622);
@@ -61,10 +64,13 @@ public class LatLngBoundsActivity extends AppCompatActivity {
                         .snippet("City Hall")
                         .position(NEW_YORK));
 
+                List<LatLng> points = new ArrayList<>();
+                points.add(NEW_YORK);
+                points.add(LOS_ANGELES);
+
                 // Create Bounds
                 final LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(NEW_YORK)
-                        .include(LOS_ANGELES)
+                        .includes(points)
                         .build();
 
                 // Add map padding
