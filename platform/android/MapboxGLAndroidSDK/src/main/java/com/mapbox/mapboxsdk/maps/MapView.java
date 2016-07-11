@@ -457,7 +457,7 @@ public class MapView extends FrameLayout {
                 } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {
                     mMapboxMap.getMarkerViewManager().scheduleViewMarkerInvalidation();
 
-                    mCompassView.update(getDirection());
+                    mCompassView.update(getBearing());
                     mMyLocationView.update();
                     mMapboxMap.getMarkerViewManager().update();
 
@@ -632,45 +632,6 @@ public class MapView extends FrameLayout {
     void setTilt(Double pitch) {
         mMyLocationView.setTilt(pitch);
         mNativeMapView.setPitch(pitch, 0);
-    }
-
-
-    //
-    // Direction
-    //
-
-    double getDirection() {
-        if (mDestroyed) {
-            return 0;
-        }
-
-        double direction = -mNativeMapView.getBearing();
-
-        while (direction > 360) {
-            direction -= 360;
-        }
-        while (direction < 0) {
-            direction += 360;
-        }
-
-        return direction;
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction) {
-        if (mDestroyed) {
-            return;
-        }
-        setDirection(direction, false);
-    }
-
-    void setDirection(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION) double direction, boolean animated) {
-        if (mDestroyed) {
-            return;
-        }
-        long duration = animated ? MapboxConstants.ANIMATION_DURATION : 0;
-        mNativeMapView.cancelTransitions();
-        // Out of range directions are normalised in setBearing
-        mNativeMapView.setBearing(-direction, duration);
     }
 
     void resetNorth() {
@@ -1405,7 +1366,17 @@ public class MapView extends FrameLayout {
         if (mDestroyed) {
             return 0;
         }
-        return mNativeMapView.getBearing();
+
+        double direction = -mNativeMapView.getBearing();
+
+        while (direction > 360) {
+            direction -= 360;
+        }
+        while (direction < 0) {
+            direction += 360;
+        }
+
+        return direction;
     }
 
     void setBearing(float bearing) {
@@ -1420,6 +1391,13 @@ public class MapView extends FrameLayout {
             return;
         }
         mNativeMapView.setBearing(bearing, duration);
+    }
+
+    void setBearing(double bearing, float focalX, float focalY) {
+        if (mDestroyed) {
+            return;
+        }
+        mNativeMapView.setBearing(bearing, focalX, focalY);
     }
 
     //
@@ -1931,12 +1909,10 @@ public class MapView extends FrameLayout {
             // Rotate the map
             if (mFocalPoint != null) {
                 // User provided focal point
-                mNativeMapView.setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
+                setBearing(bearing, mFocalPoint.x / mScreenDensity, mFocalPoint.y / mScreenDensity);
             } else {
                 // around gesture
-                mNativeMapView.setBearing(bearing,
-                        detector.getFocusX() / mScreenDensity,
-                        detector.getFocusY() / mScreenDensity);
+                setBearing(bearing, detector.getFocusX() / mScreenDensity, detector.getFocusY() / mScreenDensity);
             }
             return true;
         }
