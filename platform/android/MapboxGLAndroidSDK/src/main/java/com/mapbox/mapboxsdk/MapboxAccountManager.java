@@ -2,8 +2,10 @@ package com.mapbox.mapboxsdk;
 
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidAccessTokenException;
+import com.mapbox.mapboxsdk.exceptions.MapboxAccountManagerNotStartedException;
 import com.mapbox.mapboxsdk.telemetry.MapboxEventManager;
 
 public class MapboxAccountManager {
@@ -16,8 +18,9 @@ public class MapboxAccountManager {
     /**
      * MapboxAccountManager should NOT be instantiated directly.
      * Use @see MapboxAccountManager#getInstance() instead.
+     *
      * @param applicationContext Context used to get ApplicationContext
-     * @param accessToken Mapbox Access Token
+     * @param accessToken        Mapbox Access Token
      */
     private MapboxAccountManager(Context applicationContext, String accessToken) {
         super();
@@ -29,7 +32,7 @@ public class MapboxAccountManager {
      * Primary entry point to Mapbox for implementing developers.
      * Must be configured in either Application.onCreate() or Launch Activity.onCreate()
      *
-     * @param context Context used to get Application Context
+     * @param context     Context used to get Application Context
      * @param accessToken Mapbox Access Token.  You can get one on the Mapbox Web site.
      * @return MapboxAccountManager instance for app
      */
@@ -49,11 +52,16 @@ public class MapboxAccountManager {
      * @return MapboxAccountManager instance for app.  May be NULL if not configured yet.
      */
     public static MapboxAccountManager getInstance() {
+        if (mapboxAccountManager == null) {
+            throw new MapboxAccountManagerNotStartedException();
+        }
+
         return mapboxAccountManager;
     }
 
     /**
      * Access Token for this application
+     *
      * @return Mapbox Access Token
      */
     public String getAccessToken() {
