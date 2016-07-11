@@ -1,7 +1,6 @@
 #import "MGLFaux3DUserLocationAnnotationView.h"
 
 #import "MGLMapView.h"
-#import "MGLUserLocation_Private.h"
 
 const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
