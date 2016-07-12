@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLAnnotation;
 
-/** These constants indicate the current drag state of an annotation view. **/
+/** These constants indicate the current drag state of an annotation view. */
 typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
     /**
      The view is not involved in a drag operation.
