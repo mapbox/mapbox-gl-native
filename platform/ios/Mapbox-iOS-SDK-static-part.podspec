@@ -8,11 +8,4 @@
   m.vendored_frameworks = 'Mapbox.framework'
   m.module_name = 'Mapbox'
 
-  m.frameworks = 'CoreLocation', 'GLKit', 'ImageIO', 'MobileCoreServices', 'QuartzCore', 'SystemConfiguration'
-  m.libraries = 'c++', 'sqlite3', 'z'
-  m.pod_target_xcconfig = {
-    'OTHER_CPLUSPLUSFLAGS' => '-std=gnu++11 -stdlib=libc++',
-    'OTHER_LDFLAGS' => '-ObjC',
-  }
-
 end
