@@ -3463,8 +3463,8 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
             positioningRect = annotationView.frame;
             
             [annotationView.superview bringSubviewToFront:annotationView];
-            
-            annotationView.selected = YES;
+
+            [annotationView setSelected:YES animated:animated];
         }
     }
     
