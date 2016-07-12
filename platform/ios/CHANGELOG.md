@@ -4,6 +4,8 @@ Mapbox welcomes participation and contributions from everyone.  Please read [CON
 
 ## master
 
+* Added [quadkey](https://msdn.microsoft.com/en-us/library/bb259689.aspx) support and limited WMS support in raster tile URL templates. ([#5628](https://github.com/mapbox/mapbox-gl-native/pull/5628))
+
 ## 3.3.0
 
 ### Styles and data
