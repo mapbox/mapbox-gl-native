@@ -222,6 +222,7 @@ xnode: $(NODE_OUTPUT_PATH)/config.gypi $(GYP_DEPENDENCIES)
 .PHONY: test-node
 test-node: node
 	npm test
+	npm run test-memory
 	npm run test-suite
 
 #### Qt targets #####################################################
