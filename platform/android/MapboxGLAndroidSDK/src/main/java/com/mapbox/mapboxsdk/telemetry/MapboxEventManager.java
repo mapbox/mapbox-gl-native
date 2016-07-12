@@ -90,6 +90,8 @@ public class MapboxEventManager {
 
     private static MessageDigest messageDigest = null;
 
+    private static final double locationEventAccuracy = 10000000;
+
     private Timer timer = null;
 
     /**
@@ -329,8 +331,8 @@ public class MapboxEventManager {
         event.put(MapboxEvent.ATTRIBUTE_CREATED, generateCreateDate());
         event.put(MapboxEvent.ATTRIBUTE_SOURCE, MapboxEvent.SOURCE_MAPBOX);
         event.put(MapboxEvent.ATTRIBUTE_SESSION_ID, encodeString(mapboxSessionId));
-        event.put(MapboxEvent.KEY_LATITUDE, location.getLatitude());
-        event.put(MapboxEvent.KEY_LONGITUDE, location.getLongitude());
+        event.put(MapboxEvent.KEY_LATITUDE, Math.floor(location.getLatitude() * locationEventAccuracy) / locationEventAccuracy);
+        event.put(MapboxEvent.KEY_LONGITUDE, Math.floor(location.getLongitude() * locationEventAccuracy) / locationEventAccuracy);
         event.put(MapboxEvent.KEY_ALTITUDE, location.getAltitude());
         event.put(MapboxEvent.ATTRIBUTE_OPERATING_SYSTEM, operatingSystem);
         event.put(MapboxEvent.ATTRIBUTE_APPLICATION_STATE, getApplicationState());
