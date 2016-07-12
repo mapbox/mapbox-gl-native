@@ -27,7 +27,6 @@ custom_categories:
     children:
       - MGLAnnotation
       - MGLAnnotationImage
-      - MGLAnnotationVerticalAlignment
       - MGLAnnotationView
       - MGLAnnotationViewDragState
       - MGLCalloutView
