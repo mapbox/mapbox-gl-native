@@ -19,7 +19,7 @@ public:
 
     PaintProperty<bool> fillAntialias { true };
     PaintProperty<float> fillOpacity { 1 };
-    PaintProperty<Color> fillColor { { 0, 0, 0, 1 } };
+    PaintProperty<Color> fillColor { Color::black() };
     PaintProperty<Color> fillOutlineColor { {} };
     PaintProperty<std::array<float, 2>> fillTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> fillTranslateAnchor { TranslateAnchorType::Map };

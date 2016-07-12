@@ -58,15 +58,15 @@ public:
     bool recalculate(const CalculationParameters&);
 
     PaintProperty<float> iconOpacity { 1 };
-    PaintProperty<Color> iconColor { { 0, 0, 0, 1 } };
-    PaintProperty<Color> iconHaloColor { { 0, 0, 0, 0 } };
+    PaintProperty<Color> iconColor { Color::black() };
+    PaintProperty<Color> iconHaloColor { {} };
     PaintProperty<float> iconHaloWidth { 0 };
     PaintProperty<float> iconHaloBlur { 0 };
     PaintProperty<std::array<float, 2>> iconTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> iconTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<float> textOpacity { 1 };
-    PaintProperty<Color> textColor { { 0, 0, 0, 1 } };
-    PaintProperty<Color> textHaloColor { { 0, 0, 0, 0 } };
+    PaintProperty<Color> textColor { Color::black() };
+    PaintProperty<Color> textHaloColor { {} };
     PaintProperty<float> textHaloWidth { 0 };
     PaintProperty<float> textHaloBlur { 0 };
     PaintProperty<std::array<float, 2>> textTranslate { {{ 0, 0 }} };

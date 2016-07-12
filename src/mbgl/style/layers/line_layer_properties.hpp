@@ -28,7 +28,7 @@ public:
     bool recalculate(const CalculationParameters&);
 
     PaintProperty<float> lineOpacity { 1 };
-    PaintProperty<Color> lineColor { { 0, 0, 0, 1 } };
+    PaintProperty<Color> lineColor { Color::black() };
     PaintProperty<std::array<float, 2>> lineTranslate { {{ 0, 0 }} };
     PaintProperty<TranslateAnchorType> lineTranslateAnchor { TranslateAnchorType::Map };
     PaintProperty<float> lineWidth { 1 };

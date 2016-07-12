@@ -17,7 +17,7 @@ public:
     void cascade(const CascadeParameters&);
     bool recalculate(const CalculationParameters&);
 
-    PaintProperty<Color> backgroundColor { { 0, 0, 0, 1 } };
+    PaintProperty<Color> backgroundColor { Color::black() };
     PaintProperty<std::string, CrossFadedPropertyEvaluator> backgroundPattern { "" };
     PaintProperty<float> backgroundOpacity { 1 };
 };
