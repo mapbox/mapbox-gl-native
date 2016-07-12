@@ -43,7 +43,9 @@ workflows:
             export BUILDTYPE=Release
             make android
             make test-android
-    - start-android-emulator@1.0.2: {}
+    - start-android-emulator@1.0.2:
+        inputs:
+        - other_options: "-gpu on"
     - script:
         title: Run integragion tests
         run_if: '{{enveq "SKIPCI" "false"}}'
