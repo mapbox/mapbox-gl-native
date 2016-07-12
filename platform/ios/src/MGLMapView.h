@@ -31,10 +31,8 @@ extern const CGFloat MGLMapViewDecelerationRateFast;
 extern const CGFloat MGLMapViewDecelerationRateImmediate;
 
 /**
- The vertical alignment of an annotation within a map view.
-
- @note This is currently used with the `MGLMapView.userLocationVerticalAlignment`
- property.
+ The vertical alignment of an annotation within a map view. Used with the
+ `MGLMapView.userLocationVerticalAlignment` property.
  */
 typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     /** Aligns the annotation vertically in the center of the map view. */
