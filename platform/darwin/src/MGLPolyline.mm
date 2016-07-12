@@ -24,9 +24,9 @@
     }
 
     mbgl::LineAnnotation annotation { geometry };
-    annotation.opacity = [delegate alphaForShapeAnnotation:self];
-    annotation.color = [delegate strokeColorForShapeAnnotation:self];
-    annotation.width = [delegate lineWidthForPolylineAnnotation:self];
+    annotation.opacity = { [delegate alphaForShapeAnnotation:self] };
+    annotation.color = { [delegate strokeColorForShapeAnnotation:self] };
+    annotation.width = { [delegate lineWidthForPolylineAnnotation:self] };
 
     return annotation;
 }

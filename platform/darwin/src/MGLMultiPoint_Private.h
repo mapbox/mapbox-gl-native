@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLMultiPointDelegate <NSObject>
 
 /** Returns the fill alpha value for the given annotation. */
-- (double)alphaForShapeAnnotation:(MGLShape *)annotation;
+- (float)alphaForShapeAnnotation:(MGLShape *)annotation;
 
 /** Returns the stroke color object for the given annotation. */
 - (mbgl::Color)strokeColorForShapeAnnotation:(MGLShape *)annotation;
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (mbgl::Color)fillColorForPolygonAnnotation:(MGLPolygon *)annotation;
 
 /** Returns the stroke width object for the given annotation. */
-- (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
+- (float)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
 @end
 
