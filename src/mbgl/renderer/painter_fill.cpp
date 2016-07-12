@@ -24,11 +24,8 @@ void Painter::renderFill(PaintParameters& parameters,
     Color fillColor = properties.fillColor;
     float opacity = properties.fillOpacity;
 
-    Color strokeColor = properties.fillOutlineColor;
-    bool isOutlineColorDefined = strokeColor.a >= 0;
-    if (!isOutlineColorDefined) {
-        strokeColor = fillColor;
-    }
+    const bool isOutlineColorDefined = !properties.fillOutlineColor.isUndefined();
+    Color strokeColor = isOutlineColorDefined? properties.fillOutlineColor : fillColor;
 
     auto worldSize = util::convert<GLfloat>(frame.framebufferSize);
 

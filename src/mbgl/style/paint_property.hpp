@@ -39,8 +39,12 @@ public:
         return *this;
     }
 
+    bool isUndefined() const {
+        return values.find(ClassID::Default) == values.end();
+    }
+
     const PropertyValue<T>& get() const {
-        return values.at(ClassID::Default);
+        return isUndefined() ? values.at(ClassID::Fallback) : values.at(ClassID::Default);
     }
 
     void set(const PropertyValue<T>& value_, const optional<std::string>& klass) {
