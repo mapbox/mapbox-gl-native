@@ -754,9 +754,9 @@ jni::jarray<jlong>* nativeAddPolylines(JNIEnv *env, jni::jobject* obj, jlong nat
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polyline, *polylinePointsId);
 
         mbgl::LineAnnotation annotation { toGeometry<mbgl::LineString<double>>(env, points) };
-        annotation.opacity = jni::GetField<jfloat>(*env, polyline, *polylineAlphaId);
-        annotation.color = toColor(jni::GetField<jint>(*env, polyline, *polylineColorId));
-        annotation.width = jni::GetField<jfloat>(*env, polyline, *polylineWidthId);
+        annotation.opacity = { jni::GetField<jfloat>(*env, polyline, *polylineAlphaId) };
+        annotation.color = { toColor(jni::GetField<jint>(*env, polyline, *polylineColorId)) };
+        annotation.width = { jni::GetField<jfloat>(*env, polyline, *polylineWidthId) };
         ids.push_back(nativeMapView->getMap().addAnnotation(annotation));
 
         jni::DeleteLocalRef(*env, polyline);
@@ -781,9 +781,9 @@ jni::jarray<jlong>* nativeAddPolygons(JNIEnv *env, jni::jobject* obj, jlong nati
         jni::jobject* points = jni::GetField<jni::jobject*>(*env, polygon, *polygonPointsId);
 
         mbgl::FillAnnotation annotation { mbgl::Polygon<double> { toGeometry<mbgl::LinearRing<double>>(env, points) } };
-        annotation.opacity = jni::GetField<jfloat>(*env, polygon, *polygonAlphaId);
-        annotation.outlineColor = toColor(jni::GetField<jint>(*env, polygon, *polygonStrokeColorId));
-        annotation.color = toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId));
+        annotation.opacity = { jni::GetField<jfloat>(*env, polygon, *polygonAlphaId) };
+        annotation.outlineColor = { toColor(jni::GetField<jint>(*env, polygon, *polygonStrokeColorId)) };
+        annotation.color = { toColor(jni::GetField<jint>(*env, polygon, *polygonFillColorId)) };
         ids.push_back(nativeMapView->getMap().addAnnotation(annotation));
 
         jni::DeleteLocalRef(*env, polygon);
