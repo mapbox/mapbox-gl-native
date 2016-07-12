@@ -61,10 +61,14 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
         Nan::New("require").ToLocalChecked()).ToLocalChecked().As<v8::Function>();
 
     v8::Local<v8::Value> eventsString = Nan::New("events").ToLocalChecked();
-    v8::Local<v8::Object> events = Nan::Call(require, module, 1, &eventsString).ToLocalChecked()->ToObject();
+    v8::Local<v8::Object> events = Nan::To<v8::Object>(Nan::Call(require, module, 1, &eventsString).ToLocalChecked()).ToLocalChecked();
 
-    v8::Local<v8::Object> EventEmitter = Nan::Get(events,
-        Nan::New("EventEmitter").ToLocalChecked()).ToLocalChecked()->ToObject();
+    v8::Local<v8::Object> EventEmitter = Nan::To<v8::Object>(
+        Nan::Get(
+            events,
+            Nan::New("EventEmitter").ToLocalChecked()
+        ).ToLocalChecked()
+    ).ToLocalChecked();
 
     Nan::SetPrototype(target,
         Nan::Get(EventEmitter, Nan::New("prototype").ToLocalChecked()).ToLocalChecked());
