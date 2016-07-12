@@ -2,6 +2,8 @@
 
 #include <mbgl/util/variant.hpp>
 
+#include <string>
+
 namespace mbgl {
 namespace style {
 namespace conversion {
@@ -53,7 +55,7 @@ namespace conversion {
    them for v8 types.
 */
 
-struct Error { const char * message; };
+struct Error { std::string message; };
 
 template <class T>
 class Result : private variant<T, Error> {

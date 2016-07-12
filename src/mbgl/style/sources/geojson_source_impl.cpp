@@ -83,7 +83,7 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
             conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
             if (!geoJSON) {
-                Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message);
+                Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
                 mapbox::geojson::feature_collection features;

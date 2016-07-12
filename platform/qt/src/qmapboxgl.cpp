@@ -628,7 +628,7 @@ void QMapboxGL::addSource(const QString& sourceID, const QVariant& value)
 
     Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(value, sourceID.toStdString());
     if (!source) {
-        qWarning() << "Unable to add source:" << source.error().message;
+        qWarning() << "Unable to add source:" << source.error().message.c_str();
         return;
     }
 
@@ -665,7 +665,7 @@ void QMapboxGL::addLayer(const QVariant& value)
 
     Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(value);
     if (!layer) {
-        qWarning() << "Unable to add layer:" << layer.error().message;
+        qWarning() << "Unable to add layer:" << layer.error().message.c_str();
         return;
     }
 
@@ -692,7 +692,7 @@ void QMapboxGL::setFilter(const QString& layer_, const QVariant& filter_)
 
     Result<Filter> converted = convert<Filter>(filter_);
     if (!converted) {
-        qWarning() << "Error parsing filter:" << converted.error().message;
+        qWarning() << "Error parsing filter:" << converted.error().message.c_str();
         return;
     }
     filter = std::move(*converted);

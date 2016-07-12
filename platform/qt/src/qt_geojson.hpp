@@ -29,22 +29,16 @@ Result<GeoJSON> convertGeoJSON(const QVariant& value) {
         d.Parse<0>(value.toByteArray().constData());
     }
 
-    // Needed to keep the error message alive
-    // when we go out of this scope.
-    static std::string error;
-
     if (d.HasParseError()) {
         std::stringstream message;
         message << d.GetErrorOffset() << " - " << rapidjson::GetParseError_En(d.GetParseError());
 
-        error = message.str();
-        return Error { error.c_str() };
+        return Error { message.str() };
     }
 
     conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
     if (!geoJSON) {
-        error = geoJSON.error().message;
-        return Error { error.c_str() };
+        return Error { geoJSON.error().message };
     }
 
     return geoJSON;

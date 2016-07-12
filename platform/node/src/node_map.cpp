@@ -504,7 +504,7 @@ NAN_METHOD(NodeMap::AddSource) {
 
     Result<std::unique_ptr<Source>> source = convert<std::unique_ptr<Source>>(info[1], *Nan::Utf8String(info[0]));
     if (!source) {
-        Nan::ThrowTypeError(source.error().message);
+        Nan::ThrowTypeError(source.error().message.c_str());
         return;
     }
 
@@ -524,7 +524,7 @@ NAN_METHOD(NodeMap::AddLayer) {
 
     Result<std::unique_ptr<Layer>> layer = convert<std::unique_ptr<Layer>>(info[0]);
     if (!layer) {
-        Nan::ThrowTypeError(layer.error().message);
+        Nan::ThrowTypeError(layer.error().message.c_str());
         return;
     }
 
@@ -557,7 +557,7 @@ NAN_METHOD(NodeMap::SetLayoutProperty) {
 
     mbgl::optional<Error> error = setLayoutProperty(*layer, *Nan::Utf8String(info[1]), info[2]);
     if (error) {
-        return Nan::ThrowTypeError(error->message);
+        return Nan::ThrowTypeError(error->message.c_str());
     }
 
     nodeMap->map->update(mbgl::Update::RecalculateStyle);
@@ -595,7 +595,7 @@ NAN_METHOD(NodeMap::SetPaintProperty) {
 
     mbgl::optional<Error> error = setPaintProperty(*layer, *Nan::Utf8String(info[1]), info[2], klass);
     if (error) {
-        return Nan::ThrowTypeError(error->message);
+        return Nan::ThrowTypeError(error->message.c_str());
     }
 
     nodeMap->map->update(mbgl::Update::RecalculateStyle | mbgl::Update::Classes);
@@ -627,7 +627,7 @@ NAN_METHOD(NodeMap::SetFilter) {
     if (!info[1]->IsNull() && !info[1]->IsUndefined()) {
         Result<Filter> converted = convert<Filter>(info[1]);
         if (!converted) {
-            Nan::ThrowTypeError(converted.error().message);
+            Nan::ThrowTypeError(converted.error().message.c_str());
             return;
         }
         filter = std::move(*converted);
