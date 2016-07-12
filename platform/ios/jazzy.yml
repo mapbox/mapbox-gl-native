@@ -19,22 +19,15 @@ custom_categories:
     children:
       - MGLAccountManager
       - MGLMapCamera
-      - MGLMapDebugMaskOptions
       - MGLMapView
-      - MGLMapViewDecelerationRateFast
-      - MGLMapViewDecelerationRateImmediate
-      - MGLMapViewDecelerationRateNormal
       - MGLMapViewDelegate
       - MGLStyle
-      - MGLStyleDefaultVersion
       - MGLUserTrackingMode
   - name: Annotations
     children:
       - MGLAnnotation
       - MGLAnnotationImage
-      - MGLAnnotationVerticalAlignment
       - MGLAnnotationView
-      - MGLAnnotationViewDragState
       - MGLCalloutView
       - MGLCalloutViewDelegate
       - MGLMultiPoint
@@ -62,17 +55,8 @@ custom_categories:
       - MGLOfflineRegion
       - MGLOfflineStorage
       - MGLOfflinePack
-      - MGLOfflinePackAdditionCompletionHandler
-      - MGLOfflinePackErrorNotification
-      - MGLOfflinePackErrorUserInfoKey
-      - MGLOfflinePackMaximumCountUserInfoKey
-      - MGLOfflinePackMaximumMapboxTilesReachedNotification
       - MGLOfflinePackProgress
-      - MGLOfflinePackProgressChangedNotification
-      - MGLOfflinePackProgressUserInfoKey
-      - MGLOfflinePackRemovalCompletionHandler
       - MGLOfflinePackState
-      - MGLOfflinePackStateUserInfoKey
       - MGLTilePyramidOfflineRegion
   - name: Geometry
     children:

@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MGLAnnotation;
 
-/** These constants indicate the current drag state of an annotation view. **/
+/** These constants indicate the current drag state of an annotation view. */
 typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
     /**
      The view is not involved in a drag operation.
@@ -64,7 +64,7 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationViewDragState) {
  leaves the viewport, the map view moves its associated view to a reuse queue.
  When a new annotation becomes visible, you can request a view for that
  annotation by passing the appropriate reuse identifier string to the
- `-[MGLMapView dequeueReusableAnnotationViewWithIdentifier:` method.
+ `-[MGLMapView dequeueReusableAnnotationViewWithIdentifier:]` method.
  
  @param reuseIdentifier A unique string identifier for this view that allows you
     to reuse this view with multiple similar annotations. You can set this

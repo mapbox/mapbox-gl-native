@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The MGLAccountManager object provides a global way to set a Mapbox API access
- token, as well as other settings used framework-wide.
+ token.
  */
 @interface MGLAccountManager : NSObject
 
