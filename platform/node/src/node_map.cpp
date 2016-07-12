@@ -757,7 +757,12 @@ NodeMap::~NodeMap() {
 }
 
 std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback callback_) {
-    Nan::HandleScope scope;
+    Nan::HandleScope handleScope;
+
+    // Enter a new v8::Context to avoid leaking v8::FunctionTemplate
+    // from Nan::New<v8::Function>
+    v8::Local<v8::Context> context = v8::Context::New(v8::Isolate::GetCurrent());
+    v8::Context::Scope scope(context);
 
     auto requestHandle = NodeRequest::Create(resource, callback_)->ToObject();
     auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(requestHandle);
