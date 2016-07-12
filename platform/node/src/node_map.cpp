@@ -737,20 +737,21 @@ NodeMap::~NodeMap() {
     if (map) release();
 }
 
-std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, Callback callback_) {
-    Nan::HandleScope handleScope;
+std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
+    Nan::HandleScope scope;
 
-    // Enter a new v8::Context to avoid leaking v8::FunctionTemplate
-    // from Nan::New<v8::Function>
-    v8::Local<v8::Context> context = v8::Context::New(v8::Isolate::GetCurrent());
-    v8::Context::Scope scope(context);
+    v8::Local<v8::Value> argv[] = {
+        Nan::New<v8::External>(this),
+        Nan::New<v8::External>(&callback_)
+    };
 
-    auto requestHandle = NodeRequest::Create(resource, callback_)->ToObject();
-    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(requestHandle);
-    auto callbackHandle = Nan::New<v8::Function>(NodeRequest::Respond, requestHandle);
+    auto instance = Nan::New(NodeRequest::constructor)->NewInstance(2, argv);
 
-    v8::Local<v8::Value> argv[] = { requestHandle, callbackHandle };
-    Nan::MakeCallback(handle()->GetInternalField(1)->ToObject(), "request", 2, argv);
+    Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
+    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(resource.kind));
+
+    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(instance);
+    request->Execute();
 
     return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
 }

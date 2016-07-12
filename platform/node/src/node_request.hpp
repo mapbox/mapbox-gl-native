@@ -11,21 +11,21 @@
 
 namespace node_mbgl {
 
+class NodeMap;
+
 class NodeRequest : public Nan::ObjectWrap, public Nan::AsyncWorker {
 public:
-    NodeRequest(mbgl::FileSource::Callback);
+    NodeRequest(NodeMap*, mbgl::FileSource::Callback);
     ~NodeRequest();
 
     static Nan::Persistent<v8::Function> constructor;
 
     static NAN_MODULE_INIT(Init);
 
-    static NAN_METHOD(New);
+    static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
     static NAN_METHOD(Respond);
 
     void Execute();
-
-    static v8::Handle<v8::Object> Create(const mbgl::Resource&, mbgl::FileSource::Callback);
 
     struct NodeAsyncRequest : public mbgl::AsyncRequest {
         NodeAsyncRequest(NodeRequest*);
@@ -34,7 +34,9 @@ public:
     };
 
 private:
+    NodeMap* target;
     mbgl::FileSource::Callback callback;
+
     NodeAsyncRequest* asyncRequest = nullptr;
 };
 

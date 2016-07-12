@@ -1,4 +1,5 @@
 #include "node_request.hpp"
+#include "node_map.hpp"
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/chrono.hpp>
 
@@ -6,8 +7,11 @@
 
 namespace node_mbgl {
 
-NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
+NodeRequest::NodeRequest(
+    NodeMap* target_,
+    mbgl::FileSource::Callback callback_)
     : AsyncWorker(nullptr),
+    target(target_),
     callback(callback_) {
 }
 
@@ -32,27 +36,30 @@ NAN_MODULE_INIT(NodeRequest::Init) {
     Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(NodeRequest::New) {
-    auto req = new NodeRequest(*reinterpret_cast<mbgl::FileSource::Callback*>(info[0].As<v8::External>()->Value()));
-    req->Wrap(info.This());
+void NodeRequest::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto target = reinterpret_cast<NodeMap*>(info[0].As<v8::External>()->Value());
+    auto callback = reinterpret_cast<mbgl::FileSource::Callback*>(info[1].As<v8::External>()->Value());
+
+    auto request = new NodeRequest(target, *callback);
+
+    request->Wrap(info.This());
     info.GetReturnValue().Set(info.This());
 }
 
-v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl::FileSource::Callback callback) {
-    Nan::EscapableHandleScope scope;
+void NodeRequest::Execute() {
+    Nan::HandleScope handleScope;
 
-    v8::Local<v8::Value> argv[] = {
-        Nan::New<v8::External>(const_cast<mbgl::FileSource::Callback*>(&callback))
-    };
-    auto instance = Nan::New(constructor)->NewInstance(1, argv);
+    // Enter a new v8::Context to avoid leaking v8::FunctionTemplate
+    // from Nan::New<v8::Function>
+    v8::Local<v8::Context> context = v8::Context::New(v8::Isolate::GetCurrent());
+    v8::Context::Scope scope(context);
 
-    Nan::Set(instance, Nan::New("url").ToLocalChecked(), Nan::New(resource.url).ToLocalChecked());
-    Nan::Set(instance, Nan::New("kind").ToLocalChecked(), Nan::New<v8::Integer>(int(resource.kind)));
+    auto fn = Nan::New<v8::Function>(NodeRequest::Respond, handle());
 
-    return scope.Escape(instance);
+    v8::Local<v8::Value> argv[] = { handle(), fn };
+
+    Nan::MakeCallback(Nan::To<v8::Object>(target->handle()->GetInternalField(1)).ToLocalChecked(), "request", 2, argv);
 }
-
-void NodeRequest::Execute() {}
 
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
