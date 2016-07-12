@@ -1738,6 +1738,8 @@ public class MapView extends FrameLayout {
                 return false;
             }
 
+            requestDisallowInterceptTouchEvent(true);
+
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
 
