@@ -277,3 +277,4 @@ task makeAndroidAll(type: Exec) {
     commandLine 'make', 'apackage'
 }
 
+apply from: 'gradle-checkstyle.gradle'
