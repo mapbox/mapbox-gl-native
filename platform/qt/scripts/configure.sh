@@ -38,7 +38,12 @@ fi
 function print_qt_flags {
     mason install Qt system
 
-    QT_VERSION_MAJOR=$(qmake -query QT_VERSION | cut -d. -f1)
+    QMAKE="qmake"
+    if [ ! $(which ${QMAKE} 2>/dev/null) ]; then
+        QMAKE="qmake-qt5"
+    fi
+
+    QT_VERSION_MAJOR=$(${QMAKE} -query QT_VERSION | cut -d. -f1)
     CONFIG+="    'qt_version_major%': ['${QT_VERSION_MAJOR}'],"$LN
     CONFIG+="    'qt_image_decoders%': [0],"$LN
 
