@@ -3,12 +3,22 @@
 #include <mbgl/util/chrono.hpp>
 
 #include <cmath>
-#include <iostream>
 
 namespace node_mbgl {
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Static Node Methods
+NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
+    : AsyncWorker(nullptr),
+    callback(callback_) {
+}
+
+NodeRequest::~NodeRequest() {
+    // When this object gets garbage collected, make sure that the
+    // AsyncRequest can no longer attempt to remove the callback function
+    // this object was holding (it can't be fired anymore).
+    if (asyncRequest) {
+        asyncRequest->request = nullptr;
+    }
+}
 
 Nan::Persistent<v8::Function> NodeRequest::constructor;
 
@@ -41,6 +51,8 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 
     return scope.Escape(instance);
 }
+
+void NodeRequest::Execute() {}
 
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
@@ -126,9 +138,6 @@ NAN_METHOD(NodeRequest::Respond) {
     info.GetReturnValue().SetUndefined();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Instance
-
 NodeRequest::NodeAsyncRequest::NodeAsyncRequest(NodeRequest* request_) : request(request_) {
     assert(request);
     // Make sure the JS object has a pointer to this so that it can remove its pointer in the
@@ -145,16 +154,4 @@ NodeRequest::NodeAsyncRequest::~NodeAsyncRequest() {
     }
 }
 
-NodeRequest::NodeRequest(mbgl::FileSource::Callback callback_)
-    : callback(callback_) {
 }
-
-NodeRequest::~NodeRequest() {
-    // When this object gets garbage collected, make sure that the AsyncRequest can no longer
-    // attempt to remove the callback function this object was holding (it can't be fired anymore).
-    if (asyncRequest) {
-        asyncRequest->request = nullptr;
-    }
-}
-
-} // namespace node_mbgl
