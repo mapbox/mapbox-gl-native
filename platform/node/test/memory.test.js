@@ -1,16 +1,15 @@
 'use strict';
 
 var fs = require('fs');
-var mbgl = require('../../../../lib/mapbox-gl-native');
+var mbgl = require('../../../lib/mapbox-gl-native');
 var path = require('path');
 var test = require('tape');
 
 var testParams = {
     mapPoolSize: 10,
-    numRenderings: 30,
-    heapGrowthThreshould: 256 * 1024, // 256 KB
-
-    ratio: 2,
+    numRenderings: 100,
+    heapGrowthThreshold: 0,
+    ratio: 2
 };
 
 function readFixture(file) {
@@ -28,6 +27,11 @@ var tile_raster   = readFixture('raster.tile');
 var tile_vector   = readFixture('vector.tile');
 
 test('Memory', function(t) {
+    // Trigger garbage collection before starting test, then initialize 
+    // heap size
+    if (typeof gc === 'function') gc();
+    var lastHeapSize = process.memoryUsage()['heapUsed'];
+
     var options = {
         request: function(req, callback) {
             if (req.url == null) {
@@ -40,7 +44,7 @@ test('Memory', function(t) {
                 callback(null, { data: glyph });
             } else if (req.url.endsWith('mapbox.satellite')) {
                 callback(null, { data: source_raster });
-            } else if (req.url.indexOf('satellite') > -1 && req.url.endsWith('png')) {
+            } else if (req.url.indexOf('satellite') > -1 && (req.url.endsWith('png') || req.url.endsWith('webp'))) {
                 callback(null, { data: tile_raster });
             } else if (req.url.endsWith('mapbox.mapbox-streets-v7')) {
                 callback(null, { data: source_vector });
@@ -62,7 +66,6 @@ test('Memory', function(t) {
 
     var renderCount = 0;
     var heapGrowth = 0;
-    var lastHeapSize = 0;
 
     var interval = setInterval(function () {
         if (mapPool.length == 0) {
@@ -81,22 +84,21 @@ test('Memory', function(t) {
             mapPool.push(map);
 
             if (renderCount % (testParams.numRenderings / 10) == 0) {
+                // Manually trigger garbage collection
+                if (typeof gc === 'function') gc();
+                
                 var currentHeapSize = process.memoryUsage()['heapUsed'];
 
                 // Print some progress, so slow build bots don't timeout.
                 t.comment("Rendering (" + renderCount.toString() +
                     "/" + testParams.numRenderings.toString() + ")");
 
-                if (lastHeapSize == 0) {
-                    lastHeapSize = currentHeapSize;
-                }
-
                 heapGrowth = heapGrowth + currentHeapSize - lastHeapSize;
                 lastHeapSize = currentHeapSize;
             }
 
             if (++renderCount == testParams.numRenderings) {
-                t.ok(heapGrowth < testParams.heapGrowthThreshould, heapGrowth);
+                t.ok(heapGrowth < testParams.heapGrowthThreshold, heapGrowth);
                 t.end();
 
                 clearInterval(interval);
