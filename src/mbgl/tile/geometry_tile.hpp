@@ -3,9 +3,9 @@
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/tile/tile_worker.hpp>
 #include <mbgl/text/placement_config.hpp>
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/feature.hpp>
 
+#include <atomic>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -73,7 +73,7 @@ private:
     PlacementConfig targetConfig;
 
     // Used to signal the worker that it should abandon parsing this tile as soon as possible.
-    util::Atomic<bool> obsolete { false };
+    std::atomic<bool> obsolete { false };
 };
 
 } // namespace mbgl

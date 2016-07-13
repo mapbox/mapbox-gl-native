@@ -3,7 +3,8 @@
 #include <mbgl/gl/object_store.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/atomic.hpp>
+
+#include <atomic>
 
 namespace mbgl {
 
@@ -34,7 +35,7 @@ public:
 
 private:
     // raw pixels have been loaded
-    util::Atomic<bool> loaded { false };
+    std::atomic<bool> loaded { false };
 
     // filters
     Scaling filter = Scaling::Nearest;

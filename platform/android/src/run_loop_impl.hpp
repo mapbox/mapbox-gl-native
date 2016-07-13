@@ -2,11 +2,11 @@
 
 #include "jni.hpp"
 
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread.hpp>
 
+#include <atomic>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -43,7 +43,7 @@ public:
 
     ALooper* loop = nullptr;
     RunLoop* runLoop = nullptr;
-    util::Atomic<bool> running;
+    std::atomic<bool> running;
 
 private:
     friend RunLoop;

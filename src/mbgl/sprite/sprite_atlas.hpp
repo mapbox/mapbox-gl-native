@@ -3,11 +3,11 @@
 #include <mbgl/geometry/binpack.hpp>
 #include <mbgl/gl/gl.hpp>
 #include <mbgl/gl/object_store.hpp>
-#include <mbgl/util/atomic.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/ptr.hpp>
 #include <mbgl/util/optional.hpp>
 
+#include <atomic>
 #include <string>
 #include <map>
 #include <mutex>
@@ -92,7 +92,7 @@ private:
     std::map<Key, Holder> images;
     std::set<std::string> uninitialized;
     std::unique_ptr<uint32_t[]> data;
-    util::Atomic<bool> dirty;
+    std::atomic<bool> dirty;
     bool fullUploadRequired = true;
     mbgl::optional<gl::UniqueTexture> texture;
     uint32_t filter = 0;
