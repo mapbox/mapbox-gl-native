@@ -451,7 +451,6 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     // setup compass
     //
     _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
-    _compassView.frame = { CGPointZero, _compassView.image.size };
     _compassView.alpha = 0;
     _compassView.userInteractionEnabled = YES;
     [_compassView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleCompassTapGesture:)]];
@@ -749,7 +748,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1
-                                       constant:5]];
+                                       constant:5 + self.contentInset.top]];
     }
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:compassContainer
@@ -758,7 +757,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1
-                                   constant:5]];
+                                   constant:5 + self.contentInset.top]];
 
     [compassContainerConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -767,7 +766,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:compassContainer
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:5]];
+                                   constant:5 + self.contentInset.right]];
 
     UIImage *compassImage = self.compassView.image;
     [compassContainerConstraints addObject:
@@ -802,7 +801,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                          toItem:self.logoView
                                       attribute:NSLayoutAttributeBaseline
                                      multiplier:1
-                                       constant:8]];
+                                       constant:8 + self.contentInset.bottom]];
     }
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -811,7 +810,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.logoView
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.bottom]];
 
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.logoView
@@ -820,7 +819,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self
                                   attribute:NSLayoutAttributeLeading
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.left]];
     [constraintParentView addConstraints:self.logoViewConstraints];
 
     // attribution button
@@ -836,7 +835,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                          toItem:self.attributionButton
                                       attribute:NSLayoutAttributeBaseline
                                      multiplier:1
-                                       constant:8]];
+                                       constant:8 + self.contentInset.bottom]];
     }
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -845,7 +844,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.bottom]];
 
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -854,7 +853,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:8]];
+                                   constant:8 + self.contentInset.right]];
     [constraintParentView addConstraints:self.attributionButtonConstraints];
 
     [super updateConstraints];
