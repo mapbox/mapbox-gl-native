@@ -3632,7 +3632,7 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
         {
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             annotationView = annotationContext.annotationView;
-            annotationView.selected = NO;
+            [annotationView setSelected:NO animated:animated];
         }
 
         // clean up
