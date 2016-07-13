@@ -42,7 +42,7 @@ NodeLogObserver::NodeLogObserver(v8::Local<v8::Object> target)
 
           v8::Local<v8::Value> argv[] = { Nan::New("message").ToLocalChecked(), msg };
           auto handle = Nan::New<v8::Object>(module);
-          auto emit = Nan::Get(handle, Nan::New("emit").ToLocalChecked()).ToLocalChecked()->ToObject();
+          auto emit = Nan::To<v8::Object>(Nan::Get(handle, Nan::New("emit").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
           Nan::CallAsFunction(emit, handle, 2, argv);
       })) {
     Nan::HandleScope scope;

@@ -13,7 +13,8 @@ namespace node_mbgl {
 
 class NodeMap;
 
-class NodeRequest : public Nan::ObjectWrap, public Nan::AsyncWorker {
+class NodeRequest : public Nan::ObjectWrap,
+                    public Nan::AsyncWorker {
 public:
     NodeRequest(NodeMap*, mbgl::FileSource::Callback);
     ~NodeRequest();

@@ -32,9 +32,6 @@ struct NodeMap::RenderOptions {
     mbgl::MapDebugOptions debugOptions = mbgl::MapDebugOptions::NoDebug;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Static Node Methods
-
 Nan::Persistent<v8::Function> NodeMap::constructor;
 
 static std::shared_ptr<mbgl::HeadlessDisplay> sharedDisplay() {
@@ -113,7 +110,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
  *     fs.writeFileSync('image.png', image);
  * });
  */
-NAN_METHOD(NodeMap::New) {
+void NodeMap::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (!info.IsConstructCall()) {
         return Nan::ThrowTypeError("Use the new operator to create new Map objects");
     }
@@ -122,7 +119,7 @@ NAN_METHOD(NodeMap::New) {
         return Nan::ThrowTypeError("Requires an options object as first argument");
     }
 
-    auto options = info[0]->ToObject();
+    auto options = Nan::To<v8::Object>(info[0]).ToLocalChecked();
 
     // Check that 'request' is set. If 'cancel' is set it must be a
     // function and if 'ratio' is set it must be a number.
@@ -156,9 +153,12 @@ NAN_METHOD(NodeMap::New) {
 std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
     Nan::HandleScope scope;
 
-    v8::Local<v8::Object> JSON = Nan::Get(
-        Nan::GetCurrentContext()->Global(),
-        Nan::New("JSON").ToLocalChecked()).ToLocalChecked()->ToObject();
+    v8::Local<v8::Object> JSON = Nan::To<v8::Object>(
+        Nan::Get(
+            Nan::GetCurrentContext()->Global(),
+            Nan::New("JSON").ToLocalChecked()
+        ).ToLocalChecked()
+    ).ToLocalChecked();
 
     return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
 }
@@ -178,7 +178,7 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  * // providing a string
  * map.load(fs.readFileSync('./test/fixtures/style.json', 'utf8'));
  */
-NAN_METHOD(NodeMap::Load) {
+void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -211,7 +211,7 @@ NAN_METHOD(NodeMap::Load) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::Loaded) {
+void NodeMap::Loaded(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -261,16 +261,16 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
     }
 
     if (Nan::Has(obj, Nan::New("classes").ToLocalChecked()).FromJust()) {
-        auto classes = Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Array>();
+        auto classes = Nan::To<v8::Object>(Nan::Get(obj, Nan::New("classes").ToLocalChecked()).ToLocalChecked()).ToLocalChecked().As<v8::Array>();
         const int length = classes->Length();
         options.classes.reserve(length);
         for (int i = 0; i < length; i++) {
-            options.classes.push_back(std::string { *Nan::Utf8String(Nan::Get(classes, i).ToLocalChecked()->ToString()) });
+            options.classes.push_back(std::string { *Nan::Utf8String(Nan::To<v8::String>(Nan::Get(classes, i).ToLocalChecked()).ToLocalChecked()) });
         }
     }
 
     if (Nan::Has(obj, Nan::New("debug").ToLocalChecked()).FromJust()) {
-        auto debug = Nan::Get(obj, Nan::New("debug").ToLocalChecked()).ToLocalChecked()->ToObject().As<v8::Object>();
+        auto debug = Nan::To<v8::Object>(Nan::Get(obj, Nan::New("debug").ToLocalChecked()).ToLocalChecked()).ToLocalChecked();
         if (Nan::Has(debug, Nan::New("tileBorders").ToLocalChecked()).FromJust()) {
             if (Nan::Get(debug, Nan::New("tileBorders").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
                 options.debugOptions = options.debugOptions | mbgl::MapDebugOptions::TileBorders;
@@ -317,7 +317,7 @@ NodeMap::RenderOptions NodeMap::ParseOptions(v8::Local<v8::Object> obj) {
  * @returns {undefined} calls callback
  * @throws {Error} if stylesheet is not loaded or if map is already rendering
  */
-NAN_METHOD(NodeMap::Render) {
+void NodeMap::Render(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -337,7 +337,7 @@ NAN_METHOD(NodeMap::Render) {
         return Nan::ThrowError("Map is currently rendering an image");
     }
 
-    auto options = ParseOptions(info[0]->ToObject());
+    auto options = ParseOptions(Nan::To<v8::Object>(info[0]).ToLocalChecked());
 
     assert(!nodeMap->callback);
     assert(!nodeMap->image.data);
@@ -447,7 +447,7 @@ void NodeMap::renderFinished() {
  * @name release
  * @returns {undefined}
  */
-NAN_METHOD(NodeMap::Release) {
+void NodeMap::Release(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -470,7 +470,7 @@ void NodeMap::release() {
     map.reset();
 }
 
-NAN_METHOD(NodeMap::AddClass) {
+void NodeMap::AddClass(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -487,7 +487,7 @@ NAN_METHOD(NodeMap::AddClass) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::AddSource) {
+void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -511,7 +511,7 @@ NAN_METHOD(NodeMap::AddSource) {
     nodeMap->map->addSource(std::move(*source));
 }
 
-NAN_METHOD(NodeMap::AddLayer) {
+void NodeMap::AddLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -531,7 +531,7 @@ NAN_METHOD(NodeMap::AddLayer) {
     nodeMap->map->addLayer(std::move(*layer));
 }
 
-NAN_METHOD(NodeMap::SetLayoutProperty) {
+void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -564,7 +564,7 @@ NAN_METHOD(NodeMap::SetLayoutProperty) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::SetPaintProperty) {
+void NodeMap::SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -602,7 +602,7 @@ NAN_METHOD(NodeMap::SetPaintProperty) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::SetFilter) {
+void NodeMap::SetFilter(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
     using namespace mbgl::style::conversion;
 
@@ -657,7 +657,7 @@ NAN_METHOD(NodeMap::SetFilter) {
     Nan::ThrowTypeError("layer doesn't support filters");
 }
 
-NAN_METHOD(NodeMap::DumpDebugLogs) {
+void NodeMap::DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -665,7 +665,7 @@ NAN_METHOD(NodeMap::DumpDebugLogs) {
     info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(NodeMap::QueryRenderedFeatures) {
+void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
 
@@ -713,9 +713,6 @@ NAN_METHOD(NodeMap::QueryRenderedFeatures) {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-// Instance
-
 NodeMap::NodeMap(v8::Local<v8::Object> options) :
     view(sharedDisplay(), [&] {
         Nan::HandleScope scope;
@@ -756,4 +753,4 @@ std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resou
     return std::make_unique<NodeRequest::NodeAsyncRequest>(request);
 }
 
-} // namespace node_mbgl
+}

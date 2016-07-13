@@ -69,10 +69,10 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
     if (info.Length() < 1) {
         response.noContent = true;
     } else if (info[0]->IsObject()) {
-        auto err = info[0]->ToObject();
+        auto err = Nan::To<v8::Object>(info[0]).ToLocalChecked();
         auto msg = Nan::New("message").ToLocalChecked();
 
-        if (Nan::Has(err, msg).IsJust()) {
+        if (Nan::Has(err, msg).FromJust()) {
             request->SetErrorMessage(*Nan::Utf8String(
                 Nan::Get(err, msg).ToLocalChecked()));
         }
@@ -83,7 +83,7 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
     } else {
         auto res = Nan::To<v8::Object>(info[1]).ToLocalChecked();
 
-        if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).IsJust()) {
+        if (Nan::Has(res, Nan::New("modified").ToLocalChecked()).FromJust()) {
             const double modified = Nan::To<double>(Nan::Get(res, Nan::New("modified").ToLocalChecked()).ToLocalChecked()).FromJust();
             if (!std::isnan(modified)) {
                 response.modified = mbgl::Timestamp{ mbgl::Seconds(
@@ -91,7 +91,7 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
             }
         }
 
-        if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).IsJust()) {
+        if (Nan::Has(res, Nan::New("expires").ToLocalChecked()).FromJust()) {
             const double expires = Nan::To<double>(Nan::Get(res, Nan::New("expires").ToLocalChecked()).ToLocalChecked()).FromJust();
             if (!std::isnan(expires)) {
                 response.expires = mbgl::Timestamp{ mbgl::Seconds(
@@ -99,12 +99,12 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
             }
         }
 
-        if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).IsJust()) {
+        if (Nan::Has(res, Nan::New("etag").ToLocalChecked()).FromJust()) {
             const Nan::Utf8String etag(Nan::Get(res, Nan::New("etag").ToLocalChecked()).ToLocalChecked());
             response.etag = std::string { *etag, size_t(etag.length()) };
         }
 
-        if (Nan::Has(res, Nan::New("data").ToLocalChecked()).IsJust()) {
+        if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto data = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(data)) {
                 response.data = std::make_shared<std::string>(
