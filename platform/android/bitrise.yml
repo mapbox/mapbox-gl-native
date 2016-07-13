@@ -43,6 +43,13 @@ workflows:
             export BUILDTYPE=Release
             make android
             make test-android
+    - script:
+        title: Setting env for gpu emulator
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
+            envman add --key LD_LIBRARY_PATH --value "$ANDROID_HOME/tools/lib64:$LD_LIBRARY_PATH"
     - start-android-emulator@1.0.2:
         inputs:
         - other_options: "-gpu on"
