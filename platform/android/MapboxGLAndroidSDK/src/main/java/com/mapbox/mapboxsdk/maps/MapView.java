@@ -1743,7 +1743,6 @@ public class MapView extends FrameLayout {
             // reset tracking modes if gesture occurs
             resetTrackingModesIfRequired();
 
-
             // Cancel any animation
             mNativeMapView.cancelTransitions();
 
@@ -2559,7 +2558,9 @@ public class MapView extends FrameLayout {
         if (!mInitialLoad) {
             callback.onMapReady(mMapboxMap);
         } else {
-            mOnMapReadyCallbackList.add(callback);
+            if(callback!=null) {
+                mOnMapReadyCallbackList.add(callback);
+            }
         }
     }
 
