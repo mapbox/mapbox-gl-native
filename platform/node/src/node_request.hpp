@@ -23,7 +23,7 @@ public:
     static void Init();
 
     static void New(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static NAN_METHOD(Respond);
+    static void HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>&);
 
     void Execute();
 
@@ -36,7 +36,6 @@ public:
 private:
     NodeMap* target;
     mbgl::FileSource::Callback callback;
-
     NodeAsyncRequest* asyncRequest = nullptr;
 };
 
