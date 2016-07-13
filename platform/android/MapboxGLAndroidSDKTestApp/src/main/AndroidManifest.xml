@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MapboxApplication"
@@ -47,7 +47,7 @@
             android:label="@string/activity_dynamic_infowindow_adapter">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_infowindow"/>
+                android:value="@string/category_infowindow" />
         </activity>
         <activity
             android:name=".activity.annotation.BulkMarkerActivity"
@@ -74,9 +74,10 @@
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
         </activity>
-        <activity android:name=".activity.annotation.PressForMarkerActivity"
-                  android:description="@string/description_press_for_marker"
-                  android:label="@string/activity_press_for_marker">
+        <activity
+            android:name=".activity.annotation.PressForMarkerActivity"
+            android:description="@string/description_press_for_marker"
+            android:label="@string/activity_press_for_marker">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_annotation" />
@@ -100,8 +101,8 @@
         <activity
             android:name=".activity.camera.LatLngBoundsActivity"
             android:description="@string/description_visible_bounds"
-            android:screenOrientation="portrait"
-            android:label="@string/activity_visible_coordinate_bounds">
+            android:label="@string/activity_visible_coordinate_bounds"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_camera" />
@@ -278,12 +279,22 @@
                 android:value="@string/category_annotation" />
         </activity>
 
-        <activity android:name=".activity.navigation.LocationPickerActivity"
-                  android:description="@string/description_location_picker"
-                  android:label="@string/activity_location_picker">
+        <activity
+            android:name=".activity.navigation.LocationPickerActivity"
+            android:description="@string/description_location_picker"
+            android:label="@string/activity_location_picker">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_navigation" />
+        </activity>
+
+        <activity
+            android:name=".activity.fragment.ViewPagerActivity"
+            android:description="@string/description_viewpager"
+            android:label="@string/activity_viewpager">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_fragment" />
         </activity>
 
         <!-- Configuration Settings -->
