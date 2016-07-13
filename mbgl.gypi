@@ -108,6 +108,8 @@
               'GCC_INLINES_ARE_PRIVATE_EXTERN': 'YES',
               'DEAD_CODE_STRIPPING': 'NO',
             },
+          }, 'OS=="android"', {
+            'cflags_cc': [ '-g', '-Os', '-fvisibility=hidden' ],
           }, {
             'cflags_cc': [ '-g', '-O3' ],
           }],

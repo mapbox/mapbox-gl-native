@@ -1,6 +1,7 @@
 {
   'variables': {
     'loop_lib': 'android',
+    'OS': 'android',
     'headless_lib': 'none',
     'coverage': 0,
   },
