@@ -178,37 +178,32 @@ if [[ "${GCC_GENERATE_DEBUGGING_SYMBOLS}" == false ]]; then
     fi
 fi
 
-function create_local_podspec_dynamic {
-    step "Creating local podspec (dynamic)"
+function create_podspec {
+    step "Creating local podspec (${1})"
+    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
     POD_SOURCE_PATH='    :path => ".",'
     POD_FRAMEWORKS="  m.vendored_frameworks = '"${NAME}".framework'"
-    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
     INPUT_PODSPEC=platform/ios/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    LOCAL_PODSPEC=${OUTPUT}/"dynamic"/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    sed "s/.*:http.*/${POD_SOURCE_PATH}/" ${INPUT_PODSPEC} > ${LOCAL_PODSPEC}
-    sed -i '' "s/.*vendored_frameworks.*/${POD_FRAMEWORKS}/" ${LOCAL_PODSPEC}
-    cp -pv LICENSE.md ${OUTPUT}/"dynamic"/
-}
-
-function create_local_podspec_static {
-    step "Creating local podspec (static)"
-    [[ $SYMBOLS = YES ]] && POD_SUFFIX="-symbols" || POD_SUFFIX=""
-    POD_SOURCE_PATH='    :path => ".",'
-    INPUT_PODSPEC=platform/ios/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    LOCAL_PODSPEC=${OUTPUT}/"static"/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
-    awk '/Pod::Spec.new/,/m.platform/' ${INPUT_PODSPEC} > ${LOCAL_PODSPEC}
-    cat platform/ios/${NAME}-iOS-SDK-static-part.podspec >> ${LOCAL_PODSPEC}
-    sed -i '' "s/.*:http.*/${POD_SOURCE_PATH}/" ${LOCAL_PODSPEC}
-    cp -pv LICENSE.md ${OUTPUT}/"static"/
+    OUTPUT_PODSPEC=${OUTPUT}/${1}/${NAME}-iOS-SDK${POD_SUFFIX}.podspec
+    if [[ ${1} == "dynamic" ]]; then
+        sed "s/.*:http.*/${POD_SOURCE_PATH}/" ${INPUT_PODSPEC} > ${OUTPUT_PODSPEC}
+        sed -i '' "s/.*vendored_frameworks.*/${POD_FRAMEWORKS}/" ${OUTPUT_PODSPEC}
+    fi
+    if [[ ${1} == "static" ]]; then
+        awk '/Pod::Spec.new/,/m.platform/' ${INPUT_PODSPEC} > ${OUTPUT_PODSPEC}
+        cat platform/ios/${NAME}-iOS-SDK-static-part.podspec >> ${OUTPUT_PODSPEC}
+        sed -i '' "s/.*:http.*/${POD_SOURCE_PATH}/" ${OUTPUT_PODSPEC}    
+    fi
+    cp -pv LICENSE.md ${OUTPUT}/${1}/
 }
 
 if [[ ${BUILD_STATIC} == true ]]; then
     stat "${OUTPUT}/static/${NAME}.framework"
-    create_local_podspec_static
+    create_podspec "static"
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     stat "${OUTPUT}/dynamic/${NAME}.framework"
-    create_local_podspec_dynamic
+    create_podspec "dynamic"
 fi
 
 if [[ ${BUILD_STATIC} == true ]]; then
