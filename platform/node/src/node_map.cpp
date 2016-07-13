@@ -60,6 +60,7 @@ NAN_MODULE_INIT(NodeMap::Init) {
     Nan::SetPrototypeMethod(tpl, "addClass", AddClass);
     Nan::SetPrototypeMethod(tpl, "addSource", AddSource);
     Nan::SetPrototypeMethod(tpl, "addLayer", AddLayer);
+    Nan::SetPrototypeMethod(tpl, "removeLayer", RemoveLayer);
     Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
     Nan::SetPrototypeMethod(tpl, "setFilter", SetFilter);
@@ -529,6 +530,24 @@ NAN_METHOD(NodeMap::AddLayer) {
     }
 
     nodeMap->map->addLayer(std::move(*layer));
+}
+
+NAN_METHOD(NodeMap::RemoveLayer) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() != 1) {
+        return Nan::ThrowTypeError("One argument required");
+    }
+
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    nodeMap->map->removeLayer(*Nan::Utf8String(info[0]));
 }
 
 NAN_METHOD(NodeMap::SetLayoutProperty) {
