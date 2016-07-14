@@ -44,7 +44,7 @@
     }
 
     mbgl::FillAnnotation annotation { geometry };
-    annotation.opacity = { [delegate alphaForShapeAnnotation:self] };
+    annotation.opacity = { static_cast<float>([delegate alphaForShapeAnnotation:self]) };
     annotation.outlineColor = { [delegate strokeColorForShapeAnnotation:self] };
     annotation.color = { [delegate fillColorForPolygonAnnotation:self] };
 

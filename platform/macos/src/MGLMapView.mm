@@ -2097,11 +2097,11 @@ public:
 
 #pragma mark MGLMultiPointDelegate methods
 
-- (float)alphaForShapeAnnotation:(MGLShape *)annotation {
+- (double)alphaForShapeAnnotation:(MGLShape *)annotation {
     if (_delegateHasAlphasForShapeAnnotations) {
         return [self.delegate mapView:self alphaForShapeAnnotation:annotation];
     }
-    return 1.0f;
+    return 1.0;
 }
 
 - (mbgl::Color)strokeColorForShapeAnnotation:(MGLShape *)annotation {
@@ -2118,11 +2118,11 @@ public:
     return MGLColorObjectFromNSColor(color);
 }
 
-- (float)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation {
+- (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation {
     if (_delegateHasLineWidthsForShapeAnnotations) {
         return [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation];
     }
-    return 3.0f;
+    return 3.0;
 }
 
 #pragma mark MGLPopoverDelegate methods

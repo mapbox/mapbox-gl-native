@@ -247,7 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param annotation The annotation being rendered.
  @return A line width for the polyline, measured in points.
  */
-- (float)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
+- (CGFloat)mapView:(MGLMapView *)mapView lineWidthForPolylineAnnotation:(MGLPolyline *)annotation;
 
 #pragma mark Managing Annotation Views
 

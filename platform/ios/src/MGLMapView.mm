@@ -3033,13 +3033,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return annotationContext.annotationView;
 }
 
-- (float)alphaForShapeAnnotation:(MGLShape *)annotation
+- (double)alphaForShapeAnnotation:(MGLShape *)annotation
 {
     if (_delegateHasAlphasForShapeAnnotations)
     {
         return [self.delegate mapView:self alphaForShapeAnnotation:annotation];
     }
-    return 1.0f;
+    return 1.0;
 }
 
 - (mbgl::Color)strokeColorForShapeAnnotation:(MGLShape *)annotation
@@ -3058,13 +3058,13 @@ mbgl::Duration MGLDurationInSeconds(NSTimeInterval duration)
     return MGLColorObjectFromUIColor(color);
 }
 
-- (float)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation
+- (CGFloat)lineWidthForPolylineAnnotation:(MGLPolyline *)annotation
 {
     if (_delegateHasLineWidthsForShapeAnnotations)
     {
         return [self.delegate mapView:self lineWidthForPolylineAnnotation:(MGLPolyline *)annotation];
     }
-    return 3.0f;
+    return 3.0;
 }
 
 - (void)installAnnotationImage:(MGLAnnotationImage *)annotationImage
