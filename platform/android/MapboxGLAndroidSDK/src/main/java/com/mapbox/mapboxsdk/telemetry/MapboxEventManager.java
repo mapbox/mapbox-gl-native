@@ -637,7 +637,9 @@ public class MapboxEventManager {
                 // =========
                 JSONArray jsonArray = new JSONArray();
 
-                for (Hashtable<String, Object> evt : events) {
+                Vector<Hashtable<String, Object>> eventsClone = (Vector<Hashtable<String, Object>>) events.clone();
+
+                for (Hashtable<String, Object> evt : eventsClone) {
                     JSONObject jsonObject = new JSONObject();
 
                     // Build the JSON but only if there's a value for it in the evt
