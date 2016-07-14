@@ -503,13 +503,16 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, optional
     double height = nePixel.y - swPixel.y;
 
     // Calculate the zoom level.
-    double scaleX = getWidth() / width;
-    double scaleY = getHeight() / height;
-    if (padding && *padding) {
-        scaleX -= (padding->left + padding->right) / width;
-        scaleY -= (padding->top + padding->bottom) / height;
+    double minScale = INFINITY;
+    if (width > 0 || height > 0) {
+        double scaleX = getWidth() / width;
+        double scaleY = getHeight() / height;
+        if (padding && *padding) {
+            scaleX -= (padding->left + padding->right) / width;
+            scaleY -= (padding->top + padding->bottom) / height;
+        }
+        minScale = util::min(scaleX, scaleY);
     }
-    double minScale = ::fmin(scaleX, scaleY);
     double zoom = util::log2(getScale() * minScale);
     zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
 
