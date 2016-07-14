@@ -29,7 +29,10 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeConnectionFailed = 3,
 };
 
-/** The mode used to track the user location on the map. */
+/**
+ The mode used to track the user location on the map. Used with
+ `MGLMapView.userTrackingMode`.
+ */
 typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
     /** The map does not follow the user location. */
     MGLUserTrackingModeNone              = 0,
