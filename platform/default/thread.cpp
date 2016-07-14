@@ -26,7 +26,11 @@ void setCurrentThreadName(const std::string& name) {
     pthread_setname_np(name.c_str());
 #elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
 #if __GLIBC_PREREQ(2, 12)
-    pthread_setname_np(pthread_self(), name.c_str());
+    if (name.size() > 15) { // Linux hard limit (see manpages).
+        pthread_setname_np(pthread_self(), name.substr(0, 15).c_str());
+    } else {
+        pthread_setname_np(pthread_self(), name.c_str());
+    }
 #endif
 #endif
     (void)name;
