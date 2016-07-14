@@ -1441,6 +1441,17 @@ public class MapView extends FrameLayout {
     private void trackGestureEvent(@NonNull String gestureId, @NonNull float xCoordinate, @NonNull float yCoordinate) {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
 
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has a NaN lat or lon.  Returning.");
+            return;
+        }
+
+        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureEvent() has an Infinite lat or lon.  Returning.");
+            return;
+        }
+
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_CLICK);
         evt.put(MapboxEvent.ATTRIBUTE_CREATED, MapboxEventManager.generateCreateDate());
@@ -1461,6 +1472,17 @@ public class MapView extends FrameLayout {
      */
     private void trackGestureDragEndEvent(@NonNull float xCoordinate, @NonNull float yCoordinate) {
         LatLng tapLatLng = fromScreenLocation(new PointF(xCoordinate, yCoordinate));
+
+        // NaN and Infinite checks to prevent JSON errors at send to server time
+        if (Double.isNaN(tapLatLng.getLatitude()) ||  Double.isNaN(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has a NaN lat or lon.  Returning.");
+            return;
+        }
+
+        if (Double.isInfinite(tapLatLng.getLatitude()) ||  Double.isInfinite(tapLatLng.getLongitude())) {
+            Log.d(MapView.class.getSimpleName(), "trackGestureDragEndEvent() has an Infinite lat or lon.  Returning.");
+            return;
+        }
 
         Hashtable<String, Object> evt = new Hashtable<>();
         evt.put(MapboxEvent.ATTRIBUTE_EVENT, MapboxEvent.TYPE_MAP_DRAGEND);
