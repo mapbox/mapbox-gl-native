@@ -18,6 +18,8 @@ NAN_MODULE_INIT(NodeRequest::Init) {
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     tpl->SetClassName(Nan::New("Request").ToLocalChecked());
 
+    Nan::SetPrototypeMethod(tpl, "respond", Respond);
+
     constructor.Reset(tpl->GetFunction());
     Nan::Set(target, Nan::New("Request").ToLocalChecked(), tpl->GetFunction());
 }
@@ -45,8 +47,7 @@ v8::Handle<v8::Object> NodeRequest::Create(const mbgl::Resource& resource, mbgl:
 NAN_METHOD(NodeRequest::Respond) {
     using Error = mbgl::Response::Error;
 
-    // Move out of the object so callback() can only be fired once.
-    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Data().As<v8::Object>());
+    auto request = Nan::ObjectWrap::Unwrap<NodeRequest>(info.Holder());
     auto callback = std::move(request->callback);
     if (!callback) {
         info.GetReturnValue().SetUndefined();
