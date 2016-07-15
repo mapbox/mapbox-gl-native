@@ -53,8 +53,8 @@ std::vector<Resource> OfflineDownload::spriteResources(const style::Parser& pars
     std::vector<Resource> result;
 
     if (!parser.spriteURL.empty()) {
-        result.push_back(Resource::spriteImage(parser.spriteURL, definition.pixelRatio));
-        result.push_back(Resource::spriteJSON(parser.spriteURL, definition.pixelRatio));
+        result.push_back(Resource::spriteImage(parser.spriteURL, pixelRatio(definition)));
+        result.push_back(Resource::spriteJSON(parser.spriteURL, pixelRatio(definition)));
     }
 
     return result;
@@ -77,8 +77,8 @@ std::vector<Resource> OfflineDownload::glyphResources(const style::Parser& parse
 std::vector<Resource> OfflineDownload::tileResources(SourceType type, uint16_t tileSize, const Tileset& tileset) const {
     std::vector<Resource> result;
 
-    for (const auto& tile : definition.tileCover(type, tileSize, tileset.zoomRange)) {
-        result.push_back(Resource::tile(tileset.tiles[0], definition.pixelRatio, tile.x, tile.y, tile.z));
+    for (const auto& tile : tileCover(definition, type, tileSize, tileset.zoomRange)) {
+        result.push_back(Resource::tile(tileset.tiles[0], pixelRatio(definition), tile.x, tile.y, tile.z));
     }
 
     return result;
@@ -92,7 +92,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     OfflineRegionStatus result = offlineDatabase.getRegionCompletedStatus(id);
 
     result.requiredResourceCount++;
-    optional<Response> styleResponse = offlineDatabase.get(Resource::style(definition.styleURL));
+    optional<Response> styleResponse = offlineDatabase.get(Resource::style(styleURL(definition)));
     if (!styleResponse) {
         return result;
     }
@@ -153,7 +153,7 @@ void OfflineDownload::activateDownload() {
 
     requiredSourceURLs.clear();
 
-    ensureResource(Resource::style(definition.styleURL), [&] (Response styleResponse) {
+    ensureResource(Resource::style(styleURL(definition)), [&] (Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
