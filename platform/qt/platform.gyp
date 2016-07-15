@@ -47,7 +47,6 @@
         '../default/online_file_source.cpp',
         '../default/sqlite3.cpp',
         '../default/string_stdlib.cpp',
-        '../default/thread.cpp',
         'include/qmapbox.hpp',
         'include/qmapboxgl.hpp',
         'include/qquickmapboxgl.hpp',
@@ -168,16 +167,25 @@
         ['OS == "mac"', {
           'xcode_settings': {
             'OTHER_CPLUSPLUSFLAGS': [ '<@(cflags)' ],
-          }
+          },
+          'sources': [
+            '../darwin/src/nsthread.mm',
+          ],
         }, {
           'cflags_cc': [ '<@(cflags)' ],
+          'sources': [
+            '../default/thread.cpp',
+          ],
         }]
       ],
 
       'link_settings': {
         'conditions': [
           ['OS == "mac"', {
-            'libraries': [ '<@(libraries)' ],
+            'libraries': [
+              '<@(libraries)',
+              '$(SDKROOT)/System/Library/Frameworks/Cocoa.framework',
+            ],
             'xcode_settings': { 'OTHER_LDFLAGS': [ '<@(ldflags)' ] }
           }, {
             'libraries': [ '<@(libraries)', '<@(ldflags)' ],
