@@ -107,8 +107,10 @@ class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
 
+    bool operator()(const Feature&) const;
+
     template <class PropertyAccessor>
-    bool operator()(FeatureType type, PropertyAccessor accessor) const;
+    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
 };
 
 } // namespace style
