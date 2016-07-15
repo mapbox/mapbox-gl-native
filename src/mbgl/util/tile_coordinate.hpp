@@ -16,6 +16,11 @@ public:
         const double scale = std::pow(2, zoom - state.getZoom());
         return { state.project(latLng) * scale / double(util::tileSize), zoom };
     }
+    
+    LatLng toLatLng(const TransformState& state) const {
+        const double scale = std::pow(2, z - state.getZoom());
+        return state.unproject(p * double(util::tileSize) / scale);
+    }
 
     static TileCoordinate fromScreenCoordinate(const TransformState& state, double zoom, const ScreenCoordinate& point) {
         return fromLatLng(state, zoom, state.screenCoordinateToLatLng(point));
