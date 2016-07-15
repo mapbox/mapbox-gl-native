@@ -139,7 +139,11 @@ private:
 
     void setDepthSublayer(int n);
 
+#if defined(DEBUG)
     bool isOverdraw() const { return frame.debugOptions & MapDebugOptions::Overdraw; }
+#else
+    bool isOverdraw() const { return false; }
+#endif
 
     mat4 projMatrix;
 
@@ -174,7 +178,9 @@ private:
     FrameHistory frameHistory;
 
     std::unique_ptr<Shaders> shaders;
+#if defined(DEBUG)
     std::unique_ptr<Shaders> overdrawShaders;
+#endif
 
     // Set up the stencil quad we're using to generate the stencil mask.
     StaticVertexBuffer tileStencilBuffer {

@@ -46,7 +46,9 @@ Painter::Painter(const TransformState& state_,
     gl::debugging::enable();
 
     shaders = std::make_unique<Shaders>(store);
+#if defined(DEBUG)
     overdrawShaders = std::make_unique<Shaders>(store, Shader::Overdraw);
+#endif
 
     // Reset GL values
     config.setDirty();
@@ -69,7 +71,11 @@ void Painter::render(const Style& style, const FrameData& frame_, SpriteAtlas& a
     frame = frame_;
 
     PaintParameters parameters {
+#if defined(DEBUG)
         isOverdraw() ? *overdrawShaders : *shaders
+#else
+        *shaders
+#endif
     };
 
     glyphAtlas = style.glyphAtlas.get();
