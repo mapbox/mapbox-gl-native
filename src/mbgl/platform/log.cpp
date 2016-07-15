@@ -50,7 +50,7 @@ void Log::record(EventSeverity severity, Event event, int64_t code, const std::s
 
     std::stringstream logStream;
 
-    logStream << "{" << util::getCurrentThreadName() << "}";
+    logStream << "{" << platform::getCurrentThreadName() << "}";
     logStream << "[" << Enum<Event>::toString(event) << "]";
 
     if (code >= 0) {

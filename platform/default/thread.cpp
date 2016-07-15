@@ -1,15 +1,36 @@
 #include <mbgl/platform/platform.hpp>
-
 #include <mbgl/platform/log.hpp>
 
+#include <string>
+
 #include <pthread.h>
-#ifdef __linux__
-#include <linux/sched.h>
-#endif
 #include <sched.h>
 
 namespace mbgl {
 namespace platform {
+
+std::string getCurrentThreadName() {
+    char name[32] = "unknown";
+#if defined(__APPLE__)
+    pthread_getname_np(pthread_self(), name, sizeof(name));
+#elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#if __GLIBC_PREREQ(2, 12)
+    pthread_getname_np(pthread_self(), name, sizeof(name));
+#endif
+#endif
+    return name;
+}
+
+void setCurrentThreadName(const std::string& name) {
+#if defined(__APPLE__)
+    pthread_setname_np(name.c_str());
+#elif defined(__GLIBC__) && defined(__GLIBC_PREREQ)
+#if __GLIBC_PREREQ(2, 12)
+    pthread_setname_np(pthread_self(), name.c_str());
+#endif
+#endif
+    (void)name;
+}
 
 void makeThreadLowPriority() {
 #ifdef SCHED_IDLE
