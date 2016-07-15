@@ -1,9 +1,24 @@
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
+#include <mbgl/util/geometry.hpp>
 #include <mbgl/map/transform_state.hpp>
 
+#include <mapbox/earcut.hpp>
+
 #include <functional>
+
+namespace mapbox {
+namespace util {
+    template <> struct nth<0, mbgl::Point<double>> {
+        static double get(const mbgl::Point<double>& t) { return t.x; };
+    };
+    
+    template <> struct nth<1, mbgl::Point<double>> {
+        static double get(const mbgl::Point<double>& t) { return t.y; };
+    };
+} // namespace util
+} // namespace mapbox
 
 namespace mbgl {
 
@@ -24,6 +39,11 @@ struct edge {
         y1 = b.y;
         dx = b.x - a.x;
         dy = b.y - a.y;
+        
+        assert(std::isfinite(x0));
+        assert(std::isfinite(x1));
+        assert(std::isfinite(y0));
+        assert(std::isfinite(y1));
     }
 };
 
@@ -74,6 +94,22 @@ static void scanTriangle(const Point<double>& a, const Point<double>& b, const P
 namespace util {
 
 namespace {
+    
+std::pair<size_t, size_t> ringAndPointIndicesFromFlatIndex(const Polygon<double>& polygon, size_t flatIndex) {
+    size_t ringIndex = 0;
+    while (flatIndex >= polygon[ringIndex].size()) {
+        flatIndex -= polygon[ringIndex].size();
+        ++ringIndex;
+    }
+    assert(ringIndex < polygon.size());
+    assert(flatIndex < polygon[ringIndex].size());
+    return std::make_pair(ringIndex, flatIndex);
+}
+    
+const Point<double>& pointAtFlatIndex(const Polygon<double>& polygon, size_t flatIndex) {
+    std::pair<size_t, size_t> ringAndPointIndices = ringAndPointIndicesFromFlatIndex(polygon, flatIndex);
+    return polygon[ringAndPointIndices.first][ringAndPointIndices.second];
+}
 
 std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
                                        const Point<double>& tr,
@@ -124,6 +160,70 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
     }
     return result;
 }
+    
+std::vector<UnwrappedTileID> tileCover(const Polygon<double> &poly, const Point<double> &center, int32_t z) {
+    const int32_t tiles = 1 << z;
+    
+    struct ID {
+        int32_t x, y;
+        double sqDist;
+    };
+    
+    std::vector<ID> t;
+    
+    auto scanLine = [&](int32_t x0, int32_t x1, int32_t y) {
+        int32_t x;
+        if (y >= 0 && y <= tiles) {
+            for (x = x0; x < x1; ++x) {
+                const auto dx = x + 0.5 - center.x, dy = y + 0.5 - center.y;
+                t.emplace_back(ID{ x, y, dx * dx + dy * dy });
+            }
+        }
+    };
+    
+    std::vector<uint32_t> indices = mapbox::earcut(poly);
+    assert(indices.size() % 3 == 0);
+    assert(indices.size() > 0);
+    
+    for (size_t i = 0; i < indices.size(); i += 3) {
+        // This function is sloooow but I want to just get things working before figuring out how to optimize it
+        Point<double> a = pointAtFlatIndex(poly, indices[i]);
+        Point<double> b = pointAtFlatIndex(poly, indices[i + 1]);
+        Point<double> c = pointAtFlatIndex(poly, indices[i + 2]);
+        scanTriangle(a, b, c, 0, tiles, scanLine);
+    }
+    
+    // Sort first by distance, then by x/y.
+    std::sort(t.begin(), t.end(), [](const ID& a, const ID& b) {
+        return (a.sqDist != b.sqDist) ? (a.sqDist < b.sqDist)
+        : ((a.x != b.x) ? (a.x < b.x) : (a.y < b.y));
+    });
+    
+    // Erase duplicate tile IDs (they typically occur at the common side of both triangles).
+    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
+        return a.x == b.x && a.y == b.y;
+    }), t.end());
+    
+    std::vector<UnwrappedTileID> result;
+    for (const auto& id : t) {
+        result.emplace_back(z, id.x, id.y);
+    }
+    return result;
+}
+    
+Polygon<double> fromLatLng(const Polygon<double>& polygon, int32_t z) {
+    TransformState state;
+    Polygon<double> result;
+    for (const LinearRing<double>& ring : polygon) {
+        result.emplace_back();
+        for (const Point<double>& point : ring) {
+            result.back().push_back(TileCoordinate::fromLatLng(state, z, { point.y, point.x }).p);
+            assert(std::isfinite(result.back().back().x));
+            assert(std::isfinite(result.back().back().y));
+        }
+    }
+    return result;
+}
 
 } // namespace
 
@@ -155,6 +255,12 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         TileCoordinate::fromLatLng(state, z, bounds.southwest()).p,
         TileCoordinate::fromLatLng(state, z, bounds.center()).p,
         z);
+}
+    
+std::vector<UnwrappedTileID> tileCover(const Polygon<double>& polygon, int32_t z) {
+    if (polygon.size() == 0) { return {}; }
+    Point<double> center;
+    return tileCover(fromLatLng(polygon, z), center, z);
 }
 
 std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
