@@ -10,7 +10,7 @@ void BucketParameters::eachFilteredFeature(const Filter& filter,
     auto name = layer.getName();
     for (std::size_t i = 0; !cancelled() && i < layer.featureCount(); i++) {
         auto feature = layer.getFeature(i);
-        if (!filter(feature->getType(), [&] (const auto& key) { return feature->getValue(key); }))
+        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
         function(*feature, i, name);
     }

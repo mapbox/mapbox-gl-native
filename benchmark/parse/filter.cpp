@@ -28,7 +28,7 @@ static void Parse_EvaluateFilter(benchmark::State& state) {
     const PropertyMap properties = { { "foo", std::string("bar") } };
 
     while (state.KeepRunning()) {
-        filter(FeatureType::Unknown, [&] (const std::string& key) -> optional<Value> {
+        filter(FeatureType::Unknown, {}, [&] (const std::string& key) -> optional<Value> {
             auto it = properties.find(key);
             if (it == properties.end())
                 return {};

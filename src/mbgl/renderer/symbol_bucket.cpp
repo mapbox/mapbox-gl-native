@@ -119,7 +119,7 @@ void SymbolBucket::parseFeatures(const GeometryTileLayer& layer, const Filter& f
     const GLsizei featureCount = static_cast<GLsizei>(layer.featureCount());
     for (GLsizei i = 0; i < featureCount; i++) {
         auto feature = layer.getFeature(i);
-        if (!filter(feature->getType(), [&] (const auto& key) { return feature->getValue(key); }))
+        if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
 
         SymbolFeature ft;
