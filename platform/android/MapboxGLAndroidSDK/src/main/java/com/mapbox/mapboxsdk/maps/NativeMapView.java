@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
+import com.mapbox.mapboxsdk.offline.OfflineManager;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ final class NativeMapView {
 
     public NativeMapView(MapView mapView) {
         Context context = mapView.getContext();
-        String dataPath = context.getFilesDir().getAbsolutePath();
+        String dataPath = OfflineManager.getDatabasePath(context);
 
         // With the availability of offline, we're unifying the ambient (cache) and the offline
         // databases to be in the same folder, outside cache, to avoid automatic deletion from

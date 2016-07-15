@@ -31,6 +31,16 @@ public class MapboxConstants {
     public static final String KEY_META_DATA_STAGING_ACCESS_TOKEN = "com.mapbox.TestEventsAccessToken";
 
     /**
+     * Key used to switch storage to external in AndroidManifest.xml
+     */
+    public final static String KEY_META_DATA_SET_STORAGE_EXTERNAL = "com.mapbox.SetStorageExternal";
+
+    /**
+     * Default value for KEY_META_DATA_SET_STORAGE_EXTERNAL (default is internal storage)
+     */
+    public final static boolean DEFAULT_SET_STORAGE_EXTERNAL = false;
+
+    /**
      * Default animation time
      */
     public static final int ANIMATION_DURATION = 300;
