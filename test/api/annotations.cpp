@@ -68,6 +68,21 @@ TEST(Annotations, FillAnnotation) {
     test.checkRendering("fill_annotation");
 }
 
+TEST(Annotations, OverlappingFillAnnotation) {
+    AnnotationTest test;
+
+    Polygon<double> polygon = {{ {{ { 0, 0 }, { 0, 45 }, { 45, 45 }, { 45, 0 } }} }};
+    FillAnnotation underlaidAnnotation { polygon };
+    underlaidAnnotation.color = { { 0, 255, 0, 1 } };
+    FillAnnotation overlaidAnnotation { polygon };
+    overlaidAnnotation.color = { { 255, 0, 0, 1 } };
+
+    test.map.setStyleJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotation(underlaidAnnotation);
+    test.map.addAnnotation(overlaidAnnotation);
+    test.checkRendering("overlapping_fill_annotation");
+}
+
 TEST(Annotations, StyleSourcedShapeAnnotation) {
     AnnotationTest test;
 
