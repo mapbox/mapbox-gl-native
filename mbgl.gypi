@@ -196,6 +196,8 @@
           '<@(geometry_cflags)',
           '<@(geojson_cflags)',
           '<@(geojsonvt_cflags)',
+          '<@(supercluster_cflags)',
+          '<@(kdbush_cflags)',
           '<@(rapidjson_cflags)',
           '<@(variant_cflags)',
           '<@(earcut_cflags)',
