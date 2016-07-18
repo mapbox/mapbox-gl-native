@@ -86,7 +86,10 @@ public:
     // Renders the red debug frame around a tile, visualizing its perimeter.
     void renderDebugFrame(const mat4 &matrix);
 
+#if defined(DEBUG)
+    // Renders tile clip boundaries, using stencil buffer to calculate fill color.
     void renderClipMasks();
+#endif
 
     void renderDebugText(Tile&, const mat4&);
     void renderFill(PaintParameters&, FillBucket&, const style::FillLayer&, const RenderTile&);
