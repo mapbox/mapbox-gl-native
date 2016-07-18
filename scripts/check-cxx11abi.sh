@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 if [ ! `uname -s` = 'Linux' ]; then
-    echo ""
+    echo -n "OFF"
     exit 0
 fi
 
@@ -13,7 +13,7 @@ fi
 LIBSTDCPP=$(ldd $(dirname $0)/check-cxx11abi.dat |grep libstdc++ |cut -d' ' -f3)
 
 if [ $(readelf -Ws $LIBSTDCPP |c++filt |grep -c ::__cxx11::) -gt 0 ]; then
-    echo "-cxx11abi"
+    echo -n "ON"
 else
-    echo ""
+    echo -n "OFF"
 fi

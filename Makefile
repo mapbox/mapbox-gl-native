@@ -257,7 +257,8 @@ $(LINUX_BUILD): $(BUILD_DEPS)
 	mkdir -p $(LINUX_OUTPUT_PATH)
 	(cd $(LINUX_OUTPUT_PATH) && cmake -G Ninja ../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh))
 
 .PHONY: linux
 linux: glfw-app render offline
@@ -337,7 +338,8 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DBUILD_PLATFORM=$(BUILD_PLATFORM) \
 		-DMBGL_PLATFORM=qt \
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
-		-DWITH_QT_4=${WITH_QT_4})
+		-DWITH_QT_4=${WITH_QT_4} \
+		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh))
 
 .PHONY: qt-app
 qt-app: $(QT_BUILD)
