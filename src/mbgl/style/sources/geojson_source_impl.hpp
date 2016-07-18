@@ -12,7 +12,7 @@ namespace style {
 
 class GeoJSONSource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, Source&);
+    Impl(std::string id, Source&, const GeoJSONOptions&);
     ~Impl() final;
 
     void setURL(std::string);
@@ -34,6 +34,8 @@ private:
 
     variant<std::string, GeoJSON> urlOrGeoJSON;
     std::unique_ptr<AsyncRequest> req;
+
+    GeoJSONOptions options;
 };
 
 } // namespace style

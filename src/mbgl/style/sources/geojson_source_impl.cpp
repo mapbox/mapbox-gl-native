@@ -15,29 +15,31 @@
 
 #include <sstream>
 
-using namespace mapbox::geojsonvt;
-
 namespace mbgl {
 namespace style {
 namespace conversion {
 
 template <>
-Result<GeoJSON> convertGeoJSON(const JSValue& value) {
-    Options options;
-    options.buffer = util::EXTENT / util::tileSize * 128;
-    options.extent = util::EXTENT;
+Result<GeoJSON> convertGeoJSON(const JSValue& value, const GeoJSONOptions& options) {
+    double scale = util::EXTENT / util::tileSize;
+
+    mapbox::geojsonvt::Options vtOptions;
+    vtOptions.maxZoom = options.maxzoom;
+    vtOptions.extent = util::EXTENT;
+    vtOptions.buffer = std::round(scale * options.buffer);
+    vtOptions.tolerance = scale * options.tolerance;
 
     try {
         const auto geojson = mapbox::geojson::convert(value);
-        return GeoJSON { std::make_unique<GeoJSONVT>(geojson, options) };
+        return GeoJSON { std::make_unique<mapbox::geojsonvt::GeoJSONVT>(geojson, vtOptions) };
     } catch (const std::exception& ex) {
         return Error { ex.what() };
     }
 }
 } // namespace conversion
 
-GeoJSONSource::Impl::Impl(std::string id_, Source& base_)
-    : Source::Impl(SourceType::GeoJSON, std::move(id_), base_) {
+GeoJSONSource::Impl::Impl(std::string id_, Source& base_, const GeoJSONOptions& options_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_), base_), options(options_) {
 }
 
 GeoJSONSource::Impl::~Impl() = default;
@@ -81,13 +83,13 @@ void GeoJSONSource::Impl::load(FileSource& fileSource) {
 
             invalidateTiles();
 
-            conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d);
+            conversion::Result<GeoJSON> geoJSON = conversion::convertGeoJSON<JSValue>(d, this->options);
             if (!geoJSON) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s", geoJSON.error().message.c_str());
                 // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
                 // tiles to load.
                 mapbox::geojson::feature_collection features;
-                urlOrGeoJSON = GeoJSON { std::make_unique<GeoJSONVT>(features) };
+                urlOrGeoJSON = GeoJSON { std::make_unique<mapbox::geojsonvt::GeoJSONVT>(features) };
             } else {
                 urlOrGeoJSON = std::move(*geoJSON);
             }
