@@ -726,7 +726,10 @@ public class MapboxEventManager {
                         .add("events.mapbox.com", "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
                         .build();
 
-                OkHttpClient client = new OkHttpClient.Builder().certificatePinner(certificatePinner).build();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .certificatePinner(certificatePinner)
+                        .addInterceptor(new GzipRequestInterceptor())
+                        .build();
                 RequestBody body = RequestBody.create(JSON, jsonArray.toString());
 
                 String url = eventsURL + "/events/v2?access_token=" + accessToken;
