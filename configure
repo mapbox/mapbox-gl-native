@@ -119,7 +119,9 @@ print_flags nunicode static_libs cflags ldflags
 print_flags libzip static_libs cflags ldflags
 print_flags geometry cflags
 print_flags geojson static_libs cflags ldflags
-print_flags geojsonvt static_libs cflags ldflags
+print_flags geojsonvt cflags
+print_flags supercluster cflags
+print_flags kdbush cflags
 print_flags variant cflags
 print_flags rapidjson static_libs cflags ldflags
 print_flags gtest static_libs cflags ldflags
