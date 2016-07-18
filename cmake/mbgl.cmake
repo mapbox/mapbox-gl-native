@@ -7,11 +7,15 @@ if (NOT DEFINED MBGL_PLATFORM)
 endif()
 
 if (NOT DEFINED ENV{MASON_PLATFORM})
-    if(MBGL_PLATFORM STREQUAL "macos")
-        set(ENV{MASON_PLATFORM} "osx")
+    if(MBGL_PLATFORM STREQUAL "qt")
+        set(ENV{MASON_PLATFORM} ${BUILD_PLATFORM})
     else()
         set(ENV{MASON_PLATFORM} ${MBGL_PLATFORM})
     endif()
+endif()
+
+if ("$ENV{MASON_PLATFORM}" STREQUAL "macos")
+    set(ENV{MASON_PLATFORM} "osx")
 endif()
 
 set(MBGL_GENERATED ${CMAKE_BINARY_DIR}/generated/${CMAKE_CFG_INTDIR})

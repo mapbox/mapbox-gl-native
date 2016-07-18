@@ -12,7 +12,11 @@
 // Needs to be on the global namespace
 // for linking purposes.
 void initResources() {
+#if defined(__APPLE__)
+    Q_INIT_RESOURCE(platform_qt_qmapbox);
+#else
     Q_INIT_RESOURCE(qmapbox);
+#endif
 }
 
 namespace mbgl {

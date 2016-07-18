@@ -9,10 +9,12 @@ endif
 ifeq ($(shell uname -s), Darwin)
   HOST_PLATFORM = macos
   HOST_PLATFORM_VERSION = $(shell uname -m)
+  NINJA ?= platform/macos/ninja
   export JOBS ?= $(shell sysctl -n hw.ncpu)
 else ifeq ($(shell uname -s), Linux)
   HOST_PLATFORM = linux
   HOST_PLATFORM_VERSION = $(shell uname -m)
+  NINJA ?= platform/linux/ninja
   export JOBS ?= $(shell grep --count processor /proc/cpuinfo)
 else
   $(error Cannot determine host platform)
@@ -250,7 +252,6 @@ ifeq ($(HOST_PLATFORM), linux)
 export PATH := $(shell pwd)/platform/linux:$(PATH)
 export LINUX_OUTPUT_PATH = build/linux-$(shell uname -m)/$(BUILDTYPE)
 LINUX_BUILD = $(LINUX_OUTPUT_PATH)/build.ninja
-NINJA = platform/linux/ninja
 
 $(LINUX_BUILD): $(BUILD_DEPS)
 	mkdir -p $(LINUX_OUTPUT_PATH)
@@ -322,6 +323,47 @@ check: compdb clang-tools
 	scripts/clang-tools.sh $(LINUX_OUTPUT_PATH) --diff
 
 endif
+
+#### Qt targets #####################################################
+
+export QT_OUTPUT_PATH = build/qt-$(BUILD_PLATFORM)-$(BUILD_PLATFORM_VERSION)/$(BUILDTYPE)
+QT_BUILD = $(QT_OUTPUT_PATH)/build.ninja
+
+$(QT_BUILD): $(BUILD_DEPS)
+	mkdir -p $(QT_OUTPUT_PATH)
+	(cd $(QT_OUTPUT_PATH) && cmake -G Ninja ../../.. \
+		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DBUILD_PLATFORM=$(BUILD_PLATFORM) \
+		-DMBGL_PLATFORM=qt \
+		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
+		-DWITH_QT_4=${WITH_QT_4})
+
+.PHONY: qt-app
+qt-app: $(QT_BUILD)
+	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt
+
+.PHONY: run-qt-app
+run-qt-app: qt-app
+	$(QT_OUTPUT_PATH)/mbgl-qt
+
+.PHONY: qt-qml-app
+qt-qml-app: $(QT_BUILD)
+	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-qt-qml
+
+.PHONY: run-qt-qml-app
+run-qt-qml-app: qt-qml-app
+	$(QT_OUTPUT_PATH)/mbgl-qt-qml
+
+.PHONY: qt-test
+qt-test: $(QT_BUILD)
+	$(NINJA) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-test
+
+run-qt-test-%: qt-test
+	$(QT_OUTPUT_PATH)/mbgl-test --gtest_catch_exceptions=0 --gtest_filter=$*
+
+.PHONY: run-qt-test
+run-qt-test: run-qt-test-*
 
 #### Node targets ##############################################################
 
